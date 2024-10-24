@@ -1,0 +1,71 @@
+#
+#   Copyright (c) 2021 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+if CHIP
+
+config MBEDTLS
+    default y
+
+config MBEDTLS_ENTROPY_ENABLED
+    default y
+
+config MBEDTLS_ENTROPY_ENABLED
+    default y
+
+config MBEDTLS_ZEPHYR_ENTROPY
+    default y
+
+config MBEDTLS_ENABLE_HEAP
+    default y
+
+config MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
+    default y
+
+config MBEDTLS_ECP_ALL_ENABLED
+    default y
+
+config MBEDTLS_ECP_C
+    default y 
+
+config MBEDTLS_PKCS5_C
+    default y
+
+config MBEDTLS_HKDF_C
+    default y
+
+config MBEDTLS_CIPHER_CCM_ENABLED
+    default y
+
+config MBEDTLS_CTR_DRBG_ENABLED
+    default y 
+
+config MBEDTLS_CIPHER_AES_ENABLED
+    default y
+
+config MBEDTLS_ECDH_C
+    default y
+
+config MBEDTLS_ECDSA_C
+    default y
+
+config MBEDTLS_X509_CSR_WRITE_C
+    default y
+
+config MBEDTLS_PK_WRITE_C
+    default y
+
+endif #CHIP
+

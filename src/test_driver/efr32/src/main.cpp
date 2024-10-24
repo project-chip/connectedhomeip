@@ -19,12 +19,12 @@
 #include <pw_unit_test/unit_test_service.h>
 
 #include <AppConfig.h>
-#include <FreeRTOS.h>
 #include <PigweedLogger.h>
 #include <PigweedLoggerMutex.h>
+#include <ProvisionManager.h>
+#include <cmsis_os2.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <cstring>
-#include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/UnitTest.h>
@@ -34,11 +34,12 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <sl_cmsis_os2_common.h>
 #include <sl_system_init.h>
 #include <sl_system_kernel.h>
-#include <task.h>
 
-#include "SilabsDeviceDataProvider.h"
+using namespace chip;
+using namespace chip::DeviceLayer;
 
 extern "C" int printf(const char * format, ...)
 {
@@ -65,13 +66,17 @@ public:
 } // namespace chip::rpc
 
 namespace {
-
-#define TEST_TASK_STACK_SIZE 16 * 1024
-#define TEST_TASK_PRIORITY 1
-
-static TaskHandle_t sTestTaskHandle;
-StaticTask_t sTestTaskBuffer;
-StackType_t sTestTaskStack[TEST_TASK_STACK_SIZE];
+osThreadId_t sTestTaskHandle;
+osThread_t testTaskControlBlock;
+constexpr uint32_t kTestTaskStackSize = 16 * 1024;
+uint8_t testTaskStack[kTestTaskStackSize];
+constexpr osThreadAttr_t kTestTaskAttr = { .name       = "TestDriver",
+                                           .attr_bits  = osThreadDetached,
+                                           .cb_mem     = &testTaskControlBlock,
+                                           .cb_size    = osThreadCbSize,
+                                           .stack_mem  = testTaskStack,
+                                           .stack_size = kTestTaskStackSize,
+                                           .priority   = osPriorityNormal };
 
 chip::rpc::NlTest nl_test_service;
 pw::unit_test::UnitTestService unit_test_service;
@@ -91,26 +96,27 @@ void RunRpcService(void *)
 int main(void)
 {
     sl_system_init();
-    chip::DeviceLayer::Silabs::GetPlatform().Init();
+    Silabs::GetPlatform().Init();
     PigweedLogger::init();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
-    chip::Platform::MemoryInit();
+    Platform::MemoryInit();
+    PlatformMgr().InitChipStack();
 
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    // required for inits tied to the event loop
-    chip::DeviceLayer::SetDeviceInstanceInfoProvider(&chip::DeviceLayer::Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
-    chip::DeviceLayer::SetCommissionableDataProvider(&chip::DeviceLayer::Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
+    // Init Provision Manager and provider instanaces. Required for inits tied to the event loop
+    Silabs::Provision::Manager & provision = Silabs::Provision::Manager::GetInstance();
+    provision.Init();
+    SetDeviceInstanceInfoProvider(&provision.GetStorage());
+    SetCommissionableDataProvider(&provision.GetStorage());
 
-    SILABS_LOG("***** CHIP EFR32 device tests *****\r\n");
+    ChipLogProgress(AppServer, "***** CHIP EFR32 device tests *****\r\n");
 
     // Start RPC service which runs the tests.
-    sTestTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TEST_TASK", ArraySize(sTestTaskStack), nullptr, TEST_TASK_PRIORITY,
-                                        sTestTaskStack, &sTestTaskBuffer);
-    SILABS_LOG("Starting FreeRTOS scheduler");
+    sTestTaskHandle = osThreadNew(RunRpcService, nullptr, &kTestTaskAttr);
+    ChipLogProgress(AppServer, "Starting Kernel");
     sl_system_kernel_start();
 
     // Should never get here.
-    SILABS_LOG("vTaskStartScheduler() failed");
+    ChipLogProgress(AppServer, "sl_system_kernel_start() failed");
     return -1;
 }

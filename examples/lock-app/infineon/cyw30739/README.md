@@ -12,7 +12,7 @@ An example showing the use of Matter on the Infineon CYW30739 platform.
     -   [Installing ModusToolbox™ Software](#installing-modustoolbox-software)
         -   [ModusToolbox™ tools package](#modustoolbox-tools-package)
             -   [Note for WSL (Windows Subsystem for Linux)](#note-for-wsl-windows-subsystem-for-linux)
-        -   [Checkout Submodules](#checkout-submodules)
+        -   [Checkout Submodules and Bootstrap](#checkout-submodules-and-bootstrap)
     -   [Building](#building)
     -   [Factory Data](#factory-data)
         -   [Commissionable Data](#commissionable-data)
@@ -65,7 +65,7 @@ If you are using WSL, please ensure you have installed the ModusToolbox™
 Software for Linux. Running Windows tools directly from the WSL command line
 would cause path resolution failure in the build process.
 
-### Checkout Submodules
+### Checkout Submodules and Bootstrap
 
 Before building the example, check out the Matter repository and sync submodules
 using the following command:
@@ -73,6 +73,7 @@ using the following command:
 ```bash
 $ cd ~/connectedhomeip
 $ scripts/checkout_submodules.py --platform infineon
+$ bash scripts/bootstrap.sh -p all,infineon
 ```
 
 ## Building
@@ -211,7 +212,7 @@ Put the CYW30739 in to the recovery mode before running the flash script.
 
 -   It is assumed here that you already have an OpenThread border router
     configured and running. If not see the following guide
-    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
     for more information on how to setup a border router on a raspberryPi.
 
 -   You can provision and control the device using the Python controller REPL,

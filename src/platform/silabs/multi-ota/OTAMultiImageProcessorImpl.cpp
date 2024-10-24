@@ -32,7 +32,7 @@ static chip::OTAMultiImageProcessorImpl gImageProcessor;
 
 extern "C" {
 #include "btl_interface.h"
-#include "em_bus.h" // For CORE_CRITICAL_SECTION
+#include "sl_core.h"
 #if SL_WIFI
 #include "spi_multiplex.h"
 #endif // SL_WIFI
@@ -42,7 +42,7 @@ namespace chip {
 
 CHIP_ERROR OTAMultiImageProcessorImpl::Init(OTADownloader * downloader)
 {
-    ReturnErrorCodeIf(downloader == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(downloader != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     gImageProcessor.SetOTADownloader(downloader);
 
@@ -297,7 +297,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ConfirmCurrentImage()
     uint32_t targetVersion;
 
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    ReturnErrorCodeIf(requestor == nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INTERNAL);
 
     targetVersion = requestor->GetTargetVersion();
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
@@ -419,9 +419,6 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     imageProcessor->mAccumulator.Clear();
 
     ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
-
-    // TODO: check where to put this
-    // ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
 
     // This reboots the device
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)

@@ -20,6 +20,7 @@
 #include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/ClusterEnums.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentData.h>
@@ -33,11 +34,24 @@ using SymmetricKeystore = SessionKeystore;
 
 namespace chip {
 
-inline constexpr size_t kICDMonitoringBufferSize = 60;
+static constexpr size_t MaxICDMonitoringEntrySize()
+{
+    // All the fields added together
+    return TLV::EstimateStructOverhead(sizeof(NodeId) /*checkInNodeID*/, sizeof(uint64_t) /*monitoredSubject*/,
+                                       sizeof(Crypto::Symmetric128BitsKeyByteArray) /*aes_key_handle*/,
+                                       sizeof(Crypto::Symmetric128BitsKeyByteArray) /*hmac_key_handle*/,
+                                       sizeof(uint8_t) /*client_type*/) *
+        // Provide 50% extra space to make a firmware upgrade that starts storing
+        // more data followed by a downgrade work easily and reliably.
+        // The 50% number is chosen fairly randomly; storage increases larger than that are
+        // possible but need to be staged carefully.
+        3 / 2;
+}
+
+inline constexpr size_t kICDMonitoringBufferSize = MaxICDMonitoringEntrySize();
 
 struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
 {
-
     ICDMonitoringEntry(FabricIndex fabric = kUndefinedFabricIndex, NodeId nodeId = kUndefinedNodeId)
     {
         this->fabricIndex      = fabric;
@@ -101,14 +115,15 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
      */
     bool IsKeyEquivalent(ByteSpan keyData);
 
-    chip::FabricIndex fabricIndex                 = kUndefinedFabricIndex;
-    chip::NodeId checkInNodeID                    = kUndefinedNodeId;
-    uint64_t monitoredSubject                     = static_cast<uint64_t>(0);
-    Crypto::Aes128KeyHandle aesKeyHandle          = Crypto::Aes128KeyHandle();
-    Crypto::Hmac128KeyHandle hmacKeyHandle        = Crypto::Hmac128KeyHandle();
-    bool keyHandleValid                           = false;
-    uint16_t index                                = 0;
-    Crypto::SymmetricKeystore * symmetricKeystore = nullptr;
+    chip::FabricIndex fabricIndex                           = kUndefinedFabricIndex;
+    chip::NodeId checkInNodeID                              = kUndefinedNodeId;
+    uint64_t monitoredSubject                               = static_cast<uint64_t>(0);
+    app::Clusters::IcdManagement::ClientTypeEnum clientType = app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
+    Crypto::Aes128KeyHandle aesKeyHandle                    = Crypto::Aes128KeyHandle();
+    Crypto::Hmac128KeyHandle hmacKeyHandle                  = Crypto::Hmac128KeyHandle();
+    bool keyHandleValid                                     = false;
+    uint16_t index                                          = 0;
+    Crypto::SymmetricKeystore * symmetricKeystore           = nullptr;
 };
 
 /**

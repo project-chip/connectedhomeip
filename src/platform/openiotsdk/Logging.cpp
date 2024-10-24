@@ -81,13 +81,6 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     DeviceLayer::OnLogOutput();
 }
 
-void ois_logging_init()
-{
-#if defined(NDEBUG) && CHIP_CONFIG_TEST == 0
-    SetLogFilter(LogCategory::kLogCategory_Progress);
-#endif
-}
-
 } // namespace Platform
 } // namespace Logging
 } // namespace chip

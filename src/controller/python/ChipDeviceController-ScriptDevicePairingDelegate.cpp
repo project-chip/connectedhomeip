@@ -188,9 +188,11 @@ ScriptDevicePairingDelegate::GetOpenWindowCallback(Controller::CommissioningWind
 void ScriptDevicePairingDelegate::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icdCounter)
 {
     app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = nodeId;
+    clientInfo.peer_node     = nodeId;
+    clientInfo.check_in_node = chip::ScopedNodeId(sCommissioningParameters.GetICDCheckInNodeId().Value(), nodeId.GetFabricIndex());
     clientInfo.monitored_subject = sCommissioningParameters.GetICDMonitoredSubject().Value();
     clientInfo.start_icd_counter = icdCounter;
+    clientInfo.client_type       = sCommissioningParameters.GetICDClientType().Value();
 
     CHIP_ERROR err = sICDClientStorage.SetKey(clientInfo, ByteSpan(sICDSymmetricKey));
     if (err == CHIP_NO_ERROR)

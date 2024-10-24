@@ -76,6 +76,7 @@ public:
     {
         kButtonId_ExampleAction = 1,
         kButtonId_FactoryReset,
+        kButtonId_StartWiFi,
         kButtonId_StartThread,
         kButtonId_StartBleAdv
     } ButtonId;
@@ -102,9 +103,12 @@ protected:
     static void StartBleAdvButtonEventHandler(void);
     static void StartBleAdvHandler(AppEvent * aEvent);
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     static void StartThreadButtonEventHandler(void);
     static void StartThreadHandler(AppEvent * aEvent);
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    static void StartWiFiButtonEventHandler(void);
+    static void StartWiFiHandler(AppEvent * aEvent);
 #endif
 
     static void ExampleActionButtonEventHandler(void);

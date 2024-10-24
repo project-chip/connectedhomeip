@@ -47,7 +47,7 @@
 #include <cybsp.h>
 #include <cyhal.h>
 
-void init_p6Platform(void)
+void init_psoc6Platform(void)
 {
     /* Initialize the board support package */
     cybsp_init();

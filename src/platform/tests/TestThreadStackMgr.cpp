@@ -18,7 +18,9 @@
 #include <assert.h>
 #include <memory>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ThreadOperationalDataset.h>
 

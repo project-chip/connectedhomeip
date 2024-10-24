@@ -165,90 +165,35 @@ template("tizen_sdk_package") {
   }
 }
 
-# Create ISO image for Tizen QEMU.
-#
-# Parameters:
-#   runner: Path to the Tizen QEMU runner script.
-#   assets: List of assets to copy to the ISO image.
-template("tizen_qemu_mkisofs") {
-  # This target shall only be used for testing purposes.
-  testonly = true
-
-  assert(defined(invoker.runner), "It is required to specify runner script.")
-  assert(get_path_info(invoker.runner, "file") == "runner.sh",
-         "Runner script must be named 'runner.sh'")
-
-  image_file = "${target_gen_dir}/${target_name}.iso"
-
-  action(target_name) {
-    forward_variables_from(invoker, [ "deps" ])
-    inputs = [ invoker.runner ]
-    outputs = [ image_file ]
-
-    args = [
-      "mkisofs",
-      "-input-charset=default",
-      "-VCHIP",  # Volume ID = CHIP
-      "-JRU",  # Joliet + Rock Ridge with untranslated filenames
-    ]
-
-    # Exclude files from the ISO image which might otherwise be included
-    # by non-tracked assets in case of adding entire directory. This will
-    # not exclude files added explicitly.
-    if (defined(invoker.assets_non_tracked_exclude_globs)) {
-      foreach(glob, invoker.assets_non_tracked_exclude_globs) {
-        args += [
-          "-m",
-          glob,
-        ]
-      }
-    }
-
-    args += [
-      "-o",
-      rebase_path(image_file),
-      rebase_path(invoker.runner),
-    ]
-
-    if (defined(invoker.assets)) {
-      args += invoker.assets
-      inputs += invoker.assets
-    }
-    if (defined(invoker.assets_non_tracked)) {
-      args += invoker.assets_non_tracked
-    }
-
-    script = "${build_root}/gn_run_binary.py"
-  }
-}
-
 # Run Tizen in QEMU.
 #
 # Parameters:
-#   iso_image: The path to ISO image with the runner script.
+#   share: Directory to share between host and QEMU.
 #   virtio_net: Enable external network access.
 template("tizen_qemu_run") {
   # This target shall only be used for testing purposes.
   testonly = true
 
-  assert(defined(invoker.iso_image),
-         "It is required to specify ISO runner image.")
+  assert(defined(invoker.share), "It is required to specify path to share.")
 
   # Store QEMU output in a dedicated log file.
   output_log_file = "${root_out_dir}/tizen-qemu-" + target_name + ".log"
 
   action(target_name) {
     forward_variables_from(invoker, [ "deps" ])
-    inputs = [ invoker.iso_image ]
+
     outputs = [ output_log_file ]
 
     args = [
-      "--image-iso=" + invoker.iso_image,
+      "--share=" + invoker.share,
       "--output=" + rebase_path(output_log_file),
     ]
     if (defined(invoker.virtio_net) && invoker.virtio_net) {
       args += [ "--virtio-net" ]
     }
+
+    # Use console pool to print QEMU output in real-time.
+    pool = "//:console"
 
     script = tizen_qemu
   }

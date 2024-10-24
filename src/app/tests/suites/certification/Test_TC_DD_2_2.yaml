@@ -181,6 +181,29 @@ tests:
           SoftAP commissioning not currently supported on TH=all-clusters-app
       disabled: true
 
+    - label:
+          "Step 3c: TH is configured with the default channel to be Channel 6 in
+          2.4GHz. If TH has a 5GHz Wi-Fi radio, TH is configured with an
+          additional channel list that includes Channel 44 and the operating
+          channel Wi-Fi network the DUT is on if it is operating in non-ETSI
+          regulatory domains and includes Channel 149 if it is operating in ETSI
+          regulatory domains."
+      PICS: MCORE.DD.DISCOVERY_PAF
+      verification: |
+          TH must start sending Wi-Fi PAF Publish Frames on the default channel and the channel list.
+          2.4g - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=2437
+          5g - FCC - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5220
+          5g ETSI - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5745
+      disabled: true
+
+    - label: "Step 3d: DUT starts Wi-Fi PAF scan in its commissioning channel"
+      PICS: MCORE.DD.DISCOVERY_PAF
+      verification: |
+          DUT must find TH and provide onboarding data to for validation. Pass Criteria: DUT is able to report the Onboarding payload as set on TH
+
+          $ sudo ./chip-tool pairing wifipaf-wifi 1 n_m_2g nxp12345 20202021 3840
+      disabled: true
+
     - label: "Step 4a: DUT scans using Wi-Fi in background"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |

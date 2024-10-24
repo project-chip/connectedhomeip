@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class ElectricalPowerMeasurementClusterHarmonicMeasurementStruct(
   val order: UInt,
-  val measurement: Long?
+  val measurement: Long?,
 ) {
   override fun toString(): String = buildString {
     append("ElectricalPowerMeasurementClusterHarmonicMeasurementStruct {\n")
@@ -52,7 +52,7 @@ class ElectricalPowerMeasurementClusterHarmonicMeasurementStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): ElectricalPowerMeasurementClusterHarmonicMeasurementStruct {
       tlvReader.enterStructure(tlvTag)
       val order = tlvReader.getUInt(ContextSpecificTag(TAG_ORDER))

@@ -212,7 +212,7 @@ public:
      *
      */
     ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType,
-                Observer * observer);
+                Observer * observer, DataModel::Provider * apDataModel);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
@@ -222,18 +222,37 @@ public:
      *  The callback passed in has to outlive this handler object.
      *
      */
-    ReadHandler(ManagementCallback & apCallback, Observer * observer);
+    ReadHandler(ManagementCallback & apCallback, Observer * observer, DataModel::Provider * apDataModel);
 #endif
 
     const SingleLinkedListNode<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
     const SingleLinkedListNode<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
     const SingleLinkedListNode<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
 
+    /**
+     * @brief Returns the reporting intervals that will used by the ReadHandler for the subscription being requested.
+     *        After the subscription is established, these will be the set reporting intervals and cannot be changed.
+     *
+     * @param[out] aMinInterval minimum time delta between two reports for the subscription
+     * @param[in] aMaxInterval maximum time delta between two reports for the subscription
+     */
     void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
         aMinInterval = mMinIntervalFloorSeconds;
         aMaxInterval = mMaxInterval;
     }
+
+    /**
+     * @brief Returns the maximum reporting interval that was initially requested by the subscriber
+     *        This is the same value as the mMaxInterval member if the max interval is not changed by the publisher.
+     *
+     * @note If the device is an ICD, the MaxInterval of a subscription is automatically set to a multiple of the IdleModeDuration.
+     *       This function is the only way to get the requested max interval once the OnSubscriptionRequested application callback
+     *       is called.
+     *
+     * @return uint16_t subscriber requested maximum reporting interval
+     */
+    inline uint16_t GetSubscriberRequestedMaxInterval() const { return mSubscriberRequestedMaxInterval; }
 
     CHIP_ERROR SetMinReportingIntervalForTests(uint16_t aMinInterval)
     {
@@ -254,7 +273,7 @@ public:
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(aMaxInterval <= std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval),
+        VerifyOrReturnError(aMaxInterval <= std::max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval),
                             CHIP_ERROR_INVALID_ARGUMENT);
         mMaxInterval = aMaxInterval;
         return CHIP_NO_ERROR;
@@ -500,7 +519,7 @@ private:
     /// @param aFlag Flag to clear
     void ClearStateFlag(ReadHandlerFlags aFlag);
 
-    AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
+    AttributePathExpandIterator mAttributePathExpandIterator;
 
     // The current generation of the reporting engine dirty set the last time we were notified that a path we're interested in was
     // marked dirty.
@@ -542,9 +561,10 @@ private:
     // engine, the "oldest" subscription is the subscription with the smallest generation.
     uint64_t mTransactionStartGeneration = 0;
 
-    SubscriptionId mSubscriptionId    = 0;
-    uint16_t mMinIntervalFloorSeconds = 0;
-    uint16_t mMaxInterval             = 0;
+    SubscriptionId mSubscriptionId           = 0;
+    uint16_t mMinIntervalFloorSeconds        = 0;
+    uint16_t mMaxInterval                    = 0;
+    uint16_t mSubscriberRequestedMaxInterval = 0;
 
     EventNumber mEventMin = 0;
 
@@ -582,5 +602,6 @@ private:
     // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
     Observer * mObserver = nullptr;
 };
+
 } // namespace app
 } // namespace chip

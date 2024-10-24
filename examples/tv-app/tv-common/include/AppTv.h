@@ -149,6 +149,10 @@ public:
     void InstallContentApp(uint16_t vendorId, uint16_t productId);
     // Remove the app from the list of mContentApps
     bool UninstallContentApp(uint16_t vendorId, uint16_t productId);
+    // Print mContentApps and endpoints
+    void LogInstalledApps();
+    // TODO: method to retrieve list of mContentApps
+    // https://github.com/project-chip/connectedhomeip/issues/34020
 
 protected:
     std::vector<std::unique_ptr<ContentAppImpl>> mContentApps;

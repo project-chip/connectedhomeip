@@ -30,6 +30,8 @@ inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
 
+CHIP_ERROR GetConnectedNetwork(Network & network);
+
 template <typename T>
 class SlScanResponseIterator : public Iterator<T>
 {

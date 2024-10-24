@@ -62,6 +62,7 @@ YAML schema
 |&emsp; &emsp; &emsp; hasMasksClear |list||
 |&emsp; &emsp; &emsp; notValue |NoneType,bool,int,float,list,dict|Y|
 |&emsp; &emsp; &emsp; anyOf |list||
+|&emsp; &emsp; &emsp; python |str|Y|
 |&emsp; &emsp; saveAs |str||
 |&emsp; &emsp; saveDataVersschemaionAs |str||
 |&emsp; saveResponseAs |str||

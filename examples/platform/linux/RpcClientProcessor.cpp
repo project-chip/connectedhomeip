@@ -33,7 +33,6 @@ namespace {
 
 // Constants
 constexpr size_t kMaxTransmissionUnit = 256;
-constexpr uint32_t kDefaultChannelId  = 1;
 const char * kDefaultRpcServerAddress = "127.0.0.1";
 
 // RPC Stream and Channel Setup

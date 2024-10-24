@@ -21,24 +21,18 @@
 #include <commands/fabric-sync/Commands.h>
 #include <commands/interactive/Commands.h>
 #include <commands/pairing/Commands.h>
+#include <device_manager/DeviceManager.h>
 #include <zap-generated/cluster/Commands.h>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#if defined(PW_RPC_ENABLED)
-#include <rpc/RpcServer.h>
-#endif
-
 using namespace chip;
 
 void ApplicationInit()
 {
-#if defined(PW_RPC_ENABLED)
-    InitRpcServer(kFabricAdminServerPort);
-    ChipLogProgress(NotSpecified, "PW_RPC initialized.");
-#endif
+    DeviceMgr().Init();
 }
 
 // ================================================================================

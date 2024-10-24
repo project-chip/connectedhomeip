@@ -136,6 +136,15 @@ const char * StageToString(CommissioningStage stage)
     case kNeedsNetworkCreds:
         return "NeedsNetworkCreds";
 
+    case kPrimaryOperationalNetworkFailed:
+        return "PrimaryOperationalNetworkFailed";
+
+    case kRemoveWiFiNetworkConfig:
+        return "RemoveWiFiNetworkConfig";
+
+    case kRemoveThreadNetworkConfig:
+        return "RemoveThreadNetworkConfig";
+
     default:
         return "???";
     }

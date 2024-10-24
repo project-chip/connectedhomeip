@@ -36,6 +36,7 @@ public:
     {
         ON_ACTION = 0,
         OFF_ACTION,
+        IDENTIFY_ACTION,
 
         INVALID_ACTION
     } Action;
@@ -58,6 +59,7 @@ public:
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
 
     static void OnTriggerOffWithEffect(OnOffEffect * effect);
+    void IdentifyEventHandler();
 
 private:
     friend LightingManager & LightMgr(void);

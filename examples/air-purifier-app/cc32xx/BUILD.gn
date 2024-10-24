@@ -100,6 +100,7 @@ ti_simplelink_executable("air-purifier_app") {
     "${chip_root}/examples/air-purifier-app/air-purifier-common",
     "${chip_root}/examples/platform/cc32xx:cc32xx-attestation-credentials",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
   ]
 

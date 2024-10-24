@@ -30,65 +30,67 @@ class MCContentLauncherLaunchURLExampleViewModel: ObservableObject {
 
     func invokeCommand(castingPlayer: MCCastingPlayer, contentUrl: String, displayString: String)
     {
-        // select the MCEndpoint on the MCCastingPlayer to invoke the command on
-        if let endpoint: MCEndpoint = castingPlayer.endpoints().filter({ $0.vendorId().intValue == sampleEndpointVid}).first
-        {
-            // validate that the selected endpoint supports the ContentLauncher cluster
-            if(!endpoint.hasCluster(MCEndpointClusterTypeContentLauncher))
-            {
-                self.Log.error("No ContentLauncher cluster supporting endpoint found")
-                DispatchQueue.main.async
-                {
-                    self.status = "No ContentLauncher cluster supporting endpoint found"
-                }
-                return
-            }
-            
-            // get ContentLauncher cluster from the endpoint
-            let contentLaunchercluster: MCContentLauncherCluster = endpoint.cluster(for: MCEndpointClusterTypeContentLauncher) as! MCContentLauncherCluster
+        self.Log.info("MCContentLauncherLaunchURLExampleViewModel.invokeCommand()")
+        castingPlayer.logAllEndpoints()
 
-            // get the launchURLCommand from the contentLauncherCluster
-            let launchURLCommand: MCContentLauncherClusterLaunchURLCommand? = contentLaunchercluster.launchURLCommand()
-            if(launchURLCommand == nil)
-            {
-                self.Log.error("LaunchURL not supported on cluster")
-                DispatchQueue.main.async
-                {
-                    self.status = "LaunchURL not supported on cluster"
-                }
-                return
+        // Use MCEndpointSelector to select the endpoint
+        guard let endpoint = MCEndpointSelector.selectEndpoint(from: castingPlayer, sampleEndpointVid: sampleEndpointVid) else {
+            self.Log.error("MCContentLauncherLaunchURLExampleViewModel.invokeCommand() No endpoint matching the example VID or identifier 1 found")
+            DispatchQueue.main.async {
+                self.status = "No endpoint matching the example VID or identifier 1 found"
             }
-                
-            // create the LaunchURL request
-            let request: MCContentLauncherClusterLaunchURLParams = MCContentLauncherClusterLaunchURLParams()
-            request.contentURL = contentUrl
-            request.displayString = displayString
-                    
-            // call invoke on launchURLCommand while passing in a completion block
-            launchURLCommand!.invoke(request, context: nil, completion: { context, err, response in
-                DispatchQueue.main.async
-                {
-                    if(err == nil)
-                    {
-                        self.Log.info("LaunchURLCommand invoke completion success with \(String(describing: response))")
-                        self.status = "Success. Response data: \(String(describing: response?.data))"
-                    }
-                    else
-                    {
-                        self.Log.error("LaunchURLCommand invoke completion failure with \(String(describing: err))")
-                        self.status = "Failure: \(String(describing: err))"
-                    }
-                }
-            },
-            timedInvokeTimeoutMs: 5000) // time out after 5000ms
+            return
         }
-        else
+
+        self.Log.info("MCContentLauncherLaunchURLExampleViewModel.invokeCommand() selected endpoint: \(endpoint.description)")
+
+        // validate that the selected endpoint supports the ContentLauncher cluster
+        if(!endpoint.hasCluster(MCEndpointClusterTypeContentLauncher))
         {
-            self.Log.error("No endpoint matching the example VID found")
+            self.Log.error("MCContentLauncherLaunchURLExampleViewModel.invokeCommand() No ContentLauncher cluster supporting endpoint found")
             DispatchQueue.main.async
             {
-                self.status = "No endpoint matching the example VID found"
+                self.status = "No ContentLauncher cluster supporting endpoint found"
             }
+            return
         }
+        
+        // get ContentLauncher cluster from the endpoint
+        let contentLaunchercluster: MCContentLauncherCluster = endpoint.cluster(for: MCEndpointClusterTypeContentLauncher) as! MCContentLauncherCluster
+
+        // get the launchURLCommand from the contentLauncherCluster
+        let launchURLCommand: MCContentLauncherClusterLaunchURLCommand? = contentLaunchercluster.launchURLCommand()
+        if(launchURLCommand == nil)
+        {
+            self.Log.error("LaunchURL not supported on cluster")
+            DispatchQueue.main.async
+            {
+                self.status = "LaunchURL not supported on cluster"
+            }
+            return
+        }
+            
+        // create the LaunchURL request
+        let request: MCContentLauncherClusterLaunchURLParams = MCContentLauncherClusterLaunchURLParams()
+        request.contentURL = contentUrl
+        request.displayString = displayString
+                
+        // call invoke on launchURLCommand while passing in a completion block
+        launchURLCommand!.invoke(request, context: nil, completion: { context, err, response in
+            DispatchQueue.main.async
+            {
+                if(err == nil)
+                {
+                    self.Log.info("LaunchURLCommand invoke completion success with \(String(describing: response))")
+                    self.status = "Success. Response data: \(String(describing: response?.data))"
+                }
+                else
+                {
+                    self.Log.error("LaunchURLCommand invoke completion failure with \(String(describing: err))")
+                    self.status = "Failure: \(String(describing: err))"
+                }
+            }
+        },
+        timedInvokeTimeoutMs: 5000) // time out after 5000ms
     }
 }

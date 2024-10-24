@@ -18,6 +18,8 @@
 #import "MTRBaseDevice.h"
 #import <Foundation/Foundation.h>
 
+#import "MTRDeviceDataValueDictionary.h"
+
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -116,7 +118,8 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 
 /**
  * Like the public invokeCommandWithEndpointID but allows passing through a
- * serverSideProcessingTimeout.
+ * serverSideProcessingTimeout and controlling whether we log the call (so we
+ * can not log when the call is not actually originating with MTRBaseDevice).
  */
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
@@ -124,6 +127,7 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                        commandFields:(id)commandFields
                   timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
          serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                             logCall:(BOOL)logCall
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion;
 
@@ -195,6 +199,17 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                      queue:(dispatch_queue_t)queue
                 completion:(MTRDeviceResponseHandler)completion;
 
+/**
+ * Same as the public version, except for logging.  For use from MTRDevice only.
+ */
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion;
+
 @end
 
 @interface MTRClusterPath ()
@@ -244,6 +259,6 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
 // TLV Data with an anonymous tag.  This method assumes the encoding of the
 // value fits in a single UDP MTU; for lists this method might need to be used
 // on each list item separately.
-NSData * _Nullable MTREncodeTLVFromDataValueDictionary(NSDictionary<NSString *, id> * value, NSError * __autoreleasing * error);
+NSData * _Nullable MTREncodeTLVFromDataValueDictionary(MTRDeviceDataValueDictionary value, NSError * __autoreleasing * error);
 
 NS_ASSUME_NONNULL_END

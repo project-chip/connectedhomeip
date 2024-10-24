@@ -100,8 +100,8 @@ public:
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
          * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
-         *   status response from the server.  In that case,
-         *   StatusIB::InitFromChipError can be used to extract the status.
+         *   status response from the server.  In that case, constructing
+         *   a StatusIB from the error can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
          */
         CHIP_ERROR error;
@@ -136,7 +136,7 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apCommandSender The command sender object that initiated the command transaction.
+         * @param[in] commandSender   The command sender object that initiated the command transaction.
          * @param[in] aResponseData   Information pertaining to the response.
          */
         virtual void OnResponse(CommandSender * commandSender, const ResponseData & aResponseData) {}
@@ -149,7 +149,7 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param apCommandSender The CommandSender object that initiated the transaction.
+         * @param commandSender   The CommandSender object that initiated the transaction.
          * @param aNoResponseData Details about the request without a response.
          */
         virtual void OnNoResponse(CommandSender * commandSender, const NoResponseData & aNoResponseData) {}

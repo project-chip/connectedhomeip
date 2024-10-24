@@ -128,7 +128,7 @@ std::vector<ContentApp::SupportedCluster> convert_to_cpp(JNIEnv * env, jobject s
     // Find Java classes. WARNING: Reflection
     jclass collectionClass = env->FindClass("java/util/Collection");
     jclass iteratorClass   = env->FindClass("java/util/Iterator");
-    jclass clusterClass    = env->FindClass("com/matter/tv/server/tvapp/SupportedCluster");
+    jclass clusterClass    = env->FindClass("com/matter/tv/server/tvapp/ContentAppSupportedCluster");
     if (collectionClass == nullptr || iteratorClass == nullptr || clusterClass == nullptr)
     {
         return {};

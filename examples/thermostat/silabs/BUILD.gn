@@ -47,10 +47,6 @@ import("${examples_common_plat_dir}/args.gni")
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
-
-  # Enable the temperature sensor
-  # Some boards do not have a temperature sensor
-  use_temp_sensor = false
 }
 
 if (wifi_soc) {
@@ -112,19 +108,6 @@ if (wifi_soc) {
         "PW_RPC_ENABLED",
       ]
     }
-
-    if (use_temp_sensor) {
-      include_dirs += [
-        "${efr32_sdk_root}/platform/driver/i2cspm/inc",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht/config",
-        "${efr32_sdk_root}/hardware/driver/si70xx/inc",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_select",
-        "${efr32_sdk_root}/platform/common/config",
-      ]
-
-      defines += [ "USE_TEMP_SENSOR" ]
-    }
   }
 }
 
@@ -141,23 +124,13 @@ silabs_executable("thermostat_app") {
     "src/ZclCallbacks.cpp",
   ]
 
-  if (use_temp_sensor) {
-    sources += [
-      "${efr32_sdk_root}/hardware/driver/si70xx/src/sl_si70xx.c",
-      "${efr32_sdk_root}/platform/common/src/sl_status.c",
-      "${efr32_sdk_root}/platform/driver/i2cspm/src/sl_i2cspm.c",
-      "${efr32_sdk_root}/platform/emlib/src/em_i2c.c",
-      "${examples_common_plat_dir}/TemperatureSensor.cpp",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
-    ]
-  }
-
   if (!disable_lcd) {
     sources += [ "src/ThermostatUI.cpp" ]
   }
 
   deps = [
     ":sdk",
+    "${chip_root}/src/platform/logging:default",
     app_data_model,
   ]
 

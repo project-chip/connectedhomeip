@@ -18,7 +18,6 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
-#include <app-common/zap-generated/cluster-enums.h>
 #include <app/AppConfig.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>
@@ -34,9 +33,10 @@
 #include <system/SystemClock.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-#include <app/icd/server/ICDCheckInSender.h>   // nogncheck
-#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
-#endif                                         // CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/icd/server/ICDCheckInBackOffStrategy.h> // nogncheck
+#include <app/icd/server/ICDCheckInSender.h>          // nogncheck
+#include <app/icd/server/ICDMonitoringTable.h>        // nogncheck
+#endif                                                // CHIP_CONFIG_ENABLE_ICD_CIP
 
 namespace chip {
 namespace Crypto {
@@ -115,8 +115,52 @@ public:
     ICDManager()  = default;
     ~ICDManager() = default;
 
-    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider);
+    /*
+        Builder function to set all necessary members for the ICDManager class
+    */
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    ICDManager & SetPersistentStorageDelegate(PersistentStorageDelegate * storage)
+    {
+        mStorage = storage;
+        return *this;
+    };
+
+    ICDManager & SetFabricTable(FabricTable * fabricTable)
+    {
+        mFabricTable = fabricTable;
+        return *this;
+    };
+
+    ICDManager & SetSymmetricKeyStore(Crypto::SymmetricKeystore * symmetricKeystore)
+    {
+        mSymmetricKeystore = symmetricKeystore;
+        return *this;
+    };
+
+    ICDManager & SetExchangeManager(Messaging::ExchangeManager * exchangeManager)
+    {
+        mExchangeManager = exchangeManager;
+        return *this;
+    };
+
+    ICDManager & SetSubscriptionsInfoProvider(SubscriptionsInfoProvider * subInfoProvider)
+    {
+        mSubInfoProvider = subInfoProvider;
+        return *this;
+    };
+
+    ICDManager & SetICDCheckInBackOffStrategy(ICDCheckInBackOffStrategy * strategy)
+    {
+        mICDCheckInBackOffStrategy = strategy;
+        return *this;
+    };
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    /**
+     * @brief Validates that the ICDManager has all the necessary members to function and initializes the class
+     */
+    void Init();
     void Shutdown();
 
     /**
@@ -197,6 +241,12 @@ public:
     void OnNetworkActivity() override;
     void OnKeepActiveRequest(KeepActiveFlags request) override;
     void OnActiveRequestWithdrawal(KeepActiveFlags request) override;
+
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    void OnSITModeRequest() override;
+    void OnSITModeRequestWithdrawal() override;
+#endif
+
     void OnICDManagementServerEvent(ICDManagementEvents event) override;
     void OnSubscriptionReport() override;
 
@@ -312,6 +362,10 @@ private:
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
     uint8_t mOpenExchangeContextCount = 0;
 
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    bool mSITModeRequested = false;
+#endif
+
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     uint8_t mCheckInRequestCount = 0;
 
@@ -319,11 +373,12 @@ private:
     bool mIsBootUpResumeSubscriptionExecuted = false;
 #endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-    PersistentStorageDelegate * mStorage           = nullptr;
-    FabricTable * mFabricTable                     = nullptr;
-    Messaging::ExchangeManager * mExchangeManager  = nullptr;
-    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
-    SubscriptionsInfoProvider * mSubInfoProvider   = nullptr;
+    PersistentStorageDelegate * mStorage                   = nullptr;
+    FabricTable * mFabricTable                             = nullptr;
+    Messaging::ExchangeManager * mExchangeManager          = nullptr;
+    Crypto::SymmetricKeystore * mSymmetricKeystore         = nullptr;
+    SubscriptionsInfoProvider * mSubInfoProvider           = nullptr;
+    ICDCheckInBackOffStrategy * mICDCheckInBackOffStrategy = nullptr;
     ObjectPool<ICDCheckInSender, (CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS)> mICDSenderPool;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 

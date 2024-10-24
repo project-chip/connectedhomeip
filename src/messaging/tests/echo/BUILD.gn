@@ -43,6 +43,7 @@ executable("chip-echo-requester") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
   ]
@@ -58,6 +59,7 @@ executable("chip-echo-responder") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
   ]

@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class RvcOperationalStateClusterOperationalStateStruct(
   val operationalStateID: UInt,
-  val operationalStateLabel: Optional<String>
+  val operationalStateLabel: Optional<String>,
 ) {
   override fun toString(): String = buildString {
     append("RvcOperationalStateClusterOperationalStateStruct {\n")
@@ -37,7 +37,7 @@ class RvcOperationalStateClusterOperationalStateStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D), operationalStateID)
+      put(ContextSpecificTag(TAG_OPERATIONAL_STATE_ID), operationalStateID)
       if (operationalStateLabel.isPresent) {
         val optoperationalStateLabel = operationalStateLabel.get()
         put(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL), optoperationalStateLabel)
@@ -47,15 +47,15 @@ class RvcOperationalStateClusterOperationalStateStruct(
   }
 
   companion object {
-    private const val TAG_OPERATIONAL_STATE_I_D = 0
+    private const val TAG_OPERATIONAL_STATE_ID = 0
     private const val TAG_OPERATIONAL_STATE_LABEL = 1
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): RvcOperationalStateClusterOperationalStateStruct {
       tlvReader.enterStructure(tlvTag)
-      val operationalStateID = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D))
+      val operationalStateID = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATIONAL_STATE_ID))
       val operationalStateLabel =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL)))
@@ -67,7 +67,7 @@ class RvcOperationalStateClusterOperationalStateStruct(
 
       return RvcOperationalStateClusterOperationalStateStruct(
         operationalStateID,
-        operationalStateLabel
+        operationalStateLabel,
       )
     }
   }

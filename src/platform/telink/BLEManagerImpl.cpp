@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@
 #include <zephyr/sys/util.h>
 
 extern "C" {
-#include <b9x_bt_flash.h>
+extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
 }
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
@@ -117,7 +117,7 @@ CHIP_ERROR InitBLEMACAddress()
     int error = 0;
     bt_addr_le_t addr;
 
-    b9x_bt_blc_mac_init(addr.a.val);
+    telink_bt_blc_mac_init(addr.a.val);
 
     if (BT_ADDR_IS_STATIC(&addr.a)) // in case of Random static address, create a new id
     {
@@ -284,22 +284,26 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest(void)
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (ConnectivityMgr().IsThreadProvisioned())
     {
-        ChipLogProgress(DeviceLayer, "Thread provisioned, can't StartAdvertising");
+        ChipLogProgress(DeviceLayer, "Device provisioned, can't StartAdvertising");
 
-        return CHIP_ERROR_INCORRECT_STATE;
+        err = CHIP_ERROR_INCORRECT_STATE;
     }
     else if (!mBLERadioInitialized)
     {
         ThreadStackMgrImpl().StartThreadScan(mInternalScanCallback);
     }
     else
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     {
-        return StartAdvertisingProcess();
+        err = StartAdvertisingProcess();
     }
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
@@ -308,11 +312,13 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
 
     if (!mBLERadioInitialized)
     {
-        /* Switch off Thread */
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        // Deinit Thread
         ThreadStackMgrImpl().SetThreadEnabled(false);
         ThreadStackMgrImpl().SetRadioBlocked(true);
+#endif
 
-        /* Init BLE stack */
+        // Init BLE
         err = bt_enable(NULL);
         VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
@@ -379,12 +385,14 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
 
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (ConnectivityMgr().IsThreadProvisioned())
     {
-        ChipLogProgress(DeviceLayer, "Thread provisioned, StopAdvertising done");
+        ChipLogProgress(DeviceLayer, "Device provisioned, StopAdvertising done");
 
         return CHIP_ERROR_INCORRECT_STATE;
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     ReturnErrorOnFailure(System::MapErrorZephyr(bt_le_adv_stop()));
 
@@ -655,6 +663,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         err = HandleTXCharComplete(event);
         break;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kThreadStateChange:
         err = HandleThreadStateChange(event);
         break;
@@ -666,6 +675,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kOperationalNetworkEnabled:
         err = HandleOperationalNetworkEnabled(event);
         break;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     default:
         break;
@@ -684,10 +694,10 @@ uint16_t BLEManagerImpl::_NumConnections(void)
     return mGAPConns;
 }
 
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (ConnId %02x)", bt_conn_index(conId));
-    return bt_conn_disconnect(conId, BT_HCI_ERR_REMOTE_USER_TERM_CONN) == 0;
+    return MapErrorZephyr(bt_conn_disconnect(conId, BT_HCI_ERR_REMOTE_USER_TERM_CONN));
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -695,20 +705,22 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return bt_gatt_get_mtu(conId);
 }
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                   const ChipBleUUID * charId)
 {
     ChipLogDetail(DeviceLayer, "BLE central not implemented");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
     ChipLogDetail(DeviceLayer, "BLE central not implemented");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                          PacketBufferHandle pBuf)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
     int status                       = 0;
@@ -730,19 +742,14 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     VerifyOrExit(status == 0, err = MapErrorZephyr(status));
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    return err == CHIP_NO_ERROR;
+    return err;
 }
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                            PacketBufferHandle pBuf)
 {
     ChipLogDetail(DeviceLayer, "BLE central not implemented");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
@@ -893,6 +900,7 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
 }
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 CHIP_ERROR BLEManagerImpl::HandleOperationalNetworkEnabled(const ChipDeviceEvent * event)
 {
     ChipLogDetail(DeviceLayer, "HandleOperationalNetworkEnabled");
@@ -936,12 +944,11 @@ CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * eve
     return CHIP_NO_ERROR;
 }
 
-/* @todo: move to RadioSwitch module */
 void BLEManagerImpl::SwitchToIeee802154(void)
 {
-    ChipLogProgress(DeviceLayer, "SwitchToIeee802154");
+    ChipLogProgress(DeviceLayer, "Switch context from BLE to Thread");
 
-    /* Deinit BLE stack */
+    // Deinit BLE
     bt_disable();
     mBLERadioInitialized = false;
 
@@ -949,10 +956,11 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
 #endif
 
-    /* Init IEEE802154 */
+    // Init Thread
     ThreadStackMgrImpl().SetRadioBlocked(false);
     ThreadStackMgrImpl().SetThreadEnabled(true);
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 } // namespace Internal
 } // namespace DeviceLayer

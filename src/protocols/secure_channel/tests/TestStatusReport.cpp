@@ -16,16 +16,16 @@
  *    limitations under the License.
  */
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
-
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/SystemPacketBuffer.h>
-
-#include <gtest/gtest.h>
 
 using namespace chip;
 using namespace chip::Protocols;

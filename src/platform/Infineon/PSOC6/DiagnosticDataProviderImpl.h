@@ -31,7 +31,7 @@
 #include "whd_wlioctl.h"
 #include <cy_wcm.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/Infineon/PSOC6/P6Utils.h>
+#include <platform/Infineon/PSOC6/PSOC6Utils.h>
 
 #define PHYRATE_KPBS_BYTES_PER_SEC 125
 

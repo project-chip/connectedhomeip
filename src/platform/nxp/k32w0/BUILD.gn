@@ -1,0 +1,151 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+
+import("${chip_root}/src/platform/device.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
+assert(chip_device_platform == "nxp")
+assert(nxp_platform == "k32w0")
+
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+}
+
+source_set("nxp_factory_data") {
+}
+source_set("nxp_ota") {
+}
+
+static_library("nxp_platform") {
+  defines = []
+  sources = [
+    "../../SingletonConfigurationManager.cpp",
+    "../common/ble/BLEManagerCommon.cpp",
+    "../common/ble/BLEManagerCommon.h",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "K32W0Config.cpp",
+    "K32W0Config.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "NFCManagerImpl.cpp",
+    "NFCManagerImpl.h",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "RamStorage.cpp",
+    "SystemTimeSupport.cpp",
+    "ble_function_mux.c",
+  ]
+
+  public = [
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
+    "${chip_root}/src/credentials/examples/ExampleDACs.h",
+    "${chip_root}/src/credentials/examples/ExamplePAI.h",
+    "${chip_root}/src/platform/nxp/k32w0/BLEManagerImpl.h",
+  ]
+
+  if (chip_with_factory_data == 1) {
+    sources += [
+      "FactoryDataProvider.cpp",
+      "FactoryDataProviderImpl.cpp",
+    ]
+    public += [
+      "${chip_root}/src/credentials/CHIPCert.h",
+      "${chip_root}/src/credentials/CertificationDeclaration.h",
+    ]
+  }
+
+  if (chip_with_low_power != 0) {
+    sources += [ "LowPowerHooks.cpp" ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    public += [ "../common/ota/OTAImageProcessorImpl.h" ]
+
+    sources += [
+      "../common/ota/OTAImageProcessorImpl.cpp",
+      "../common/ota/OTAImageProcessorImpl.h",
+      "../common/ota/OTATlvProcessor.cpp",
+      "../common/ota/OTATlvProcessor.h",
+    ]
+
+    if (chip_enable_ota_firmware_processor == 1) {
+      sources += [
+        "OTAFirmwareProcessor.cpp",
+        "OTAFirmwareProcessor.h",
+        "OTAHooks.cpp",
+      ]
+
+      if (chip_with_factory_data == 1 &&
+          chip_enable_ota_factory_data_processor == 1) {
+        sources += [
+          "OTAFactoryDataProcessor.cpp",
+          "OTAFactoryDataProcessor.h",
+        ]
+      }
+    }
+  }
+
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  if (chip_crypto == "platform") {
+    if (chip_crypto_flavor == "tinycrypt") {
+      sources += [ "${chip_root}/src/platform/nxp/common/crypto/CHIPCryptoPALTinyCrypt.cpp" ]
+
+      public_deps += [ "${mbedtls_root}:mbedtls" ]
+    }
+
+    if (chip_crypto_flavor == "NXP-Ultrafast-P256") {
+      sources += [ "${chip_root}/src/platform/nxp/k32w0/crypto/CHIPCryptoPALNXPUltrafastP256.cpp" ]
+
+      public_deps += [
+        "${mbedtls_root}:mbedtls",
+        "${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_sdk",
+      ]
+    }
+  }
+
+  if (chip_enable_openthread) {
+    sources += [
+      "../../OpenThread/OpenThreadUtils.cpp",
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    if (chip_mdns == "platform") {
+      sources += [
+        "../../OpenThread/DnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.h",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+  }
+
+  public_deps += [ "${chip_root}/src/crypto" ]
+}

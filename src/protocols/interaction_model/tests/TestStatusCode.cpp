@@ -18,8 +18,10 @@
 
 #include <stdint.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
+
 #include <lib/core/Optional.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace ::chip;

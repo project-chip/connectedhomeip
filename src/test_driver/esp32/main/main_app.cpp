@@ -56,5 +56,12 @@ extern "C" void app_main()
         exit(err);
     }
 
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", esp_err_to_name(err));
+        exit(err);
+    }
+
     tester_task(nullptr);
 }

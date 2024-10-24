@@ -42,12 +42,8 @@ if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 endif()
 get_filename_component(GN_ROOT_TARGET ${CHIP_ROOT}/config/nxp/chip-gn REALPATH)
-get_filename_component(COMMON_CMAKE_SOURCE_DIR ${CHIP_ROOT}/config/common/cmake REALPATH)
 
-# Get common Cmake sources
-
-include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_args.cmake)
-include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
+include(${CHIP_ROOT}/config/nxp/cmake/common.cmake)
 
 # Prepare compiler flags
 if (CHIP_CFLAGS)
@@ -95,6 +91,13 @@ endif()
 
 get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 
+if (CONFIG_USE_CHIP_DATA_MODEL_INTERFACE)
+    set(DATA_MODEL_INTERFACE "enabled")
+else()
+    set(DATA_MODEL_INTERFACE "disabled")
+endif()
+
+
 # ==============================================================================
 # Generate configuration for CHIP GN build system
 # ==============================================================================
@@ -105,34 +108,11 @@ matter_common_gn_args(
     LIB_TESTS       CONFIG_CHIP_BUILD_TESTS
     PROJECT_CONFIG  ${CONFIG_CHIP_PROJECT_CONFIG}
     DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+    DATA_MODEL_INTERFACE ${DATA_MODEL_INTERFACE}
 )
 matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
 matter_add_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
-matter_add_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
-matter_add_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
-matter_add_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
-matter_add_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
-matter_add_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_CHIP_IPV4)
-matter_add_gn_arg_bool  ("chip_persist_subscriptions"             CONFIG_CHIP_PERSISTENT_SUBSCRIPTIONS)
-matter_add_gn_arg_bool  ("chip_monolithic_tests"                  CONFIG_CHIP_BUILD_TESTS)
-matter_add_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
-matter_add_gn_arg_bool  ("chip_error_logging"                     CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 1)
-matter_add_gn_arg_bool  ("chip_progress_logging"                  CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
-matter_add_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
-matter_add_gn_arg_bool  ("chip_automation_logging"                FALSE)
-matter_add_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MALLOC_SYS_HEAP)
-matter_add_gn_arg_bool  ("chip_enable_wifi"                       CONFIG_CHIP_WIFI)
-matter_add_gn_arg_bool  ("chip_system_config_provide_statistics"  CONFIG_CHIP_STATISTICS)
-matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_ENABLE_ICD_SUPPORT)
-matter_add_gn_arg_bool  ("enable_eventlist_attribute"             TRUE)
-matter_add_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQUESTOR)
-
-if(CONFIG_DEBUG)
-    matter_add_gn_arg_bool("optimize_debug" true)
-    matter_add_gn_arg_string("optimize_debug_level" "0")
-    matter_add_gn_arg_string("symbol_level" "2")
-endif()
 
 if (CONFIG_CHIP_FACTORY_DATA)
     matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
@@ -141,32 +121,20 @@ elseif (CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
     matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
 endif()
 
-if (CONFIG_CHIP_ROTATING_DEVICE_ID)
-    matter_add_gn_arg_bool("chip_enable_rotating_device_id"          TRUE)
-    matter_add_gn_arg_bool("chip_enable_additional_data_advertising" TRUE)
-endif()
-
 if (CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_string("chip_mdns" "platform")
-elseif(CONFIG_WIFI_NXP)
+elseif(CONFIG_WIFI_NXP OR CONFIG_CHIP_ETHERNET)
     matter_add_gn_arg_string("chip_mdns" "minimal")
 else()
     matter_add_gn_arg_string("chip_mdns" "none")
 endif()
 
-if (CONFIG_CHIP_CRYPTO_PSA)
-    matter_add_gn_arg_string("chip_crypto" "psa")
-endif()
 
 # if (BOARD STREQUAL "native_posix")
 #     matter_add_gn_arg_string("target_cpu" "x86")
 # elseif (BOARD STREQUAL "native_posix_64")
 #     matter_add_gn_arg_string("target_cpu" "x64")
 # endif()
-
-if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
-    matter_add_gn_arg_string("symbol_level" "0")
-endif()
 
 # if (CHIP_COMPILER_LAUNCHER)
 #     matter_add_gn_arg_string("pw_command_launcher" ${CHIP_COMPILER_LAUNCHER})
@@ -214,14 +182,7 @@ endif()
 # ==============================================================================
 # Define 'chip-ota-image' target for building CHIP OTA image
 # ==============================================================================
-if(EXISTS "${CHIP_ROOT}/src/platform/nxp/zephyr/boards/${BOARD}/${BOARD}.overlay")
-  set(DTC_BOARD_OVERLAY "${CHIP_ROOT}/src/platform/nxp/zephyr/boards/${BOARD}/${BOARD}.overlay")
-else()
-  set(DTC_BOARD_OVERLAY "")
-  message(STATUS "No board overlay found")
-endif()
-
-if (CONFIG_CHIP_OTA_REQUESTOR)
+if(CONFIG_CHIP_OTA_REQUESTOR)
     if(CONFIG_MCUBOOT_SIGNATURE_KEY_FILE STREQUAL "")
         set(ZEPHYR_OUTPUT_NAME "zephyr")
     else()
@@ -233,11 +194,12 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DEXTRA_DTC_OVERLAY_FILE=${DTC_BOARD_OVERLAY}
+            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE}
+            -DEXTRA_DTC_OVERLAY_FILE="${DTC_OVERLAY_FILE};${EXTRA_DTC_OVERLAY_FILE}"
         COMMAND
         cp ${PROJECT_BINARY_DIR}/../modules/connectedhomeip/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
     )
-
+    add_dependencies(build_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
     set(BLOCK_SIZE "1024")
     dt_nodelabel(dts_partition_path NODELABEL "boot_partition")
     dt_reg_size(mcuboot_size PATH ${dts_partition_path})
@@ -249,7 +211,7 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
         COMMAND
         dd if=${PROJECT_BINARY_DIR}/${ZEPHYR_OUTPUT_NAME}.bin of=${PROJECT_BINARY_DIR}/zephyr_full.bin bs=${BLOCK_SIZE} seek=${boot_blocks}
     )
-    add_dependencies(merge_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
+    add_dependencies(merge_mcuboot build_mcuboot)
 
     if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         chip_ota_image(chip-ota-image

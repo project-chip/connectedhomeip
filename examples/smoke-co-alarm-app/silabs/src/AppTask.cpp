@@ -31,7 +31,7 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(BRD4325B))
+#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT))
 #define LIGHT_LED 1
 #else
 #define LIGHT_LED 0
@@ -78,7 +78,10 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Register Smoke & Co Test Event Trigger
-    Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&AlarmMgr());
+    if (Server::GetInstance().GetTestEventTriggerDelegate() != nullptr)
+    {
+        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&AlarmMgr());
+    }
 
     sAlarmLED.Init(LIGHT_LED);
     sAlarmLED.Set(false);

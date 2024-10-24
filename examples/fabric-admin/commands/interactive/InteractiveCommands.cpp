@@ -31,6 +31,7 @@
 
 #if defined(PW_RPC_ENABLED)
 #include <rpc/RpcClient.h>
+#include <rpc/RpcServer.h>
 #endif
 
 using namespace chip;
@@ -40,7 +41,10 @@ namespace {
 constexpr char kInteractiveModePrompt[]          = ">>> ";
 constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
 constexpr char kInteractiveModeStopCommand[]     = "quit()";
-constexpr uint16_t kRetryIntervalS               = 5;
+
+#if defined(PW_RPC_ENABLED)
+constexpr uint16_t kRetryIntervalS = 3;
+#endif
 
 // File pointer for the log file
 FILE * sLogFile = nullptr;
@@ -113,13 +117,15 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
 #if defined(PW_RPC_ENABLED)
 void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
 {
-    if (InitRpcClient(kFabricBridgeServerPort) == CHIP_NO_ERROR)
+    if (StartRpcClient() == CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Connected to Fabric-Bridge");
+        // print to console
+        fprintf(stderr, "Connected to Fabric-Bridge\n");
     }
     else
     {
-        ChipLogError(NotSpecified, "Failed to connect to Fabric-Bridge, retry in %d seconds....", kRetryIntervalS);
+        // print to console
+        fprintf(stderr, "Failed to connect to Fabric-Bridge, retry in %d seconds....\n", kRetryIntervalS);
         systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect, nullptr);
     }
 }
@@ -193,6 +199,9 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     }
 
 #if defined(PW_RPC_ENABLED)
+    SetRpcRemoteServerPort(mFabricBridgeServerPort.Value());
+    InitRpcServer(mLocalServerPort.Value());
+    ChipLogProgress(NotSpecified, "PW_RPC initialized.");
     DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredConnect, 0);
 #endif
 

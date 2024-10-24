@@ -1,1 +1,1 @@
-59 : Install order fix for glib with enabled thread sanitizer.
+86 : [Tizen] Pass runner's path as QEMU argument

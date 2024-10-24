@@ -49,6 +49,21 @@ namespace DeviceLayer {
 
 namespace {
 
+app::Clusters::NetworkCommissioning::WiFiBandEnum ConvertBandEnum(uint8_t band)
+{
+    switch (band)
+    {
+    case WIFI_FREQ_BAND_2_4_GHZ:
+        return app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4;
+    case WIFI_FREQ_BAND_5_GHZ:
+        return app::Clusters::NetworkCommissioning::WiFiBandEnum::k5g;
+    case WIFI_FREQ_BAND_6_GHZ:
+        return app::Clusters::NetworkCommissioning::WiFiBandEnum::k6g;
+    default:
+        return app::Clusters::NetworkCommissioning::WiFiBandEnum::kUnknownEnumValue;
+    }
+}
+
 NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * result)
 {
     NetworkCommissioning::WiFiScanResponse response = {};
@@ -61,9 +76,10 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
         // TODO: Distinguish WPA versions
         response.security.Set(result->security == WIFI_SECURITY_TYPE_PSK ? NetworkCommissioning::WiFiSecurity::kWpaPersonal
                                                                          : NetworkCommissioning::WiFiSecurity::kUnencrypted);
-        response.channel = result->channel;
-        response.rssi    = result->rssi;
-        response.ssidLen = result->ssid_length;
+        response.channel  = result->channel;
+        response.rssi     = result->rssi;
+        response.ssidLen  = result->ssid_length;
+        response.wiFiBand = ConvertBandEnum(result->band);
         memcpy(response.ssid, result->ssid, result->ssid_length);
         // TODO: MAC/BSSID is not filled by the Wi-Fi driver
         memcpy(response.bssid, result->mac, result->mac_length);
@@ -300,8 +316,8 @@ CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
 
     stats.mPacketMulticastRxCount = data.multicast.rx;
     stats.mPacketMulticastTxCount = data.multicast.tx;
-    stats.mPacketUnicastRxCount   = data.pkts.rx - data.multicast.rx - data.broadcast.rx;
-    stats.mPacketUnicastTxCount   = data.pkts.tx - data.multicast.tx - data.broadcast.tx;
+    stats.mPacketUnicastRxCount   = data.unicast.rx;
+    stats.mPacketUnicastTxCount   = data.unicast.tx;
     stats.mBeaconsSuccessCount    = data.sta_mgmt.beacons_rx;
     stats.mBeaconsLostCount       = data.sta_mgmt.beacons_miss;
 

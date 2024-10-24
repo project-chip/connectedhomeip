@@ -59,7 +59,13 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalByteSpans)
     MutableByteSpan valueReadBack(getArray);
     err = persistenceProvider.SafeReadValue(TestConcretePath, valueReadBack);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_TRUE(std::equal(valueReadBack.begin(), valueReadBack.end(), value.begin(), value.end()));
+    EXPECT_TRUE(valueReadBack.data_equal(value));
+
+    uint8_t getArrayThatIsLongerThanNeeded[10];
+    MutableByteSpan valueReadBack2(getArrayThatIsLongerThanNeeded);
+    err = persistenceProvider.SafeReadValue(TestConcretePath, valueReadBack2);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(valueReadBack2.data_equal(value));
 
     // Finishing
     persistenceProvider.Shutdown();
@@ -320,6 +326,7 @@ TEST_F(TestAttributePersistenceProvider, TestBufferTooSmallErrors)
     err = persistenceProvider.SafeReadValue(TestConcretePath, valueReadBackByteSpan8);
     EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
 
+    // TODO: ReadScalarValue() does not take a buffer, so expecting CHIP_ERROR_BUFFER_TOO_SMALL is bad API
     // Fail to get value as uint8_t
     uint8_t valueReadBack8;
     err = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack8);

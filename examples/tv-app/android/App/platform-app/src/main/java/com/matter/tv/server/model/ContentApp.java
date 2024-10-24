@@ -25,6 +25,7 @@ public class ContentApp {
     this.vendorId = vendorId;
     this.productId = productId;
     this.version = version;
+    this.supportedClusters = Collections.EMPTY_SET;
   }
 
   public ContentApp(

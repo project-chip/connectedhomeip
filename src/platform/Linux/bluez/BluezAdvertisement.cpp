@@ -161,7 +161,7 @@ CHIP_ERROR BluezAdvertisement::SetupServiceData(ServiceDataFlags aFlags)
     deviceInfo.SetAdditionalDataFlag(true);
 #endif
 
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
     if (aFlags & kServiceDataExtendedAnnouncement)
     {
         deviceInfo.SetExtendedAnnouncementFlag(true);

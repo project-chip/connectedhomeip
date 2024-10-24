@@ -31,7 +31,6 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-using TestContext = chip::Test::AppContext;
 using namespace chip::app;
 using namespace chip;
 
@@ -65,39 +64,7 @@ struct ValidationInstruction
 
 using InstructionListType = std::vector<ValidationInstruction>;
 
-class TestBufferedReadCallback : public ::testing::Test
-{
-public:
-    static void SetUpTestSuite()
-    {
-        mpTestContext = new TestContext;
-        mpTestContext->SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        if (mpTestContext != nullptr)
-        {
-            delete mpTestContext;
-        }
-    }
-    void SetUp() override
-    {
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->SetUp();
-        }
-    }
-    void TearDown() override
-    {
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->TearDown();
-        }
-    }
-    static TestContext * mpTestContext;
-};
-TestContext * TestBufferedReadCallback::mpTestContext = nullptr;
+using TestBufferedReadCallback = chip::Test::AppContext;
 
 class DataSeriesValidator : public BufferedReadCallback::Callback
 {
@@ -268,11 +235,11 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
 
         auto iter = value.begin();
 
-        uint8_t index = 0;
+        uint32_t index = 0;
         while (iter.Next() && index < expectedListLength)
         {
             auto & iterValue = iter.GetValue();
-            EXPECT_EQ(iterValue, (index));
+            EXPECT_EQ(iterValue, (index % 256));
             index++;
         }
 

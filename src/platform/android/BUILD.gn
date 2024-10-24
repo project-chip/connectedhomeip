@@ -36,6 +36,19 @@ source_set("tracing") {
   ]
 }
 
+static_library("logging") {
+  sources = [ "Logging.cpp" ]
+  deps = [
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/support:attributes",
+    "${chip_root}/src/lib/support:logging_constants",
+    "${chip_root}/src/platform:platform_config_header",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+
+  libs = [ "log" ]
+}
+
 static_library("android") {
   output_name = "libAndroidPlatform"
 
@@ -101,6 +114,7 @@ android_library("java") {
 
   sources = [
     "java/chip/platform/AndroidBleManager.java",
+    "java/chip/platform/AndroidChipLogging.java",
     "java/chip/platform/AndroidChipPlatform.java",
     "java/chip/platform/AndroidChipPlatformException.java",
     "java/chip/platform/BleCallback.java",

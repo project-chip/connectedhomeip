@@ -19,6 +19,11 @@ import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
+  # Build monolithic test library.
+  chip_monolithic_tests = false
+}
+
+declare_args() {
   # Enable building tests.
   chip_build_tests = current_os != "freertos"
 }

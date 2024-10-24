@@ -162,7 +162,8 @@ class TestRunner(TestRunnerBase):
         try:
             if config.auto_start_stop:
                 await self.start()
-            status = await asyncio.wait_for(self._run(parser, config), parser.timeout)
+            task = self._run(parser, config)
+            status = await asyncio.wait_for(asyncio.shield(task), parser.timeout)
         except (Exception, CancelledError) as exception:
             status = exception
         finally:

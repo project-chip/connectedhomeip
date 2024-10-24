@@ -329,6 +329,58 @@ tests:
               minValue: 0
               maxValue: 3
 
+    - label:
+          "Step 5a: TH sends EnhancedMoveHue command to DUT with MoveMode=0x01
+          (up) and Rate=0 (units/s)"
+      PICS: CC.S.F01 && CC.S.C41.Rsp
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 1
+              - name: "Rate"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 5b: TH sends EnhancedMoveHue command to DUT with MoveMode=0x03
+          (down) and Rate=0 (units/s)"
+      PICS: CC.S.F01 && CC.S.C41.Rsp
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 3
+              - name: "Rate"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 5c: TH sends EnhancedMoveHue command to DUT with MoveMode=0x00
+          (stop) and Rate=0 (units/s)"
+      PICS: CC.S.F01 && CC.S.C41.Rsp
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 0
+              - name: "Rate"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
     - label: "Turn Off light that we turned on"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"

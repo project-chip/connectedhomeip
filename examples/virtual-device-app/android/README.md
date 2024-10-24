@@ -23,7 +23,7 @@ This app offers the following features:
 ## Requirements for building
 
 For information about how to build the application, see the
-[Building Android](../../../docs/guides/android_building.md) guide.
+[Building Android](../../../docs/platforms/android/android_building.md) guide.
 
 ## Preparing for build
 

@@ -43,7 +43,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 {
     DiscoveryContext * discoveryContext = static_cast<DiscoveryContext *>(context);
 
-    if (error != CHIP_NO_ERROR)
+    if (error != CHIP_NO_ERROR && error != CHIP_ERROR_IN_PROGRESS)
     {
         discoveryContext->Release();
         return;
@@ -55,7 +55,13 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 
     nodeData.Get<CommissionNodeData>().LogDetail();
     discoveryContext->OnNodeDiscovered(nodeData);
-    discoveryContext->Release();
+
+    // CHIP_ERROR_IN_PROGRESS indicates that more results are coming, so don't release
+    // the context yet.
+    if (error == CHIP_NO_ERROR)
+    {
+        discoveryContext->Release();
+    }
 }
 
 static void HandleNodeOperationalBrowse(void * context, DnssdService * result, CHIP_ERROR error)
@@ -240,7 +246,8 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     switch (key)
     {
     case TxtFieldKey::kTcpSupported:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
+        VerifyOrReturnError(params.GetTCPSupportModes() != TCPModeAdvertise::kNone, CHIP_ERROR_UNINITIALIZED);
+        return CopyTextRecordValue(buffer, bufferLen, to_underlying(params.GetTCPSupportModes()));
     case TxtFieldKey::kSessionIdleInterval:
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         // A ICD operating as a LIT should not advertise its slow polling interval
@@ -408,7 +415,6 @@ void DnssdService::ToDiscoveredCommissionNodeData(const Span<Inet::IPAddress> & 
         ByteSpan key(reinterpret_cast<const uint8_t *>(mTextEntries[i].mKey), strlen(mTextEntries[i].mKey));
         ByteSpan val(mTextEntries[i].mData, mTextEntries[i].mDataSize);
         FillNodeDataFromTxt(key, val, discoveredData);
-        FillNodeDataFromTxt(key, val, discoveredData);
     }
 }
 
@@ -419,7 +425,12 @@ CHIP_ERROR DiscoveryImplPlatform::InitImpl()
     VerifyOrReturnError(mState == State::kUninitialized, CHIP_NO_ERROR);
     mState = State::kInitializing;
 
-    ReturnErrorOnFailure(ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this));
+    CHIP_ERROR err = ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        mState = State::kUninitialized;
+        return err;
+    }
     UpdateCommissionableInstanceName();
 
     return CHIP_NO_ERROR;

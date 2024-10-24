@@ -17,11 +17,13 @@
 #include <errno.h>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Pool.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -43,10 +45,8 @@ using namespace chip::Messaging;
 
 class MockExchangeDelegate;
 
-struct TestExchange : public Test::LoopbackMessagingContext, public ::testing::Test
+struct TestExchange : public Test::LoopbackMessagingContext
 {
-    // TODO Add TearDown function when changing test framework to Pigweed to make it more clear how it works.
-    // Currently, the TearDown function is from LoopbackMessagingContext
     void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
@@ -54,12 +54,6 @@ struct TestExchange : public Test::LoopbackMessagingContext, public ::testing::T
 #endif
         chip::Test::LoopbackMessagingContext::SetUp();
     }
-
-    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
-
-    static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
-
-    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
 
     template <typename AfterRequestChecker, typename AfterResponseChecker>
     void DoRoundTripTest(MockExchangeDelegate & delegate1, MockExchangeDelegate & delegate2, uint8_t requestMessageType,
@@ -226,4 +220,15 @@ TEST_F(TestExchange, CheckBasicExchangeMessageDispatch)
             });
     }
 }
+
+// A crude test to exercise VerifyOrDieWithObject() in ObjectPool and
+// the resulting DumpToLog() call on the ExchangeContext.
+// TODO: Find a way to automate this test without killing the process.
+// TEST_F(TestExchange, DumpExchangePoolToLog)
+// {
+//     MockExchangeDelegate delegate;
+//     ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> pool;
+//     pool.CreateObject(&GetExchangeManager(), static_cast<uint16_t>(1234), GetSessionAliceToBob(), true, &delegate);
+// }
+
 } // namespace

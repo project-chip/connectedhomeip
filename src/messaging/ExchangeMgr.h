@@ -80,9 +80,13 @@ public:
      *  Shutdown the ExchangeManager. This terminates this instance
      *  of the object and releases all held resources.
      *
+     * Please see documentation for SessionManager::Shutdown() for ordering
+     * dependecies between that and this Shutdown() method.
+     *
      *  @note
      *     The protocol should only call this function after ensuring that
-     *     there are no active ExchangeContext objects. Furthermore, it is the
+     *     there are no active ExchangeContext objects (again, see
+     *     SessionManager::Shutdown() documentation). Furthermore, it is the
      *     onus of the application to de-allocate the ExchangeManager
      *     object after calling ExchangeManager::Shutdown().
      */

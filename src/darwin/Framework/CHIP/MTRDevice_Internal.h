@@ -18,16 +18,16 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDevice.h>
+#import <os/lock.h>
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceDataValueDictionary.h"
 #import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class MTRAsyncWorkQueue;
-
-typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
 
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
@@ -51,34 +51,72 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
     MTRInternalDeviceStateLaterSubscriptionEstablished = 4,
 };
 
+// Consider moving utility classes to their own file
+#pragma mark - Utility Classes
+
 /**
- * Information about a cluster: data version and known attribute values.
+ * container of MTRDevice delegate weak reference, its queue, and its interested
+ * paths for attribute reports.
  */
-MTR_TESTABLE
-@interface MTRDeviceClusterData : NSObject <NSSecureCoding, NSCopying>
-@property (nonatomic, nullable) NSNumber * dataVersion;
-@property (nonatomic, readonly) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
+MTR_DIRECT_MEMBERS
+@interface MTRDeviceDelegateInfo : NSObject {
+@private
+    void * _delegatePointerValue;
+    __weak id _delegate;
+    dispatch_queue_t _queue;
+}
 
-- (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute;
-- (void)removeValueForAttribute:(NSNumber *)attribute;
+// Array of interested cluster paths, attribute paths, or endpointID, for attribute report filtering.
+@property (readonly, nullable) NSArray * interestedPathsForAttributes;
 
-- (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes;
+// Array of interested cluster paths, attribute paths, or endpointID, for event report filtering.
+@property (readonly, nullable) NSArray * interestedPathsForEvents;
+
+// Expose delegate
+@property (readonly) id delegate;
+
+// Pointer value for logging purpose only
+@property (readonly) void * delegatePointerValue;
+
+- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents;
+
+// Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
+- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
+
+#ifdef DEBUG
+// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously.
+- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
+#endif
 @end
 
-@interface MTRDevice ()
-- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
+#pragma mark - MTRDevice internal extensions
 
-// Called from MTRClusters for writes and commands
-- (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
+@interface MTRDevice () {
+    // Ivars needed to implement shared MTRDevice functionality.
+@protected
+    // Lock that protects overall device state, including delegate storage.
+    os_unfair_lock _lock;
+    NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
+
+    // Our node ID, with the ivar declared explicitly so it's accessible to
+    // subclasses.
+    NSNumber * _nodeID;
+
+    // Our controller.  Declared nullable because our property is, though in
+    // practice it does not look like we ever set it to nil.  If this changes,
+    // fix _concreteController on MTRDevice_Concrete accordingly.
+    MTRDeviceController * _Nullable _deviceController;
+}
+
+- (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 // called by controller to clean up and shutdown
 - (void)invalidate;
 
-// Called by controller when a new operational advertisement for what we think
-// is this device's identity has been observed.  This could have
-// false-positives, for example due to compressed fabric id collisions.
-- (void)nodeMayBeAdvertisingOperational;
+- (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
+
+// Called by MTRDevice_XPC to forward delegate callbacks
+- (BOOL)_lockAndCallDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 
 /**
  * Like the public invokeCommandWithEndpointID but:
@@ -104,28 +142,46 @@ MTR_TESTABLE
 @property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 
-// Method to insert persisted cluster data
-//   Contains data version information and attribute values.
-- (void)setPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
+#pragma mark - MTRDevice functionality to deal with delegates.
 
-// Method to insert persisted data that pertains to the whole device.
-- (void)setPersistedDeviceData:(NSDictionary<NSString *, id> *)data;
+// Returns YES if any non-null delegates were found
+- (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^ _Nullable)(MTRDeviceDelegateInfo * delegateInfo))block;
+
+- (BOOL)_delegateExists;
+
+// Must be called by subclasses or MTRDevice implementation only.
+- (void)_delegateAdded;
 
 #ifdef DEBUG
-- (NSUInteger)unitTestAttributeCount;
+// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
+// Returns YES if a delegate is called
+- (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 #endif
 
-- (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
+// Used to generate attribute report that contains all known attributes, taking into consideration expected values
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport;
 
-// Returns whether this MTRDevice uses Thread for communication
-- (BOOL)deviceUsesThread;
+// Hooks for controller suspend/resume.
+- (void)controllerSuspended;
+- (void)controllerResumed;
+
+// Methods for comparing attribute data values.
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)one isEqualToDataValue:(MTRDeviceDataValueDictionary)theOther;
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)observed satisfiesValueExpectation:(MTRDeviceDataValueDictionary)expected;
 
 @end
 
-#pragma mark - Utility for clamping numbers
-// Returns a NSNumber object that is aNumber if it falls within the range [min, max].
-// Returns min or max, if it is below or above, respectively.
-NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
+#pragma mark - MTRDevice internal state monitoring
+@protocol MTRDeviceInternalStateDelegate
+- (void)devicePrivateInternalStateChanged:(MTRDevice *)device internalState:(NSDictionary *)state;
+@end
+
+// Returns whether a data-value dictionary is well-formed (in the sense that all
+// the types of the objects inside are as expected, so it's actually a valid
+// representation of some TLV).  Implemented in MTRBaseDevice.mm because that's
+// where the pieces needed to implement it are, but declared here so our tests
+// can see it.
+MTR_EXTERN MTR_TESTABLE BOOL MTRDataValueDictionaryIsWellFormed(MTRDeviceDataValueDictionary value);
 
 #pragma mark - Constants
 
@@ -134,5 +190,14 @@ static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage"
 
 // Declared inside platform, but noting here for reference
 // static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
+
+// Concrete to XPC internal state property dictionary keys
+static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
+static NSString * const kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalStateKeyProductID";
+static NSString * const kMTRDeviceInternalPropertyNetworkFeatures = @"MTRDeviceInternalPropertyNetworkFeatures";
+static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
+static NSString * const kMTRDeviceInternalPropertyLastSubscriptionAttemptWait = @"kMTRDeviceInternalPropertyLastSubscriptionAttemptWait";
+static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDeviceInternalPropertyMostRecentReportTime";
+static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
 
 NS_ASSUME_NONNULL_END

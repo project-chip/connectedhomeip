@@ -20,7 +20,9 @@
 
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 using namespace chip::Dnssd;

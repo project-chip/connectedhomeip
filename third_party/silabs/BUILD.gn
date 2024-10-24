@@ -66,8 +66,6 @@ if (wifi_soc != true) {  # CCP board
   if (use_silabs_thread_lib) {
     config("libopenthread-platform_config") {
       include_dirs = [ "${openthread_root}/examples/platforms" ]
-
-      defines = [ "SL_CONFIG_OPENTHREAD_LIB=1" ]
     }
 
     copy("copy_openthread_system") {
@@ -126,8 +124,13 @@ if (wifi_soc != true) {  # CCP board
     }
 
     source_set("ot-efr32-cert") {
+      sources = [
+        "${openthread_root}/examples/platforms/utils/mac_frame.cpp",
+        "${openthread_root}/examples/platforms/utils/mac_frame.h",
+      ]
+
       if (enable_openthread_cli) {
-        sources = [
+        sources += [
           "${openthread_root}/examples/apps/cli/cli_uart.cpp",
           "${openthread_root}/src/cli/cli.cpp",
           "${openthread_root}/src/cli/cli.hpp",
@@ -150,12 +153,16 @@ if (wifi_soc != true) {  # CCP board
           "${openthread_root}/src/cli/cli_history.hpp",
           "${openthread_root}/src/cli/cli_joiner.cpp",
           "${openthread_root}/src/cli/cli_joiner.hpp",
+          "${openthread_root}/src/cli/cli_link_metrics.cpp",
+          "${openthread_root}/src/cli/cli_link_metrics.hpp",
           "${openthread_root}/src/cli/cli_mac_filter.cpp",
           "${openthread_root}/src/cli/cli_mac_filter.hpp",
+          "${openthread_root}/src/cli/cli_mdns.cpp",
+          "${openthread_root}/src/cli/cli_mdns.hpp",
           "${openthread_root}/src/cli/cli_network_data.cpp",
           "${openthread_root}/src/cli/cli_network_data.hpp",
-          "${openthread_root}/src/cli/cli_output.cpp",
-          "${openthread_root}/src/cli/cli_output.hpp",
+          "${openthread_root}/src/cli/cli_ping.cpp",
+          "${openthread_root}/src/cli/cli_ping.hpp",
           "${openthread_root}/src/cli/cli_srp_client.cpp",
           "${openthread_root}/src/cli/cli_srp_client.hpp",
           "${openthread_root}/src/cli/cli_srp_server.cpp",
@@ -164,6 +171,8 @@ if (wifi_soc != true) {  # CCP board
           "${openthread_root}/src/cli/cli_tcp.hpp",
           "${openthread_root}/src/cli/cli_udp.cpp",
           "${openthread_root}/src/cli/cli_udp.hpp",
+          "${openthread_root}/src/cli/cli_utils.cpp",
+          "${openthread_root}/src/cli/cli_utils.hpp",
           "${openthread_root}/src/cli/x509_cert_key.hpp",
         ]
       }
@@ -187,7 +196,24 @@ if (wifi_soc != true) {  # CCP board
       XTD = "ftd"
       if (!chip_openthread_ftd) {
         XTD = "mtd"
+      } else {
+        # additional files needed for ftd lib
+        sources += [
+          "${openthread_root}/examples/platforms/utils/link_metrics.cpp",
+          "${openthread_root}/examples/platforms/utils/link_metrics.h",
+          "${openthread_root}/src/core/api/link_api.cpp",
+          "${openthread_root}/src/core/mac/mac.cpp",
+          "${openthread_root}/src/core/mac/mac_frame.cpp",
+          "${openthread_root}/src/core/mac/sub_mac.cpp",
+          "${openthread_root}/src/core/thread/mle.cpp",
+
+          # Temporary file until the files in the SI SDK is fixed
+          "${sdk_support_root}/protocol/openthread/platform-abstraction/efr32/radio.c",
+        ]
+
+        include_dirs = [ "${sl_ot_platform_abstraction}/include" ]
       }
+      sources += [ "${sl_ot_platform_abstraction}/efr32/sleep.c" ]
 
       # Use silabs openthread library stack with or without coap api enabled
       COAP_API = ""
@@ -196,6 +222,11 @@ if (wifi_soc != true) {  # CCP board
       }
 
       public_configs += [ "${openthread_root}:openthread_${XTD}_config" ]
+
+      if (silabs_family == "mgm24") {
+        # Locally set silabs_family to efr32mg24 as mgm24 doesn't have dedicated sl_ot_platform libs
+        silabs_family = "efr32mg24"
+      }
 
       libs = [
         "${sl_ot_libs_path}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a",

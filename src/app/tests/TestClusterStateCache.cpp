@@ -37,7 +37,6 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-using TestContext = chip::Test::AppContext;
 using namespace chip::app;
 using namespace chip;
 
@@ -101,6 +100,11 @@ struct AttributeInstruction
         }
     }
 
+    ConcreteAttributePath GetAttributePath() const
+    {
+        return ConcreteAttributePath(mEndpointId, Clusters::UnitTesting::Id, GetAttributeId());
+    }
+
     static uint8_t sInstructionId;
 };
 
@@ -108,26 +112,7 @@ uint8_t AttributeInstruction::sInstructionId = 0;
 
 using AttributeInstructionListType = std::vector<AttributeInstruction>;
 
-class TestClusterStateCache : public ::testing::Test
-{
-public:
-    static void SetUpTestSuite()
-    {
-        mpTestContext = new TestContext;
-        mpTestContext->SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        delete mpTestContext;
-    }
-
-    void SetUp() override { mpTestContext->SetUp(); }
-    void TearDown() override { mpTestContext->TearDown(); }
-
-    static TestContext * mpTestContext;
-};
-TestContext * TestClusterStateCache::mpTestContext = nullptr;
+using TestClusterStateCache = chip::Test::AppContext;
 
 class ForwardedDataCallbackValidator final
 {
@@ -626,6 +611,94 @@ void RunAndValidateSequence(AttributeInstructionListType list)
 
         ++bufferSize;
     } while (true);
+
+    // Now check clearing behavior.  First for attributes.
+    ConcreteAttributePath firstAttr = list[0].GetAttributePath();
+
+    TLV::TLVReader reader;
+    CHIP_ERROR err = cache.Get(firstAttr, reader);
+    // Should have gotten a value or status for now.
+    EXPECT_NE(err, CHIP_ERROR_KEY_NOT_FOUND);
+
+    cache.ClearAttribute(firstAttr);
+
+    err = cache.Get(firstAttr, reader);
+    // Should have gotten no value.
+    EXPECT_EQ(err, CHIP_ERROR_KEY_NOT_FOUND);
+
+    // Now clearing for clusters.  First check that things that should be there are.
+    for (auto & listItem : list)
+    {
+        ConcreteAttributePath path = listItem.GetAttributePath();
+        if (path == firstAttr)
+        {
+            // We removed this one already.
+            continue;
+        }
+
+        err = cache.Get(path, reader);
+
+        // Should have gotten a value or status for now.
+        EXPECT_NE(err, CHIP_ERROR_KEY_NOT_FOUND);
+    }
+
+    auto firstCluster = ConcreteClusterPath(firstAttr);
+    cache.ClearAttributes(firstCluster);
+
+    for (auto & listItem : list)
+    {
+        ConcreteAttributePath path = listItem.GetAttributePath();
+
+        err = cache.Get(path, reader);
+
+        if (ConcreteClusterPath(path) == firstCluster)
+        {
+            EXPECT_EQ(err, CHIP_ERROR_KEY_NOT_FOUND);
+        }
+        else
+        {
+            // Should still have a value or status
+            EXPECT_NE(err, CHIP_ERROR_KEY_NOT_FOUND);
+        }
+    }
+
+    // Now clearing for endpoints.  First check that things that should be there are.
+    // TODO: Since all our attributes have the same cluster, this is not
+    // actually testing anything useful right now.
+    for (auto & listItem : list)
+    {
+        ConcreteAttributePath path = listItem.GetAttributePath();
+        if (ConcreteClusterPath(path) == firstCluster)
+        {
+            // We removed this one already.
+            continue;
+        }
+
+        err = cache.Get(path, reader);
+
+        // Should have gotten a value or status for now.
+        EXPECT_NE(err, CHIP_ERROR_KEY_NOT_FOUND);
+    }
+
+    auto firstEndpoint = firstAttr.mEndpointId;
+    cache.ClearAttributes(firstEndpoint);
+
+    for (auto & listItem : list)
+    {
+        ConcreteAttributePath path = listItem.GetAttributePath();
+
+        err = cache.Get(path, reader);
+
+        if (path.mEndpointId == firstEndpoint)
+        {
+            EXPECT_EQ(err, CHIP_ERROR_KEY_NOT_FOUND);
+        }
+        else
+        {
+            // Should still have a value or status
+            EXPECT_NE(err, CHIP_ERROR_KEY_NOT_FOUND);
+        }
+    }
 }
 
 /*

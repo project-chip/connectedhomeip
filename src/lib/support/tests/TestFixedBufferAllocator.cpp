@@ -19,7 +19,10 @@
 #include <lib/support/FixedBufferAllocator.h>
 
 #include <cstring>
-#include <gtest/gtest.h>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 

@@ -22,10 +22,10 @@
  *
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
-
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 
@@ -249,7 +249,7 @@ TEST_F(TestKeyValueStoreMgr, AllCharactersKey)
     for (size_t charId = 0; charId < sizeof(allChars); charId += kKeyLength)
     {
         char testKey[kKeyLength + 1] = {};
-        memcpy(testKey, &allChars[charId], chip::min(sizeof(allChars) - charId, kKeyLength));
+        memcpy(testKey, &allChars[charId], std::min(sizeof(allChars) - charId, kKeyLength));
 
         CHIP_ERROR err = KeyValueStoreMgr().Put(testKey, kTestValue);
         EXPECT_EQ(err, CHIP_NO_ERROR);

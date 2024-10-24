@@ -14,12 +14,60 @@
 package com.matter.casting.support;
 
 /**
- * Feature: Target Content Application - The set of content app Vendor IDs (and optionally, Product
- * IDs) that can be used for authentication.
+ * Feature: Target Content Application - An entry in the IdentificationDeclarationOptions.java
+ * TargetAppList which contains a TargetVendorId and an optional TargetProductId.
  */
 public class TargetAppInfo {
   /** Target Target Content Application Vendor ID, null means unspecified */
-  public Integer vendorId;
+  private Integer vendorId;
   /** Target Target Content Application Product ID, null means unspecified */
-  public Integer productId;
+  private Integer productId;
+
+  /**
+   * Constructor to set both vendorId and productId.
+   *
+   * @param vendorId the vendor ID, null means unspecified.
+   * @param productId the product ID, null means unspecified.
+   */
+  public TargetAppInfo(Integer vendorId, Integer productId) {
+    this.vendorId = vendorId;
+    this.productId = productId;
+  }
+
+  /**
+   * Constructor to set only the vendorId.
+   *
+   * @param vendorId the vendor ID, null means unspecified.
+   */
+  public TargetAppInfo(Integer vendorId) {
+    this.vendorId = vendorId;
+  }
+
+  /**
+   * Getter for vendorId.
+   *
+   * @return the vendor ID, null means unspecified.
+   */
+  public Integer getVendorId() {
+    return vendorId;
+  }
+
+  /**
+   * Getter for productId.
+   *
+   * @return the product ID, null means unspecified.
+   */
+  public Integer getProductId() {
+    return productId;
+  }
+
+  /**
+   * Returns a string representation of the object.
+   *
+   * @return a string representation of the object.
+   */
+  @Override
+  public String toString() {
+    return "TargetAppInfo Vendor ID:" + vendorId + ", Product ID:" + productId;
+  }
 }

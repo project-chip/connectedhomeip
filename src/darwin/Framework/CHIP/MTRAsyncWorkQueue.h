@@ -228,6 +228,9 @@ MTR_TESTABLE
 - (BOOL)hasDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID
                  workItemData:(id)opaqueWorkItemData;
 
+// Returns current count of queued items.
+- (NSUInteger)itemCount;
+
 /// Cancels and removes all work items.
 - (void)invalidate;
 @end

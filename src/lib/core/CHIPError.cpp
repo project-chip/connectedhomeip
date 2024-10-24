@@ -362,6 +362,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_VERSION_MISMATCH.AsInteger():
         desc = "Version mismatch";
         break;
+    case CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL.AsInteger():
+        desc = "The CHIP message's access is restricted by ARL";
+        break;
     case CHIP_EVENT_ID_FOUND.AsInteger():
         desc = "Event ID matching criteria was found";
         break;

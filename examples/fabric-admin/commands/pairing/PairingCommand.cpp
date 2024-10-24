@@ -18,9 +18,12 @@
 
 #include "PairingCommand.h"
 
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <commands/common/DeviceScanner.h>
+#include <commands/interactive/InteractiveCommands.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <device_manager/DeviceSynchronization.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
@@ -146,7 +149,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            chip::Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
@@ -157,6 +160,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         {
             mICDMonitoredSubject.SetValue(mICDCheckInNodeId.Value());
         }
+        if (!mICDClientType.HasValue())
+        {
+            mICDClientType.SetValue(app::Clusters::IcdManagement::ClientTypeEnum::kPermanent);
+        }
         // These Optionals must have values now.
         // The commissioner will verify these values.
         params.SetICDSymmetricKey(mICDSymmetricKey.Value());
@@ -166,6 +173,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         }
         params.SetICDCheckInNodeId(mICDCheckInNodeId.Value());
         params.SetICDMonitoredSubject(mICDMonitoredSubject.Value());
+        params.SetICDClientType(mICDClientType.Value());
     }
 
     return params;
@@ -268,7 +276,7 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uin
         // There is no device with this index that has some resolution data. This could simply
         // be because the device is a ble device. In this case let's fall back to looking for
         // a device with this index and some RendezvousParameters.
-        chip::SetupPayload payload;
+        SetupPayload payload;
         bool isQRCode = strncmp(mOnboardingPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
         if (isQRCode)
         {
@@ -308,21 +316,21 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
     Dnssd::DiscoveryFilter filter(mFilterType);
     switch (mFilterType)
     {
-    case chip::Dnssd::DiscoveryFilterType::kNone:
+    case Dnssd::DiscoveryFilterType::kNone:
         break;
-    case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
-    case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
-    case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
-    case chip::Dnssd::DiscoveryFilterType::kVendorId:
-    case chip::Dnssd::DiscoveryFilterType::kDeviceType:
+    case Dnssd::DiscoveryFilterType::kShortDiscriminator:
+    case Dnssd::DiscoveryFilterType::kLongDiscriminator:
+    case Dnssd::DiscoveryFilterType::kCompressedFabricId:
+    case Dnssd::DiscoveryFilterType::kVendorId:
+    case Dnssd::DiscoveryFilterType::kDeviceType:
         filter.code = mDiscoveryFilterCode;
         break;
-    case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
+    case Dnssd::DiscoveryFilterType::kCommissioningMode:
         break;
-    case chip::Dnssd::DiscoveryFilterType::kCommissioner:
+    case Dnssd::DiscoveryFilterType::kCommissioner:
         filter.code = 1;
         break;
-    case chip::Dnssd::DiscoveryFilterType::kInstanceName:
+    case Dnssd::DiscoveryFilterType::kInstanceName:
         filter.code         = 0;
         filter.instanceName = mDiscoveryFilterInstanceName;
         break;
@@ -395,10 +403,9 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     {
         // print to console
         fprintf(stderr, "New device with Node ID: 0x%lx has been successfully added.\n", nodeId);
-
-#if defined(PW_RPC_ENABLED)
-        AddSynchronizedDevice(nodeId);
-#endif
+        // CurrentCommissioner() has a lifetime that is the entire life of the application itself
+        // so it is safe to provide to StartDeviceSynchronization.
+        DeviceSynchronizer::Instance().StartDeviceSynchronization(&CurrentCommissioner(), mNodeId, mDeviceIsICD);
     }
     else
     {
@@ -413,12 +420,6 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             }
         }
         ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
-    }
-
-    if (mCommissioningDelegate)
-    {
-        mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
-        this->UnregisterCommissioningDelegate();
     }
 
     SetCommandExitStatus(err);
@@ -453,10 +454,10 @@ void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioning
 
 void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icdCounter)
 {
-    char icdSymmetricKeyHex[chip::Crypto::kAES_CCM128_Key_Length * 2 + 1];
+    char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
-    chip::Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
-                               sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
+    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
+                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
     clientInfo.peer_node         = nodeId;
@@ -494,7 +495,7 @@ void PairingCommand::OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t pro
                     ChipLogValueX64(deviceId.GetNodeId()), promisedActiveDuration);
 }
 
-void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData)
+void PairingCommand::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
 {
     // Ignore nodes with closed commissioning window
     VerifyOrReturn(nodeData.commissioningMode != 0);
@@ -502,7 +503,7 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & 
     auto & resolutionData = nodeData;
 
     const uint16_t port = resolutionData.port;
-    char buf[chip::Inet::IPAddress::kMaxStringLength];
+    char buf[Inet::IPAddress::kMaxStringLength];
     resolutionData.ipAddress[0].ToString(buf);
     ChipLogProgress(NotSpecified, "Discovered Device: %s:%u", buf, port);
 
@@ -539,7 +540,9 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
         fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
 
 #if defined(PW_RPC_ENABLED)
-        RemoveSynchronizedDevice(nodeId);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(command->CurrentCommissioner().GetFabricIndex(), nodeId);
+        ScopedNodeId scopedNodeId(nodeId, command->CurrentCommissioner().GetFabricIndex());
+        RemoveSynchronizedDevice(scopedNodeId);
 #endif
     }
     else
@@ -547,30 +550,22 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
         ChipLogProgress(NotSpecified, "Device unpair Failure: " ChipLogFormatX64 " %s", ChipLogValueX64(nodeId), ErrorStr(err));
     }
 
-    PairingDelegate * pairingDelegate = command->GetPairingDelegate();
-    if (pairingDelegate)
-    {
-        pairingDelegate->OnDeviceRemoved(nodeId, err);
-        command->UnregisterPairingDelegate();
-    }
-
     command->SetCommandExitStatus(err);
 }
 
-chip::Optional<uint16_t> PairingCommand::FailSafeExpiryTimeoutSecs() const
+Optional<uint16_t> PairingCommand::FailSafeExpiryTimeoutSecs() const
 {
-    // We don't need to set additional failsafe timeout as we don't ask the final user if he wants to continue
-    return chip::Optional<uint16_t>();
+    // No manual input, so do not need to extend.
+    return Optional<uint16_t>();
 }
 
-void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner,
-                                                  chip::DeviceProxy * device,
-                                                  const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
-                                                  chip::Credentials::AttestationVerificationResult attestationResult)
+void PairingCommand::OnDeviceAttestationCompleted(Controller::DeviceCommissioner * deviceCommissioner, DeviceProxy * device,
+                                                  const Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
+                                                  Credentials::AttestationVerificationResult attestationResult)
 {
     // Bypass attestation verification, continue with success
     auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
-        device, chip::Credentials::AttestationVerificationResult::kSuccess);
+        device, Credentials::AttestationVerificationResult::kSuccess);
     if (CHIP_NO_ERROR != err)
     {
         SetCommandExitStatus(err);

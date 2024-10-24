@@ -15,9 +15,7 @@ Generally regenerate using one of:
 |          3 |       0x03 | Identify                                                |
 |          4 |       0x04 | Groups                                                  |
 |          6 |       0x06 | OnOff                                                   |
-|          7 |       0x07 | OnOffSwitchConfiguration                                |
 |          8 |       0x08 | LevelControl                                            |
-|         15 |       0x0F | BinaryInputBasic                                        |
 |         28 |       0x1C | PulseWidthModulation                                    |
 |         29 |       0x1D | Descriptor                                              |
 |         30 |       0x1E | Binding                                                 |
@@ -79,6 +77,7 @@ Generally regenerate using one of:
 |        129 |       0x81 | ValveConfigurationAndControl                            |
 |        144 |       0x90 | ElectricalPowerMeasurement                              |
 |        145 |       0x91 | ElectricalEnergyMeasurement                             |
+|        148 |       0x94 | WaterHeaterManagement                                   |
 |        150 |       0x96 | DemandResponseLoadControl                               |
 |        151 |       0x97 | Messages                                                |
 |        152 |       0x98 | DeviceEnergyManagement                                  |
@@ -86,10 +85,11 @@ Generally regenerate using one of:
 |        155 |       0x9B | EnergyPreference                                        |
 |        156 |       0x9C | PowerTopology                                           |
 |        157 |       0x9D | EnergyEvseMode                                          |
+|        158 |       0x9E | WaterHeaterMode                                         |
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
-|        259 |      0x103 | BarrierControl                                          |
+|        336 |      0x150 | ServiceArea                                             |
 |        512 |      0x200 | PumpConfigurationAndControl                             |
 |        513 |      0x201 | Thermostat                                              |
 |        514 |      0x202 | FanControl                                              |
@@ -129,7 +129,13 @@ Generally regenerate using one of:
 |       1294 |      0x50E | AccountLogin                                            |
 |       1295 |      0x50F | ContentControl                                          |
 |       1296 |      0x510 | ContentAppObserver                                      |
-|       2820 |      0xB04 | ElectricalMeasurement                                   |
+|       1360 |      0x550 | ZoneManagement                                          |
+|       1361 |      0x551 | CameraAvStreamManagement                                |
+|       1363 |      0x553 | WebRTCTransportProvider                                 |
+|       1364 |      0x554 | WebRTCTransportRequestor                                |
+|       1366 |      0x556 | Chime                                                   |
+|       1872 |      0x750 | EcosystemInformation                                    |
+|       1873 |      0x751 | CommissionerControl                                     |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |

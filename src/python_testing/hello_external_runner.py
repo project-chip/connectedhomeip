@@ -23,8 +23,8 @@ import sys
 from multiprocessing import Process
 from multiprocessing.managers import BaseManager
 
+from chip.testing.matter_testing import MatterTestConfig, get_test_info, run_tests
 from hello_test import HelloTest
-from matter_testing_support import MatterTestConfig, get_test_info, run_tests
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -59,7 +59,7 @@ class TestTestRunnerHooks(TestRunnerHooks):
     def stop(self, duration: int):
         self.stop_called = True
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         self.test_start_called = True
 
     def test_stop(self, exception: Exception, duration: int):

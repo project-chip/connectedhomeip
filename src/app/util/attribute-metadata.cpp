@@ -18,6 +18,16 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 
+bool EmberAfAttributeMetadata::IsBoolean() const
+{
+    return attributeType == ZCL_BOOLEAN_ATTRIBUTE_TYPE;
+}
+
+bool EmberAfAttributeMetadata::IsSignedIntegerAttribute() const
+{
+    return chip::app::IsSignedAttributeType(attributeType);
+}
+
 bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType)
 {
     return (attributeType == ZCL_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
