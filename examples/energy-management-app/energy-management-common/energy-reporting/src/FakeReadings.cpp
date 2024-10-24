@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <DEMDelegate.h>
+#include <CommonMain.h>
 #include <DEMManufacturerDelegate.h>
 
 #include <EnergyTimeUtils.h>

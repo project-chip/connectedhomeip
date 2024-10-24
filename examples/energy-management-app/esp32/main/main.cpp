@@ -17,15 +17,8 @@
 
 #include "DeviceCallbacks.h"
 
-#if CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-#include <EnergyEvseMain.h>
-#endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-
-#if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-#include <WaterHeaterMain.h>
-#endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-
 #include "esp_log.h"
+#include <CommonMain.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
@@ -43,8 +36,10 @@
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
 #include "shell_extension/openthread_cli_register.h"
+#include <EnergyManagementAppCmdLineOptions.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/util/endpoint-config-api.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
@@ -80,6 +75,7 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WaterHeaterManagement;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
@@ -156,15 +152,29 @@ chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 #error Cannot define CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE and CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 #endif
 
+EndpointId GetMainAppEndpointId()
+{
+#if defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
+    return kWaterHeaterEndpoint;
+#else
+    return kEvseEndpoint;
+#endif
+}
+
 void ApplicationInit()
 {
     ESP_LOGD(TAG, "Energy Management App: ApplicationInit()");
 #if CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-    EvseApplicationInit();
+
+    EvseApplicationInit(kEvseEndpoint);
+    // Disable Water Heater Endpoint
+    emberAfEndpointEnableDisable(kWaterHeaterEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    FullWhmApplicationInit();
+    WaterHeaterApplicationInit(kWaterHeaterEndpoint);
+    // Disable EVSE Endpoint
+    emberAfEndpointEnableDisable(kEvseEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 
@@ -177,7 +187,7 @@ void ApplicationShutdown()
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    FullWhmApplicationShutdown();
+    WaterHeaterApplicationShutdown();
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 

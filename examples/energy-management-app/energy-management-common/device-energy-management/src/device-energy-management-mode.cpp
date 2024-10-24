@@ -16,18 +16,26 @@
  *    limitations under the License.
  */
 
+#include <CommonMain.h>
+#include <EnergyManagementAppCmdLineOptions.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <device-energy-management-modes.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagementMode;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
+
 using chip::Protocols::InteractionModel::Status;
 template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
+namespace {
+
 static std::unique_ptr<DeviceEnergyManagementModeDelegate> gDeviceEnergyManagementModeDelegate;
 static std::unique_ptr<ModeBase::Instance> gDeviceEnergyManagementModeInstance;
+
+} // namespace
 
 CHIP_ERROR DeviceEnergyManagementModeDelegate::Init()
 {
@@ -77,11 +85,6 @@ CHIP_ERROR DeviceEnergyManagementModeDelegate::GetModeTagsByIndex(uint8_t modeIn
     return CHIP_NO_ERROR;
 }
 
-ModeBase::Instance * DeviceEnergyManagementMode::Instance()
-{
-    return gDeviceEnergyManagementModeInstance.get();
-}
-
 void DeviceEnergyManagementMode::Shutdown()
 {
     gDeviceEnergyManagementModeInstance.reset();
@@ -90,6 +93,18 @@ void DeviceEnergyManagementMode::Shutdown()
 
 void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpointId)
 {
+    VerifyOrDie(endpointId == kEvseEndpoint || endpointId == kWaterHeaterEndpoint);
+
+    /* emberAfDeviceEnergyManagementModeClusterInitCallback() is called for all endpoints
+       that include this endpoint (even the one we disable dynamically). So here, we only
+       proceed when it's called for the right endpoint determined by GetMainAppEndpointId()
+       (a cmd line argument or #define).
+    */
+    if (endpointId != GetMainAppEndpointId())
+    {
+        return;
+    }
+
     VerifyOrDie(!gDeviceEnergyManagementModeDelegate && !gDeviceEnergyManagementModeInstance);
     gDeviceEnergyManagementModeDelegate = std::make_unique<DeviceEnergyManagementMode::DeviceEnergyManagementModeDelegate>();
     gDeviceEnergyManagementModeInstance = std::make_unique<ModeBase::Instance>(gDeviceEnergyManagementModeDelegate.get(),

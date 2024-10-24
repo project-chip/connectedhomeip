@@ -24,9 +24,12 @@ using chip::Protocols::InteractionModel::Status;
 template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
+namespace {
 
-static ExampleWaterHeaterModeDelegate * gWaterHeaterModeDelegate = nullptr;
-static ModeBase::Instance * gWaterHeaterModeInstance             = nullptr;
+ExampleWaterHeaterModeDelegate * gWaterHeaterModeDelegate = nullptr;
+ModeBase::Instance * gWaterHeaterModeInstance             = nullptr;
+
+} // namespace
 
 CHIP_ERROR ExampleWaterHeaterModeDelegate::Init()
 {
