@@ -948,6 +948,12 @@ const char * TransferSession::OutputEvent::ToString(OutputEventType outputEventT
     }
 }
 
+const char * TransferSession::OutputEvent::TypeToString(const OutputEventType outputEventType)
+{
+    OutputEvent event(outputEventType);
+    return event.ToString(outputEventType);
+}
+
 TransferSession::OutputEvent TransferSession::OutputEvent::TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg)
 {
     OutputEvent event(OutputEventType::kInitReceived);
