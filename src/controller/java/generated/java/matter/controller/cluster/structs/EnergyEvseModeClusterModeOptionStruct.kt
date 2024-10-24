@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class EnergyEvseModeClusterModeOptionStruct(
   val label: String,
   val mode: UByte,
-  val modeTags: List<EnergyEvseModeClusterModeTagStruct>
+  val modeTags: List<EnergyEvseModeClusterModeTagStruct>,
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseModeClusterModeOptionStruct {\n")

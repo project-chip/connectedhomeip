@@ -60,7 +60,7 @@ bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath);
  */
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState);
+                                 AttributeEncodeState * apEncoderState);
 
 /**
  * Returns the metadata of the attribute for the given path.

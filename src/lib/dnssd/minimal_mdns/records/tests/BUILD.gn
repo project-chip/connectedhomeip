@@ -32,6 +32,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/dnssd/minimal_mdns/records",
   ]
 }

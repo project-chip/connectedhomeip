@@ -77,6 +77,7 @@ asr_executable("temperature_measurement_app") {
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/examples/temperature-measurement-app/temperature-measurement-common",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
   ]
 

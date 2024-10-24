@@ -127,6 +127,7 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
 
         if (res == CHIP_NO_ERROR)
         {
+            // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): GetSocket calls ensure mSocket is valid
             if (bind(mSocket, &sa.any, sockaddrsize) != 0)
             {
                 res = CHIP_ERROR_POSIX(errno);
@@ -248,6 +249,7 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
         return INET_ERROR_WRONG_ADDRESS_TYPE;
     }
 
+    // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): GetSocket calls ensure mSocket is valid
     int conRes = connect(mSocket, &sa.any, sockaddrsize);
 
     if (conRes == -1 && errno != EINPROGRESS)
@@ -947,10 +949,9 @@ void TCPEndPointImplSockets::ReceiveData()
         {
             VerifyOrDie(rcvLen > 0);
             size_t newDataLength = rcvBuf->DataLength() + static_cast<size_t>(rcvLen);
-            VerifyOrDie(CanCastTo<uint16_t>(newDataLength));
             if (isNewBuf)
             {
-                rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength));
+                rcvBuf->SetDataLength(newDataLength);
                 rcvBuf.RightSize();
                 if (mRcvQueue.IsNull())
                 {
@@ -963,7 +964,7 @@ void TCPEndPointImplSockets::ReceiveData()
             }
             else
             {
-                rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength), mRcvQueue);
+                rcvBuf->SetDataLength(newDataLength, mRcvQueue);
             }
         }
     }

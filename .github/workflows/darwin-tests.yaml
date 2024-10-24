@@ -16,8 +16,9 @@ name: Darwin Tests
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -37,7 +38,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-asan-clang]
+                build_variant: [no-ble-no-shell-asan-clang]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
 
@@ -72,6 +73,10 @@ jobs:
                 platform: darwin
                 bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}
 
+            - name: Build iOS Darwin Framework Tool Build Debug
+              working-directory: src/darwin/Framework
+              run: xcodebuild -target "darwin-framework-tool" -sdk iphoneos -configuration Debug AD_HOC_CODE_SIGNING_ALLOWED=YES
+
             - name: Run macOS Darwin Framework Tool Build Debug
               working-directory: src/darwin/Framework
               run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug
@@ -95,6 +100,7 @@ jobs:
                         --target darwin-x64-lit-icd-${BUILD_VARIANT} \
                         --target darwin-x64-microwave-oven-${BUILD_VARIANT} \
                         --target darwin-x64-rvc-${BUILD_VARIANT} \
+                        --target darwin-x64-network-manager-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -116,6 +122,7 @@ jobs:
                      --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                      --microwave-oven-app ./out/darwin-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/darwin-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
+                     --network-manager-app ./out/darwin-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                   "
             - name: Run OTA Test
               run: |

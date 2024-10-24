@@ -21,6 +21,9 @@
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/TCP.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 namespace chip {
 
@@ -39,13 +42,29 @@ public:
 
     void Close();
 
-    void Disconnect(const Transport::PeerAddress & address);
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    CHIP_ERROR TCPConnect(const Transport::PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
+                          Transport::ActiveTCPConnectionState ** peerConnState);
+
+    void TCPDisconnect(const Transport::PeerAddress & address);
+
+    void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0);
+
+    void HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn) override;
+
+    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override;
+
+    void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     void SetSessionManager(TransportMgrDelegate * sessionManager) { mSessionManager = sessionManager; }
 
+    TransportMgrDelegate * GetSessionManager() { return mSessionManager; };
+
     CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join);
 
-    void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg) override;
+    void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
+                               Transport::MessageTransportContext * ctxt = nullptr) override;
 
 private:
     TransportMgrDelegate * mSessionManager = nullptr;

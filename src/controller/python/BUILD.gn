@@ -18,6 +18,7 @@ import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
 
+import("${chip_root}/build/chip/python_wheel.gni")
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/platform/python.gni")
 import("${chip_root}/src/system/system.gni")
@@ -29,12 +30,6 @@ if (current_os == "mac") {
 
 config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
-}
-
-declare_args() {
-  chip_python_version = "0.0"
-  chip_python_package_prefix = "chip"
-  chip_python_supports_stack_locking = chip_system_config_locking != "none"
 }
 
 shared_library("ChipDeviceCtrl") {
@@ -76,6 +71,8 @@ shared_library("ChipDeviceCtrl") {
       "chip/crypto/p256keypair.cpp",
       "chip/crypto/p256keypair.h",
       "chip/discovery/NodeResolution.cpp",
+      "chip/icd/PyChipCheckInDelegate.cpp",
+      "chip/icd/PyChipCheckInDelegate.h",
       "chip/interaction_model/Delegate.cpp",
       "chip/interaction_model/Delegate.h",
       "chip/internal/ChipThreadWork.cpp",
@@ -121,6 +118,7 @@ shared_library("ChipDeviceCtrl") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/server",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib",
@@ -128,6 +126,7 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
@@ -152,69 +151,6 @@ shared_library("ChipDeviceCtrl") {
   }
 
   configs += [ ":controller_wno_deprecate" ]
-}
-
-template("chip_python_wheel_action") {
-  _dist_dir = "${root_out_dir}/controller/python"
-
-  _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
-
-  pw_python_action(target_name) {
-    script = "build-chip-wheel.py"
-    forward_variables_from(invoker, "*")
-
-    _py_manifest_files_rebased = []
-    foreach(_manifest_entry, py_manifest_files) {
-      inputs += _manifest_entry.sources
-      _py_manifest_files_rebased += [
-        {
-          src_dir = rebase_path(_manifest_entry.src_dir,
-                                get_path_info(_py_manifest_file, "dir"))
-          sources =
-              rebase_path(_manifest_entry.sources, _manifest_entry.src_dir)
-        },
-      ]
-    }
-
-    if (defined(invoker.py_scripts)) {
-      _py_scripts = invoker.py_scripts
-    } else {
-      _py_scripts = []
-    }
-
-    _py_manifest = {
-      files = _py_manifest_files_rebased
-      packages = py_packages
-      scripts = _py_scripts
-      package_reqs = py_package_reqs
-    }
-
-    write_file(_py_manifest_file, _py_manifest, "json")
-
-    args = [
-      "--package_name",
-      py_package_name,
-      "--build_number",
-      chip_python_version,
-      "--build_dir",
-      rebase_path("${target_gen_dir}/${target_name}.py_build", root_build_dir),
-      "--dist_dir",
-      rebase_path(_dist_dir, root_build_dir),
-      "--manifest",
-      rebase_path(_py_manifest_file, root_build_dir),
-      "--plat-name",
-      py_platform_tag,
-    ]
-
-    if (defined(invoker.lib_name)) {
-      args += [
-        "--lib-name",
-        lib_name,
-      ]
-    }
-
-    outputs = [ "${_dist_dir}/$output_name" ]
-  }
 }
 
 chip_python_wheel_action("chip-core") {
@@ -243,7 +179,9 @@ chip_python_wheel_action("chip-core") {
         "chip/commissioning/commissioning_flow_blocks.py",
         "chip/commissioning/pase.py",
         "chip/configuration/__init__.py",
+        "chip/credentials/__init__.py",
         "chip/credentials/cert.py",
+        "chip/crypto/__init__.py",
         "chip/crypto/fabric.py",
         "chip/crypto/p256keypair.py",
         "chip/discovery/__init__.py",
@@ -414,10 +352,7 @@ chip_python_wheel_action("chip-clusters") {
 }
 
 chip_python_wheel_action("chip-repl") {
-  py_scripts = [
-    "chip-device-ctrl.py",
-    "chip-repl.py",
-  ]
+  py_scripts = [ "chip-repl.py" ]
 
   py_manifest_files = [
     {

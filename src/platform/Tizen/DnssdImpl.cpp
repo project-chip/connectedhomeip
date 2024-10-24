@@ -354,7 +354,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
     VerifyOrExit(ret == DNSSD_ERROR_NONE,
                  ChipLogError(DeviceLayer, "dnssd_service_get_all_txt_record() failed: %s", get_error_message(ret)));
 
-    rCtx->mResult.mAddress.SetValue(ipAddr);
+    rCtx->mResult.mAddress.emplace(ipAddr);
 
     {
         // Before calling the Resolve() callback, we need to lock stack mutex.
@@ -467,7 +467,7 @@ void ResolveContext::Finalize(CHIP_ERROR error)
     mResult.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
     mResult.mTextEntrySize = textEntries.size();
 
-    chip::Inet::IPAddress ipAddr = mResult.mAddress.Value();
+    chip::Inet::IPAddress ipAddr = mResult.mAddress.value();
 
     mCallback(mCbContext, &mResult, chip::Span<chip::Inet::IPAddress>(&ipAddr, 1), CHIP_NO_ERROR);
 }

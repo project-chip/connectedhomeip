@@ -31,6 +31,7 @@
 
 #include <errno.h>
 
+#include <filesystem>
 #include <sstream>
 #include <string>
 
@@ -418,8 +419,9 @@ void JsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
 
         info.result->address.ToString(address_buff);
 
-        result["supports_tcp"] = info.result->supportsTcp;
-        result["address"]      = address_buff;
+        result["supports_tcp_client"] = info.result->supportsTcpClient;
+        result["supports_tcp_server"] = info.result->supportsTcpServer;
+        result["address"]             = address_buff;
 
         result["mrp"]["idle_retransmit_timeout_ms"]   = info.result->mrpRemoteConfig.mIdleRetransTimeout.count();
         result["mrp"]["active_retransmit_timeout_ms"] = info.result->mrpRemoteConfig.mActiveRetransTimeout.count();
@@ -460,8 +462,16 @@ void JsonBackend::CloseFile()
 CHIP_ERROR JsonBackend::OpenFile(const char * path)
 {
     CloseFile();
-    mOutputFile.open(path, std::ios_base::out);
 
+    std::error_code ec;
+    std::filesystem::path filePath(path);
+    // Create directories if they don't exist
+    if (!std::filesystem::create_directories(filePath.remove_filename(), ec))
+    {
+        return CHIP_ERROR_POSIX(ec.value());
+    }
+
+    mOutputFile.open(path, std::ios_base::out);
     if (!mOutputFile)
     {
         return CHIP_ERROR_POSIX(errno);

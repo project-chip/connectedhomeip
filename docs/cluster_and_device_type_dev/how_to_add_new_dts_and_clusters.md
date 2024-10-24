@@ -1,4 +1,4 @@
-# How to Add New Device Types & Clusters
+# Adding new clusters and device types to the codegen
 
 This document outlines the process needed to add a new Matter device type and
 related clusters. Obviously, the steps below assume that the related Matter
@@ -17,10 +17,9 @@ directory:**
 
 1. [.github/workflows/tests.yaml](https://github.com/project-chip/connectedhomeip/tree/master/.github/workflows/tests.yaml)
 2. [scripts/rules.matterlint](https://github.com/project-chip/connectedhomeip/tree/master/scripts/rules.matterlint)
-3. [src/app/zap-templates/zcl/data-model/all.xml](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/data-model/all.xml)
-4. [src/app/zap-templates/zcl/zcl-with-test-extensions.json](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/zcl-with-test-extensions.json)
-5. [src/app/zap-templates/zcl/zcl.json](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/zcl.json)
-6. If it is a derived cluster, add a reference to the base cluster definition.
+3. [src/app/zap-templates/zcl/zcl-with-test-extensions.json](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/zcl-with-test-extensions.json)
+4. [src/app/zap-templates/zcl/zcl.json](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/zcl.json)
+5. If it is a derived cluster, add a reference to the base cluster definition.
    (e.g. in mode-base-cluster.xml you may need to add cluster codes - otherwise
    you may get strange exceptions which aren't clear when running regen_all.py)
 
@@ -31,7 +30,7 @@ directory:**
     > </struct>
     > ```
 
-7. [src/controller/python/chip/clusters/\_\_init\_\_.py](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python/chip/clusters/__init__.py)
+6. [src/controller/python/chip/clusters/\_\_init\_\_.py](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python/chip/clusters/__init__.py)
 
 **Enable your new cluster in the Python and Android clients** in
 [src/controller/data_model/controller-clusters.zap](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/data_model/controller-clusters.zap)

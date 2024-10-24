@@ -8,12 +8,12 @@ exclude = [
     "third_party",
     "examples/common/QRCode/",
 ]
-target-version = "py37"
+target-version = "py310"
 
 line-length = 132
 
 [lint]
 select = ["E4", "E7", "E9", "F"]
 ignore = [
-    "E721" # We use is for good reasons
+    "E721" # We use it for good reasons
 ]

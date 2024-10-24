@@ -17,6 +17,7 @@
  */
 
 #pragma once
+
 #import <Matter/Matter.h>
 #include <commands/common/Command.h>
 #include <commands/common/CredentialIssuerCommands.h>
@@ -25,8 +26,6 @@
 #include <string>
 
 #include "../provider/OTAProviderDelegate.h"
-
-#pragma once
 
 inline constexpr char kIdentityAlpha[] = "alpha";
 inline constexpr char kIdentityBeta[] = "beta";
@@ -39,9 +38,11 @@ public:
     {
         AddArgument("commissioner-name", &mCommissionerName);
         AddArgument("commissioner-nodeId", 0, UINT64_MAX, &mCommissionerNodeId,
-            "Sets the commisser node ID of the given "
+            "Sets the commissioner node ID of the given "
             "commissioner-name. Interactive mode will only set a single commissioner on the inital command. "
             "The commissioner node ID will be persisted until a different one is specified.");
+        AddArgument("commissioner-shared-storage", 0, 1, &mCommissionerSharedStorage,
+            "Use a shared storage instance instead of individual storage for each commissioner. Default is true.");
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
             "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
             "directory.");
@@ -88,8 +89,13 @@ protected:
 
     // This method returns the commissioner instance to be used for running the command.
     MTRDeviceController * CurrentCommissioner();
+    NSNumber * CurrentCommissionerFabricId();
 
     MTRDeviceController * GetCommissioner(const char * identity);
+
+    // Returns the MTRBaseDevice for the specified node ID.
+    // Will utilize an existing PASE connection if the device is being commissioned.
+    MTRBaseDevice * BaseDeviceWithNodeId(chip::NodeId nodeId);
 
     // Will log the given string and given error (as progress if success, error
     // if failure).
@@ -127,6 +133,8 @@ private:
     void StopWaiting();
 
     CHIP_ERROR MaybeSetUpStack();
+    CHIP_ERROR SetUpStackWithSharedStorage(NSArray<NSData *> * productAttestationAuthorityCertificates);
+    CHIP_ERROR SetUpStackWithPerControllerStorage(NSArray<NSData *> * productAttestationAuthorityCertificates);
     void MaybeTearDownStack();
 
     CHIP_ERROR GetPAACertsFromFolder(NSArray<NSData *> * __autoreleasing * paaCertsResult);
@@ -137,6 +145,9 @@ private:
     // The current controller; the one the current command should be using.
     MTRDeviceController * mCurrentController;
 
+    static bool sUseSharedStorage;
+    chip::Optional<bool> mCommissionerSharedStorage;
+
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     chip::Optional<char *> mCommissionerName;
@@ -145,4 +156,5 @@ private:
     static dispatch_queue_t mOTAProviderCallbackQueue;
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<chip::VendorId> mCommissionerVendorId;
+    std::string mCurrentIdentity;
 };

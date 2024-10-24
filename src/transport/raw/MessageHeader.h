@@ -59,8 +59,7 @@ static constexpr size_t kMaxPerSpecApplicationPayloadAndMICSizeBytes =
 static constexpr size_t kMaxPacketBufferApplicationPayloadAndMICSizeBytes = System::PacketBuffer::kMaxSize;
 
 static constexpr size_t kMaxApplicationPayloadAndMICSizeBytes =
-    min(kMaxPerSpecApplicationPayloadAndMICSizeBytes, kMaxPacketBufferApplicationPayloadAndMICSizeBytes);
-
+    std::min(kMaxPerSpecApplicationPayloadAndMICSizeBytes, kMaxPacketBufferApplicationPayloadAndMICSizeBytes);
 } // namespace detail
 
 static constexpr size_t kMaxTagLen = 16;
@@ -73,6 +72,16 @@ static_assert(detail::kMaxApplicationPayloadAndMICSizeBytes > kMaxTagLen, "Need 
 static constexpr size_t kMaxAppMessageLen = detail::kMaxApplicationPayloadAndMICSizeBytes - kMaxTagLen;
 
 static constexpr uint16_t kMsgUnicastSessionIdUnsecured = 0x0000;
+
+// Minimum header size of TCP + IPv6 without options.
+static constexpr size_t kMaxTCPAndIPHeaderSizeBytes = 60;
+
+// Max space for the Application Payload and MIC for large packet buffers
+// This is the size _excluding_ the header reserve.
+static constexpr size_t kMaxLargeApplicationPayloadAndMICSizeBytes =
+    System::PacketBuffer::kLargeBufMaxSize - kMaxTCPAndIPHeaderSizeBytes;
+
+static constexpr size_t kMaxLargeAppMessageLen = kMaxLargeApplicationPayloadAndMICSizeBytes - kMaxTagLen;
 
 typedef int PacketHeaderFlags;
 

@@ -63,6 +63,7 @@ ti_simplelink_executable("pump_app") {
   output_name = "chip-${ti_simplelink_board}-pump-example.out"
 
   sources = [
+    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/CHIPDeviceManager.cpp",
     "${project_dir}/main/DeviceCallbacks.cpp",
@@ -71,12 +72,17 @@ ti_simplelink_executable("pump_app") {
     "${project_dir}/main/main.cpp",
   ]
 
+  public = [
+    "${chip_root}/src/platform/cc13xx_26xx/DefaultTestEventTriggerDelegate.h",
+  ]
+
   deps = [
     ":sdk",
     ":sysconfig",
     "${chip_root}/examples/platform/cc13x4_26x4:cc13x4_26x4-attestation-credentials",
     "${chip_root}/examples/pump-app/pump-common",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/openthread:openthread",
   ]
   defines = []

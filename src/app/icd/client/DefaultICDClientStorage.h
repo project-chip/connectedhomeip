@@ -120,16 +120,24 @@ public:
     CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
                                      Protocols::SecureChannel::CounterType & counter) override;
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    size_t GetFabricListSize() { return mFabricList.size(); }
+
+    PersistentStorageDelegate * GetClientInfoStore() { return mpClientInfoStore; }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
 protected:
     enum class ClientInfoTag : uint8_t
     {
         kPeerNodeId       = 1,
-        kFabricIndex      = 2,
-        kStartICDCounter  = 3,
-        kOffset           = 4,
-        kMonitoredSubject = 5,
-        kAesKeyHandle     = 6,
-        kHmacKeyHandle    = 7,
+        kCheckInNodeId    = 2,
+        kFabricIndex      = 3,
+        kStartICDCounter  = 4,
+        kOffset           = 5,
+        kMonitoredSubject = 6,
+        kAesKeyHandle     = 7,
+        kHmacKeyHandle    = 8,
+        kClientType       = 9,
     };
 
     enum class CounterTag : uint8_t
@@ -156,10 +164,11 @@ protected:
     static constexpr size_t MaxICDClientInfoSize()
     {
         // All the fields added together
-        return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t) /*start_icd_counter*/,
-                                           sizeof(uint32_t) /*offset*/, sizeof(uint64_t) /*monitored_subject*/,
-                                           sizeof(Crypto::Symmetric128BitsKeyByteArray) /*aes_key_handle*/,
-                                           sizeof(Crypto::Symmetric128BitsKeyByteArray) /*hmac_key_handle*/);
+        return TLV::EstimateStructOverhead(
+            sizeof(NodeId), sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t) /*start_icd_counter*/,
+            sizeof(uint32_t) /*offset*/, sizeof(uint64_t) /*monitored_subject*/,
+            sizeof(Crypto::Symmetric128BitsKeyByteArray) /*aes_key_handle*/,
+            sizeof(Crypto::Symmetric128BitsKeyByteArray) /*hmac_key_handle*/, sizeof(uint8_t) /*client_type*/);
     }
 
     static constexpr size_t MaxICDCounterSize()
@@ -170,8 +179,11 @@ protected:
 
 private:
     friend class ICDClientInfoIteratorImpl;
+    CHIP_ERROR StoreFabricList();
     CHIP_ERROR LoadFabricList();
     CHIP_ERROR LoadCounter(FabricIndex fabricIndex, size_t & count, size_t & clientInfoSize);
+
+    bool FabricExists(FabricIndex fabricIndex);
 
     CHIP_ERROR IncreaseEntryCountForFabric(FabricIndex fabricIndex);
     CHIP_ERROR DecreaseEntryCountForFabric(FabricIndex fabricIndex);

@@ -242,36 +242,6 @@
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
- *  @def ReturnErrorCodeWithMetricIf(kMetricKey, expr, code)
- *
- *  @brief
- *    Returns a specified error code if expression evaluates to true
- *    If the expression evaluates to true, a metric with the specified key is emitted
- *    with the value set to code.
- *
- *  Example usage:
- *
- *  @code
- *    ReturnErrorCodeWithMetricIf(kMetricKey, state == kInitialized, CHIP_NO_ERROR);
- *    ReturnErrorCodeWithMetricIf(kMetricKey, state == kInitialized, CHIP_ERROR_INCORRECT_STATE);
- *  @endcode
- *
- *  @param[in]  kMetricKey  Metric key for the metric event to be emitted if the expr evaluates
- *                          to true. Value of the metric is to code.
- *  @param[in]  expr        A Boolean expression to be evaluated.
- *  @param[in]  code        A value to return if @a expr is false.
- */
-#define ReturnErrorCodeWithMetricIf(kMetricKey, expr, code)                                                                        \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (expr)                                                                                                                  \
-        {                                                                                                                          \
-            MATTER_LOG_METRIC(kMetricKey, code);                                                                                   \
-            return code;                                                                                                           \
-        }                                                                                                                          \
-    } while (false)
-
-/**
  *  @def SuccessOrExitWithMetric(kMetricKey, error)
  *
  *  @brief
@@ -434,14 +404,15 @@
  *  @param[in]  kMetricKey  Metric key for the metric event to be emitted.
  *                          Value of the metric is set to false.
  *  @param[in]  expr        A Boolean expression to be evaluated.
+ *  @param[in]  code        Error code to emit as part of the metric.
  *  @param[in]  ...         Statements to execute.
  */
-#define VerifyOrDoWithMetric(kMetricKey, expr, ...)                                                                                \
+#define VerifyOrDoWithMetric(kMetricKey, expr, code, ...)                                                                          \
     do                                                                                                                             \
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
-            MATTER_LOG_METRIC(kMetricKey, false);                                                                                  \
+            MATTER_LOG_METRIC(kMetricKey, code);                                                                                   \
             __VA_ARGS__;                                                                                                           \
         }                                                                                                                          \
     } while (false)
@@ -576,13 +547,11 @@
 
 #define VerifyOrReturnWithMetric(kMetricKey, expr, ...) VerifyOrReturn(expr, ##__VA_ARGS__)
 
-#define VerifyOrReturnErrorWithMetric(kMetricKey, expr, code, ...) VerifyOrReturnValue(expr, code, ##__VA_ARGS__)
+#define VerifyOrReturnErrorWithMetric(kMetricKey, expr, code, ...) VerifyOrReturnError(expr, code, ##__VA_ARGS__)
 
 #define VerifyOrReturnValueWithMetric(kMetricKey, expr, value, ...) VerifyOrReturnValue(expr, value, ##__VA_ARGS__)
 
 #define VerifyOrReturnLogErrorWithMetric(kMetricKey, expr, code) VerifyOrReturnLogError(expr, code)
-
-#define ReturnErrorCodeWithMetricIf(kMetricKey, expr, code) ReturnErrorCodeIf(expr, code)
 
 #define SuccessOrExitWithMetric(kMetricKey, aStatus) SuccessOrExit(aStatus)
 
@@ -592,7 +561,7 @@
 
 #define LogErrorOnFailureWithMetric(kMetricKey, expr) LogErrorOnFailure(expr)
 
-#define VerifyOrDoWithMetric(kMetricKey, expr, ...) VerifyOrDo(expr, ##__VA_ARGS__)
+#define VerifyOrDoWithMetric(kMetricKey, expr, code, ...) VerifyOrDo(expr, ##__VA_ARGS__)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Map all MATTER_LOG_METRIC_XYZ macros to noops

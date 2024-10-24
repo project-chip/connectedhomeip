@@ -14,6 +14,8 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/ble/ble.gni")
+import("${chip_root}/src/inet/inet.gni")
+import("${chip_root}/src/platform/device.gni")
 
 static_library("raw") {
   output_name = "libRawTransport"
@@ -23,17 +25,30 @@ static_library("raw") {
     "MessageHeader.cpp",
     "MessageHeader.h",
     "PeerAddress.h",
-    "TCP.cpp",
-    "TCP.h",
     "Tuple.h",
     "UDP.cpp",
     "UDP.h",
   ]
 
+  if (chip_inet_config_enable_tcp_endpoint) {
+    sources += [
+      "ActiveTCPConnectionState.h",
+      "TCP.cpp",
+      "TCP.h",
+      "TCPConfig.h",
+    ]
+  }
+
   if (chip_config_network_layer_ble) {
     sources += [
       "BLE.cpp",
       "BLE.h",
+    ]
+  }
+  if (chip_device_config_enable_wifipaf) {
+    sources += [
+      "WiFiPAF.cpp",
+      "WiFiPAF.h",
     ]
   }
 

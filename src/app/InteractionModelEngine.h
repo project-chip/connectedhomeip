@@ -31,8 +31,7 @@
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
-#include <app/CommandHandler.h>
-#include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
@@ -50,6 +49,8 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/OperationTypes.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/ReportScheduler.h>
@@ -86,12 +87,14 @@ namespace app {
  */
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
+                               private DataModel::ActionContext,
                                public CommandResponseSender::Callback,
-                               public CommandHandler::Callback,
+                               public CommandHandlerImpl::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
                                public SubscriptionsInfoProvider,
-                               public TimedHandlerDelegate
+                               public TimedHandlerDelegate,
+                               public WriteHandlerDelegate
 {
 public:
     /**
@@ -123,10 +126,6 @@ public:
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apFabricTable    A pointer to the FabricTable object.
      *  @param[in]    apCASESessionMgr An optional pointer to a CASESessionManager (used for re-subscriptions).
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
-     *          kState_NotInitialized.
-     *  @retval #CHIP_NO_ERROR On success.
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
@@ -192,11 +191,6 @@ public:
      */
     WriteHandler * ActiveWriteHandlerAt(unsigned int aIndex);
 
-    /**
-     * The Magic number of this InteractionModelEngine, the magic number is set during Init()
-     */
-    uint32_t GetMagicNumber() const { return mMagic; }
-
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
     reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
@@ -219,11 +213,6 @@ public:
     CHIP_ERROR PushFrontDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList,
                                               DataVersionFilter & aDataVersionFilter);
 
-    CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
-    CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
-    CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
-    void UnregisterCommandHandlers(EndpointId endpointId);
-
     /*
      * Register an application callback to be notified of notable events when handling reads/subscribes.
      */
@@ -239,6 +228,9 @@ public:
                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
     void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+
+    // WriteHandlerDelegate implementation
+    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & apath) override;
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
@@ -283,12 +275,6 @@ public:
      * Returns the number of dirty subscriptions. Including the subscriptions that are generating reports.
      */
     size_t GetNumDirtySubscriptions() const;
-
-    /**
-     * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write
-     * transaction is in the middle of processing the chunked value of the given path.)
-     */
-    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
 
     /**
      * Select the oldest (and the one that exceeds the per subscription resource minimum if there are any) read handler on the
@@ -418,7 +404,22 @@ public:
     }
 #endif
 
+    // Temporarily NOT const because the data model provider will be auto-set
+    // to codegen on first usage. This behaviour will be changed once each
+    // application must explicitly set the data model provider.
+    DataModel::Provider * GetDataModelProvider();
+
+    // MUST NOT be used while the interaction model engine is running as interaction
+    // model functionality (e.g. active reads/writes/subscriptions) rely on data model
+    // state
+    //
+    // Returns the old data model provider value.
+    DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
+
 private:
+    /* DataModel::ActionContext implementation */
+    Messaging::ExchangeContext * CurrentExchange() override { return mCurrentExchange; }
+
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
@@ -426,7 +427,7 @@ private:
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandResponseSender & apResponderObj) override;
-    void OnDone(CommandHandler & apCommandObj) override;
+    void OnDone(CommandHandlerImpl & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
     void TryToResumeSubscriptions();
@@ -457,9 +458,9 @@ private:
      *
      *
      */
-    static CHIP_ERROR ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                          AttributePathIBs::Parser & aAttributePathListParser, bool & aHasValidAttributePath,
-                                          size_t & aRequestedAttributePathCount);
+    CHIP_ERROR ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                   AttributePathIBs::Parser & aAttributePathListParser, bool & aHasValidAttributePath,
+                                   size_t & aRequestedAttributePathCount);
 
     /**
      * This parses the event path list to ensure it is well formed. If so, for each path in the list, it will expand to a list
@@ -470,9 +471,8 @@ private:
      *
      * aRequestedEventPathCount will be updated to reflect the number of event paths in the request.
      */
-    static CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                      EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
-                                      size_t & aRequestedEventPathCount);
+    CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor, EventPathIBs::Parser & aEventPathListParser,
+                               bool & aHasValidEventPath, size_t & aRequestedEventPathCount);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
@@ -506,9 +506,10 @@ private:
     Status OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                    System::PacketBufferHandle && aPayload);
 
-    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
-    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
+
+    Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override;
 
     bool HasActiveRead();
 
@@ -612,6 +613,15 @@ private:
     void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
+    Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath);
+    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest);
+    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest);
+
+    /**
+     * Check if the given attribute path is a valid path in the data model provider.
+     */
+    bool IsExistentAttributePath(const ConcreteAttributePath & path);
+
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     template <typename T, size_t N>
@@ -620,8 +630,6 @@ private:
     CHIP_ERROR PushFront(SingleLinkedListNode<T> *& aObjectList, T & aData, ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-
-    CommandHandlerInterface * mCommandHandlerList = nullptr;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ICDManager * mICDManager = nullptr;
@@ -707,9 +715,31 @@ private:
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
-    // A magic number for tracking values between stack Shutdown()-s and Init()-s.
-    // An ObjectHandle is valid iff. its magic equals to this one.
-    uint32_t mMagic = 0;
+    DataModel::Provider * mDataModelProvider      = nullptr;
+    Messaging::ExchangeContext * mCurrentExchange = nullptr;
+
+    enum class State : uint8_t
+    {
+        kUninitialized, // The object has not been initialized.
+        kInitializing,  // Initial setup is in progress (e.g. setting up mpExchangeMgr).
+        kInitialized    // The object has been fully initialized and is ready for use.
+    };
+    State mState = State::kUninitialized;
+
+    // Changes the current exchange context of a InteractionModelEngine to a given context
+    class CurrentExchangeValueScope
+    {
+    public:
+        CurrentExchangeValueScope(InteractionModelEngine & engine, Messaging::ExchangeContext * context) : mEngine(engine)
+        {
+            mEngine.mCurrentExchange = context;
+        }
+
+        ~CurrentExchangeValueScope() { mEngine.mCurrentExchange = nullptr; }
+
+    private:
+        InteractionModelEngine & mEngine;
+    };
 };
 
 } // namespace app

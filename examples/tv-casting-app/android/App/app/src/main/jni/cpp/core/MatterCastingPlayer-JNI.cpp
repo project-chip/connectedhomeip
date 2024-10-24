@@ -18,12 +18,14 @@
 
 #include "MatterCastingPlayer-JNI.h"
 
-#include "../JNIDACProvider.h"
 #include "../support/Converters-JNI.h"
 #include "../support/RotatingDeviceIdUniqueIdProvider-JNI.h"
-#include "core/CastingApp.h"             // from tv-casting-common
-#include "core/CastingPlayer.h"          // from tv-casting-common
-#include "core/CastingPlayerDiscovery.h" // from tv-casting-common
+#include "core/CastingApp.h"                       // from tv-casting-common
+#include "core/CastingPlayer.h"                    // from tv-casting-common
+#include "core/CastingPlayerDiscovery.h"           // from tv-casting-common
+#include "core/CommissionerDeclarationHandler.h"   // from tv-casting-common
+#include "core/ConnectionCallbacks.h"              // from tv-casting-common
+#include "core/IdentificationDeclarationOptions.h" // from tv-casting-common
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
@@ -43,61 +45,111 @@ namespace core {
 MatterCastingPlayerJNI MatterCastingPlayerJNI::sInstance;
 
 JNI_METHOD(jobject, verifyOrEstablishConnection)
-(JNIEnv * env, jobject thiz, jlong commissioningWindowTimeoutSec, jobject desiredEndpointFilterJavaObject, jobject jSuccessCallback,
- jobject jFailureCallback)
+(JNIEnv * env, jobject thiz, jobject jconnectionCallbacks, jlong commissioningWindowTimeoutSec,
+ jobject jIdentificationDeclarationOptions)
 {
     chip::DeviceLayer::StackLock lock;
-    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() called with a timeout of: %ld seconds",
-                    static_cast<long>(commissioningWindowTimeoutSec));
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() called with a timeout of: %d seconds",
+                    static_cast<int>(commissioningWindowTimeoutSec));
 
     CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
 
-    matter::casting::core::EndpointFilter desiredEndpointFilter;
-    if (desiredEndpointFilterJavaObject != nullptr)
-    {
-        // Convert the EndpointFilter Java class to a C++ EndpointFilter
-        jclass endpointFilterJavaClass = env->GetObjectClass(desiredEndpointFilterJavaObject);
-        jfieldID vendorIdFieldId       = env->GetFieldID(endpointFilterJavaClass, "vendorId", "Ljava/lang/Integer;");
-        jfieldID productIdFieldId      = env->GetFieldID(endpointFilterJavaClass, "productId", "Ljava/lang/Integer;");
-        jobject vendorIdIntegerObject  = env->GetObjectField(desiredEndpointFilterJavaObject, vendorIdFieldId);
-        jobject productIdIntegerObject = env->GetObjectField(desiredEndpointFilterJavaObject, productIdFieldId);
-        // jfieldID requiredDeviceTypesFieldId = env->GetFieldID(endpointFilterJavaClass, "requiredDeviceTypes",
-        // "Ljava/util/List;");
+    // Find the ConnectionCallbacks class, get the field IDs of the connection callbacks and extract the callback objects.
+    jclass connectionCallbacksClass = env->GetObjectClass(jconnectionCallbacks);
+    VerifyOrReturnValue(
+        connectionCallbacksClass != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT),
+        ChipLogError(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() connectionCallbacksClass == nullptr "));
 
-        // Value of 0 means unspecified
-        desiredEndpointFilter.vendorId  = vendorIdIntegerObject != nullptr
-             ? static_cast<uint16_t>(env->CallIntMethod(
-                  vendorIdIntegerObject, env->GetMethodID(env->GetObjectClass(vendorIdIntegerObject), "intValue", "()I")))
-             : 0;
-        desiredEndpointFilter.productId = productIdIntegerObject != nullptr
-            ? static_cast<uint16_t>(env->CallIntMethod(
-                  productIdIntegerObject, env->GetMethodID(env->GetObjectClass(productIdIntegerObject), "intValue", "()I")))
-            : 0;
-        // TODO: In following PRs. Translate the Java requiredDeviceTypes list to a C++ requiredDeviceTypes vector. For now we're
-        // passing an empty list of DeviceTypeStruct.
+    jfieldID successCallbackFieldID =
+        env->GetFieldID(connectionCallbacksClass, "onSuccess", "Lcom/matter/casting/support/MatterCallback;");
+    jfieldID failureCallbackFieldID =
+        env->GetFieldID(connectionCallbacksClass, "onFailure", "Lcom/matter/casting/support/MatterCallback;");
+    jfieldID commissionerDeclarationCallbackFieldID =
+        env->GetFieldID(connectionCallbacksClass, "onCommissionerDeclaration", "Lcom/matter/casting/support/MatterCallback;");
+
+    jobject jSuccessCallback                 = env->GetObjectField(jconnectionCallbacks, successCallbackFieldID);
+    jobject jFailureCallback                 = env->GetObjectField(jconnectionCallbacks, failureCallbackFieldID);
+    jobject jCommissionerDeclarationCallback = env->GetObjectField(jconnectionCallbacks, commissionerDeclarationCallbackFieldID);
+
+    VerifyOrReturnValue(
+        jSuccessCallback != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT),
+        ChipLogError(AppServer,
+                     "MatterCastingPlayer-JNI::verifyOrEstablishConnection() jSuccessCallback == nullptr but is mandatory "));
+    VerifyOrReturnValue(
+        jFailureCallback != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT),
+        ChipLogError(AppServer,
+                     "MatterCastingPlayer-JNI::verifyOrEstablishConnection() jFailureCallback == nullptr but is mandatory "));
+
+    // jIdentificationDeclarationOptions is optional
+    matter::casting::core::IdentificationDeclarationOptions * idOptions = nullptr;
+    if (jIdentificationDeclarationOptions == nullptr)
+    {
+        ChipLogProgress(AppServer,
+                        "MatterCastingPlayer-JNI::verifyOrEstablishConnection() Optional jIdentificationDeclarationOptions not "
+                        "provided by the client");
+    }
+    else
+    {
+        ChipLogProgress(
+            AppServer,
+            "MatterCastingPlayer-JNI::verifyOrEstablishConnection() jIdentificationDeclarationOptions was provided by client");
+        idOptions = support::convertIdentificationDeclarationOptionsFromJavaToCpp(jIdentificationDeclarationOptions);
+        VerifyOrReturnValue(idOptions != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT),
+                            ChipLogError(AppServer,
+                                         "MatterCastingPlayer-JNI::verifyOrEstablishConnection() "
+                                         "convertIdentificationDeclarationOptionsFromJavaToCpp() error"));
+        idOptions->LogDetail();
     }
 
     MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
     MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
-    castingPlayer->VerifyOrEstablishConnection(
-        [](CHIP_ERROR err, CastingPlayer * playerPtr) {
-            ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback called");
-            if (err == CHIP_NO_ERROR)
-            {
-                ChipLogProgress(AppServer, "MatterCastingPlayer-JNI:: Connected to Casting Player with device ID: %s",
-                                playerPtr->GetId());
-                MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.Handle(nullptr);
-            }
-            else
-            {
-                ChipLogError(AppServer, "MatterCastingPlayer-JNI:: ConnectCallback, connection error: %" CHIP_ERROR_FORMAT,
-                             err.Format());
-                MatterCastingPlayerJNIMgr().mConnectionFailureHandler.Handle(err);
-            }
-        },
-        static_cast<unsigned long long int>(commissioningWindowTimeoutSec), desiredEndpointFilter);
+
+    // jCommissionerDeclarationCallback is optional
+    if (jCommissionerDeclarationCallback == nullptr)
+    {
+        ChipLogProgress(AppServer,
+                        "MatterCastingPlayer-JNI::verifyOrEstablishConnection() optional jCommissionerDeclarationCallback was not "
+                        "provided by the client");
+    }
+    else
+    {
+        MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.SetUp(env, jCommissionerDeclarationCallback);
+    }
+
+    matter::casting::core::ConnectionCallbacks connectionCallbacks;
+    connectionCallbacks.mOnConnectionComplete = MatterCastingPlayerJNI::getInstance().getConnectCallback();
+    connectionCallbacks.mCommissionerDeclarationCallback =
+        MatterCastingPlayerJNI::getInstance().getCommissionerDeclarationCallback();
+
+    castingPlayer->VerifyOrEstablishConnection(connectionCallbacks, static_cast<uint16_t>(commissioningWindowTimeoutSec),
+                                               *idOptions);
+
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
+}
+
+JNI_METHOD(jobject, continueConnectingNative)
+(JNIEnv * env, jobject thiz)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::continueConnecting()");
+
+    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
+
+    return support::convertMatterErrorFromCppToJava(castingPlayer->ContinueConnecting());
+}
+
+JNI_METHOD(jobject, stopConnecting)
+(JNIEnv * env, jobject thiz)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::stopConnecting()");
+
+    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
+
+    return support::convertMatterErrorFromCppToJava(castingPlayer->StopConnecting());
 }
 
 JNI_METHOD(void, disconnect)
@@ -134,6 +186,54 @@ JNI_METHOD(jobject, getEndpoints)
         chip::JniReferences::GetInstance().AddToList(jEndpointList, matterEndpointJavaObject);
     }
     return jEndpointList;
+}
+
+void MatterCastingPlayerJNI::ConnectCallback(CHIP_ERROR err, CastingPlayer * playerPtr)
+{
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback()");
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer,
+                        "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback() Connected to Casting Player "
+                        "with device ID: %s",
+                        playerPtr->GetId());
+        // The Java jSuccessCallback is expecting a Void v callback parameter which translates to a nullptr. When calling the
+        // Java method from C++ via JNI, passing nullptr is equivalent to passing a Void object in Java.
+        MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.Handle(nullptr);
+    }
+    else
+    {
+        ChipLogError(
+            AppServer,
+            "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback() Connection error: %" CHIP_ERROR_FORMAT,
+            err.Format());
+        MatterCastingPlayerJNIMgr().mConnectionFailureHandler.Handle(err);
+    }
+}
+
+void MatterCastingPlayerJNI::CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source,
+                                                             chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
+{
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() CommissionerDeclarationCallback()");
+    cd.DebugLog();
+
+    char addressStr[chip::Transport::PeerAddress::kMaxToStringSize];
+    source.ToString(addressStr, sizeof(addressStr));
+    ChipLogProgress(AppServer,
+                    "MatterCastingPlayer-JNI::verifyOrEstablishConnection() CommissionerDeclarationCallback() source: %s",
+                    addressStr);
+
+    // Call the Java CommissionerDeclarationCallback if it was provided by the client.
+    if (!MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.IsSetUp())
+    {
+        ChipLogError(AppServer,
+                     "MatterCastingPlayer-JNI::verifyOrEstablishConnection() CommissionerDeclarationCallback() received from "
+                     "but Java callback is not set");
+    }
+    else
+    {
+        MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.Handle(cd);
+    }
 }
 
 }; // namespace core

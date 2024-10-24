@@ -100,7 +100,7 @@ tests:
 
           [1663842366.887733][13938:13938] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
           [1663842366.887797][13938:13938] CHIP:DL: Inet Layer shutdown
-          [1663842366.887851][13938:13938] CHIP:DL: BLE shutdown
+          [1663842366.887851][13938:13938] CHIP:DL: BLE Layer shutdown
           [1663842366.887905][13938:13938] CHIP:DL: System Layer shutdown
           [1663842366.888154][13938:13938] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/common/CHIPCommand.cpp:454: CHIP Error 0x00000032: Timeout
       disabled: true
@@ -154,7 +154,7 @@ tests:
           verify you got the following message in the TH_CR2(CHIP-TOOL) log
 
           [1700552012.724377][27528:27528] CHIP:DL: Inet Layer shutdown
-          [1700552012.724405][27528:27528] CHIP:DL: BLE shutdown
+          [1700552012.724405][27528:27528] CHIP:DL: BLE Layer shutdown
           [1700552012.724445][27528:27528] CHIP:DL: System Layer shutdown
           [1700552012.725294][27528:27528] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/common/CHIPCommand.cpp:589: CHIP Error 0x00000032: Timeout
       disabled: true
@@ -276,7 +276,7 @@ tests:
           Verify you got the following message in the TH_CR3(Chip-tool) log
 
           [1700552012.724377][27528:27528] CHIP:DL: Inet Layer shutdown
-          [1700552012.724405][27528:27528] CHIP:DL: BLE shutdown
+          [1700552012.724405][27528:27528] CHIP:DL: BLE Layer shutdown
           [1700552012.724445][27528:27528] CHIP:DL: System Layer shutdown
           [1700552012.725294][27528:27528] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/common/CHIPCommand.cpp:589: CHIP Error 0x00000032: Timeout
       disabled: true

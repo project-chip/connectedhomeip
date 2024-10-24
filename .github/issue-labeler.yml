@@ -5,12 +5,25 @@ darwin:
   # (like "kiosk" or whatnot), but do allow matching "ios8" and things
   # like that.
   #
+  # Make sure we don't trigger for the string "MAC", which almost
+  # certainly has nothing to do with Darwin.
+  #
   # \\b means "word boundary"
   # (?![a-z]) means "there is no next char in the range a-z".
-  - "/(\\bios(?![a-z])|homepod|darwin|\\bmac\\b|macos)/i"
+  - "/(\\b[Ii][Oo][Ss](?![a-zA-Z])|[Hh][Oo][Mm][Ee][Pp][Oo][Dd]|[Dd][Aa][Rr][Ww][Ii][Nn]|\\bm[Aa][Cc]\\b|\\bMa[Cc]\\b|\\bM[Aa]c\\b|[Mm][Aa][Cc][Oo][Ss])/"
 
-linux:
-  - "/(linux)/i"
+
+# NOTE:
+# Linux intentionally disabled: most people compile either on linux or darwin and
+# as a result a lot of issues get tagged as such even though they are not platform specific
+# (e.g. we get test case failures reported as linux even though they are just normal
+# test runs)
+#
+# Linux label should be reserved to platform-specific problems (usually bootstrap/packages
+# or integration with wifi/ethernet/bluetootn/etc.)
+#
+# linux:
+#   - "/(linux)/i"
 
 # Special Keywords for Cert Blockers
 air purifiers:

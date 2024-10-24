@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
+import("//build_overrides/googletest.gni")
 import("//build_overrides/pigweed.gni")
 
 # The location of the build configuration file.
@@ -25,12 +26,18 @@ script_executable = "python3"
 
 default_args = {
   pw_unit_test_AUTOMATIC_RUNNER = "$dir_pigweed/targets/host/run_test"
+  pw_unit_test_CONFIG = "//config/pw_unit_test:define_overrides"
 
   pw_build_PIP_CONSTRAINTS = [ "//scripts/setup/constraints.txt" ]
   pw_build_PIP_REQUIREMENTS = [ "//scripts/setup/requirements.build.txt" ]
 
   # GN target to use for the default Python build venv.
   pw_build_PYTHON_BUILD_VENV = "//:matter_build_venv"
+
+  # Use the GoogleTest backend for unit tests running on host.
+  pw_unit_test_BACKEND = "$dir_pw_unit_test:googletest"
+  pw_unit_test_MAIN = "$dir_pigweed/third_party/googletest:gmock_main"
+  dir_pw_third_party_googletest = "$dir_googletest"
 
   # Required for pw_unit_test
   pw_sys_io_BACKEND = "$dir_pw_sys_io_stdio"

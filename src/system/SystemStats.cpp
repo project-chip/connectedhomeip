@@ -38,7 +38,7 @@ namespace System {
 namespace Stats {
 
 static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
 #define LWIP_PBUF_MEMPOOL(name, num, payload, desc) "SystemLayer_Num" desc,
 #include "lwippools.h"
 #undef LWIP_PBUF_MEMPOOL
@@ -107,7 +107,7 @@ bool Difference(Snapshot & result, Snapshot & after, Snapshot & before)
 
 void UpdateLwipPbufCounts(void)
 {
-#if LWIP_PBUF_FROM_CUSTOM_POOLS
+#if CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
     size_t lwip_pool_idx = PBUF_CUSTOM_POOL_IDX_END;
     size_t system_idx    = 0;
 
@@ -119,12 +119,12 @@ void UpdateLwipPbufCounts(void)
         system_idx++;
     }
 
-#else // LWIP_PBUF_FROM_CUSTOM_POOLS
+#else // CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
 
     chip::System::Stats::GetResourcesInUse()[kSystemLayer_NumPacketBufs] = MEMP_STATS_GET(used, MEMP_PBUF_POOL);
     chip::System::Stats::GetHighWatermarks()[kSystemLayer_NumPacketBufs] = MEMP_STATS_GET(max, MEMP_PBUF_POOL);
 
-#endif // LWIP_PBUF_FROM_CUSTOM_POOLS
+#endif // CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
 

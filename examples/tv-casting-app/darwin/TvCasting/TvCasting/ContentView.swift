@@ -26,7 +26,7 @@ struct ContentView: View {
             }
             else
             {
-                StartFromCacheView()
+                CommissionerDiscoveryView()
             }
         }
     }

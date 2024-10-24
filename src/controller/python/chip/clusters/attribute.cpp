@@ -145,18 +145,20 @@ public:
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
+        // Only enable auto resubscribe if the subscription is established successfully.
+        mAutoResubscribeNeeded = mAutoResubscribe;
         gOnSubscriptionEstablishedCallback(mAppContext, aSubscriptionId);
     }
 
     CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
     {
-        if (mAutoResubscribe)
+        if (mAutoResubscribeNeeded)
         {
             ReturnErrorOnFailure(ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
         }
         gOnResubscriptionAttemptedCallback(mAppContext, ToPyChipError(aTerminationCause),
                                            apReadClient->ComputeTimeTillNextSubscription());
-        if (mAutoResubscribe)
+        if (mAutoResubscribeNeeded)
         {
             return CHIP_NO_ERROR;
         }
@@ -242,7 +244,8 @@ private:
     PyObject * mAppContext;
 
     std::unique_ptr<ReadClient> mReadClient;
-    bool mAutoResubscribe = true;
+    bool mAutoResubscribe       = true;
+    bool mAutoResubscribeNeeded = false;
 };
 
 extern "C" {
@@ -450,18 +453,32 @@ exit:
     return ToPyChipError(err);
 }
 
-void pychip_ReadClient_Abort(ReadClient * apReadClient, ReadClientCallback * apCallback)
+void pychip_ReadClient_ShutdownSubscription(ReadClient * apReadClient)
 {
-    VerifyOrDie(apReadClient != nullptr);
-    VerifyOrDie(apCallback != nullptr);
+    // If apReadClient is nullptr, it means that its life cycle has ended (such as an error happend), and nothing needs to be done.
+    VerifyOrReturn(apReadClient != nullptr);
+    // If it is not SubscriptionType, this function should not be executed.
+    VerifyOrDie(apReadClient->IsSubscriptionType());
 
-    delete apCallback;
+    Optional<SubscriptionId> subscriptionId = apReadClient->GetSubscriptionId();
+    VerifyOrDie(subscriptionId.HasValue());
+
+    FabricIndex fabricIndex = apReadClient->GetFabricIndex();
+    NodeId nodeId           = apReadClient->GetPeerNodeId();
+
+    InteractionModelEngine::GetInstance()->ShutdownSubscription(ScopedNodeId(nodeId, fabricIndex), subscriptionId.Value());
 }
 
 void pychip_ReadClient_OverrideLivenessTimeout(ReadClient * pReadClient, uint32_t livenessTimeoutMs)
 {
     VerifyOrDie(pReadClient != nullptr);
     pReadClient->OverrideLivenessTimeout(System::Clock::Milliseconds32(livenessTimeoutMs));
+}
+
+void pychip_ReadClient_TriggerResubscribeIfScheduled(ReadClient * pReadClient, const char * reason)
+{
+    VerifyOrDie(pReadClient != nullptr);
+    pReadClient->TriggerResubscribeIfScheduled(reason);
 }
 
 PyChipError pychip_ReadClient_GetReportingIntervals(ReadClient * pReadClient, uint16_t * minIntervalSec, uint16_t * maxIntervalSec)
@@ -488,10 +505,10 @@ void pychip_ReadClient_GetSubscriptionTimeoutMs(ReadClient * pReadClient, uint32
     }
 }
 
-PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
-                                   DeviceProxy * device, uint8_t * readParamsBuf, void ** attributePathsFromPython,
-                                   size_t numAttributePaths, void ** dataversionFiltersFromPython, size_t numDataversionFilters,
-                                   void ** eventPathsFromPython, size_t numEventPaths, uint64_t * eventNumberFilter)
+PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, DeviceProxy * device, uint8_t * readParamsBuf,
+                                   void ** attributePathsFromPython, size_t numAttributePaths, void ** dataversionFiltersFromPython,
+                                   size_t numDataversionFilters, void ** eventPathsFromPython, size_t numEventPaths,
+                                   uint64_t * eventNumberFilter)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     PyReadAttributeParams pyParams = {};
@@ -603,7 +620,6 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
     }
 
     *pReadClient = readClient.get();
-    *pCallback   = callback.get();
 
     callback->AdoptReadClient(std::move(readClient));
 

@@ -313,13 +313,6 @@ public:
 private:
     // Private data members:
 
-    // UUID of CHIP service characteristic used for central writes.
-    static const ChipBleUUID CHIP_BLE_CHAR_1_ID;
-    // UUID of CHIP service characteristic used for peripheral indications.
-    static const ChipBleUUID CHIP_BLE_CHAR_2_ID;
-    // UUID of CHIP service characteristic used for additional data
-    static const ChipBleUUID CHIP_BLE_CHAR_3_ID;
-
     BleConnectionDelegate * mConnectionDelegate;
     BlePlatformDelegate * mPlatformDelegate;
     BleApplicationDelegate * mApplicationDelegate;
@@ -327,7 +320,6 @@ private:
 
     // Private functions:
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);
-    void DriveSending();
     CHIP_ERROR HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, System::PacketBufferHandle && pBuf);
 
     static BleTransportProtocolVersion GetHighestSupportedProtocolVersion(const BleTransportCapabilitiesRequestMessage & reqMsg);

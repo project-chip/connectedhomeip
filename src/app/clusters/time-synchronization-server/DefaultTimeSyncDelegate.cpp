@@ -24,17 +24,6 @@
 using chip::TimeSyncDataProvider;
 using namespace chip::app::Clusters::TimeSynchronization;
 
-void DefaultTimeSyncDelegate::TimeZoneListChanged(const Span<TimeSyncDataProvider::TimeZoneStore> timeZoneList)
-{
-    // placeholder implementation
-}
-
-bool DefaultTimeSyncDelegate::HandleUpdateDSTOffset(chip::CharSpan name)
-{
-    // placeholder implementation
-    return false;
-}
-
 bool DefaultTimeSyncDelegate::IsNTPAddressValid(chip::CharSpan ntp)
 {
     // placeholder implementation
@@ -66,15 +55,4 @@ CHIP_ERROR DefaultTimeSyncDelegate::UpdateTimeFromPlatformSource(chip::Callback:
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR DefaultTimeSyncDelegate::UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
-                                                               chip::Callback::Callback<OnFallbackNTPCompletion> * callback)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-void DefaultTimeSyncDelegate::UTCTimeAvailabilityChanged(uint64_t time)
-{
-    // placeholder implementation
 }

@@ -6,12 +6,13 @@ RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     git \
+    xz-utils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 RUN set -x \
-    && git clone --recursive -b v5.1.2 --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git /tmp/esp-idf \
+    && git clone --recursive -b v5.3 --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git /tmp/esp-idf \
     && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}

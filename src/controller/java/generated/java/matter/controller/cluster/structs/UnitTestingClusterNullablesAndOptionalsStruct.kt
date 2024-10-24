@@ -36,7 +36,7 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
   val nullableOptionalStruct: Optional<UnitTestingClusterSimpleStruct>?,
   val nullableList: List<UByte>?,
   val optionalList: Optional<List<UByte>>,
-  val nullableOptionalList: Optional<List<UByte>>?
+  val nullableOptionalList: Optional<List<UByte>>?,
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterNullablesAndOptionalsStruct {\n")
@@ -218,7 +218,7 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
           Optional.of(
             UnitTestingClusterSimpleStruct.fromTlv(
               ContextSpecificTag(TAG_OPTIONAL_STRUCT),
-              tlvReader
+              tlvReader,
             )
           )
         } else {
@@ -230,7 +230,7 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
             Optional.of(
               UnitTestingClusterSimpleStruct.fromTlv(
                 ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT),
-                tlvReader
+                tlvReader,
               )
             )
           } else {
@@ -301,7 +301,7 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
         nullableOptionalStruct,
         nullableList,
         optionalList,
-        nullableOptionalList
+        nullableOptionalList,
       )
     }
   }

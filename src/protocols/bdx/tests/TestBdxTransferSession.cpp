@@ -1,15 +1,15 @@
-#include <protocols/Protocols.h>
-#include <protocols/bdx/BdxMessages.h>
-#include <protocols/bdx/BdxTransferSession.h>
-
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <protocols/Protocols.h>
+#include <protocols/bdx/BdxMessages.h>
+#include <protocols/bdx/BdxTransferSession.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/SystemPacketBuffer.h>
@@ -124,6 +124,13 @@ void VerifyNoMoreOutput(TransferSession & transferSession)
     EXPECT_EQ(event.EventType, TransferSession::OutputEventType::kNone);
 }
 
+void VerifyInternalError(TransferSession & transferSession)
+{
+    TransferSession::OutputEvent event;
+    transferSession.PollOutput(event, kNoAdvanceTime);
+    EXPECT_EQ(event.EventType, TransferSession::OutputEventType::kInternalError);
+}
+
 // Helper method for initializing two TransferSession objects, generating a TransferInit message, and passing it to a responding
 // TransferSession.
 void SendAndVerifyTransferInit(TransferSession::OutputEvent & outEvent, System::Clock::Timeout timeout, TransferSession & initiator,
@@ -233,6 +240,30 @@ void SendAndVerifyAcceptMsg(TransferSession::OutputEvent & outEvent, TransferSes
 
     // Verify that MaxBlockSize was set appropriately
     EXPECT_LE(acceptReceiver.GetTransferBlockSize(), initData.MaxBlockSize);
+}
+
+void SendAndVerifyRejectMsg(TransferSession::OutputEvent & outEvent, TransferSession & rejectSender, StatusCode reason,
+                            TransferSession & rejectReceiver)
+{
+    CHIP_ERROR err = rejectSender.RejectTransfer(reason);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Verify Sender emits status message for sending
+    rejectSender.PollOutput(outEvent, kNoAdvanceTime);
+    VerifyNoMoreOutput(rejectSender);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
+    System::PacketBufferHandle statusReportMsg = outEvent.MsgData.Retain();
+    VerifyStatusReport(std::move(outEvent.MsgData), reason);
+
+    // Pass status message to rejectReceiver
+    err = AttachHeaderAndSend(outEvent.msgTypeData, std::move(outEvent.MsgData), rejectReceiver);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Verify received status message.
+    rejectReceiver.PollOutput(outEvent, kNoAdvanceTime);
+    VerifyInternalError(rejectReceiver);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kStatusReceived);
+    EXPECT_EQ(outEvent.statusData.statusCode, reason);
 }
 
 // Helper method for preparing a sending a BlockQuery message between two TransferSession objects.
@@ -697,4 +728,34 @@ TEST_F(TestBdxTransferSession, TestDuplicateBlockError)
         EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kInternalError);
         EXPECT_EQ(outEvent.statusData.statusCode, StatusCode::kBadBlockCounter);
     }
+}
+
+TEST_F(TestBdxTransferSession, TestRejectTransfer)
+{
+    TransferSession::OutputEvent outEvent;
+    TransferSession initiatingReceiver;
+    TransferSession respondingSender;
+
+    // Chosen arbitrarily for this test
+    uint16_t proposedBlockSize     = 128;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
+    TransferControlFlags driveMode = TransferControlFlags::kReceiverDrive;
+
+    // ReceiveInit parameters
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlags = driveMode;
+    initOptions.MaxBlockSize     = proposedBlockSize;
+    char testFileDes[9]          = { "test.txt" };
+    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
+    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+
+    // Initialize respondingSender and pass ReceiveInit message
+    BitFlags<TransferControlFlags> senderOpts;
+    senderOpts.Set(driveMode);
+
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender,
+                              senderOpts, proposedBlockSize);
+
+    // Reject the transfer with a status
+    SendAndVerifyRejectMsg(outEvent, respondingSender, StatusCode::kResponderBusy, initiatingReceiver);
 }

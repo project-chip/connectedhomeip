@@ -26,14 +26,19 @@
 #define CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS 2
 
 // Uncomment this for a large Tunnel MTU.
-//#define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
+// #define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 
 // Enable support functions for parsing command-line arguments
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
 
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+//  Enable use of test setup parameters for testing purposes only.
+//
+//    WARNING: This option makes it possible to circumvent basic chip security functionality.
+//    Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+//
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+#define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
+#endif
 
 // Enable reading DRBG seed data from /dev/(u)random.
 // This is needed for test applications and the CHIP device manager to function
@@ -45,6 +50,8 @@
 //
 //    WARNING: These options make it possible to circumvent basic Chip security functionality,
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
+//
+//    To build with this flag, pass 'treat_warnings_as_errors=false' to gn/ninja.
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 

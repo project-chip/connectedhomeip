@@ -1,0 +1,274 @@
+# Copyright (c) 2021-2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+import("//build_overrides/openthread.gni")
+
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
+import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+
+declare_args() {
+  # Setup discriminator as argument
+  setup_discriminator = 3840
+  chip_with_diag_logs_demo = true
+}
+
+assert(current_os == "freertos")
+assert(target_os == "freertos")
+
+example_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
+common_example_dir = "${chip_root}/examples/platform/nxp/common"
+support_common_platform_dir =
+    "${nxp_sdk_matter_support_root}/examples/platform/common"
+
+mcxw71_k32w1_sdk("sdk") {
+  defines = []
+  include_dirs = []
+  sources = []
+
+  # Indicate the path to CHIPProjectConfig.h
+  include_dirs += [ "include/config" ]
+
+  # Indicate the default path to FreeRTOSConfig.h
+  include_dirs += [ "${example_platform_dir}/app/project_include/freeRTOS" ]
+
+  # Indicate the default path to OpenThreadConfig.h
+  include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
+
+  # Indicate the default path to GATT database
+  include_dirs += [ "${support_common_platform_dir}/ble" ]
+
+  include_dirs += [
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C",
+  ]
+
+  sources += [
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C/clock_config.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C/pin_mux.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/app_services_init.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_comp.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_dcdc.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_extflash.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_lp.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/hardware_init.c",
+    "${support_common_platform_dir}/ble/ble_function_mux.c",
+  ]
+
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
+
+  if (chip_key_storage == "littlefs") {
+    include_dirs += [ "${example_platform_dir}/board" ]
+    sources += [
+      "${example_platform_dir}/board/peripherals.c",
+      "${example_platform_dir}/board/peripherals.h",
+    ]
+  }
+}
+
+mcxw71_k32w1_executable("contact_sensor_app") {
+  output_name = "chip-mcxw71-contact-example"
+
+  defines = []
+  deps = []
+  include_dirs = []
+  sources = []
+
+  # Defines used by common code
+  defines += [
+    "CONFIG_NET_L2_OPENTHREAD=1",
+    "CONFIG_NETWORK_LAYER_BLE=1",
+    "CONFIG_THREAD_DEVICE_TYPE=kThreadDeviceType_SleepyEndDevice",
+    "CONFIG_OPERATIONAL_KEYSTORE=1",
+    "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
+  ]
+
+  if (chip_with_diag_logs_demo) {
+    defines += [ "CONFIG_DIAG_LOGS_DEMO=1" ]
+  }
+
+  if (chip_with_low_power == 1) {
+    defines += [ "CONFIG_LOW_POWER=1" ]
+  } else {
+    defines += [
+      "CONFIG_ENABLE_FEEDBACK=1",
+      "APP_QUEUE_TICKS_TO_WAIT=pdMS_TO_TICKS(10)",
+    ]
+  }
+
+  # App common files
+  include_dirs += [
+    "${common_example_dir}/app_task/include",
+    "${common_example_dir}/matter_button/include",
+    "${common_example_dir}/clusters/include",
+    "${common_example_dir}/device_callbacks/include",
+    "${common_example_dir}/device_manager/include",
+    "${common_example_dir}/diagnostic_logs/include",
+    "${common_example_dir}/factory_data/include",
+    "${common_example_dir}/led_widget/include",
+    "${common_example_dir}/low_power/include",
+    "${common_example_dir}/operational_keystore/include",
+    "${common_example_dir}/ui_feedback/include",
+    "${common_example_dir}/app_ble/include",
+  ]
+
+  sources += [
+    "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
+    "${common_example_dir}/app_task/source/AppTaskBase.cpp",
+    "${common_example_dir}/app_task/source/AppTaskFreeRTOS.cpp",
+    "${common_example_dir}/clusters/source/ZclCallbacks.cpp",
+    "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
+    "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
+    "${common_example_dir}/matter_button/source/ButtonApp.cpp",
+    "${common_example_dir}/matter_button/source/ButtonBle.cpp",
+    "${common_example_dir}/matter_button/source/ButtonManager.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationAppAndBle.cpp",
+    "${common_example_dir}/matter_button/source/ButtonWithTimer.cpp",
+    "${common_example_dir}/operational_keystore/source/OperationalKeystoreS200.cpp",
+    "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
+  ]
+
+  if (chip_with_low_power == 1) {
+    sources += [ "${common_example_dir}/low_power/source/LowPower.cpp" ]
+  }
+
+  if (chip_with_factory_data == 1) {
+    include_dirs +=
+        [ "${chip_root}/src/platform/nxp/common/factory_data/legacy" ]
+    deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    defines += [
+      "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/ota/OTAImageProcessorImpl.h\"",
+
+      # The status LED and the external flash CS pin are wired together. The OTA image writing may fail if used together.
+      "LED_MANAGER_ENABLE_STATUS_LED=0",
+    ]
+
+    include_dirs += [
+      "${common_example_dir}/ota_requestor/include",
+      "${chip_root}/src/platform/nxp/common/ota",
+    ]
+    sources += [ "${common_example_dir}/ota_requestor/source/OTARequestorInitiatorMultiImage.cpp" ]
+    deps += [ "${chip_root}/src/platform/nxp:nxp_ota" ]
+  }
+
+  if (chip_with_diag_logs_demo) {
+    sources += [
+      "${common_example_dir}/diagnostic_logs/source/DiagnosticLogsDemo.cpp",
+      "${common_example_dir}/diagnostic_logs/source/DiagnosticLogsProviderDelegateImpl.cpp",
+    ]
+  }
+
+  # Platform specific files
+  include_dirs += [
+    "${example_platform_dir}/util",
+    "${example_platform_dir}/app/support",
+    "${example_platform_dir}/button",
+  ]
+
+  sources += [ "${example_platform_dir}/clusters/Identify.cpp" ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [ "${example_platform_dir}/ota/OtaUtils.cpp" ]
+  }
+
+  include_dirs += [
+    "include/config",
+    "../common/include",
+  ]
+
+  sources += [
+    "../common/AppTask.cpp",
+    "../common/DeviceCallbacks.cpp",
+    "../common/ZclCallbacks.cpp",
+    "../common/main.cpp",
+  ]
+
+  if (chip_with_low_power == 0) {
+    sources += [
+      "${common_example_dir}/ui_feedback/source/LedManager.cpp",
+      "${example_platform_dir}/util/LedOnOff.cpp",
+    ]
+  }
+
+  deps += [
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/platform/logging:default",
+  ]
+
+  #lit and sit are using different zap files
+  if (chip_enable_icd_lit) {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/" ]
+  } else {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-sit/" ]
+  }
+
+  if (chip_openthread_ftd) {
+    deps += [
+      "${openthread_root}:libopenthread-cli-ftd",
+      "${openthread_root}:libopenthread-ftd",
+    ]
+  } else {
+    deps += [
+      "${openthread_root}:libopenthread-cli-mtd",
+      "${openthread_root}:libopenthread-mtd",
+    ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  ldscript = "${nxp_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc/connectivity.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [
+    "-Wl,--defsym=__heap_size__=0",
+    "-Wl,--defsym=__stack_size__=0x480",
+    "-Wl,--defsym=lp_ram_lower_limit=0x04000000",
+    "-Wl,--defsym=lp_ram_upper_limit=0x2001C000",
+    "-Wl,-print-memory-usage",
+    "-Wl,--no-warn-rwx-segments",
+    "-T" + rebase_path(ldscript, root_build_dir),
+  ]
+
+  if (chip_with_factory_data == 1) {
+    ldflags += [ "-Wl,--defsym=gUseFactoryData_d=1" ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("default") {
+  deps = [ ":contact_sensor_app" ]
+}

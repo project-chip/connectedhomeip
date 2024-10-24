@@ -18,6 +18,7 @@
 #include "Efr32OpaqueKeypair.h"
 #include "em_device.h"
 #include <psa/crypto.h>
+#include <sl_psa_crypto.h>
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
@@ -46,14 +47,6 @@ namespace Internal {
 
 static_assert((kEFR32OpaqueKeyIdPersistentMax - kEFR32OpaqueKeyIdPersistentMin) < PSA_KEY_ID_FOR_MATTER_SIZE,
               "Not enough PSA range to store all allowed opaque key IDs");
-
-#if defined(SEMAILBOX_PRESENT) && (_SILICON_LABS_SECURITY_FEATURE == _SILICON_LABS_SECURITY_FEATURE_VAULT)
-#define PSA_CRYPTO_LOCATION_FOR_DEVICE PSA_KEY_LOCATION_SL_SE_OPAQUE
-#elif defined(CRYPTOACC_PRESENT) && defined(SEPUF_PRESENT) && defined(SL_TRUSTZONE_NONSECURE)
-#define PSA_CRYPTO_LOCATION_FOR_DEVICE PSA_KEY_LOCATION_SL_CRYPTOACC_OPAQUE
-#else
-#define PSA_CRYPTO_LOCATION_FOR_DEVICE PSA_KEY_LOCATION_LOCAL_STORAGE
-#endif
 
 static void _log_PSA_error(psa_status_t status)
 {
@@ -190,7 +183,8 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId opaque_id, EFR32OpaqueKey
     if (opaque_id == kEFR32OpaqueKeyIdVolatile)
     {
         psa_set_key_lifetime(
-            &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_VOLATILE, PSA_CRYPTO_LOCATION_FOR_DEVICE));
+            &attr,
+            PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_VOLATILE, sl_psa_get_most_secure_key_location()));
     }
     else
     {
@@ -210,7 +204,8 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId opaque_id, EFR32OpaqueKey
 
         psa_set_key_id(&attr, key_id);
         psa_set_key_lifetime(
-            &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, PSA_CRYPTO_LOCATION_FOR_DEVICE));
+            &attr,
+            PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, sl_psa_get_most_secure_key_location()));
     }
 
     switch (usage)

@@ -18,8 +18,9 @@
 
 #include <cstring>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Scoped.h>
 #include <lib/support/static_support_smart_ptr.h>
 
@@ -56,6 +57,7 @@ TEST(TestStaticSupportSmartPtr, TestCheckedGlobalInstanceReference)
     // We expect that sizes of global references is minimal
     EXPECT_EQ(sizeof(ref), 1u);
 
+    ASSERT_TRUE(ref);
     EXPECT_EQ(ref->num, 123);
     EXPECT_STREQ(ref->str, "abc");
 
@@ -69,6 +71,7 @@ TEST(TestStaticSupportSmartPtr, TestCheckedGlobalInstanceReference)
 
     CheckedGlobalInstanceReference<TestClass> ref2(&gTestClass);
 
+    ASSERT_TRUE(ref2);
     EXPECT_EQ(ref->num, ref2->num);
     EXPECT_STREQ(ref->str, ref2->str);
 
@@ -82,6 +85,10 @@ TEST(TestStaticSupportSmartPtr, TestCheckedGlobalInstanceReference)
         EXPECT_EQ(ref2->num, 321);
         EXPECT_STREQ(ref2->str, "test");
     }
+
+    // Check default constructed CheckedGlobalInstanceReference
+    CheckedGlobalInstanceReference<TestClass> ref_default;
+    ASSERT_TRUE(ref_default);
 }
 
 TEST(TestStaticSupportSmartPtr, TestSimpleInstanceReference)
@@ -95,6 +102,9 @@ TEST(TestStaticSupportSmartPtr, TestSimpleInstanceReference)
     // overhead of simple references should be a simple pointer
     EXPECT_LE(sizeof(ref_a), sizeof(void *));
 
+    ASSERT_TRUE(ref_a);
+    ASSERT_TRUE(ref_b);
+
     EXPECT_EQ(ref_a->num, 123);
     EXPECT_EQ(ref_b->num, 100);
 
@@ -103,6 +113,10 @@ TEST(TestStaticSupportSmartPtr, TestSimpleInstanceReference)
 
     EXPECT_EQ(a.num, 99);
     EXPECT_EQ(ref_b->num, 30);
+
+    // Check default constructed SimpleInstanceReference
+    SimpleInstanceReference<TestClass> ref_default;
+    ASSERT_FALSE(ref_default);
 }
 
 } // namespace

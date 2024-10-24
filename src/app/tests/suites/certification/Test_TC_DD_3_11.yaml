@@ -171,6 +171,46 @@ tests:
           [1651105530.973215][27371:27371] CHIP:DIS: Updating services using commissioning mode 0
       disabled: true
 
+    - label: "Step 2d: Scan the QR code from the previous step using the DUT."
+      PICS: MCORE.DD.DISCOVERY_PAF
+      verification: |
+          1. User has a QR code to pass into DUT
+
+          # ./chip-all-clusters-app --wifi --wifipaf --custom-flow 0 --capabilities 8
+          [1719392550.248867][1563:1563] CHIP:SVR: SetupQRCode: [MT:-24J0M3810KA0648G00]
+          [1719392550.248883][1563:1563] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1719392550.248892][1563:1563] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0M3810KA0648G00
+          [1719392550.248911][1563:1563] CHIP:SVR: Manual pairing code: [34970112332]
+      disabled: true
+
+    - label: "Step 2e: Verify the QR code has been scanned successfully."
+      PICS: MCORE.DD.SCAN_QR_CODE
+      verification: |
+          1. Verify the QR code has been scanned successfully.
+
+          $ sudo ./chip-tool payload parse-setup-payload MT:-24J0M3810KA0648G00
+          [1719392883.120482][28468:28468] CHIP:DL: ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_tool_kvs
+          [1719392883.120687][28468:28468] CHIP:SPL: Parsing base38Representation: MT:-24J0M3810KA0648G00
+          [1719392883.120839][28468:28468] CHIP:SPL: Version: 0
+          [1719392883.120859][28468:28468] CHIP:SPL: VendorID: 65521
+          [1719392883.120874][28468:28468] CHIP:SPL: ProductID: 32769
+          [1719392883.120890][28468:28468] CHIP:SPL: Custom flow: 0 (STANDARD)
+          [1719392883.120910][28468:28468] CHIP:SPL: Discovery Bitmask: 0x08 (Wi-Fi PAF)
+          [1719392883.120928][28468:28468] CHIP:SPL: Long discriminator: 3840 (0xf00)
+          [1719392883.120944][28468:28468] CHIP:SPL: Passcode: 20202021
+      disabled: true
+
+    - label:
+          "Step 2f: Using the DUT, parse the TH’s QR code and follow any steps
+          needed for the Commissioner/Commissionee to complete the commissioning
+          process using Wi-Fi PAF"
+      PICS: MCORE.DD.DISCOVERY_PAF
+      verification: |
+          1. DUT parses QR code and DUT commissions TH to the Matter network
+
+          $ sudo ./chip-tool pairing code-wifi 1 n_m_2g nxp12345 MT:-24J0M3810KA0648G00
+      disabled: true
+
     - label:
           "Step 3a: Standard Commissioning Flow: Use a Commissionee with a QR
           code that has the Custom Flow field set to 0 and supports SoftAP for

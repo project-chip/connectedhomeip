@@ -15,6 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <pw_unit_test/framework.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <app/tests/suites/credentials/TestHarnessDACProvider.h>
@@ -27,10 +30,9 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
-
-#include <gtest/gtest.h>
 
 #include <dirent.h>
 #include <stdio.h>
@@ -108,7 +110,7 @@ TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
         Crypto::DRBG_get_bytes(attestationNonceBuf, sizeof(attestationNonceBuf));
 
         VendorId vid = TestVendor1;
-        uint16_t pid = strstr(entry->d_name, "_vidpid_fallback_encoding_") ? 0x00B1 : 0x8000;
+        uint16_t pid = dacProvider.GetPid();
 
         EXPECT_EQ(dacProvider.GetCertificationDeclaration(certDeclSpan), CHIP_NO_ERROR);
         EXPECT_EQ(dacProvider.GetDeviceAttestationCert(dacCertSpan), CHIP_NO_ERROR);

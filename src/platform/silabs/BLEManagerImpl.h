@@ -30,9 +30,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
-#include <rsi_ble.h>
-#include <rsi_ble_apis.h>
-#include <rsi_bt_common.h>
+#include "wfx_sl_ble_init.h"
 #ifdef __cplusplus
 }
 #endif // __cplusplus
@@ -58,12 +56,14 @@ public:
     void HandleBootEvent(void);
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    void HandleConnectEvent(void);
-    void HandleConnectionCloseEvent(uint16_t reason);
-    void HandleWriteEvent(rsi_ble_event_write_t evt);
-    void UpdateMtu(rsi_ble_event_mtu_t evt);
+    // Used for posting the event in the BLE queue
+    void BlePostEvent(SilabsBleWrapper::BleEvent_t * event);
+    void HandleConnectEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt);
+    void HandleConnectionCloseEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt);
+    void HandleWriteEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt);
+    void UpdateMtu(const SilabsBleWrapper::sl_wfx_msg_t & evt);
     void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
-    void HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt);
+    void HandleTXCharCCCDWrite(const SilabsBleWrapper::sl_wfx_msg_t & evt);
     void HandleSoftTimerEvent(void);
     int32_t SendBLEAdvertisementCommand(void);
 #else
@@ -80,7 +80,7 @@ public:
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    static void HandleC3ReadRequest(void);
+    static void HandleC3ReadRequest(SilabsBleWrapper::sl_wfx_msg_t * rsi_ble_read_req);
 #else
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);
@@ -92,6 +92,14 @@ private:
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
+
+#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
+    // rs91x BLE task handling
+    osMessageQueueId_t sBleEventQueue = NULL;
+    static void sl_ble_event_handling_task(void * args);
+    void sl_ble_init();
+    void ProcessEvent(SilabsBleWrapper::BleEvent_t inEvent);
+#endif
 
     // ===== Members that implement the BLEManager internal interface.
 
@@ -109,20 +117,16 @@ private:
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                 const Ble::ChipBleUUID * charId) override;
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                   const Ble::ChipBleUUID * charId) override;
-    bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
+    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                       const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                         const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
-    bool SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                        System::PacketBufferHandle pBuf) override;
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                          System::PacketBufferHandle pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                         System::PacketBufferHandle pBuf) override;
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
-                          const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                              System::PacketBufferHandle pBuf) override;
+    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                                System::PacketBufferHandle pBuf) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -190,7 +194,7 @@ private:
 #endif
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    void HandleRXCharWrite(rsi_ble_event_write_t * evt);
+    void HandleRXCharWrite(const SilabsBleWrapper::sl_wfx_msg_t & evt);
 #else
     void HandleRXCharWrite(volatile sl_bt_msg_t * evt);
 #endif
@@ -200,7 +204,7 @@ private:
     void CancelBleAdvTimeoutTimer(void);
     CHIPoBLEConState * GetConnectionState(uint8_t conId, bool allocate = false);
     static void DriveBLEState(intptr_t arg);
-    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
+    static void BleAdvTimeoutHandler(void * arg);
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate);
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)

@@ -118,7 +118,7 @@ public:
         const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse) override;
     void OnScanNetworksFailure(CHIP_ERROR error) override;
     void OnICDRegistrationInfoRequired() override;
-    void OnICDRegistrationComplete(chip::NodeId icdNodeId, uint32_t icdCounter) override;
+    void OnICDRegistrationComplete(chip::ScopedNodeId icdNodeId, uint32_t icdCounter) override;
 
     // PersistentStorageDelegate implementation
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
@@ -213,6 +213,10 @@ public:
     CHIP_ERROR FinishOTAProvider();
 
     CHIP_ERROR SetICDCheckInDelegate(jobject checkInDelegate);
+
+    void StartDnssd();
+
+    void StopDnssd();
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;

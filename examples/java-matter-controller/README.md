@@ -120,7 +120,7 @@ the top Matter directory:
 ```
 
 The Java executable file `java-matter-controller` will be generated at
-`out/android-x86-java-matter-controller/bin/`
+`out/linux-x64-java-matter-controller/bin/`
 
 Run the java-matter-controller
 

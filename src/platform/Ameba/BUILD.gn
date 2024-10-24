@@ -41,7 +41,6 @@ static_library("Ameba") {
     "FactoryDataProvider.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "LwIPCoreLock.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningWiFiDriver.cpp",
@@ -50,6 +49,8 @@ static_library("Ameba") {
     "SoftwareUpdateManagerImpl.h",
     "SystemTimeSupport.cpp",
     "SystemTimeSupport.h",
+    "crypto/AmebaPersistentStorageOperationalKeystore.cpp",
+    "crypto/AmebaPersistentStorageOperationalKeystore.h",
   ]
 
   deps = [
@@ -71,4 +72,15 @@ static_library("Ameba") {
       "AmebaOTAImageProcessor.h",
     ]
   }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [
+    "Logging.cpp",
+    "Logging.h",
+  ]
 }

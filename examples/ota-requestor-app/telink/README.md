@@ -1,5 +1,16 @@
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)
 
+## Supported devices
+
+The example supports building and running on the following devices:
+
+| Board/SoC                                                                                                                                                              | Build target                                                  | Zephyr Board Info                                                                                              |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| [B91](https://wiki.telink-semi.cn/wiki/Hardware/B91_Generic_Starter_Kit_Hardware_Guide) [TLSR9518ADK80D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR951x-Series) | `tlsr9518adk80d`, `tlsr9518adk80d-mars`, `tlsr9518adk80d-usb` | [TLSR9518ADK80D](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9518adk80d/doc/index.rst) |
+| [B92](https://wiki.telink-semi.cn/wiki/Hardware/B92_Generic_Starter_Kit_Hardware_Guide) [TLSR9528A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR952x-Series)      | `tlsr9528a`, `tlsr9528a_retention`                            | [TLSR9528A](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9528a/doc/index.rst)           |
+| [B95](https://wiki.telink-semi.cn/wiki/Hardware/B95_Generic_Starter_Kit_Hardware_Guide) [TLSR9258A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR925x-Series)      | `tlsr9258a`                                                   | [TLSR9258A](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9258a/doc/index.rst)           |
+| [W91](https://wiki.telink-semi.cn/wiki/Hardware/W91_Generic_Starter_Kit_Hardware_Guide) [TLSR9118BDK40D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR911x-Series) | `tlsr9118bdk40d`                                              | [TLSR9118BDK40D](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9118bdk40d/doc/index.rst) |
+
 ## Build and flash
 
 1. Run the Docker container:
@@ -8,7 +19,7 @@
     $ docker run -it --rm -v $PWD:/host -w /host ghcr.io/project-chip/chip-build-telink:$(wget -q -O - https://raw.githubusercontent.com/project-chip/connectedhomeip/master/.github/workflows/examples-telink.yaml 2> /dev/null | grep chip-build-telink | awk -F: '{print $NF}')
     ```
 
-    Compatible docker image version can be found in next file:
+    You can find the compatible Docker image version in the file:
 
     ```bash
     $ .github/workflows/examples-telink.yaml
@@ -20,8 +31,8 @@
     $ source ./scripts/activate.sh -p all,telink
     ```
 
-3. In the example dir run (replace _<build_target>_ with your board name, for
-   example, `tlsr9518adk80d`, `tlsr9528a` or `tlsr9258a`):
+3. Build the example (replace _<build_target>_ with your board name, see
+   [Supported devices](#supported-devices)):
 
     ```bash
     $ west build -b <build_target>
@@ -31,8 +42,11 @@
     MB, for example, `-DFLASH_SIZE=1m` or `-DFLASH_SIZE=4m`:
 
     ```bash
-    $ west build -b tlsr9518adk80d -- -DFLASH_SIZE=4m
+    $ west build -b <build_target> -- -DFLASH_SIZE=4m
     ```
+
+    You can find the target built file called **_zephyr.bin_** under the
+    **_build/zephyr_** directory.
 
 4. Flash binary:
 
@@ -52,16 +66,18 @@ To get output from device, connect UART to following pins:
 |  TX  | PB2 (pin 16 of J34 connector) |
 | GND  | GND                           |
 
+Baud rate: 115200 bits/s
+
 ### Buttons
 
 The following buttons are available on **tlsr9518adk80d** board:
 
-| Name     | Function               | Description                                                                                            |
-| :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
-| Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | NA                     | NA                                                                                                     |
-| Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
-| Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
+| Name     | Function               | Description                                                                                                                                       |
+| :------- | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and return to a decommissioned state (to activate, push the button 3 times) |
+| Button 2 | NA                     | NA                                                                                                                                                |
+| Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                                                                        |
+| Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                                                                      |
 
 ### LEDs
 
@@ -99,12 +115,14 @@ be used to specify the the effect. It is able to be in following effects:
 2. Pair with device
 
     ```
-    ${CHIP_TOOL_DIR}/chip-tool pairing code ${NODE_ID_TO_ASSIGN} MT:D8XA0CQM00KA0648G00
+    ${CHIP_TOOL_DIR}/chip-tool pairing ble-thread ${NODE_ID} hex:${DATASET} ${PIN_CODE} ${DISCRIMINATOR}
     ```
 
-    here:
+    Example:
 
-    - \${NODE_ID_TO_ASSIGN} is the node id to assign to the ota requestor
+    ```
+    ./chip-tool pairing ble-thread 1234 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd61f77bd3df233e051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212340410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8 20202021 3840
+    ```
 
 ### OTA with Linux OTA Provider
 
@@ -116,10 +134,10 @@ feature for another Telink example:
 
 After build application with enabled OTA feature, use next binary files:
 
--   zephyr.bin - main binary to flash PCB (Use at least 2MB PCB).
--   zephyr-ota.bin - binary for OTA Provider
+-   merged.bin - main binary to flash PCB (Use at least 2MB PCB).
+-   matter.ota - binary for OTA Provider
 
-All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have
+All binaries has the same SW version. To test OTA “matter.ota” should have
 higher SW version than base SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in
 corresponding “prj.conf” conﬁguration file.
 
@@ -134,7 +152,7 @@ Usage of OTA:
 -   Run the Linux OTA Provider with OTA image.
 
     ```
-    ./chip-ota-provider-app -f zephyr-ota.bin
+    ./chip-ota-provider-app -f matter.ota
     ```
 
 -   Provision the Linux OTA Provider using chip-tool

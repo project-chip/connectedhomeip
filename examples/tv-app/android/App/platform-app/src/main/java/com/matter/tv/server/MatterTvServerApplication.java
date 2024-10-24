@@ -6,9 +6,16 @@ import android.os.Build;
 import com.matter.tv.server.service.MatterServantService;
 
 public class MatterTvServerApplication extends Application {
+  private static Application mApp;
+
+  public static Application getApplication() {
+    return mApp;
+  }
+
   @Override
   public void onCreate() {
     super.onCreate();
+    mApp = this;
     startMatterServantService();
   }
 

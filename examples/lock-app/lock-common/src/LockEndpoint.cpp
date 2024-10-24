@@ -17,10 +17,15 @@
  */
 #include "LockEndpoint.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-enums.h>
 #include <cstring>
+#include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+using chip::ByteSpan;
+using chip::MutableByteSpan;
+using chip::Optional;
 using chip::to_underlying;
 using chip::app::DataModel::MakeNullable;
 
@@ -204,7 +209,8 @@ bool LockEndpoint::GetCredential(uint16_t credentialIndex, CredentialTypeEnum cr
     if (credentialIndex >= mLockCredentials.at(to_underlying(credentialType)).size() ||
         (0 == credentialIndex && CredentialTypeEnum::kProgrammingPIN != credentialType))
     {
-        ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d]", mEndpointId, credentialIndex);
+        ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d]: %d", mEndpointId, credentialIndex,
+                     static_cast<int>(mLockCredentials.at(to_underlying(credentialType)).size()));
         return false;
     }
 
@@ -405,6 +411,149 @@ DlStatus LockEndpoint::SetSchedule(uint8_t holidayIndex, DlScheduleStatus status
     scheduleInStorage.status                  = status;
 
     return DlStatus::kSuccess;
+}
+
+CHIP_ERROR LockEndpoint::GetAliroReaderVerificationKey(MutableByteSpan & verificationKey)
+{
+    if (!mAliroStateInitialized)
+    {
+        verificationKey.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+
+    return chip::CopySpanToMutableSpan(ByteSpan(mAliroReaderVerificationKey), verificationKey);
+}
+
+CHIP_ERROR LockEndpoint::GetAliroReaderGroupIdentifier(MutableByteSpan & groupIdentifier)
+{
+    if (!mAliroStateInitialized)
+    {
+        groupIdentifier.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+
+    return CopySpanToMutableSpan(ByteSpan(mAliroReaderGroupIdentifier), groupIdentifier);
+}
+
+CHIP_ERROR LockEndpoint::GetAliroReaderGroupSubIdentifier(MutableByteSpan & groupSubIdentifier)
+{
+    return CopySpanToMutableSpan(ByteSpan(mAliroReaderGroupSubIdentifier), groupSubIdentifier);
+}
+
+namespace {
+
+CHIP_ERROR CopyProtocolVersionIntoSpan(uint16_t protocolVersionValue, MutableByteSpan & protocolVersion)
+{
+    using namespace chip::app::Clusters::DoorLock;
+
+    static_assert(sizeof(protocolVersionValue) == kAliroProtocolVersionSize);
+
+    if (protocolVersion.size() < kAliroProtocolVersionSize)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Per Aliro spec, protocol version encoding is big-endian
+    chip::Encoding::BigEndian::Put16(protocolVersion.data(), protocolVersionValue);
+    protocolVersion.reduce_size(kAliroProtocolVersionSize);
+    return CHIP_NO_ERROR;
+}
+
+} // anonymous namespace
+
+CHIP_ERROR LockEndpoint::GetAliroExpeditedTransactionSupportedProtocolVersionAtIndex(size_t index,
+                                                                                     MutableByteSpan & protocolVersion)
+{
+    // Only claim support for the one known protocol version for now: 0x0100.
+    constexpr uint16_t knownProtocolVersion = 0x0100;
+
+    if (index > 0)
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    return CopyProtocolVersionIntoSpan(knownProtocolVersion, protocolVersion);
+}
+
+CHIP_ERROR LockEndpoint::GetAliroGroupResolvingKey(MutableByteSpan & groupResolvingKey)
+{
+    if (!mAliroStateInitialized)
+    {
+        groupResolvingKey.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+
+    return CopySpanToMutableSpan(ByteSpan(mAliroGroupResolvingKey), groupResolvingKey);
+}
+
+CHIP_ERROR LockEndpoint::GetAliroSupportedBLEUWBProtocolVersionAtIndex(size_t index, MutableByteSpan & protocolVersion)
+{
+    // Only claim support for the one known protocol version for now: 0x0100.
+    constexpr uint16_t knownProtocolVersion = 0x0100;
+
+    if (index > 0)
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    return CopyProtocolVersionIntoSpan(knownProtocolVersion, protocolVersion);
+}
+
+uint8_t LockEndpoint::GetAliroBLEAdvertisingVersion()
+{
+    // For now the only define value of the BLE advertising version for Aliro is 0.
+    return 0;
+}
+
+uint16_t LockEndpoint::GetNumberOfAliroCredentialIssuerKeysSupported()
+{
+    using namespace chip::app::Clusters::DoorLock;
+
+    // Our vector has an extra entry at index 0 that is not a valid entry, so
+    // the actual number of credentials supported is one length than the length.
+    return static_cast<uint16_t>(mLockCredentials.at(to_underlying(CredentialTypeEnum::kAliroCredentialIssuerKey)).size() - 1);
+}
+
+uint16_t LockEndpoint::GetNumberOfAliroEndpointKeysSupported()
+{
+    using namespace chip::app::Clusters::DoorLock;
+
+    // Our vector has an extra entry at index 0 that is not a valid entry, so
+    // the actual number of credentials supported is one length than the length.
+    //
+    // Also, our arrays are the same size, so we just return the size of one of
+    // the arrays: that is the cap on the total number of endpoint keys
+    // supported, which can be of either type.
+    return static_cast<uint16_t>(mLockCredentials.at(to_underlying(CredentialTypeEnum::kAliroEvictableEndpointKey)).size() - 1);
+}
+
+CHIP_ERROR LockEndpoint::SetAliroReaderConfig(const ByteSpan & signingKey, const ByteSpan & verificationKey,
+                                              const ByteSpan & groupIdentifier, const Optional<ByteSpan> & groupResolvingKey)
+{
+    // We ignore the signing key, since we never do anything with it.
+
+    VerifyOrReturnError(verificationKey.size() == sizeof(mAliroReaderVerificationKey), CHIP_ERROR_INVALID_ARGUMENT);
+    memcpy(mAliroReaderVerificationKey, verificationKey.data(), sizeof(mAliroReaderVerificationKey));
+
+    VerifyOrReturnError(groupIdentifier.size() == sizeof(mAliroReaderGroupIdentifier), CHIP_ERROR_INVALID_ARGUMENT);
+    memcpy(mAliroReaderGroupIdentifier, groupIdentifier.data(), sizeof(mAliroReaderGroupIdentifier));
+
+    if (groupResolvingKey.HasValue())
+    {
+        VerifyOrReturnError(groupResolvingKey.Value().size() == sizeof(mAliroGroupResolvingKey), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mAliroGroupResolvingKey, groupResolvingKey.Value().data(), sizeof(mAliroGroupResolvingKey));
+    }
+
+    mAliroStateInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LockEndpoint::ClearAliroReaderConfig()
+{
+    // A real implementation would clear out key data from the other parts of
+    // the application that might use it.
+    mAliroStateInitialized = false;
+    return CHIP_NO_ERROR;
 }
 
 bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,

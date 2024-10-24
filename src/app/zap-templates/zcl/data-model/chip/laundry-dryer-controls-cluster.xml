@@ -26,15 +26,15 @@ limitations under the License.
         <item name="Max" value="0x3" />
     </enum>
 
-    <cluster apiMaturity="provisional">
+    <cluster>
         <domain>Appliances</domain>
         <name>Laundry Dryer Controls</name>
         <code>0x004A</code>
         <define>LAUNDRY_DRYER_CONTROLS_CLUSTER</define>
         <client init="false" tick="false">true</client>
         <server init="false" tick="false">true</server>
-        <description>This cluster supports remotely monitoring and controling the different typs of
-            functionality available to a drying device, such as a laundry dryer.</description>
+        <description>This cluster provides a way to access options associated with the operation of
+            a laundry dryer device type.</description>
 
         <globalAttribute side="either" code="0xFFFD" value="1" />
 

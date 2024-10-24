@@ -35,6 +35,9 @@ from typing import List
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
+# TODO: Can we share this constant definition with generate.py?
+DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
+
 
 class TargetType(Flag):
     """Type of targets that can be re-generated"""
@@ -108,6 +111,12 @@ class ZapInput:
         """What command to execute for this zap input. """
         if self.zap_file:
             return [script, self.zap_file]
+        if self.properties_json == DEFAULT_DATA_MODEL_DESCRIPTION_FILE:
+            # Omit the -z bits because that's the default generate.py
+            # will use anyway, and this leads to nicer-looking command
+            # lines if people need to run the regen manually and get
+            # their command line from our --dry-run.
+            return [script]
         return [script, '-z', self.properties_json]
 
 
@@ -275,7 +284,7 @@ class JinjaCodegenTarget():
             for name in paths:
                 logging.info("    %s" % name)
 
-            VERSION = "0.44"
+            VERSION = "0.51"
             JAR_NAME = f"ktfmt-{VERSION}-jar-with-dependencies.jar"
             jar_url = f"https://repo1.maven.org/maven2/com/facebook/ktfmt/{VERSION}/{JAR_NAME}"
 
@@ -341,7 +350,8 @@ def setupArgumentsParser():
 
     parser.add_argument('--parallel', action='store_true')
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.set_defaults(parallel=True)
+    parser.add_argument('--no-rerun-in-env', action='store_false', dest='rerun_in_env')
+    parser.set_defaults(parallel=True, rerun_in_env=True)
 
     args = parser.parse_args()
 
@@ -382,7 +392,7 @@ def getGlobalTemplatesTargets():
 
         targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
 
-    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json'),
+    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson(DEFAULT_DATA_MODEL_DESCRIPTION_FILE),
                    client_side=True, matter_file_name="src/controller/data_model/controller-clusters.matter"))
 
     return targets
@@ -414,7 +424,7 @@ def getGoldenTestImageTargets():
 
 
 def getSpecificTemplatesTargets():
-    zap_input = ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json')
+    zap_input = ZapInput.FromPropertiesJson(DEFAULT_DATA_MODEL_DESCRIPTION_FILE)
 
     # Mapping of required template and output directory
     templates = {
@@ -486,6 +496,26 @@ def main():
         level=logging.INFO,
         format='%(asctime)s %(name)s %(levelname)-7s %(message)s'
     )
+
+    # The scripts executed by this generally MUST be within a bootstrapped environment because
+    # we need:
+    #    - zap-cli in PATH
+    #    - scripts/codegen.py uses click (can be in current pyenv, but guaranteed in bootstrap)
+    #    - formatting is using bootstrapped clang-format
+    # Figure out if bootstrapped. For now assume `PW_ROOT` is such a marker in the environment
+    if "PW_ROOT" not in os.environ:
+        logging.error("Script MUST be run in a bootstrapped environment.")
+
+        # using the `--no-rerun-in-env` to avoid recursive infinite calls
+        if '--no-rerun-in-env' not in sys.argv:
+            import shlex
+            logging.info("Will re-try running in a build environment....")
+
+            what_to_run = sys.argv + ['--no-rerun-in-env']
+            launcher = os.path.join(CHIP_ROOT_DIR, 'scripts', 'run_in_build_env.sh')
+            os.execv(launcher, [launcher, shlex.join(what_to_run)])
+        sys.exit(1)
+
     checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
     args = setupArgumentsParser()

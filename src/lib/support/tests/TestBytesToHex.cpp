@@ -20,13 +20,15 @@
 #include <string>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
+
 namespace {
 
 using namespace chip;

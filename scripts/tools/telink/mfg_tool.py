@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2022-2024 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -671,6 +671,7 @@ def get_and_validate_args():
     check_str_range(args.hw_ver_str, 1, 64, 'Hardware version string')
     check_str_range(args.mfg_date, 8, 16, 'Manufacturing date')
     check_str_range(args.rd_id_uid, 16, 32, 'Rotating device Unique id')
+    check_str_range(args.enable_key, 32, 32, 'Enable Key')
 
     # Validates the attestation related arguments
     # DAC key and DAC cert both should be present or none

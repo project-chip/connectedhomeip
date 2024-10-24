@@ -91,11 +91,11 @@ class TestPythonController(CHIPVirtualHome):
 
         req_device_id = req_ids[0]
 
-        self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
+        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_clusters-0.0-py3-none-any.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
+        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
+        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_repl-0.0-py3-none-any.whl")))
 
         command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
@@ -126,7 +126,7 @@ class TestPythonController(CHIPVirtualHome):
                 "Toggle ep1 on/off from state 0 to 1",
                 "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000",
                 "Toggle ep1 on/off from state 1 to 0",
-                "No command 0x0000_0001 in Cluster 0x0000_0006 on Endpoint 0xe9"]),
+                "No command 0x0000_0001 in Cluster 0x0000_0006 on Endpoint 233"]),
                 "Datamodel test failed: cannot find matching string from device {}".format(device_id))
 
 

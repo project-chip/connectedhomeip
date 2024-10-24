@@ -1,6 +1,6 @@
 # Stage 1: Setup dependencies (based on chip-build).
-FROM ubuntu:22.04 as chip-build-cert
-LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
+FROM ubuntu:24.04 AS chip-build-cert
+LABEL org.opencontainers.image.source=https://github.com/project-chip/connectedhomeip
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
 ARG COMMITHASH=c1ec2d777456924dcaa59b53351b00d73caf378f
@@ -89,7 +89,6 @@ RUN set -x \
     wget \
     git-lfs \
     zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/ \
     && git lfs install \
     && : # last line
 
@@ -119,17 +118,16 @@ RUN case ${TARGETPLATFORM} in \
 
 # Python 3 and PIP
 RUN set -x \
-    && DEBIAN_FRONTEND=noninteractive  apt-get update \
-    && DEBIAN_FRONTEND=noninteractive  apt-get install -y libgirepository1.0-dev \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
+    && DEBIAN_FRONTEND=noninteractive  apt-get install -y \
+    libgirepository1.0-dev \
+    software-properties-common \
     && add-apt-repository universe \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-    && python3 get-pip.py \
-    && rm -rf /var/lib/apt/lists/ \
+    && python3 get-pip.py --break-system-packages \
     && : # last line
 
 RUN set -x \
-    && pip3 install attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate \
+    && pip3 install attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate --break-system-packages \
     && : # last line
 
 # build and install gn
@@ -148,9 +146,9 @@ RUN set -x \
     && git clone https://github.com/google/bloaty.git \
     && mkdir -p bloaty/build \
     && cd bloaty/build \
-    && cmake ../ \
-    && make -j8 \
-    && make install \
+    && cmake -G Ninja ../ \
+    && ninja \
+    && ninja install \
     && cd ../.. \
     && rm -rf bloaty \
     && : # last line
@@ -164,7 +162,7 @@ RUN ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallo
 RUN bash scripts/bootstrap.sh
 
 # Stage 2: Build.
-FROM chip-build-cert as chip-build-cert-bins
+FROM chip-build-cert AS chip-build-cert-bins
 
 SHELL ["/bin/bash", "-c"]
 
@@ -195,6 +193,10 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-energy-management-ipv6only \
     --target linux-x64-microwave-oven-ipv6only \
     --target linux-x64-rvc-ipv6only \
+    --target linux-x64-fabric-bridge-rpc-ipv6only \
+    --target linux-x64-fabric-admin-rpc-ipv6only \
+    --target linux-x64-light-data-model-no-unique-id-ipv6only \
+    --target linux-x64-network-manager-ipv6only \
     build \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -215,6 +217,10 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
     && mv out/linux-x64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     && mv out/linux-x64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
+    && mv out/linux-x64-fabric-bridge-rpc-ipv6only/fabric-bridge-app out/fabric-bridge-app \
+    && mv out/linux-x64-fabric-admin-rpc-ipv6only/fabric-admin out/fabric-admin \
+    && mv out/linux-x64-light-data-model-no-unique-id-ipv6only/chip-lighting-app out/chip-lighting-data-model-no-unique-id-app \
+    && mv out/linux-x64-network-manager-ipv6only/matter-network-manager-app out/matter-network-manager-app \
     ;; \
     "linux/arm64")\
     set -x \
@@ -238,6 +244,11 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-lit-icd-ipv6only \
     --target linux-arm64-energy-management-ipv6only \
     --target linux-arm64-microwave-oven-ipv6only \
+    --target linux-arm64-rvc-ipv6only \
+    --target linux-arm64-fabric-bridge-rpc-ipv6only \
+    --target linux-arm64-fabric-admin-rpc-ipv6only \
+    --target linux-arm64-light-data-model-no-unique-id-ipv6only \
+    --target linux-arm64-network-manager-ipv6only \
     build \
     && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -258,6 +269,10 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
     && mv out/linux-arm64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     && mv out/linux-arm64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
+    && mv out/linux-arm64-fabric-bridge-rpc-ipv6only/fabric-bridge-app out/fabric-bridge-app \
+    && mv out/linux-arm64-fabric-admin-rpc-ipv6only/fabric-admin out/fabric-admin \
+    && mv out/linux-arm64-light-data-model-no-unique-id-ipv6only/chip-lighting-app out/chip-lighting-data-model-no-unique-id-app \
+    && mv out/linux-arm64-network-manager-ipv6only/matter-network-manager-app out/matter-network-manager-app \
     ;; \
     *) ;; \
     esac
@@ -265,7 +280,7 @@ RUN case ${TARGETPLATFORM} in \
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i out/python_env
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update -y
@@ -291,6 +306,11 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app lit-icd-a
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app chip-energy-management-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app chip-microwave-oven-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-rvc-app chip-rvc-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/examples/fabric-admin/scripts/fabric-sync-app.py fabric-sync-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-bridge-app fabric-bridge-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-admin fabric-admin
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-data-model-no-unique-id-app chip-lighting-data-model-no-unique-id-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/matter-network-manager-app matter-network-manager-app
 
 # Stage 3.1: Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
@@ -299,9 +319,12 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python
 COPY --from=chip-build-cert-bins /root/connectedhomeip/data_model python_testing/data_model
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/scripts/tests/requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
-RUN pip install --no-cache-dir python_lib/controller/python/chip*.whl
+# PIP requires MASON package compilation, which seems to require a JDK
+RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get update; apt-get install -fy openjdk-8-jdk
+
+RUN pip install --break-system-packages --no-cache-dir python_lib/controller/python/chip*.whl

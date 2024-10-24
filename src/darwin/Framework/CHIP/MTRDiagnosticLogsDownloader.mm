@@ -16,10 +16,13 @@
  */
 
 #import "MTRDiagnosticLogsDownloader.h"
+#import <Matter/Matter.h>
 
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/LockTracker.h>
 #include <protocols/bdx/BdxTransferServerDelegate.h>
+#include <protocols/bdx/DiagnosticLogs.h>
 
-#import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
@@ -41,7 +44,7 @@ class DiagnosticLogsDownloaderBridge;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Download : NSObject
+@interface MTRDownload : NSObject
 @property (nonatomic) NSString * fileDesignator;
 @property (nonatomic) NSNumber * fabricIndex;
 @property (nonatomic) NSNumber * nodeID;
@@ -55,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
                       nodeID:(NSNumber *)nodeID
                        queue:(dispatch_queue_t)queue
                   completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
-                        done:(void (^)(Download * finishedDownload))done;
+                        done:(void (^)(MTRDownload * finishedDownload))done;
 
 - (void)writeToFile:(NSData *)data error:(out NSError **)error;
 
@@ -69,24 +72,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)failure:(NSError * _Nullable)error;
 @end
 
-@interface Downloads : NSObject
-@property (nonatomic, strong) NSMutableArray<Download *> * downloads;
+@interface MTRDownloads : NSObject
+@property (nonatomic, strong) NSMutableArray<MTRDownload *> * downloads;
 
-- (Download * _Nullable)get:(NSString *)fileDesignator
-                fabricIndex:(NSNumber *)fabricIndex
-                     nodeID:(NSNumber *)nodeID;
+- (MTRDownload * _Nullable)get:(NSString *)fileDesignator
+                   fabricIndex:(NSNumber *)fabricIndex
+                        nodeID:(NSNumber *)nodeID;
 
-- (Download * _Nullable)add:(MTRDiagnosticLogType)type
-                fabricIndex:(NSNumber *)fabricIndex
-                     nodeID:(NSNumber *)nodeID
-                      queue:(dispatch_queue_t)queue
-                 completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
-                       done:(void (^)(Download * finishedDownload))done;
+- (MTRDownload * _Nullable)add:(MTRDiagnosticLogType)type
+                   fabricIndex:(NSNumber *)fabricIndex
+                        nodeID:(NSNumber *)nodeID
+                         queue:(dispatch_queue_t)queue
+                    completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+                          done:(void (^)(MTRDownload * finishedDownload))done;
+
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
+
 @end
 
 @interface MTRDiagnosticLogsDownloader ()
 @property (readonly) DiagnosticLogsDownloaderBridge * bridge;
-@property (nonatomic, strong) Downloads * downloads;
+@property (nonatomic, strong) MTRDownloads * downloads;
 
 /**
  * Notify the delegate when a BDX Session starts for some logs.
@@ -134,21 +140,21 @@ public:
     CHIP_ERROR OnTransferEnd(chip::bdx::BDXTransferProxy * transfer, CHIP_ERROR error) override;
     CHIP_ERROR OnTransferData(chip::bdx::BDXTransferProxy * transfer, const chip::ByteSpan & data) override;
 
-    CHIP_ERROR StartBDXTransferTimeout(Download * download, uint16_t timeoutInSeconds);
-    void CancelBDXTransferTimeout(Download * download);
+    CHIP_ERROR StartBDXTransferTimeout(MTRDownload * download, uint16_t timeoutInSeconds);
+    void CancelBDXTransferTimeout(MTRDownload * download);
 
 private:
     static void OnTransferTimeout(chip::System::Layer * layer, void * context);
     MTRDiagnosticLogsDownloader * __weak mDelegate;
 };
 
-@implementation Download
+@implementation MTRDownload
 - (instancetype)initWithType:(MTRDiagnosticLogType)type
                  fabricIndex:(NSNumber *)fabricIndex
                       nodeID:(NSNumber *)nodeID
                        queue:(dispatch_queue_t)queue
                   completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
-                        done:(void (^)(Download * finishedDownload))done;
+                        done:(void (^)(MTRDownload * finishedDownload))done;
 {
     self = [super init];
     if (self) {
@@ -158,7 +164,7 @@ private:
         __weak typeof(self) weakSelf = self;
         auto bdxTransferDone = ^(NSError * bdxError) {
             dispatch_async(queue, ^{
-                Download * strongSelf = weakSelf;
+                MTRDownload * strongSelf = weakSelf;
                 if (strongSelf) {
                     // If a fileHandle exists, it means that the BDX session has been initiated and a file has
                     // been created to host the data of the session. So even if there is an error there may be some
@@ -189,10 +195,11 @@ private:
 
     VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusBusy)], [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_BUSY]]);
     VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusDenied)], [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_ACCESS_DENIED]]);
+    VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusNoLogs)], [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]]);
 
     // If the whole log content fits into the response LogContent field or if there is no log, forward it to the caller
     // and stop here.
-    if ([status isEqual:@(MTRDiagnosticLogsStatusExhausted)] || [status isEqual:@(MTRDiagnosticLogsStatusNoLogs)]) {
+    if ([status isEqual:@(MTRDiagnosticLogsStatusExhausted)]) {
         NSError * writeError = nil;
         [self writeToFile:response.logContent error:&writeError];
         VerifyOrReturn(nil == writeError, [self failure:writeError]);
@@ -303,7 +310,7 @@ private:
 
 @end
 
-@implementation Downloads
+@implementation MTRDownloads
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -315,15 +322,15 @@ private:
 - (void)dealloc
 {
     auto error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL];
-    for (Download * download in _downloads) {
+    for (MTRDownload * download in _downloads) {
         [download failure:error];
     }
     _downloads = nil;
 }
 
-- (Download * _Nullable)get:(NSString *)fileDesignator fabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID
+- (MTRDownload * _Nullable)get:(NSString *)fileDesignator fabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID
 {
-    for (Download * download in _downloads) {
+    for (MTRDownload * download in _downloads) {
         if ([download matches:fileDesignator fabricIndex:fabricIndex nodeID:nodeID]) {
             return download;
         }
@@ -332,23 +339,38 @@ private:
     return nil;
 }
 
-- (Download * _Nullable)add:(MTRDiagnosticLogType)type
-                fabricIndex:(NSNumber *)fabricIndex
-                     nodeID:(NSNumber *)nodeID
-                      queue:(dispatch_queue_t)queue
-                 completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
-                       done:(void (^)(Download * finishedDownload))done
+- (MTRDownload * _Nullable)add:(MTRDiagnosticLogType)type
+                   fabricIndex:(NSNumber *)fabricIndex
+                        nodeID:(NSNumber *)nodeID
+                         queue:(dispatch_queue_t)queue
+                    completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+                          done:(void (^)(MTRDownload * finishedDownload))done
 {
     assertChipStackLockedByCurrentThread();
 
-    auto download = [[Download alloc] initWithType:type fabricIndex:fabricIndex nodeID:nodeID queue:queue completion:completion done:done];
+    auto download = [[MTRDownload alloc] initWithType:type fabricIndex:fabricIndex nodeID:nodeID queue:queue completion:completion done:done];
     VerifyOrReturnValue(nil != download, nil);
 
     [_downloads addObject:download];
     return download;
 }
 
-- (void)remove:(Download *)download
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller
+{
+    assertChipStackLockedByCurrentThread();
+
+    auto fabricIndex = @(controller.fabricIndex);
+    for (MTRDownload * download in [_downloads copy]) {
+        if (![download.fabricIndex isEqual:fabricIndex]) {
+            continue;
+        }
+
+        [download failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]];
+        [self remove:download];
+    }
+}
+
+- (void)remove:(MTRDownload *)download
 {
     assertChipStackLockedByCurrentThread();
 
@@ -362,7 +384,7 @@ private:
     assertChipStackLockedByCurrentThread();
 
     if (self = [super init]) {
-        _downloads = [[Downloads alloc] init];
+        _downloads = [[MTRDownloads alloc] init];
         _bridge = new DiagnosticLogsDownloaderBridge(self);
         if (_bridge == nullptr) {
             MTR_LOG_ERROR("Error: %@", kErrorInitDiagnosticLogsDownloader);
@@ -387,7 +409,7 @@ private:
 }
 
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
-                       controller:(MTRDeviceController *)controller
+                       controller:(MTRDeviceController_Concrete *)controller
                              type:(MTRDiagnosticLogType)type
                           timeout:(NSTimeInterval)timeout
                             queue:(dispatch_queue_t)queue
@@ -399,14 +421,14 @@ private:
     if (timeout <= 0) {
         timeoutInSeconds = 0;
     } else if (timeout > UINT16_MAX) {
-        MTR_LOG_INFO("Warning: timeout is too large. It will be truncated to UINT16_MAX.");
+        MTR_LOG("Warning: timeout is too large. It will be truncated to UINT16_MAX.");
         timeoutInSeconds = UINT16_MAX;
     } else {
         timeoutInSeconds = static_cast<uint16_t>(timeout);
     }
 
     // This block is always called when a download is finished.
-    auto done = ^(Download * finishedDownload) {
+    auto done = ^(MTRDownload * finishedDownload) {
         [controller asyncDispatchToMatterQueue:^() {
             [self->_downloads remove:finishedDownload];
 
@@ -425,7 +447,7 @@ private:
         [download checkInteractionModelResponse:response error:error];
     };
 
-    auto * device = [controller deviceForNodeID:nodeID];
+    auto * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
     auto * cluster = [[MTRClusterDiagnosticLogs alloc] initWithDevice:device endpointID:@(kDiagnosticLogsEndPoint) queue:queue];
 
     auto * params = [[MTRDiagnosticLogsClusterRetrieveLogsRequestParams alloc] init];
@@ -441,6 +463,13 @@ private:
     }
 }
 
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
+{
+    assertChipStackLockedByCurrentThread();
+
+    [_downloads abortDownloadsForController:controller];
+}
+
 - (void)handleBDXTransferSessionBeginForFileDesignator:(NSString *)fileDesignator
                                            fabricIndex:(NSNumber *)fabricIndex
                                                 nodeID:(NSNumber *)nodeID
@@ -448,7 +477,7 @@ private:
                                           abortHandler:(AbortHandler)abortHandler;
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG_DEFAULT("BDX Transfer Session Begin: %@", fileDesignator);
+    MTR_LOG("BDX Transfer Session Begin for log download: %@", fileDesignator);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
     VerifyOrReturn(nil != download, completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]));
@@ -464,7 +493,7 @@ private:
                                            completion:(MTRStatusCompletion)completion
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG_DEFAULT("BDX Transfer Session Data: %@: %@", fileDesignator, data);
+    MTR_LOG("BDX Transfer Session Data for log download: %@: %@", fileDesignator, data);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
     VerifyOrReturn(nil != download, completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]));
@@ -482,7 +511,7 @@ private:
                                                error:(NSError * _Nullable)error
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG_DEFAULT("BDX Transfer Session End: %@: %@", fileDesignator, error);
+    MTR_LOG("BDX Transfer Session End for log download: %@: %@", fileDesignator, error);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
     VerifyOrReturn(nil != download);
@@ -593,13 +622,13 @@ CHIP_ERROR DiagnosticLogsDownloaderBridge::OnTransferData(chip::bdx::BDXTransfer
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticLogsDownloaderBridge::StartBDXTransferTimeout(Download * download, uint16_t timeoutInSeconds)
+CHIP_ERROR DiagnosticLogsDownloaderBridge::StartBDXTransferTimeout(MTRDownload * download, uint16_t timeoutInSeconds)
 {
     assertChipStackLockedByCurrentThread();
     return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timeoutInSeconds), OnTransferTimeout, (__bridge void *) download);
 }
 
-void DiagnosticLogsDownloaderBridge::CancelBDXTransferTimeout(Download * download)
+void DiagnosticLogsDownloaderBridge::CancelBDXTransferTimeout(MTRDownload * download)
 {
     assertChipStackLockedByCurrentThread();
     chip::DeviceLayer::SystemLayer().CancelTimer(OnTransferTimeout, (__bridge void *) download);
@@ -609,7 +638,7 @@ void DiagnosticLogsDownloaderBridge::OnTransferTimeout(chip::System::Layer * lay
 {
     assertChipStackLockedByCurrentThread();
 
-    auto * download = (__bridge Download *) context;
+    auto * download = (__bridge MTRDownload *) context;
     VerifyOrReturn(nil != download);
 
     // If there is no abortHandler, it means that the BDX transfer has not started.

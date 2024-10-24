@@ -54,24 +54,22 @@ if (stm32_board == "STM32WB5MM-DK") {
 }
 
 stm32_sdk("sdk") {
+  include_dirs = [
+    "${chip_root}/src/platform/stm32",
+    "${examples_plat_dir}",
+    "${stm32_project_dir}/include/STM32WB5",
+    "${chip_root}/src/lib",
+  ]
+
   if (stm32_board == "STM32WB5MM-DK") {
     sources = [
       "${examples_plat_dir}/config_files/STM32WB5/FreeRTOSConfig.h",
       "${examples_plat_dir}/config_files/STM32WB5/matter_config.h",
       "${stm32_project_dir}/include/STM32WB5/CHIPProjectConfig.h",
     ]
-  }
 
-  include_dirs = [
-    "${chip_root}/src/platform/stm32",
-    "${examples_plat_dir}",
-    "${chip_root}/src/lib",
-  ]
-
-  if (stm32_board == "STM32WB5MM-DK") {
     include_dirs += [
       "${stm32_project_dir}/include/STM32WB5",
-      "${examples_plat_dir}/config_files/STM32WB5",
       "${chip_root}/src/include",
     ]
   }
@@ -86,6 +84,8 @@ stm32_sdk("sdk") {
 }
 
 stm32_executable("lighting_app") {
+  deps = []
+
   if (stm32_board == "STM32WB5MM-DK") {
     output_name = "chip-stm32-lighting-example.elf"
     include_dirs = [
@@ -100,24 +100,30 @@ stm32_executable("lighting_app") {
       "${stm32_board_src}/STM32_WPAN/App/app_matter.c",
       "${stm32_board_src}/STM32_WPAN/App/app_thread.c",
       "${stm32_board_src}/STM32_WPAN/App/custom_stm.c",
+
+      #"${stm32_board_src}/STM32_WPAN/Target/hw_ipcc.c",
       "${stm32_board_src}/Src/app_entry.cpp",
       "${stm32_board_src}/Src/main.cpp",
+      "${stm32_board_src}/Src/ota.cpp",
       "src/STM32WB5/AppTask.cpp",
+      "src/STM32WB5/IdentifierEffect.cpp",
       "src/STM32WB5/LightingManager.cpp",
       "src/STM32WB5/ZclCallbacks.cpp",
     ]
+
+    deps = [
+      ":sdk",
+      "${chip_root}/examples/lighting-app/lighting-common",
+      "${chip_root}/examples/providers:device_info_provider",
+      "${chip_root}/src/lib",
+      "${chip_root}/src/setup_payload",
+    ]
   }
+
+  deps += [ "${chip_root}/src/platform/logging:default" ]
 
   # Add the startup file to the target
   sources += [ "${examples_plat_dir}/startup_files/startup_${stm32_mcu}.s" ]
-
-  deps = [
-    ":sdk",
-    "${chip_root}/examples/lighting-app/lighting-common",
-    "${chip_root}/examples/providers:device_info_provider",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",
-  ]
 
   defines += [
     "DEBUG",

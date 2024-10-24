@@ -1,5 +1,5 @@
 # Copyright (c) 2013 The Chromium Authors. All rights reserved.
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2024 Project CHIP Authors
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -43,9 +43,14 @@
 #
 # You can also use "extra args" to filter out results (see pkg-config.py):
 #   extra_args = [ "-v, "foo" ]
+#
 # To ignore libs and ldflags (only cflags/defines will be set, which is useful
 # when doing manual dynamic linking), set:
 #   ignore_libs = true
+#
+# To allow the build to proceed if (any of) the requested packages are absent, set:
+#   optional = true
+# In this case the resulting config object will be empty.
 
 import("//build_overrides/build.gni")
 import("${build_root}/config/sysroot.gni")
@@ -109,37 +114,51 @@ template("pkg_config") {
     } else {
       args = pkg_config_args + invoker.packages
     }
+    if (defined(invoker.optional) && invoker.optional) {
+      args += [ "-o" ]
+    }
     if (defined(invoker.extra_args)) {
       args += invoker.extra_args
     }
 
+    # pkgresult = [present, includes, cflags, libs, lib_dirs]
     pkgresult = exec_script(pkg_config_script, args, "value")
-    cflags = pkgresult[1]
+    if (pkgresult[0]) {
+      cflags = pkgresult[2]
 
-    foreach(include, pkgresult[0]) {
-      cflags += [ "-I$include" ]
-    }
-
-    if (!defined(invoker.ignore_libs) || !invoker.ignore_libs) {
-      libs = pkgresult[2]
-      lib_dirs = pkgresult[3]
-    }
-
-    # Link libraries statically for OSS-Fuzz fuzzer build
-    if (oss_fuzz) {
-      libs = []
-      ldflags = [ "-Wl,-Bstatic" ]
-      foreach(lib, pkgresult[2]) {
-        ldflags += [ "-l$lib" ]
+      foreach(include, pkgresult[1]) {
+        cflags += [ "-I$include" ]
       }
-      ldflags += [ "-Wl,-Bdynamic" ]
-      lib_dirs = pkgresult[3]
-    }
 
-    forward_variables_from(invoker,
-                           [
-                             "defines",
-                             "visibility",
-                           ])
+      if (!defined(invoker.ignore_libs) || !invoker.ignore_libs) {
+        libs = pkgresult[3]
+        lib_dirs = pkgresult[4]
+      }
+
+      # Link libraries statically for OSS-Fuzz fuzzer build
+      if (oss_fuzz) {
+        # Output libs needed for static linking (direct + transitive/non-direct libs), we will re-execute the script to get those libs
+        args += [ "--static" ]
+        pkgresult_static = exec_script(pkg_config_script, args, "value")
+        libs = []
+        ldflags = [ "-Wl,-Bstatic" ]
+        foreach(lib, pkgresult_static[3]) {
+          # dl(dynamic loading) lib is not needed for linking statically and its presence triggers errors.
+          # example of errors:
+          #   ld.lld: error: undefined symbol: __dlsym
+          #   >>> referenced by dlsym.o:(dlsym) in archive /lib/x86_64-linux-gnu/libdl.a
+          if (lib != "dl") {
+            ldflags += [ "-l$lib" ]
+          }
+        }
+        ldflags += [ "-Wl,-Bdynamic" ]
+        lib_dirs = pkgresult[4]
+      }
+
+      forward_variables_from(invoker, [ "defines" ])
+    }
   }
+
+  # Always forward visibility
+  forward_variables_from(invoker, [ "visibility" ])
 }

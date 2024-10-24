@@ -226,11 +226,10 @@ private:
     CHIP_ERROR AddCommonTxtEntries(const BaseAdvertisingParams<Derived> & params, CommonTxtEntryStorage & storage,
                                    char ** txtFields, size_t & numTxtFields)
     {
-        auto optionalMrp = params.GetLocalMRPConfig();
 
-        if (optionalMrp.HasValue())
+        if (const auto & optionalMrp = params.GetLocalMRPConfig(); optionalMrp.has_value())
         {
-            auto mrp = optionalMrp.Value();
+            auto mrp = *optionalMrp;
 
             // An ICD operating as a LIT shall not advertise its slow polling interval.
             // Don't include the SII key in the advertisement when operating as so.
@@ -278,14 +277,16 @@ private:
                 txtFields[numTxtFields++] = storage.sessionActiveThresholdBuf;
             }
         }
-        if (params.GetTcpSupported().HasValue())
+
+        if (params.GetTCPSupportModes() != TCPModeAdvertise::kNone)
         {
-            size_t writtenCharactersNumber = static_cast<size_t>(
-                snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf), "T=%d", params.GetTcpSupported().Value()));
+            size_t writtenCharactersNumber = static_cast<size_t>(snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf),
+                                                                          "T=%d", static_cast<int>(params.GetTCPSupportModes())));
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.tcpSupportedBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.tcpSupportedBuf;
         }
+
         if (params.GetICDModeToAdvertise() != ICDModeAdvertise::kNone)
         {
             size_t writtenCharactersNumber =
@@ -557,7 +558,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
                        DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, params.GetPeerId().GetCompressedFabricId()));
     FullQName compressedFabricIdSubtype = operationalAllocator->AllocateQName(
         nameBuffer, kSubtypeServiceNamePart, kOperationalServiceName, kOperationalProtocol, kLocalDomain);
-    ReturnErrorCodeIf(compressedFabricIdSubtype.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(compressedFabricIdSubtype.nameCount != 0, CHIP_ERROR_NO_MEMORY);
 
     if (!operationalAllocator->AddResponder<PtrResponder>(compressedFabricIdSubtype, instanceName)
              .SetReportAdditional(instanceName)
@@ -670,13 +671,12 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
     }
 
-    if (params.GetVendorId().HasValue())
+    if (const auto & vendorId = params.GetVendorId(); vendorId.has_value())
     {
-        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                           DiscoveryFilter(DiscoveryFilterType::kVendorId, params.GetVendorId().Value()));
+        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kVendorId, *vendorId));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-        ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(vendorServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
 
         if (!allocator->AddResponder<PtrResponder>(vendorServiceName, instanceName)
                  .SetReportAdditional(instanceName)
@@ -688,13 +688,12 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
     }
 
-    if (params.GetDeviceType().HasValue())
+    if (const auto & deviceType = params.GetDeviceType(); deviceType.has_value())
     {
-        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                           DiscoveryFilter(DiscoveryFilterType::kDeviceType, params.GetDeviceType().Value()));
+        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kDeviceType, *deviceType));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-        ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(vendorServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
 
         if (!allocator->AddResponder<PtrResponder>(vendorServiceName, instanceName)
                  .SetReportAdditional(instanceName)
@@ -714,7 +713,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
                                DiscoveryFilter(DiscoveryFilterType::kShortDiscriminator, params.GetShortDiscriminator()));
             FullQName shortServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-            ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(shortServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
 
             if (!allocator->AddResponder<PtrResponder>(shortServiceName, instanceName)
                      .SetReportAdditional(instanceName)
@@ -731,7 +730,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
                                DiscoveryFilter(DiscoveryFilterType::kLongDiscriminator, params.GetLongDiscriminator()));
             FullQName longServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-            ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(longServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
             if (!allocator->AddResponder<PtrResponder>(longServiceName, instanceName)
                      .SetReportAdditional(instanceName)
                      .SetReportInServiceListing(true)
@@ -747,7 +746,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
             MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kCommissioningMode));
             FullQName longServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-            ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(longServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
             if (!allocator->AddResponder<PtrResponder>(longServiceName, instanceName)
                      .SetReportAdditional(instanceName)
                      .SetReportInServiceListing(true)
@@ -812,28 +811,32 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
                                                                                            : &mQueryResponderAllocatorCommissioner;
 
     char txtVidPid[chip::Dnssd::kKeyVendorProductMaxLength + 4];
-    if (params.GetProductId().HasValue() && params.GetVendorId().HasValue())
     {
-        snprintf(txtVidPid, sizeof(txtVidPid), "VP=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
-        txtFields[numTxtFields++] = txtVidPid;
-    }
-    else if (params.GetVendorId().HasValue())
-    {
-        snprintf(txtVidPid, sizeof(txtVidPid), "VP=%d", params.GetVendorId().Value());
-        txtFields[numTxtFields++] = txtVidPid;
+        const auto & productId = params.GetProductId();
+        const auto & vendorId  = params.GetVendorId();
+        if (productId.has_value() && vendorId.has_value())
+        {
+            snprintf(txtVidPid, sizeof(txtVidPid), "VP=%d+%d", *vendorId, *productId);
+            txtFields[numTxtFields++] = txtVidPid;
+        }
+        else if (vendorId.has_value())
+        {
+            snprintf(txtVidPid, sizeof(txtVidPid), "VP=%d", *vendorId);
+            txtFields[numTxtFields++] = txtVidPid;
+        }
     }
 
     char txtDeviceType[chip::Dnssd::kKeyDeviceTypeMaxLength + 4];
-    if (params.GetDeviceType().HasValue())
+    if (const auto & deviceType = params.GetDeviceType(); deviceType.has_value())
     {
-        snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%" PRIu32, params.GetDeviceType().Value());
+        snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%" PRIu32, *deviceType);
         txtFields[numTxtFields++] = txtDeviceType;
     }
 
     char txtDeviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 4];
-    if (params.GetDeviceName().HasValue())
+    if (const auto & deviceName = params.GetDeviceName(); deviceName.has_value())
     {
-        snprintf(txtDeviceName, sizeof(txtDeviceName), "DN=%s", params.GetDeviceName().Value());
+        snprintf(txtDeviceName, sizeof(txtDeviceName), "DN=%s", *deviceName);
         txtFields[numTxtFields++] = txtDeviceName;
     }
     CommonTxtEntryStorage commonStorage;
@@ -858,27 +861,27 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
         snprintf(txtCommissioningMode, sizeof(txtCommissioningMode), "CM=%d", static_cast<int>(params.GetCommissioningMode()));
         txtFields[numTxtFields++] = txtCommissioningMode;
 
-        if (params.GetRotatingDeviceId().HasValue())
+        if (const auto & rotatingDeviceId = params.GetRotatingDeviceId(); rotatingDeviceId.has_value())
         {
-            snprintf(txtRotatingDeviceId, sizeof(txtRotatingDeviceId), "RI=%s", params.GetRotatingDeviceId().Value());
+            snprintf(txtRotatingDeviceId, sizeof(txtRotatingDeviceId), "RI=%s", *rotatingDeviceId);
             txtFields[numTxtFields++] = txtRotatingDeviceId;
         }
 
-        if (params.GetPairingHint().HasValue())
+        if (const auto & pairingHint = params.GetPairingHint(); pairingHint.has_value())
         {
-            snprintf(txtPairingHint, sizeof(txtPairingHint), "PH=%d", params.GetPairingHint().Value());
+            snprintf(txtPairingHint, sizeof(txtPairingHint), "PH=%d", *pairingHint);
             txtFields[numTxtFields++] = txtPairingHint;
         }
 
-        if (params.GetPairingInstruction().HasValue())
+        if (const auto & pairingInstruction = params.GetPairingInstruction(); pairingInstruction.has_value())
         {
-            snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", params.GetPairingInstruction().Value());
+            snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", *pairingInstruction);
             txtFields[numTxtFields++] = txtPairingInstr;
         }
     }
     else
     {
-        if (params.GetCommissionerPasscodeSupported().ValueOr(false))
+        if (params.GetCommissionerPasscodeSupported().value_or(false))
         {
             snprintf(txtCommissionerPasscode, sizeof(txtCommissionerPasscode), "CP=%d", static_cast<int>(1));
             txtFields[numTxtFields++] = txtCommissionerPasscode;

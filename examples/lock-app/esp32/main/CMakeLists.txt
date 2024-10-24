@@ -74,8 +74,8 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/door-lock-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/icd-management-server"
-                     PRIV_REQUIRES bt chip QRCode nvs_flash driver)
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/icd-management-server")
+
 add_dependencies(${COMPONENT_LIB} app-codegen)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")

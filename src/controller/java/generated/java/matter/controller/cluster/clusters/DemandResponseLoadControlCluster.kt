@@ -45,7 +45,7 @@ import matter.tlv.TlvWriter
 
 class DemandResponseLoadControlCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class LoadControlProgramsAttribute(
     val value: List<DemandResponseLoadControlClusterLoadControlProgramStruct>
@@ -126,7 +126,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun registerLoadControlProgramRequest(
     loadControlProgram: DemandResponseLoadControlClusterLoadControlProgramStruct,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 0u
 
@@ -141,7 +141,7 @@ class DemandResponseLoadControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -150,22 +150,22 @@ class DemandResponseLoadControlCluster(
 
   suspend fun unregisterLoadControlProgramRequest(
     loadControlProgramID: ByteArray,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 1u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_LOAD_CONTROL_PROGRAM_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_LOAD_CONTROL_PROGRAM_I_D_REQ), loadControlProgramID)
+    val TAG_LOAD_CONTROL_PROGRAM_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_LOAD_CONTROL_PROGRAM_ID_REQ), loadControlProgramID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -174,7 +174,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun addLoadControlEventRequest(
     event: DemandResponseLoadControlClusterLoadControlEventStruct,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 2u
 
@@ -189,7 +189,7 @@ class DemandResponseLoadControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -199,15 +199,15 @@ class DemandResponseLoadControlCluster(
   suspend fun removeLoadControlEventRequest(
     eventID: ByteArray,
     cancelControl: UShort,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 3u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_EVENT_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_EVENT_I_D_REQ), eventID)
+    val TAG_EVENT_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_EVENT_ID_REQ), eventID)
 
     val TAG_CANCEL_CONTROL_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_CANCEL_CONTROL_REQ), cancelControl)
@@ -217,7 +217,7 @@ class DemandResponseLoadControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -235,7 +235,7 @@ class DemandResponseLoadControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -275,7 +275,7 @@ class DemandResponseLoadControlCluster(
           add(
             DemandResponseLoadControlClusterLoadControlProgramStruct.fromTlv(
               AnonymousTag,
-              tlvReader
+              tlvReader,
             )
           )
         }
@@ -287,7 +287,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeLoadControlProgramsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LoadControlProgramsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -300,7 +300,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -333,7 +333,7 @@ class DemandResponseLoadControlCluster(
                 add(
                   DemandResponseLoadControlClusterLoadControlProgramStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader
+                    tlvReader,
                   )
                 )
               }
@@ -382,7 +382,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeNumberOfLoadControlProgramsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -395,7 +395,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -474,7 +474,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeEventsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -487,7 +487,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -518,7 +518,7 @@ class DemandResponseLoadControlCluster(
                 add(
                   DemandResponseLoadControlClusterLoadControlEventStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader
+                    tlvReader,
                   )
                 )
               }
@@ -576,7 +576,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeActiveEventsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ActiveEventsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -589,7 +589,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -620,7 +620,7 @@ class DemandResponseLoadControlCluster(
                 add(
                   DemandResponseLoadControlClusterLoadControlEventStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader
+                    tlvReader,
                   )
                 )
               }
@@ -669,7 +669,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeNumberOfEventsPerProgramAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -682,7 +682,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -752,7 +752,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeNumberOfTransitionsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -765,7 +765,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -846,10 +846,10 @@ class DemandResponseLoadControlCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -875,7 +875,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeDefaultRandomStartAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -888,7 +888,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -958,7 +958,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun writeDefaultRandomDurationAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 7u
 
@@ -972,10 +972,10 @@ class DemandResponseLoadControlCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1001,7 +1001,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeDefaultRandomDurationAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -1014,7 +1014,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1091,7 +1091,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -1104,7 +1104,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1188,7 +1188,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -1201,7 +1201,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1285,7 +1285,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -1298,7 +1298,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1380,7 +1380,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -1393,7 +1393,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1468,7 +1468,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1481,7 +1481,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1549,7 +1549,7 @@ class DemandResponseLoadControlCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1562,7 +1562,7 @@ class DemandResponseLoadControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

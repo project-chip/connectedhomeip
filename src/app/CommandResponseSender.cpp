@@ -113,7 +113,7 @@ void CommandResponseSender::StartSendingCommandResponses()
     }
 }
 
-void CommandResponseSender::OnDone(CommandHandler & apCommandObj)
+void CommandResponseSender::OnDone(CommandHandlerImpl & apCommandObj)
 {
     if (mState == State::ErrorSentDelayCloseUntilOnDone)
     {
@@ -125,17 +125,17 @@ void CommandResponseSender::OnDone(CommandHandler & apCommandObj)
     StartSendingCommandResponses();
 }
 
-void CommandResponseSender::DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+void CommandResponseSender::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                             TLV::TLVReader & apPayload)
 {
     VerifyOrReturn(mpCommandHandlerCallback);
     mpCommandHandlerCallback->DispatchCommand(apCommandObj, aCommandPath, apPayload);
 }
 
-Status CommandResponseSender::CommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status CommandResponseSender::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
 {
-    VerifyOrReturnValue(mpCommandHandlerCallback, Protocols::InteractionModel::Status::UnsupportedCommand);
-    return mpCommandHandlerCallback->CommandExists(aCommandPath);
+    VerifyOrReturnValue(mpCommandHandlerCallback, Protocols::InteractionModel::Status::Failure);
+    return mpCommandHandlerCallback->ValidateCommandCanBeDispatched(request);
 }
 
 CHIP_ERROR CommandResponseSender::SendCommandResponse()
@@ -226,12 +226,28 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
     }
 }
 
+size_t CommandResponseSender::GetCommandResponseMaxBufferSize()
+{
+    if (!mExchangeCtx || !mExchangeCtx->HasSessionHandle())
+    {
+        ChipLogError(DataManagement, "Session not available. Unable to infer session-specific buffer capacities.");
+        return kMaxSecureSduLengthBytes;
+    }
+
+    if (mExchangeCtx->GetSessionHandle()->AllowsLargePayload())
+    {
+        return kMaxLargeSecureSduLengthBytes;
+    }
+
+    return kMaxSecureSduLengthBytes;
+}
+
 #if CHIP_WITH_NLFAULTINJECTION
 
 void CommandResponseSender::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,
                                                                            System::PacketBufferHandle && payload,
                                                                            bool isTimedInvoke,
-                                                                           CommandHandler::NlFaultInjectionType faultType)
+                                                                           CommandHandlerImpl::NlFaultInjectionType faultType)
 {
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement,

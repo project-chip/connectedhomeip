@@ -6,6 +6,7 @@
 # Users are not expected to import this file, instead, users can use import chip.clusters,
 # which will import all symbols from this file and can get a readable, pretty naming like
 # clusters.OnOff.commands.OnCommand
+from __future__ import annotations
 
 import typing
 from dataclasses import dataclass, field
@@ -18,6 +19,42 @@ from chip.tlv import float32, uint
 from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand, ClusterEvent, ClusterObject,
                              ClusterObjectDescriptor, ClusterObjectFieldDescriptor)
 from .Types import Nullable, NullValue
+
+
+__all__ = [
+    "Globals",
+{{#zcl_clusters}}
+    "{{asUpperCamelCase name}}",
+{{/zcl_clusters}}
+]
+
+
+class Globals:
+    class Enums:
+{{#zcl_enums}}
+{{#if has_no_clusters}}
+{{> enum_def cluster="Globals"}}
+
+{{/if}}
+{{/zcl_enums}}
+    class Bitmaps:
+{{#zcl_bitmaps}}
+{{#if has_no_clusters}}
+{{! Work around https://github.com/project-chip/zap/issues/1370 and manually filter out built-in bitmap types. }}
+{{#if_is_atomic label}}
+{{else}}
+{{> bitmap_def }}
+
+{{/if_is_atomic}}
+{{/if}}
+{{/zcl_bitmaps}}
+    class Structs:
+{{#zcl_structs}}
+{{#if has_no_clusters}}
+{{> struct_def cluster="Globals"}}
+
+{{/if}}
+{{/zcl_structs}}
 
 {{#zcl_clusters}}
 
@@ -40,9 +77,9 @@ class {{asUpperCamelCase name}}(Cluster):
 
 {{#zcl_attributes_server}}
 {{#if entryType}}
-    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = None
+    {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name)}}
 {{else}}
-    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = None
+    {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
 {{/if}}
 {{/zcl_attributes_server}}
 
@@ -50,23 +87,7 @@ class {{asUpperCamelCase name}}(Cluster):
 {{#first}}
     class Enums:
 {{/first}}
-        class {{asType label}}(MatterIntEnum):
-{{#zcl_enum_items}}
-            k{{asUpperCamelCase label}} = {{asHex value 2}}
-{{/zcl_enum_items}}
-{{#unless (isInConfigList (concat (asUpperCamelCase ../name) "::" label) "EnumsNotUsedAsTypeInXML")}}
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = {{first_unused_enum_value mode="first_unused"}},
-{{else}}
-            # kUnknownEnumValue intentionally not defined. This enum never goes
-            # through DataModel::Decode, likely because it is a part of a derived
-            # cluster. As a result having kUnknownEnumValue in this enum is error
-            # prone, and was removed. See
-            # src/app/common/templates/config-data.yaml.
-{{/unless}}
+{{> enum_def cluster=(asUpperCamelCase ../name)}}
 
 {{#last}}
 {{/last}}
@@ -75,30 +96,14 @@ class {{asUpperCamelCase name}}(Cluster):
 {{#first}}
     class Bitmaps:
 {{/first}}
-        class {{asType label}}(IntFlag):
-{{#zcl_bitmap_items}}
-            k{{asUpperCamelCase label}} = {{asHex mask}}
-{{/zcl_bitmap_items}}
+{{> bitmap_def }}
 
 {{/zcl_bitmaps}}
 {{#zcl_structs}}
 {{#first}}
     class Structs:
 {{/first}}
-        @dataclass
-        class {{asUpperCamelCase name}}(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                    {{#zcl_struct_items}}
-                        ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
-                    {{/zcl_struct_items}}
-                    ])
-
-            {{#zcl_struct_items}}
-            {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
-            {{/zcl_struct_items}}
+{{> struct_def cluster=(asUpperCamelCase parent.name) }}
 
 {{/zcl_structs}}
 {{#zcl_commands}}
@@ -117,7 +122,7 @@ class {{asUpperCamelCase name}}(Cluster):
             {{~#if responseName}}
             response_type: typing.ClassVar[str] = '{{asUpperCamelCase responseName}}'
             {{else}}
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
             {{/if}}
 
             @ChipUtility.classproperty
@@ -138,7 +143,7 @@ class {{asUpperCamelCase name}}(Cluster):
             {{#first}}
 
             {{/first}}
-            {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
+            {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
             {{/zcl_command_arguments}}
 
 {{/zcl_commands}}
@@ -171,9 +176,9 @@ class {{asUpperCamelCase name}}(Cluster):
             {{/if}}
 
             {{#if entryType}}
-            value: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name)}}
+            value: {{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name)}}
             {{else}}
-            value: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
+            value: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
             {{/if}}
 
 {{/zcl_attributes_server}}
@@ -203,7 +208,7 @@ class {{asUpperCamelCase name}}(Cluster):
             {{#first}}
 
             {{/first}}
-            {{ asLowerCamelCase name }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
+            {{ asLowerCamelCase name }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
             {{/zcl_event_fields}}
 
 {{/zcl_events}}

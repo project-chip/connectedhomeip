@@ -19,8 +19,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 
-#include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/minimal_mdns/core/HeapQName.h>
@@ -250,8 +250,6 @@ public:
 
     /// Mark a resolution as a success, removing it from the internal list
     void Complete(const chip::PeerId & peerId);
-    void CompleteCommissioner(const chip::Dnssd::DiscoveredNodeData & data);
-    void CompleteCommissionable(const chip::Dnssd::DiscoveredNodeData & data);
     void CompleteIpResolution(SerializedQNameIterator targetHostName);
 
     /// Mark all browse-type scheduled attemptes as a success, removing them
@@ -273,7 +271,7 @@ public:
     // Get minimum time until the next pending reply is required.
     //
     // Returns missing if no actively tracked elements exist.
-    chip::Optional<chip::System::Clock::Timeout> GetTimeUntilNextExpectedResponse() const;
+    std::optional<chip::System::Clock::Timeout> GetTimeUntilNextExpectedResponse() const;
 
     // Get the peer Id that needs scheduling for a query
     //
@@ -283,7 +281,7 @@ public:
     //    now'
     //  - there is NO sorting implied by this call. Returned value will be
     //    any peer that needs a new request sent
-    chip::Optional<ScheduledAttempt> NextScheduled();
+    std::optional<ScheduledAttempt> NextScheduled();
 
     /// Check if any of the pending queries are for the given host name for
     /// IP resolution.

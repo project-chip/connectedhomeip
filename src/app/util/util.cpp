@@ -88,14 +88,12 @@ void emberAfInit()
 // them in.
 void MatterBallastConfigurationPluginServerInitCallback() {}
 void MatterBooleanStatePluginServerInitCallback() {}
-void MatterElectricalMeasurementPluginServerInitCallback() {}
 void MatterRelativeHumidityMeasurementPluginServerInitCallback() {}
 void MatterIlluminanceMeasurementPluginServerInitCallback() {}
 void MatterBinaryInputBasicPluginServerInitCallback() {}
 void MatterPressureMeasurementPluginServerInitCallback() {}
 void MatterTemperatureMeasurementPluginServerInitCallback() {}
 void MatterFlowMeasurementPluginServerInitCallback() {}
-void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}
 void MatterBridgedDeviceBasicInformationPluginServerInitCallback() {}
 void MatterPowerConfigurationPluginServerInitCallback() {}
@@ -139,6 +137,9 @@ void MatterEnergyEvseModePluginServerInitCallback() {}
 void MatterPowerTopologyPluginServerInitCallback() {}
 void MatterElectricalEnergyMeasurementPluginServerInitCallback() {}
 void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
+void MatterServiceAreaPluginServerInitCallback() {}
+void MatterWaterHeaterManagementPluginServerInitCallback() {}
+void MatterWaterHeaterModePluginServerInitCallback() {}
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {

@@ -30,8 +30,8 @@
  * endpoint or for all endpoints.
  *
  * Instances of AttributeAccessInterface that are registered via
- * registerAttributeAccessOverride will be consulted before taking the normal
- * attribute access codepath and can use that codepath as a fallback if desired.
+ * AttributeAccessInterfaceRegistry::Instance().Register will be consulted before taking the
+ * normal attribute access codepath and can use that codepath as a fallback if desired.
  */
 namespace chip {
 namespace app {
@@ -148,6 +148,9 @@ public:
         return mClusterId == aOther.mClusterId &&
             (!mEndpointId.HasValue() || !aOther.mEndpointId.HasValue() || mEndpointId.Value() == aOther.mEndpointId.Value());
     }
+
+protected:
+    Optional<EndpointId> GetEndpointId() { return mEndpointId; }
 
 private:
     Optional<EndpointId> mEndpointId;

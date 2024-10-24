@@ -45,6 +45,14 @@ Instruments devices.
 | Red & Green LED On State                         | Pump is started                        |
 | Red & Green LED Off State                        | Pump stopped                           |
 
+When the device has LIT ICD functionality enabled (`chip_enable_icd_lit` set to
+true in args.gni), the functionality of the right long button press changes as
+described below:
+
+| Action                                           | Functionality            |
+| ------------------------------------------------ | ------------------------ |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | User Active Mode Trigger |
+
 ## Building
 
 ### Preparation
@@ -64,10 +72,16 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
     ```
 
 -   Run the bootstrap script to setup the build environment.
+-   Note, a recursive submodule checkout is required to utilize TI's Openthread
+    reference commit.
+-   Note, in order to build the chip-tool and ota-provider examples, a recursive
+    submodule checkout is required for the linux platform as seen in the command
+    below.
 
     ```
     $ cd ~/connectedhomeip
     $ source ./scripts/bootstrap.sh
+    $ ./scripts/checkout_submodules.py --shallow --platform cc13xx_26xx linux --recursive
 
     ```
 
@@ -102,7 +116,7 @@ Ninja to build the executable.
     to the GN call.
 
     ```
-    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
+    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"] chip_generate_link_map_file=true"
     ```
 
 ## Programming

@@ -14,212 +14,420 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import glob
 import logging
 import os
-import subprocess
+import signal
 import sys
 import tempfile
 import time
-from typing import List, Optional, TextIO, Tuple
+from dataclasses import dataclass
+from typing import List, Optional
 
 import click
+from linux.log_line_processing import ProcessOutputCapture
+from linux.tv_casting_test_sequence_utils import App, Sequence, Step
+from linux.tv_casting_test_sequences import START_APP, STOP_APP
+
+"""
+This script can be used to validate the casting experience between the Linux tv-casting-app and the Linux tv-app.
+
+It runs a series of test sequences that check for expected output lines from the tv-casting-app and the tv-app in 
+a deterministic order. If these lines are not found, it indicates an issue with the casting experience.
+"""
+
+
+@dataclass
+class RunningProcesses:
+    tv_casting: ProcessOutputCapture = None
+    tv_app: ProcessOutputCapture = None
+
 
 # Configure logging format.
-logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
-
-# The maximum amount of time to wait for the Linux tv-app to start before timeout.
-TV_APP_MAX_START_WAIT_SEC = 2
+logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
 
 # File names of logs for the Linux tv-casting-app and the Linux tv-app.
-LINUX_TV_APP_LOGS = 'Linux-tv-app-logs.txt'
-LINUX_TV_CASTING_APP_LOGS = 'Linux-tv-casting-app-logs.txt'
-
-# Values that identify the Linux tv-app and are noted in the 'Device Configuration' in the Linux tv-app output
-# as well as under the 'Discovered Commissioner' details in the Linux tv-casting-app output.
-VENDOR_ID = 0xFFF1   # Spec 7.20.2.1 MEI code: test vendor IDs are 0xFFF1 to 0xFFF4
-PRODUCT_ID = 0x8001  # Test product id
-DEVICE_TYPE_CASTING_VIDEO_PLAYER = 0x23    # Device type library 10.3: Casting Video Player
+LINUX_TV_APP_LOGS = "Linux-tv-app-logs.txt"
+LINUX_TV_CASTING_APP_LOGS = "Linux-tv-casting-app-logs.txt"
 
 
-class ProcessManager:
-    """A context manager for managing subprocesses.
+class TestStepException(Exception):
+    """Thrown when a test fails, contains information about the test step that faied"""
 
-    This class provides a context manager for safely starting and stopping a subprocess.
-    """
+    def __init__(self, message, sequence_name: str, step: Optional[Step]):
+        super().__init__(message)
+        self.sequence_name = sequence_name
+        self.step = step
 
-    def __init__(self, command: List[str], stdout, stderr):
-        self.command = command
-        self.stdout = stdout
-        self.stderr = stderr
-
-    def __enter__(self):
-        self.process = subprocess.Popen(self.command, stdout=self.stdout, stderr=self.stderr, text=True)
-        return self.process
-
-    def __exit__(self, exception_type, exception_value, traceback):
-        self.process.terminate()
-        self.process.wait()
+        logging.error("EXCEPTION at %s/%r: %s", sequence_name, step, message)
 
 
-def dump_temporary_logs_to_console(log_file_path: str):
-    """Dump log file to the console; log file will be removed once the function exits."""
-    """Write the entire content of `log_file_path` to the console."""
-    print('\nDumping logs from: ', log_file_path)
+def remove_cached_files(cached_file_pattern: str):
+    """Remove any cached files that match the provided pattern."""
 
-    with open(log_file_path, 'r') as file:
-        for line in file:
-            print(line.rstrip())
+    cached_files = glob.glob(
+        cached_file_pattern
+    )  # Returns a list of paths that match the pattern.
 
-
-def handle_discovery_failure(log_file_paths: List[str]):
-    """Log 'Discovery failed!' as error, dump log files to console, exit on error."""
-    logging.error('Discovery failed!')
-
-    for log_file_path in log_file_paths:
+    for cached_file in cached_files:
         try:
-            dump_temporary_logs_to_console(log_file_path)
-        except Exception as e:
-            logging.exception(f"Failed to dump {log_file_path}: {e}")
-
-    sys.exit(1)
-
-
-def extract_value_from_string(line: str) -> int:
-    """Extract and return integer value from given output string.
-
-    The string is expected to be in the following format as it is received
-    from the Linux tv-casting-app output:
-    \x1b[0;34m[1713741926895] [7276:9521344] [DIS] Vendor ID: 65521\x1b[0m
-    The integer value to be extracted here is 65521.
-    """
-    value = line.split(':')[-1].strip().replace('\x1b[0m', '')
-    value = int(value)
-
-    return value
+            os.remove(cached_file)
+        except OSError as e:
+            logging.error(
+                f"Failed to remove cached file `{cached_file}` with error: `{e.strerror}`"
+            )
+            raise  # Re-raise the OSError to propagate it up.
 
 
-def validate_value(expected_value: int, log_paths: List[str], line: str, value_name: str) -> Optional[str]:
-    """Validate a value in a string against an expected value."""
-    value = extract_value_from_string(line)
+def stop_app(test_sequence_name: str, app_name: str, app: ProcessOutputCapture):
+    """Stop the given `app` subprocess."""
 
-    if value != expected_value:
-        logging.error(f'{value_name} does not match the expected value!')
-        logging.error(f'Expected {value_name}: {expected_value}')
-        logging.error(line.rstrip('\n'))
-        handle_discovery_failure(log_paths)
-        return None
+    app.process.terminate()
+    app_exit_code = app.process.wait()
 
-    # Return the line containing the valid value.
-    return line.rstrip('\n')
+    if app.process.poll() is None:
+        raise TestStepException(
+            f"{test_sequence_name}: Failed to stop running {app_name}. Process is still running.",
+            test_sequence_name,
+            None,
+        )
+
+    if app_exit_code >= 0:
+        raise TestStepException(
+            f"{test_sequence_name}: {app_name} exited with unexpected exit code {app_exit_code}.",
+            test_sequence_name,
+            None,
+        )
+
+    signal_number = -app_exit_code
+    if signal_number != signal.SIGTERM.value:
+        raise TestStepException(
+            f"{test_sequence_name}: {app_name} stopped by signal {signal_number} instead of {signal.SIGTERM.value} (SIGTERM).",
+            test_sequence_name,
+            None,
+        )
+
+    logging.info(
+        f"{test_sequence_name}: {app_name} stopped by {signal_number} (SIGTERM) signal."
+    )
 
 
-def start_up_tv_app_success(tv_app_process: subprocess.Popen, linux_tv_app_log_file: TextIO) -> bool:
-    """Check if the Linux tv-app is able to successfully start or until timeout occurs."""
+def parse_output_msg_in_subprocess(
+    processes: RunningProcesses, test_sequence_name: str, test_sequence_step: Step
+):
+    """Parse the output of a given `app` subprocess and validate its output against the expected `output_msg` in the given `Step`."""
+
+    if not test_sequence_step.output_msg:
+        raise TestStepException(
+            f"{test_sequence_name} - No output message provided in the test sequence step.",
+            test_sequence_name,
+            test_sequence_step,
+        )
+
+    app_subprocess = (
+        processes.tv_casting
+        if test_sequence_step.app == App.TV_CASTING_APP
+        else processes.tv_app
+    )
+
     start_wait_time = time.time()
+    msg_block = []
 
-    while True:
-        # Check if the time elapsed since the start wait time exceeds the maximum allowed startup time for the TV app.
-        if time.time() - start_wait_time > TV_APP_MAX_START_WAIT_SEC:
-            logging.error("The Linux tv-app process did not start successfully within the timeout.")
-            return False
+    current_index = 0
+    while current_index < len(test_sequence_step.output_msg):
+        # Check if we exceeded the maximum wait time to parse for the output string(s).
+        max_wait_time = start_wait_time + test_sequence_step.timeout_sec - time.time()
+        if max_wait_time < 0:
+            raise TestStepException(
+                f"{test_sequence_name} - Did not find the expected output string(s) in the {test_sequence_step.app.value} subprocess within the timeout: {test_sequence_step.output_msg}",
+                test_sequence_name,
+                test_sequence_step,
+            )
+        output_line = app_subprocess.next_output_line(max_wait_time)
 
-        tv_app_output_line = tv_app_process.stdout.readline()
+        if output_line:
+            if test_sequence_step.output_msg[current_index] in output_line:
+                msg_block.append(output_line.rstrip("\n"))
+                current_index += 1
+            elif msg_block:
+                msg_block.append(output_line.rstrip("\n"))
+                if test_sequence_step.output_msg[0] in output_line:
+                    msg_block.clear()
+                    msg_block.append(output_line.rstrip("\n"))
+                    current_index = 1
+                # Sanity check that `Discovered Commissioner #0` is the valid commissioner.
+                elif "Discovered Commissioner #" in output_line:
+                    raise TestStepException(
+                        f"{test_sequence_name} - The valid discovered commissioner should be `Discovered Commissioner #0`.",
+                        test_sequence_name,
+                        test_sequence_step,
+                    )
 
-        linux_tv_app_log_file.write(tv_app_output_line)
-        linux_tv_app_log_file.flush()
+            if current_index == len(test_sequence_step.output_msg):
+                logging.info(
+                    f"{test_sequence_name} - Found the expected output string(s) in the {test_sequence_step.app.value} subprocess:"
+                )
+                for line in msg_block:
+                    logging.info(f"{test_sequence_name} - {line}")
 
-        # Check if the Linux tv-app started successfully.
-        if "Started commissioner" in tv_app_output_line:
-            logging.info('Linux tv-app is up and running!')
-            return True
+                # successful completion
+                return
+
+    raise TestStepException("Unexpected exit", test_sequence_name, test_sequence_step)
 
 
-def parse_output_for_valid_commissioner(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
-    """Parse the output of the Linux tv-casting-app to find a valid commissioner."""
-    tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
+def send_input_cmd_to_subprocess(
+    processes: RunningProcesses,
+    test_sequence_name: str,
+    test_sequence_step: Step,
+):
+    """Send a given input command (`input_cmd`) from the `Step` to its given `app` subprocess."""
 
-    valid_discovered_commissioner = None
-    valid_vendor_id = None
-    valid_product_id = None
-    valid_device_type = None
+    if not test_sequence_step.input_cmd:
+        raise TestStepException(
+            f"{test_sequence_name} - No input command provided in the test sequence step.",
+            test_sequence_step,
+            test_sequence_step,
+        )
 
-    # Read the output as we receive it from the tv-casting-app subprocess.
-    for line in tv_casting_app_process.stdout:
-        linux_tv_casting_app_log_file.write(line)
-        linux_tv_casting_app_log_file.flush()
+    app_subprocess = (
+        processes.tv_casting
+        if test_sequence_step.app == App.TV_CASTING_APP
+        else processes.tv_app
+    )
+    app_name = test_sequence_step.app.value
 
-        # Fail fast if "No commissioner discovered" string found.
-        if "No commissioner discovered" in line:
-            logging.error(line.rstrip('\n'))
-            handle_discovery_failure(log_paths)
+    input_cmd = test_sequence_step.input_cmd
+    app_subprocess.send_to_program(input_cmd)
 
-        elif "Discovered Commissioner" in line:
-            valid_discovered_commissioner = line.rstrip('\n')
+    input_cmd = input_cmd.rstrip("\n")
+    logging.info(
+        f"{test_sequence_name} - Sent `{input_cmd}` to the {app_name} subprocess."
+    )
 
-        elif valid_discovered_commissioner:
-            # Continue parsing the output for the information of interest under 'Discovered Commissioner'
-            if 'Vendor ID:' in line:
-                valid_vendor_id = validate_value(VENDOR_ID, log_paths, line, 'Vendor ID')
 
-            elif 'Product ID:' in line:
-                valid_product_id = validate_value(PRODUCT_ID, log_paths, line, 'Product ID')
+def handle_input_cmd(
+    processes: RunningProcesses, test_sequence_name: str, test_sequence_step: Step
+):
+    """Handle the input command (`input_cmd`) from a test sequence step."""
+    if test_sequence_step.input_cmd == STOP_APP:
+        if test_sequence_step.app == App.TV_CASTING_APP:
+            stop_app(
+                test_sequence_name, test_sequence_step.app.value, processes.tv_casting
+            )
+        elif test_sequence_step.app == App.TV_APP:
+            stop_app(test_sequence_name, test_sequence_step.app.value, processes.tv_app)
+        else:
+            raise TestStepException(
+                "Unknown stop app", test_sequence_name, test_sequence_step
+            )
+        return
 
-            elif 'Device Type:' in line:
-                valid_device_type = validate_value(DEVICE_TYPE_CASTING_VIDEO_PLAYER, log_paths, line, 'Device Type')
+    send_input_cmd_to_subprocess(processes, test_sequence_name, test_sequence_step)
 
-        # A valid commissioner has VENDOR_ID, PRODUCT_ID, and DEVICE TYPE in its list of entries.
-        if valid_vendor_id and valid_product_id and valid_device_type:
-            logging.info('Found a valid commissioner in the Linux tv-casting-app logs:')
-            logging.info(valid_discovered_commissioner)
-            logging.info(valid_vendor_id)
-            logging.info(valid_product_id)
-            logging.info(valid_device_type)
-            logging.info('Discovery success!')
-            break
+
+def run_test_sequence_steps(
+    current_index: int,
+    test_sequence_name: str,
+    test_sequence_steps: List[Step],
+    processes: RunningProcesses,
+):
+    """Run through the test steps from a test sequence starting from the current index and perform actions based on the presence of `output_msg` or `input_cmd`."""
+
+    if test_sequence_steps is None:
+        logging.error("No test sequence steps provided.")
+
+    while current_index < len(test_sequence_steps):
+        # Current step in the list of steps.
+        test_sequence_step = test_sequence_steps[current_index]
+
+        # A test sequence step contains either an output_msg or input_cmd entry.
+        if test_sequence_step.output_msg:
+            parse_output_msg_in_subprocess(
+                processes,
+                test_sequence_name,
+                test_sequence_step,
+            )
+        elif test_sequence_step.input_cmd:
+            handle_input_cmd(
+                processes,
+                test_sequence_name,
+                test_sequence_step,
+            )
+
+        current_index += 1
+
+
+def cmd_execute_list(app_path):
+    """Returns the list suitable to pass to a ProcessOutputCapture/subprocess.run for execution."""
+    cmd = []
+
+    # On Unix-like systems, use stdbuf to disable stdout buffering.
+    # Configure command options to disable stdout buffering during tests.
+    if sys.platform == "darwin" or sys.platform == "linux":
+        cmd = ["stdbuf", "-o0", "-i0"]
+
+    cmd.append(app_path)
+
+    # Our applications support better debugging logs. Enable them
+    cmd.append("--trace-to")
+    cmd.append("json:log")
+
+    return cmd
 
 
 @click.command()
-@click.option('--tv-app-rel-path', type=str, default='out/tv-app/chip-tv-app', help='Path to the Linux tv-app executable.')
-@click.option('--tv-casting-app-rel-path', type=str, default='out/tv-casting-app/chip-tv-casting-app', help='Path to the Linux tv-casting-app executable.')
-def test_discovery_fn(tv_app_rel_path, tv_casting_app_rel_path):
-    """Test if the Linux tv-casting-app is able to discover the Linux tv-app.
+@click.option(
+    "--tv-app-rel-path",
+    type=str,
+    default="out/tv-app/chip-tv-app",
+    help="Path to the Linux tv-app executable.",
+)
+@click.option(
+    "--tv-casting-app-rel-path",
+    type=str,
+    default="out/tv-casting-app/chip-tv-casting-app",
+    help="Path to the Linux tv-casting-app executable.",
+)
+@click.option(
+    "--commissioner-generated-passcode",
+    type=bool,
+    default=False,
+    help="Enable the commissioner generated passcode test flow.",
+)
+@click.option(
+    "--log-directory",
+    type=str,
+    default=None,
+    help="Where to place output logs",
+)
+def test_casting_fn(
+    tv_app_rel_path, tv_casting_app_rel_path, commissioner_generated_passcode, log_directory
+):
+    """Test if the casting experience between the Linux tv-casting-app and the Linux tv-app continues to work.
 
-    Default paths for the executables are provided but can be overridden via command line arguments.
-    For example: python3 run_tv_casting_test.py --tv-app-rel-path=path/to/tv-app
-                 --tv-casting-app-rel-path=path/to/tv-casting-app
+    By default, it uses the provided executable paths and the commissionee generated passcode flow as the test sequence.
+
+    Example usages:
+    1. Use default paths and test sequence:
+        python3 run_tv_casting_test.py
+
+    2. Use custom executable paths and default test sequence:
+        python3 run_tv_casting_test.py --tv-app-rel-path=path/to/tv-app --tv-casting-app-rel-path=path/to/tv-casting-app
+
+    3. Use default paths and a test sequence that is not the default test sequence (replace `test-sequence-name` with the actual name of the test sequence):
+        python3 run_tv_casting_test.py --test-sequence-name=True
+
+    4. Use custom executable paths and a test sequence that is not the default test sequence (replace `test-sequence-name` with the actual name of the test sequence):
+        python3 run_tv_casting_test.py --tv-app-rel-path=path/to/tv-app --tv-casting-app-rel-path=path/to/tv-casting-app --test-sequence-name=True
+
+    Note: In order to enable a new test sequence, we also need to define a @click.option() entry for the test sequence.
     """
+
     # Store the log files to a temporary directory.
     with tempfile.TemporaryDirectory() as temp_dir:
-        linux_tv_app_log_path = os.path.join(temp_dir, LINUX_TV_APP_LOGS)
-        linux_tv_casting_app_log_path = os.path.join(temp_dir, LINUX_TV_CASTING_APP_LOGS)
+        if log_directory:
+            linux_tv_app_log_path = os.path.join(log_directory, LINUX_TV_APP_LOGS)
+            linux_tv_casting_app_log_path = os.path.join(
+                log_directory, LINUX_TV_CASTING_APP_LOGS
+            )
+        else:
+            linux_tv_app_log_path = os.path.join(temp_dir, LINUX_TV_APP_LOGS)
+            linux_tv_casting_app_log_path = os.path.join(
+                temp_dir, LINUX_TV_CASTING_APP_LOGS
+            )
 
-        with open(linux_tv_app_log_path, 'w') as linux_tv_app_log_file, open(linux_tv_casting_app_log_path, 'w') as linux_tv_casting_app_log_file:
+        # Get all the test sequences.
+        test_sequences = Sequence.get_test_sequences()
 
-            # Configure command options to disable stdout buffering during tests.
-            disable_stdout_buffering_cmd = []
-            # On Unix-like systems, use stdbuf to disable stdout buffering.
-            if sys.platform == 'darwin' or sys.platform == 'linux':
-                disable_stdout_buffering_cmd = ['stdbuf', '-o0', '-i0']
+        # Get the test sequence that we are interested in validating.
+        test_sequence_name = "commissionee_generated_passcode_test"
+        if commissioner_generated_passcode:
+            test_sequence_name = "commissioner_generated_passcode_test"
+        test_sequence = Sequence.get_test_sequence_by_name(
+            test_sequences, test_sequence_name
+        )
 
-            tv_app_abs_path = os.path.abspath(tv_app_rel_path)
-            # Run the Linux tv-app subprocess.
-            with ProcessManager(disable_stdout_buffering_cmd + [tv_app_abs_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_app_process:
+        if not test_sequence:
+            raise TestStepException(
+                "No test sequence found by the test sequence name provided.",
+                test_sequence_name,
+                None,
+            )
 
-                if not start_up_tv_app_success(tv_app_process, linux_tv_app_log_file):
-                    handle_discovery_failure([linux_tv_app_log_path])
+        # At this point, we have retrieved the test sequence of interest.
+        test_sequence_steps = test_sequence.steps
 
-                tv_casting_app_abs_path = os.path.abspath(tv_casting_app_rel_path)
-                # Run the Linux tv-casting-app subprocess.
-                with ProcessManager(disable_stdout_buffering_cmd + [tv_casting_app_abs_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_casting_app_process:
-                    log_paths = [linux_tv_app_log_path, linux_tv_casting_app_log_path]
-                    tv_casting_app_info = (tv_casting_app_process, linux_tv_casting_app_log_file)
-                    parse_output_for_valid_commissioner(tv_casting_app_info, log_paths)
+        current_index = 0
+        if test_sequence_steps[current_index].input_cmd != START_APP:
+            raise ValueError(
+                f"{test_sequence_name}: The first step in the test sequence must contain `START_APP` as `input_cmd` to indicate starting the tv-app."
+            )
+        elif test_sequence_steps[current_index].app != App.TV_APP:
+            raise ValueError(
+                f"{test_sequence_name}: The first step in the test sequence must be to start up the tv-app."
+            )
+        current_index += 1
+
+        tv_app_abs_path = os.path.abspath(tv_app_rel_path)
+        # Run the Linux tv-app subprocess.
+        with ProcessOutputCapture(
+            cmd_execute_list(tv_app_abs_path), linux_tv_app_log_path
+        ) as tv_app_process:
+            # Verify that the tv-app is up and running.
+            parse_output_msg_in_subprocess(
+                RunningProcesses(tv_app=tv_app_process),
+                test_sequence_name,
+                test_sequence_steps[current_index],
+            )
+            current_index += 1
+
+            if test_sequence_steps[current_index].input_cmd != START_APP:
+                raise ValueError(
+                    f"{test_sequence_name}: The third step in the test sequence must contain `START_APP` as `input_cmd` to indicate starting the tv-casting-app."
+                )
+            elif test_sequence_steps[current_index].app != App.TV_CASTING_APP:
+                raise ValueError(
+                    f"{test_sequence_name}: The third step in the test sequence must be to start up the tv-casting-app."
+                )
+            current_index += 1
+
+            tv_casting_app_abs_path = os.path.abspath(tv_casting_app_rel_path)
+            # Run the Linux tv-casting-app subprocess.
+            with ProcessOutputCapture(
+                cmd_execute_list(tv_casting_app_abs_path), linux_tv_casting_app_log_path
+            ) as tv_casting_app_process:
+                processes = RunningProcesses(
+                    tv_casting=tv_casting_app_process, tv_app=tv_app_process
+                )
+
+                # Verify that the server initialization is completed in the tv-casting-app output.
+                parse_output_msg_in_subprocess(
+                    processes,
+                    test_sequence_name,
+                    test_sequence_steps[current_index],
+                )
+                current_index += 1
+
+                run_test_sequence_steps(
+                    current_index,
+                    test_sequence_name,
+                    test_sequence_steps,
+                    processes,
+                )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     # Start with a clean slate by removing any previously cached entries.
-    os.system('rm -f /tmp/chip_*')
+    try:
+        cached_file_pattern = "/tmp/chip_*"
+        remove_cached_files(cached_file_pattern)
+    except OSError:
+        logging.error(
+            f"Error while removing cached files with file pattern: {cached_file_pattern}"
+        )
+        sys.exit(1)
 
-    # Test discovery between the Linux tv-casting-app and the tv-app.
-    test_discovery_fn()
+    # Test casting (discovery and commissioning) between the Linux tv-casting-app and the tv-app.
+    test_casting_fn()

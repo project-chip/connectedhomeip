@@ -607,6 +607,19 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
     return CHIP_NO_ERROR;
 }
 
+void DefaultDACVerifier::CheckForRevokedDACChain(const AttestationInfo & info,
+                                                 Callback::Callback<OnAttestationInformationVerification> * onCompletion)
+{
+    if (mRevocationDelegate != nullptr)
+    {
+        mRevocationDelegate->CheckForRevokedDACChain(info, onCompletion);
+    }
+    else
+    {
+        onCompletion->mCall(onCompletion->mContext, info, AttestationVerificationResult::kSuccess);
+    }
+}
+
 bool CsaCdKeysTrustStore::IsCdTestKey(const ByteSpan & kid) const
 {
     return kid.data_equal(ByteSpan{ gTestCdPubkeyKid });
@@ -614,9 +627,9 @@ bool CsaCdKeysTrustStore::IsCdTestKey(const ByteSpan & kid) const
 
 CHIP_ERROR CsaCdKeysTrustStore::AddTrustedKey(const ByteSpan & kid, const Crypto::P256PublicKey & pubKey)
 {
-    ReturnErrorCodeIf(kid.size() > SingleKeyEntry::kMaxKidSize, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(kid.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(mNumTrustedKeys == kMaxNumTrustedKeys, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(kid.size() <= SingleKeyEntry::kMaxKidSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!kid.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mNumTrustedKeys != kMaxNumTrustedKeys, CHIP_ERROR_NO_MEMORY);
 
     auto & entry = mTrustedKeys[mNumTrustedKeys];
 
@@ -683,9 +696,10 @@ const AttestationTrustStore * GetTestAttestationTrustStore()
     return &gTestAttestationTrustStore.get();
 }
 
-DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore)
+DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore,
+                                                  DeviceAttestationRevocationDelegate * revocationDelegate)
 {
-    static DefaultDACVerifier defaultDACVerifier{ paaRootStore };
+    static DefaultDACVerifier defaultDACVerifier{ paaRootStore, revocationDelegate };
 
     return &defaultDACVerifier;
 }

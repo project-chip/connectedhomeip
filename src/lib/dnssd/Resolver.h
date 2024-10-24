@@ -19,13 +19,13 @@
 
 #include <cstdint>
 #include <limits>
+#include <optional>
 #include <utility>
 
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/dnssd/Constants.h>
@@ -74,9 +74,9 @@ public:
 class DiscoveryContext : public ReferenceCounted<DiscoveryContext>
 {
 public:
-    void SetBrowseIdentifier(intptr_t identifier) { mBrowseIdentifier.Emplace(identifier); }
-    void ClearBrowseIdentifier() { mBrowseIdentifier.ClearValue(); }
-    const Optional<intptr_t> & GetBrowseIdentifier() const { return mBrowseIdentifier; }
+    void SetBrowseIdentifier(intptr_t identifier) { mBrowseIdentifier.emplace(identifier); }
+    void ClearBrowseIdentifier() { mBrowseIdentifier.reset(); }
+    const std::optional<intptr_t> & GetBrowseIdentifier() const { return mBrowseIdentifier; }
 
     void SetDiscoveryDelegate(DiscoverNodeDelegate * delegate) { mDelegate = delegate; }
     void OnNodeDiscovered(const DiscoveredNodeData & nodeData)
@@ -93,7 +93,7 @@ public:
 
 private:
     DiscoverNodeDelegate * mDelegate = nullptr;
-    Optional<intptr_t> mBrowseIdentifier;
+    std::optional<intptr_t> mBrowseIdentifier;
 };
 
 /**

@@ -19,3 +19,31 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 group("nxp") {
   public_deps = [ "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_platform" ]
 }
+
+source_set("logging") {
+  public_deps = [
+    "${chip_root}/src/platform:platform",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+
+  if (nxp_platform == "k32w0" || nxp_platform == "mcxw71_k32w1") {
+    sources = [ "${chip_root}/src/platform/nxp/${nxp_platform}/Logging.cpp" ]
+  } else {
+    sources = [ "${chip_root}/src/platform/nxp/common/Logging.cpp" ]
+  }
+}
+
+# The application can use this target to integrate the default, platform-specific
+# NXP factory data provider. Each platform should define an "nxp_factory_data" source set.
+# Usage: deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
+group("nxp_factory_data") {
+  public_deps =
+      [ "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_factory_data" ]
+}
+
+# The application can use this target to integrate the default, platform-specific
+# NXP OTA implementation. Each platform should define an "nxp_ota" source set.
+# Usage: deps += [ "${chip_root}/src/platform/nxp:nxp_ota" ]
+group("nxp_ota") {
+  public_deps = [ "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_ota" ]
+}

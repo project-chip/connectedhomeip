@@ -190,7 +190,7 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="manage" />
         </attribute>
-        <attribute side="server" code="35" define="AUTO_RELOCK_TIME" type="int32u" reportable="true" writable="true">
+        <attribute side="server" code="35" define="AUTO_RELOCK_TIME" type="int32u" reportable="true" writable="true" optional="true">
             <description>AutoRelockTime</description>
             <access op="read" role="view" />
             <access op="write" role="manage" />
@@ -491,6 +491,7 @@ limitations under the License.
             <arg name="CreatorFabricIndex" type="fabric_idx" isNullable="true" />
             <arg name="LastModifiedFabricIndex" type="fabric_idx" isNullable="true" />
             <arg name="NextCredentialIndex" type="int16u" isNullable="true" />
+            <arg name="CredentialData" type="octet_string" isNullable="true" optional="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
         <command source="client" code="38" name="ClearCredential" mustUseTimedInvoke="true" optional="true">

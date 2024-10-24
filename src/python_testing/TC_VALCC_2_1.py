@@ -15,11 +15,27 @@
 #    limitations under the License.
 #
 
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -159,7 +175,7 @@ class TC_VALCC_2_1(MatterBaseTest):
         if attributes.ValveFault.attribute_id in attribute_list:
             valve_fault_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.ValveFault)
 
-            asserts.assert_less_equal(valve_fault_dut, 0b00000111, "ValveFault is not in valid range")
+            asserts.assert_less_equal(valve_fault_dut, 0b00111111, "ValveFault is not in valid range")
         else:
             logging.info("Test step skipped")
 

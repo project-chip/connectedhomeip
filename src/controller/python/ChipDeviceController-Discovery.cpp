@@ -23,12 +23,16 @@
  *
  */
 
+#include <string>
+
 #include <controller/CHIPDeviceController.h>
 #include <controller/python/chip/native/PyChipError.h>
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 #include <lib/dnssd/Resolver.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 
 using namespace chip;
 
@@ -142,7 +146,9 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         {
             jsonVal["mrpRetryActiveThreshold"] = activeThreshold->count();
         }
-        jsonVal["supportsTcp"] = dnsSdInfo->supportsTcp;
+
+        jsonVal["supportsTcpClient"] = dnsSdInfo->supportsTcpClient;
+        jsonVal["supportsTcpServer"] = dnsSdInfo->supportsTcpServer;
         {
             Json::Value addresses;
             for (unsigned j = 0; j < dnsSdInfo->numIPs; ++j)
@@ -169,66 +175,6 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
     }
 }
 
-void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommissioner * devCtrl)
-{
-    for (int i = 0; i < devCtrl->GetMaxCommissionableNodesSupported(); ++i)
-    {
-        const Dnssd::CommissionNodeData * dnsSdInfo = devCtrl->GetDiscoveredDevice(i);
-        if (dnsSdInfo == nullptr)
-        {
-            continue;
-        }
-        char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
-
-        ChipLogProgress(Discovery, "Commissionable Node %d", i);
-        ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->instanceName);
-        ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
-        ChipLogProgress(Discovery, "\tPort:\t\t\t%u", dnsSdInfo->port);
-        ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);
-        ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->vendorId);
-        ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->productId);
-        ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", dnsSdInfo->commissioningMode);
-        ChipLogProgress(Discovery, "\tDevice Type\t\t%u", dnsSdInfo->deviceType);
-        ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->deviceName);
-        ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
-        ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
-        ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->pairingHint);
-
-        auto idleInterval = dnsSdInfo->GetMrpRetryIntervalIdle();
-        if (idleInterval.has_value())
-        {
-            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", idleInterval->count());
-        }
-        else
-        {
-            ChipLogProgress(Discovery, "\tMrp Interval idle\tNot present");
-        }
-
-        auto activeInterval = dnsSdInfo->GetMrpRetryIntervalActive();
-        if (activeInterval.has_value())
-        {
-            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", activeInterval->count());
-        }
-        else
-        {
-            ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
-        }
-
-        ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
-        if (dnsSdInfo->isICDOperatingAsLIT.has_value())
-        {
-            ChipLogProgress(Discovery, "\tICD is operating as a\t%s", *(dnsSdInfo->isICDOperatingAsLIT) ? "LIT" : "SIT");
-        }
-        for (unsigned j = 0; j < dnsSdInfo->numIPs; ++j)
-        {
-            char buf[Inet::IPAddress::kMaxStringLength];
-            dnsSdInfo->ipAddress[j].ToString(buf);
-            ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", j, buf);
-        }
-    }
-}
-
 bool pychip_DeviceController_GetIPForDiscoveredDevice(Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len)
 {
@@ -243,5 +189,32 @@ bool pychip_DeviceController_GetIPForDiscoveredDevice(Controller::DeviceCommissi
         return true;
     }
     return false;
+}
+
+PyChipError pychip_CreateManualCode(uint16_t longDiscriminator, uint32_t passcode, char * manualCodeBuffer, size_t inBufSize,
+                                    size_t * outBufSize)
+{
+    SetupPayload payload;
+    SetupDiscriminator discriminator;
+    discriminator.SetLongValue(longDiscriminator);
+    payload.discriminator = discriminator;
+    payload.setUpPINCode  = passcode;
+    std::string setupManualCode;
+
+    *outBufSize    = 0;
+    CHIP_ERROR err = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(setupManualCode);
+    if (err == CHIP_NO_ERROR)
+    {
+        MutableCharSpan span(manualCodeBuffer, inBufSize);
+        // Plus 1 so we copy the null terminator
+        CopyCharSpanToMutableCharSpan(CharSpan(setupManualCode.c_str(), setupManualCode.length() + 1), span);
+        *outBufSize = span.size();
+        if (*outBufSize == 0)
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
+    return ToPyChipError(err);
 }
 }

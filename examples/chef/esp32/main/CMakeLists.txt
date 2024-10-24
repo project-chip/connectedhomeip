@@ -70,6 +70,9 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/../common/clusters/low-power/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/media-input/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/media-playback/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/resource-monitoring/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/switch/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/target-navigator/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/wake-on-lan/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
@@ -118,8 +121,10 @@ endif (CONFIG_ENABLE_PW_RPC)
 idf_component_register(PRIV_INCLUDE_DIRS
                       "${CHIP_SHELL_DIR}/shell_common/include"
                       "${PRIV_INCLUDE_DIRS_LIST}"
-                      PRIV_REQUIRES chip nvs_flash bt console mbedtls QRCode tft screen-framework spidriver
                       SRC_DIRS ${SRC_DIRS_LIST})
+
+# Forces the linker to include common/stubs.cpp
+target_link_libraries(${COMPONENT_LIB} INTERFACE "-u chef_include_stubs_impl")
 
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
 chip_app_component_codegen("${CHEF}/devices/${SAMPLE_NAME}.matter")

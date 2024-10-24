@@ -1,0 +1,59 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libIMInterfaceTests"
+
+  test_sources = [
+    "TestActionReturnStatus.cpp",
+    "TestEventEmitting.cpp",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/data-model-provider:string-builder-adapters",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+  ]
+}
+
+source_set("encode-decode") {
+  # Handles the conversions between Raw data (usually byte buffers backed by TLV encoders
+  # and `*IBs::Builder` classes) and data used by by Providers like AttributeValueEncoder
+  # or AttributeValueDecoder.
+  #
+  # Intended to make writing tests simpler and focusing less on encoding and more on
+  # "Assume you receive an int" or "Check that the encoded value was the string 'abc'"
+  # and so on
+  sources = [
+    "ReadTesting.cpp",
+    "ReadTesting.h",
+    "TestConstants.h",
+    "WriteTesting.cpp",
+    "WriteTesting.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
+  ]
+}

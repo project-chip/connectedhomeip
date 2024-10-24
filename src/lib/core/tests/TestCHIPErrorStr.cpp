@@ -28,10 +28,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 
@@ -69,6 +70,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_UNINITIALIZED,
     CHIP_ERROR_INVALID_STRING_LENGTH,
     CHIP_ERROR_INVALID_LIST_LENGTH,
+    CHIP_ERROR_FAILED_DEVICE_ATTESTATION,
     CHIP_END_OF_TLV,
     CHIP_ERROR_TLV_UNDERRUN,
     CHIP_ERROR_INVALID_TLV_ELEMENT,
@@ -138,6 +140,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_ACCESS_DENIED,
     CHIP_ERROR_UNKNOWN_RESOURCE_ID,
     CHIP_ERROR_VERSION_MISMATCH,
+    CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL,
     CHIP_EVENT_ID_FOUND,
     CHIP_ERROR_INTERNAL,
     CHIP_ERROR_OPEN_FAILED,
@@ -194,6 +197,40 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStr)
         char const * const file = err.GetFile();
         ASSERT_NE(file, nullptr);
         EXPECT_EQ(strstr(file, "src/lib/core/"), file);
+
+        // File should be included in the error.
+        EXPECT_NE(strstr(errStr, file), nullptr);
+#endif // CHIP_CONFIG_ERROR_SOURCE
+    }
+}
+
+TEST(TestCHIPErrorStr, CheckCoreErrorStrWithoutSourceLocation)
+{
+    // Register the layer error formatter
+
+    RegisterCHIPLayerErrorFormatter();
+
+    // For each defined error...
+    for (const auto & err : kTestElements)
+    {
+        const char * errStr = ErrorStr(err, /*withSourceLocation=*/false);
+        char expectedText[9];
+
+        // Assert that the error string contains the error number in hex.
+        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
+        EXPECT_TRUE((strstr(errStr, expectedText) != nullptr));
+
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+        // Assert that the error string contains a description, which is signaled
+        // by a presence of a colon proceeding the description.
+        EXPECT_TRUE((strchr(errStr, ':') != nullptr));
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
+
+#if CHIP_CONFIG_ERROR_SOURCE
+        char const * const file = err.GetFile();
+        ASSERT_NE(file, nullptr);
+        // File should not be included in the error.
+        EXPECT_EQ(strstr(errStr, file), nullptr);
 #endif // CHIP_CONFIG_ERROR_SOURCE
     }
 }

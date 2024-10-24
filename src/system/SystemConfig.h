@@ -179,6 +179,23 @@
 /* Configuration option variables defined below */
 
 /**
+ * @def CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
+ *
+ * @brief
+ *     Enable the use of lwIP pbufs from a custom pool
+ *
+ * This config option exist because not all platforms defines LWIP_PBUF_FROM_CUSTOM_POOLS in lwip/opt.h
+ * Defaults to LWIP_PBUF_FROM_CUSTOM_POOLS if defined, otherwise 0
+ */
+#ifndef CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && defined(LWIP_PBUF_FROM_CUSTOM_POOLS)
+#define CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL LWIP_PBUF_FROM_CUSTOM_POOLS
+#else
+#define CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL 0
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && defined(LWIP_PBUF_FROM_CUSTOM_POOLS)
+#endif // CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
+
+/**
  *  @def CHIP_SYSTEM_CONFIG_POSIX_LOCKING
  *
  *  @brief
@@ -541,7 +558,9 @@ struct LwIPEvent;
  *  @def CHIP_SYSTEM_CONFIG_PLATFORM_LOG
  *
  *  @brief
- *      Defines whether (1) or not (0) the system uses a platform-specific logging implementation.
+ *      Defines whether (1) or not (0) the system uses a platform-specific implementation of
+ *      ChipLog* macros. Most platforms do not use this option and simply provide a logging
+ *      backend that implements LogV.
  *
  *  See CHIPLogging.h for details.
  */
@@ -771,3 +790,21 @@ struct LwIPEvent;
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD 0
 #endif
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD
+
+/**
+ * @def CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES
+ *
+ * @brief Maximum buffer allocation size of a 'Large' message
+ *
+ * This is the default maximum capacity (including both data and reserve
+ * space) of a large PacketBuffer(exceeding the IPv6 MTU of 1280 bytes).
+ * This shall be used over transports, such as TCP, that support large
+ * payload transfers. Fetching of large command responses or wildcard
+ * subscription responses may leverage this increased bandwidth transfer.
+ * Individual systems may override this size based on their requirements.
+ * Data transfers over MRP should not be using this size for allocating
+ * buffers as they are restricted by the IPv6 MTU.
+ */
+#ifndef CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES
+#define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (64000)
+#endif

@@ -23,8 +23,10 @@
  *
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
+
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/PersistedCounter.h>
 #include <lib/support/TestPersistentStorageDelegate.h>

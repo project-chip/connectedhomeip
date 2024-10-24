@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2023 Project CHIP Authors
+# Copyright (c) 2021-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,8 +45,6 @@ static_library("telink") {
     "ConnectivityManagerImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
-    "NFCManagerImpl.cpp",
-    "NFCManagerImpl.h",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
   ]
@@ -69,6 +67,13 @@ static_library("telink") {
     ]
   }
 
+  if (chip_enable_openthread || chip_enable_wifi) {
+    sources += [
+      "../Zephyr/InetUtils.cpp",
+      "../Zephyr/InetUtils.h",
+    ]
+  }
+
   if (chip_enable_openthread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
@@ -76,7 +81,7 @@ static_library("telink") {
       "ThreadStackManagerImpl.h",
     ]
 
-    if (chip_mdns == "platform") {
+    if (chip_mdns_platform) {
       sources += [
         "../OpenThread/DnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.cpp",
@@ -86,10 +91,37 @@ static_library("telink") {
     }
   }
 
+  if (chip_enable_wifi) {
+    sources += [
+      "OTAImageProcessorImplWiFi.h",
+      "wifi/ConnectivityManagerImplWiFi.cpp",
+      "wifi/ConnectivityManagerImplWiFi.h",
+      "wifi/TelinkWiFiDriver.cpp",
+      "wifi/TelinkWiFiDriver.h",
+      "wifi/WiFiManager.cpp",
+      "wifi/WiFiManager.h",
+    ]
+  }
+
+  if (chip_enable_nfc) {
+    sources += [
+      "NFCManagerImpl.cpp",
+      "NFCManagerImpl.h",
+    ]
+  }
+
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
   }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "../Zephyr/Logging.cpp" ]
 }

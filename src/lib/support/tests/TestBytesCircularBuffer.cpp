@@ -23,8 +23,9 @@
 #include <string.h>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/BytesCircularBuffer.h>
 
 namespace {

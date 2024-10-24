@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class ThermostatClusterScheduleTypeStruct(
   val systemMode: UByte,
   val numberOfSchedules: UByte,
-  val scheduleTypeFeatures: UShort
+  val scheduleTypeFeatures: UShort,
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterScheduleTypeStruct {\n")
@@ -61,7 +61,7 @@ class ThermostatClusterScheduleTypeStruct(
       return ThermostatClusterScheduleTypeStruct(
         systemMode,
         numberOfSchedules,
-        scheduleTypeFeatures
+        scheduleTypeFeatures,
       )
     }
   }

@@ -41,6 +41,7 @@ ALL_PLATFORMS = set([
     'linux',
     'mbed',
     'nrfconnect',
+    'nuttx',
     'qpg',
     'stm32',
     'telink',

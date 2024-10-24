@@ -41,12 +41,6 @@ constexpr char kSRPDot[] = "default.service.arpa.";
 // The extra time in milliseconds that we will wait for the resolution on the SRP domain to complete.
 constexpr uint16_t kSRPTimeoutInMsec = 250;
 
-constexpr DNSServiceFlags kRegisterFlags        = kDNSServiceFlagsNoAutoRename;
-constexpr DNSServiceFlags kBrowseFlags          = kDNSServiceFlagsShareConnection;
-constexpr DNSServiceFlags kGetAddrInfoFlags     = kDNSServiceFlagsTimeout | kDNSServiceFlagsShareConnection;
-constexpr DNSServiceFlags kResolveFlags         = kDNSServiceFlagsShareConnection;
-constexpr DNSServiceFlags kReconfirmRecordFlags = 0;
-
 bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 {
     return (protocol == DnssdServiceProtocol::kDnssdProtocolUdp) || (protocol == DnssdServiceProtocol::kDnssdProtocolTcp);
@@ -179,10 +173,11 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
     ChipLogProgress(Discovery, "Registering service %s on host %s with port %u and type: %s on interface id: %" PRIu32,
                     StringOrNullMarker(name), StringOrNullMarker(hostname), port, StringOrNullMarker(type), interfaceId);
 
-    RegisterContext * sdCtx = nullptr;
+    constexpr DNSServiceFlags registerFlags = kDNSServiceFlagsNoAutoRename;
+    RegisterContext * sdCtx                 = nullptr;
     if (CHIP_NO_ERROR == MdnsContexts::GetInstance().GetRegisterContextOfTypeAndName(type, name, &sdCtx))
     {
-        auto err = DNSServiceUpdateRecord(sdCtx->serviceRef, nullptr, kRegisterFlags, record.size(), record.data(), 0 /* ttl */);
+        auto err = DNSServiceUpdateRecord(sdCtx->serviceRef, nullptr, registerFlags, record.size(), record.data(), 0 /* ttl */);
         VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
         return CHIP_NO_ERROR;
     }
@@ -193,12 +188,17 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
     auto err = sdCtx->mHostNameRegistrar.Init(hostname, addressType, interfaceId);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
-    DNSServiceRef sdRef;
-    err = DNSServiceRegister(&sdRef, kRegisterFlags, interfaceId, name, type, kLocalDot, hostname, htons(port), record.size(),
-                             record.data(), OnRegister, sdCtx);
-    VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+    err = DNSServiceRegister(&sdCtx->serviceRef, registerFlags, interfaceId, name, type, kLocalDot, hostname, htons(port),
+                             record.size(), record.data(), OnRegister, sdCtx);
+    if (err != kDNSServiceErr_NoError)
+    {
+        // Just in case DNSServiceCreateConnection put garbage in the outparam
+        // on failure.
+        sdCtx->serviceRef = nullptr;
+        return sdCtx->Finalize(err);
+    }
 
-    return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
+    return MdnsContexts::GetInstance().Add(sdCtx);
 }
 
 static void OnBrowse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err, const char * name,
@@ -213,7 +213,7 @@ CHIP_ERROR BrowseOnDomain(BrowseHandler * sdCtx, uint32_t interfaceId, const cha
 {
     auto sdRef = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
 
-    auto err = DNSServiceBrowse(&sdRef, kBrowseFlags, interfaceId, type, domain, OnBrowse, sdCtx);
+    auto err = DNSServiceBrowse(&sdRef, kDNSServiceFlagsShareConnection, interfaceId, type, domain, OnBrowse, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
     return CHIP_NO_ERROR;
 }
@@ -221,16 +221,23 @@ CHIP_ERROR BrowseOnDomain(BrowseHandler * sdCtx, uint32_t interfaceId, const cha
 CHIP_ERROR Browse(BrowseHandler * sdCtx, uint32_t interfaceId, const char * type)
 {
     auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
-    VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+    if (err != kDNSServiceErr_NoError)
+    {
+        // Just in case DNSServiceCreateConnection put garbage in the outparam
+        // on failure.
+        sdCtx->serviceRef = nullptr;
+        return sdCtx->Finalize(err);
+    }
 
     // We will browse on both the local domain and the SRP domain.
+    // BrowseOnDomain guarantees it will Finalize() on failure.
     ChipLogProgress(Discovery, "Browsing for: %s on local domain", StringOrNullMarker(type));
     ReturnErrorOnFailure(BrowseOnDomain(sdCtx, interfaceId, type, kLocalDot));
 
     ChipLogProgress(Discovery, "Browsing for: %s on %s domain", StringOrNullMarker(type), kSRPDot);
     ReturnErrorOnFailure(BrowseOnDomain(sdCtx, interfaceId, type, kSRPDot));
 
-    return MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
+    return MdnsContexts::GetInstance().Add(sdCtx);
 }
 
 CHIP_ERROR Browse(void * context, DnssdBrowseCallback callback, uint32_t interfaceId, const char * type,
@@ -334,8 +341,8 @@ static void GetAddrInfo(ResolveContext * sdCtx)
 
         ResolveContextWithType * contextWithType =
             (interface.first.isSRPResult) ? &sdCtx->resolveContextWithSRPType : &sdCtx->resolveContextWithNonSRPType;
-        auto err =
-            DNSServiceGetAddrInfo(&sdRefCopy, kGetAddrInfoFlags, interfaceId, protocol, hostname, OnGetAddrInfo, contextWithType);
+        auto err = DNSServiceGetAddrInfo(&sdRefCopy, kDNSServiceFlagsShareConnection, interfaceId, protocol, hostname,
+                                         OnGetAddrInfo, contextWithType);
         VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
         interface.second.isDNSLookUpRequested = true;
     }
@@ -372,7 +379,8 @@ static CHIP_ERROR ResolveWithContext(ResolveContext * sdCtx, uint32_t interfaceI
 {
     auto sdRef = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
 
-    auto err = DNSServiceResolve(&sdRef, kResolveFlags, interfaceId, name, type, domain, OnResolve, contextWithType);
+    auto err =
+        DNSServiceResolve(&sdRef, kDNSServiceFlagsShareConnection, interfaceId, name, type, domain, OnResolve, contextWithType);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
     return CHIP_NO_ERROR;
 }
@@ -384,10 +392,17 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
                     StringOrNullMarker(name), StringOrNullMarker(domain), interfaceId);
 
     auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
-    VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+    if (err != kDNSServiceErr_NoError)
+    {
+        // Just in case DNSServiceCreateConnection put garbage in the outparam
+        // on failure.
+        sdCtx->serviceRef = nullptr;
+        return sdCtx->Finalize(err);
+    }
 
     // If we have a single domain from a browse, we will use that for the Resolve.
     // Otherwise we will try to resolve using both the local domain and the SRP domain.
+    // ResolveWithContext guarantees it will Finalize() on failure.
     if (domain != nullptr)
     {
         ReturnErrorOnFailure(ResolveWithContext(sdCtx, interfaceId, type, name, domain, &sdCtx->resolveContextWithNonSRPType));
@@ -404,7 +419,7 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
         sdCtx->shouldStartSRPTimerForResolve = true;
     }
 
-    auto retval = MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
+    auto retval = MdnsContexts::GetInstance().Add(sdCtx);
     if (retval == CHIP_NO_ERROR)
     {
         (*(sdCtx->consumerCounter))++;
@@ -655,7 +670,7 @@ CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    auto error = DNSServiceReconfirmRecord(kReconfirmRecordFlags, interfaceId, fullname.c_str(), rrtype, rrclass, rdlen, rdata);
+    auto error = DNSServiceReconfirmRecord(0 /* DNSServiceFlags */, interfaceId, fullname.c_str(), rrtype, rrclass, rdlen, rdata);
     LogOnFailure(__func__, error);
 
     return Error::ToChipError(error);

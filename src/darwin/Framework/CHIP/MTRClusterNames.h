@@ -31,7 +31,7 @@
  *
  * For unknown IDs, a string '<Unknown clusterID %d>' will be returned.
  */
-MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTRClusterNameForID(MTRClusterIDType clusterID);
+MTR_EXTERN MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) NSString * MTRClusterNameForID(MTRClusterIDType clusterID);
 
 /**
  * Resolve Matter attribute IDs into a descriptive string.
@@ -40,4 +40,31 @@ MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTRClusterNameForID(MTRClusterIDType c
  * or '<Unknown attributeID %d>' (if the cluster ID is known but the attribute ID is not known)
  * will be returned.
  */
-MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType attributeID);
+MTR_EXTERN MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType attributeID);
+
+/**
+ * Resolve Matter request (client to server) command IDs into a descriptive string.
+ *
+ * For unknown IDs, a string '<Unknown clusterID %d>' (if the cluster ID is not known)
+ * or '<Unknown commandID %d>' (if the cluster ID is known but the command ID is not known)
+ * will be returned.
+ */
+MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDType commandID);
+
+/**
+ * Resolve Matter response (server to client) command IDs into a descriptive string.
+ *
+ * For unknown IDs, a string '<Unknown clusterID %d>' (if the cluster ID is not known)
+ * or '<Unknown commandID %d>' (if the cluster ID is known but the command ID is not known)
+ * will be returned.
+ */
+MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDType commandID);
+
+/**
+ * Resolve Matter event IDs into a descriptive string.
+ *
+ * For unknown IDs, a string '<Unknown clusterID %d>' (if the cluster ID is not known)
+ * or '<Unknown eventID %d>' (if the cluster ID is known but the event ID is not known)
+ * will be returned.
+ */
+MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID);

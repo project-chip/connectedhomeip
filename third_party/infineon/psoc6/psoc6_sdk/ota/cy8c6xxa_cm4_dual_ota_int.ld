@@ -43,15 +43,12 @@ ENTRY(Reset_Handler)
 /* Size of the stack section at the end of CM4 SRAM */
 STACK_SIZE = 0x1000;
 
-/* Size of the Cortex-M0+ application image at the start of FLASH - passed in as argument to ld.exe*/
-/* MCUBOOT_BOOTLOADER_SIZE  = 0x12000; */
-
-/* MCUBoot Header Size passed in as argument to ld.exe */
-/* MCUBOOT_HEADER_SIZE = 0x1000; */
-
-/* CY_BOOT_PRIMARY_1_SIZE Slot 1 size passed in as argument to ld.exe */
-/* CY_BOOT_PRIMARY_1_SIZE = 0x0EE000 (Internal FLASH) */
-/* CY_BOOT_PRIMARY_1_SIZE = 0x10C000 (External FLASH) */
+/*
+   Arguments for OTA using MCUBoot -- will get from passed in Makefile:
+   --defsym,MCUBOOT_HEADER_SIZE=XXXX
+   --defsym,FLASH_AREA_IMG_1_PRIMARY_START=XXXX
+   --defsym,FLASH_AREA_IMG_1_PRIMARY_SIZE=XXXX
+*/
 
 /* Force symbol to be entered in the output file as an undefined symbol. Doing
 * this may, for example, trigger linking of additional modules from standard
@@ -74,7 +71,7 @@ MEMORY
      * where 'xx' is the device group; for example, 'cy8c6xx7_cm0plus.ld'.
      */
     ram               (rwx)   : ORIGIN = 0x08020800, LENGTH = 0xDF000
-    flash             (rx)    : ORIGIN = 0x10000000 + MCUBOOT_BOOTLOADER_SIZE, LENGTH = CY_BOOT_PRIMARY_1_SIZE
+    flash             (rx)    : ORIGIN = 0x10000000 + FLASH_AREA_IMG_1_PRIMARY_START + MCUBOOT_HEADER_SIZE, LENGTH = FLASH_AREA_IMG_1_PRIMARY_SIZE - MCUBOOT_HEADER_SIZE
 
     /* This is a 32K flash region used for EEPROM emulation. This region can also be used as the general purpose flash.
      * You can assign sections to this memory region for only one of the cores.
@@ -133,7 +130,7 @@ GROUP(libgcc.a libc.a libm.a libnosys.a)
 SECTIONS
 {
     /* Cortex-M4 application flash area */
-    .text ORIGIN(flash)  + MCUBOOT_HEADER_SIZE :
+    .text ORIGIN(flash) :
     {
         . = ALIGN(8);
         __cy_app_load_addr = . ;

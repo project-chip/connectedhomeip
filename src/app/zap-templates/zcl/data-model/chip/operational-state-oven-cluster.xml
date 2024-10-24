@@ -16,7 +16,34 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <cluster apiMaturity="provisional">
+
+  <enum name="OperationalStateEnum" type="enum8">
+    <cluster code="0x0048"/>
+    <!-- These are the base values from the OperationalStateCluster, which have to
+         be copied in each derived cluster, due to ZAP XML constraints, until it
+         is possible to auto-include these without duplication in codegen. -->
+    <item name="Stopped" value="0x00"/>
+    <item name="Running" value="0x01"/>
+    <item name="Paused"  value="0x02"/>
+    <item name="Error"   value="0x03"/>
+
+    <!-- Derived cluster-specific values start below at 0x40 -->
+  </enum>
+
+  <enum name="ErrorStateEnum" type="enum8">
+    <cluster code="0x0048"/>
+    <!-- These are the base values from the OperationalStateCluster, which have to
+         be copied in each derived cluster, due to ZAP XML constraints, until it
+         is possible to auto-include these without duplication in codegen. -->
+    <item name="NoError"                    value="0x00"/>
+    <item name="UnableToStartOrResume"      value="0x01"/>
+    <item name="UnableToCompleteOperation"  value="0x02"/>
+    <item name="CommandInvalidInState"      value="0x03"/>
+
+    <!-- Derived cluster-specific values start below at 0x40 -->
+  </enum>
+
+  <cluster>
     <domain>Appliances</domain>
     <name>Oven Cavity Operational State</name>
     <code>0x0048</code>

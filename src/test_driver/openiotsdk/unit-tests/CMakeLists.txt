@@ -28,6 +28,7 @@ set(CONFIG_CHIP_DETAIL_LOGGING NO)
 set(CONFIG_CHIP_PROGRESS_LOGGING NO)
 set(CONFIG_CHIP_AUTOMATION_LOGGING YES)
 set(CONFIG_CHIP_ERROR_LOGGING NO)
+set(CONFIG_CHIP_FORCE_LOGGING_STDIO YES)
 
 # Toolchain files need to exist before first call to project
 include(toolchain)
@@ -42,43 +43,12 @@ include(linker)
 add_subdirectory(${OPEN_IOT_SDK_EXAMPLE_COMMON}/app ./app_build)
 
 file(STRINGS test_components.txt TEST_NAMES_FROM_FILE)
-# TODO [PW_MIGRATION] Remove the following variable once the migration to pw_unit_test is complete. 
-file(STRINGS test_components_nl.txt TEST_NAMES_FROM_FILE_NL)
+
 
 target_compile_definitions(openiotsdk-startup
     PRIVATE
         IOT_SDK_APP_MAIN_STACK_SIZE=20480
 )
-
-# TODO [PW_MIGRATION] Remove the following targets once the migration to pw_unit_test is complete. 
-foreach(TEST_NAME IN LISTS TEST_NAMES_FROM_FILE_NL)
-    set(APP_TARGET ${TEST_NAME}_ns)
-    add_executable(${APP_TARGET})
-    target_include_directories(${APP_TARGET}
-        PRIVATE
-            main/include
-            ${CHIP_ROOT}/third_party/nlunit-test/repo/src
-    )
-
-    target_sources(${APP_TARGET}
-        PRIVATE
-            main/main_ns_nl.cpp
-    )
-
-    target_link_libraries(${APP_TARGET}
-        openiotsdk-startup
-        openiotsdk-app
-    )
-
-    # Link the *whole-archives* to keep the static test objects.
-    target_link_options(${APP_TARGET}
-        PUBLIC
-            -Wl,--whole-archive "${CMAKE_CURRENT_BINARY_DIR}/chip_build/lib/lib${TEST_NAME}.a"
-            -Wl,--no-whole-archive)
-
-    set_target_link(${APP_TARGET})
-    sdk_post_build(${APP_TARGET})
-endforeach()
 
 foreach(TEST_NAME IN LISTS TEST_NAMES_FROM_FILE)
     set(APP_TARGET ${TEST_NAME}_ns)

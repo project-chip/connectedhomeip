@@ -27,6 +27,7 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -39,10 +40,13 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private static final long RESOLVE_SERVICE_TIMEOUT = 30000;
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
+  private MulticastLock publishMulticastLock;
   private List<NsdManager.RegistrationListener> registrationListeners = new ArrayList<>();
   private final CopyOnWriteArrayList<String> mMFServiceName = new CopyOnWriteArrayList<>();
   @Nullable private final NsdManagerResolverAvailState nsdManagerResolverAvailState;
   private final long timeout;
+
+  private ExecutorService mResolveExecutorService;
 
   /**
    * @param context application context
@@ -60,8 +64,16 @@ public class NsdManagerServiceResolver implements ServiceResolver {
         ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
             .createMulticastLock("chipMulticastLock");
     this.multicastLock.setReferenceCounted(true);
+
+    this.publishMulticastLock =
+        ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
+            .createMulticastLock("chipPublishMulticastLock");
+    this.publishMulticastLock.setReferenceCounted(true);
+
     this.nsdManagerResolverAvailState = nsdManagerResolverAvailState;
     this.timeout = timeout;
+
+    mResolveExecutorService = Executors.newSingleThreadExecutor();
   }
 
   public NsdManagerServiceResolver(Context context) {
@@ -91,10 +103,6 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             + serviceType
             + "'");
 
-    if (nsdManagerResolverAvailState != null) {
-      nsdManagerResolverAvailState.acquireResolver();
-    }
-
     Runnable timeoutRunnable =
         new Runnable() {
           @Override
@@ -113,21 +121,28 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
         };
 
-    ScheduledFuture<?> resolveTimeoutExecutor =
-        Executors.newSingleThreadScheduledExecutor()
-            .schedule(timeoutRunnable, timeout, TimeUnit.MILLISECONDS);
+    mResolveExecutorService.execute(
+        () -> {
+          if (nsdManagerResolverAvailState != null) {
+            nsdManagerResolverAvailState.acquireResolver();
+          }
 
-    NsdServiceFinderAndResolver serviceFinderResolver =
-        new NsdServiceFinderAndResolver(
-            this.nsdManager,
-            serviceInfo,
-            callbackHandle,
-            contextHandle,
-            chipMdnsCallback,
-            multicastLock,
-            resolveTimeoutExecutor,
-            nsdManagerResolverAvailState);
-    serviceFinderResolver.start();
+          ScheduledFuture<?> resolveTimeoutExecutor =
+              Executors.newSingleThreadScheduledExecutor()
+                  .schedule(timeoutRunnable, timeout, TimeUnit.MILLISECONDS);
+
+          NsdServiceFinderAndResolver serviceFinderResolver =
+              new NsdServiceFinderAndResolver(
+                  this.nsdManager,
+                  serviceInfo,
+                  callbackHandle,
+                  contextHandle,
+                  chipMdnsCallback,
+                  multicastLock,
+                  resolveTimeoutExecutor,
+                  nsdManagerResolverAvailState);
+          serviceFinderResolver.start();
+        });
   }
 
   @Override
@@ -204,7 +219,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
         };
     if (registrationListeners.size() == 0) {
-      multicastLock.acquire();
+      publishMulticastLock.acquire();
     }
     registrationListeners.add(registrationListener);
     mMFServiceName.add(serviceName);
@@ -216,8 +231,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   @Override
   public void removeServices() {
     Log.d(TAG, "removeServices: ");
-    if (registrationListeners.size() > 0) {
-      multicastLock.release();
+    if (registrationListeners.size() > 0 && publishMulticastLock.isHeld()) {
+      publishMulticastLock.release();
     }
     for (NsdManager.RegistrationListener l : registrationListeners) {
       Log.i(TAG, "Remove " + l);

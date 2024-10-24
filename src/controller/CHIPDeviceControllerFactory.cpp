@@ -132,8 +132,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     // OperationalCertificateStore needs to be provided to init the fabric table if fabric table is
     // not provided wholesale.
-    ReturnErrorCodeIf((params.fabricTable == nullptr) && (params.opCertStore == nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(params.sessionKeystore == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((params.fabricTable != nullptr) || (params.opCertStore != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.sessionKeystore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
 #if CONFIG_DEVICE_LAYER
@@ -141,6 +141,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #else
     stateParams.bleLayer = params.bleLayer;
 #endif // CONFIG_DEVICE_LAYER
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    stateParams.wifipaf_layer = params.wifipaf_layer;
+#endif
     VerifyOrReturnError(stateParams.bleLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 #endif
 
@@ -161,6 +164,16 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if CONFIG_NETWORK_LAYER_BLE
                                                             ,
                                                         Transport::BleListenParameters(stateParams.bleLayer)
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                                            ,
+                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                                                            .SetAddressType(IPAddressType::kIPv6)
+                                                            .SetListenPort(params.listenPort)
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                                                            ,
+                                                        Transport::WiFiPAFListenParameters()
 #endif
                                                             ));
 
@@ -184,7 +197,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     {
         // TODO(#16231): Previously (and still) the objects new-ed in this entire method seem expected to last forever...
         auto newFabricTable = Platform::MakeUnique<FabricTable>();
-        ReturnErrorCodeIf(!newFabricTable, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(newFabricTable, CHIP_ERROR_NO_MEMORY);
 
         FabricTable::InitParams fabricTableInitParams;
         fabricTableInitParams.storage             = params.fabricIndependentStorage;
@@ -468,6 +481,15 @@ void DeviceControllerSystemState::Shutdown()
         mCASESessionManager->Shutdown();
         Platform::Delete(mCASESessionManager);
         mCASESessionManager = nullptr;
+    }
+
+    // The above took care of CASE handshakes, and shutting down all the
+    // controllers should have taken care of the PASE handshakes.  Clean up any
+    // outstanding secure sessions (shouldn't really be any, since controllers
+    // should have handled that, but just in case).
+    if (mSessionMgr != nullptr)
+    {
+        mSessionMgr->ExpireAllSecureSessions();
     }
 
     // mCASEClientPool and mSessionSetupPool must be deallocated

@@ -20,6 +20,8 @@
 
 #import "MTRDeviceTestDelegate.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase+ServerAppRunner.h"
+#import "MTRTestCase.h"
 #import "MTRTestKeys.h"
 #import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
@@ -44,7 +46,7 @@
 
 #if ENABLE_OTA_TESTS
 
-static const uint16_t kPairingTimeoutInSeconds = 10;
+static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint16_t kTimeoutWithUpdateInSeconds = 60;
 static const uint64_t kDeviceId1 = 0x12341234;
@@ -73,21 +75,10 @@ static NSNumber * kUpdatedSoftwareVersion_10 = @10;
 
 static NSString * kUpdatedSoftwareVersionString_10 = @"10.0";
 
-// kOtaRequestorBasePort gets the discriminator added to it to figure out the
-// port the ota-requestor app should be using.  This ensures that apps with
-// distinct discriminators use distinct ports.
-static const uint16_t kOtaRequestorBasePort = 5542 - 1111;
-
-@class MTROTARequestorAppRunner;
-
-@interface MTROTAProviderTests : XCTestCase
-- (NSTask *)createTaskForPath:(NSString *)path;
+@interface MTROTAProviderTests : MTRTestCase
 - (NSString *)createImageFromRawImage:(NSString *)rawImage withVersion:(NSNumber *)version;
 - (MTRDevice *)commissionDeviceWithPayload:(NSString *)payloadString nodeID:(NSNumber *)nodeID;
-- (void)registerRunningRequestor:(MTROTARequestorAppRunner *)requestor;
 @end
-
-static unsigned sAppRunnerIndex = 1;
 
 @interface MTROTARequestorAppRunner : NSObject
 @property (nonatomic, copy) NSString * downloadFilePath;
@@ -97,11 +88,8 @@ static unsigned sAppRunnerIndex = 1;
 @end
 
 @implementation MTROTARequestorAppRunner {
-    unsigned _uniqueIndex;
-    NSTask * _appTask;
     MTROTAProviderTests * _testcase;
     NSString * _payload;
-    MTRDevice * commissionedDevice;
 }
 
 - (MTRDevice *)commissionWithNodeID:(NSNumber *)nodeID
@@ -111,65 +99,23 @@ static unsigned sAppRunnerIndex = 1;
 
 - (instancetype)initWithPayload:(NSString *)payload testcase:(MTROTAProviderTests *)testcase
 {
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    _uniqueIndex = sAppRunnerIndex++;
-    _testcase = testcase;
-    _payload = payload;
-    _downloadFilePath = [NSString stringWithFormat:@"/tmp/chip-ota-requestor-downloaded-image%u", _uniqueIndex];
-
-    NSError * error;
-    __auto_type * parsedPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:payload error:&error];
-    XCTAssertNotNil(parsedPayload);
-    XCTAssertNil(error);
-
-    XCTAssertFalse(parsedPayload.hasShortDiscriminator);
-
-    __auto_type * discriminator = parsedPayload.discriminator;
-
-    _appTask = [testcase createTaskForPath:@"out/debug/ota-requestor-app/chip-ota-requestor-app"];
-
-    __auto_type * arguments = @[
-        @"--interface-id",
-        @"-1",
-        @"--secured-device-port",
-        [NSString stringWithFormat:@"%u", kOtaRequestorBasePort + discriminator.unsignedShortValue],
-        @"--discriminator",
-        [NSString stringWithFormat:@"%u", discriminator.unsignedShortValue],
-        @"--KVS",
-        [NSString stringWithFormat:@"/tmp/chip-ota-requestor-kvs%u", _uniqueIndex],
+    __auto_type * downloadFilePath = [NSString stringWithFormat:@"/tmp/chip-ota-requestor-downloaded-image%u", [MTROTAProviderTests nextUniqueIndex]];
+    __auto_type * extraArguments = @[
         @"--otaDownloadPath",
-        _downloadFilePath,
+        downloadFilePath,
         @"--autoApplyImage",
     ];
 
-    [_appTask setArguments:arguments];
+    BOOL started = [testcase startAppWithName:@"ota-requestor" arguments:extraArguments payload:payload];
+    if (!started) {
+        return nil;
+    }
 
-    NSString * outFile = [NSString stringWithFormat:@"/tmp/darwin/framework-tests/ota-requestor-app-%u.log", _uniqueIndex];
-    NSString * errorFile = [NSString stringWithFormat:@"/tmp/darwin/framework-tests/ota-requestor-app-err-%u.log", _uniqueIndex];
-
-    // Make sure the files exist.
-    [[NSFileManager defaultManager] createFileAtPath:outFile contents:nil attributes:nil];
-    [[NSFileManager defaultManager] createFileAtPath:errorFile contents:nil attributes:nil];
-
-    _appTask.standardOutput = [NSFileHandle fileHandleForWritingAtPath:outFile];
-    _appTask.standardError = [NSFileHandle fileHandleForWritingAtPath:errorFile];
-
-    [_appTask launchAndReturnError:&error];
-    XCTAssertNil(error);
-
-    NSLog(@"Started requestor with arguments %@ stdout=%@ and stderr=%@", arguments, outFile, errorFile);
-
-    [_testcase registerRunningRequestor:self];
+    _testcase = testcase;
+    _payload = payload;
+    _downloadFilePath = downloadFilePath;
 
     return self;
-}
-
-- (void)terminate
-{
-    [_appTask terminate];
 }
 
 @end
@@ -579,7 +525,6 @@ static BOOL sNeedsStackShutdown = YES;
 
 @implementation MTROTAProviderTests {
     NSMutableSet<NSNumber *> * _commissionedNodeIDs;
-    NSMutableSet<MTROTARequestorAppRunner *> * _runningRequestors;
 }
 
 + (void)tearDown
@@ -605,7 +550,6 @@ static BOOL sNeedsStackShutdown = YES;
     }
 
     _commissionedNodeIDs = [[NSMutableSet alloc] init];
-    _runningRequestors = [[NSMutableSet alloc] init];
 
     XCTAssertNil(sOTAProviderDelegate.queryImageHandler);
     XCTAssertNil(sOTAProviderDelegate.applyUpdateRequestHandler);
@@ -636,12 +580,6 @@ static BOOL sNeedsStackShutdown = YES;
         __auto_type * device = [MTRBaseDevice deviceWithNodeID:nodeID controller:sController];
         ResetCommissionee(device, dispatch_get_main_queue(), self, kTimeoutInSeconds);
     }
-
-    for (MTROTARequestorAppRunner * runner in _runningRequestors) {
-        [runner terminate];
-    }
-    // Break cycle.
-    _runningRequestors = nil;
 
     if (sController != nil) {
         [sController shutdown];
@@ -686,11 +624,6 @@ static BOOL sNeedsStackShutdown = YES;
     return [MTRDevice deviceWithNodeID:nodeID controller:sController];
 }
 
-- (void)registerRunningRequestor:(MTROTARequestorAppRunner *)requestor
-{
-    [_runningRequestors addObject:requestor];
-}
-
 - (void)initStack
 {
     sStackInitRan = YES;
@@ -715,43 +648,6 @@ static BOOL sNeedsStackShutdown = YES;
     sNeedsStackShutdown = NO;
 
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
-}
-
-/**
- * Given a path relative to the Matter root, create an absolute path to the file.
- */
-- (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
-{
-    // Find the right absolute path to our file.  PWD should
-    // point to our src/darwin/Framework.
-    NSString * pwd = [[NSProcessInfo processInfo] environment][@"PWD"];
-    NSMutableArray * pathComponents = [[NSMutableArray alloc] init];
-    [pathComponents addObject:[pwd substringToIndex:(pwd.length - @"src/darwin/Framework".length)]];
-    [pathComponents addObjectsFromArray:[matterRootRelativePath pathComponents]];
-    return [NSString pathWithComponents:pathComponents];
-}
-
-/**
- * Create a task given a path relative to the Matter root.
- */
-- (NSTask *)createTaskForPath:(NSString *)path
-{
-    NSTask * task = [[NSTask alloc] init];
-    [task setLaunchPath:[self absolutePathFor:path]];
-    return task;
-}
-
-/**
- * Runs a task to completion and makes sure it succeeds.
- */
-- (void)runTask:(NSTask *)task
-{
-    NSError * launchError;
-    [task launchAndReturnError:&launchError];
-    XCTAssertNil(launchError);
-
-    [task waitUntilExit];
-    XCTAssertEqual([task terminationStatus], 0);
 }
 
 /**
@@ -923,6 +819,7 @@ static BOOL sNeedsStackShutdown = YES;
     XCTestExpectation * queryExpectation1 = [self expectationWithDescription:@"handleQueryImageForNodeID called first time"];
     XCTestExpectation * queryExpectation2 = [self expectationWithDescription:@"handleQueryImageForNodeID called second time"];
     XCTestExpectation * queryExpectation3 = [self expectationWithDescription:@"handleQueryImageForNodeID called third time"];
+    XCTestExpectation * transferEndExpectation = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
 
     const uint16_t busyDelay = 1; // 1 second
     NSString * fakeImageURI = @"No such image, really";
@@ -930,6 +827,7 @@ static BOOL sNeedsStackShutdown = YES;
     __block QueryImageHandler handleThirdQuery;
     sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
         MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        [queryExpectation1 fulfill];
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
         XCTAssertEqual(controller, sController);
         [sOTAProviderDelegate respondAvailableWithDelay:@(0)
@@ -938,23 +836,32 @@ static BOOL sNeedsStackShutdown = YES;
                                         softwareVersion:kUpdatedSoftwareVersion_5
                                   softwareVersionString:kUpdatedSoftwareVersionString_5
                                              completion:completion];
-        [queryExpectation1 fulfill];
     };
     sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
         NSNumber * offset, MTRStatusCompletion outerCompletion) {
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        // Now that we've begun a transfer, we expect to be told when it ends, even if it's due to an error
+        sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error) {
+            [transferEndExpectation fulfill];
+            sOTAProviderDelegate.transferEndHandler = nil;
+            XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+            XCTAssertIdentical(controller, sController);
+            XCTAssertNotNil(error); // we cancelled the transfer, so there should be an error
+        };
+
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
-        XCTAssertEqual(controller, sController);
+        XCTAssertIdentical(controller, sController);
 
         // Don't actually respond until the second requestor has queried us for
         // an image.  We need to reset queryImageHandler here, so we can close
         // over outerCompletion.
         sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
             MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion innerCompletion) {
+            [queryExpectation2 fulfill];
             sOTAProviderDelegate.queryImageHandler = handleThirdQuery;
-            sOTAProviderDelegate.transferBeginHandler = nil;
 
             XCTAssertEqualObjects(nodeID, @(kDeviceId2));
-            XCTAssertEqual(controller, sController);
+            XCTAssertIdentical(controller, sController);
 
             // We respond UpdateAvailable, but since we are in the middle of
             // handling OTA for device1 we expect the requestor to get Busy and
@@ -965,8 +872,9 @@ static BOOL sNeedsStackShutdown = YES;
                                             softwareVersion:kUpdatedSoftwareVersion_5
                                       softwareVersionString:kUpdatedSoftwareVersionString_5
                                                  completion:innerCompletion];
+
+            // Cancel the transfer with device1
             [sOTAProviderDelegate respondErrorWithCompletion:outerCompletion];
-            [queryExpectation2 fulfill];
         };
 
         announceResponseExpectation2 = [self announceProviderToDevice:device2];
@@ -974,11 +882,11 @@ static BOOL sNeedsStackShutdown = YES;
 
     handleThirdQuery = ^(NSNumber * nodeID, MTRDeviceController * controller,
         MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        [queryExpectation3 fulfill];
         XCTAssertEqualObjects(nodeID, @(kDeviceId2));
-        XCTAssertEqual(controller, sController);
+        XCTAssertIdentical(controller, sController);
 
         [sOTAProviderDelegate respondNotAvailableWithCompletion:completion];
-        [queryExpectation3 fulfill];
     };
 
     // Advertise ourselves as an OTA provider.
@@ -986,7 +894,7 @@ static BOOL sNeedsStackShutdown = YES;
 
     // Make sure we get our queries in order.  Give it a bit more time, because
     // there will be a delay between the two queries.
-    [self waitForExpectations:@[ queryExpectation1, queryExpectation2, queryExpectation3 ]
+    [self waitForExpectations:@[ queryExpectation1, queryExpectation2, transferEndExpectation, queryExpectation3 ]
                       timeout:(kTimeoutInSeconds + busyDelay * 3)
                  enforceOrder:YES];
 
