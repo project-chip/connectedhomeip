@@ -108,8 +108,8 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
-          ./chip-tv-casting-app accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tool accountlogin login 11111 20202021 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin login 11111 20202021 1 4 --timedInteractionTimeoutMs 1000
 
           On TH (tv-app), Verify the  login command is received successfully.
 
