@@ -6389,6 +6389,10 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Contact Sensor";
     case 0x00000016:
         return "Root Node";
+    case 0x00000017:
+        return "Solar Power";
+    case 0x00000018:
+        return "Battery Storage";
     case 0x00000019:
         return "Secondary Network Interface";
     case 0x00000022:
@@ -6491,6 +6495,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Flow Sensor";
     case 0x00000307:
         return "Humidity Sensor";
+    case 0x00000309:
+        return "Heat Pump";
     case 0x0000050C:
         return "EVSE";
     case 0x0000050D:
