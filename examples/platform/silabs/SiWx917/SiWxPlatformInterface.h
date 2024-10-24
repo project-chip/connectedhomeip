@@ -24,6 +24,15 @@
 #include <sl_si91x_button.h>
 #include <sl_si91x_button_pin_config.h>
 #include <sl_si91x_driver_gpio.h>
+extern "C" {
+/**
+ * @brief      invoked when button press event is received when in sleep
+ * @param[in]  pin_intr GPIO pin interrupt number.
+ * @return     none.
+ * @note       this is a callback from the Wiseconnect SDK
+ */
+void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr);
+}
 #endif // SLI_SI91X_MCU_INTERFACE
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -54,14 +63,6 @@ inline void sl_si91x_btn_event_handler()
  * @note       this requires hardware jumping of the GPIO PINs to work with the baseboard.
  */
 void sl_si91x_uart_power_requirement_handler();
-
-/**
- * @brief      invoked when button press event is received when in sleep
- * @param[in]  pin_intr GPIO pin interrupt number.
- * @return     none.
- * @note       this is a callback from the Wiseconnect SDK
- */
-void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr);
 #endif // SLI_SI91X_MCU_INTERFACE
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 } // namespace SiWxPlatformInterface

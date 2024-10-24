@@ -160,9 +160,9 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
     if (btn == SL_BUTTON_BTN0_NUMBER)
     {
         // if the btn was not pressed and only a release event came, ignore it
-        VerifyOrReturn((btnAction == BUTTON_RELEASED) && (btn0_pressed == false));
         // if the btn was already pressed and another press event came, ignore it
-        VerifyOrReturn((btnAction == BUTTON_PRESSED) && (btn0_pressed == true));
+        VerifyOrReturn(btnAction ^ btn0_pressed);
+
         if ((btnAction == BUTTON_PRESSED) && (btn0_pressed == false))
         {
             btn0_pressed = true;

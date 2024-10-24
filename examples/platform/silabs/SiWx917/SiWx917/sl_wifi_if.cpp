@@ -260,7 +260,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
-void chip::DeviceLayer::Silabs::SiWxPlatformInterface::gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
+void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
 {
     // UULP_GPIO_2 is used to detect the button 0 press
     VerifyOrReturn(pin_intr == RTE_UULP_GPIO_2_PIN, ChipLogError(DeviceLayer, "invalid pin interrupt: %ld", pin_intr));
