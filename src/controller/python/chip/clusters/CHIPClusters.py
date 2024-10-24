@@ -12543,7 +12543,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000006: {
-                "attributeName": "MaxPreRollBufferSize",
+                "attributeName": "MaxContentBufferSize",
                 "attributeId": 0x00000006,
                 "type": "int",
                 "reportable": True,

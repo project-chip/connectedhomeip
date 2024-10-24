@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model-provider/EmberDataBuffer.h>
+#include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/util/attribute-storage-null-handling.h>
@@ -37,9 +37,9 @@ namespace {
 ///
 /// the max size value (0xFF and 0xFFFF) is reserved for NULL representation so
 /// it is not available
-constexpr uint32_t MaxLength(EmberAttributeBuffer::PascalStringType s)
+constexpr uint32_t MaxLength(EmberAttributeDataBuffer::PascalStringType s)
 {
-    if (s == EmberAttributeBuffer::PascalStringType::kShort)
+    if (s == EmberAttributeDataBuffer::PascalStringType::kShort)
     {
         return std::numeric_limits<uint8_t>::max() - 1;
     }
@@ -51,6 +51,8 @@ struct UnsignedDecodeInfo
 {
     unsigned byteCount;
     uint64_t maxValue;
+
+    constexpr UnsignedDecodeInfo(unsigned bytes) : byteCount(bytes), maxValue(NumericLimits::MaxUnsignedValue(bytes)) {}
 };
 
 constexpr UnsignedDecodeInfo GetUnsignedDecodeInfo(EmberAfAttributeType type)
@@ -59,21 +61,21 @@ constexpr UnsignedDecodeInfo GetUnsignedDecodeInfo(EmberAfAttributeType type)
     switch (type)
     {
     case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
-        return UnsignedDecodeInfo{ 1, NumericLimits::MaxUnsignedValue(1) };
+        return UnsignedDecodeInfo(1);
     case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
-        return UnsignedDecodeInfo{ 2, NumericLimits::MaxUnsignedValue(2) };
+        return UnsignedDecodeInfo(2);
     case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-        return UnsignedDecodeInfo{ 3, NumericLimits::MaxUnsignedValue(3) };
+        return UnsignedDecodeInfo(3);
     case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
-        return UnsignedDecodeInfo{ 4, NumericLimits::MaxUnsignedValue(4) };
+        return UnsignedDecodeInfo(4);
     case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
-        return UnsignedDecodeInfo{ 5, NumericLimits::MaxUnsignedValue(5) };
+        return UnsignedDecodeInfo(5);
     case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
-        return UnsignedDecodeInfo{ 6, NumericLimits::MaxUnsignedValue(6) };
+        return UnsignedDecodeInfo(6);
     case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
-        return UnsignedDecodeInfo{ 7, NumericLimits::MaxUnsignedValue(7) };
+        return UnsignedDecodeInfo(7);
     case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
-        return UnsignedDecodeInfo{ 8, NumericLimits::MaxUnsignedValue(8) };
+        return UnsignedDecodeInfo(8);
     }
     chipDie();
 }
@@ -83,6 +85,10 @@ struct SignedDecodeInfo
     unsigned byteCount;
     int64_t minValue;
     int64_t maxValue;
+
+    constexpr SignedDecodeInfo(unsigned bytes) :
+        byteCount(bytes), minValue(NumericLimits::MinSignedValue(bytes)), maxValue(NumericLimits::MaxSignedValue(bytes))
+    {}
 };
 
 constexpr SignedDecodeInfo GetSignedDecodeInfo(EmberAfAttributeType type)
@@ -90,84 +96,29 @@ constexpr SignedDecodeInfo GetSignedDecodeInfo(EmberAfAttributeType type)
 
     switch (type)
     {
-    case ZCL_INT8S_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
-        return SignedDecodeInfo{
-            1,
-            NumericLimits::MinSignedValue(1),
-            NumericLimits::MaxSignedValue(1),
-        };
-    case ZCL_INT16S_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
-        return SignedDecodeInfo{
-            2,
-            NumericLimits::MinSignedValue(2),
-            NumericLimits::MaxSignedValue(2),
-        };
-    case ZCL_INT24S_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-        return SignedDecodeInfo{
-            3,
-            NumericLimits::MinSignedValue(3),
-            NumericLimits::MaxSignedValue(3),
-        };
-    case ZCL_INT32S_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
-        return SignedDecodeInfo{
-            4,
-            NumericLimits::MinSignedValue(4),
-            NumericLimits::MaxSignedValue(4),
-        };
-    case ZCL_INT40S_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
-        return SignedDecodeInfo{
-            5,
-            NumericLimits::MinSignedValue(5),
-            NumericLimits::MaxSignedValue(5),
-        };
-    case ZCL_INT48S_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
-        return SignedDecodeInfo{
-            6,
-            NumericLimits::MinSignedValue(6),
-            NumericLimits::MaxSignedValue(6),
-        };
-    case ZCL_INT56S_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
-        return SignedDecodeInfo{
-            7,
-            NumericLimits::MinSignedValue(7),
-            NumericLimits::MaxSignedValue(7),
-        };
-    case ZCL_INT64S_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
-        return SignedDecodeInfo{
-            8,
-            NumericLimits::MinSignedValue(8),
-            NumericLimits::MaxSignedValue(8),
-        };
+    case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
+        return SignedDecodeInfo(1);
+    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
+        return SignedDecodeInfo(2);
+    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
+        return SignedDecodeInfo(3);
+    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
+        return SignedDecodeInfo(4);
+    case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
+        return SignedDecodeInfo(5);
+    case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
+        return SignedDecodeInfo(6);
+    case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
+        return SignedDecodeInfo(7);
+    case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
+        return SignedDecodeInfo(8);
     }
     chipDie();
 }
 
-static constexpr bool IsOddIntegerSize(unsigned byteCount)
-{
-    // All these conditions seem to result in the same code size:
-    // - (byteCount > 2) && (byteCount != 4) && (byteCount != 8) OR
-    // - (byteCount == 6) || ((byteCount & 0x1) != 0)
-    //
-    // So ended up keeping the "readable" one
-    return (byteCount == 3) || (byteCount == 5) || (byteCount == 6) || (byteCount == 7);
-}
-
-// This is an odd workaround for legacy. Errors SHOULD be always ConstraintError
-// however in practice old ember code returns INVALID_ARGUMENT for odd sized integers
-//
-// TODO: This should ALWAYS return ConstraintError (and method should not exist ...)
-CHIP_ERROR OutOfRangeError(unsigned byteCount)
-{
-    if (IsOddIntegerSize(byteCount))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-}
-
 } // namespace
 
-CHIP_ERROR EmberAttributeBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer)
+CHIP_ERROR EmberAttributeDataBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer)
 {
     UnsignedDecodeInfo info = GetUnsignedDecodeInfo(mAttributeType);
 
@@ -183,17 +134,20 @@ CHIP_ERROR EmberAttributeBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader & re
     {
         ReturnErrorOnFailure(reader.Get(value));
 
-        VerifyOrReturnError(mIsNullable // ::max() on the type is used as the NULL flag
-                                ? (value < info.maxValue)
-                                : (value <= info.maxValue),
-                            OutOfRangeError(info.byteCount));
+        bool valid =
+            // Value is in [0, max] RANGE
+            (value <= info.maxValue)
+            // Nullable values reserve a specific value to mean NULL
+            && !(mIsNullable && (value == NumericLimits::UnsignedMaxValueToNullValue(info.maxValue)));
+
+        VerifyOrReturnError(valid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
     writer.EndianPut(value, info.byteCount);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmberAttributeBuffer::DecodeSignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer)
+CHIP_ERROR EmberAttributeDataBuffer::DecodeSignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer)
 {
     SignedDecodeInfo info = GetSignedDecodeInfo(mAttributeType);
 
@@ -209,18 +163,19 @@ CHIP_ERROR EmberAttributeBuffer::DecodeSignedInteger(chip::TLV::TLVReader & read
     {
         ReturnErrorOnFailure(reader.Get(value));
 
-        // NULLABLE reserves minValue for NULL, so range is:
-        //   - NULLABLE:      (minValue, MaxValue]
-        //   - NON-NULLABLE:  [minValue, MaxValue]
-        bool valid = (value <= info.maxValue) && (mIsNullable ? (value > info.minValue) : (value >= info.minValue));
+        bool valid =
+            // Value is in [min, max] RANGE
+            ((value >= info.minValue) && (value <= info.maxValue))
+            // Nullable values reserve a specific value to mean NULL
+            && !(mIsNullable && (value == NumericLimits::SignedMinValueToNullValue(info.minValue)));
 
-        VerifyOrReturnError(valid, OutOfRangeError(info.byteCount));
+        VerifyOrReturnError(valid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
     writer.EndianPutSigned(value, info.byteCount);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmberAttributeBuffer::DecodeAsString(chip::TLV::TLVReader & reader, PascalStringType stringType, TLV::TLVType tlvType,
+CHIP_ERROR EmberAttributeDataBuffer::DecodeAsString(chip::TLV::TLVReader & reader, PascalStringType stringType, TLV::TLVType tlvType,
                                                 EndianWriter & writer)
 {
     // Handle null first, then the actual data
@@ -263,9 +218,9 @@ CHIP_ERROR EmberAttributeBuffer::DecodeAsString(chip::TLV::TLVReader & reader, P
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmberAttributeBuffer::Decode(chip::TLV::TLVReader & reader)
+CHIP_ERROR EmberAttributeDataBuffer::Decode(chip::TLV::TLVReader & reader)
 {
-    // all methods below assume that nullable setting matches  (this is to reduce code size
+    // all methods below assume that nullable setting matches (this is to reduce code size
     // even though clarity suffers)
     VerifyOrReturnError(mIsNullable || reader.GetType() != TLV::kTLVType_Null, CHIP_ERROR_WRONG_TLV_TYPE);
 

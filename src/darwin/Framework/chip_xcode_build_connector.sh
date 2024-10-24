@@ -103,6 +103,7 @@ done
 [[ $ENABLE_BITCODE == YES ]] && target_cflags+=("-flto")
 
 declare -a args=(
+    'import("//config/darwin/args.gni")'
     'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="boringssl"'
     'chip_build_controller_dynamic_server=false'
@@ -132,7 +133,6 @@ esac
 [[ $PLATFORM_FAMILY_NAME != macOS ]] && {
     args+=(
         'target_os="ios"'
-        'import("//config/ios/args.gni")'
     )
 }
 

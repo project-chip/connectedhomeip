@@ -33,10 +33,10 @@ namespace Ember {
 /// unaligned) and strings are Pascal-like (short with 1-byte length prefix or long with 2-byte length
 /// prefix).
 ///
-/// Class is to be used a one-shot:
+/// Class is to be used as a one-shot:
 ///   - create it out of metadata + data span
 ///   - call Decode (which modifies the input data span)
-class EmberAttributeBuffer
+class EmberAttributeDataBuffer
 {
 public:
     enum class PascalStringType
@@ -47,7 +47,7 @@ public:
 
     static constexpr bool kIsFabricScoped = false;
 
-    EmberAttributeBuffer(const EmberAfAttributeMetadata * meta, MutableByteSpan & data) :
+    EmberAttributeDataBuffer(const EmberAfAttributeMetadata * meta, MutableByteSpan & data) :
         mIsNullable(meta->IsNullable()), mAttributeType(chip::app::Compatibility::Internal::AttributeBaseType(meta->attributeType)),
         mDataBuffer(data)
     {}
@@ -91,7 +91,7 @@ private:
 namespace DataModel {
 
 /// Helper method to forward the decode of this type to the class specific implementation
-inline CHIP_ERROR Decode(TLV::TLVReader & reader, Ember::EmberAttributeBuffer & buffer)
+inline CHIP_ERROR Decode(TLV::TLVReader & reader, Ember::EmberAttributeDataBuffer & buffer)
 {
     return buffer.Decode(reader);
 }
