@@ -49,23 +49,8 @@ public:
 
     CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
-        chip::TLV::TLVWriter writer;
-        chip::TLV::TLVReader reader;
-
-        mData = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(sizeof(uint8_t), mDataMaxLen));
-        VerifyOrReturnError(mData != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        writer.Init(mData, mDataMaxLen);
-
-        ReturnErrorOnFailure(mAttributeValue.Encode(writer, chip::TLV::AnonymousTag()));
-        reader.Init(mData, writer.GetLengthWritten());
-        ReturnErrorOnFailure(reader.Next());
-
-        id value = NSObjectFromCHIPTLV(&reader);
-        if (value == nil) {
-            return CHIP_ERROR_INTERNAL;
-        }
-
+        id value;
+        ReturnErrorOnFailure(GetValue(&value));
         return WriteAttribute::SendCommand(device, endpointId, mClusterId, mAttributeId, value);
     }
 
@@ -122,6 +107,35 @@ protected:
     chip::Optional<uint32_t> mDataVersion;
 
 private:
+    CHIP_ERROR GetValue(id _Nonnull * _Nonnull outValue)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVWriter writer;
+        chip::TLV::TLVReader reader;
+
+        mData = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(sizeof(uint8_t), mDataMaxLen));
+        VerifyOrExit(mData != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+        writer.Init(mData, mDataMaxLen);
+
+        err = mAttributeValue.Encode(writer, chip::TLV::AnonymousTag());
+        SuccessOrExit(err);
+
+        reader.Init(mData, writer.GetLengthWritten());
+        err = reader.Next();
+        SuccessOrExit(err);
+
+        *outValue = NSObjectFromCHIPTLV(&reader);
+        VerifyOrDo(nil != *outValue, err = CHIP_ERROR_INTERNAL);
+
+    exit:
+        if (nullptr != mData) {
+            chip::Platform::MemoryFree(mData);
+            mData = nullptr;
+        }
+        return err;
+    }
+
     chip::ClusterId mClusterId;
     chip::AttributeId mAttributeId;
     CHIP_ERROR mError = CHIP_NO_ERROR;
