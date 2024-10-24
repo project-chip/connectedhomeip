@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 
 import("//build_overrides/chip.gni")
 
-chip_system_config_clock = "gettimeofday"
 chip_device_platform = "darwin"
 
-chip_project_config_include_dirs = [ "${chip_root}/config/ios" ]
+chip_project_config_include = ""
+chip_system_project_config_include = ""
 
 pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]
