@@ -108,9 +108,11 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         self.endpoint = self.matter_test_config.endpoint
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         app_pid = self.matter_test_config.app_pid
-        if app_pid != 0:
-            self.app_pipe = self.app_pipe + str(app_pid)
-
+        if self.is_ci:
+            app_pid = self.matter_test_config.app_pid
+            if app_pid == 0:
+                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
+                
         self.print_step(1, "Commissioning, already done")
 
         # Ensure that the device is in the correct state
