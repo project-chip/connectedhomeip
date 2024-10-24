@@ -6495,6 +6495,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "EVSE";
     case 0x0000050D:
         return "Device Energy Management";
+    case 0x0000050F:
+        return "Water Heater";
     case 0x00000510:
         return "Electrical Sensor";
     case 0x00000840:
