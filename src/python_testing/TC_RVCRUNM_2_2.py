@@ -142,7 +142,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
             app_pid = self.matter_test_config.app_pid
             if app_pid == 0:
                 asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
-        
+
         RVCRun_cluster = Clusters.RvcRunMode
         attributes = RVCRun_cluster.Attributes
 
