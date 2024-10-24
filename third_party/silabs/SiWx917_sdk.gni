@@ -325,6 +325,8 @@ template("siwx917_sdk") {
         "SL_SI91X_NPSS_GPIO_BTN_HANDLER=1",
         "SL_SI91X_POWER_MANAGER_UC_AVAILABLE=1",
         "SL_SI91X_TICKLESS_MODE=1",
+        "SL_ENABLE_GPIO_WAKEUP_SOURCE=1",
+        "ENABLE_NPSS_GPIO_2=1",
       ]
     }
 

@@ -67,14 +67,13 @@ extern "C" {
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 #include "rsi_rom_power_save.h"
+#include "sl_gpio_board.h"
+#include "sl_si91x_button.h"
 #include "sl_si91x_button_pin_config.h"
+#include "sl_si91x_driver_gpio.h"
 #include "sl_si91x_power_manager.h"
-
 namespace {
-// TODO: should be removed once we are getting the press interrupt for button 0 with sleep
-#define BUTTON_PRESSED 1
-bool btn0_pressed = false;
-
+bool sl_btn0_pressed = false;
 #ifdef ENABLE_CHIP_SHELL
 bool ps_requirement_added = false;
 #endif // ENABLE_CHIP_SHELL
@@ -263,24 +262,33 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
 // Required to invoke button press event during sleep as falling edge is not detected
-void sl_si91x_invoke_btn_press_event(void)
+void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
 {
-    // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
-    if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
+    // UULP_GPIO_2 is used to detect the button 0 press
+    VerifyOrReturn(pin_intr == RTE_UULP_GPIO_2_PIN, ChipLogError(DeviceLayer, "invalid pin interrupt: %ld", pin_intr));
+    sl_status_t status = SL_STATUS_OK;
+    while (sl_si91x_gpio_get_uulp_npss_pin(pin_intr) == LOW && sl_btn0_pressed)
+        ; // button was pressed
+
+    if (sl_si91x_gpio_get_uulp_npss_pin(pin_intr) == LOW && !(sl_btn0_pressed))
     {
+        status          = sl_si91x_gpio_driver_mask_uulp_npss_interrupt(BIT(pin_intr));
+        sl_btn0_pressed = true;
+        VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
         sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
-        btn0_pressed = true;
     }
-    if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
+    else if (sl_si91x_gpio_get_uulp_npss_pin(pin_intr) == HIGH)
     {
-        btn0_pressed = false;
+        sl_btn0_pressed = false;
+        sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_RELEASED);
     }
 }
+
 void sl_si91x_uart_power_requirement_handler(void)
 {
 #ifdef ENABLE_CHIP_SHELL
     // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
-    if (RSI_NPSSGPIO_GetPin(RTE_UULP_GPIO_1_PIN))
+    if (sl_si91x_gpio_driver_mask_uulp_npss_interrupt(RTE_UULP_GPIO_1_PIN))
     {
         if (!ps_requirement_added)
         {
