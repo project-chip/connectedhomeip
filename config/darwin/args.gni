@@ -12,28 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Certification test checks
+import("//build_overrides/chip.gni")
 
-on:
-  pull_request:
-    paths:
-      - "src/app/tests/suites/certification/**"
-permissions:
-  contents: read
+chip_device_platform = "darwin"
 
-jobs:
-  check-certification-tests:
-    name: Check for common problems in certification tests
-    runs-on: ubuntu-latest
+chip_project_config_include = ""
+chip_system_project_config_include = ""
 
-    container:
-      image: ghcr.io/project-chip/chip-build
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Run checks
-        run: |
-          python3 scripts/tests/matter_yaml_linter.py
+pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]
