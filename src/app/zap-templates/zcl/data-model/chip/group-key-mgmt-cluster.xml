@@ -65,21 +65,33 @@ limitations under the License.
       <description>GroupKeyMap</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="GROUP_TABLE" type="array" length="254" entryType="GroupInfoMapStruct" writable="false" optional="false">GroupTable</attribute>
-    <attribute side="server" code="0x0002" define="MAX_GROUPS_PER_FABRIC" type="int16u" writable="false" optional="false">MaxGroupsPerFabric</attribute>
-    <attribute side="server" code="0x0003" define="MAX_GROUP_KEYS_PER_FABRIC" type="int16u" writable="false" optional="false">MaxGroupKeysPerFabric</attribute>
-
+    <attribute side="server" code="0x0001" define="GROUP_TABLE" type="array" length="254" entryType="GroupInfoMapStruct">
+      <description>GroupTable</description>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" define="MAX_GROUPS_PER_FABRIC" type="int16u">
+      <description>MaxGroupsPerFabric</description>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0003" define="MAX_GROUP_KEYS_PER_FABRIC" type="int16u">
+      <description>MaxGroupKeysPerFabric</description>
+      <mandatoryConform/>
+    </attribute>
+    
     <command source="client" code="0x00" name="KeySetWrite" isFabricScoped="true" optional="false" cli="zcl GroupKeyManagement KeySetWrite">
       <description>Write a new set of keys for the given key set id.</description>
       <arg name="GroupKeySet" type="GroupKeySetStruct"/>
       <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x01" name="KeySetRead" isFabricScoped="true" response="KeySetReadResponse" optional="false" cli="zcl GroupKeyManagement KeySetRead">
       <description>Read the keys for a given key set id.</description>
       <arg name="GroupKeySetID" type="int16u"/>
       <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x02" name="KeySetReadResponse" optional="false" disableDefaultResponse="true">
@@ -87,24 +99,28 @@ limitations under the License.
        Response to KeySetRead
       </description>
       <arg name="GroupKeySet" type="GroupKeySetStruct"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x03" name="KeySetRemove" isFabricScoped="true" optional="false" cli="zcl GroupKeyManagement KeySetRemove">
       <description>Revoke a Root Key from a Group</description>
       <arg name="GroupKeySetID" type="int16u"/>
       <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x04" name="KeySetReadAllIndices" response="KeySetReadAllIndicesResponse" isFabricScoped="true" optional="false" cli="zcl GroupKeyManagement KeySetReadAllIndices">
       <description>Return the list of Group Key Sets associated with the accessing fabric</description>
       <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x05" name="KeySetReadAllIndicesResponse" optional="false" disableDefaultResponse="true">
       <description>
         Reseponse to KeySetReadAllIndices
       </description>
-        <arg name="GroupKeySetIDs" type="int16u" array="true"/>
+      <arg name="GroupKeySetIDs" type="int16u" array="true"/>
+      <mandatoryConform/>
     </command>
 
   </cluster>
