@@ -21,6 +21,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
+#include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
 #include <app/codegen-data-model-provider/EmberMetadata.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
@@ -83,198 +84,6 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttribute
     //   - if decoding was done, assume DONE (i.e. final CHIP_NO_ERROR)
     //   -  otherwise, if no decoding done, return that processing must continue via nullopt
     return decoder.TriedDecode() ? std::make_optional(CHIP_NO_ERROR) : std::nullopt;
-}
-
-/// Metadata of what a ember/pascal short string means (prepended by a u8 length)
-struct ShortPascalString
-{
-    using LengthType                        = uint8_t;
-    static constexpr LengthType kNullLength = 0xFF;
-
-    static void SetLength(uint8_t * buffer, LengthType value) { *buffer = value; }
-};
-
-/// Metadata of what a ember/pascal LONG string means (prepended by a u16 length)
-struct LongPascalString
-{
-    using LengthType                        = uint16_t;
-    static constexpr LengthType kNullLength = 0xFFFF;
-
-    // Encoding for ember string lengths is little-endian (see ember-strings.cpp)
-    static void SetLength(uint8_t * buffer, LengthType value) { Encoding::LittleEndian::Put16(buffer, value); }
-};
-
-// ember assumptions ... should just work
-static_assert(sizeof(ShortPascalString::LengthType) == 1);
-static_assert(sizeof(LongPascalString::LengthType) == 2);
-
-/// Convert the value stored in 'decoder' into an ember format span 'out'
-///
-/// The value converted will be of type T (e.g. CharSpan or ByteSpan) and it will be converted
-/// via the given ENCODING (i.e. ShortPascalString or LongPascalString)
-///
-/// isNullable defines if the value of NULL is allowed to be converted.
-template <typename T, class ENCODING>
-CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool isNullable, MutableByteSpan & out)
-{
-    T workingValue;
-
-    if (isNullable)
-    {
-        typename DataModel::Nullable<T> nullableWorkingValue;
-        ReturnErrorOnFailure(decoder.Decode(nullableWorkingValue));
-
-        if (nullableWorkingValue.IsNull())
-        {
-            VerifyOrReturnError(out.size() >= sizeof(typename ENCODING::LengthType), CHIP_ERROR_BUFFER_TOO_SMALL);
-            ENCODING::SetLength(out.data(), ENCODING::kNullLength);
-            out.reduce_size(sizeof(typename ENCODING::LengthType));
-            return CHIP_NO_ERROR;
-        }
-
-        // continue encoding non-null value
-        workingValue = nullableWorkingValue.Value();
-    }
-    else
-    {
-        ReturnErrorOnFailure(decoder.Decode(workingValue));
-    }
-
-    auto len = static_cast<typename ENCODING::LengthType>(workingValue.size());
-    VerifyOrReturnError(out.size() >= sizeof(len) + len, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    uint8_t * output_buffer = out.data();
-
-    ENCODING::SetLength(output_buffer, len);
-    output_buffer += sizeof(len);
-
-    memcpy(output_buffer, workingValue.data(), workingValue.size());
-    output_buffer += workingValue.size();
-
-    out.reduce_size(static_cast<size_t>(output_buffer - out.data()));
-    return CHIP_NO_ERROR;
-}
-
-/// Decodes a numeric data value of type T from the `decoder` into a ember-encoded buffer `out`
-///
-/// isNullable defines if the value of NULL is allowed to be decoded.
-template <typename T>
-CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullable, MutableByteSpan & out)
-{
-    using Traits = NumericAttributeTraits<T>;
-    typename Traits::StorageType storageValue;
-
-    if (isNullable)
-    {
-        DataModel::Nullable<typename Traits::WorkingType> workingValue;
-        ReturnErrorOnFailure(decoder.Decode(workingValue));
-
-        if (workingValue.IsNull())
-        {
-            Traits::SetNull(storageValue);
-        }
-        else
-        {
-            // This guards against trying to decode something that overlaps nullable, for example
-            // Nullable<uint8_t>(0xFF) is not representable because 0xFF is the encoding of NULL in ember
-            // as well as odd-sized integers (e.g. full 32-bit value like 0x11223344 cannot be written
-            // to a 3-byte odd-sized integger).
-            VerifyOrReturnError(Traits::CanRepresentValue(isNullable, workingValue.Value()), CHIP_ERROR_INVALID_ARGUMENT);
-            Traits::WorkingToStorage(workingValue.Value(), storageValue);
-        }
-
-        VerifyOrReturnError(out.size() >= sizeof(storageValue), CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    else
-    {
-        typename Traits::WorkingType workingValue;
-        ReturnErrorOnFailure(decoder.Decode(workingValue));
-
-        Traits::WorkingToStorage(workingValue, storageValue);
-
-        VerifyOrReturnError(out.size() >= sizeof(storageValue), CHIP_ERROR_INVALID_ARGUMENT);
-
-        // Even non-nullable values may be outside range: e.g. odd-sized integers have working values
-        // that are larger than the storage values (e.g. a uint32_t being stored as a 3-byte integer)
-        VerifyOrReturnError(Traits::CanRepresentValue(isNullable, workingValue), CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    const uint8_t * data = Traits::ToAttributeStoreRepresentation(storageValue);
-
-    // The decoding + ToAttributeStoreRepresentation will result in data being
-    // stored in native format/byteorder, suitable to directly be stored in the data store
-    memcpy(out.data(), data, sizeof(storageValue));
-    out.reduce_size(sizeof(storageValue));
-
-    return CHIP_NO_ERROR;
-}
-
-/// Read the data from "decoder" into an ember-formatted buffer "out"
-///
-/// `out` is a in/out buffer:
-///    - its initial size determines the maximum size of the buffer
-///    - its output size reflects the actual data size
-///
-/// Uses the attribute `metadata` to determine how the data is to be encoded into out.
-CHIP_ERROR DecodeValueIntoEmberBuffer(AttributeValueDecoder & decoder, const EmberAfAttributeMetadata * metadata,
-                                      MutableByteSpan & out)
-{
-    VerifyOrReturnError(metadata != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    const bool isNullable = metadata->IsNullable();
-
-    switch (AttributeBaseType(metadata->attributeType))
-    {
-    case ZCL_BOOLEAN_ATTRIBUTE_TYPE: // Boolean
-        return DecodeIntoEmberBuffer<bool>(decoder, isNullable, out);
-    case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
-        return DecodeIntoEmberBuffer<uint8_t>(decoder, isNullable, out);
-    case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
-        return DecodeIntoEmberBuffer<uint16_t>(decoder, isNullable, out);
-    case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-        return DecodeIntoEmberBuffer<OddSizedInteger<3, false>>(decoder, isNullable, out);
-    case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
-        return DecodeIntoEmberBuffer<uint32_t>(decoder, isNullable, out);
-    case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
-        return DecodeIntoEmberBuffer<OddSizedInteger<5, false>>(decoder, isNullable, out);
-    case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
-        return DecodeIntoEmberBuffer<OddSizedInteger<6, false>>(decoder, isNullable, out);
-    case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
-        return DecodeIntoEmberBuffer<OddSizedInteger<7, false>>(decoder, isNullable, out);
-    case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
-        return DecodeIntoEmberBuffer<uint64_t>(decoder, isNullable, out);
-    case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
-        return DecodeIntoEmberBuffer<int8_t>(decoder, isNullable, out);
-    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
-        return DecodeIntoEmberBuffer<int16_t>(decoder, isNullable, out);
-    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
-        return DecodeIntoEmberBuffer<OddSizedInteger<3, true>>(decoder, isNullable, out);
-    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
-        return DecodeIntoEmberBuffer<int32_t>(decoder, isNullable, out);
-    case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
-        return DecodeIntoEmberBuffer<OddSizedInteger<5, true>>(decoder, isNullable, out);
-    case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
-        return DecodeIntoEmberBuffer<OddSizedInteger<6, true>>(decoder, isNullable, out);
-    case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
-        return DecodeIntoEmberBuffer<OddSizedInteger<7, true>>(decoder, isNullable, out);
-    case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
-        return DecodeIntoEmberBuffer<int64_t>(decoder, isNullable, out);
-    case ZCL_SINGLE_ATTRIBUTE_TYPE: // 32-bit float
-        return DecodeIntoEmberBuffer<float>(decoder, isNullable, out);
-    case ZCL_DOUBLE_ATTRIBUTE_TYPE: // 64-bit float
-        return DecodeIntoEmberBuffer<double>(decoder, isNullable, out);
-    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
-        return DecodeStringLikeIntoEmberBuffer<CharSpan, ShortPascalString>(decoder, isNullable, out);
-    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
-        return DecodeStringLikeIntoEmberBuffer<CharSpan, LongPascalString>(decoder, isNullable, out);
-    case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
-        return DecodeStringLikeIntoEmberBuffer<ByteSpan, ShortPascalString>(decoder, isNullable, out);
-    case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
-        return DecodeStringLikeIntoEmberBuffer<ByteSpan, LongPascalString>(decoder, isNullable, out);
-    default:
-        ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(metadata->attributeType));
-        return CHIP_IM_GLOBAL_STATUS(Failure);
-    }
 }
 
 } // namespace
@@ -414,7 +223,10 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     }
 
     MutableByteSpan dataBuffer = gEmberAttributeIOBufferSpan;
-    ReturnErrorOnFailure(DecodeValueIntoEmberBuffer(decoder, *attributeMetadata, dataBuffer));
+    {
+        Ember::EmberAttributeDataBuffer emberData(*attributeMetadata, dataBuffer);
+        ReturnErrorOnFailure(decoder.Decode(emberData));
+    }
 
     Protocols::InteractionModel::Status status;
 

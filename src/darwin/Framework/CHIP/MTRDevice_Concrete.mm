@@ -3307,22 +3307,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return nil;
 }
 
-- (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther
-{
-    // Sanity check for nil cases
-    if (!one && !theOther) {
-        MTR_LOG_ERROR("%@ attribute data-value comparison does not expect comparing two nil dictionaries", self);
-        return YES;
-    }
-    if (!one || !theOther) {
-        // Comparing against nil is expected, and should return NO quietly
-        return NO;
-    }
-
-    // Attribute data-value dictionaries are equal if type and value are equal, and specifically, this should return true if values are both nil
-    return [one[MTRTypeKey] isEqual:theOther[MTRTypeKey]] && ((one[MTRValueKey] == theOther[MTRValueKey]) || [one[MTRValueKey] isEqual:theOther[MTRValueKey]]);
-}
-
 // Utility to return data value dictionary without data version
 - (NSDictionary *)_dataValueWithoutDataVersion:(NSDictionary *)attributeValue
 {
@@ -3538,9 +3522,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
     for (NSDictionary<NSString *, id> * attributeResponseValue in reportedAttributeValues) {
         MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
-        NSDictionary * attributeDataValue = attributeResponseValue[MTRDataKey];
-        NSError * attributeError = attributeResponseValue[MTRErrorKey];
-        NSDictionary * previousValue;
+        MTRDeviceDataValueDictionary _Nullable attributeDataValue = attributeResponseValue[MTRDataKey];
+        NSError * _Nullable attributeError = attributeResponseValue[MTRErrorKey];
+        MTRDeviceDataValueDictionary _Nullable previousValue;
 
         // sanity check either data value or error must exist
         if (!attributeDataValue && !attributeError) {

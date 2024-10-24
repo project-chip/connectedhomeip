@@ -7751,8 +7751,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"RateDistortionTradeOffPoints";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxPreRollBufferSizeID:
-            result = @"MaxPreRollBufferSize";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxContentBufferSizeID:
+            result = @"MaxContentBufferSize";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMicrophoneCapabilitiesID:

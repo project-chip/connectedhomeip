@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
+import("//build_overrides/googletest.gni")
 import("//build_overrides/pigweed.gni")
 
 import("$dir_pigweed/targets/host/target_toolchains.gni")
@@ -61,7 +62,7 @@ gcc_toolchain("chip_pw_fuzztest") {
 
     dir_pw_third_party_abseil_cpp = "//third_party/abseil-cpp/src"
     dir_pw_third_party_fuzztest = "//third_party/fuzztest"
-    dir_pw_third_party_googletest = "//third_party/googletest"
+    dir_pw_third_party_googletest = "$dir_googletest"
 
     # TODO: Seems that re2 support within FuzzTest was deprecated, keeping it defined is triggering warning
     # Remove if re2 is indeed not needed

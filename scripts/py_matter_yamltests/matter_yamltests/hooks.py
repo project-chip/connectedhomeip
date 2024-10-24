@@ -152,7 +152,7 @@ class TestRunnerHooks():
         """
         pass
 
-    def step_start(self, request: TestStep, endpoint: Optional[int] = None):
+    def step_start(self, request: TestStep):
         """
         This method is called when the runner starts running a step from the test.
 
@@ -160,8 +160,6 @@ class TestRunnerHooks():
         ----------
         request: TestStep
             The original request as defined by the test step.
-        endpoint: int
-            An optional device endpoint the step will target.
         """
         pass
 

@@ -44779,7 +44779,7 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="nightVisionCapable", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="minViewport", Tag=0x00000004, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
                 ClusterObjectFieldDescriptor(Label="rateDistortionTradeOffPoints", Tag=0x00000005, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]]),
-                ClusterObjectFieldDescriptor(Label="maxPreRollBufferSize", Tag=0x00000006, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="maxContentBufferSize", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="microphoneCapabilities", Tag=0x00000007, Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]),
                 ClusterObjectFieldDescriptor(Label="speakerCapabilities", Tag=0x00000008, Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]),
                 ClusterObjectFieldDescriptor(Label="twoWayTalkSupport", Tag=0x00000009, Type=typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum]),
@@ -44833,7 +44833,7 @@ class CameraAvStreamManagement(Cluster):
     nightVisionCapable: typing.Optional[bool] = None
     minViewport: typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct] = None
     rateDistortionTradeOffPoints: typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]] = None
-    maxPreRollBufferSize: typing.Optional[uint] = None
+    maxContentBufferSize: typing.Optional[uint] = None
     microphoneCapabilities: typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct] = None
     speakerCapabilities: typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct] = None
     twoWayTalkSupport: typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum] = None
@@ -45561,7 +45561,7 @@ class CameraAvStreamManagement(Cluster):
             value: typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]] = None
 
         @dataclass
-        class MaxPreRollBufferSize(ClusterAttributeDescriptor):
+        class MaxContentBufferSize(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000551

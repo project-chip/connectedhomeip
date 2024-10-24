@@ -2133,9 +2133,7 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNo
     using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
     AttributeValueDecoder decoder = test.DecoderFor<NullableType>(0x1223344);
 
-    // write should fail: written value is not in range
-    // NOTE: this matches legacy behaviour, however realistically maybe ConstraintError would be more correct
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 }
 
 TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNullable)
@@ -2151,12 +2149,10 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNu
     using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
     AttributeValueDecoder decoder = test.DecoderFor<NullableType>(0x1223344);
 
-    // write should fail: written value is not in range
-    // NOTE: this matches legacy behaviour, however realistically maybe ConstraintError would be more correct
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 }
 
-TEST(TestCodegenModelViaMoceNullValueToNullables, EmberAttributeWriteBasicTypesLowestValue)
+TEST(TestCodegenModelViaMocksNullValueToNullables, EmberAttributeWriteBasicTypesLowestValue)
 {
     TestEmberScalarTypeWrite<int8_t, ZCL_INT8S_ATTRIBUTE_TYPE>(-127);
     TestEmberScalarTypeWrite<int16_t, ZCL_INT16S_ATTRIBUTE_TYPE>(-32767);

@@ -4181,8 +4181,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MinViewport";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id:
             return "RateDistortionTradeOffPoints";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxPreRollBufferSize::Id:
-            return "MaxPreRollBufferSize";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxContentBufferSize::Id:
+            return "MaxContentBufferSize";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MicrophoneCapabilities::Id:
             return "MicrophoneCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerCapabilities::Id:
@@ -6389,6 +6389,10 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Contact Sensor";
     case 0x00000016:
         return "Root Node";
+    case 0x00000017:
+        return "Solar Power";
+    case 0x00000018:
+        return "Battery Storage";
     case 0x00000019:
         return "Secondary Network Interface";
     case 0x00000022:
@@ -6491,10 +6495,14 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Flow Sensor";
     case 0x00000307:
         return "Humidity Sensor";
+    case 0x00000309:
+        return "Heat Pump";
     case 0x0000050C:
         return "EVSE";
     case 0x0000050D:
         return "Device Energy Management";
+    case 0x0000050F:
+        return "Water Heater";
     case 0x00000510:
         return "Electrical Sensor";
     case 0x00000840:
