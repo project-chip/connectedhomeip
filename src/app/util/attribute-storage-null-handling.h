@@ -246,7 +246,6 @@ struct NumericAttributeTraits<bool>
 
     static uint8_t MaxValue(bool isNullable) { return 1; }
 
-private:
     static constexpr StorageType kNullValue = 0xFF;
 };
 
