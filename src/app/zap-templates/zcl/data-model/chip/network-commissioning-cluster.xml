@@ -114,18 +114,15 @@ limitations under the License.
             </feature>
         </features>
 
-        <attribute side="server" code="0x0000" define="MAX_NETWORKS" type="int8u">
-            <description>MaxNetworks</description>
+        <attribute side="server" code="0x0000" name="MaxNetworks" define="MAX_NETWORKS" type="int8u">
             <access op="read" privilege="administer"/>
             <mandatoryConform/>
         </attribute>
-        <attribute side="server" code="0x0001" define="NETWORKS" type="array" entryType="NetworkInfoStruct">
-            <description>Networks</description>
+        <attribute side="server" code="0x0001" name="Networks" define="NETWORKS" type="array" entryType="NetworkInfoStruct">
             <access op="read" privilege="administer"/>
             <mandatoryConform/>
         </attribute>
-        <attribute side="server" code="0x0002" define="SCAN_MAX_TIME_SECONDS" type="int8u" optional="true">
-            <description>ScanMaxTimeSeconds</description>
+        <attribute side="server" code="0x0002" name="ScanMaxTimeSeconds" define="SCAN_MAX_TIME_SECONDS" type="int8u" optional="true">
             <mandatoryConform>
               <orTerm>
                 <feature name="WI"/>
@@ -133,50 +130,42 @@ limitations under the License.
               </orTerm>
             </mandatoryConform>
         </attribute>
-        <attribute side="server" code="0x0003" define="CONNECT_MAX_TIME_SECONDS" type="int8u" optional="true">
-            <description>ConnectMaxTimeSeconds</description>
+        <attribute side="server" code="0x0003" name="ConnectMaxTimeSeconds" define="CONNECT_MAX_TIME_SECONDS" type="int8u" optional="true">
             <mandatoryConform>
               <orTerm>
                 <feature name="WI"/>
                 <feature name="TH"/>
               </orTerm>
             </mandatoryConform>
-          </attribute>
-        <attribute side="server" code="0x0004" define="INTERFACE_ENABLED" type="boolean" writable="true">
-            <description>InterfaceEnabled</description>
+        </attribute>
+        <attribute side="server" code="0x0004" name="InterfaceEnabled" define="INTERFACE_ENABLED" type="boolean" writable="true">
             <access op="read" privilege="view"/>
             <access op="write" privilege="administer"/>
             <mandatoryConform/>
         </attribute>
-        <attribute side="server" code="0x0005" define="LAST_NETWORKING_STATUS" type="NetworkCommissioningStatusEnum" isNullable="true">
-            <description>LastNetworkingStatus</description>
+        <attribute side="server" code="0x0005" name="LastNetworkingStatus" define="LAST_NETWORKING_STATUS" type="NetworkCommissioningStatusEnum" isNullable="true">
             <access op="read" privilege="administer"/>
             <mandatoryConform/>
         </attribute>
-        <attribute side="server" code="0x0006" define="LAST_NETWORK_ID" type="octet_string" length="32" isNullable="true">
-            <description>LastNetworkID</description>
+        <attribute side="server" code="0x0006" name="LastNetworkID" define="LAST_NETWORK_ID" type="octet_string" length="32" isNullable="true">
             <access op="read" privilege="administer"/>
             <mandatoryConform/>
         </attribute>
-        <attribute side="server" code="0x0007" define="LAST_CONNECT_ERROR_VALUE" type="int32s" isNullable="true">
-            <description>LastConnectErrorValue</description>
+        <attribute side="server" code="0x0007" name="LastConnectErrorValue" define="LAST_CONNECT_ERROR_VALUE" type="int32s" isNullable="true">
             <access op="read" privilege="administer"/>
             <mandatoryConform/>
         </attribute>
-        <attribute side="server" code="0x0008" define="SUPPORTED_WIFI_BANDS" type="array" entryType="WiFiBandEnum" optional="true" apiMaturity="provisional">
-          <description>SupportedWiFiBands</description>
+        <attribute side="server" code="0x0008" name="SupportedWiFiBands" define="SUPPORTED_WIFI_BANDS" type="array" entryType="WiFiBandEnum" optional="true" apiMaturity="provisional">
           <mandatoryConform>
             <feature name="WI"/>
           </mandatoryConform>
         </attribute>
-        <attribute side="server" code="0x0009" define="SUPPORTED_THREAD_FEATURES" type="ThreadCapabilitiesBitmap" optional="true" apiMaturity="provisional">
-          <description>SupportedThreadFeatures</description>
+        <attribute side="server" code="0x0009" name="SupportedThreadFeatures" define="SUPPORTED_THREAD_FEATURES" type="ThreadCapabilitiesBitmap" optional="true" apiMaturity="provisional">
           <mandatoryConform>
             <feature name="TH"/>
           </mandatoryConform>
         </attribute>
-        <attribute side="server" code="0x000A" define="THREAD_VERSION" type="int16u" optional="true" apiMaturity="provisional">
-          <description>ThreadVersion</description>
+        <attribute side="server" code="0x000A" name="ThreadVersion" define="THREAD_VERSION" type="int16u" optional="true" apiMaturity="provisional">
           <mandatoryConform>
             <feature name="TH"/>
           </mandatoryConform>

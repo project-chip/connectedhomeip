@@ -32,12 +32,10 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="MEDIA_INPUT_LIST" type="array" entryType="InputInfoStruct" length="254">
-      <description>InputList</description>
+    <attribute side="server" code="0x0000" name="InputList" define="MEDIA_INPUT_LIST" type="array" entryType="InputInfoStruct" length="254">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="MEDIA_INPUT_CURRENT_INPUT" type="int8u">
-      <description>CurrentInput</description>
+    <attribute side="server" code="0x0001" name="CurrentInput" define="MEDIA_INPUT_CURRENT_INPUT" type="int8u">
       <mandatoryConform/>
     </attribute>
 

@@ -64,68 +64,55 @@ limitations under the License.
       </feature>
     </features>
     
-    <attribute side="server" code="0x00" define="BSSID" type="octet_string" length="6" isNullable="true" minLength="6">
-      <description>BSSID</description>
+    <attribute side="server" code="0x00" name="BSSID" define="BSSID" type="octet_string" length="6" isNullable="true" minLength="6">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x01" define="SECURITY_TYPE" type="SecurityTypeEnum" isNullable="true">
-      <description>SecurityType</description>
+    <attribute side="server" code="0x01" name="SecurityType" define="SECURITY_TYPE" type="SecurityTypeEnum" isNullable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x02" define="WIFI_VERSION" type="WiFiVersionEnum" isNullable="true">
-      <description>WiFiVersion</description>
+    <attribute side="server" code="0x02" name="WiFiVersion" define="WIFI_VERSION" type="WiFiVersionEnum" isNullable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x03" define="CHANNEL_NUMBER" type="int16u" isNullable="true">
-      <description>ChannelNumber</description>
+    <attribute side="server" code="0x03" name="ChannelNumber" define="CHANNEL_NUMBER" type="int16u" isNullable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x04" define="RSSI" type="int8s" min="-120" max="0" isNullable="true">
-      <description>RSSI</description>
+    <attribute side="server" code="0x04" name="RSSI" define="RSSI" type="int8s" min="-120" max="0" isNullable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x05" define="BEACON_LOST_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
-      <description>BeaconLostCount</description>
+    <attribute side="server" code="0x05" name="BeaconLostCount" define="BEACON_LOST_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="ERRCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x06" define="BEACON_RX_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
-      <description>BeaconRxCount</description>
+    <attribute side="server" code="0x06" name="BeaconRxCount" define="BEACON_RX_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x07" define="PACKET_MULTICAST_RX_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
-      <description>PacketMulticastRxCount</description>
+    <attribute side="server" code="0x07" name="PacketMulticastRxCount" define="PACKET_MULTICAST_RX_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x08" define="PACKET_MULTICAST_TX_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
-      <description>PacketMulticastTxCount</description>
+    <attribute side="server" code="0x08" name="PacketMulticastTxCount" define="PACKET_MULTICAST_TX_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x09" define="PACKET_UNICAST_RX_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
-      <description>PacketUnicastRxCount</description>
+    <attribute side="server" code="0x09" name="PacketUnicastRxCount" define="PACKET_UNICAST_RX_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0A" define="PACKET_UNICAST_TX_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
-      <description>PacketUnicastTxCount</description>
+    <attribute side="server" code="0x0A" name="PacketUnicastTxCount" define="PACKET_UNICAST_TX_COUNT" type="int32u" default="0x00000000" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0B" define="CURRENT_MAX_RATE" type="int64u" default="0x0000000000000000" isNullable="true" optional="true">
-      <description>CurrentMaxRate</description>
+    <attribute side="server" code="0x0B" name="CurrentMaxRate" define="CURRENT_MAX_RATE" type="int64u" default="0x0000000000000000" isNullable="true" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0C" define="OVERRUN_COUNT" type="int64u" default="0x0000000000000000" isNullable="true" optional="true">
-      <description>OverrunCount</description>
+    <attribute side="server" code="0x0C" name="OverrunCount" define="OVERRUN_COUNT" type="int64u" default="0x0000000000000000" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="ERRCNT"/>
       </mandatoryConform>

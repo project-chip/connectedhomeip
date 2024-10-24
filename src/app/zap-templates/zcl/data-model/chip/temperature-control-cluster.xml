@@ -40,38 +40,32 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="TEMP_SETPOINT" type="temperature" optional="true">
-      <description>TemperatureSetpoint</description>
+    <attribute side="server" code="0x0000" name="TemperatureSetpoint" define="TEMP_SETPOINT" type="temperature" optional="true">
       <mandatoryConform>
         <feature name="TN"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0001" define="MIN_TEMP" type="temperature" optional="true">
-      <description>MinTemperature</description>
+    <attribute side="server" code="0x0001" name="MinTemperature" define="MIN_TEMP" type="temperature" optional="true">
       <mandatoryConform>
         <feature name="TN"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0002" define="MAX_TEMP" type="temperature" optional="true">
-      <description>MaxTemperature</description>
+    <attribute side="server" code="0x0002" name="MaxTemperature" define="MAX_TEMP" type="temperature" optional="true">
       <mandatoryConform>
         <feature name="TN"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0003" define="STEP" type="temperature" optional="true">
-      <description>Step</description>
+    <attribute side="server" code="0x0003" name="Step" define="STEP" type="temperature" optional="true">
       <mandatoryConform>
         <feature name="STEP"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0004" define="SELECTED_TEMP_LEVEL" type="int8u" optional="true">
-      <description>SelectedTemperatureLevel</description>
+    <attribute side="server" code="0x0004" name="SelectedTemperatureLevel" define="SELECTED_TEMP_LEVEL" type="int8u" optional="true">
       <mandatoryConform>
         <feature name="TL"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0005" define="SUPPORTED_TEMP_LEVELS" type="array" entryType="char_string" optional="true">
-      <description>SupportedTemperatureLevels</description>
+    <attribute side="server" code="0x0005" name="SupportedTemperatureLevels" define="SUPPORTED_TEMP_LEVELS" type="array" entryType="char_string" optional="true">
       <mandatoryConform>
         <feature name="TL"/>
       </mandatoryConform>

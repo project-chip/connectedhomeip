@@ -37,20 +37,16 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x00" define="THREAD_METRICS" type="array" entryType="ThreadMetricsStruct" length="254" optional="true">
-      <description>ThreadMetrics</description>
+    <attribute side="server" code="0x00" name="ThreadMetrics" define="THREAD_METRICS" type="array" entryType="ThreadMetricsStruct" length="254" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x01" define="CURRENT_HEAP_FREE" type="int64u" optional="true">
-      <description>CurrentHeapFree</description>
+    <attribute side="server" code="0x01" name="CurrentHeapFree" define="CURRENT_HEAP_FREE" type="int64u" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x02" define="CURRENT_HEAP_USED" type="int64u" optional="true">
-      <description>CurrentHeapUsed</description>
+    <attribute side="server" code="0x02" name="CurrentHeapUsed" define="CURRENT_HEAP_USED" type="int64u" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x03" define="CURRENT_HEAP_HIGH_WATERMARK" type="int64u" optional="true">
-      <description>CurrentHeapHighWatermark</description>
+    <attribute side="server" code="0x03" name="CurrentHeapHighWatermark" define="CURRENT_HEAP_HIGH_WATERMARK" type="int64u" optional="true">
       <mandatoryConform>
         <feature name="WTRMRK"/>
       </mandatoryConform>

@@ -43,48 +43,40 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="ENABLED" type="boolean">
-      <description>Enabled</description>
+    <attribute side="server" code="0x0000" name="Enabled" define="ENABLED" type="boolean">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="ON_DEMAND_RATINGS" type="array" entryType="RatingNameStruct" optional="true">
-      <description>OnDemandRatings</description>
+    <attribute side="server" code="0x0001" name="OnDemandRatings" define="ON_DEMAND_RATINGS" type="array" entryType="RatingNameStruct" optional="true">
       <mandatoryConform>
         <feature name="OCR"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0002" define="ON_DEMAND_THRESHOLD" type="char_string" length="8" optional="true">
-      <description>OnDemandRatingThreshold</description>
+    <attribute side="server" code="0x0002" name="OnDemandRatingThreshold" define="ON_DEMAND_THRESHOLD" type="char_string" length="8" optional="true">
       <mandatoryConform>
         <feature name="OCR"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0003" define="SCHEDULED_CONTENT_RATINGS" type="array" entryType="RatingNameStruct" optional="true">
-      <description>ScheduledContentRatings</description>
+    <attribute side="server" code="0x0003" name="ScheduledContentRatings" define="SCHEDULED_CONTENT_RATINGS" type="array" entryType="RatingNameStruct" optional="true">
       <mandatoryConform>
         <feature name="SCR"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0004" define="SCHEDULED_CONTENT_RATING_THRESHOLD" type="char_string" length="8" optional="true">
-      <description>ScheduledContentRatingThreshold</description>
+    <attribute side="server" code="0x0004" name="ScheduledContentRatingThreshold" define="SCHEDULED_CONTENT_RATING_THRESHOLD" type="char_string" length="8" optional="true">
       <mandatoryConform>
         <feature name="SCR"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0005" define="SCREEN_DAILY_TIME" type="elapsed_s" optional="true" length="86400">
-      <description>ScreenDailyTime</description>
+    <attribute side="server" code="0x0005" name="ScreenDailyTime" define="SCREEN_DAILY_TIME" type="elapsed_s" optional="true" length="86400">
       <mandatoryConform>
         <feature name="ST"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0006" define="REMAINING_SCREEN_TIME" type="elapsed_s" optional="true" length="86400">
-      <description>RemainingScreenTime</description>
+    <attribute side="server" code="0x0006" name="RemainingScreenTime" define="REMAINING_SCREEN_TIME" type="elapsed_s" optional="true" length="86400">
       <mandatoryConform>
         <feature name="ST"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0007" define="ENABLED" type="boolean">
-      <description>BlockUnrated</description>
+    <attribute side="server" code="0x0007" name="BlockUnrated" define="ENABLED" type="boolean">
       <mandatoryConform>
         <feature name="BU"/>
       </mandatoryConform>

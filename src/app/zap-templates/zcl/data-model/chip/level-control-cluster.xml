@@ -61,72 +61,58 @@ limitations under the License.
         <provisionalConform/>
       </feature>
     </features>
-    <attribute side="server" code="0x0000" define="CURRENT_LEVEL" type="int8u" isNullable="true">
-      <description>CurrentLevel</description>
+    <attribute side="server" code="0x0000" name="CurrentLevel" define="CURRENT_LEVEL" type="int8u" isNullable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME" type="int16u" default="0x0000" optional="true">
-      <description>RemainingTime</description>
+    <attribute side="server" code="0x0001" name="RemainingTime" define="LEVEL_CONTROL_REMAINING_TIME" type="int16u" default="0x0000" optional="true">
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0002" define="MINIMUM_LEVEL" type="int8u" default="0x00" optional="true">
-      <description>MinLevel</description>
+    <attribute side="server" code="0x0002" name="MinLevel" define="MINIMUM_LEVEL" type="int8u" default="0x00" optional="true">
       <optionalConform>
         <notTerm>
           <feature name="LT"/>
         </notTerm>
       </optionalConform>
     </attribute>
-    <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL" type="int8u" default="0xFE" optional="true">
-      <description>MaxLevel</description>
+    <attribute side="server" code="0x0003" name="MaxLevel" define="MAXIMUM_LEVEL" type="int8u" default="0xFE" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY" type="int16u" default="0x0000" optional="true" reportable="true">
-      <description>CurrentFrequency</description>
+    <attribute side="server" code="0x0004" name="CurrentFrequency" define="CURRENT_FREQUENCY" type="int16u" default="0x0000" optional="true" reportable="true">
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0005" define="MIN_FREQUENCY" type="int16u" default="0x0000" optional="true">
-      <description>MinFrequency</description>
+    <attribute side="server" code="0x0005" name="MinFrequency" define="MIN_FREQUENCY" type="int16u" default="0x0000" optional="true">
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0006" define="MAX_FREQUENCY" type="int16u" default="0x0000" optional="true">
-      <description>MaxFrequency</description>
+    <attribute side="server" code="0x0006" name="MaxFrequency" define="MAX_FREQUENCY" type="int16u" default="0x0000" optional="true">
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0010" define="ON_OFF_TRANSITION_TIME" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>OnOffTransitionTime</description>
+    <attribute side="server" code="0x0010" name="OnOffTransitionTime" define="ON_OFF_TRANSITION_TIME" type="int16u" writable="true" default="0x0000" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0011" define="ON_LEVEL" type="int8u" isNullable="true" writable="true">
-      <description>OnLevel</description>
+    <attribute side="server" code="0x0011" name="OnLevel" define="ON_LEVEL" type="int8u" isNullable="true" writable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0012" define="ON_TRANSITION_TIME" type="int16u" isNullable="true" writable="true" optional="true">
-      <description>OnTransitionTime</description>
+    <attribute side="server" code="0x0012" name="OnTransitionTime" define="ON_TRANSITION_TIME" type="int16u" isNullable="true" writable="true" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0013" define="OFF_TRANSITION_TIME" type="int16u" isNullable="true" writable="true" optional="true">
-      <description>OffTransitionTime</description>
+    <attribute side="server" code="0x0013" name="OffTransitionTime" define="OFF_TRANSITION_TIME" type="int16u" isNullable="true" writable="true" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0014" define="DEFAULT_MOVE_RATE" type="int8u" isNullable="true" min="0x01" max="0xFF" writable="true" optional="true">
-      <description>DefaultMoveRate</description>
+    <attribute side="server" code="0x0014" name="DefaultMoveRate" define="DEFAULT_MOVE_RATE" type="int8u" isNullable="true" min="0x01" max="0xFF" writable="true" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x000F" define="OPTIONS" type="OptionsBitmap" min="0x00" max="0x03" writable="true" default="0x00">
-      <description>Options</description>
+    <attribute side="server" code="0x000F" name="Options" define="OPTIONS" type="OptionsBitmap" min="0x00" max="0x03" writable="true" default="0x00">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x4000" define="START_UP_CURRENT_LEVEL" type="int8u" isNullable="true" writable="true" optional="true">
-      <description>StartUpCurrentLevel</description>
+    <attribute side="server" code="0x4000" name="StartUpCurrentLevel" define="START_UP_CURRENT_LEVEL" type="int8u" isNullable="true" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
       <mandatoryConform>

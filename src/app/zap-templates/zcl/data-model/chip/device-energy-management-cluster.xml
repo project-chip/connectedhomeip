@@ -74,36 +74,29 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
       </feature>
     </features>
     <!--Attributes-->
-    <attribute code="0x0000" side="server" type="ESATypeEnum" define="ESA_TYPE" min="0x00" max="0xFF" default="0xFF">
-      <description>ESAType</description>
+    <attribute code="0x0000" side="server" name="ESAType" type="ESATypeEnum" define="ESA_TYPE" min="0x00" max="0xFF" default="0xFF">
       <mandatoryConform/>
     </attribute>
-    <attribute code="0x0001" side="server" type="boolean" define="ESA_CAN_GENERATE" default="0">
-      <description>ESACanGenerate</description>
+    <attribute code="0x0001" side="server" name="ESACanGenerate" type="boolean" define="ESA_CAN_GENERATE" default="0">
       <mandatoryConform/>
     </attribute>
-    <attribute code="0x0002" side="server" type="ESAStateEnum" define="ESA_STATE" default="0x00" min="0x00" max="0x04">
-      <description>ESAState</description>
+    <attribute code="0x0002" side="server" name="ESAState" type="ESAStateEnum" define="ESA_STATE" default="0x00" min="0x00" max="0x04">
       <mandatoryConform/>
     </attribute>
-    <attribute code="0x0003" side="server" type="power_mw" define="ABS_MIN_POWER" default="0">
-      <description>AbsMinPower</description>
+    <attribute code="0x0003" side="server" name="AbsMinPower" type="power_mw" define="ABS_MIN_POWER" default="0">
       <mandatoryConform/>
     </attribute>
-    <attribute code="0x0004" side="server" type="power_mw" define="ABS_MAX_POWER" default="0">
-      <description>AbsMaxPower</description>
+    <attribute code="0x0004" side="server" name="AbsMaxPower" type="power_mw" define="ABS_MAX_POWER" default="0">
       <mandatoryConform/>
     </attribute>
     <!--Conformance feature PA - for now optional-->
-    <attribute code="0x0005" side="server" type="PowerAdjustCapabilityStruct" define="POWER_ADJUSTMENT_CAPABILITY" isNullable="true" optional="true">
-      <description>PowerAdjustmentCapability</description>
+    <attribute code="0x0005" side="server" name="PowerAdjustmentCapability" type="PowerAdjustCapabilityStruct" define="POWER_ADJUSTMENT_CAPABILITY" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="PA"/>
       </mandatoryConform>
     </attribute>
     <!--Conformance feature PFR \| SFR - for now optional-->
-    <attribute code="0x0006" side="server" type="ForecastStruct" define="FORECAST" isNullable="true" optional="true">
-      <description>Forecast</description>
+    <attribute code="0x0006" side="server" name="Forecast" type="ForecastStruct" define="FORECAST" isNullable="true" optional="true">
       <mandatoryConform>
         <orTerm>
           <feature name="PFR"/>
@@ -111,8 +104,7 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
         </orTerm>
       </mandatoryConform>
     </attribute>
-    <attribute code="0x0007" side="server" type="OptOutStateEnum" define="OPT_OUT_STATE" min="0x00" max="0x03" default="0x00" optional="true">
-      <description>OptOutState</description>
+    <attribute code="0x0007" side="server" name="OptOutState" type="OptOutStateEnum" define="OPT_OUT_STATE" min="0x00" max="0x03" default="0x00" optional="true">
       <mandatoryConform>
         <orTerm>
           <feature name="PA"/>

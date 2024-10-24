@@ -43,16 +43,13 @@ limitations under the License.
         <optionalConform/>
       </feature>
     </features>
-    <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="CommissioningWindowStatusEnum">
-      <description>WindowStatus</description>
+    <attribute side="server" code="0x0000" name="WindowStatus" define="WINDOW_STATUS" type="CommissioningWindowStatusEnum">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" isNullable="true">
-      <description>AdminFabricIndex</description>
+    <attribute side="server" code="0x0001" name="AdminFabricIndex" define="ADMIN_FABRIC_INDEX" type="fabric_idx" isNullable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="vendor_id" isNullable="true">
-      <description>AdminVendorId</description>
+    <attribute side="server" code="0x0002" name="AdminVendorId" define="ADMIN_VENDOR_ID" type="vendor_id" isNullable="true">
       <mandatoryConform/>
     </attribute>
     

@@ -43,22 +43,18 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="MASK" type="AlarmBitmap" default="0">
-      <description>Mask</description>
+    <attribute side="server" code="0x0000" name="Mask" define="MASK" type="AlarmBitmap" default="0">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="LATCH" type="AlarmBitmap" default="0" optional="true">
-      <description>Latch</description>
+    <attribute side="server" code="0x0001" name="Latch" define="LATCH" type="AlarmBitmap" default="0" optional="true">
       <mandatoryConform>
         <feature name="RESET"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0002" define="STATE" type="AlarmBitmap" default="0">
-      <description>State</description>
+    <attribute side="server" code="0x0002" name="State" define="STATE" type="AlarmBitmap" default="0">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0">
-      <description>Supported</description>
+    <attribute side="server" code="0x0003" name="Supported" define="SUPPORTED" type="AlarmBitmap" default="0">
       <mandatoryConform/>
     </attribute>
 

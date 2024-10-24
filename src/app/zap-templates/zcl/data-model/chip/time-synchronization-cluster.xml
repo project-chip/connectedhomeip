@@ -114,74 +114,61 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="UTC_TIME" type="epoch_us" isNullable="true">
-      <description>UTCTime</description>
+    <attribute side="server" code="0x0000" name="UTCTime" define="UTC_TIME" type="epoch_us" isNullable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="GRANULARITY" type="GranularityEnum" default="0x00">
-      <description>Granularity</description>
+    <attribute side="server" code="0x0001" name="Granularity" define="GRANULARITY" type="GranularityEnum" default="0x00">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0002" define="TIME_SOURCE" type="TimeSourceEnum" default="0x00" optional="true">
-      <description>TimeSource</description>
+    <attribute side="server" code="0x0002" name="TimeSource" define="TIME_SOURCE" type="TimeSourceEnum" default="0x00" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0003" define="TRUSTED_TIME_SOURCE" type="TrustedTimeSourceStruct" isNullable="true" optional="true">
-      <description>TrustedTimeSource</description>
+    <attribute side="server" code="0x0003" name="TrustedTimeSource" define="TRUSTED_TIME_SOURCE" type="TrustedTimeSourceStruct" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="TSC"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0004" define="DEFAULT_NTP" type="char_string" length="128" isNullable="true" optional="true">
-      <description>DefaultNTP</description>
+    <attribute side="server" code="0x0004" name="DefaultNTP" define="DEFAULT_NTP" type="char_string" length="128" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="NTPC"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0005" define="TIME_ZONE" type="array" entryType="TimeZoneStruct" optional="true">
-      <description>TimeZone</description>
+    <attribute side="server" code="0x0005" name="TimeZone" define="TIME_ZONE" type="array" entryType="TimeZoneStruct" optional="true">
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0006" define="DST_OFFSET" type="array" entryType="DSTOffsetStruct" optional="true">
-      <description>DSTOffset</description>
+    <attribute side="server" code="0x0006" name="DSTOffset" define="DST_OFFSET" type="array" entryType="DSTOffsetStruct" optional="true">
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0007" define="LOCAL_TIME" type="epoch_us" default="0xFFFFFFFFFFFFFFFF" isNullable="true" optional="true">
-      <description>LocalTime</description>
+    <attribute side="server" code="0x0007" name="LocalTime" define="LOCAL_TIME" type="epoch_us" default="0xFFFFFFFFFFFFFFFF" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0008" define="TIME_ZONE_DATABASE" type="TimeZoneDatabaseEnum" default="2" optional="true">
-      <description>TimeZoneDatabase</description>
+    <attribute side="server" code="0x0008" name="TimeZoneDatabase" define="TIME_ZONE_DATABASE" type="TimeZoneDatabaseEnum" default="2" optional="true">
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0009" define="NTP_SERVER_AVAILABLE" type="boolean" optional="true">
-      <description>NTPServerAvailable</description>
+    <attribute side="server" code="0x0009" name="NTPServerAvailable" define="NTP_SERVER_AVAILABLE" type="boolean" optional="true">
       <mandatoryConform>
         <feature name="NTPS"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x000A" define="TIME_ZONE_LIST_MAX_SIZE" type="int8u" min="1" max="2" optional="true">
-      <description>TimeZoneListMaxSize</description>
+    <attribute side="server" code="0x000A" name="TimeZoneListMaxSize" define="TIME_ZONE_LIST_MAX_SIZE" type="int8u" min="1" max="2" optional="true">
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x000B" define="DST_OFFSET_LIST_MAX_SIZE" type="int8u" min="1" optional="true">
-      <description>DSTOffsetListMaxSize</description>
+    <attribute side="server" code="0x000B" name="DSTOffsetListMaxSize" define="DST_OFFSET_LIST_MAX_SIZE" type="int8u" min="1" optional="true">
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x000C" define="SUPPORTS_DNS_RESOLVE" type="boolean" optional="true">
-      <description>SupportsDNSResolve</description>
+    <attribute side="server" code="0x000C" name="SupportsDNSResolve" define="SUPPORTS_DNS_RESOLVE" type="boolean" optional="true">
       <mandatoryConform>
         <feature name="NTPC"/>
       </mandatoryConform>

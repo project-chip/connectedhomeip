@@ -29,16 +29,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     
-    <attribute side="server" code="0x0000" define="MASK" type="AlarmBitmap" default="0">
-      <description>Mask</description>
+    <attribute side="server" code="0x0000" name="Mask" define="MASK" type="AlarmBitmap" default="0">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0002" define="STATE" type="AlarmBitmap" default="0">
-      <description>State</description>
+    <attribute side="server" code="0x0002" name="State" define="STATE" type="AlarmBitmap" default="0">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0">
-      <description>Supported</description>
+    <attribute side="server" code="0x0003" name="Supported" define="SUPPORTED" type="AlarmBitmap" default="0">
       <mandatoryConform/>
     </attribute>
 

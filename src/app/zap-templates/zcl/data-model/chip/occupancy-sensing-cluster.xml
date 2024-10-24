@@ -83,40 +83,34 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="5"/>
 
-    <attribute side="server" code="0x0000" define="OCCUPANCY" type="OccupancyBitmap" min="0x00" max="0x01" reportable="true">
-      <description>Occupancy</description>
+    <attribute side="server" code="0x0000" name="Occupancy" define="OCCUPANCY" type="OccupancyBitmap" min="0x00" max="0x01" reportable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="OccupancySensorTypeEnum" min="0x00" max="0xFE">
-      <description>OccupancySensorType</description>
+    <attribute side="server" code="0x0001" name="OccupancySensorType" define="OCCUPANCY_SENSOR_TYPE" type="OccupancySensorTypeEnum" min="0x00" max="0xFE">
       <otherwiseConform>
         <mandatoryConform/>
         <deprecateConform/>
       </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="OccupancySensorTypeBitmap" min="0x00" max="0x07">
-      <description>OccupancySensorTypeBitmap</description>
+    <attribute side="server" code="0x0002" name="OccupancySensorTypeBitmap" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="OccupancySensorTypeBitmap" min="0x00" max="0x07">
       <otherwiseConform>
         <mandatoryConform/>
         <deprecateConform/>
       </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0003" define="HOLD_TIME" type="int16u" writable="true" optional="true">
-      <description>HoldTime</description>
+    <attribute side="server" code="0x0003" name="HoldTime" define="HOLD_TIME" type="int16u" writable="true" optional="true">
       <access op="write" privilege="manage"/>
       <optionalConform/>
     </attribute>
 
-    <attribute side="server" code="0x0004" define="HOLD_TIME_LIMITS" type="HoldTimeLimitsStruct" optional="true">
-      <description>HoldTimeLimits</description>
+    <attribute side="server" code="0x0004" name="HoldTimeLimits" define="HOLD_TIME_LIMITS" type="HoldTimeLimitsStruct" optional="true">
       <mandatoryConform>
         <attribute name="HoldTime"/>
       </mandatoryConform>
     </attribute>
     
-    <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>PIROccupiedToUnoccupiedDelay</description>
+    <attribute side="server" code="0x0010" name="PIROccupiedToUnoccupiedDelay" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
       <otherwiseConform>
@@ -143,8 +137,7 @@ limitations under the License.
       </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>PIRUnoccupiedToOccupiedDelay</description>
+    <attribute side="server" code="0x0011" name="PIRUnoccupiedToOccupiedDelay" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
       <otherwiseConform>
@@ -193,8 +186,7 @@ limitations under the License.
       </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0012" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>PIRUnoccupiedToOccupiedThreshold</description>
+    <attribute side="server" code="0x0012" name="PIRUnoccupiedToOccupiedThreshold" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
       <otherwiseConform>
@@ -243,8 +235,7 @@ limitations under the License.
       </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>UltrasonicOccupiedToUnoccupiedDelay</description>
+    <attribute side="server" code="0x0020" name="UltrasonicOccupiedToUnoccupiedDelay" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
       <otherwiseConform>
@@ -258,8 +249,7 @@ limitations under the License.
       </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>UltrasonicUnoccupiedToOccupiedDelay</description>
+    <attribute side="server" code="0x0021" name="UltrasonicUnoccupiedToOccupiedDelay" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
       <otherwiseConform>
@@ -280,8 +270,7 @@ limitations under the License.
       </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0022" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>UltrasonicUnoccupiedToOccupiedThreshold</description>
+    <attribute side="server" code="0x0022" name="UltrasonicUnoccupiedToOccupiedThreshold" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
       <otherwiseConform>
@@ -302,8 +291,7 @@ limitations under the License.
       </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>PhysicalContactOccupiedToUnoccupiedDelay</description>
+    <attribute side="server" code="0x0030" name="PhysicalContactOccupiedToUnoccupiedDelay" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
       <otherwiseConform>
@@ -317,8 +305,7 @@ limitations under the License.
       </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>PhysicalContactUnoccupiedToOccupiedDelay</description>
+    <attribute side="server" code="0x0031" name="PhysicalContactUnoccupiedToOccupiedDelay" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
       <otherwiseConform>
@@ -339,8 +326,7 @@ limitations under the License.
       </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0032" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>PhysicalContactUnoccupiedToOccupiedThreshold</description>
+    <attribute side="server" code="0x0032" name="PhysicalContactUnoccupiedToOccupiedThreshold" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
       <otherwiseConform>

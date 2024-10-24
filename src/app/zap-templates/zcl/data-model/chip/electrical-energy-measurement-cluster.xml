@@ -42,12 +42,10 @@ limitations under the License.
     </features>
 
     <!--Attributes-->
-    <attribute code="0x0000" side="server" define="ACCURACY" type="MeasurementAccuracyStruct">
-      <description>Accuracy</description>
+    <attribute code="0x0000" side="server" name="Accuracy" define="ACCURACY" type="MeasurementAccuracyStruct">
       <mandatoryConform/>
     </attribute>
-    <attribute code="0x0001" side="server" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" optional="true" isNullable="true">
-      <description>CumulativeEnergyImported</description>
+    <attribute code="0x0001" side="server" name="CumulativeEnergyImported" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" optional="true" isNullable="true">
       <mandatoryConform>
         <andTerm>
           <feature name="IMPE"/>
@@ -56,8 +54,7 @@ limitations under the License.
       </mandatoryConform>
     </attribute>
     <!--Conformance feature IMPE & CUME - for now optional-->
-    <attribute code="0x0002" side="server" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">
-      <description>CumulativeEnergyExported</description>
+    <attribute code="0x0002" side="server" name="CumulativeEnergyExported" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">
       <mandatoryConform>
         <andTerm>
           <feature name="EXPE"/>
@@ -66,8 +63,7 @@ limitations under the License.
       </mandatoryConform>
     </attribute>
     <!--Conformance feature EXPE & CUME - for now optional-->
-    <attribute code="0x0003" side="server" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">
-      <description>PeriodicEnergyImported</description>
+    <attribute code="0x0003" side="server" name="PeriodicEnergyImported" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">
       <mandatoryConform>
         <andTerm>
           <feature name="IMPE"/>
@@ -76,8 +72,7 @@ limitations under the License.
       </mandatoryConform>
     </attribute>
     <!--Conformance feature IMPE & PERE - for now optional-->
-    <attribute code="0x0004" side="server" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">
-      <description>PeriodicEnergyExported</description>
+    <attribute code="0x0004" side="server" name="PeriodicEnergyExported" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">
       <mandatoryConform>
         <andTerm>
           <feature name="EXPE"/>
@@ -85,8 +80,7 @@ limitations under the License.
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute code="0x0005" side="server" define="CUMULATIVE_ENERGY_RESET" type="CumulativeEnergyResetStruct" isNullable="true" optional="true">
-      <description>CumulativeEnergyReset</description>
+    <attribute code="0x0005" side="server" name="CumulativeEnergyReset" define="CUMULATIVE_ENERGY_RESET" type="CumulativeEnergyResetStruct" isNullable="true" optional="true">
       <optionalConform>
         <feature name="CUME"/>
       </optionalConform>

@@ -44,12 +44,10 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <!-- cluster revision -->
     <globalAttribute code="0xFFFD" side="either" value="1"/>
-    <attribute code="0x0000" side="server" define="DEVICE_DIRECTORY" type="array" entryType="EcosystemDeviceStruct">
-      <description>DeviceDirectory</description>
+    <attribute code="0x0000" side="server" name="DeviceDirectory" define="DEVICE_DIRECTORY" type="array" entryType="EcosystemDeviceStruct">
       <access op="read" privilege="manage"/>
     </attribute>
-    <attribute code="0x0001" side="server" define="LOCATION_DIRECTORY" type="array" entryType="EcosystemLocationStruct">
-      <description>LocationDirectory</description>
+    <attribute code="0x0001" side="server" name="LocationDirectory" define="LOCATION_DIRECTORY" type="array" entryType="EcosystemLocationStruct">
       <access op="read" privilege="manage"/>
     </attribute>
   </cluster>

@@ -25,12 +25,10 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/> <!-- Revision   -->
     <description>This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.</description>
-    <attribute side="server" code="0x0000" define="TARGET_NAVIGATOR_LIST" type="array" entryType="TargetInfoStruct" length="254">
-      <description>TargetList</description>
+    <attribute side="server" code="0x0000" name="TargetList" define="TARGET_NAVIGATOR_LIST" type="array" entryType="TargetInfoStruct" length="254">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="TARGET_NAVIGATOR_CURRENT_TARGET" type="int8u" default="0" optional="true">
-      <description>CurrentTarget</description>
+    <attribute side="server" code="0x0001" name="CurrentTarget" define="TARGET_NAVIGATOR_CURRENT_TARGET" type="int8u" default="0" optional="true">
       <optionalConform/>
     </attribute>
     

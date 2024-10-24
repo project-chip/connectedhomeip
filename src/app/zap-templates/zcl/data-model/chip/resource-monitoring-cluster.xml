@@ -38,32 +38,26 @@ limitations under the License.
     </features>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CONDITION" type="percent" optional="true">
-      <description>Condition</description>
+    <attribute side="server" code="0x0000" name="Condition" define="CONDITION" type="percent" optional="true">
       <mandatoryConform>
         <feature name="CON"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" optional="true">
-      <description>DegradationDirection</description>
+    <attribute side="server" code="0x0001" name="DegradationDirection" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" optional="true">
       <mandatoryConform>
         <feature name="CON"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" default="0">
-      <description>ChangeIndication</description>
+    <attribute side="server" code="0x0002" name="ChangeIndication" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" default="0">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" optional="true">
-      <description>InPlaceIndicator</description>
+    <attribute side="server" code="0x0003" name="InPlaceIndicator" define="IN_PLACE_INDICATOR" type="boolean" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">
-      <description>LastChangedTime</description>
+    <attribute side="server" code="0x0004" name="LastChangedTime" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="array" entryType="ReplacementProductStruct" length="5" optional="true">
-      <description>ReplacementProductList</description>
+    <attribute side="server" code="0x0005" name="ReplacementProductList" define="REPLACEMENT_PRODUCT_LIST" type="array" entryType="ReplacementProductStruct" length="5" optional="true">
       <mandatoryConform>
         <feature name="REP"/>
       </mandatoryConform>
@@ -98,32 +92,26 @@ limitations under the License.
     </features>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CONDITION" type="percent" optional="true">
-      <description>Condition</description>
+    <attribute side="server" code="0x0000" name="Condition" define="CONDITION" type="percent" optional="true">
       <mandatoryConform>
         <feature name="CON"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" optional="true">
-      <description>DegradationDirection</description>
+    <attribute side="server" code="0x0001" name="DegradationDirection" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" optional="true">
       <mandatoryConform>
         <feature name="CON"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" default="0">
-      <description>ChangeIndication</description>
+    <attribute side="server" code="0x0002" name="ChangeIndication" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" default="0">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" optional="true">
-      <description>InPlaceIndicator</description>
+    <attribute side="server" code="0x0003" name="InPlaceIndicator" define="IN_PLACE_INDICATOR" type="boolean" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">
-      <description>LastChangedTime</description>
+    <attribute side="server" code="0x0004" name="LastChangedTime" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="array" entryType="ReplacementProductStruct" length="5" optional="true">
-      <description>ReplacementProductList</description>
+    <attribute side="server" code="0x0005" name="ReplacementProductList" define="REPLACEMENT_PRODUCT_LIST" type="array" entryType="ReplacementProductStruct" length="5" optional="true">
       <mandatoryConform>
         <feature name="REP"/>
       </mandatoryConform>

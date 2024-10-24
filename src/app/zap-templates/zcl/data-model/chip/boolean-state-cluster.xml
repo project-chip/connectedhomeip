@@ -26,8 +26,7 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
-    <attribute side="server" code="0x0000" define="STATE_VALUE" type="boolean" reportable="true">
-      <description>StateValue</description>
+    <attribute side="server" code="0x0000" name="StateValue" define="STATE_VALUE" type="boolean" reportable="true">
       <mandatoryConform/>
     </attribute>
     

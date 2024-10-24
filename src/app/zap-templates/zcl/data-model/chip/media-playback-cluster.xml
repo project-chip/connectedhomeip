@@ -46,66 +46,55 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE" type="PlaybackStateEnum" min="0x00" max="0x03">
-      <description>CurrentState</description>
+    <attribute side="server" code="0x0000" name="CurrentState" define="MEDIA_PLAYBACK_STATE" type="PlaybackStateEnum" min="0x00" max="0x03">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME" type="epoch_us" isNullable="true" optional="true">
-      <description>StartTime</description>
+    <attribute side="server" code="0x0001" name="StartTime" define="MEDIA_PLAYBACK_START_TIME" type="epoch_us" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="AS"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION" type="int64u" isNullable="true" optional="true">
-      <description>Duration</description>
+    <attribute side="server" code="0x0002" name="Duration" define="MEDIA_PLAYBACK_DURATION" type="int64u" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="AS"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION" type="PlaybackPositionStruct" isNullable="true" optional="true">
-      <description>SampledPosition</description>
+    <attribute side="server" code="0x0003" name="SampledPosition" define="MEDIA_PLAYBACK_PLAYBACK_POSITION" type="PlaybackPositionStruct" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="AS"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0004" define="MEDIA_PLAYBACK_PLAYBACK_SPEED" type="single" default="0" optional="true">
-      <description>PlaybackSpeed</description>
+    <attribute side="server" code="0x0004" name="PlaybackSpeed" define="MEDIA_PLAYBACK_PLAYBACK_SPEED" type="single" default="0" optional="true">
       <mandatoryConform>
         <feature name="AS"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0005" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END" type="int64u" isNullable="true" optional="true">
-      <description>SeekRangeEnd</description>
+    <attribute side="server" code="0x0005" name="SeekRangeEnd" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END" type="int64u" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="AS"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0006" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="int64u" isNullable="true" optional="true">
-      <description>SeekRangeStart</description>
+    <attribute side="server" code="0x0006" name="SeekRangeStart" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="int64u" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="AS"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0007" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_AUDIO_TRACK" optional="true" type="TrackStruct" isNullable="true">
-      <description>ActiveAudioTrack</description>
+    <attribute side="server" code="0x0007" name="ActiveAudioTrack" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_AUDIO_TRACK" optional="true" type="TrackStruct" isNullable="true">
       <mandatoryConform>
         <feature name="AT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0008" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_AUDIO_TRACKS" optional="true" type="array" entryType="TrackStruct" isNullable="true">
-      <description>AvailableAudioTracks</description>
+    <attribute side="server" code="0x0008" name="AvailableAudioTracks" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_AUDIO_TRACKS" optional="true" type="array" entryType="TrackStruct" isNullable="true">
       <mandatoryConform>
         <feature name="AT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0009" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_TEXT_TRACK" optional="true" type="TrackStruct" isNullable="true">
-      <description>ActiveTextTrack</description>
+    <attribute side="server" code="0x0009" name="ActiveTextTrack" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_TEXT_TRACK" optional="true" type="TrackStruct" isNullable="true">
       <mandatoryConform>
         <feature name="TT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x000A" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_TEXT_TRACKS" optional="true" type="array" entryType="TrackStruct" isNullable="true">
-      <description>AvailableTextTracks</description>
+    <attribute side="server" code="0x000A" name="AvailableTextTracks" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_TEXT_TRACKS" optional="true" type="array" entryType="TrackStruct" isNullable="true">
       <mandatoryConform>
         <feature name="TT"/>
       </mandatoryConform>

@@ -57,12 +57,10 @@ limitations under the License.
     </features>
 
     <!-- Base data types -->
-    <attribute side="server" code="0x0000" define="SUPPORTED_MODES" type="array" entryType="ModeOptionStruct" length="255">
-      <description>SupportedModes</description>
+    <attribute side="server" code="0x0000" name="SupportedModes" define="SUPPORTED_MODES" type="array" entryType="ModeOptionStruct" length="255">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_MODE" type="int8u" reportable="true">
-      <description>CurrentMode</description>
+    <attribute side="server" code="0x0001" name="CurrentMode" define="CURRENT_MODE" type="int8u" reportable="true">
       <mandatoryConform/>
     </attribute>
     <attribute side="server" code="0x0002" define="START_UP_MODE"    type="int8u"                              writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>

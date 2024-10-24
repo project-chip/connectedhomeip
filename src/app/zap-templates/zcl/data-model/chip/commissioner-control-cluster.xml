@@ -32,8 +32,7 @@ limitations under the License.
 
     <!-- cluster revision -->
     <globalAttribute side="either" code="0xFFFD" value="1"/>
-    <attribute side="server" code="0x0000" define="SUPPORTED_DEVICE_CATEGORIES" type="SupportedDeviceCategoryBitmap" default="0" min="0x00000000" max="0x00000001">
-      <description>SupportedDeviceCategories</description>
+    <attribute side="server" code="0x0000" name="SupportedDeviceCategories" define="SUPPORTED_DEVICE_CATEGORIES" type="SupportedDeviceCategoryBitmap" default="0" min="0x00000000" max="0x00000001">
       <access op="read" privilege="manage"/>
       <mandatoryConform/>
     </attribute>

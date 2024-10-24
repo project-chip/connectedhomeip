@@ -58,20 +58,17 @@ limitations under the License.
       </features>
 
     <!-- Base data types -->
-    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormatEnum" writable="true">
-      <description>HourFormat</description>
+    <attribute side="server" code="0x00" name="HourFormat" define="HOUR_FORMAT" type="HourFormatEnum" writable="true">
       <access op="write" role="manage"/>
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x01" define="ACTIVE_CALENDAR_TYPE" type="CalendarTypeEnum" writable="true" optional="true">
-      <description>ActiveCalendarType</description>
+    <attribute side="server" code="0x01" name="ActiveCalendarType" define="ACTIVE_CALENDAR_TYPE" type="CalendarTypeEnum" writable="true" optional="true">
       <access op="write" role="manage"/>
       <mandatoryConform>
         <feature name="CALFMT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="array" entryType="CalendarTypeEnum" optional="true">
-      <description>SupportedCalendarTypes</description>
+    <attribute side="server" code="0x02" name="SupportedCalendarTypes" define="SUPPORTED_CALENDAR_TYPES" type="array" entryType="CalendarTypeEnum" optional="true">
       <mandatoryConform>
         <feature name="CALFMT"/>
       </mandatoryConform>
