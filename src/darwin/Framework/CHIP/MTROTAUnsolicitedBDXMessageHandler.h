@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import "MTROTAImageTransferHandler.h"
+#import <Foundation/Foundation.h>
 
 #include <lib/core/CHIPError.h>
 #include <messaging/ExchangeMgr.h>
@@ -42,7 +42,7 @@ public:
         sInstance = this;
     }
 
-    ~MTROTAUnsolicitedBDXMessageHandler() { mExchangeMgr = nullptr;}
+    ~MTROTAUnsolicitedBDXMessageHandler() { mExchangeMgr = nullptr; }
 
     static MTROTAUnsolicitedBDXMessageHandler * GetInstance();
 
@@ -50,7 +50,6 @@ public:
 
     // Returns the number of delegates that are currently handling BDX transfers.
     static uint8_t GetNumberOfDelegates();
-
 
     static void IncrementNumberOfDelegates();
 
@@ -79,7 +78,6 @@ private:
     static inline uint8_t mNumberOfDelegates = 0;
 
     static MTROTAUnsolicitedBDXMessageHandler * sInstance;
-
 };
 
 NS_ASSUME_NONNULL_END

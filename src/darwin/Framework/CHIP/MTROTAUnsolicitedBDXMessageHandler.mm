@@ -50,12 +50,10 @@ void MTROTAUnsolicitedBDXMessageHandler::Shutdown()
     mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
     MTROTAUnsolicitedBDXMessageHandler::mNumberOfDelegates = 0;
 
-    if (mOTAImageTransferHandler != nullptr)
-    {
+    if (mOTAImageTransferHandler != nullptr) {
         mOTAImageTransferHandler->DestroySelf();
         delete mOTAImageTransferHandler;
     }
-
 }
 
 void MTROTAUnsolicitedBDXMessageHandler::ControllerShuttingDown(MTRDeviceController * controller)
@@ -137,8 +135,7 @@ void MTROTAUnsolicitedBDXMessageHandler::OnDelegateDestroyed(void * imageTransfe
     assertChipStackLockedByCurrentThread();
 
     // TODO: #36181 - Remove the object matching imageTransferHandler in the set of MTROTAImageTransferHandler objects.
-    if (mOTAImageTransferHandler == static_cast<MTROTAImageTransferHandler *>(imageTransferHandler))
-    {
+    if (mOTAImageTransferHandler == static_cast<MTROTAImageTransferHandler *>(imageTransferHandler)) {
         mOTAImageTransferHandler = nullptr;
     }
     MTROTAUnsolicitedBDXMessageHandler::DecrementNumberOfDelegates();

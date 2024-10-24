@@ -45,9 +45,9 @@ CHIP_ERROR AsyncTransferFacilitator::Init(System::Layer * layer, Messaging::Exch
 
     mSystemLayer = layer;
     mExchange.Grab(exchangeCtx);
-    mTimeout = timeout;
+    mTimeout                = timeout;
     mProcessingOutputEvents = false;
-    mDestroySelf = false;
+    mDestroySelf            = false;
     return CHIP_NO_ERROR;
 }
 
@@ -178,7 +178,8 @@ CHIP_ERROR AsyncResponder::Init(System::Layer * layer, Messaging::ExchangeContex
 
 void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEvent & event, CHIP_ERROR status)
 {
-    ChipLogDetail(BDX, "NotifyEventHandled : Event %s Error %" CHIP_ERROR_FORMAT, TransferSession::OutputEvent::TypeToString(event.EventType), status.Format());
+    ChipLogDetail(BDX, "NotifyEventHandled : Event %s Error %" CHIP_ERROR_FORMAT,
+                  TransferSession::OutputEvent::TypeToString(event.EventType), status.Format());
 
     // If it's a message indicating either the end of the transfer or a timeout reported by the transfer session
     // or an error occured, we need to call DestroySelf().

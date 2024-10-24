@@ -34,16 +34,15 @@ constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
 @interface MTROTAImageTransferHandlerWrapper : NSObject
 - (instancetype)initWithMTROTAImageTransferHandler:(MTROTAImageTransferHandler *)otaImageTransferHandler;
-@property(nonatomic, nullable, readwrite, assign) MTROTAImageTransferHandler * otaImageTransferHandler;
+@property (nonatomic, nullable, readwrite, assign) MTROTAImageTransferHandler * otaImageTransferHandler;
 @end
 
 @implementation MTROTAImageTransferHandlerWrapper
 
 - (instancetype)initWithMTROTAImageTransferHandler:(MTROTAImageTransferHandler *)otaImageTransferHandler
 {
-    if (self = [super init])
-    {
-        _otaImageTransferHandler =  otaImageTransferHandler;
+    if (self = [super init]) {
+        _otaImageTransferHandler = otaImageTransferHandler;
     }
     return self;
 }
@@ -108,18 +107,16 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
     auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
     VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
-    MTROTAImageTransferHandlerWrapper * __weak weakWrapper =  mOTAImageTransferHandlerWrapper;
+    MTROTAImageTransferHandlerWrapper * __weak weakWrapper = mOTAImageTransferHandlerWrapper;
 
     auto completionHandler = ^(NSError * _Nullable error) {
-
         [controller
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
 
                 // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
                 MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
-                if (!strongWrapper || !strongWrapper.otaImageTransferHandler)
-                {
+                if (!strongWrapper || !strongWrapper.otaImageTransferHandler) {
                     return;
                 }
 
@@ -233,18 +230,16 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent
     auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
     VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
-    MTROTAImageTransferHandlerWrapper * __weak weakWrapper =  mOTAImageTransferHandlerWrapper;
+    MTROTAImageTransferHandlerWrapper * __weak weakWrapper = mOTAImageTransferHandlerWrapper;
 
     auto completionHandler = ^(NSData * _Nullable data, BOOL isEOF) {
-
         [controller
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
 
                 // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
                 MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
-                if (!strongWrapper || !strongWrapper.otaImageTransferHandler)
-                {
+                if (!strongWrapper || !strongWrapper.otaImageTransferHandler) {
                     return;
                 }
 
