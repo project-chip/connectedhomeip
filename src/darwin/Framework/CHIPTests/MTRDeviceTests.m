@@ -27,6 +27,7 @@
 #import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRDeviceClusterData.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
@@ -1505,7 +1506,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [device unitTestInjectEventReport:@[ @{
             MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(1)],
             MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
-            MTREventTimestampDateKey : [NSDate date]
+            MTREventTimestampDateKey : [NSDate date],
+            MTREventIsHistoricalKey : @(NO),
+            MTREventPriorityKey : @(MTREventPriorityInfo),
+            MTREventNumberKey : @(1), // Doesn't matter, in practice
+            MTRDataKey : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[],
+            },
         } ]];
 #endif
     };
@@ -4139,7 +4147,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
         MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
         MTREventTimestampDateKey : [NSDate date],
-        // For unit test no real data is needed, but timestamp is required
+        MTREventIsHistoricalKey : @(NO),
+        MTREventPriorityKey : @(MTREventPriorityInfo),
+        MTREventNumberKey : @(1), // Doesn't matter, in practice
+        // Empty payload.
+        MTRDataKey : @ {
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[],
+        },
     };
 }
 
@@ -5187,111 +5202,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
 }
 
-- (void)test042_StructuralValidityChecker
+- (void)test042_AttributeReportWellFormedness
 {
     __auto_type * testData = @[
         @{
-            @"input" : @ {
-                MTRTypeKey : MTRSignedIntegerValueType,
-                MTRValueKey : @(-5),
-            },
-            @"structure" : MTRInputStructureDataValue,
+            @"input" : @[],
             @"valid" : @(YES),
-        },
-        @{
-            @"input" : @(5),
-            @"structure" : NSNumber.class,
-            @"valid" : @(YES),
-        },
-        @{
-            @"input" : @("abc"),
-            @"structure" : NSNumber.class,
-            @"valid" : @(NO),
-        },
-        @{
-            @"input" : @("abc"),
-            @"structure" : NSString.class,
-            @"valid" : @(YES),
-        },
-        @{
-            @"input" : @[
-                @("abc"),
-                @("def"),
-            ],
-            @"structure" : @[ NSString.class ],
-            @"valid" : @(YES),
-        },
-        @{
-            @"input" : @[
-                @("abc"),
-                @(5),
-            ],
-            @"structure" : @[ NSString.class ],
-            @"valid" : @(NO),
-        },
-        @{
-            @"input" : @ {
-                @"a" : @(5),
-                @"b" : @("def"),
-            },
-            @"structure" : @ {
-                @"a" : NSNumber.class,
-                @"b" : NSString.class,
-            },
-            @"valid" : @(YES),
-        },
-        @{
-            @"input" : @ {
-                @"a" : @(5),
-            },
-            @"structure" : @ {
-                @"a" : NSNumber.class,
-                @"b" : NSString.class,
-            },
-            // Validation for "b" fails.
-            @"valid" : @(NO),
-        },
-        @{
-            @"input" : @ {
-                @"a" : @(5),
-                @"b" : @("def"),
-                @"c" : [NSData data],
-            },
-            @"structure" : @ {
-                @"a" : NSNumber.class,
-                @"b" : NSString.class,
-            },
-            // Extra keys in input are OK, if we are not planning to touch them.
-            @"valid" : @(YES),
-        },
-        @{
-            @"input" : @ {
-                MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
-                MTRDataKey : @ {
-                    MTRTypeKey : MTRBooleanValueType,
-                    MTRValueKey : @(YES),
-                },
-            },
-            @"structure" : @ {
-                MTRAttributePathKey : MTRAttributePath.class,
-                MTRDataKey : MTRInputStructureDataValue
-            },
-            @"valid" : @(YES),
-        },
-        @{
-            @"input" : @ {
-                MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
-                MTRDataKey : @ {
-                    MTRTypeKey : MTRBooleanValueType,
-                    MTRValueKey : @(YES),
-                },
-            },
-            @"structure" : @ {
-                MTREventPathKey : MTREventPath.class,
-                MTRDataKey : MTRInputStructureDataValue
-            },
-            // No MTREventPathKey in input.
-            @"valid" : @(NO),
         },
         @{
             @"input" : @[
@@ -5303,7 +5219,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     },
                 },
             ],
-            @"structure" : MTRInputStructureAttributeReport,
             @"valid" : @(YES),
         },
         @{
@@ -5320,7 +5235,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
                 },
             ],
-            @"structure" : MTRInputStructureAttributeReport,
             @"valid" : @(YES),
         },
         @{
@@ -5333,10 +5247,38 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
                 },
             ],
-            @"structure" : MTRInputStructureAttributeReport,
-            // Missing error or data
+            // Missing both error and data
             @"valid" : @(NO),
         },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @("abc"),
+                    },
+                },
+            ],
+            // Data dictionary is broken.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {},
+            // Input is not an array.
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTRAttributeReportIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
+}
+
+- (void)test043_EventReportWellFormedness
+{
+    __auto_type * testData = @[
         @{
             @"input" : @[
                 @{
@@ -5345,7 +5287,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTREventIsHistoricalKey : @(NO),
                 },
             ],
-            @"structure" : MTRInputStructureEventReport,
             @"valid" : @(YES),
         },
         @{
@@ -5363,7 +5304,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTREventIsHistoricalKey : @(NO),
                 },
             ],
-            @"structure" : MTRInputStructureEventReport,
             @"valid" : @(YES),
         },
         @{
@@ -5381,7 +5321,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTREventIsHistoricalKey : @(NO),
                 },
             ],
-            @"structure" : MTRInputStructureEventReport,
             @"valid" : @(YES),
         },
         @{
@@ -5399,7 +5338,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTREventIsHistoricalKey : @(NO),
                 },
             ],
-            @"structure" : MTRInputStructureEventReport,
             // Wrong date type
             @"valid" : @(NO),
         },
@@ -5418,7 +5356,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTREventIsHistoricalKey : @(NO),
                 },
             ],
-            @"structure" : MTRInputStructureEventReport,
             // Wrong type of EventNumber
             @"valid" : @(NO),
         },
@@ -5437,7 +5374,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTREventIsHistoricalKey : @(NO),
                 },
             ],
-            @"structure" : MTRInputStructureEventReport,
             // Wrong type of EventPriority
             @"valid" : @(NO),
         },
@@ -5456,23 +5392,36 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTREventIsHistoricalKey : @(NO),
                 },
             ],
-            @"structure" : MTRInputStructureEventReport,
             // Wrong type of EventTimeType
             @"valid" : @(NO),
         },
         @{
             @"input" : @[ @(5) ],
-            @"structure" : MTRInputStructureEventReport,
             // Wrong type of data entirely.
             @"valid" : @(NO),
         },
+        @{
+            @"input" : @ {},
+            // Not even an array.
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTREventReportIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
+}
+
+- (void)test044_InvokeResponseWellFormedness
+{
+    __auto_type * testData = @[
         @{
             @"input" : @[
                 @{
                     MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
                 },
             ],
-            @"structure" : MTRInputStructureInvokeResponse,
             @"valid" : @(YES),
         },
         @{
@@ -5484,7 +5433,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
                 },
             ],
-            @"structure" : MTRInputStructureInvokeResponse,
             // Multiple responses
             @"valid" : @(NO),
         },
@@ -5495,7 +5443,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
                 },
             ],
-            @"structure" : MTRInputStructureInvokeResponse,
             @"valid" : @(YES),
         },
         @{
@@ -5508,7 +5455,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     },
                 },
             ],
-            @"structure" : MTRInputStructureInvokeResponse,
             @"valid" : @(YES),
         },
         @{
@@ -5522,7 +5468,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
                 },
             ],
-            @"structure" : MTRInputStructureInvokeResponse,
             // Having both data and error not valid.
             @"valid" : @(NO),
         },
@@ -5536,7 +5481,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     },
                 },
             ],
-            @"structure" : MTRInputStructureInvokeResponse,
             // Data is not a struct.
             @"valid" : @(NO),
         },
@@ -5547,15 +5491,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     MTRDataKey : @(6),
                 },
             ],
-            @"structure" : MTRInputStructureInvokeResponse,
             // Data is not a data-value at all..
             @"valid" : @(NO),
         },
     ];
 
     for (NSDictionary * test in testData) {
-        XCTAssertEqual(MTRInputIsStructurallyValid(test[@"input"], test[@"structure"]), [test[@"valid"] boolValue],
-            "input: %@, structure: %@", test[@"input"], test[@"structure"]);
+        XCTAssertEqual(MTRInvokeResponseIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
     }
 }
 

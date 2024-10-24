@@ -31,7 +31,7 @@
 #import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerOverXPC.h"
 #import "MTRDeviceController_Internal.h"
-#import "MTRDeviceDataValueDictionary.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -1887,9 +1887,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 }
 
 // BEGIN DRAGON: This is used by the XPC Server to inject reports into local cache and broadcast them
-- (void)_injectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
+- (void)_injectAttributeReport:(NSArray<MTRDeviceResponseValueDictionary> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
-    if (!MTRInputIsStructurallyValid(attributeReport, @"attribute-report")) {
+    if (!MTRAttributeReportIsWellFormed(attributeReport)) {
+        MTR_LOG_ERROR("%@ injected attribute report is not well-formed: %@", self, attributeReport);
         return;
     }
 
@@ -1903,9 +1904,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     } errorHandler:nil];
 }
 
-- (void)_injectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+- (void)_injectEventReport:(NSArray<MTRDeviceResponseValueDictionary> *)eventReport
 {
-    if (!MTRInputIsStructurallyValid(eventReport, @"event-report")) {
+    if (!MTREventReportIsWellFormed(eventReport)) {
+        MTR_LOG_ERROR("%@ injected event report is not well-formed: %@", self, eventReport);
         return;
     }
 
