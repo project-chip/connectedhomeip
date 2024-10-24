@@ -9689,6 +9689,95 @@
       watchOS: "11.2"
       tvOS: "18.2"
   introduced:
+      clusters:
+          - MicrowaveOvenControl
+          - MicrowaveOvenMode
+          - OvenMode
+          - OvenCavityOperationalState
+      attributes:
+          MicrowaveOvenControl:
+              - CookTime
+              - MaxCookTime
+              - PowerSetting
+              - MinPower
+              - MaxPower
+              - PowerStep
+              # SupportedWatts and SelectedWattIndex are Provisional because WATTS is Provisional in Matter 1.3
+              # WATTS is provisional in 1.3 because no one has submitted a DUT for it
+              - WattRating
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          MicrowaveOvenMode:
+              - SupportedModes
+              - CurrentMode
+              - StartUpMode
+              - OnMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OvenMode:
+              - SupportedModes
+              - CurrentMode
+              - StartUpMode
+              - OnMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OvenCavityOperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+      commands:
+          MicrowaveOvenControl:
+              - SetCookingParameters
+              - AddMoreTime
+          MicrowaveOvenMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          OvenMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          OvenCavityOperationalState:
+              - Pause
+              - Stop
+              - Start
+              - Resume
+              - OperationalCommandResponse
+      command fields:
+          MicrowaveOvenControl:
+              SetCookingParameters:
+                  - cookMode
+                  - cookTime
+                  - powerSetting
+                  # wattSettingIndex is provisional because WATTS is provisional in Matter 1.3
+                  # WATTS is provisional in 1.3 because no one has submitted a DUT for it
+                  - startAfterSetting
+              AddMoreTime:
+                  - timeToAdd
+          OvenMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          OvenCavityOperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
       enums:
           ColorControl:
               - DirectionEnum
@@ -9696,6 +9785,60 @@
               - EnhancedColorModeEnum
               - MoveModeEnum
               - StepModeEnum
+          MicrowaveOvenMode:
+              - ModeTag
+          OvenMode:
+              - ModeTag
+          OvenCavityOperationalState:
+              - ErrorStateEnum
+              - OperationalStateEnum
+      structs:
+          MicrowaveOvenMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+          OvenMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+          OvenCavityOperationalState:
+              - ErrorStateStruct
+              - OperationalStateStruct
+      struct fields:
+          MicrowaveOvenMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+          OvenMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+          OvenCavityOperationalState:
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+      events:
+          OvenCavityOperationalState:
+              - OperationalError
+              - OperationCompletion
+      event fields:
+          OvenCavityOperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
       enum values:
           ColorControl:
               ColorLoopDirectionEnum:
@@ -9726,11 +9869,44 @@
               StepModeEnum:
                   - Up
                   - Down
+          MicrowaveOvenMode:
+              ModeTag:
+                  - Normal
+                  - Defrost
+          OvenMode:
+              ModeTag:
+                  - Bake
+                  - Convection
+                  - Grill
+                  - Roast
+                  - Clean
+                  - ConvectionBake
+                  - ConvectionRoast
+                  - Warming
+                  - Proofing
+                  - Steam
+          OvenCavityOperationalState:
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
       bitmaps:
           ColorControl:
               - ColorCapabilitiesBitmap
               - OptionsBitmap
               - UpdateFlagsBitmap
+          MicrowaveOvenControl:
+              - Feature
+          MicrowaveOvenMode:
+              - Feature
+          OvenMode:
+              - Feature
       bitmap values:
           ColorControl:
               ColorCapabilitiesBitmap:
@@ -9746,6 +9922,18 @@
                   - UpdateDirection
                   - UpdateTime
                   - UpdateStartHue
+          MicrowaveOvenControl:
+              Feature:
+                  - PowerAsNumber
+                  # PowerInWatts is provisional because WATTS is provisional in Matter 1.3
+                  # WATTS is provisional in 1.3 because no one has submitted a DUT for it
+                  - PowerNumberLimits
+          MicrowaveOvenMode:
+              Feature:
+                  - OnOff
+          OvenMode:
+              Feature:
+                  - OnOff
       device types:
           - AirQualitySensor
           - AirPurifier
