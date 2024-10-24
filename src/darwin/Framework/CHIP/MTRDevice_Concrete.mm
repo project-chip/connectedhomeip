@@ -488,6 +488,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return properties;
 }
 
+- (nullable NSNumber *)vendorID
+{
+    std::lock_guard lock(_descriptionLock);
+    return [_vid copy];
+}
+
+- (nullable NSNumber *)productID
+{
+    std::lock_guard lock(_descriptionLock);
+    return [_pid copy];
+}
+
 - (void)_notifyDelegateOfPrivateInternalPropertiesChanges
 {
     os_unfair_lock_assert_owner(&self->_lock);

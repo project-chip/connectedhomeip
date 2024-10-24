@@ -131,6 +131,16 @@
         _deviceController.uniqueIdentifier];
 }
 
+- (nullable NSNumber *)vendorID
+{
+    return [[self._internalState objectForKey:kMTRDeviceInternalPropertyKeyVendorID] copy];
+}
+
+- (nullable NSNumber *)productID
+{
+    return [[self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID] copy];
+}
+
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
 // required methods for MTRDeviceDelegates
