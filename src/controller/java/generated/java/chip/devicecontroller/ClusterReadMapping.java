@@ -18340,17 +18340,17 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementRateDistortionTradeOffPointsCommandParams
         );
         result.put("readRateDistortionTradeOffPointsAttribute", readCameraAvStreamManagementRateDistortionTradeOffPointsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementMaxPreRollBufferSizeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementMaxPreRollBufferSizeAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readCameraAvStreamManagementMaxContentBufferSizeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCameraAvStreamManagementMaxContentBufferSizeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readMaxPreRollBufferSizeAttribute(
+            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readMaxContentBufferSizeAttribute(
               (ChipClusters.LongAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readCameraAvStreamManagementMaxPreRollBufferSizeCommandParams
+          readCameraAvStreamManagementMaxContentBufferSizeCommandParams
         );
-        result.put("readMaxPreRollBufferSizeAttribute", readCameraAvStreamManagementMaxPreRollBufferSizeAttributeInteractionInfo);
+        result.put("readMaxContentBufferSizeAttribute", readCameraAvStreamManagementMaxContentBufferSizeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementTwoWayTalkSupportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementTwoWayTalkSupportAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
