@@ -82,7 +82,6 @@
     "DeviceManagement": [
         "Test_TC_BINFO_3_1",
         "Test_TC_OPCREDS_3_1",
-        "Test_TC_OPCREDS_3_2",
         "Test_TC_OPCREDS_3_3",
         "Test_TC_OPCREDS_3_4",
         "Test_TC_OPCREDS_3_5",
