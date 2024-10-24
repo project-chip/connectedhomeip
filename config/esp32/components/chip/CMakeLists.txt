@@ -432,7 +432,7 @@ set(target_name "${idf_target}")
 
 if(CONFIG_BT_ENABLED)
     idf_component_get_property(bt_lib bt COMPONENT_LIB)
-    if((target_name STREQUAL "esp32h2") OR (target_name STREQUAL "esp32c2") OR (target_name STREQUAL "esp32c6"))
+    if((target_name STREQUAL "esp32h2") OR (target_name STREQUAL "esp32c2") OR (target_name STREQUAL "esp32c6") OR (target_name STREQUAL "esp32c5"))
         idf_component_get_property(bt_dir bt COMPONENT_DIR)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
         list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a")

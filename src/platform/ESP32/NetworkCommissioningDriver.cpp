@@ -477,6 +477,9 @@ void ESPWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callb
 uint32_t ESPWiFiDriver::GetSupportedWiFiBandsMask() const
 {
     uint32_t bands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
+#if CONFIG_SOC_WIFI_SUPPORT_5G
+    bands |= static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k5g));
+#endif
     return bands;
 }
 
