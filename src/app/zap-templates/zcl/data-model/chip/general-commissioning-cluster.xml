@@ -52,30 +52,24 @@ limitations under the License.
         </otherwiseConform>
       </feature>
     </features>
-    <attribute side="server" code="0x00" define="BREADCRUMB" type="int64u" writable="true" default="0x0000000000000000" optional="false">
-      <description>Breadcrumb</description>
+    <attribute side="server" code="0x00" name="Breadcrumb" define="BREADCRUMB" type="int64u" writable="true" default="0x0000000000000000" optional="false">
       <access op="read" privilege="view"/>
       <access op="write" privilege="administer"/>
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x01" define="BASIC_COMMISSIONING_INFO" type="BasicCommissioningInfo">
-      <description>BasicCommissioningInfo</description>
+    <attribute side="server" code="0x01" name="BasicCommissioningInfo" define="BASIC_COMMISSIONING_INFO" type="BasicCommissioningInfo">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x02" define="REGULATORY_CONFIG" type="RegulatoryLocationTypeEnum">
-      <description>RegulatoryConfig</description>
+    <attribute side="server" code="0x02" name="RegulatoryConfig" define="REGULATORY_CONFIG" type="RegulatoryLocationTypeEnum">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x03" define="LOCATION_CAPABILITY" type="RegulatoryLocationTypeEnum">
-      <description>LocationCapability</description>
+    <attribute side="server" code="0x03" name="LocationCapability" define="LOCATION_CAPABILITY" type="RegulatoryLocationTypeEnum">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x04" define="SUPPORTS_CONCURRENT_CONNECTION" type="boolean" default="1">
-      <description>SupportsConcurrentConnection</description>
+    <attribute side="server" code="0x04" name="SupportsConcurrentConnection" define="SUPPORTS_CONCURRENT_CONNECTION" type="boolean" default="1">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x05" define="TC_ACCEPTED_VERSION" type="int16u" optional="true" apiMaturity="provisional">
-      <description>TCAcceptedVersion</description>
+    <attribute side="server" code="0x05" name="TCAcceptedVersion" define="TC_ACCEPTED_VERSION" type="int16u" optional="true" apiMaturity="provisional">
       <access op="read" privilege="administer"/>
       <otherwiseConform>
         <provisionalConform/>
@@ -84,8 +78,7 @@ limitations under the License.
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x06" define="TC_MIN_REQUIRED_VERSION" type="int16u" writable="false" optional="true" apiMaturity="provisional">
-      <description>TCMinRequiredVersion</description>
+    <attribute side="server" code="0x06" name="TCMinRequiredVersion" define="TC_MIN_REQUIRED_VERSION" type="int16u" writable="false" optional="true" apiMaturity="provisional">
       <access op="read" privilege="administer"/>
       <otherwiseConform>
         <provisionalConform/>
@@ -94,8 +87,7 @@ limitations under the License.
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x07" define="TC_ACKNOWLEDGEMENTS" type="bitmap16" writable="false" default="0x0000" optional="true" apiMaturity="provisional">
-      <description>TCAcknowledgements</description>
+    <attribute side="server" code="0x07" name="TCAcknowledgements" define="TC_ACKNOWLEDGEMENTS" type="bitmap16" writable="false" default="0x0000" optional="true" apiMaturity="provisional">
       <access op="read" privilege="administer"/>
       <otherwiseConform>
         <provisionalConform/>
@@ -104,8 +96,7 @@ limitations under the License.
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x08" define="TC_ACKNOWLEDGEMENTS_REQUIRED" type="boolean" writable="false" optional="true" apiMaturity="provisional">
-      <description>TCAcknowledgementsRequired</description>
+    <attribute side="server" code="0x08" name="TCAcknowledgementsRequired" define="TC_ACKNOWLEDGEMENTS_REQUIRED" type="boolean" writable="false" optional="true" apiMaturity="provisional">
       <access op="read" privilege="administer"/>
       <otherwiseConform>
         <provisionalConform/>
@@ -114,8 +105,7 @@ limitations under the License.
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x09" define="TC_UPDATE_DEADLINE" type="int32u" writable="false" optional="true" apiMaturity="provisional">
-      <description>TCUpdateDeadline</description>
+    <attribute side="server" code="0x09" name="TCUpdateDeadline" define="TC_UPDATE_DEADLINE" type="int32u" writable="false" optional="true" apiMaturity="provisional">
       <access op="read" privilege="administer"/>
       <otherwiseConform>
         <provisionalConform/>

@@ -109,15 +109,13 @@ limitations under the License.
       and enforce Access Control for the Node&apos;s endpoints and their associated
       cluster instances.</description>
 
-    <attribute side="server" code="0x0000" define="ACL" type="array" entryType="AccessControlEntryStruct" writable="true">
-      <description>ACL</description>
+    <attribute side="server" code="0x0000" name="ACL" define="ACL" type="array" entryType="AccessControlEntryStruct" writable="true">
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
       <mandatoryConform/>
     </attribute>
 
-    <attribute side="server" code="0x0001" define="EXTENSION" type="array" entryType="AccessControlExtensionStruct" writable="true" optional="true">
-      <description>Extension</description>
+    <attribute side="server" code="0x0001" name="Extension" define="EXTENSION" type="array" entryType="AccessControlExtensionStruct" writable="true" optional="true">
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
       <mandatoryConform>
@@ -125,26 +123,21 @@ limitations under the License.
       </mandatoryConform>
     </attribute>
 
-    <attribute side="server" code="0x0002" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="4" default="4">
-      <description>SubjectsPerAccessControlEntry</description>
+    <attribute side="server" code="0x0002" name="SubjectsPerAccessControlEntry" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="4" default="4">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0003" define="TARGETS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="3" default="3">
-      <description>TargetsPerAccessControlEntry</description>
+    <attribute side="server" code="0x0003" name="TargetsPerAccessControlEntry" define="TARGETS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="3" default="3">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0004" define="ACCESS_CONTROL_ENTRIES_PER_FABRIC" type="int16u" min="4" default="4">
-      <description>AccessControlEntriesPerFabric</description>
+    <attribute side="server" code="0x0004" name="AccessControlEntriesPerFabric" define="ACCESS_CONTROL_ENTRIES_PER_FABRIC" type="int16u" min="4" default="4">
       <mandatoryConform/>
     </attribute>
-    <attribute code="0x0005" side="server" define="COMMISSIONING_ARL" type="array" entryType="CommissioningAccessRestrictionEntryStruct" optional="true">
-      <description>CommissioningARL</description>
+    <attribute code="0x0005" side="server" name="CommissioningARL" define="COMMISSIONING_ARL" type="array" entryType="CommissioningAccessRestrictionEntryStruct" optional="true">
       <mandatoryConform>
         <feature name="MNGD"/>
       </mandatoryConform>
     </attribute>
-    <attribute code="0x0006" side="server" define="ARL" type="array" entryType="AccessRestrictionEntryStruct" optional="true">
-      <description>ARL</description>
+    <attribute code="0x0006" side="server" name="ARL" define="ARL" type="array" entryType="AccessRestrictionEntryStruct" optional="true">
       <mandatoryConform>
         <feature name="MNGD"/>
       </mandatoryConform>

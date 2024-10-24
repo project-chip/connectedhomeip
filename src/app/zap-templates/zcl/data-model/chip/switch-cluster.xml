@@ -78,16 +78,13 @@ Interactions with the switch device are exposed as attributes (for the latching 
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="NUMBER_OF_POSITIONS" type="int8u" default="2" min="2">
-      <description>NumberOfPositions</description>
+    <attribute side="server" code="0x0000" name="NumberOfPositions" define="NUMBER_OF_POSITIONS" type="int8u" default="2" min="2">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_POSITION" type="int8u" reportable="true">
-      <description>CurrentPosition</description>
+    <attribute side="server" code="0x0001" name="CurrentPosition" define="CURRENT_POSITION" type="int8u" reportable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0002" define="MULTI_PRESS_MAX" type="int8u" optional="true" default="2" min="2">
-      <description>MultiPressMax</description>
+    <attribute side="server" code="0x0002" name="MultiPressMax" define="MULTI_PRESS_MAX" type="int8u" optional="true" default="2" min="2">
       <mandatoryConform>
         <feature name="MSM"/>
       </mandatoryConform>

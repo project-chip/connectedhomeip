@@ -61,28 +61,22 @@ limitations under the License.
     
     <globalAttribute side="either" code="0xFFFD" value="1"/>
     
-    <attribute side="server" code="0x0000" define="PHASE_LIST" type="array" entryType="char_string" isNullable="true">
-      <description>PhaseList</description>
+    <attribute side="server" code="0x0000" name="PhaseList" define="PHASE_LIST" type="array" entryType="char_string" isNullable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_PHASE" type="int8u" min="0x00" max="0x1F" isNullable="true">
-      <description>CurrentPhase</description>
+    <attribute side="server" code="0x0001" name="CurrentPhase" define="CURRENT_PHASE" type="int8u" min="0x00" max="0x1F" isNullable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME" type="elapsed_s" min="0x00" max="259200" isNullable="true" optional="true">
-      <description>CountdownTime</description>
+    <attribute side="server" code="0x0002" name="CountdownTime" define="COUNTDOWN_TIME" type="elapsed_s" min="0x00" max="259200" isNullable="true" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST" type="array" entryType="OperationalStateStruct">
-      <description>OperationalStateList</description>
+    <attribute side="server" code="0x0003" name="OperationalStateList" define="OPERATIONAL_STATE_LIST" type="array" entryType="OperationalStateStruct">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0004" define="OPERATIONAL_STATE" type="OperationalStateEnum">
-      <description>OperationalState</description>
+    <attribute side="server" code="0x0004" name="OperationalState" define="OPERATIONAL_STATE" type="OperationalStateEnum">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR" type="ErrorStateStruct">
-      <description>OperationalError</description>
+    <attribute side="server" code="0x0005" name="OperationalError" define="OPERATIONAL_ERROR" type="ErrorStateStruct">
       <mandatoryConform/>
     </attribute>
     

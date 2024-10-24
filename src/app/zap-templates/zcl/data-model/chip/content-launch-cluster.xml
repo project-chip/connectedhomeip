@@ -26,14 +26,12 @@ limitations under the License.
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
     
-    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER" type="array" entryType="char_string" length="254" optional="true">
-      <description>AcceptHeader</description>
+    <attribute side="server" code="0x0000" name="AcceptHeader" define="CONTENT_LAUNCHER_ACCEPT_HEADER" type="array" entryType="char_string" length="254" optional="true">
       <mandatoryConform>
         <feature name="UP"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0" optional="true">
-      <description>SupportedStreamingProtocols</description>
+    <attribute side="server" code="0x0001" name="SupportedStreamingProtocols" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0" optional="true">
       <mandatoryConform>
         <feature name="UP"/>
       </mandatoryConform>

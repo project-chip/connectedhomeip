@@ -82,30 +82,25 @@ limitations under the License.
       </feature>
     </features>
     
-    <attribute side="server" code="0x0000" define="ON_OFF" type="boolean" default="0" reportable="true">
-      <description>OnOff</description>
+    <attribute side="server" code="0x0000" name="OnOff" define="ON_OFF" type="boolean" default="0" reportable="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x4000" define="GLOBAL_SCENE_CONTROL" type="boolean" default="1" optional="true">
-      <description>GlobalSceneControl</description>
+    <attribute side="server" code="0x4000" name="GlobalSceneControl" define="GLOBAL_SCENE_CONTROL" type="boolean" default="1" optional="true">
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x4001" define="ON_TIME" type="int16u" default="0" writable="true" optional="true">
-      <description>OnTime</description>
+    <attribute side="server" code="0x4001" name="OnTime" define="ON_TIME" type="int16u" default="0" writable="true" optional="true">
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x4002" define="OFF_WAIT_TIME" type="int16u" default="0" writable="true" optional="true">
-      <description>OffWaitTime</description>
+    <attribute side="server" code="0x4002" name="OffWaitTime" define="OFF_WAIT_TIME" type="int16u" default="0" writable="true" optional="true">
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x4003" define="START_UP_ON_OFF" type="StartUpOnOffEnum" min="0" max="2" isNullable="true" writable="true" optional="true">
-      <description>StartUpOnOff</description>
+    <attribute side="server" code="0x4003" name="StartUpOnOff" define="START_UP_ON_OFF" type="StartUpOnOffEnum" min="0" max="2" isNullable="true" writable="true" optional="true">
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
       <mandatoryConform>

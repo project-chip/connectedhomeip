@@ -91,12 +91,10 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="LIST_MESSAGES" type="array" entryType="MessageStruct" length="8">
-      <description>Messages</description>
+    <attribute side="server" code="0x0000" name="Messages" define="LIST_MESSAGES" type="array" entryType="MessageStruct" length="8">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="MESSAGES_CLUSTER_ACTIVE_MESSAGES_IDS" type="ARRAY" entryType="octet_string" max="8">
-      <description>ActiveMessageIDs</description>
+    <attribute side="server" code="0x0001" name="ActiveMessageIDs" define="MESSAGES_CLUSTER_ACTIVE_MESSAGES_IDS" type="ARRAY" entryType="octet_string" max="8">
       <mandatoryConform/>
     </attribute>
     <command source="client" code="0x00" name="PresentMessagesRequest" isFabricScoped="true" optional="false">

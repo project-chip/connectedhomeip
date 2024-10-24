@@ -31,12 +31,10 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST" type="array" entryType="OutputInfoStruct" length="254">
-      <description>OutputList</description>
+    <attribute side="server" code="0x0000" name="OutputList" define="AUDIO_OUTPUT_LIST" type="array" entryType="OutputInfoStruct" length="254">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="int8u">
-      <description>CurrentOutput</description>
+    <attribute side="server" code="0x0001" name="CurrentOutput" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="int8u">
       <mandatoryConform/>
     </attribute>
     

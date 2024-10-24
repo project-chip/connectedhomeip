@@ -26,8 +26,7 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
-    <attribute side="server" code="0x0000" define="SOURCES" type="array" entryType="endpoint_no" length="6">
-      <description>Sources</description>
+    <attribute side="server" code="0x0000" name="Sources" define="SOURCES" type="array" entryType="endpoint_no" length="6">
       <mandatoryConform/>
     </attribute>
   </cluster>
