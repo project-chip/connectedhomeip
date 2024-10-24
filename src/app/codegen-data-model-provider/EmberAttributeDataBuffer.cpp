@@ -175,8 +175,8 @@ CHIP_ERROR EmberAttributeDataBuffer::DecodeSignedInteger(chip::TLV::TLVReader & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmberAttributeDataBuffer::DecodeAsString(chip::TLV::TLVReader & reader, PascalStringType stringType, TLV::TLVType tlvType,
-                                                EndianWriter & writer)
+CHIP_ERROR EmberAttributeDataBuffer::DecodeAsString(chip::TLV::TLVReader & reader, PascalStringType stringType,
+                                                    TLV::TLVType tlvType, EndianWriter & writer)
 {
     // Handle null first, then the actual data
     if (reader.GetType() == TLV::kTLVType_Null)
