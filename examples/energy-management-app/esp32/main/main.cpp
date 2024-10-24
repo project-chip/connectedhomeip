@@ -17,15 +17,8 @@
 
 #include "DeviceCallbacks.h"
 
-#if CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-#include <EnergyEvseMain.h>
-#endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-
-#if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-#include <WaterHeaterMain.h>
-#endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-
 #include "esp_log.h"
+#include <CommonMain.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
@@ -179,7 +172,7 @@ void ApplicationInit()
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    FullWhmApplicationInit(kWaterHeaterEndpoint);
+    WaterHeaterApplicationInit(kWaterHeaterEndpoint);
     // Disable EVSE Endpoint
     emberAfEndpointEnableDisable(kEvseEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
@@ -194,7 +187,7 @@ void ApplicationShutdown()
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    FullWhmApplicationShutdown();
+    WaterHeaterApplicationShutdown();
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 

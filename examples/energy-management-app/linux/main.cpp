@@ -17,9 +17,9 @@
  */
 
 #include <AppMain.h>
+#include <CommonMain.h>
 #include <EnergyEvseMain.h>
 #include <EnergyManagementAppCmdLineOptions.h>
-#include <WaterHeaterMain.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/BitMask.h>
@@ -115,7 +115,7 @@ void ApplicationInit()
     }
     else if (strcmp(spApp, kWhmApp) == 0)
     {
-        FullWhmApplicationInit(kWaterHeaterEndpoint);
+        WaterHeaterApplicationInit(kWaterHeaterEndpoint);
         // Disable EVSE Endpoint
         emberAfEndpointEnableDisable(kEvseEndpoint, false);
     }
@@ -130,7 +130,7 @@ void ApplicationShutdown()
     ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
 
     EvseApplicationShutdown();
-    FullWhmApplicationShutdown();
+    WaterHeaterApplicationShutdown();
 }
 
 static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,

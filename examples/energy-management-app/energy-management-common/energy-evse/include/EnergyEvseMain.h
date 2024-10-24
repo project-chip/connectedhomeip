@@ -18,7 +18,20 @@
 
 #pragma once
 
+#include <DeviceEnergyManagementDelegateImpl.h>
+#include <DeviceEnergyManagementManager.h>
+#include <ElectricalPowerMeasurementDelegate.h>
+#include <PowerTopologyDelegate.h>
 #include <lib/core/CHIPError.h>
 
-void EvseApplicationInit(chip::EndpointId endpointId);
-void EvseApplicationShutdown();
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ElectricalPowerMeasurement;
+using namespace chip::app::Clusters::PowerTopology;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
+
+CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId);
+CHIP_ERROR EnergyEvseShutdown();
+
+CHIP_ERROR EVSEManufacturerInit(ElectricalPowerMeasurementInstance & epmInstance, PowerTopologyInstance & ptInstance,
+                                DeviceEnergyManagementManager & demInstance, DeviceEnergyManagementDelegate & demDelegate);
+CHIP_ERROR EVSEManufacturerShutdown();

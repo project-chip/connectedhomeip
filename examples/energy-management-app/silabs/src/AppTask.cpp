@@ -21,12 +21,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
-#if SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-#include <EnergyEvseMain.h>
-#endif
-#if SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-#include <WaterHeaterMain.h>
-#endif
+#include <CommonMain.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -156,7 +151,7 @@ void ApplicationInit()
 #if SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
     SILABS_LOG("energy-management-example WaterHeater starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
 
-    FullWhmApplicationInit(kWaterHeaterEndpoint);
+    WaterHeaterApplicationInit(kWaterHeaterEndpoint);
     // Disable EVSE Endpoint
     emberAfEndpointEnableDisable(kEvseEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE

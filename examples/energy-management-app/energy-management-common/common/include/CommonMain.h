@@ -18,15 +18,18 @@
 
 #pragma once
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace WaterHeaterManagement {
+#include <DeviceEnergyManagementDelegateImpl.h>
+#include <DeviceEnergyManagementManager.h>
+#include <ElectricalPowerMeasurementDelegate.h>
+#include <PowerTopologyDelegate.h>
+#include <lib/core/CHIPError.h>
 
-void FullWhmApplicationInit(EndpointId endpointId);
-void FullWhmApplicationShutdown();
+void EvseApplicationInit(chip::EndpointId endpointId);
+void EvseApplicationShutdown();
 
-} // namespace WaterHeaterManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+void WaterHeaterApplicationInit(chip::EndpointId endpointId);
+void WaterHeaterApplicationShutdown();
+
+// The DEM Delegate is used for the TestEventTriggers which are functions called outside of a class/init context
+// thus have no simple way to inject this dependency, so use the Getter here.
+chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate();
