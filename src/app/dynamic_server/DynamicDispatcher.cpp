@@ -388,7 +388,8 @@ const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId c
 
 unsigned emberAfMetadataStructureGeneration()
 {
-    // DynamicServer at this point hardcodes a single OTA provider cluster
+    // DynamicDispatcher at this point hardcodes a single OTA provider cluster.
+    // The structure does not change over time, so the current version stays at 0.
     return 0;
 }
 
