@@ -2741,4 +2741,76 @@ limitations under the License.
             </include>
         </clusters>
     </deviceType>
+    <deviceType>
+        <name>MA-heatpump</name>
+        <domain>CHIP</domain>
+        <typeName>Heat Pump</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0309</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Thermostat" client="true" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>CONTROL_SEQUENCE_OF_OPERATION</requireAttribute>
+                <requireAttribute>LOCAL_TEMPERATURE</requireAttribute>
+                <requireAttribute>SYSTEM_MODE</requireAttribute>
+                <requireCommand>SetpointRaiseLower</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-solarpower</name>
+        <domain>CHIP</domain>
+        <typeName>Solar Power</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0017</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-batterystorage</name>
+        <domain>CHIP</domain>
+        <typeName>Battery Storage</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0018</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
 </configurator>
