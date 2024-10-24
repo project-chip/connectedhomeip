@@ -90,49 +90,49 @@ constexpr SignedDecodeInfo GetSignedDecodeInfo(EmberAfAttributeType type)
 
     switch (type)
     {
-    case ZCL_INT8S_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
+    case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
         return SignedDecodeInfo{
             1,
             NumericLimits::MinSignedValue(1),
             NumericLimits::MaxSignedValue(1),
         };
-    case ZCL_INT16S_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
+    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
         return SignedDecodeInfo{
             2,
             NumericLimits::MinSignedValue(2),
             NumericLimits::MaxSignedValue(2),
         };
-    case ZCL_INT24S_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
+    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
         return SignedDecodeInfo{
             3,
             NumericLimits::MinSignedValue(3),
             NumericLimits::MaxSignedValue(3),
         };
-    case ZCL_INT32S_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
+    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
         return SignedDecodeInfo{
             4,
             NumericLimits::MinSignedValue(4),
             NumericLimits::MaxSignedValue(4),
         };
-    case ZCL_INT40S_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
+    case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
         return SignedDecodeInfo{
             5,
             NumericLimits::MinSignedValue(5),
             NumericLimits::MaxSignedValue(5),
         };
-    case ZCL_INT48S_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
+    case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
         return SignedDecodeInfo{
             6,
             NumericLimits::MinSignedValue(6),
             NumericLimits::MaxSignedValue(6),
         };
-    case ZCL_INT56S_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
+    case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
         return SignedDecodeInfo{
             7,
             NumericLimits::MinSignedValue(7),
             NumericLimits::MaxSignedValue(7),
         };
-    case ZCL_INT64S_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
+    case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
         return SignedDecodeInfo{
             8,
             NumericLimits::MinSignedValue(8),
