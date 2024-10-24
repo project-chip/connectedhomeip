@@ -28,6 +28,17 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: false
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -48,17 +59,10 @@ opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
 
-class TC_CADMIN_1_3_4(MatterBaseTest):
+class TC_CADMIN(MatterBaseTest):
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
         OC_cluster = Clusters.OperationalCredentials
-        if th == self.th2:
-            th2_fabric_info = await th.ReadAttribute(nodeid=self.dut_node_id, fabricFiltered=True, attributes=[(0, OC_cluster.Attributes.Fabrics)])
-            th2_fabric_data = list(th2_fabric_info.values())[0]
-            th2_fabric_data = list(th2_fabric_data.values())[0]
-            fabric_info = vars(list(th2_fabric_data.values())[1][0])
-
-        else:
-            fabric_info = await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=True, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
+        fabric_info = await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=True, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
         return fabric_info
 
     async def get_rcac_decoded(self, th: str) -> int:
@@ -179,15 +183,15 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
 
         self.step(6)
         # TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read
-        th2_fabric_data = await self.get_fabrics(th=self.th2)
+        th2_fabric_info = await self.get_fabrics(th=self.th2)
 
         # Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device.
         await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
         th2_rcac_decoded = await self.get_rcac_decoded(th=self.th2)
-        if th2_fabric_data["rootPublicKey"] != th2_rcac_decoded[9]:
-            asserts.fail("public keys from fabric and certs for TH2 are not the same")
-        if th2_fabric_data["nodeID"] != self.dut_node_id:
-            asserts.fail("DUT node ID from fabric does not match DUT node ID for TH2 during commissioning")
+        if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded[9]:
+            asserts.fail("public keys from fabric and certs for TH1 are not the same")
+        if th2_fabric_info[0].nodeID != self.dut_node_id:
+            asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning")
 
         await self.th2.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
         await self.th1.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
@@ -342,15 +346,15 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
         th2_fabric_info = await self.get_fabrics(th=self.th2)
 
         # Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device.
-        await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(self.max_window_duration))
+        await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
         th2_rcac_decoded = await self.get_rcac_decoded(th=self.th2)
-        if th2_fabric_info['rootPublicKey'] != th2_rcac_decoded[9]:
-            asserts.fail("public keys from fabric and certs for TH2 are not the same")
-        if th2_fabric_info['nodeID'] != self.dut_node_id:
-            asserts.fail("DUT node ID from fabric does not match DUT node ID for TH2 during commissioning")
+        if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded[9]:
+            asserts.fail("public keys from fabric and certs for TH1 are not the same")
+        if th2_fabric_info[0].nodeID != self.dut_node_id:
+            asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning")
 
         await self.th2.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
-
+        
         self.step(7)
         # TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
         th2_idx = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
@@ -359,7 +363,6 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
-
 
 if __name__ == "__main__":
     default_matter_test_main()
