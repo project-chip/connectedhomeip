@@ -136,7 +136,7 @@
 // required methods for MTRDeviceDelegates
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self stateChanged:state];
     }];
@@ -144,15 +144,47 @@
 
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
+    if (![attributeReport isKindOfClass:NSArray.class]) {
+        MTR_LOG_ERROR("%@ handed an non-array attribute report: %@", self, attributeReport);
+        return;
+    }
+
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedAttributeReport:attributeReport];
     }];
+
+    std::lock_guard lock(_lock);
+    for (NSDictionary<NSString *, id> * report in attributeReport) {
+        if (![report isKindOfClass:NSDictionary.class]) {
+            MTR_LOG_ERROR("%@ handed a response-value that is not a dictionary: %@", self, report);
+            continue;
+        }
+
+        MTRAttributePath * path = report[MTRAttributePathKey];
+        if (![path isKindOfClass:MTRAttributePath.class]) {
+            MTR_LOG_ERROR("%@ no valid path for attribute report %@", self, report);
+            continue;
+        }
+
+        MTRDeviceDataValueDictionary value = report[MTRDataKey];
+        if (!value) {
+            // This is normal; this could be an error report.
+            continue;
+        }
+
+        if (![value isKindOfClass:NSDictionary.class]) {
+            MTR_LOG_ERROR("%@ invalid data-value reported: %@", self, report);
+            continue;
+        }
+
+        [self _attributeValue:value reportedForPath:path];
+    }
 }
 
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedEventReport:eventReport];
     }];
@@ -161,7 +193,7 @@
 // optional methods for MTRDeviceDelegates - check for implementation before calling
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
             [delegate deviceBecameActive:self];
