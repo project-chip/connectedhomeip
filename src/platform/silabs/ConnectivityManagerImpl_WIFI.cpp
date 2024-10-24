@@ -40,6 +40,7 @@
 #endif
 
 #include "CHIPDevicePlatformConfig.h"
+#include "EndpointQueueFilter.h"
 #include "wfx_host_events.h"
 
 using namespace ::chip;
@@ -425,6 +426,30 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         event.InternetConnectivityChange.IPv4      = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
         event.InternetConnectivityChange.IPv6      = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
         event.InternetConnectivityChange.ipAddress = addr;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        {
+            sl_wfx_mac_address_t macaddr;
+            wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
+            char macaddrString[13]; // 12 characters + null terminator
+            sprintf(macaddrString, "%02X%02X%02X%02X%02X%02X", macaddr.octet[0], macaddr.octet[1], macaddr.octet[2],
+                    macaddr.octet[3], macaddr.octet[4], macaddr.octet[5]);
+            EndpointQueueFilterConfig config;
+            config.allowedQueuedPackets = 20; // Set the desired value
+
+            mEndpointQueueFilter.SetConfig(config);
+            if (mEndpointQueueFilter.SetHostName(chip::CharSpan(macaddrString)) == CHIP_NO_ERROR)
+            {
+                chip::Inet::UDPEndPointImpl::SetQueueFilter(&mEndpointQueueFilter);
+            }
+            else
+            {
+                ChipLogError(DeviceLayer, "Failed to set host name filter");
+            }
+        }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+        (void) PlatformMgr().PostEvent(&event);
 
         if (haveIPv4Conn != hadIPv4Conn)
         {

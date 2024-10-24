@@ -36,6 +36,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+#include "EndpointQueueFilter.h"
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
@@ -131,6 +132,9 @@ private:
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
 
     void UpdateInternetConnectivityState(void);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    Inet::SilabsEndpointQueueFilter::EndpointQueueFilter mEndpointQueueFilter;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif
 };
 
