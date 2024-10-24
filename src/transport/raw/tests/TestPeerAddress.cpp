@@ -101,4 +101,12 @@ TEST(TestPeerAddress, TestToString)
     }
 }
 
+TEST(TestPeerAddress, TestFromString)
+{
+    chip::Inet::IPAddress ipAddress;
+    const char * ipStrBuf = "192.168.1.8";
+    bool result           = chip::Inet::IPAddress::FromString(ipStrBuf, ipAddress);
+    EXPECT_TRUE(result);
+}
+
 } // namespace
