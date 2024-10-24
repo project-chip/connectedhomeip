@@ -588,6 +588,11 @@ public class AndroidBleManager implements BleManager {
     private static final int STATE_DISCOVER_SERVICE = 2;
     private static final int STATE_REQUEST_MTU = 3;
 
+    /// Unfortunately GATT 133 is very generic, however among other things
+    /// it may also show up on device out of range or BLE being closed due to
+    /// background task termination, hence it is a candidate to retry connectivity.
+    private static final int kGattRetryableErrorStatus = 133;
+
     private int mState = STATE_INIT;
     private BluetoothDevice mDevice;
     private int connectRetriesLeft = 3;
@@ -612,10 +617,9 @@ public class AndroidBleManager implements BleManager {
       }
 
       if (newState == BluetoothProfile.STATE_DISCONNECTED
-          && status == 133
+          && status == kGattRetryableErrorStatus
           && connectRetriesLeft-- > 0) {
-        Log.i(TAG, "GATT_ERROR 133. Retrying connect...");
-        Log.i(TAG, "Retries left: " + connectRetriesLeft);
+        Log.i(TAG, "Retries left: " + connectRetriesLeft + ". Retrying connect...");
 
         gatt.close();
 
