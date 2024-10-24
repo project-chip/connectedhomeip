@@ -49,97 +49,222 @@ limitations under the License.
         <optionalConform/>
       </feature>
     </features>
-
-    <attribute side="server" code="0x0000" define="MAX_PRESSURE" type="int16s" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="false">MaxPressure</attribute>
-    <attribute side="server" code="0x0001" define="MAX_SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="false">MaxSpeed</attribute>
-    <attribute side="server" code="0x0002" define="MAX_FLOW" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="false">MaxFlow</attribute>
-    <attribute side="server" code="0x0003" define="MIN_CONST_PRESSURE" type="int16s" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="true">MinConstPressure</attribute>
-    <attribute side="server" code="0x0004" define="MAX_CONST_PRESSURE" type="int16s" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="true">MaxConstPressure</attribute>
-    <attribute side="server" code="0x0005" define="MIN_COMP_PRESSURE" type="int16s" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="true">MinCompPressure</attribute>
-    <attribute side="server" code="0x0006" define="MAX_COMP_PRESSURE" type="int16s" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="true">MaxCompPressure</attribute>
-    <attribute side="server" code="0x0007" define="MIN_CONST_SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">MinConstSpeed</attribute>
-    <attribute side="server" code="0x0008" define="MAX_CONST_SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">MaxConstSpeed</attribute>
-    <attribute side="server" code="0x0009" define="MIN_CONST_FLOW" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">MinConstFlow</attribute>
-    <attribute side="server" code="0x000A" define="MAX_CONST_FLOW" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">MaxConstFlow</attribute>
-    <attribute side="server" code="0x000B" define="MIN_CONST_TEMP" type="int16s" isNullable="true" min="0x954D" max="32767" writable="false" optional="true">MinConstTemp</attribute>
-    <attribute side="server" code="0x000C" define="MAX_CONST_TEMP" type="int16s" isNullable="true" min="0x954D" max="0x7FFF" writable="false" optional="true">MaxConstTemp</attribute>
-    <attribute side="server" code="0x0010" define="PUMP_STATUS" type="PumpStatusBitmap" writable="false" default="0x0000" reportable="true" optional="true">PumpStatus</attribute>
-    <attribute side="server" code="0x0011" define="EFFECTIVE_OPERATION_MODE" type="OperationModeEnum" min="0x00" max="0x03" writable="false" optional="false">EffectiveOperationMode</attribute>
-    <attribute side="server" code="0x0012" define="EFFECTIVE_CONTROL_MODE" type="ControlModeEnum" min="0x00" max="0x07" writable="false" optional="false">EffectiveControlMode</attribute>
-    <attribute side="server" code="0x0013" define="CAPACITY" type="int16s" isNullable="true" min="0x0000" max="0x7FFF" writable="false" reportable="true" optional="false">Capacity</attribute>
-    <attribute side="server" code="0x0014" define="SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">Speed</attribute>
-    <attribute side="server" code="0x0015" define="LIFETIME_RUNNING_HOURS" type="int24u" isNullable="true" writable="true" default="0x000000" optional="true">
-      <description>LifetimeRunningHours</description>
-      <access op="read" privilege="view"/>
-      <access op="write" privilege="manage"/>
+    
+    <attribute side="server" code="0x0000" name="MaxPressure" define="MAX_PRESSURE" type="int16s" isNullable="true">
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0016" define="PUMP_POWER" type="int24u" isNullable="true" writable="false" optional="true">Power</attribute>
-    <attribute side="server" code="0x0017" define="LIFETIME_ENERGY_CONSUMED" type="int32u" isNullable="true" writable="true" default="0x00000000" optional="true">
-      <description>LifetimeEnergyConsumed</description>
-      <access op="read" privilege="view"/>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0001" name="MaxSpeed" define="MAX_SPEED" type="int16u" isNullable="true">
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0020" define="OPERATION_MODE" type="OperationModeEnum" min="0x00" max="0x03" writable="true" default="0x00" optional="false">
-      <description>OperationMode</description>
-      <access op="read" privilege="view"/>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0002" name="MaxFlow" define="MAX_FLOW" type="int16u" isNullable="true">
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0021" define="CONTROL_MODE" type="ControlModeEnum" min="0x00" max="0x07" writable="true" default="0x00" optional="true">
-      <description>ControlMode</description>
+    <attribute side="server" code="0x0003" name="MinConstPressure" define="MIN_CONST_PRESSURE" type="int16s" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="PRSCONST"/>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="AUTO"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="MaxConstPressure" define="MAX_CONST_PRESSURE" type="int16s" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="PRSCONST"/>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="AUTO"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="MinCompPressure" define="MIN_COMP_PRESSURE" type="int16s" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="PRSCOMP"/>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="AUTO"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="MaxCompPressure" define="MAX_COMP_PRESSURE" type="int16s" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="PRSCOMP"/>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="AUTO"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="MinConstSpeed" define="MIN_CONST_SPEED" type="int16u" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="SPD"/>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="AUTO"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="MaxConstSpeed" define="MAX_CONST_SPEED" type="int16u" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="SPD"/>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="AUTO"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="MinConstFlow" define="MIN_CONST_FLOW" type="int16u" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="FLW"/>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="AUTO"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x000A" name="MaxConstFlow" define="MAX_CONST_FLOW" type="int16u" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="FLW"/>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="AUTO"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x000B" name="MinConstTemp" define="MIN_CONST_TEMP" type="int16s" isNullable="true" min="0x954D" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="TEMP"/>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="AUTO"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x000C" name="MaxConstTemp" define="MAX_CONST_TEMP" type="int16s" isNullable="true" min="0x954D" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="TEMP"/>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="AUTO"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x0010" name="PumpStatus" define="PUMP_STATUS" type="PumpStatusBitmap" default="0x0000" reportable="true" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0011" name="EffectiveOperationMode" define="EFFECTIVE_OPERATION_MODE" type="OperationModeEnum" min="0x00" max="0x03">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0012" name="EffectiveControlMode" define="EFFECTIVE_CONTROL_MODE" type="ControlModeEnum" min="0x00" max="0x07">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0013" name="Capacity" define="CAPACITY" type="int16s" isNullable="true" reportable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0014" name="Speed" define="SPEED" type="int16u" isNullable="true" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0015" name="LifetimeRunningHours" define="LIFETIME_RUNNING_HOURS" type="int24u" isNullable="true" writable="true" default="0x000000" optional="true">
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0016" name="Power" define="PUMP_POWER" type="int24u" isNullable="true" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0017" name="LifetimeEnergyConsumed" define="LIFETIME_ENERGY_CONSUMED" type="int32u" isNullable="true" writable="true" default="0x00000000" optional="true">
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0020" name="OperationMode" define="OPERATION_MODE" type="OperationModeEnum" min="0x00" max="0x03" writable="true" default="0x00" optional="false">
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0021" name="ControlMode" define="CONTROL_MODE" type="ControlModeEnum" min="0x00" max="0x07" writable="true" default="0x00" optional="true">
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
 
     <event side="server" code="0x00" priority="info" name="SupplyVoltageLow" optional="true">
       <description>SupplyVoltageLow</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x01" priority="info" name="SupplyVoltageHigh" optional="true">
       <description>SupplyVoltageHigh</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x02" priority="info" name="PowerMissingPhase" optional="true">
       <description>PowerMissingPhase</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x03" priority="info" name="SystemPressureLow" optional="true">
       <description>SystemPressureLow</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x04" priority="info" name="SystemPressureHigh" optional="true">
       <description>SystemPressureHigh</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x05" priority="critical" name="DryRunning" optional="true">
       <description>DryRunning</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x06" priority="info" name="MotorTemperatureHigh" optional="true">
       <description>MotorTemperatureHigh</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x07" priority="critical" name="PumpMotorFatalFailure" optional="true">
       <description>PumpMotorFatalFailure</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x08" priority="info" name="ElectronicTemperatureHigh" optional="true">
       <description>ElectronicTemperatureHigh</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x09" priority="critical" name="PumpBlocked" optional="true">
       <description>PumpBlocked</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x0A" priority="info" name="SensorFailure" optional="true">
       <description>SensorFailure</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x0B" priority="info" name="ElectronicNonFatalFailure" optional="true">
       <description>ElectronicNonFatalFailure</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x0C" priority="critical" name="ElectronicFatalFailure" optional="true">
       <description>ElectronicFatalFailure</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x0D" priority="info" name="GeneralFault" optional="true">
       <description>GeneralFault</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x0E" priority="info" name="Leakage" optional="true">
       <description>Leakage</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x0F" priority="info" name="AirDetection" optional="true">
       <description>AirDetection</description>
+      <optionalConform/>
     </event>
     <event side="server" code="0x10" priority="info" name="TurbineOperation" optional="true">
       <description>TurbineOperation</description>
+      <optionalConform/>
     </event>
   </cluster>
 

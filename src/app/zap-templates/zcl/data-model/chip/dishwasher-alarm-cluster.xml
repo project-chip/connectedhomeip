@@ -43,27 +43,42 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="MASK"      type="AlarmBitmap" default="0" writable="false" optional="false">Mask</attribute>
-    <attribute side="server" code="0x0001" define="LATCH"     type="AlarmBitmap" default="0" writable="false" optional="true">Latch</attribute>
-    <attribute side="server" code="0x0002" define="STATE"     type="AlarmBitmap" default="0" writable="false" optional="false">State</attribute>
-    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0" writable="false" optional="false">Supported</attribute>
+    <attribute side="server" code="0x0000" name="Mask" define="MASK" type="AlarmBitmap" default="0">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="Latch" define="LATCH" type="AlarmBitmap" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="RESET"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="State" define="STATE" type="AlarmBitmap" default="0">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0003" name="Supported" define="SUPPORTED" type="AlarmBitmap" default="0">
+      <mandatoryConform/>
+    </attribute>
 
     <command source="client" code="0x00" name="Reset" optional="true">
-        <description>Reset alarm</description>
-        <arg name="Alarms" type="AlarmBitmap" optional="false"/>
+      <description>Reset alarm</description>
+      <arg name="Alarms" type="AlarmBitmap" optional="false"/>
+      <mandatoryConform>
+        <feature name="RESET"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x01" name="ModifyEnabledAlarms" optional="true">
-        <description>Modify enabled alarms</description>
-        <arg name="Mask" type="AlarmBitmap" optional="false"/>
+      <description>Modify enabled alarms</description>
+      <arg name="Mask" type="AlarmBitmap" optional="false"/>
+      <optionalConform/>
     </command>
 
     <event side="server" code="0x00" priority="info" name="Notify" optional="false">
-        <description>Notify</description>
-        <field id="0" name="Active" type="AlarmBitmap" />
-        <field id="1" name="Inactive" type="AlarmBitmap" />
-        <field id="2" name="State" type="AlarmBitmap" />
-        <field id="3" name="Mask" type="AlarmBitmap" />
+      <description>Notify</description>
+      <field id="0" name="Active" type="AlarmBitmap"/>
+      <field id="1" name="Inactive" type="AlarmBitmap"/>
+      <field id="2" name="State" type="AlarmBitmap"/>
+      <field id="3" name="Mask" type="AlarmBitmap"/>
+      <mandatoryConform/>
     </event>
   </cluster>
 </configurator>

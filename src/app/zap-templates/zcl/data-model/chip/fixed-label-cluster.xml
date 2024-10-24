@@ -31,6 +31,8 @@ limitations under the License.
     <define>FIXED_LABEL_CLUSTER</define>
     <description>The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels.</description>
-    <attribute side="server" code="0x0000" define="LABEL_LIST" type="array" entryType="LabelStruct" writable="false" optional="false">LabelList</attribute>
+    <attribute side="server" code="0x0000" name="LabelList" define="LABEL_LIST" type="array" entryType="LabelStruct">
+      <mandatoryConform/>
+    </attribute>
   </cluster>
 </configurator>

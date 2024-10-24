@@ -59,102 +59,156 @@ limitations under the License.
         <item value="1" name="LIT" />
     </enum>
 
-    <cluster>
-        <domain>General</domain>
-        <name>ICD Management</name>
-        <code>0x0046</code>
-        <define>ICD_MANAGEMENT_CLUSTER</define>
-        <description>Allows servers to ensure that listed clients are notified when a server is available for communication.</description>
+  <cluster>
+    <domain>General</domain>
+    <name>ICD Management</name>
+    <code>0x0046</code>
+    <define>ICD_MANAGEMENT_CLUSTER</define>
+    <description>Allows servers to ensure that listed clients are notified when a server is available for communication.</description>
+    
+    <!-- Cluster feature map -->
+    <globalAttribute side="server" code="0xFFFC" value="0x0000"/>
+    <!-- Current cluster version -->
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    
+    <features>
+      <feature bit="0" code="CIP" name="CheckInProtocolSupport" summary="Device supports attributes and commands for the Check-In Protocol support.">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="LITS"/>
+          </mandatoryConform>
+          <optionalConform/>
+        </otherwiseConform>
+      </feature>
+      <feature bit="1" code="UAT" name="UserActiveModeTrigger" summary="Device supports the user active mode trigger feature.">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="LITS"/>
+          </mandatoryConform>
+          <optionalConform/>
+        </otherwiseConform>
+      </feature>
+      <feature bit="2" code="LITS" name="LongIdleTimeSupport" summary="Device supports operating as a Long Idle Time ICD.">
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform/>
+        </otherwiseConform>
+      </feature>
+      <feature bit="3" code="DSLS" name="DynamicSitLitSupport" summary="Device supports dynamic switching from SIT to LIT operating modes.">
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform>
+            <feature name="LITS"/>
+          </optionalConform>
+        </otherwiseConform>
+      </feature>
+    </features>
 
-        <!-- Cluster feature map -->
-        <globalAttribute side="server" code="0xFFFC" value="0x0000"/>
-        <!-- Current cluster version -->
-        <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <attribute side="server" code="0x00" name="IdleModeDuration" define="IDLE_MODE_DURATION" type="int32u" min="1" max="64800" default="1">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x01" name="ActiveModeDuration" define="ACTIVE_MODE_DURATION" type="int32u" default="300">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x02" name="ActiveModeThreshold" define="ACTIVE_MODE_THRESHOLD" type="int16u" default="300">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x03" name="RegisteredClients" define="REGISTERED_CLIENTS" type="array" entryType="MonitoringRegistrationStruct" optional="true">
+      <access op="read" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x04" name="ICDCounter" define="ICD_COUNTER" type="int32u" default="0" optional="true">
+      <access op="read" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x05" name="ClientsSupportedPerFabric" define="CLIENTS_SUPPORTED_PER_FABRIC" type="int16u" min="1" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x06" name="UserActiveModeTriggerHint" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" optional="true" apiMaturity="provisional">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="UAT"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x07" name="UserActiveModeTriggerInstruction" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" optional="true" apiMaturity="provisional">
+      <provisionalConform/>
+    </attribute>
+    <attribute side="server" code="0x08" name="OperatingMode" define="OPERATING_MODE" type="OperatingModeEnum" default="0" optional="true" apiMaturity="provisional">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="LITS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x09" name="MaximumCheckInBackOff" define="MAXIMUM_CHECK_IN_BACK_OFF" type="int32u" default="1" max="64800" optional="true" apiMaturity="provisional">
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+    </attribute>
 
-        <features>
-            <feature bit="0" code="CIP" name="CheckInProtocolSupport" summary="Device supports attributes and commands for the Check-In Protocol support.">
-            <otherwiseConform>
-                <provisionalConform/>
-                <mandatoryConform>
-                <feature name="LITS"/>
-                </mandatoryConform>
-                <optionalConform/>
-            </otherwiseConform>
-            </feature>
-            <feature bit="1" code="UAT" name="UserActiveModeTrigger" summary="Device supports the user active mode trigger feature.">
-            <otherwiseConform>
-                <provisionalConform/>
-                <mandatoryConform>
-                <feature name="LITS"/>
-                </mandatoryConform>
-                <optionalConform/>
-            </otherwiseConform>
-            </feature>
-            <feature bit="2" code="LITS" name="LongIdleTimeSupport" summary="Device supports operating as a Long Idle Time ICD.">
-            <otherwiseConform>
-                <provisionalConform/>
-                <optionalConform/>
-            </otherwiseConform>
-            </feature>
-            <feature bit="3" code="DSLS" name="DynamicSitLitSupport" summary="Device supports dynamic switching from SIT to LIT operating modes.">
->               <otherwiseConform>
->                   <provisionalConform/>
->                   <optionalConform>
->                       <feature name="LITS"/>
->                   </optionalConform>
-                </otherwiseConform>
-            </feature>
-        </features>
+    <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
+      <description>Register a client to the end device</description>
+      <arg name="CheckInNodeID" type="node_id" optional="false"/>
+      <arg name="MonitoredSubject" type="int64u" optional="false"/>
+      <arg name="Key" type="octet_string" length="16" optional="false"/>
+      <arg name="VerificationKey" type="octet_string" length="16" optional="true"/>
+      <arg name="ClientType" type="ClientTypeEnum" optional="false"/>
+      <access op="invoke" privilege="manage"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+    </command>
 
+    <command source="server" code="0x01" name="RegisterClientResponse" optional="true" disableDefaultResponse="true">
+      <description>RegisterClient response command</description>
+      <arg name="ICDCounter" type="int32u" isNullable="false"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+    </command>
 
-        <attribute side="server" code="0x00" define="IDLE_MODE_DURATION" type="int32u" min="1" max="64800" default="1" writable="false" optional="false" isNullable="false">IdleModeDuration</attribute>
-        <attribute side="server" code="0x01" define="ACTIVE_MODE_DURATION" type="int32u" default="300" writable="false" optional="false" isNullable="false">ActiveModeDuration</attribute>
-        <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="int16u" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
-        <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="array" entryType="MonitoringRegistrationStruct" writable="false" optional="true" isNullable="false">
-            <description>RegisteredClients</description>
-            <access op="read" privilege="administer"/>
-        </attribute>
-        <attribute side="server" code="0x04" define="ICD_COUNTER" type="int32u" writable="false" default="0" optional="true" isNullable="false">
-            <description>ICDCounter</description>
-            <access op="read" privilege="administer"/>
-        </attribute>
-        <attribute side="server" code="0x05" define="CLIENTS_SUPPORTED_PER_FABRIC" type="int16u" min="1" default="1" writable="false" optional="true" isNullable="false">ClientsSupportedPerFabric</attribute>
-        <attribute side="server" code="0x06" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" writable="false" optional="true" isNullable="false" apiMaturity="provisional">UserActiveModeTriggerHint</attribute>
-        <attribute side="server" code="0x07" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" writable="false" optional="true" isNullable="false" apiMaturity="provisional">UserActiveModeTriggerInstruction</attribute>
-        <attribute side="server" code="0x08" define="OPERATING_MODE" type="OperatingModeEnum" default="0" writable="false" optional="true" isNullable="false" apiMaturity="provisional">OperatingMode</attribute>
-        <attribute side="server" code="0x09" define="MAXIMUM_CHECK_IN_BACK_OFF" type="int32u" default="1" max="64800" optional="true" isNullable="false" apiMaturity="provisional">MaximumCheckInBackOff</attribute>
+    <command source="client" code="0x02" name="UnregisterClient" isFabricScoped="true" optional="true">
+      <description>Unregister a client from an end device</description>
+      <arg name="CheckInNodeID" type="node_id"/>
+      <arg name="VerificationKey" type="octet_string" length="16" optional="true"/>
+      <access op="invoke" privilege="manage"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+    </command>
 
-        <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
-            <description>Register a client to the end device</description>
-            <arg name="CheckInNodeID" type="node_id" optional="false"/>
-            <arg name="MonitoredSubject" type="int64u" optional="false"/>
-            <arg name="Key" type="octet_string" length="16" optional="false"/>
-            <arg name="VerificationKey" type="octet_string" length="16" optional="true"/>
-            <arg name="ClientType" type="ClientTypeEnum" optional="false"/>
-            <access op="invoke" privilege="manage"/>
-        </command>
+    <command source="client" code="0x03" name="StayActiveRequest" response="StayActiveResponse" optional="true">
+      <description>Request the end device to stay in Active Mode for an additional ActiveModeThreshold</description>
+      <access op="invoke" privilege="manage"/>
+      <arg name="StayActiveDuration" type="int32u" isNullable="false"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="LITS"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </command>
 
-        <command source="server" code="0x01" name="RegisterClientResponse" optional="true" disableDefaultResponse="true">
-            <description>RegisterClient response command</description>
-            <arg name="ICDCounter" type="int32u" isNullable="false"/>
-        </command>
-
-        <command source="client" code="0x02" name="UnregisterClient" isFabricScoped="true" optional="true">
-            <description>Unregister a client from an end device</description>
-            <arg name="CheckInNodeID" type="node_id"/>
-            <arg name="VerificationKey" type="octet_string" length="16" optional="true"/>
-            <access op="invoke" privilege="manage"/>
-        </command>
-
-        <command source="client" code="0x03" name="StayActiveRequest" response="StayActiveResponse" optional="true">
-            <description>Request the end device to stay in Active Mode for an additional ActiveModeThreshold</description>
-            <access op="invoke" privilege="manage"/>
-            <arg name="StayActiveDuration" type="int32u" isNullable="false"/>
-        </command>
-
-        <command source="server" code="0x04" name="StayActiveResponse" optional="true" disableDefaultResponse="true">
-            <description>StayActiveRequest response command</description>
-            <arg name="PromisedActiveDuration" type="int32u" isNullable="false"/>
-        </command>
-    </cluster>
+    <command source="server" code="0x04" name="StayActiveResponse" optional="true" disableDefaultResponse="true">
+      <description>StayActiveRequest response command</description>
+      <arg name="PromisedActiveDuration" type="int32u" isNullable="false"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="LITS"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </command>
+  </cluster>
 </configurator>

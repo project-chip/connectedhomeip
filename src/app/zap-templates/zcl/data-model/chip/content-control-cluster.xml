@@ -43,69 +43,131 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="ENABLED" type="boolean" writable="false" optional="false">Enabled</attribute>
-    <attribute side="server" code="0x0001" define="ON_DEMAND_RATINGS" type="ARRAY" entryType="RatingNameStruct" writable="false" optional="true">OnDemandRatings</attribute>
-    <attribute side="server" code="0x0002" define="ON_DEMAND_THRESHOLD" type="char_string" length="8" writable="false" optional="true">OnDemandRatingThreshold</attribute>
-    <attribute side="server" code="0x0003" define="SCHEDULED_CONTENT_RATINGS" type="ARRAY" entryType="RatingNameStruct" writable="false" optional="true">ScheduledContentRatings</attribute>
-    <attribute side="server" code="0x0004" define="SCHEDULED_CONTENT_RATING_THRESHOLD" type="char_string" length="8" writable="false" optional="true">ScheduledContentRatingThreshold</attribute>
-    <attribute side="server" code="0x0005" define="SCREEN_DAILY_TIME" type="elapsed_s" length="86400" writable="false" optional="true">ScreenDailyTime</attribute>
-    <attribute side="server" code="0x0006" define="REMAINING_SCREEN_TIME" type="elapsed_s" length="86400" writable="false" optional="true">RemainingScreenTime</attribute>
-    <attribute side="server" code="0x0007" define="ENABLED" type="boolean" writable="false" optional="false">BlockUnrated</attribute>
+    <attribute side="server" code="0x0000" name="Enabled" define="ENABLED" type="boolean">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="OnDemandRatings" define="ON_DEMAND_RATINGS" type="array" entryType="RatingNameStruct" optional="true">
+      <mandatoryConform>
+        <feature name="OCR"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="OnDemandRatingThreshold" define="ON_DEMAND_THRESHOLD" type="char_string" length="8" optional="true">
+      <mandatoryConform>
+        <feature name="OCR"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="ScheduledContentRatings" define="SCHEDULED_CONTENT_RATINGS" type="array" entryType="RatingNameStruct" optional="true">
+      <mandatoryConform>
+        <feature name="SCR"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="ScheduledContentRatingThreshold" define="SCHEDULED_CONTENT_RATING_THRESHOLD" type="char_string" length="8" optional="true">
+      <mandatoryConform>
+        <feature name="SCR"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="ScreenDailyTime" define="SCREEN_DAILY_TIME" type="elapsed_s" optional="true" length="86400">
+      <mandatoryConform>
+        <feature name="ST"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="RemainingScreenTime" define="REMAINING_SCREEN_TIME" type="elapsed_s" optional="true" length="86400">
+      <mandatoryConform>
+        <feature name="ST"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="BlockUnrated" define="ENABLED" type="boolean">
+      <mandatoryConform>
+        <feature name="BU"/>
+      </mandatoryConform>
+    </attribute>
 
     <command source="client" code="0x00" name="UpdatePIN" optional="true">
       <description>The purpose of this command is to update the PIN used for protecting configuration of the content control settings. Upon success, the old PIN SHALL no longer work. The PIN is used to ensure that only the Node (or User) with the PIN code can make changes to the Content Control settings, for example, turn off Content Controls or modify the ScreenDailyTime. The PIN is composed of a numeric string of up to 6 human readable characters (displayable) . Upon receipt of this command, the media device SHALL check if the OldPIN field of this command is the same as the current PIN. If the PINs are the same, then the PIN code SHALL be set to NewPIN. Otherwise a response with InvalidPINCode error status SHALL be returned. The media device MAY provide a default PIN to the User via an out of band mechanism. For security reasons, it is recommended that a client encourage the user to update the PIN from its default value when performing configuration of the Content Control settings exposed by this cluster. The ResetPIN command can also be used to obtain the default PIN.</description>
       <arg name="OldPIN" type="char_string" max="6" optional="true"/>
       <arg name="NewPIN" type="char_string" max="6" optional="false"/>
+      <mandatoryConform>
+        <feature name="PM"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x01" name="ResetPIN" response="ResetPINResponse" optional="true">
       <description>The purpose of this command is to reset the PIN. If this command is executed successfully, a ResetPINResponse command with a new PIN SHALL be returned.</description>
+      <mandatoryConform>
+        <feature name="PM"/>
+      </mandatoryConform>
     </command>
 
     <command source="server" code="0x02" name="ResetPINResponse" optional="true">
       <description>This command SHALL be generated in response to a ResetPIN command. The data for this command SHALL be as follows:</description>
       <arg name="PINCode" type="char_string" max="6" optional="false"/>
+      <mandatoryConform>
+        <feature name="PM"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x03" name="Enable" optional="true">
       <description>The purpose of this command is to turn on the Content Control feature on a media device. On receipt of the Enable command, the media device SHALL set the Enabled attribute to TRUE.</description>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x04" name="Disable" optional="true">
       <description>The purpose of this command is to turn off the Content Control feature on a media device. On receipt of the Disable command, the media device SHALL set the Enabled attribute to FALSE.</description>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x05" name="AddBonusTime" optional="true">
       <description>The purpose of this command is to add the extra screen time for the user. If a client with Operate privilege invokes this command, the media device SHALL check whether the PINCode passed in the command matches the current PINCode value. If these match, then the RemainingScreenTime attribute SHALL be increased by the specified BonusTime value. If the PINs do not match, then a response with InvalidPINCode error status SHALL be returned, and no changes SHALL be made to RemainingScreenTime. If a client with Manage privilege or greater invokes this command, the media device SHALL ignore the PINCode field and directly increase the RemainingScreenTime attribute by the specified BonusTime value. A server that does not support the PM feature SHALL respond with InvalidPINCode to clients that only have Operate privilege unless: It has been provided with the PIN value to expect via an out of band mechanism, and The client has provided a PINCode that matches the expected PIN value.</description>
       <arg name="PINCode" type="char_string" max="6" optional="true"/>
       <arg name="BonusTime" type="elapsed_s" optional="true"/>
+      <mandatoryConform>
+        <feature name="ST"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x06" name="SetScreenDailyTime" optional="true">
       <description>The purpose of this command is to set the ScreenDailyTime attribute. On receipt of the SetScreenDailyTime command, the media device SHALL set the ScreenDailyTime attribute to the ScreenTime value.</description>
       <arg name="ScreenTime" type="elapsed_s" optional="false"/>
+      <mandatoryConform>
+        <feature name="ST"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x07" name="BlockUnratedContent" optional="true">
       <description>The purpose of this command is to specify whether programs with no Content rating must be blocked by this media device. On receipt of the BlockUnratedContent command, the media device SHALL set the BlockUnrated attribute to TRUE.</description>
+      <mandatoryConform>
+        <feature name="BU"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x08" name="UnblockUnratedContent" optional="true">
       <description>The purpose of this command is to specify whether programs with no Content rating must be blocked by this media device. On receipt of the UnblockUnratedContent command, the media device SHALL set the BlockUnrated attribute to FALSE.</description>
+      <mandatoryConform>
+        <feature name="BU"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x09" name="SetOnDemandRatingThreshold" optional="true">
       <description>The purpose of this command is to set the OnDemandRatingThreshold attribute. On receipt of the SetOnDemandRatingThreshold command, the media device SHALL check if the Rating field is one of values present in the OnDemandRatings attribute. If not, then a response with InvalidRating error status SHALL be returned.</description>
       <arg name="Rating" type="char_string" max="8" optional="false"/>
+      <mandatoryConform>
+        <feature name="OCR"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x0A" name="SetScheduledContentRatingThreshold" optional="true">
       <description>The purpose of this command is to set ScheduledContentRatingThreshold attribute. On receipt of the SetScheduledContentRatingThreshold command, the media device SHALL check if the Rating field is one of values present in the ScheduledContentRatings attribute. If not, then a response with InvalidRating error status SHALL be returned.</description>
       <arg name="Rating" type="char_string" max="8" optional="false"/>
+      <mandatoryConform>
+        <feature name="SCR"/>
+      </mandatoryConform>
     </command>
 
     <event side="server" code="0x00" priority="info" name="RemainingScreenTimeExpired" optional="true">
       <description>This event SHALL be generated when the RemainingScreenTime equals 0.</description>
+      <mandatoryConform>
+        <feature name="ST"/>
+      </mandatoryConform>
     </event>
   </cluster>
 

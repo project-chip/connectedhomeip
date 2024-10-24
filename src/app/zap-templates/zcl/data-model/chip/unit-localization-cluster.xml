@@ -42,9 +42,11 @@ limitations under the License.
     </features>
     
     <!-- Base data types -->
-    <attribute side="server" code="0x00" define="TEMPERATURE_UNIT" type="TempUnitEnum" min="0" max="2" writable="true" optional="true">
-        <description>TemperatureUnit</description>
-        <access op="write" role="manage"/>
+    <attribute side="server" code="0x00" name="TemperatureUnit" define="TEMPERATURE_UNIT" type="TempUnitEnum" min="0" max="2" writable="true" optional="true">
+      <access op="write" role="manage"/>
+      <mandatoryConform>
+        <feature name="TEMP"/>
+      </mandatoryConform>
     </attribute>
   </cluster>
 

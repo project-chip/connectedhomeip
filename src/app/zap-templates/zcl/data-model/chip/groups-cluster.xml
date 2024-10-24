@@ -40,8 +40,10 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="NameSupportBitmap" min="0x00" max="0x80" writable="false" optional="false">NameSupport</attribute>
-
+    <attribute side="server" code="0x0000" name="NameSupport" define="GROUP_NAME_SUPPORT" type="NameSupportBitmap" min="0x00" max="0x80">
+      <mandatoryConform/>
+    </attribute>
+    
     <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups add">
       <description>
         Command description for AddGroup
@@ -49,6 +51,7 @@ limitations under the License.
       <access op="invoke" role="manage"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="GroupName" type="char_string" length="16"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups view">
@@ -56,6 +59,7 @@ limitations under the License.
         Command description for ViewGroup
       </description>
       <arg name="GroupID" type="group_id"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x02" name="GetGroupMembership" response="GetGroupMembershipResponse" cliFunctionName="zclGroupsGetCommand" isFabricScoped="true" optional="false" cli="zcl groups get">
@@ -63,6 +67,7 @@ limitations under the License.
         Command description for GetGroupMembership
       </description>
       <arg name="GroupList" type="group_id" array="true"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x03" name="RemoveGroup" response="RemoveGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups remove">
@@ -71,6 +76,7 @@ limitations under the License.
       </description>
       <access op="invoke" role="manage"/>
       <arg name="GroupID" type="group_id"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x04" name="RemoveAllGroups" isFabricScoped="true" optional="false" cli="zcl groups rmall">
@@ -78,6 +84,7 @@ limitations under the License.
         Command description for RemoveAllGroups
       </description>
       <access op="invoke" role="manage"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x05" name="AddGroupIfIdentifying" isFabricScoped="true" optional="false" cli="zcl groups add-if-id">
@@ -87,6 +94,7 @@ limitations under the License.
       <access op="invoke" role="manage"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="GroupName" length="16" type="char_string"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x00" name="AddGroupResponse" optional="false" disableDefaultResponse="true">
@@ -95,6 +103,7 @@ limitations under the License.
       </description>
       <arg name="Status" type="enum8"/>
       <arg name="GroupID" type="group_id"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x01" name="ViewGroupResponse" optional="false" disableDefaultResponse="true">
@@ -104,6 +113,7 @@ limitations under the License.
       <arg name="Status" type="enum8"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="GroupName" length="16" type="char_string"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x02" name="GetGroupMembershipResponse" optional="false" disableDefaultResponse="true">
@@ -112,6 +122,7 @@ limitations under the License.
       </description>
       <arg name="Capacity" type="int8u" isNullable="true"/>
       <arg name="GroupList" type="group_id" array="true"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x03" name="RemoveGroupResponse" optional="false" disableDefaultResponse="true">
@@ -120,6 +131,7 @@ limitations under the License.
       </description>
       <arg name="Status" type="enum8"/>
       <arg name="GroupID" type="group_id"/>
+      <mandatoryConform/>
     </command>
   </cluster>
 </configurator>

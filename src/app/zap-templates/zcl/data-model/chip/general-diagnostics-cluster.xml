@@ -92,17 +92,35 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x00" define="NETWORK_INTERFACES" type="array" entryType="NetworkInterface" length="8" writable="false" optional="false">NetworkInterfaces</attribute>
-    <attribute side="server" code="0x01" define="REBOOT_COUNT" type="int16u" writable="false" default="0x0000" optional="false">RebootCount</attribute>
+    <attribute side="server" code="0x00" name="NetworkInterfaces" define="NETWORK_INTERFACES" type="array" entryType="NetworkInterface" length="8">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x01" name="RebootCount" define="REBOOT_COUNT" type="int16u">
+      <mandatoryConform/>
+    </attribute>
     <!-- ***NOTE***: UpTime attribute is mandatory starting at Rev >= 2, but because of backwards compatibility, has to be optional here.
          The device type config and cert tests (TC-DGGEN-1.1/2.1) ensure that it is present. -->
-    <attribute side="server" code="0x02" define="UP_TIME" type="int64u" writable="false" default="0x0000000000000000" optional="true">UpTime</attribute>
-    <attribute side="server" code="0x03" define="TOTAL_OPERATIONAL_HOURS" type="int32u" writable="false" default="0x00000000" optional="true">TotalOperationalHours</attribute>
-    <attribute side="server" code="0x04" define="BOOT_REASONS" type="BootReasonEnum" writable="false" optional="true">BootReason</attribute>
-    <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="array" entryType="HardwareFaultEnum" writable="false" optional="true">ActiveHardwareFaults</attribute>
-    <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="array" entryType="RadioFaultEnum" writable="false" optional="true">ActiveRadioFaults</attribute>
-    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="array" entryType="NetworkFaultEnum" writable="false" optional="true">ActiveNetworkFaults</attribute>
-    <attribute side="server" code="0x08" define="TEST_EVENT_TRIGGERS_ENABLED" type="boolean" writable="false" optional="false">TestEventTriggersEnabled</attribute>
+    <attribute side="server" code="0x02" name="UpTime" define="UP_TIME" type="int64u" optional="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x03" name="TotalOperationalHours" define="TOTAL_OPERATIONAL_HOURS" type="int32u" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x04" name="BootReason" define="BOOT_REASONS" type="BootReasonEnum" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x05" name="ActiveHardwareFaults" define="ACTIVE_HARDWARE_FAULTS" type="array" entryType="HardwareFaultEnum" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x06" name="ActiveRadioFaults" define="ACTIVE_RADIO_FAULTS" type="array" entryType="RadioFaultEnum" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x07" name="ActiveNetworkFaults" define="ACTIVE_NETWORK_FAULTS" type="array" entryType="NetworkFaultEnum" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x08" name="TestEventTriggersEnabled" define="TEST_EVENT_TRIGGERS_ENABLED" type="boolean">
+      <mandatoryConform/>
+    </attribute>
     <!--
         WARNING !!!!! Attribute 0x0009 (previously AverageWearCount, see #30002/#29285)
         was previously mistakenly added in SDK without being in spec and WAS REMOVED.
@@ -118,16 +136,19 @@ limitations under the License.
       <arg name="EnableKey" type="octet_string" length="16"/>
       <arg name="EventTrigger" type="int64u"/>
       <access op="invoke" role="manage"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x01" name="TimeSnapshot" response="TimeSnapshotResponse" optional="false" apiMaturity="provisional">
       <description>Take a snapshot of system time and epoch time.</description>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x02" name="TimeSnapshotResponse" optional="false" apiMaturity="provisional">
       <description>Response for the TimeSnapshot command.</description>
       <arg name="SystemTimeMs" type="systime_ms" optional="false"/>
       <arg name="PosixTimeMs" type="posix_ms" isNullable="true" optional="false"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x03" name="PayloadTestRequest" response="PayloadTestResponse" optional="true" apiMaturity="provisional">
@@ -135,31 +156,41 @@ limitations under the License.
       <arg name="EnableKey" type="octet_string" length="16"/>
       <arg name="Value" type="int8u"/>
       <arg name="Count" type="int16u" max="2048"/>
+      <mandatoryConform>
+        <feature name="DMTEST"/>
+      </mandatoryConform>
     </command>
 
-    <command source="server" code="0x04" name="PayloadTestResponse" optional="true" apiMaturity="provisional">
+   <command source="server" code="0x04" name="PayloadTestResponse" optional="true" apiMaturity="provisional">
       <description>Response for the PayloadTestRequest command.</description>
       <arg name="Payload" type="octet_string" max="2048" optional="false"/>
+      <mandatoryConform>
+        <feature name="DMTEST"/>
+      </mandatoryConform>
     </command>
 
     <event side="server" code="0x00" name="HardwareFaultChange" priority="critical" optional="true">
       <description>Indicate a change in the set of hardware faults currently detected by the Node.</description>
       <field id="0" name="Current" type="HardwareFaultEnum" array="true"/>
       <field id="1" name="Previous" type="HardwareFaultEnum" array="true"/>
+      <optionalConform/>
     </event>
     <event side="server" code="0x01" name="RadioFaultChange" priority="critical" optional="true">
       <description>Indicate a change in the set of radio faults currently detected by the Node.</description>
       <field id="0" name="Current" type="RadioFaultEnum" array="true"/>
       <field id="1" name="Previous" type="RadioFaultEnum" array="true"/>
+      <optionalConform/>
     </event>
     <event side="server" code="0x02" name="NetworkFaultChange" priority="critical" optional="true">
       <description>Indicate a change in the set of network faults currently detected by the Node.</description>
       <field id="0" name="Current" type="NetworkFaultEnum" array="true"/>
       <field id="1" name="Previous" type="NetworkFaultEnum" array="true"/>
+      <optionalConform/>
     </event>
     <event side="server" code="0x03" name="BootReason" priority="critical" optional="false">
       <description>Indicate the reason that caused the device to start-up.</description>
       <field id="0" name="BootReason" type="BootReasonEnum"/>
+      <mandatoryConform/>
     </event>
   </cluster>
 </configurator>

@@ -15,58 +15,64 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-    <domain name="CHIP"/>
+  <domain name="CHIP"/>
+  
+  <struct name="ThreadNetworkStruct" apiMaturity="provisional">
+    <cluster code="0x0453"/>
+    <item name="ExtendedPanID" type="octet_string" length="8"/>
+    <item name="NetworkName" type="char_string" length="16"/>
+    <item name="Channel" type="int16u"/>
+    <item name="ActiveTimestamp" type="int64u"/>
+  </struct>
 
-    <struct name="ThreadNetworkStruct" apiMaturity="provisional">
-        <cluster code="0x0453"/>
-        <item name="ExtendedPanID" type="octet_string" length="8"/>
-        <item name="NetworkName" type="char_string" length="16"/>
-        <item name="Channel" type="int16u"/>
-        <item name="ActiveTimestamp" type="int64u"/>
-    </struct>
+  <cluster apiMaturity="provisional">
+    <domain>Network Infrastructure</domain>
+    <name>Thread Network Directory</name>
+    <code>0x0453</code>
+    <define>THREAD_NETWORK_DIRECTORY_CLUSTER</define>
+    <description>Manages the names and credentials of Thread networks visible to the user.</description>
 
-    <cluster apiMaturity="provisional">
-        <domain>Network Infrastructure</domain>
-        <name>Thread Network Directory</name>
-        <code>0x0453</code>
-        <define>THREAD_NETWORK_DIRECTORY_CLUSTER</define>
-        <description>Manages the names and credentials of Thread networks visible to the user.</description>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
 
-        <client tick="false" init="false">true</client>
-        <server tick="false" init="false">true</server>
+    <!-- cluster revision -->
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    
+    <attribute side="server" code="0x0000" name="PreferredExtendedPanID" define="PREFERRED_EXTENDED_PAN_ID" type="octet_string" length="8" writable="true" isNullable="true" optional="false">
+      <access op="read" privilege="manage"/>
+      <access op="write" privilege="manage"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="ThreadNetworks" define="THREAD_NETWORKS" type="array" entryType="ThreadNetworkStruct" writable="false" optional="false">
+      <access op="read" privilege="operate"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="ThreadNetworkTableSize" define="THREAD_NETWORK_TABLE_SIZE" type="int8u" writable="false" optional="false">
+      <mandatoryConform/>
+    </attribute>
 
-        <!-- cluster revision -->
-        <globalAttribute side="either" code="0xFFFD" value="1"/>
-
-        <attribute side="server" code="0x0000" define="PREFERRED_EXTENDED_PAN_ID" type="octet_string" length="8" writable="true" isNullable="true" optional="false">
-            <description>PreferredExtendedPanID</description>
-            <access op="read" privilege="manage"/>
-            <access op="write" privilege="manage"/>
-        </attribute>
-        <attribute side="server" code="0x0001" define="THREAD_NETWORKS" type="array" entryType="ThreadNetworkStruct" writable="false" optional="false">
-            <description>ThreadNetworks</description>
-            <access op="read" privilege="operate"/>
-        </attribute>
-        <attribute side="server" code="0x0002" define="THREAD_NETWORK_TABLE_SIZE" type="int8u" writable="false" optional="false">ThreadNetworkTableSize</attribute>
-
-        <command source="client" code="0x00" name="AddNetwork" mustUseTimedInvoke="true" optional="false">
-            <description>Adds an entry to the ThreadNetworks list.</description>
-            <access op="invoke" privilege="manage"/>
-            <arg name="OperationalDataset" type="octet_string" length="254"/>
-        </command>
-        <command source="client" code="0x01" name="RemoveNetwork" mustUseTimedInvoke="true" optional="false">
-            <description>Removes an entry from the ThreadNetworks list.</description>
-            <access op="invoke" privilege="manage"/>
-            <arg name="ExtendedPanID" type="octet_string" length="8"/>
-        </command>
-        <command source="client" code="0x02" name="GetOperationalDataset" optional="false" response="OperationalDatasetResponse">
-            <description>Retrieves a Thread Operational Dataset from the ThreadNetworks list.</description>
-            <access op="invoke" privilege="operate"/>
-            <arg name="ExtendedPanID" type="octet_string" length="8"/>
-        </command>
-        <command source="server" code="0x03" name="OperationalDatasetResponse" optional="false">
-            <description>This is the response to a GetOperationalDataset request.</description>
-            <arg name="OperationalDataset" type="octet_string" length="254"/>
-        </command>
-    </cluster>
+    <command source="client" code="0x00" name="AddNetwork" mustUseTimedInvoke="true" optional="false">
+      <description>Adds an entry to the ThreadNetworks list.</description>
+      <access op="invoke" privilege="manage"/>
+      <arg name="OperationalDataset" type="octet_string" length="254"/>
+      <mandatoryConform/>
+    </command>
+    <command source="client" code="0x01" name="RemoveNetwork" mustUseTimedInvoke="true" optional="false">
+      <description>Removes an entry from the ThreadNetworks list.</description>
+      <access op="invoke" privilege="manage"/>
+      <arg name="ExtendedPanID" type="octet_string" length="8"/>
+      <mandatoryConform/>
+    </command>
+    <command source="client" code="0x02" name="GetOperationalDataset" optional="false" response="OperationalDatasetResponse">
+      <description>Retrieves a Thread Operational Dataset from the ThreadNetworks list.</description>
+      <access op="invoke" privilege="operate"/>
+      <arg name="ExtendedPanID" type="octet_string" length="8"/>
+      <mandatoryConform/>
+    </command>
+    <command source="server" code="0x03" name="OperationalDatasetResponse" optional="false">
+      <description>This is the response to a GetOperationalDataset request.</description>
+      <arg name="OperationalDataset" type="octet_string" length="254"/>
+      <mandatoryConform/>
+    </command>
+  </cluster>
 </configurator>
