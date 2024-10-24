@@ -76,7 +76,8 @@ if (silabs_board == "") {
 assert(silabs_board != "", "silabs_board must be specified")
 
 # Si917 WIFI board ----------
-if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
+if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
+    silabs_board == "BRD4343A") {
   if (silabs_board == "BRD2605A") {
     sl_enable_rgb_led = true
   }
