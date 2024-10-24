@@ -1812,19 +1812,29 @@ void ConnectivityManagerImpl::PostNetworkConnect()
             strncmp(ifName, sWiFiIfName, sizeof(ifName)) == 0)
         {
             chip::Inet::IPAddress addr;
-            if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
+            if (it.GetAddress(addr) != CHIP_NO_ERROR)
             {
-                ChipDeviceEvent event{ .Type                       = DeviceEventType::kInternetConnectivityChange,
-                                       .InternetConnectivityChange = {
-                                           .IPv4 = kConnectivity_Established, .IPv6 = kConnectivity_NoChange, .ipAddress = addr } };
-
-                char ipStrBuf[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
-                addr.ToString(ipStrBuf);
-
-                ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName, ipStrBuf);
-
-                PlatformMgr().PostEventOrDie(&event);
+                ChipLogError(DeviceLayer, "Failed to got IP address on interface: %s", ifName);
+                continue;
             }
+            ChipDeviceEvent event{ .Type                       = DeviceEventType::kInternetConnectivityChange,
+                                   .InternetConnectivityChange = { .ipAddress = addr } };
+
+            if (addr.IsIPv4())
+            {
+                event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
+                event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+            }
+            else if (addr.IsIPv6())
+            {
+                event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+                event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
+            }
+
+            char ipStrBuf[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
+            addr.ToString(ipStrBuf);
+            ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName, ipStrBuf);
+            PlatformMgr().PostEventOrDie(&event);
         }
     }
 
