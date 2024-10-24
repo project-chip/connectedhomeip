@@ -360,9 +360,9 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
     if (!isDelegateNull(delegate))
     {
         DataModel::Nullable<Percent> cLevel = delegate->HandleOpenValve(level);
-        if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
+        if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel) && !cLevel.IsNull())
         {
-            VerifyOrReturnError(Status::Success == CurrentLevel::Set(ep, cLevel), attribute_error);
+            UpdateCurrentLevel(ep, cLevel.Value());
         }
     }
     // start countdown
@@ -376,14 +376,28 @@ CHIP_ERROR UpdateCurrentLevel(EndpointId ep, Percent currentLevel)
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
     {
         VerifyOrReturnError(Status::Success == CurrentLevel::Set(ep, currentLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        return CHIP_NO_ERROR;
     }
-    return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+    DataModel::Nullable<Percent> targetLevel = DataModel::NullNullable;
+    TargetLevel::Get(ep, targetLevel);
+    if (!targetLevel.IsNull() && currentLevel == targetLevel.Value())
+    {
+        targetLevel = DataModel::NullNullable;
+        TargetLevel::Set(ep, targetLevel);
+        UpdateCurrentState(ep, currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR UpdateCurrentState(EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState)
 {
     VerifyOrReturnError(Status::Success == CurrentState::Set(ep, currentState), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    DataModel::Nullable<ValveStateEnum> targetState = DataModel::NullNullable;
+    TargetState::Get(ep, targetState);
+    if (currentState == targetState.ValueOr(ValveStateEnum::kUnknownEnumValue))
+    {
+        targetState = DataModel::NullNullable;
+        TargetState::Set(ep, targetState);
+    }
     emitValveStateChangedEvent(ep, currentState);
     return CHIP_NO_ERROR;
 }
