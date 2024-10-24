@@ -246,7 +246,7 @@ CHIP_ERROR EmberAttributeBuffer::DecodeAsString(chip::TLV::TLVReader & reader, P
 
 CHIP_ERROR EmberAttributeBuffer::Decode(chip::TLV::TLVReader & reader)
 {
-    // all methods below assume that nullable setting matches  (this is to reduce code size
+    // all methods below assume that nullable setting matches (this is to reduce code size
     // even though clarity suffers)
     VerifyOrReturnError(mIsNullable || reader.GetType() != TLV::kTLVType_Null, CHIP_ERROR_WRONG_TLV_TYPE);
 
