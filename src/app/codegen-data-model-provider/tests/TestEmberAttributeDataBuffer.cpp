@@ -249,24 +249,6 @@ const EmberAfAttributeMetadata * CreateFakeMeta(EmberAfAttributeType type, bool 
 }
 
 } // namespace
-//
-namespace pw {
-
-// Pretty format in case of errors
-template <>
-StatusWithSize ToString<EncodeResult>(const EncodeResult & result, pw::span<char> buffer)
-{
-    const std::optional<CHIP_ERROR> & value = result.Value();
-
-    if (!value.has_value())
-    {
-        return pw::string::Format(buffer, "SuccessResult");
-    }
-
-    return pw::string::Format(buffer, "FailureResult:CHIP_ERROR:<%" CHIP_ERROR_FORMAT ">", value->Format());
-}
-
-} // namespace pw
 
 // All the tests below assume buffer ordering in little endian format
 // Since currently all chip platforms in CI are little endian, we just kept tests
