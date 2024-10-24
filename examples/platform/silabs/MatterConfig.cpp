@@ -25,6 +25,7 @@
 #include <mbedtls/platform.h>
 
 #ifdef SL_WIFI
+#include "SiWxPlatformInterface.h"
 #include "wfx_host_events.h"
 #endif /* SL_WIFI */
 
@@ -331,7 +332,7 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 extern "C" void vApplicationIdleHook(void)
 {
 #if (SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER)
-    sl_si91x_btn_event_handler();
-    sl_si91x_uart_power_requirement_handler();
+    chip::DeviceLayer::Silabs::SiWxPlatformInterface::sl_si91x_btn_event_handler();
+    chip::DeviceLayer::Silabs::SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
 #endif
 }

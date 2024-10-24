@@ -159,6 +159,10 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
     // Currently the btn0 is pull-up resistor due to which is sends a release event on every wakeup
     if (btn == SL_BUTTON_BTN0_NUMBER)
     {
+        // if the btn was not pressed and only a release event came, ignore it
+        VerifyOrReturn((btnAction == BUTTON_RELEASED) && (sl_btn0_pressed == false));
+        // if the btn was already pressed and another press event came, ignore it
+        VerifyOrReturn((btnAction == BUTTON_PRESSED) && (sl_btn0_pressed == true));
         if ((btnAction == BUTTON_PRESSED) && (sl_btn0_pressed == false))
         {
             sl_btn0_pressed = true;
@@ -166,16 +170,6 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
         else if ((btnAction == BUTTON_RELEASED) && (sl_btn0_pressed == true))
         {
             sl_btn0_pressed = false;
-        }
-        else if ((btnAction == BUTTON_PRESSED) && (sl_btn0_pressed == true))
-        {
-            // if the btn was already pressed and another press event came, ignore it
-            return;
-        }
-        else if ((btnAction == BUTTON_RELEASED) && (sl_btn0_pressed == false))
-        {
-            // if the btn was not pressed and only a release event came, ignore it
-            return;
         }
     }
 #endif // SL_ICD_ENABLED

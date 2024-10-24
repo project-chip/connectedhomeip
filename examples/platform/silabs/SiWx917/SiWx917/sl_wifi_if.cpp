@@ -66,10 +66,10 @@ extern "C" {
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
+#include "SiWxPlatformInterface.h"
+
 #include "rsi_rom_power_save.h"
 #include "sl_gpio_board.h"
-#include "sl_si91x_button.h"
-#include "sl_si91x_button_pin_config.h"
 #include "sl_si91x_driver_gpio.h"
 #include "sl_si91x_power_manager.h"
 namespace {
@@ -260,8 +260,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
-// This function is called when the button is pressed when in sleep then the idleTask is handling the button press event
-void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
+void chip::DeviceLayer::Silabs::SiWxPlatformInterface::gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
 {
     // UULP_GPIO_2 is used to detect the button 0 press
     VerifyOrReturn(pin_intr == RTE_UULP_GPIO_2_PIN, ChipLogError(DeviceLayer, "invalid pin interrupt: %ld", pin_intr));
@@ -276,16 +275,8 @@ void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
         VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
     }
 }
-// Required to invoke button press event during sleep as falling edge is not detected
-// NOTE: flow is GPIO wakeup due to BTN0 press -> check button state in idle task
-// required as the GPIO interrupt is not detected during sleep for BUTTON RELEASED
-void sl_si91x_btn_event_handler(void)
-{
-    sl_button_on_change(SL_BUTTON_BTN0_NUMBER,
-                        (sl_si91x_gpio_get_uulp_npss_pin(SL_BUTTON_BTN0_PIN) == LOW) ? BUTTON_PRESSED : BUTTON_RELEASED);
-}
 
-void sl_si91x_uart_power_requirement_handler(void)
+void chip::DeviceLayer::Silabs::SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler(void)
 {
 #ifdef ENABLE_CHIP_SHELL
     // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
