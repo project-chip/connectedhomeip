@@ -21,6 +21,8 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
+constexpr const uint32_t kIssuerId = 12345678;
+
 @interface CertificateIssuer ()
 - (MTRCertificateDERBytes _Nullable)issueOperationalCertificateForNodeID:(NSNumber *)nodeID
                                                                 fabricID:(NSNumber *)fabricID
@@ -67,7 +69,7 @@
         return;
     }
 
-    __auto_type * rootCertificate = [MTRCertificates createRootCertificate:signingKey issuerID:nil fabricID:nil error:error];
+    __auto_type * rootCertificate = [MTRCertificates createRootCertificate:signingKey issuerID:@(kIssuerId) fabricID:nil error:error];
     if (nil == rootCertificate) {
         *error = [NSError errorWithDomain:@"Error" code:0 userInfo:@{ @"reason" : @"Error creating root certificate" }];
         return;
