@@ -69,7 +69,7 @@ parser.add_argument(
     help=("host directory to share with the guest"))
 parser.add_argument(
     '--runner', type=str,
-    help=("path to the runner script which will run automatically after boot. ignored in interactive mode. path should be relative to shared directory"))
+    help=("path to the runner script which will run automatically after boot. path should be relative to shared directory"))
 parser.add_argument(
     '--output', metavar='FILE', default="/dev/null",
     help="store the QEMU output in a FILE")
@@ -137,7 +137,7 @@ if args.interactive:
     # Run root shell instead of the runner script.
     kernel_args += " rootshell"
 
-elif args.runner:
+if args.runner:
     kernel_args += " runner=/mnt/chip/%s" % args.runner
 
 qemu_args += [
