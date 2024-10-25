@@ -66,6 +66,10 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]   
 #include "chef-operational-state-delegate-impl.h"
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
 
+#ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+#include "chef-fan-control-manager.h"
+#endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
@@ -232,6 +236,10 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                         ChipLogValueMEI(attributeId), type, *value, size);
 
         // WIP Apply attribute change to Light
+    }
+    else if (clusterId == FanControl::Id)
+    {
+        HandleFanControlAttributeChange(attributeId, type, size, value);
     }
 }
 
