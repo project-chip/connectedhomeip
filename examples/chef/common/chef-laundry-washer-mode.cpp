@@ -99,8 +99,8 @@ chip::Protocols::InteractionModel::Status chefLaundryWasherModeWriteCallback(chi
                                                                              const EmberAfAttributeMetadata * attributeMetadata,
                                                                              uint8_t * buffer)
 {
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1
-    VerifyOrReturnError(gLaundryWasherModeInstance != nullptr, chip::Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnError(endpointId == 1 || gLaundryWasherModeInstance != nullptr, 
+                        chip::Protocols::InteractionModel::Status::Failure);
 
     chip::Protocols::InteractionModel::Status ret;
     chip::AttributeId attributeId = attributeMetadata->attributeId;
