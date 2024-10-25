@@ -692,7 +692,7 @@ def BuildTizenTarget():
     target.AppendModifier("asan", use_asan=True)
     target.AppendModifier("ubsan", use_ubsan=True)
     target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(tests)')
+        '-tests')
     target.AppendModifier('with-ui', with_ui=True)
 
     return target
