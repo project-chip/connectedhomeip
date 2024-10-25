@@ -250,18 +250,20 @@ void emberAfEndpointConfigure();
 // templateClusterSpecs is a list of clusterId/mask to specify the clusters to
 // be used from the template for the new endpoint.
 //
+// endpointType must be passed in with all members zero (cluster, clusterCount, endpointSize)
+// to express the endpoint has not yet been configured before.
 // endpointType will be setup with the specified clusters and their storage size so
 // it can be used in a subsequent call to emberAfSetDynamicEndpoint instead of
 // an endpoint manually constructed with DECLARE_DYNAMIC_*.
 //
 // Note: passing invalid templateEndpointId/templateClusterIds combinations, i.e. clusters
-//   not present in the specified template endpoint, will cause the function will die with
-//   an error message as this indicates severe internal inconsistency of the setup.
+//   not present in the specified template endpoint, will cause the function to
+//   return CHIP_ERROR_NOT_FOUND and endpointType unmodified.
 //
 // Note: function may allocate memory for the endpoint declaration.
-//   Use emberAfResetEndpointDeclaration to properly dispose of an endpoint declaration.
-void emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, chip::EndpointId templateEndpointId,
-                                            const chip::Span<const EmberAfClusterSpec> & templateClusterSpecs);
+//   Use emberAfResetEndpointDeclaration to properly dispose of a dynamic endpoint declaration.
+CHIP_ERROR emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, chip::EndpointId templateEndpointId,
+                                                  const chip::Span<const EmberAfClusterSpec> & templateClusterSpecs);
 
 // reset an endpoint declaration that was setup with emberAfSetupDynamicEndpointDeclaration
 // to free all extra memory that might have been allocated.

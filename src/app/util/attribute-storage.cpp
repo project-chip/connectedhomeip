@@ -30,6 +30,7 @@
 #include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -281,32 +282,45 @@ const EmberAfCluster * getClusterTypeDefinition(EndpointId endpointId, ClusterId
 
 } // anonymous namespace
 
-void emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, EndpointId templateEndpointId,
-                                            const Span<const EmberAfClusterSpec> & templateClusterSpecs)
+CHIP_ERROR emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, EndpointId templateEndpointId,
+                                                  const Span<const EmberAfClusterSpec> & templateClusterSpecs)
 {
-    // allocate cluster list
+    // we want an explicitly empty endpoint to begin with, to make sure no already set-up endpoint is passed in
+    VerifyOrReturnError(endpointType.cluster == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endpointType.endpointSize == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endpointType.clusterCount == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    // check cluster count fits target struct's clusterCount field
     size_t clusterCount = templateClusterSpecs.size();
-    VerifyOrDieWithMsg(clusterCount <= 255, Support, "max 255 clusters per endpoint!");
-    endpointType.clusterCount = static_cast<uint8_t>(clusterCount);
-    endpointType.cluster      = new EmberAfCluster[endpointType.clusterCount];
-    endpointType.endpointSize = 0;
+    VerifyOrReturnError(CanCastTo<typeof(endpointType.clusterCount)>(clusterCount), CHIP_ERROR_NO_MEMORY);
+    // allocate new cluster array
+    auto newClusters = new EmberAfCluster[clusterCount];
+    VerifyOrReturnError(newClusters != nullptr, CHIP_ERROR_NO_MEMORY);
+    uint16_t endpointSize = 0;
     // get the actual cluster pointers and sum up memory size
-    for (size_t i = 0; i < templateClusterSpecs.size(); i++)
+    for (size_t i = 0; i < clusterCount; i++)
     {
         auto cluster =
             getClusterTypeDefinition(templateEndpointId, templateClusterSpecs[i].clusterId, templateClusterSpecs[i].mask);
-        VerifyOrDieWithMsg(cluster, Support, "cluster 0x%04x with mask %x could not be found in template endpoint %u",
-                           (unsigned int) templateClusterSpecs[i].clusterId, templateClusterSpecs[i].mask,
-                           (unsigned int) templateEndpointId);
+        if (!cluster)
+        {
+            delete[] newClusters;
+            ChipLogError(DataManagement, "cluster 0x%04x with mask %x could not be found in template endpoint %u",
+                         (unsigned int) templateClusterSpecs[i].clusterId, templateClusterSpecs[i].mask,
+                         (unsigned int) templateEndpointId);
+            return CHIP_ERROR_NOT_FOUND;
+        }
         // for now, we need to copy the cluster definition, unfortunately.
         // TODO: make endpointType use a pointer to a list of EmberAfCluster* instead, so we can re-use cluster definitions
         //   instead of duplicating them here once for every instance.
-        // Note: we need const cast here, because cluster in EmberAfEndpointType is const due
-        //   to the way static cluster code generation works.
-        const_cast<EmberAfCluster &>(endpointType.cluster[i]) = *cluster;
+        newClusters[i] = *cluster;
         // sum up the needed storage
-        endpointType.endpointSize += cluster->clusterSize;
+        endpointSize += cluster->clusterSize;
     }
+    // set up dynamic endpoint
+    endpointType.clusterCount = static_cast<uint8_t>(clusterCount);
+    endpointType.cluster      = newClusters;
+    endpointType.endpointSize = endpointSize;
+    return CHIP_NO_ERROR;
 }
 
 void emberAfResetDynamicEndpointDeclaration(EmberAfEndpointType & endpointType)
@@ -691,6 +705,8 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                 // Endpoint processing starts here, so reset the offset.
                 attributeStorageOffset = 0;
             }
+#else
+            constexpr bool hasDynamicAttributeStorage = false;
 #endif
 
             for (clusterIndex = 0; clusterIndex < endpointType->clusterCount; clusterIndex++)
@@ -720,12 +736,10 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                                 {
                                     attributeLocation = singletonAttributeLocation(am);
                                 }
-#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
                                 else if (hasDynamicAttributeStorage)
                                 {
                                     attributeLocation = emAfEndpoints[ep].dynamicAttributeStorage.data();
                                 }
-#endif
                                 else
                                 {
                                     attributeLocation = attributeData;
@@ -770,11 +784,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
 
                                 // Internal storage is only supported for fixed endpoints
                                 // and dynamic ones with dynamicAttributeStorage assigned.
-                                if (!isDynamicEndpoint
-#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
-                                    || hasDynamicAttributeStorage
-#endif
-                                )
+                                if (!isDynamicEndpoint || hasDynamicAttributeStorage)
                                 {
                                     return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
                                 }
