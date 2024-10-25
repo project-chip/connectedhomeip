@@ -172,24 +172,27 @@ bool HasValidEventPathForEndpoint(EndpointId aEndpoint, const EventPathParams & 
 
 bool HasValidEventPath(const EventPathParams & aEventPath, const Access::SubjectDescriptor & aSubjectDescriptor)
 {
-    if (aEventPath.HasWildcardEndpointId())
-    {
-        for (uint16_t endpointIndex = 0; !aHasValidEventPath && endpointIndex < emberAfEndpointCount(); ++endpointIndex)
-        {
-            if (!emberAfEndpointIndexIsEnabled(endpointIndex))
-            {
-                continue;
-            }
-            aHasValidEventPath =
-                HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), aEventPath, aSubjectDescriptor);
-        }
-    }
-    else
+    if (!aEventPath.HasWildcardEndpointId())
     {
         // No need to check whether the endpoint is enabled, because
         // emberAfFindEndpointType returns null for disabled endpoints.
-        aHasValidEventPath = HasValidEventPathForEndpoint(aEventPath.mEndpointId, aEventPath, aSubjectDescriptor);
+        return HasValidEventPathForEndpoint(aEventPath.mEndpointId, aEventPath, aSubjectDescriptor);
     }
+
+    for (uint16_t endpointIndex = 0; endpointIndex < emberAfEndpointCount(); ++endpointIndex)
+    {
+        if (!emberAfEndpointIndexIsEnabled(endpointIndex))
+        {
+            continue;
+        }
+        if (HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), aEventPath, aSubjectDescriptor))
+        {
+            return true;
+        }
+    }
+
+    // none of the paths matched
+    return false;
 }
 #endif
 
