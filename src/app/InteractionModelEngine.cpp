@@ -24,17 +24,16 @@
  */
 
 #include "InteractionModelEngine.h"
-#include "access/AccessRestrictionProvider.h"
-#include "access/Privilege.h"
-#include "app/EventPathParams.h"
-#include "lib/core/CHIPError.h"
 
 #include <cinttypes>
 
+#include <access/AccessRestrictionProvider.h>
+#include <access/Privilege.h>
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app/AppConfig.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -43,6 +42,7 @@
 #include <app/util/af-types.h>
 #include <app/util/ember-compatibility-functions.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
@@ -1864,8 +1864,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
     const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
     const bool commandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
 #else
-    const bool commandNeedsTimedInvoke         = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
-    const bool commandIsFabricScoped           = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
+    const bool commandNeedsTimedInvoke = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
+    const bool commandIsFabricScoped   = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
 #endif
 
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
