@@ -706,7 +706,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                 attributeStorageOffset = 0;
             }
 #else
-            constexpr bool hasDynamicAttributeStorage = false;
+            const bool hasDynamicAttributeStorage = false;
 #endif
 
             for (clusterIndex = 0; clusterIndex < endpointType->clusterCount; clusterIndex++)
@@ -736,10 +736,12 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                                 {
                                     attributeLocation = singletonAttributeLocation(am);
                                 }
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
                                 else if (hasDynamicAttributeStorage)
                                 {
                                     attributeLocation = emAfEndpoints[ep].dynamicAttributeStorage.data();
                                 }
+#endif
                                 else
                                 {
                                     attributeLocation = attributeData;
