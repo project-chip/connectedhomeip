@@ -348,11 +348,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * The values to wait for are represented as an array of response-values which
  * have an MTRAttributePathKey and MTRDataKey.
  *
- * The timeout argument can be nil to indicate no timeout. Otherwise it must
- * be an NSTimeInterval wrapped in NSNumber.
+ * If the provided timeout is larger than 5 minutes, it will be capped to 5 minutes.
  */
 - (void)waitForAttributeValues:(NSArray<NSDictionary<NSString *, id> *> *)values
-                       timeout:(NSNumber * _Nullable)timeout
+                       timeout:(NSTimeInterval)timeout
                          queue:(dispatch_queue_t)queue
                     completion:(void (^)(NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 

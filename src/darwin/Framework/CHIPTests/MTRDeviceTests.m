@@ -1589,7 +1589,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Some quick tests for waitForAttributeValues.  First, values that we know
     // are already there:
     XCTestExpectation * deviceTypesWaitExpectation = [self expectationWithDescription:@"deviceTypes is already the value we expect"];
-    [device waitForAttributeValues:deviceTypes timeout:nil queue:queue completion:^(NSError * _Nullable error) {
+    [device waitForAttributeValues:deviceTypes timeout:200 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [deviceTypesWaitExpectation fulfill];
     }];
@@ -1606,7 +1606,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         },
     ];
     XCTestExpectation * bogusDeviceTypesWaitExpectation = [self expectationWithDescription:@"bogusDeviceTypes wait should time out"];
-    [device waitForAttributeValues:bogusDeviceTypes timeout:@(0.5) queue:queue completion:^(NSError * _Nullable error) {
+    [device waitForAttributeValues:bogusDeviceTypes timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, MTRErrorDomain);
         XCTAssertEqual(error.code, MTRErrorCodeTimeout);
@@ -1648,7 +1648,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             MTRDataKey : writeValue,
         }
     ]
-                           timeout:@(0.5)
+                           timeout:0.5
                              queue:queue completion:^(NSError * _Nullable error) {
                                  XCTAssertNotNil(error);
                                  XCTAssertEqual(error.domain, MTRErrorDomain);
@@ -1709,19 +1709,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     };
 
     XCTestExpectation * waitingForOnTimeValue1Expectation = [self expectationWithDescription:@"OnTime value is now the expected value"];
-    [device waitForAttributeValues:@[ onTimeValueToWaitFor ] timeout:nil queue:queue completion:^(NSError * _Nullable error) {
+    [device waitForAttributeValues:@[ onTimeValueToWaitFor ] timeout:200 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [waitingForOnTimeValue1Expectation fulfill];
     }];
 
     XCTestExpectation * waitingForOnTimeValue2Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is the expected value"];
-    [device waitForAttributeValues:@[ onTimeValueToWaitFor, deviceTypes[0] ] timeout:nil queue:queue completion:^(NSError * _Nullable error) {
+    [device waitForAttributeValues:@[ onTimeValueToWaitFor, deviceTypes[0] ] timeout:200 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [waitingForOnTimeValue2Expectation fulfill];
     }];
 
     XCTestExpectation * waitingForOnTimeValue3Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is bogus, or we timed out"];
-    [device waitForAttributeValues:@[ onTimeValueToWaitFor, bogusDeviceTypes[0] ] timeout:@(0.5) queue:queue completion:^(NSError * _Nullable error) {
+    [device waitForAttributeValues:@[ onTimeValueToWaitFor, bogusDeviceTypes[0] ] timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, MTRErrorDomain);
         XCTAssertEqual(error.code, MTRErrorCodeTimeout);
