@@ -23,6 +23,7 @@
 #import "MTRCluster.h"
 #import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCluster_Internal.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
