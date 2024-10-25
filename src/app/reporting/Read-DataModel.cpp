@@ -47,7 +47,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     {
         readRequest.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
     }
-    readRequest.subjectDescriptor = subjectDescriptor;
+    readRequest.subjectDescriptor = &subjectDescriptor;
     readRequest.path              = path;
 
     DataVersion version = 0;

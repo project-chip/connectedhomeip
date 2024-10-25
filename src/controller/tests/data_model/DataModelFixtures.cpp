@@ -18,6 +18,7 @@
 
 #include "DataModelFixtures.h"
 
+#include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeValueDecoder.h>
@@ -522,8 +523,13 @@ ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & r
     }
 #endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
-    CHIP_ERROR err = ReadSingleClusterData(request.subjectDescriptor.value_or(Access::SubjectDescriptor()),
-                                           request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
+    Access::SubjectDescriptor subjectDescriptor;
+    if (request.subjectDescriptor != nullptr)
+    {
+        subjectDescriptor = *request.subjectDescriptor;
+    }
+
+    CHIP_ERROR err = ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
                                            TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
 
     // state must survive CHIP_ERRORs as it is used for chunking
