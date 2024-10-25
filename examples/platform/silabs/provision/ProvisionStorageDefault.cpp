@@ -29,7 +29,7 @@
 #include <platform/silabs/MigrationManager.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <silabs_creds.h>
-#ifndef NDEBUG && SL_MATTER_GN_BUILD==0
+#ifndef NDEBUG && SL_MATTER_GN_BUILD == 0
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 #include <sl_matter_test_event_trigger_config.h>
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
