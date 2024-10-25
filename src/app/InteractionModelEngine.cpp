@@ -81,7 +81,7 @@ bool HasValidEventPathForEndpointAndCluster(const ConcreteClusterPath & path, co
     {
         requestPath.entityId = aEventPath.mEventId;
         requiredPrivilege =
-            RequiredPrivilege::ForReadEvent(ConcreteEventPath(path.mClusterId, path.mClusterId, aEventPath.mEventId));
+            RequiredPrivilege::ForReadEvent(ConcreteEventPath(path.mEndpointId, path.mClusterId, aEventPath.mEventId));
     }
 
     return (Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requiredPrivilege) == CHIP_NO_ERROR);
