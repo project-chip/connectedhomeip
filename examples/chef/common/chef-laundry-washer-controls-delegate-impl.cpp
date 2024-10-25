@@ -30,8 +30,10 @@ const CharSpan LaundryWasherControlDelegate::spinSpeedsNameOptions[] = {
 };
 
 const NumberOfRinsesEnum LaundryWasherControlDelegate::supportRinsesOptions[] = {
+    NumberOfRinsesEnum::kNone,
     NumberOfRinsesEnum::kNormal,
     NumberOfRinsesEnum::kExtra,
+    NumberOfRinsesEnum::kMax,
 };
 
 LaundryWasherControlDelegate LaundryWasherControlDelegate::instance;

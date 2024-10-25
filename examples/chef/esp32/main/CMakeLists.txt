@@ -74,6 +74,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/../common/clusters/resource-monitoring/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/switch/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/target-navigator/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/temperature-control/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/wake-on-lan/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
