@@ -114,6 +114,8 @@ bool HasValidEventPathForEndpoint(DataModel::Provider * aProvider, EndpointId aE
 bool HasValidEventPath(DataModel::Provider * aProvider, const EventPathParams & aEventPath,
                        const Access::SubjectDescriptor & subjectDescriptor)
 {
+    VerifyOrReturnValue(aProvider != nullptr, false);
+
     if (!aEventPath.HasWildcardEndpointId())
     {
         return HasValidEventPathForEndpoint(aProvider, aEventPath.mEndpointId, aEventPath, subjectDescriptor);
