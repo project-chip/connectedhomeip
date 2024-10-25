@@ -17,8 +17,8 @@
  */
 
 #include "DataModelFixtures.h"
-#include "access/SubjectDescriptor.h"
 
+#include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeValueDecoder.h>
