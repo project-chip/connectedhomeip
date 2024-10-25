@@ -177,7 +177,7 @@ sl_status_t wfx_connect_to_ap(void)
     ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
     WfxEvent_t event;
     event.eventType = WFX_EVT_STA_START_JOIN;
-    sl_matter_wifi_post_event(event);
+    sl_matter_wifi_post_event(&event);
     return SL_STATUS_OK;
 }
 
@@ -378,7 +378,7 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 
     WfxEvent_t event;
     event.eventType = WFX_EVT_SCAN;
-    sl_matter_wifi_post_event(event);
+    sl_matter_wifi_post_event(&event);
 
     return true;
 }

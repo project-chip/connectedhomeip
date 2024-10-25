@@ -108,11 +108,13 @@ bool hasNotifiedIPV4 = false;
 
 wfx_wifi_scan_ext_t temp_reset;
 
-osSemaphoreId_t sScanSemaphore;
+osSemaphoreId_t sScanCompleteSemaphore;
+osSemaphoreId_t sScanInProgressSemaphore;
 osTimerId_t sDHCPTimer;
 osMessageQueueId_t sWifiEventQueue = nullptr;
 
 sl_net_wifi_lwip_context_t wifi_client_context;
+sl_wifi_security_t security = SL_WIFI_SECURITY_UNKNOWN;
 
 const sl_wifi_device_configuration_t config = {
     .boot_option = LOAD_NWP_FW,
@@ -189,7 +191,7 @@ constexpr uint8_t kAdvRssiToleranceThreshold = 5;
 constexpr uint8_t kAdvActiveScanDuration     = 15;
 constexpr uint8_t kAdvPassiveScanDuration    = 20;
 constexpr uint8_t kAdvMultiProbe             = 1;
-constexpr uint8_t ADV_SCAN_PERIODICITY       = 10;
+constexpr uint8_t kAdvScanPeriodicity        = 10;
 
 // TODO: Confirm that this value works for size and timing
 constexpr uint8_t kWfxQueueSize = 10;
@@ -201,7 +203,7 @@ void DHCPTimerEventHandler(void * arg)
 {
     WfxEvent_t event;
     event.eventType = WFX_EVT_DHCP_POLL;
-    sl_matter_wifi_post_event(event);
+    sl_matter_wifi_post_event(&event);
 }
 
 void CancelDHCPTimer(void)
@@ -266,8 +268,8 @@ sl_status_t sl_wifi_siwx917_init(void)
 #else
     // NCP Configurations
     status = sl_matter_wifi_platform_init();
-    VerifyOrRetunError(status == SL_STATUS_OK, status,
-                       ChipLogError(DeviceLayer, "sl_matter_wifi_platform_init failed: 0x%lx", static_cast<uint32_t>(status)));
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_matter_wifi_platform_init failed: 0x%lx", static_cast<uint32_t>(status)));
 #endif // SLI_SI91X_MCU_INTERFACE
 
     sl_wifi_firmware_version_t version = { 0 };
@@ -301,41 +303,71 @@ sl_status_t sl_wifi_siwx917_init(void)
     return status;
 }
 
-sl_status_t sl_wifi_platform_join_network(void)
+// TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
+#ifndef EXP_BOARD
+sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_result, uint32_t result_length, void * arg)
 {
-    VerifyOrReturnError(!(wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED)), SL_STATUS_IN_PROGRESS);
     sl_status_t status = SL_STATUS_OK;
-
-    sl_wifi_security_t security = SL_WIFI_SECURITY_UNKNOWN;
-    switch (wfx_rsi.sec.security)
+    if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
-    case WFX_SEC_WEP:
-        security = SL_WIFI_WEP;
-        break;
-    case WFX_SEC_WPA:
-        security = SL_WIFI_WPA_WPA2_MIXED;
-        break;
-    case WFX_SEC_WPA2:
+        ChipLogError(DeviceLayer, "Scan Netwrok Failed: 0x%lx", *reinterpret_cast<sl_status_t *>(status));
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
-        security = SL_WIFI_WPA3_TRANSITION;
-        break;
-    case WFX_SEC_WPA3:
-        security = SL_WIFI_WPA3_TRANSITION;
+        security = SL_WIFI_WPA3;
 #else
         security = SL_WIFI_WPA_WPA2_MIXED;
-#endif // WIFI_ENABLE_SECURITY_WPA3_TRANSITION
-        break;
-    case WFX_SEC_NONE:
-        security = SL_WIFI_OPEN;
-        break;
-    default:
-        ChipLogError(DeviceLayer, "sl_wifi_platform_join_network: unknown security type.");
-        return status;
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
+
+        status = SL_STATUS_FAIL;
     }
-    /*
-     * Join the network
-     */
-    wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTING;
+    else
+    {
+        security        = static_cast<sl_wifi_security_t>(scan_result->scan_info[0].security_mode);
+        wfx_rsi.ap_chan = scan_result->scan_info[0].rf_channel;
+        memcpy(&wfx_rsi.ap_mac.octet, scan_result->scan_info[0].bssid, BSSID_LEN);
+    }
+
+    osSemaphoreRelease(sScanCompleteSemaphore);
+    return status;
+}
+#endif
+
+sl_status_t InitiateScan()
+{
+    sl_status_t status = SL_STATUS_OK;
+
+// TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
+#ifndef EXP_BOARD
+    sl_wifi_ssid_t ssid = { 0 };
+
+    // TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
+    sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
+
+    ssid.length = wfx_rsi.sec.ssid_length;
+
+    chip::Platform::CopyString((char *) &ssid.value[0], ssid.length + 1, wfx_rsi.sec.ssid);
+    sl_wifi_set_scan_callback(ScanCallback, NULL);
+
+    osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
+
+    // This is an odd success code?
+    status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &ssid, &wifi_scan_configuration);
+    if (status == SL_STATUS_IN_PROGRESS)
+    {
+        osSemaphoreAcquire(sScanCompleteSemaphore, kWifiScanTimeoutTicks);
+        status = SL_STATUS_OK;
+    }
+    else
+    {
+        osSemaphoreRelease(sScanInProgressSemaphore);
+    }
+#endif
+
+    return status;
+}
+
+sl_status_t SetWifiConfigurations()
+{
+    sl_status_t status = SL_STATUS_OK;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Setting the listen interval to 0 which will set it to DTIM interval
@@ -383,27 +415,41 @@ sl_status_t sl_wifi_platform_join_network(void)
     status = sl_net_set_profile((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile Failed"));
 
+    return status;
+}
+
+sl_status_t JoinWifiNetwork(void)
+{
+    VerifyOrReturnError(!(wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED)), SL_STATUS_IN_PROGRESS);
+    sl_status_t status = SL_STATUS_OK;
+
+    // Start Join Network
+    wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTING;
+
+    status = SetWifiConfigurations();
+    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "Failure to set the Wifi Configurations!"));
+
     status = sl_net_up((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
 
     if (status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS)
     {
         WfxEvent_t event;
         event.eventType = WFX_EVT_STA_CONN;
-        sl_matter_wifi_post_event(event);
+        sl_matter_wifi_post_event(&event);
         return status;
     }
 
     // failure only happens when the firmware returns an error
-    ChipLogError(DeviceLayer, "sl_wifi_platform_join_network: sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
+    ChipLogError(DeviceLayer, "sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
     VerifyOrReturnError((wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
 
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
-    ChipLogProgress(DeviceLayer, "sl_wifi_platform_join_network: retry attempt %d", wfx_rsi.join_retries);
+    ChipLogProgress(DeviceLayer, "Connection retry attempt %d", wfx_rsi.join_retries);
     wfx_retry_connection(++wfx_rsi.join_retries);
 
     WfxEvent_t event;
     event.eventType = WFX_EVT_STA_START_JOIN;
-    sl_matter_wifi_post_event(event);
+    sl_matter_wifi_post_event(&event);
 
     return status;
 }
@@ -612,7 +658,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
 sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t * result, uint32_t result_length, void * arg)
 {
     show_scan_results(result); // To do Check error
-    osSemaphoreRelease(sScanSemaphore);
+    osSemaphoreRelease(sScanCompleteSemaphore);
     return SL_STATUS_OK;
 }
 
@@ -641,7 +687,7 @@ void HandleDHCPPolling(void)
         wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
         hasNotifiedIPV4 = true;
         event.eventType = WFX_EVT_STA_DHCP_DONE;
-        sl_matter_wifi_post_event(event);
+        sl_matter_wifi_post_event(&event);
         NotifyConnectivity();
     }
     else if (dhcp_state == DHCP_OFF)
@@ -661,14 +707,14 @@ void HandleDHCPPolling(void)
         wfx_ipv6_notify(GET_IPV6_SUCCESS);
         hasNotifiedIPV6 = true;
         event.eventType = WFX_EVT_STA_DHCP_DONE;
-        sl_matter_wifi_post_event(event);
+        sl_matter_wifi_post_event(&event);
         NotifyConnectivity();
     }
 }
 
-void sl_matter_wifi_post_event(const WfxEvent_t & event)
+void sl_matter_wifi_post_event(WfxEvent_t * event)
 {
-    if (osMessageQueuePut(sWifiEventQueue, &event, 0, 0) != osOK)
+    if (osMessageQueuePut(sWifiEventQueue, event, 0, 0) != osOK)
     {
         ChipLogError(DeviceLayer, "sl_matter_wifi_post_event: failed to post event.")
         // TODO: Handle error, requeue event depending on queue size or notify relevant task, Chipdie, etc.
@@ -689,7 +735,7 @@ void ResetDHCPNotificationFlags(void)
     hasNotifiedWifiConnectivity = false;
 
     outEvent.eventType = WFX_EVT_STA_DO_DHCP;
-    sl_matter_wifi_post_event(outEvent);
+    sl_matter_wifi_post_event(&outEvent);
 }
 
 void ProcessEvent(WfxEvent_t inEvent)
@@ -711,9 +757,8 @@ void ProcessEvent(WfxEvent_t inEvent)
             ~(WFX_RSI_ST_STA_READY | WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE);
         /* TODO: Implement disconnect notify */
         ResetDHCPNotificationFlags();
-        // wfx_lwip_set_sta_link_down(); // Internally dhcpclient_poll(netif) ->
-        // wfx_ip_changed_notify(0) for IPV4
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
+        wfx_ip_changed_notify(0); // for IPV4
         wfx_ip_changed_notify(IP_STATUS_FAIL);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         wfx_ipv6_notify(GET_IPV6_FAIL);
@@ -756,7 +801,7 @@ void ProcessEvent(WfxEvent_t inEvent)
             {
                 /* Terminate with end of scan which is no ap sent back */
                 wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
-                wifi_scan_configuration.periodic_scan_interval = ADV_SCAN_PERIODICITY;
+                wifi_scan_configuration.periodic_scan_interval = kAdvScanPeriodicity;
             }
             else
             {
@@ -764,10 +809,16 @@ void ProcessEvent(WfxEvent_t inEvent)
             }
             sl_wifi_set_scan_callback(bg_scan_callback_handler, nullptr);
             wfx_rsi.dev_state |= WFX_RSI_ST_SCANSTARTED;
+
+            osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
             status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, nullptr, &wifi_scan_configuration);
             if (SL_STATUS_IN_PROGRESS == status)
             {
-                osSemaphoreAcquire(sScanSemaphore, kWifiScanTimeoutTicks);
+                osSemaphoreAcquire(sScanCompleteSemaphore, kWifiScanTimeoutTicks);
+            }
+            else
+            {
+                osSemaphoreRelease(sScanInProgressSemaphore);
             }
         }
         break;
@@ -775,8 +826,11 @@ void ProcessEvent(WfxEvent_t inEvent)
     case WFX_EVT_STA_START_JOIN:
         ChipLogDetail(DeviceLayer, "WFX_EVT_STA_START_JOIN");
 
+        // Trigger Netwrok scan
+        InitiateScan();
+
         // Joining to the network
-        sl_wifi_platform_join_network();
+        JoinWifiNetwork();
         break;
 
     case WFX_EVT_STA_DO_DHCP:
@@ -807,9 +861,13 @@ sl_status_t sl_matter_wifi_platform_init(void)
     status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
 
-    // Create Sempaphore for scan
-    sScanSemaphore = osSemaphoreNew(1, 0, nullptr);
-    VerifyOrReturnError(sScanSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+    // Create Sempaphore for scan completion
+    sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+
+    // Create Semaphore for scan in-progress protection
+    sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
 
     // Create the message queue
     sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WfxEvent_t), nullptr);

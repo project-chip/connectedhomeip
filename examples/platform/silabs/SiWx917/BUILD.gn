@@ -190,7 +190,7 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
     "${silabs_common_plat_dir}/wifi/wfx_notify.cpp",
     "${silabs_common_plat_dir}/wifi/wfx_rsi_host.cpp",
-    "sl_wifi_if.cpp",
+    "SiWxWifiInterface.cpp",
 
     # Wi-Fi Config
     "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",

@@ -103,7 +103,10 @@ int32_t wfx_rsi_reset_count();
 int32_t sl_wifi_platform_disconnect();
 
 // TODO : this needs to be extern otherwise we get a linking error. We need to figure out why in the header clean up
+// NCP files are including this while being c files
+#ifdef __cplusplus
 extern "C" {
+#endif
 sl_status_t sl_matter_wifi_platform_init(void);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -116,11 +119,14 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
 int32_t wfx_rsi_power_save();
 #endif /* SLI_SI917 */
 #endif /* SL_ICD_ENABLED */
+#ifdef __cplusplus
 }
+#endif
 
 /**
  * @brief Posts an event to the Wi-Fi task
  *
  * @param[in] event Event to process. Must be valid ptr
  */
-void sl_matter_wifi_post_event(const WfxEvent_t & event);
+// TODO: Can't be a const & since the ncp builds are still using c files
+void sl_matter_wifi_post_event(WfxEvent_t * event);

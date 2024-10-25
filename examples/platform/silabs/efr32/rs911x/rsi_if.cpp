@@ -50,6 +50,7 @@ extern "C" {
 #endif
 
 #include "dhcp_client.h"
+#include "ethernetif.h"
 #include "lwip/nd6.h"
 #include "silabs_utils.h"
 #include "wfx_rsi.h"
@@ -109,7 +110,7 @@ static void DHCPTimerEventHandler(void * arg)
 {
     WfxEvent_t event;
     event.eventType = WFX_EVT_DHCP_POLL;
-    sl_matter_wifi_post_event(event);
+    sl_matter_wifi_post_event(&event);
 }
 
 static void CancelDHCPTimer(void)
@@ -301,7 +302,7 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
     ChipLogProgress(DeviceLayer, "wfx_rsi_join_cb: success");
     memset(&temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
     WfxEvent.eventType = WFX_EVT_STA_CONN;
-    sl_matter_wifi_post_event(WfxEvent);
+    sl_matter_wifi_post_event(&WfxEvent);
     wfx_rsi.join_retries = 0;
 }
 
@@ -322,7 +323,7 @@ static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
     wfx_rsi.join_retries += 1;
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
     WfxEvent.eventType = WFX_EVT_STA_START_JOIN;
-    sl_matter_wifi_post_event(WfxEvent);
+    sl_matter_wifi_post_event(&WfxEvent);
 }
 /*************************************************************************************
  * @fn  wfx_rsi_wlan_pkt_cb(uint16_t status, uint8_t *buf, uint32_t len)
@@ -357,18 +358,17 @@ static int32_t sl_matter_wifi_init(void)
     uint8_t buf[RSI_RESPONSE_HOLD_BUFF_SIZE];
     extern void rsi_hal_board_init(void);
 
-    ChipLogProgress(DeviceLayer, "sl_matter_wifi_init: starting(HEAP_SZ = %d)", SL_HEAP_SIZE);
     //! Driver initialization
     status = rsi_driver_init(wfx_rsi_drv_buf, WFX_RSI_BUF_SZ);
     if ((status < RSI_DRIVER_STATUS) || (status > WFX_RSI_BUF_SZ))
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_init: rsi_driver_init failed: %ld", status);
+        ChipLogError(DeviceLayer, "rsi_driver_init failed: %ld", status);
         return status;
     }
     /* ! Redpine module intialisation */
     if ((status = rsi_device_init(LOAD_NWP_FW)) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_init: rsi_device_init failed: %ld", status);
+        ChipLogError(DeviceLayer, "rsi_device_init failed: %ld", status);
         return status;
     }
     /*
@@ -377,7 +377,7 @@ static int32_t sl_matter_wifi_init(void)
     sDrvThread = osThreadNew(rsi_wireless_driver_task_wrapper, NULL, &kDrvTaskAttr);
     if (NULL == sDrvThread)
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_init: failed to create task");
+        ChipLogError(DeviceLayer, "failed to create task");
         return RSI_ERROR_INVALID_PARAM;
     }
 
@@ -388,7 +388,7 @@ static int32_t sl_matter_wifi_init(void)
     if ((status = rsi_wireless_init(OPER_MODE_0, COEX_MODE_0)) != RSI_SUCCESS)
     {
 #endif
-        ChipLogError(DeviceLayer, "sl_matter_wifi_init: rsi_wireless_init failed: %ld", status);
+        ChipLogError(DeviceLayer, "rsi_wireless_init failed: %ld", status);
         return status;
     }
 
@@ -397,7 +397,7 @@ static int32_t sl_matter_wifi_init(void)
      */
     if (rsi_wlan_get(RSI_FW_VERSION, buf, sizeof(buf)) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_init: rsi_wlan_get(RSI_FW_VERSION) failed: %ld", status);
+        ChipLogError(DeviceLayer, "rsi_wlan_get(RSI_FW_VERSION) failed: %ld", status);
         return status;
     }
 
@@ -415,13 +415,12 @@ static int32_t sl_matter_wifi_init(void)
     (void) rsi_wlan_radio_init(); /* Required so we can get MAC address */
     if ((status = rsi_wlan_get(RSI_MAC_ADDRESS, &wfx_rsi.sta_mac.octet[0], RESP_BUFF_SIZE)) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_init: rsi_wlan_get(RSI_MAC_ADDRESS) failed: %ld", status);
+        ChipLogError(DeviceLayer, "rsi_wlan_get(RSI_MAC_ADDRESS) failed: %ld", status);
         return status;
     }
 
-    ChipLogDetail(DeviceLayer, "sl_matter_wifi_init: MAC: %02x:%02x:%02x %02x:%02x:%02x", wfx_rsi.sta_mac.octet[0],
-                  wfx_rsi.sta_mac.octet[1], wfx_rsi.sta_mac.octet[2], wfx_rsi.sta_mac.octet[3], wfx_rsi.sta_mac.octet[4],
-                  wfx_rsi.sta_mac.octet[5]);
+    ChipLogDetail(DeviceLayer, "MAC: %02x:%02x:%02x %02x:%02x:%02x", wfx_rsi.sta_mac.octet[0], wfx_rsi.sta_mac.octet[1],
+                  wfx_rsi.sta_mac.octet[2], wfx_rsi.sta_mac.octet[3], wfx_rsi.sta_mac.octet[4], wfx_rsi.sta_mac.octet[5]);
 
     // Create the message queue
     sWifiEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WfxEvent_t), NULL);
@@ -443,12 +442,12 @@ static int32_t sl_matter_wifi_init(void)
      */
     if ((status = rsi_wlan_register_callbacks(RSI_JOIN_FAIL_CB, wfx_rsi_join_fail_cb)) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_init: rsi_wlan_register_callbacks failed: %ld", status);
+        ChipLogError(DeviceLayer, "rsi_wlan_register_callbacks failed: %ld", status);
         return status;
     }
     if ((status = rsi_wlan_register_callbacks(RSI_WLAN_DATA_RECEIVE_NOTIFY_CB, wfx_rsi_wlan_pkt_cb)) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_init: rsi_wlan_register_callbacks failed: %ld", status);
+        ChipLogError(DeviceLayer, "rsi_wlan_register_callbacks failed: %ld", status);
         return status;
     }
 
@@ -457,7 +456,6 @@ static int32_t sl_matter_wifi_init(void)
 #endif
 
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
-    ChipLogProgress(DeviceLayer, "sl_matter_wifi_init: success");
     return RSI_SUCCESS;
 }
 
@@ -647,7 +645,7 @@ void HandleDHCPPolling(void)
         wfx_ipv6_notify(GET_IPV6_SUCCESS);
         hasNotifiedIPV6 = true;
         event.eventType = WFX_EVT_STA_DHCP_DONE;
-        sl_matter_wifi_post_event(event);
+        sl_matter_wifi_post_event(&event);
         NotifyConnectivity();
     }
 }
@@ -667,12 +665,12 @@ void ResetDHCPNotificationFlags(void)
     hasNotifiedWifiConnectivity = false;
 
     outEvent.eventType = WFX_EVT_STA_DO_DHCP;
-    sl_matter_wifi_post_event(outEvent);
+    sl_matter_wifi_post_event(&outEvent);
 }
 
-void sl_matter_wifi_post_event(const WfxEvent_t & event)
+void sl_matter_wifi_post_event(WfxEvent_t * event)
 {
-    sl_status_t status = osMessageQueuePut(sWifiEventQueue, &event, 0, 0);
+    sl_status_t status = osMessageQueuePut(sWifiEventQueue, event, 0, 0);
 
     if (status != osOK)
     {
