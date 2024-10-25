@@ -26,6 +26,7 @@ import logging
 import subprocess
 import sys
 from enum import Enum
+from typing import Optional
 
 import click
 import requests
@@ -91,17 +92,19 @@ def parse_vid_pid_from_distinguished_name(distinguished_name):
     return vid, pid
 
 
-def get_akid(cert: x509.Certificate) -> bytes:
+def get_akid(cert: x509.Certificate) -> Optional[bytes]:
     try:
         return cert.extensions.get_extension_for_oid(x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
     except Exception:
+        logging.warning("AKID not found in certificate")
         return None
 
 
-def get_skid(cert: x509.Certificate) -> bytes:
+def get_skid(cert: x509.Certificate) -> Optional[bytes]:
     try:
         return cert.extensions.get_extension_for_oid(x509.OID_SUBJECT_KEY_IDENTIFIER).value.key_identifier
     except Exception:
+        logging.warning("SKID not found in certificate")
         return None
 
 
@@ -131,6 +134,7 @@ def verify_cert(cert: x509.Certificate, root: x509.Certificate) -> bool:
     try:
         root.public_key().verify(cert.signature, cert.tbs_certificate_bytes, ec.ECDSA(cert.signature_hash_algorithm))
     except Exception:
+        logging.warning(f"Signature verification failed for cert subject: {get_subject_b64(cert)}, issuer: {get_issuer_b64(cert)}")
         return False
 
     return True
@@ -267,7 +271,7 @@ class DCLDClient:
 
         return response["PkiRevocationDistributionPoint"]
 
-    def get_paa_cert_for_crl_issuer(self, crl_signer_certificate: x509.Certificate) -> x509.Certificate:
+    def get_paa_cert_for_crl_issuer(self, crl_signer_certificate: x509.Certificate) -> Optional[x509.Certificate]:
         '''
         Get the PAA certificate for CRL signer certificate
 
@@ -308,6 +312,7 @@ class DCLDClient:
         try:
             paa_certificate_object = x509.load_pem_x509_certificate(bytes(paa_certificate, 'utf-8'))
         except Exception:
+            logging.error('Failed to parse PAA certificate')
             return
 
         return paa_certificate_object
@@ -487,13 +492,10 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
                         logging.warning("CRL Issuer is not CRL File Issuer, continue...")
                         continue
             except Exception:
+                logging.warning("certificateIssuer entry extension not found in CRL")
                 pass
 
             serialnumber_list.append(bytes(str('{:02X}'.format(revoked_cert.serial_number)), 'utf-8').decode('utf-8'))
-
-        # No point in creating an entry which has no revoked serial numbers
-        if len(serialnumber_list) == 0:
-            continue
 
         entry = {
             "type": "revocation_set",
