@@ -89,9 +89,11 @@ std::optional<CommandId> EnumeratorCommandFinder::FindCommandId(Operation operat
 
     if (err != CHIP_NO_ERROR)
     {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
         // Report the error here since we lose actual error. This generally should NOT be possible as CommandHandlerInterface
         // usually returns unimplemented or should just work for our use case (our callback never fails)
         ChipLogError(DataManagement, "Enumerate error: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
         return kInvalidCommandId;
     }
 
@@ -120,8 +122,10 @@ std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteC
     DataVersion * versionPtr = emberAfDataVersionStorage(path);
     if (versionPtr == nullptr)
     {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
         ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI, static_cast<int>(path.mEndpointId),
                      ChipLogValueMEI(cluster.clusterId));
+#endif
         return CHIP_ERROR_NOT_FOUND;
     }
 
@@ -176,7 +180,7 @@ DataModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const Emb
             return *entryValue;
         }
 
-#if CHIP_ERROR_LOGGING
+#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
         if (CHIP_ERROR * errValue = std::get_if<CHIP_ERROR>(&entry))
         {
             ChipLogError(AppServer, "Failed to load cluster entry: %" CHIP_ERROR_FORMAT, errValue->Format());
@@ -522,7 +526,7 @@ std::optional<DataModel::ClusterInfo> CodegenDataModelProvider::GetClusterInfo(c
 
     if (CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&info))
     {
-#if CHIP_ERROR_LOGGING
+#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
         ChipLogError(AppServer, "Failed to load cluster info: %" CHIP_ERROR_FORMAT, err->Format());
 #else
         (void) err->Format();
