@@ -178,8 +178,8 @@ ActionReturnStatus TestImCustomDataModel::ReadAttribute(const ReadAttributeReque
         subjectDescriptor = *request.subjectDescriptor;
     }
 
-    CHIP_ERROR err = ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered),
-                                           request.path, TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
+    CHIP_ERROR err = ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
+                                           TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
 
     // state must survive CHIP_ERRORs as it is used for chunking
     TestOnlyAttributeValueEncoderAccessor(encoder).SetState(mutableState);

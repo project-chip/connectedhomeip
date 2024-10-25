@@ -55,7 +55,7 @@ struct OperationRequest
     ///  - operationFlags.Has(OperationFlags::kInternal) MUST NOT have this set
     ///
     /// NOTE: once kInternal flag is removed, this will become non-optional
-    const chip::Access::SubjectDescriptor *subjectDescriptor = nullptr;
+    const chip::Access::SubjectDescriptor * subjectDescriptor = nullptr;
 
     /// Accessing fabric index is the subjectDescriptor fabric index (if any).
     /// This is a readability convenience function.
