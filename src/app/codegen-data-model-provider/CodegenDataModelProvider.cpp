@@ -697,9 +697,9 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
 ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const ConcreteClusterPath & path)
 {
     EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateGeneratedCommands);
-    CommandId commandId = FindCommand(ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId), handlerFinder,
-                                      detail::EnumeratorCommandFinder::Operation::kFindFirst, mGeneratedCommandsIterator,
-                                      GeneratedCommands);
+    CommandId commandId =
+        FindCommand(ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId), handlerFinder,
+                    detail::EnumeratorCommandFinder::Operation::kFindFirst, mGeneratedCommandsIterator, GeneratedCommands);
 
     VerifyOrReturnValue(commandId != kInvalidCommandId, kInvalidCommandPath);
     return ConcreteCommandPath(path.mEndpointId, path.mClusterId, commandId);
@@ -709,9 +709,8 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
 {
     EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateGeneratedCommands);
 
-    CommandId commandId =
-        FindCommand(before, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindNext, mAcceptedCommandsIterator,
-                    GeneratedCommands);
+    CommandId commandId = FindCommand(before, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindNext,
+                                      mAcceptedCommandsIterator, GeneratedCommands);
 
     VerifyOrReturnValue(commandId != kInvalidCommandId, kInvalidCommandPath);
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, commandId);
