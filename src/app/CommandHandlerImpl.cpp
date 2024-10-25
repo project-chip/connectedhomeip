@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "access/SubjectDescriptor.h"
 #include <app/CommandHandlerImpl.h>
 
 #include <access/AccessControl.h>
@@ -391,10 +392,11 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     {
+        Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
         DataModel::InvokeRequest request;
 
         request.path              = concretePath;
-        request.subjectDescriptor = GetSubjectDescriptor();
+        request.subjectDescriptor = &subjectDescriptor;
         request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
         Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
@@ -513,10 +515,11 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
 
         {
+            Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
             DataModel::InvokeRequest request;
 
             request.path              = concretePath;
-            request.subjectDescriptor = GetSubjectDescriptor();
+            request.subjectDescriptor = &subjectDescriptor;
             request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
             Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);

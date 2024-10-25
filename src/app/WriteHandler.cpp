@@ -774,7 +774,7 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSub
     DataModel::WriteAttributeRequest request;
 
     request.path                = aPath;
-    request.subjectDescriptor   = aSubject;
+    request.subjectDescriptor   = &aSubject;
     request.previousSuccessPath = mLastSuccessfullyWrittenPath;
     request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
