@@ -16,7 +16,7 @@
 
 #import "MTRDeviceDataValidation.h"
 
-#import <Matter/MTRBaseDevice.h>
+#import "MTRBaseDevice.h"
 
 #import "MTRLogging_Internal.h"
 
