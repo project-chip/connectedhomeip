@@ -28,7 +28,7 @@ from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
-from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpOsUsed
+from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
@@ -133,6 +133,7 @@ def BuildHostTarget():
         TargetPart('bridge', app=HostApp.BRIDGE),
         TargetPart('fabric-admin', app=HostApp.FABRIC_ADMIN).OnlyIfRe("-rpc"),
         TargetPart('fabric-bridge', app=HostApp.FABRIC_BRIDGE).OnlyIfRe("-rpc"),
+        TargetPart('fabric-sync', app=HostApp.FABRIC_SYNC),
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
@@ -258,6 +259,7 @@ def BuildEfr32Target():
         TargetPart('brd2703a', board=Efr32Board.BRD2703A),
         TargetPart('brd4338a', board=Efr32Board.BRD4338A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd2605a', board=Efr32Board.BRD2605A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd4343a', board=Efr32Board.BRD4343A, enable_wifi=True, enable_917_soc=True),
     ])
 
     # apps
@@ -517,6 +519,8 @@ def BuildNxpTarget():
     target.AppendFixedTargets([
         TargetPart('k32w0', board=NxpBoard.K32W0),
         TargetPart('k32w1', board=NxpBoard.K32W1),
+        TargetPart('rt1060', board=NxpBoard.RT1060),
+        TargetPart('rt1170', board=NxpBoard.RT1170),
         TargetPart('rw61x', board=NxpBoard.RW61X),
         TargetPart('rw61x_eth', board=NxpBoard.RW61X_ETH),
         TargetPart('mcxw71', board=NxpBoard.MCXW71)
@@ -533,9 +537,9 @@ def BuildNxpTarget():
         TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('(k32w0|k32w1|mcxw71)'),
         TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('(k32w0|k32w1|mcxw71)'),
         TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('(k32w1|mcxw71)'),
-        TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rw61x'),
-        TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rw61x'),
-        TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rw61x')
+        TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rt1060|rt1170|rw61x'),
+        TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rt1060|rt1170|rw61x'),
+        TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rt1060|rt1170|rw61x')
     ])
 
     target.AppendModifier(name="factory", enable_factory_data=True)
@@ -547,15 +551,23 @@ def BuildNxpTarget():
     target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
     target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
-    target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rw61x')
+    target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x_eth-zephyr')
     target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
     target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
     target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
-    target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rw61x')
+    target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x')
     target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).OnlyIfRe('rw61x')
+    target.AppendModifier(name="evkc", board_variant=NxpBoardVariant.EVKC).OnlyIfRe('rt1060')
+    target.AppendModifier(name="iw416", iw416_transceiver=True).OnlyIfRe('rt1060')
+    target.AppendModifier(name="w8801", w8801_transceiver=True).OnlyIfRe('rt1060')
+    target.AppendModifier(name="iwx12", iwx12_transceiver=True).OnlyIfRe('rt1060|rt1170')
+    target.AppendModifier(name="log-all", log_level=NxpLogLevel.ALL).ExceptIfRe("-log-(progress|error|none)")
+    target.AppendModifier(name="log-progress", log_level=NxpLogLevel.PROGRESS).ExceptIfRe("-log-(all|error|none)")
+    target.AppendModifier(name="log-error", log_level=NxpLogLevel.ERROR).ExceptIfRe("-log-(progress|all|none)")
+    target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
 
     return target
 
@@ -669,7 +681,6 @@ def BuildTizenTarget():
     # apps
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=TizenApp.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=TizenApp.CHIP_TOOL),
         TargetPart('light', app=TizenApp.LIGHT),
         TargetPart('tests', app=TizenApp.TESTS),

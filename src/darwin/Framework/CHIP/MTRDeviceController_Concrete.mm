@@ -418,6 +418,7 @@ using namespace chip::Tracing::DarwinFramework;
         return;
     }
     [self finalShutdown];
+    [super shutdown];
 }
 
 - (void)finalShutdown
@@ -1148,7 +1149,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     os_unfair_lock_assert_owner(self.deviceMapLock);
 
-    MTRDevice * deviceToReturn = [[MTRDevice_Concrete alloc] initWithNodeID:nodeID controller:self];
+    MTRDevice_Concrete * deviceToReturn = [[MTRDevice_Concrete alloc] initWithNodeID:nodeID controller:self];
     // If we're not running, don't add the device to our map.  That would
     // create a cycle that nothing would break.  Just return the device,
     // which will be in exactly the state it would be in if it were created
@@ -1189,7 +1190,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     std::lock_guard lock(*self.deviceMapLock);
     NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
     for (NSNumber * nodeID in self.nodeIDToDeviceMap) {
-        deviceAttributeCounts[nodeID] = @([[self.nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
+        MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
+
+        // TODO: Can we not just assume this isKindOfClass test is true?  Would be
+        // really nice if we had compile-time checking for this somehow...
+        if (![device isKindOfClass:MTRDevice_Concrete.class]) {
+            continue;
+        }
+
+        auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
+        deviceAttributeCounts[nodeID] = @([concreteDevice unitTestAttributeCount]);
     }
     return deviceAttributeCounts;
 }
@@ -1388,9 +1398,19 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // Get the corresponding MTRDevice object to determine if the case/subscription pool is to be used
     MTRDevice * device = [self deviceForNodeID:@(nodeID)];
 
+    // TODO: Can we not just assume this isKindOfClass test is true?  Would be
+    // really nice if we had compile-time checking for this somehow...
+    if (![device isKindOfClass:MTRDevice_Concrete.class]) {
+        MTR_LOG_ERROR("%@ somehow has %@ instead of MTRDevice_Concrete for node ID 0x%016llX (%llu)", self, device, nodeID, nodeID);
+        completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
+
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
-    if ([device deviceUsesThread]) {
+    if ([concreteDevice deviceUsesThread]) {
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
             MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
@@ -1586,14 +1606,14 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return CHIP_NO_ERROR;
 }
 
-- (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
+- (void)invalidateCASESessionForNode:(NSNumber *)nodeID;
 {
     auto block = ^{
         auto sessionMgr = self->_cppCommissioner->SessionMgr();
         VerifyOrDie(sessionMgr != nullptr);
 
         sessionMgr->MarkSessionsAsDefunct(
-            self->_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
+            self->_cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
     };
 
     [self syncRunOnWorkQueue:block error:nil];

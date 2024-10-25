@@ -30,7 +30,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
@@ -42,7 +42,7 @@ import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 

@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0052" name="Refrigerator And Temperature Controlled Cabinet Mode Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0052" name="Refrigerator And Temperature Controlled Cabinet Mode Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status"/>
+    <revision revision="3" summary="Set OnOff feature, StartUpMode, and OnMode as disallowed (previously a Device Type override)"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0052" name="Refrigerator And Temperature Controlled Cabinet Mode"/>

@@ -909,7 +909,7 @@ CHIP_ERROR CopyViaInterface(const Entry & entry, EntryStorage & storage)
 
     size_t subjectCount = 0;
     ReturnErrorOnFailure(entry.GetSubjectCount(subjectCount));
-    ReturnErrorCodeIf(subjectCount > EntryStorage::kMaxSubjects, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(subjectCount <= EntryStorage::kMaxSubjects, CHIP_ERROR_BUFFER_TOO_SMALL);
     for (size_t i = 0; i < subjectCount; ++i)
     {
         NodeId subject = kUndefinedNodeId;
@@ -919,7 +919,7 @@ CHIP_ERROR CopyViaInterface(const Entry & entry, EntryStorage & storage)
 
     size_t targetCount = 0;
     ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
-    ReturnErrorCodeIf(targetCount > EntryStorage::kMaxTargets, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(targetCount <= EntryStorage::kMaxTargets, CHIP_ERROR_BUFFER_TOO_SMALL);
     for (size_t i = 0; i < targetCount; ++i)
     {
         Target target;

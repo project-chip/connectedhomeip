@@ -168,7 +168,6 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="BoostInfo" type="WaterHeaterBoostInfoStruct">
         <mandatoryConform/>
-        <constraint type="desc"/>
       </field>
     </command>
     <command id="0x01" name="CancelBoost" direction="commandToServer" response="Y">
@@ -182,7 +181,6 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="BoostInfo" type="WaterHeaterBoostInfoStruct">
         <mandatoryConform/>
-        <constraint type="desc"/>
       </field>
     </event>
     <event id="0x01" name="BoostEnded" priority="info">

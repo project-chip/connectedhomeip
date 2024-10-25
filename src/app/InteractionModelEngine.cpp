@@ -32,6 +32,9 @@
 #include <app/AppConfig.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/ember-compatibility-functions.h>
@@ -42,10 +45,9 @@
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-#include <app/data-model-provider/ActionReturnStatus.h>
-
 // TODO: defaulting to codegen should eventually be an application choice and not
 //       hard-coded in the interaction model
 #include <app/codegen-data-model-provider/Instance.h>
@@ -754,8 +756,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 TLV::TLVReader pathReader;
                 attributePathListParser.GetReader(&pathReader);
-                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedAttributePathCount, false) != CHIP_NO_ERROR,
-                                  Status::InvalidAction);
+                VerifyOrReturnError(TLV::Utilities::Count(pathReader, requestedAttributePathCount, false) == CHIP_NO_ERROR,
+                                    Status::InvalidAction);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
@@ -767,8 +769,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 TLV::TLVReader pathReader;
                 eventpathListParser.GetReader(&pathReader);
-                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) != CHIP_NO_ERROR,
-                                  Status::InvalidAction);
+                VerifyOrReturnError(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) == CHIP_NO_ERROR,
+                                    Status::InvalidAction);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
@@ -1505,20 +1507,14 @@ bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 #if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-
-    bool providerResult = GetDataModelProvider()
-                              ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
-                              .has_value();
+    bool providerResult = GetDataModelProvider()->GetAttributeInfo(path).has_value();
 
     bool emberResult = emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
 
     // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
     VerifyOrDie(providerResult == emberResult);
 #endif
-
-    return GetDataModelProvider()
-        ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
-        .has_value();
+    return GetDataModelProvider()->GetAttributeInfo(path).has_value();
 #else
     return emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
 #endif
@@ -1652,6 +1648,8 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 
     DataModel::InvokeRequest request;
     request.path = aCommandPath;
+    request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, apCommandObj.IsTimedInvoke());
+    request.subjectDescriptor = apCommandObj.GetSubjectDescriptor();
 
     std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->Invoke(request, apPayload, &apCommandObj);
 
@@ -1684,7 +1682,91 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 #endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
+{
+
+    Status status = CheckCommandExistence(request.path);
+
+    if (status != Status::Success)
+    {
+        ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint %u",
+                      ChipLogValueMEI(request.path.mCommandId), ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId);
+        return status;
+    }
+
+    status = CheckCommandAccess(request);
+    VerifyOrReturnValue(status == Status::Success, status);
+
+    return CheckCommandFlags(request);
+}
+
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest)
+{
+    if (!aRequest.subjectDescriptor.has_value())
+    {
+        return Status::UnsupportedAccess; // we require a subject for invoke
+    }
+
+    Access::RequestPath requestPath{ .cluster     = aRequest.path.mClusterId,
+                                     .endpoint    = aRequest.path.mEndpointId,
+                                     .requestType = Access::RequestType::kCommandInvokeRequest,
+                                     .entityId    = aRequest.path.mCommandId };
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
+    Access::Privilege minimumRequiredPrivilege =
+        commandInfo.has_value() ? commandInfo->invokePrivilege : Access::Privilege::kOperate;
+#else
+    Access::Privilege minimumRequiredPrivilege = RequiredPrivilege::ForInvokeCommand(aRequest.path);
+#endif
+    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, minimumRequiredPrivilege);
+    if (err != CHIP_NO_ERROR)
+    {
+        if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
+        {
+            return Status::Failure;
+        }
+        return err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
+    }
+
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest)
+{
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
+    // This is checked by previous validations, so it should not happen
+    VerifyOrDie(commandInfo.has_value());
+
+    const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
+    const bool commandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
+#else
+    const bool commandNeedsTimedInvoke         = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
+    const bool commandIsFabricScoped           = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
+#endif
+
+    if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
+    {
+        return Status::NeedsTimedInteraction;
+    }
+
+    if (commandIsFabricScoped)
+    {
+        // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
+        // a CommandStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code.
+
+        // Fabric-scoped commands are not allowed before a specific accessing fabric is available.
+        // This is mostly just during a PASE session before AddNOC.
+        if (aRequest.GetAccessingFabricIndex() == kUndefinedFabricIndex)
+        {
+            return Status::UnsupportedAccess;
+        }
+    }
+
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistence(const ConcreteCommandPath & aCommandPath)
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     auto provider = GetDataModelProvider();
@@ -1841,7 +1923,7 @@ uint16_t InteractionModelEngine::GetMinGuaranteedSubscriptionsPerFabric() const
     return UINT16_MAX;
 #else
     return static_cast<uint16_t>(
-        min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(UINT16_MAX)));
+        std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(UINT16_MAX)));
 #endif
 }
 
@@ -1900,9 +1982,9 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
 CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    ReturnErrorCodeIf(!mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
+    VerifyOrReturnError(mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-    ReturnErrorCodeIf(mSubscriptionResumptionScheduled, CHIP_NO_ERROR);
+    VerifyOrReturnError(!mSubscriptionResumptionScheduled, CHIP_NO_ERROR);
 #endif
 
     // To avoid the case of a reboot loop causing rapid traffic generation / power consumption, subscription resumption should make

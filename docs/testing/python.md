@@ -25,7 +25,7 @@ Python tests located in src/python_testing
         section should include various parameters and their respective values,
         which will guide the test runner on how to execute the tests.
 -   All test classes inherit from `MatterBaseTest` in
-    [matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
+    [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
     -   Support for commissioning using the python controller
     -   Default controller (`self.default_controller`) of type `ChipDeviceCtrl`
     -   `MatterBaseTest` inherits from the Mobly BaseTestClass
@@ -38,7 +38,7 @@ Python tests located in src/python_testing
         decorated with the @async_test_body decorator
 -   Use `ChipDeviceCtrl` to interact with the DUT
     -   Controller API is in `ChipDeviceCtrl.py` (see API doc in file)
-    -   Some support methods in `matter_testing_support.py`
+    -   Some support methods in `matter_testing.py`
 -   Use Mobly assertions for failing tests
 -   `self.step()` along with a `steps_*` method to mark test plan steps for cert
     tests
@@ -61,7 +61,7 @@ Python tests located in src/python_testing
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
@@ -379,7 +379,7 @@ pai = await dev_ctrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Comm
 ## Mobly helpers
 
 The test system is based on Mobly, and the
-[matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
+[matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
 class provides some helpers for Mobly integration.
 
 -   `default_matter_test_main`
@@ -561,11 +561,11 @@ these steps to set this up:
 
 ## Other support utilities
 
--   `basic_composition_support`
+-   `basic_composition`
     -   wildcard read, whole device analysis
 -   `CommissioningFlowBlocks`
     -   various commissioning support for core tests
--   `spec_parsing_support`
+-   `spec_parsing`
     -   parsing data model XML into python readable format
 
 # Running tests locally
@@ -627,7 +627,9 @@ for the CI). These arguments can be passed as sets of key/value pairs using the
 `./scripts/tests/run_python_test.py` is a convenient script that starts an
 example DUT on the host and includes factory reset support
 
-`./scripts/tests/run_python_test.py --factoryreset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"`
+```shell
+./scripts/tests/run_python_test.py --factory-reset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"
+```
 
 # Running tests in CI
 
@@ -678,7 +680,7 @@ for that run, e.g.:
 #     app: ${TYPE_OF_APP}
 #     app-args: <app_arguments>
 #     script-args: <script_arguments>
-#     factoryreset: <true|false>
+#     factory-reset: <true|false>
 #     quiet: <true|false>
 # === END CI TEST ARGUMENTS ===
 ```
@@ -692,7 +694,7 @@ for that run, e.g.:
 
     -   Example: `${TYPE_OF_APP}`
 
--   `factoryreset`: Determines whether a factory reset should be performed
+-   `factory-reset`: Determines whether a factory reset should be performed
     before the test.
 
     -   Example: `true`

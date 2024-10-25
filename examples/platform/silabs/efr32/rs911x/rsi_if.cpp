@@ -506,6 +506,9 @@ static void wfx_rsi_save_ap_info(void) // translation
     case SME_WPA2_ENTERPRISE:
         wfx_rsi.sec.security = WFX_SEC_WPA2;
         break;
+    case SME_WPA_WPA2_MIXED_MODE:
+        wfx_rsi.sec.security = WFX_SEC_WPA_WPA2_MIXED;
+        break;
     case SME_WEP:
         wfx_rsi.sec.security = WFX_SEC_WEP;
         break;
@@ -551,6 +554,7 @@ static void wfx_rsi_do_join(void)
         break;
     case WFX_SEC_WPA:
     case WFX_SEC_WPA2:
+    case WFX_SEC_WPA_WPA2_MIXED:
         connect_security_mode = RSI_WPA_WPA2_MIXED;
         break;
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
@@ -752,7 +756,7 @@ void ProcessEvent(WfxEvent_t inEvent)
             // clear structure and calculate size of SSID
             memset(&ap, 0, sizeof(ap));
             ap.ssid_length =
-                strnlen(reinterpret_cast<char *>(scan->ssid), chip::min<size_t>(sizeof(scan->ssid), WFX_MAX_SSID_LENGTH));
+                strnlen(reinterpret_cast<char *>(scan->ssid), std::min<size_t>(sizeof(scan->ssid), WFX_MAX_SSID_LENGTH));
             chip::Platform::CopyString(ap.ssid, ap.ssid_length, reinterpret_cast<char *>(scan->ssid));
 
             // check if the scanned ssid is the one we are looking for
