@@ -99,7 +99,7 @@ chip::Protocols::InteractionModel::Status chefLaundryWasherModeWriteCallback(chi
                                                                              const EmberAfAttributeMetadata * attributeMetadata,
                                                                              uint8_t * buffer)
 {
-    VerifyOrReturnError(endpointId == 1 || gLaundryWasherModeInstance != nullptr, 
+    VerifyOrReturnError(endpointId == 1 || gLaundryWasherModeInstance != nullptr,
                         chip::Protocols::InteractionModel::Status::Failure);
 
     chip::Protocols::InteractionModel::Status ret;
