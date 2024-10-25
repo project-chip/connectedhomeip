@@ -45,5 +45,6 @@ declare_args() {
   # This is an optimization for small-flash size devices as extra logging requires
   # additional flash for messages & code for formatting.
   chip_data_model_extra_logging =
-      current_os == "linux" || current_os == "ios" || current_os == "mac" || current_os == "android"
+      current_os == "linux" || current_os == "ios" || current_os == "mac" ||
+      current_os == "android"
 }
