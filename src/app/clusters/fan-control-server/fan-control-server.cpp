@@ -234,7 +234,7 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
             }
             else
             {
-                res = Status::WriteIgnored;
+                res = Status::InvalidInState;
             }
         }
         else
