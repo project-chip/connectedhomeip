@@ -295,7 +295,7 @@ CHIP_ERROR emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpoint
     // allocate new cluster array
     auto newClusters = new EmberAfCluster[clusterCount];
     VerifyOrReturnError(newClusters != nullptr, CHIP_ERROR_NO_MEMORY);
-    uint16_t endpointSize = 0;
+    size_t endpointSize = 0;
     // get the actual cluster pointers and sum up memory size
     for (size_t i = 0; i < clusterCount; i++)
     {
@@ -313,13 +313,18 @@ CHIP_ERROR emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpoint
         // TODO: make endpointType use a pointer to a list of EmberAfCluster* instead, so we can re-use cluster definitions
         //   instead of duplicating them here once for every instance.
         newClusters[i] = *cluster;
-        // sum up the needed storage
+        // sum up the needed storage, result must
         endpointSize += cluster->clusterSize;
+        if (!CanCastTo<typeof(endpointType.endpointSize)>(endpointSize))
+        {
+            delete[] newClusters;
+            return CHIP_ERROR_NO_MEMORY;
+        }
     }
     // set up dynamic endpoint
-    endpointType.clusterCount = static_cast<uint8_t>(clusterCount);
+    endpointType.clusterCount = static_cast<typeof(endpointType.clusterCount)>(clusterCount);
     endpointType.cluster      = newClusters;
-    endpointType.endpointSize = endpointSize;
+    endpointType.endpointSize = static_cast<typeof(endpointType.endpointSize)>(endpointSize);
     return CHIP_NO_ERROR;
 }
 
