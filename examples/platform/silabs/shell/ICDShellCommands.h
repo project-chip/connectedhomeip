@@ -15,34 +15,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#if defined(ENABLE_CHIP_SHELL)
+#pragma once
 
-#include "ShellCommands.h"
-#include <lib/shell/Engine.h>
-#include <lib/shell/commands/Help.h>
-#include <platform/CHIPDeviceLayer.h>
+namespace ICDCommands {
 
-using namespace chip;
-using namespace chip::app;
+void RegisterCommands();
 
-namespace LitICDCommands {
-
-using Shell::Engine;
-using Shell::shell_command_t;
-using Shell::streamer_get;
-using Shell::streamer_printf;
-
-/**
- * @brief configures lit icd matter shell
- */
-void RegisterSwitchCommands()
-{
-    // Blank structure for now
-    static const shell_command_t sLitICDCommand = {};
-
-    Engine::Root().RegisterCommands(&sLitICDCommand, 1);
-}
-
-} // namespace LitICDCommands
-
-#endif // ENABLE_CHIP_SHELL
+} // namespace ICDCommands
