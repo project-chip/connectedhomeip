@@ -107,9 +107,9 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectAndKeyIdFromPEMCert(const st
     return CHIP_NO_ERROR;
 }
 
-// cross validate DAC/PAI cert details with crl signer OR crl signer delegator
-bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revokedSet, const CharSpan & akidHexStr,
-                                                      const CharSpan & issuerNameBase64Str)
+// Check if issuer and AKID matches with the crl signer OR crl signer delegator's subject and SKID
+bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revokedSet, const std::string & akidHexStr,
+                                                      const std::string & issuerNameBase64Str)
 {
     std::string certPEM;
     [[maybe_unused]] const char * certType;
@@ -129,13 +129,10 @@ bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revoke
     std::string keyId;   // crl signer or crl signer delegator SKID
     VerifyOrReturnValue(CHIP_NO_ERROR == GetSubjectAndKeyIdFromPEMCert(certPEM, subject, keyId), false);
 
-    ChipLogDetail(NotSpecified, "%s Subject: %s", certType, subject.c_str());
-    ChipLogDetail(NotSpecified, "%s SKID: %s", certType, keyId.c_str());
+    ChipLogDetail(NotSpecified, "%s: Subject: %s", certType, subject.c_str());
+    ChipLogDetail(NotSpecified, "%s: SKID: %s", certType, keyId.c_str());
 
-    std::string issuerSKID(akidHexStr.data(), akidHexStr.size());
-    std::string issuerName(issuerNameBase64Str.data(), issuerNameBase64Str.size());
-
-    return (issuerSKID == keyId && issuerName == subject);
+    return (akidHexStr == keyId && issuerNameBase64Str == subject);
 }
 
 // This method parses the below JSON Scheme
@@ -154,7 +151,7 @@ bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revoke
 // ]
 //
 bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
-                                                           const CharSpan & serialNumberHexStr, bool isPAI)
+                                                           const CharSpan & serialNumberHexStr)
 {
     std::ifstream file(mDeviceAttestationRevocationSetPath.c_str());
     if (!file.is_open())
@@ -195,18 +192,11 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akid
             continue;
         }
 
-        if (isPAI)
-        {
-            // 4.a cross  validate PAI with crl signer OR crl signer delegator
-            VerifyOrReturnValue(CrossValidateCert(revokedSet, akidHexStr, issuerNameBase64Str), false);
-        }
-        else
-        {
-            // 4.b cross validate DAC with crl signer OR crl signer delegator
-            VerifyOrReturnValue(CrossValidateCert(revokedSet, akidHexStr, issuerNameBase64Str), false);
-        }
+        // 4.a cross validate PAI with crl signer OR crl signer delegator
+        // 4.b cross validate DAC with crl signer OR crl signer delegator
+        VerifyOrReturnValue(CrossValidateCert(revokedSet, akid, issuerName), false);
 
-        // 4.c
+        // 4.c check if serial number is revoked
         for (const auto & revokedSerialNumber : revokedSet["revoked_serial_numbers"])
         {
             if (revokedSerialNumber.asString() == serialNumber)
@@ -280,7 +270,7 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetRDNBase64Str(const ByteSpan & certD
 CHIP_ERROR TestDACRevocationDelegateImpl::GetIssuerNameBase64Str(const ByteSpan & certDer,
                                                                  MutableCharSpan & outIssuerNameBase64String)
 {
-    return GetRDNBase64Str(certDer, outIssuerNameBase64String, true);
+    return GetRDNBase64Str(certDer, outIssuerNameBase64String, true /* isIssuer */);
 }
 
 CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectNameBase64Str(const ByteSpan & certDer,
@@ -290,8 +280,7 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectNameBase64Str(const ByteSpan
 }
 
 // @param certDer Certificate being tested for revocation in
-// @param isPAI true if the certificate being tested is a PAI, false otherwise
-bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDer, bool isPAI)
+bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDer)
 {
     char issuerNameBuffer[kMaxIssuerBase64Len]                           = { 0 };
     char serialNumberHexStrBuffer[2 * kMaxCertificateSerialNumberLength] = { 0 };
@@ -310,7 +299,7 @@ bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDe
     VerifyOrReturnValue(CHIP_NO_ERROR == GetAKIDHexStr(certDer, akid), false);
     ChipLogDetail(NotSpecified, "AKID: %.*s", static_cast<int>(akid.size()), akid.data());
 
-    return IsEntryInRevocationSet(akid, issuerName, serialNumber, isPAI);
+    return IsEntryInRevocationSet(akid, issuerName, serialNumber);
 }
 
 void TestDACRevocationDelegateImpl::CheckForRevokedDACChain(
@@ -327,7 +316,7 @@ void TestDACRevocationDelegateImpl::CheckForRevokedDACChain(
 
     ChipLogDetail(NotSpecified, "Checking for revoked DAC in %s", mDeviceAttestationRevocationSetPath.c_str());
 
-    if (IsCertificateRevoked(info.dacDerBuffer, false /* isPAI */))
+    if (IsCertificateRevoked(info.dacDerBuffer))
     {
         ChipLogProgress(NotSpecified, "Found revoked DAC in %s", mDeviceAttestationRevocationSetPath.c_str());
         attestationError = AttestationVerificationResult::kDacRevoked;
@@ -335,7 +324,7 @@ void TestDACRevocationDelegateImpl::CheckForRevokedDACChain(
 
     ChipLogDetail(NotSpecified, "Checking for revoked PAI in %s", mDeviceAttestationRevocationSetPath.c_str());
 
-    if (IsCertificateRevoked(info.paiDerBuffer, true /* isPAI */))
+    if (IsCertificateRevoked(info.paiDerBuffer))
     {
         ChipLogProgress(NotSpecified, "Found revoked PAI in %s", mDeviceAttestationRevocationSetPath.c_str());
 
