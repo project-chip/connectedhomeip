@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/support/CodeUtils.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -77,9 +78,6 @@ public:
     ///    - kInvalidCommandId if the find failed (but command handler interface does provide a list)
     ///    - valid id if command handler interface usage succeeds
     std::optional<CommandId> FindCommandId(Operation operation, const ConcreteCommandPath & path);
-
-    /// Uses FindCommandId to find the given command and loads the command entry data
-    std::optional<DataModel::CommandEntry> FindCommandEntry(Operation operation, const ConcreteCommandPath & path);
 
 private:
     HandlerCallbackFunction mCallback;
@@ -276,20 +274,6 @@ DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath
                          CommandIsFabricScoped(clusterPath.mClusterId, clusterCommandId));
 
     return entry;
-}
-
-std::optional<DataModel::CommandEntry> EnumeratorCommandFinder::FindCommandEntry(Operation operation,
-                                                                                 const ConcreteCommandPath & path)
-{
-
-    std::optional<CommandId> id = FindCommandId(operation, path);
-
-    if (!id.has_value())
-    {
-        return std::nullopt;
-    }
-
-    return (*id == kInvalidCommandId) ? DataModel::CommandEntry::kInvalid : CommandEntryFrom(path, *id);
 }
 
 // TODO: DeviceTypeEntry content is IDENTICAL to EmberAfDeviceType, so centralizing
@@ -682,13 +666,16 @@ std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeIn
 
 DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const ConcreteClusterPath & path)
 {
-    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
-                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindFirst,
-                                                       ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId));
 
-    if (handlerInterfaceValue.has_value())
+    std::optional<CommandId> handlerCommandId =
+        EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+            .FindCommandId(EnumeratorCommandFinder::Operation::kFindFirst,
+                           ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId));
+
+    if (handlerCommandId.has_value())
     {
-        return *handlerInterfaceValue;
+        VerifyOrReturnValue((*handlerCommandId != kInvalidCommandId), DataModel::CommandEntry::kInvalid);
+        return CommandEntryFrom(path, *handlerCommandId);
     }
 
     const EmberAfCluster * cluster = FindServerCluster(path);
@@ -705,12 +692,13 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
 {
     // TODO: `Next` redirecting to a callback is slow O(n^2).
     //       see https://github.com/project-chip/connectedhomeip/issues/35790
-    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
-                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindNext, before);
+    std::optional<CommandId> nextId = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+                                          .FindCommandId(EnumeratorCommandFinder::Operation::kFindNext, before);
 
-    if (handlerInterfaceValue.has_value())
+    if (nextId.has_value())
     {
-        return *handlerInterfaceValue;
+        VerifyOrReturnValue((*nextId != kInvalidCommandId), DataModel::CommandEntry::kInvalid);
+        return CommandEntryFrom(before, *nextId);
     }
 
     const EmberAfCluster * cluster = FindServerCluster(before);
@@ -725,12 +713,13 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
 
 std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
-                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindExact, path);
+    std::optional<CommandId> handlerCommandId = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+                                                    .FindCommandId(EnumeratorCommandFinder::Operation::kFindExact, path);
 
-    if (handlerInterfaceValue.has_value())
+    if (handlerCommandId.has_value())
     {
-        return handlerInterfaceValue->IsValid() ? std::make_optional(handlerInterfaceValue->info) : std::nullopt;
+        VerifyOrReturnValue((*handlerCommandId != kInvalidCommandId), std::nullopt);
+        return CommandEntryFrom(path, *handlerCommandId).info;
     }
 
     const EmberAfCluster * cluster = FindServerCluster(path);
