@@ -710,7 +710,7 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
     EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateGeneratedCommands);
 
     CommandId commandId = FindCommand(before, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindNext,
-                                      mAcceptedCommandsIterator, GeneratedCommands);
+                                      mGeneratedCommandsIterator, GeneratedCommands);
 
     VerifyOrReturnValue(commandId != kInvalidCommandId, kInvalidCommandPath);
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, commandId);
