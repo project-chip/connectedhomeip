@@ -9713,8 +9713,6 @@
           MicrowaveOvenMode:
               - SupportedModes
               - CurrentMode
-              - StartUpMode
-              - OnMode
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -9723,8 +9721,6 @@
           OvenMode:
               - SupportedModes
               - CurrentMode
-              - StartUpMode
-              - OnMode
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -9746,17 +9742,9 @@
           MicrowaveOvenControl:
               - SetCookingParameters
               - AddMoreTime
-          MicrowaveOvenMode:
-              - ChangeToMode
-              - ChangeToModeResponse
-          OvenMode:
-              - ChangeToMode
-              - ChangeToModeResponse
           OvenCavityOperationalState:
-              - Pause
               - Stop
               - Start
-              - Resume
               - OperationalCommandResponse
       command fields:
           MicrowaveOvenControl:
