@@ -3996,7 +3996,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTROvenCavityOperationalStateClusterPauseParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4080,7 +4080,7 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTROvenCavityOperationalStateClusterResumeParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4127,7 +4127,7 @@ MTR_NEWLY_AVAILABLE
                                          error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTROvenModeClusterChangeToModeParams : NSObject <NSCopying>
 
 @property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
@@ -4157,7 +4157,7 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTROvenModeClusterChangeToModeResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_NEWLY_AVAILABLE;
@@ -4175,7 +4175,7 @@ MTR_NEWLY_AVAILABLE
  * schema for this command.
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
