@@ -9916,12 +9916,6 @@
                   # PowerInWatts is provisional because WATTS is provisional in Matter 1.3
                   # WATTS is provisional in 1.3 because no one has submitted a DUT for it
                   - PowerNumberLimits
-          MicrowaveOvenMode:
-              Feature:
-                  - OnOff
-          OvenMode:
-              Feature:
-                  - OnOff
       device types:
           - AirQualitySensor
           - AirPurifier
