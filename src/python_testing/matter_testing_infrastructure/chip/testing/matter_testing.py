@@ -1094,6 +1094,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.current_step_index = 0
         self.step_start_time = datetime.now(timezone.utc)
         self.step_skipped = False
+        self.global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
+        # self.stored_global_wildcard stores value of self.global_wildcard after first async call, appears needed in order to not timeout during commissioning
+        self.stored_global_wildcard = None
 
     def setup_test(self):
         self.current_step_index = 0
@@ -1415,7 +1418,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.mark_current_step_skipped()
         return pics_condition
 
-    async def attributes_guard(self, attribute_condition: bool):
+    async def attributes_guard(self, endpoint: int, attribute: str):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using attributes against attributes_list, otherwise returns True.
            For example can be used to check if a test step should be run:
@@ -1428,7 +1431,9 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        attr_condition = await asyncio.wait_for(should_run_test_on_endpoint(self, has_attribute(attribute_condition)), timeout=60)
+        if self.stored_global_wildcard == None:
+            self.stored_global_wildcard = await self.global_wildcard
+        attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
         if not attr_condition:
             self.mark_current_step_skipped()
         return attr_condition
