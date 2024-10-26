@@ -1087,7 +1087,7 @@ extern "C" void sl_bt_on_event(sl_bt_msg_t * evt)
     }
     break;
     case sl_bt_evt_connection_data_length_id: {
-        ChipLogProgress(DeviceLayer, "Connection data lenght ID received - txL:%d,txT:%d,rxL:%d,rxL:%d",
+        ChipLogProgress(DeviceLayer, "Connection data length ID received - txL:%d,txT:%d,rxL:%d,rxL:%d",
                         evt->data.evt_connection_data_length.tx_data_len, evt->data.evt_connection_data_length.tx_time_us,
                         evt->data.evt_connection_data_length.rx_data_len, evt->data.evt_connection_data_length.rx_time_us);
     }
