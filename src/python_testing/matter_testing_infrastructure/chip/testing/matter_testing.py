@@ -1432,7 +1432,7 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        if self.stored_global_wildcard == None:
+        if self.stored_global_wildcard is None:
             self.stored_global_wildcard = await self.global_wildcard
         attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
         if not attr_condition:
