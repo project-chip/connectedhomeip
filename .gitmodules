@@ -332,6 +332,7 @@
 [submodule "third_party/lwip/repo"]
 	path = third_party/lwip/repo
 	url = https://github.com/lwip-tcpip/lwip.git
+	excluded-platforms = darwin
 [submodule "third_party/abseil-cpp/src"]
 	path = third_party/abseil-cpp/src
 	url = https://github.com/abseil/abseil-cpp.git
