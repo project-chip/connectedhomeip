@@ -1,15 +1,18 @@
 import inspect
 from enum import IntFlag
+import chip.clusters as Clusters
 from chip.tlv import uint
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.enum import MatterIntEnum
 from chip.clusters.ClusterObjects import ClusterObject
-import chip.clusters as Clusters
-from typing import get_args, get_origin, Union
-from basic_composition_support import BasicCompositionTests
+from chip.testing import global_attribute_ids
+from matter_testing_infrastructure.chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_infrastructure.chip.testing.basic_composition import BasicCompositionTests
 from mobly import asserts
-from spec_parsing_support import build_xml_clusters
+# from spec_parsing_support import build_xml_clusters
+from matter_testing_infrastructure.chip.testing.spec_parsing import build_xml_clusters
+from typing import get_args, get_origin, Union
+
 
 class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
@@ -92,10 +95,10 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                     print(f'attributes_of_type_on_device: {attributes_of_type_on_device}, attributes_of_type: {attributes_of_type}')
                     chosen_attribute = next(iter(attributes_of_type_on_device))
                     value = self.pick_writable_value(chosen_attribute)
-                    output = await self.write_single_attribute(
-                        attribute_value=chosen_attribute(value=value),
-                        endpoint_id=endpoint,
-                        )
+                #     output = await self.write_single_attribute(
+                #         attribute_value=chosen_attribute(value=value),
+                #         endpoint_id=endpoint,
+                #         )
                 if attributes_of_type_on_device:
                     return True
         return False
@@ -106,12 +109,17 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         await self.setup_class_helper()
         self.xml_clusters, self.problems = build_xml_clusters()
         all_clusters = [cluster for cluster in Clusters.ClusterObjects.ALL_ATTRIBUTES]
+        expected_descriptor_attributes = ClusterObjects.ALL_ATTRIBUTES[Clusters.Objects.Descriptor.id]
+        
+        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor)])
+        returned_attributes = [a for a in read_request[0][Clusters.Objects.Descriptor].keys() if a !=
+                               Clusters.Attribute.DataVersion]
+        
 
         self.device_clusters = self.all_device_clusters()
         self.device_attributes = self.all_device_attributes()
         self.all_supported_clusters = [cluster for cluster in Clusters.__dict__.values(
         ) if inspect.isclass(cluster) and issubclass(cluster, ClusterObjects.Cluster)]
-
 
         # Step 1
 
@@ -122,6 +130,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         # Verify that the DUT sends a WriteResponseMessage with any status except UNSUPPORTED_WRITE or DATA_VERSION_MISMATCH. If the Status is SUCCESS, verify the updated
         #  value by sending a ReadRequestMessage for all affected paths. If the status is SUCCESS, send a WriteRequestMessage to set the value back to `original`.
         writable_attributes = []
+        command_map = {}
         for cluster_id in self.xml_clusters:
             xml_cluster = self.xml_clusters[cluster_id]
             attributes = xml_cluster.attributes
@@ -129,12 +138,23 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                 write_access = xml_attribute.write_access
                 if not write_access:
                     continue
+                if write_access is not None and write_access < Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate:
+                    continue
                 if cluster_id in Clusters.ClusterObjects.ALL_ATTRIBUTES and attribute_id in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
                     attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
-                    if hasattr(attribute, 'value'):
+                    if hasattr(attribute, 'value') and write_access >= Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate:
+    
                         writable_attributes.append(attribute)
-                            
+                        if cluster_id not in command_map:
+                            command_map[cluster_id] = self.xml_clusters[cluster_id].command_map
 
+        writable_clusters = []
+    
+        for writable_attribute in writable_attributes:
+            cluster = Clusters.ClusterObjects.ALL_CLUSTERS[writable_attribute.cluster_id]
+            if cluster not in writable_clusters:
+                writable_clusters.append(cluster)
+        
         writable_attributes_iter = iter(writable_attributes)
 
         chosen_writable_attribute = next(writable_attributes_iter)
@@ -147,6 +167,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             if output_1: # Skip if no output -- e.g., happens with Objects.PumpConfigurationAndControl.Attributes.LifetimeRunningHours
 
                 endpoint = next(iter(output_1.attributes))
+        
                 original_value = output_1.attributes[endpoint][chosen_writable_cluster][chosen_writable_attribute]
 
                 value = self.pick_writable_value(chosen_writable_attribute)
@@ -177,6 +198,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             output_1 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
             if output_1:
                 endpoint = next(iter(output_1.attributes))
+                # import pdb;pdb.set_trace()
+                # print(f"endpoint: {endpoint}")
                 value = self.pick_writable_value(chosen_writable_attribute)
                 await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, chosen_writable_attribute(value=value))])
                 output_2 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
@@ -286,7 +309,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         # result = await self.read_single_attribute_expect_error(endpoint=unsupported[0], cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.FeatureMap, error=Status.UnsupportedEndpoint)
         chosen_writable_attribute = next(writable_attributes_iter)
         value = self.pick_writable_value(chosen_writable_attribute)
-        result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
+        # result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
 
         # Step 14
 
@@ -307,11 +330,13 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                 if unsupported:
                     unsupported_attribute = (ClusterObjects.ALL_ATTRIBUTES[unsupported[0]])[0]
                     chosen_writable_attribute = next(writable_attributes_iter)
+                    chosen_writable_cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_writable_attribute.cluster_id]
                     value = self.pick_writable_value(chosen_writable_attribute)
-                    result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
-                    # result = await self.read_single_attribute_expect_error(endpoint=endpoint_id, cluster=ClusterObjects.ALL_CLUSTERS[unsupported[0]], attribute=unsupported_attribute, error=Status.UnsupportedCluster)
-                    asserts.assert_true(isinstance(result.Reason, InteractionModelError),
-                                        msg="Unexpected success writing invalid cluster")
+                    if value is not None:
+                        result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
+                        result = await self.read_single_attribute_expect_error(endpoint=endpoint_id, cluster=ClusterObjects.ALL_CLUSTERS[unsupported[0]], attribute=unsupported_attribute, error=Status.UnsupportedCluster)
+                        asserts.assert_true(isinstance(result.Reason, InteractionModelError),
+                                            msg="Unexpected success writing invalid cluster")
 
         # Step 15
 
@@ -337,11 +362,16 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                 if unsupported:
                     chosen_writable_attribute = next(writable_attributes_iter)
                     value = self.pick_writable_value(chosen_writable_attribute)
-                    result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
-                    asserts.assert_true(isinstance(result.Reason, InteractionModelError),
-                                        msg="Unexpected success writing invalid attribute")
+                    if value is not None:
+                        output_1 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
+                        original_value = output_1.attributes[endpoint][chosen_writable_cluster][chosen_writable_attribute]
+                        result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
+                        asserts.assert_true(isinstance(result.Reason, InteractionModelError),
+                                            msg="Unexpected success writing invalid attribute")
                     found_unsupported = True
                     break
+        write_output = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, chosen_writable_attribute(value=original_value))])
+        asserts.assert_equal(output_3.attributes[endpoint][chosen_writable_cluster][chosen_writable_attribute], original_value, "Failure writing back to original value")
 
         # Step 16
 
@@ -361,6 +391,17 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         # Verify that the DUT sends a WriteResponseMessage with any status except UNSUPPORTED_WRITE or DATA_VERSION_MISMATCH. If the Status is SUCCESS, verify the updated value by sending a ReadRequestMessage for all affected paths. If the status is SUCCESS, send a WriteRequestMessage to set the value back to `original`.
 
+        chosen_writable_attribute = next(writable_attributes_iter)
+        chosen_writable_cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_writable_attribute.cluster_id]
+        output_1 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
+        endpoint = next(iter(output_1.attributes))
+        value = self.pick_writable_value(chosen_writable_attribute)
+        data_version = output_1.attributes[endpoint][Clusters.Thermostat][Clusters.Attribute.DataVersion]
+        result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
+        
+        asserts.assert_true(isinstance(result.Reason, InteractionModelError),
+                            msg="Unexpected success writing invalid attribute")
+        
         # Step 18
 
         # TH sends a ReadRequest message to the DUT to read any writeable attribute on any cluster.
@@ -368,8 +409,21 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         # DUT returns with a report data action with the attribute values and the dataversion of the cluster.
         # TH sends a WriteRequestMessage to the DUT to modify the value of the selected attribute no DataVersion indicated.
         # TH sends a second WriteRequestMessage to the DUT to modify the value of an attribute with the dataversion field set to the value received earlier.
-
         # Verify that the DUT sends a Write Response message with the error DATA_VERSION_MISMATCH for the second Write request.
+        
+        chosen_writable_attribute = next(writable_attributes_iter)
+        chosen_writable_cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_writable_attribute.cluster_id]
+        output_1 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
+        endpoint = next(iter(output_1.attributes))
+
+        value = self.pick_writable_value(chosen_writable_attribute)
+        data_version = output_1.attributes[endpoint][Clusters.Thermostat][Clusters.Attribute.DataVersion]
+        result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
+        result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value + 1), endpoint_id=endpoint)
+        
+        asserts.assert_true(isinstance(result.Reason, InteractionModelError),
+                            msg="Unexpected success writing invalid attribute")
+
 
         # Step 19
 
@@ -377,6 +431,35 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         # If no such attribute exists, skip this step.
 
         # On the TH verify that the DUT sends a status code NEEDS_TIMED_INTERACTION.
+
+        command_map_iter = iter(command_map)
+        
+        while True:
+            
+            cluster_id = next(command_map_iter)
+            command_dict = command_map[cluster_id]
+            chosen_writable_cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+            if command_dict and chosen_writable_cluster in writable_clusters:
+                break
+        
+        for writable_attribute in writable_attributes:
+            if writable_attribute.cluster_id == chosen_writable_cluster.id:
+                chosen_writable_attribute = writable_attribute
+                break
+
+        chosen_command_str = next(iter(command_dict))
+        value = self.pick_writable_value(chosen_writable_attribute)
+        chosen_command = getattr(chosen_writable_cluster.Commands, chosen_command_str)
+        
+        await self.send_single_cmd(timedRequestTimeoutMs=1000, cmd=chosen_command(is_client=False))
+        value = self.pick_writable_value(chosen_writable_attribute)
+        result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
+        # In one particular example, chosen_writable_attribute = Clusters.HepaFilterMonitoring.Attributes.LastChangedTime,
+        # chosen_writable_cluster = Clusters.HepaFilterMonitoring, and
+        # chosen_command = Clusters.HepaFilterMonitoring.Commands.ResetCondition
+        # Yet the only members of this command are cluster_id, command_id, descriptor, is_client, and response_type.
+        # Passing any of these (e.g. Clusters.HepaFilterMonitoring.Commands.ResetCondition(is_client=False) gives a TypeError with an
+        # unexpected argument, so passing this to await self.send_single_cmd(cmd=cmd) can't be done. How to filter out commands that work?)
 
 if __name__ == "__main__":
     default_matter_test_main()
