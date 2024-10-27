@@ -102,7 +102,7 @@ source_set("efr32_test_main") {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",
-      "${examples_plat_dir}:efr-matter-shell",
+      "${examples_plat_dir}:matter-shell",
     ]
   }
 

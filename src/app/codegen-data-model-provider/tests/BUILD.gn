@@ -52,7 +52,10 @@ source_set("mock_model") {
 chip_test_suite("tests") {
   output_name = "libCodegenDataModelProviderTests"
 
-  test_sources = [ "TestCodegenModelViaMocks.cpp" ]
+  test_sources = [
+    "TestCodegenModelViaMocks.cpp",
+    "TestEmberAttributeDataBuffer.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
 
