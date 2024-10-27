@@ -344,7 +344,7 @@
 [submodule "third_party/googletest"]
 	path = third_party/googletest
 	url = https://github.com/google/googletest
-	platforms = linux,android,darwin,tizen
+	platforms = linux,android,tizen
 [submodule "third_party/re2/src"]
 	path = third_party/re2/src
 	url = https://github.com/google/re2.git
