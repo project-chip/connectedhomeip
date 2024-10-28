@@ -30,9 +30,10 @@
 constexpr char kInteractiveModeInstruction[] = "╔══════════════════════════════════════════════════════════════════╗\n"
                                                "║                        Interactive Mode                          ║\n"
                                                "╠══════════════════════════════════════════════════════════════════╣\n"
-                                               "║ Stop and restart stack: [Ctrl+_] & [Ctrl+^ ]                     ║\n"
-                                               "║ Trigger exit(0)       : [Ctrl+@]                                 ║\n"
-                                               "║ Quit Interactive      : 'quit()' or `quit`                       ║\n"
+                                               "║ Stop and restart stack    : [Ctrl+_] & [Ctrl+^ ]                 ║\n"
+                                               "║ Suspend/Resume controllers: [Ctrl+Z]                             ║\n"
+                                               "║ Trigger exit(0)           : [Ctrl+@]                             ║\n"
+                                               "║ Quit Interactive          : 'quit()' or `quit`                   ║\n"
                                                "╚══════════════════════════════════════════════════════════════════╝\n";
 constexpr char kInteractiveModePrompt[] = ">>> ";
 constexpr char kInteractiveModeHistoryFilePath[] = "/tmp/darwin_framework_tool_history";
@@ -70,6 +71,22 @@ public:
     CHIP_ERROR RunCommand() override
     {
         StopCommissioners();
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
+};
+
+class SuspendOrResumeCommand : public CHIPCommandBridge {
+public:
+    SuspendOrResumeCommand()
+        : CHIPCommandBridge("suspend")
+    {
+    }
+
+    CHIP_ERROR RunCommand() override
+    {
+        SuspendOrResumeCommissioners();
         return CHIP_NO_ERROR;
     }
 
@@ -312,6 +329,13 @@ el_status_t StopFunction()
     return CSstay;
 }
 
+el_status_t SuspendOrResumeFunction()
+{
+    SuspendOrResumeCommand cmd;
+    cmd.RunCommand();
+    return CSstay;
+}
+
 el_status_t ExitFunction()
 {
     exit(0);
@@ -333,6 +357,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     el_bind_key(CTL('^'), RestartFunction);
     el_bind_key(CTL('_'), StopFunction);
     el_bind_key(CTL('@'), ExitFunction);
+    el_bind_key(CTL('Z'), SuspendOrResumeFunction);
 
     char * command = nullptr;
     int status;
