@@ -444,7 +444,6 @@ CHIP_ERROR EmberAttributeDataBuffer::EncodeInteger(chip::TLV::TLVWriter & writer
     // code prioritizes code size over readability here.
     if (mIsNullable && (value.uint_value == nullValueAsU64))
     {
-        // MaxValue is used for NULL setting
         return writer.PutNull(tag);
     }
 
