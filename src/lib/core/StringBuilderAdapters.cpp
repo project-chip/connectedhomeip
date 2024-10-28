@@ -29,3 +29,19 @@ StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffe
 }
 
 } // namespace pw
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_TIZEN ||                         \
+    CHIP_DEVICE_LAYER_TARGET_ANDROID
+namespace chip {
+
+void PrintTo(const CHIP_ERROR & err, std::ostream * os)
+{
+    if (CHIP_ERROR::IsSuccess(err))
+    {
+        *os << "CHIP_NO_ERROR";
+        return;
+    }
+    *os << "CHIP_ERROR:<" << err.Format() << ">";
+}
+} // namespace chip
+#endif

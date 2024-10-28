@@ -116,6 +116,7 @@ source_set("string-builder-adapters") {
   public_deps = [
     ":error",
     "$dir_pw_string",
+    "$dir_pw_unit_test",
   ]
 }
 
