@@ -16,6 +16,8 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <cmath>
+
 #include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
 
 #include <app-common/zap-generated/attribute-type.h>
@@ -35,7 +37,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
-#include <math.h>
 
 #include <limits>
 #include <optional>
