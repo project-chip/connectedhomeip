@@ -16,6 +16,8 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <cmath>
+
 #include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
 
 #include <app-common/zap-generated/attribute-type.h>
@@ -35,9 +37,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
-#include <math.h>
-
-#include <cmath>
 #include <limits>
 #include <optional>
 
@@ -113,7 +112,6 @@ bool IsEqual(const T & a, const T & b)
 template <>
 bool IsEqual<float>(const float & a, const float & b)
 {
-
     if (std::isnan(a) && std::isnan(b))
     {
         return true;
@@ -125,7 +123,6 @@ bool IsEqual<float>(const float & a, const float & b)
 template <>
 bool IsEqual<double>(const double & a, const double & b)
 {
-
     if (std::isnan(a) && std::isnan(b))
     {
         return true;
@@ -1157,7 +1154,7 @@ TEST(TestEmberAttributeBuffer, TestDecodeFloatingPoint)
     {
         EncodeTester tester(CreateFakeMeta(ZCL_SINGLE_ATTRIBUTE_TYPE, false /* nullable */));
         // non-nullable float
-        EXPECT_TRUE(tester.TryDecode<float>(std::nan("0"), { 0, 0, 0xC0, 0x7F }).IsSuccess());
+        EXPECT_TRUE(tester.TryDecode<float>(std::nanf("0"), { 0, 0, 0xC0, 0x7F }).IsSuccess());
     }
 
     {
