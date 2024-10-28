@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
-import("//build_overrides/googletest.gni")
 import("//build_overrides/pigweed.gni")
 
 # The location of the build configuration file.
