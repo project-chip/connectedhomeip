@@ -139,7 +139,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
         productAttestationAuthorityCertificates = nil;
     }
 
-    sUseSharedStorage = mCommissionerSharedStorage.ValueOr(true);
+    sUseSharedStorage = mCommissionerSharedStorage.ValueOr(false);
     if (sUseSharedStorage) {
         return SetUpStackWithSharedStorage(productAttestationAuthorityCertificates);
     }
