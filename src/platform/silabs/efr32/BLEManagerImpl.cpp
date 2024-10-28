@@ -1076,7 +1076,7 @@ extern "C" void sl_bt_on_event(sl_bt_msg_t * evt)
     }
     break;
     case sl_bt_evt_connection_parameters_id: {
-        ChipLogProgress(DeviceLayer, "Connection parameter ID received - i:%d,l:%d,t:%d,sm:%d",
+        ChipLogProgress(DeviceLayer, "Connection parameter ID received - i:%d, l:%d, t:%d, sm:%d",
                         evt->data.evt_connection_parameters.interval, evt->data.evt_connection_parameters.latency,
                         evt->data.evt_connection_parameters.timeout, evt->data.evt_connection_parameters.security_mode);
         chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectParams(evt);
@@ -1087,7 +1087,7 @@ extern "C" void sl_bt_on_event(sl_bt_msg_t * evt)
     }
     break;
     case sl_bt_evt_connection_data_length_id: {
-        ChipLogProgress(DeviceLayer, "Connection data length ID received - txL:%d,txT:%d,rxL:%d,rxL:%d",
+        ChipLogProgress(DeviceLayer, "Connection data length ID received - txL:%d, txT:%d, rxL:%d, rxL:%d",
                         evt->data.evt_connection_data_length.tx_data_len, evt->data.evt_connection_data_length.tx_time_us,
                         evt->data.evt_connection_data_length.rx_data_len, evt->data.evt_connection_data_length.rx_time_us);
     }
