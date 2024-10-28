@@ -1121,6 +1121,12 @@ TEST(TestEmberAttributeBuffer, TestDecodeFloatingPoint)
     }
 
     {
+        EncodeTester tester(CreateFakeMeta(ZCL_SINGLE_ATTRIBUTE_TYPE, false /* nullable */));
+        EXPECT_EQ(tester.TryDecode<DataModel::Nullable<float>>(DataModel::NullNullable, { 0, 0, 0xC0, 0x7F }),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    {
         EncodeTester tester(CreateFakeMeta(ZCL_DOUBLE_ATTRIBUTE_TYPE, false /* nullable */));
         EXPECT_TRUE(tester.TryDecode<double>(123.55, { 0x33, 0x33, 0x33, 0x33, 0x33, 0xE3, 0x5E, 0x40 }).IsSuccess());
     }
@@ -1132,5 +1138,12 @@ TEST(TestEmberAttributeBuffer, TestDecodeFloatingPoint)
             tester.TryDecode<DataModel::Nullable<double>>(123.55, { 0x33, 0x33, 0x33, 0x33, 0x33, 0xE3, 0x5E, 0x40 }).IsSuccess());
         EXPECT_TRUE(
             tester.TryDecode<DataModel::Nullable<double>>(DataModel::NullNullable, { 0, 0, 0, 0, 0, 0, 0xF8, 0x7F }).IsSuccess());
+    }
+
+    {
+        EncodeTester tester(CreateFakeMeta(ZCL_DOUBLE_ATTRIBUTE_TYPE, false /* nullable */));
+        // non-nullable double
+        EXPECT_EQ(tester.TryDecode<DataModel::Nullable<double>>(DataModel::NullNullable, { 0, 0, 0, 0, 0, 0, 0xF8, 0x7F }),
+                  CHIP_ERROR_INVALID_ARGUMENT);
     }
 }
