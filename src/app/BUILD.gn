@@ -258,7 +258,6 @@ static_library("interaction-model") {
       "reporting/Read-Ember.cpp",
       "reporting/Read-Ember.h",
     ]
-    public_deps += [ "${chip_root}/src/app/ember_coupling" ]
   } else if (chip_use_data_model_interface == "check") {
     sources += [
       "reporting/Read-Checked.cpp",
@@ -268,10 +267,7 @@ static_library("interaction-model") {
       "reporting/Read-Ember.cpp",
       "reporting/Read-Ember.h",
     ]
-    public_deps += [
-      "${chip_root}/src/app/data-model-provider",
-      "${chip_root}/src/app/ember_coupling",
-    ]
+    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
   } else {  # enabled
     sources += [
       "reporting/Read-DataModel.cpp",
