@@ -69,7 +69,7 @@ namespace {
  *    - Event read if the path is a concrete event path
  */
 bool HasAccessibleEventPathForEndpointAndCluster(const ConcreteClusterPath & path, const EventPathParams & aEventPath,
-                                            const Access::SubjectDescriptor & aSubjectDescriptor)
+                                                 const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     Access::RequestPath requestPath{ .cluster     = path.mClusterId,
                                      .endpoint    = path.mEndpointId,
@@ -95,7 +95,7 @@ bool HasValidEventPathForEndpoint(DataModel::Provider * aProvider, EndpointId aE
     if (!aEventPath.HasWildcardClusterId())
     {
         return HasAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, aEventPath.mClusterId), aEventPath,
-                                                      aSubjectDescriptor);
+                                                           aSubjectDescriptor);
     }
 
     DataModel::ClusterEntry clusterEntry = aProvider->FirstCluster(aEventPath.mEndpointId);
@@ -169,7 +169,7 @@ bool HasValidEventPathForEndpoint(EndpointId aEndpoint, const EventPathParams & 
         return false;
     }
     return HasAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, cluster->clusterId), aEventPath,
-                                                  aSubjectDescriptor);
+                                                       aSubjectDescriptor);
 }
 
 bool HasValidEventPath(const EventPathParams & aEventPath, const Access::SubjectDescriptor & aSubjectDescriptor)
