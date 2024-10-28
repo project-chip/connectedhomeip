@@ -68,8 +68,8 @@ namespace {
  *    - Cluster::View in case the path is a wildcard for the event id
  *    - Event read if the path is a concrete event path
  */
-bool HasAccessibleEventPathForEndpointAndCluster(const ConcreteClusterPath & path, const EventPathParams & aEventPath,
-                                                 const Access::SubjectDescriptor & aSubjectDescriptor)
+bool MayHaveAccessibleEventPathForEndpointAndCluster(const ConcreteClusterPath & path, const EventPathParams & aEventPath,
+                                                     const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     Access::RequestPath requestPath{ .cluster     = path.mClusterId,
                                      .endpoint    = path.mEndpointId,
@@ -94,14 +94,14 @@ bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, Endp
 {
     if (!aEventPath.HasWildcardClusterId())
     {
-        return HasAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, aEventPath.mClusterId), aEventPath,
-                                                           aSubjectDescriptor);
+        return MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, aEventPath.mClusterId), aEventPath,
+                                                               aSubjectDescriptor);
     }
 
     DataModel::ClusterEntry clusterEntry = aProvider->FirstCluster(aEventPath.mEndpointId);
     while (clusterEntry.IsValid())
     {
-        if (HasAccessibleEventPathForEndpointAndCluster(clusterEntry.path, aEventPath, aSubjectDescriptor))
+        if (MayHaveAccessibleEventPathForEndpointAndCluster(clusterEntry.path, aEventPath, aSubjectDescriptor))
         {
             return true;
         }
@@ -168,8 +168,8 @@ bool MayHaveAccessibleEventPathForEndpoint(EndpointId aEndpoint, const EventPath
         // Nothing valid here.
         return false;
     }
-    return HasAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, cluster->clusterId), aEventPath,
-                                                       aSubjectDescriptor);
+    return MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, cluster->clusterId), aEventPath,
+                                                           aSubjectDescriptor);
 }
 
 bool MayHaveAccessibleEventPath(const EventPathParams & aEventPath, const Access::SubjectDescriptor & aSubjectDescriptor)
@@ -1864,8 +1864,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
     const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
     const bool commandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
 #else
-    const bool commandNeedsTimedInvoke         = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
-    const bool commandIsFabricScoped           = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
+    const bool commandNeedsTimedInvoke = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
+    const bool commandIsFabricScoped   = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
 #endif
 
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
