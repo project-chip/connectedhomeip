@@ -265,9 +265,6 @@ static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKey
     VerifyOrReturn([self _internalState:dictionary hasValidValuesForKeys:requiredInternalStateKeys valueRequired:YES]);
     VerifyOrReturn([self _internalState:dictionary hasValidValuesForKeys:optionalInternalStateKeys valueRequired:NO]);
 
-    // Save old state for comparison later
-    NSNumber * oldStateNumber = self._internalState[kMTRDeviceInternalPropertyDeviceState];
-    NSNumber * newStateNumber = dictionary[kMTRDeviceInternalPropertyDeviceState];
     [self _setInternalState:dictionary];
 
     if (!MTREqualObjects(oldStateNumber, newStateNumber)) {
