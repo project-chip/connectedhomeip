@@ -756,7 +756,7 @@ TEST(TestEmberAttributeBuffer, TestDecodeFailures)
     {
         // Bad boolean data
         EncodeTester tester(CreateFakeMeta(ZCL_BOOLEAN_ATTRIBUTE_TYPE, false /* nullable */));
-        EXPECT_EQ(tester.TryDecode<bool>(true, { 123 }), CHIP_ERROR_INCORRECT_STATE);
+        EXPECT_EQ(tester.TryDecode<bool>(true, { 123 }), CHIP_ERROR_INVALID_ARGUMENT);
     }
 }
 

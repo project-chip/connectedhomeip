@@ -442,7 +442,7 @@ CHIP_ERROR EmberAttributeDataBuffer::EncodeInteger(chip::TLV::TLVWriter & writer
     // bit-formatted as both int64 and uint64. When we define the nullValue,
     // it is bitcast into u64 hence this comparison. This is ugly, however this
     // code prioritizes code size over readability here.
-    if (mIsNullable && (value.uint_value == nullValue))
+    if (mIsNullable && (value.uint_value == nullValueAsU64))
     {
         // MaxValue is used for NULL setting
         return writer.PutNull(tag);
@@ -488,10 +488,11 @@ CHIP_ERROR EmberAttributeDataBuffer::Encode(chip::TLV::TLVWriter & writer, TLV::
         case 1:
             return writer.PutBoolean(tag, value != 0);
         case 0xFF:
+            VerifyOrReturnError(mIsNullable, CHIP_ERROR_INVALID_ARGUMENT);
             return writer.PutNull(tag);
         default:
             // Unknown types
-            return CHIP_ERROR_INCORRECT_STATE;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
     case ZCL_INT8U_ATTRIBUTE_TYPE:  // Unsigned 8-bit integer
@@ -524,6 +525,7 @@ CHIP_ERROR EmberAttributeDataBuffer::Encode(chip::TLV::TLVWriter & writer, TLV::
         }
         if (NumericAttributeTraits<float>::IsNullValue(value.value))
         {
+            VerifyOrReturnError(mIsNullable, CHIP_ERROR_INVALID_ARGUMENT);
             return writer.PutNull(tag);
         }
         return writer.Put(tag, value.value);
@@ -541,6 +543,7 @@ CHIP_ERROR EmberAttributeDataBuffer::Encode(chip::TLV::TLVWriter & writer, TLV::
         }
         if (NumericAttributeTraits<double>::IsNullValue(value.value))
         {
+            VerifyOrReturnError(mIsNullable, CHIP_ERROR_INVALID_ARGUMENT);
             return writer.PutNull(tag);
         }
         return writer.Put(tag, value.value);
