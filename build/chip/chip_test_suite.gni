@@ -14,6 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/googletest.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/tests.gni")
@@ -119,6 +120,10 @@ template("chip_test_suite") {
 
           # Link to the common lib for this suite so we get its `sources`.
           public_deps += [ ":${_suite_name}.lib" ]
+
+          if (pw_unit_test_BACKEND == "$dir_pw_unit_test:googletest") {
+            test_main = "$dir_pigweed/third_party/googletest:gmock_main"
+          }
 
           # Set variables that the platform executable may need.
           if (test_executable_output_name != "") {
