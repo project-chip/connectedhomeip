@@ -48,7 +48,10 @@ CHIP_ERROR X509_PemToDer(const std::string & pemCert, MutableByteSpan & derCert)
     std::string endMarker   = "-----END CERTIFICATE-----";
 
     std::size_t beginPos = pemCert.find(beginMarker);
-    std::size_t endPos   = pemCert.find(endMarker);
+    VerifyOrReturnError(beginPos != std::string::npos, CHIP_ERROR_INVALID_ARGUMENT);
+
+    std::size_t endPos = pemCert.find(endMarker);
+    VerifyOrReturnError(endPos != std::string::npos, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Extract content between markers
     std::string plainB64Str = pemCert.substr(beginPos + beginMarker.length(), endPos - (beginPos + beginMarker.length()));
@@ -56,6 +59,8 @@ CHIP_ERROR X509_PemToDer(const std::string & pemCert, MutableByteSpan & derCert)
     // Remove all newline characters '\n' and '\r'
     plainB64Str.erase(std::remove(plainB64Str.begin(), plainB64Str.end(), '\n'), plainB64Str.end());
     plainB64Str.erase(std::remove(plainB64Str.begin(), plainB64Str.end(), '\r'), plainB64Str.end());
+
+    VerifyOrReturnError(!plainB64Str.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Verify we have enough room to store the decoded certificate
     size_t maxDecodeLen = BASE64_MAX_DECODED_LEN(plainB64Str.size());

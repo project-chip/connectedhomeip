@@ -526,7 +526,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
 
     // Test issuer does not match
-    // crl_signer_cert is not a valid and just used for testing
+    // crl_signer_cert is not valid and just used for testing
     jsonData = R"(
     [{
         "type": "revocation_set",
@@ -541,7 +541,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
 
     // Test subject key ID does not match
-    // crl_signer_cert is not a valid and just used for testing
+    // crl_signer_cert is not valid and just used for testing
     jsonData = R"(
     [{
         "type": "revocation_set",
@@ -556,7 +556,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
 
     // Test serial number does not match
-    // crl_signer_cert is not a valid and just used for testing
+    // crl_signer_cert is not valid and just used for testing
     jsonData = R"(
     [{
         "type": "revocation_set",
@@ -571,7 +571,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
 
     // Test starting serial number bytes match but not all,
-    // crl_signer_cert is not a valid and just used for testing
+    // crl_signer_cert is not valid and just used for testing
     jsonData = R"(
     [{
         "type": "revocation_set",
@@ -586,7 +586,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
 
     // Test DAC is revoked, and crl signer delegator is present
-    // crl_signer_cert is not a valid and just used for testing
+    // crl_signer_cert is not valid and just used for testing
     jsonData = R"(
     [{
         "type": "revocation_set",
@@ -600,4 +600,34 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     WriteTestRevokedData(jsonData, tmpJsonFile);
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacRevoked);
+
+    // Test with invalid crl signer cert missing begin and end cert markers
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "crl_signer_cert": "MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAw\nWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7z\neO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDAS\nBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3\nCU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGh\ncX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETET\ni+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ=="
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    }]
+    )";
+
+    WriteTestRevokedData(jsonData, tmpJsonFile);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // test with malformed crl signer certificate
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "crl_signer_cert": "-----BEGIN CERTIFICATE-----\nMIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAw\nWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7z\neO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDAS\nBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3\nCU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGh\ncX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETET\ni+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==\n-----END CERTIFICATE-----",
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    }]
+    )";
+
+    WriteTestRevokedData(jsonData, tmpJsonFile);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
 }
