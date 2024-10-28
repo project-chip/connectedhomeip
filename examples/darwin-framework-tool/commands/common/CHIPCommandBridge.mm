@@ -139,7 +139,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
         productAttestationAuthorityCertificates = nil;
     }
 
-    sUseSharedStorage = mCommissionerSharedStorage.ValueOr(true);
+    sUseSharedStorage = mCommissionerSharedStorage.ValueOr(false);
     if (sUseSharedStorage) {
         return SetUpStackWithSharedStorage(productAttestationAuthorityCertificates);
     }
@@ -283,6 +283,17 @@ MTRBaseDevice * CHIPCommandBridge::BaseDeviceWithNodeId(chip::NodeId nodeId)
     VerifyOrReturnValue(controller != nil, nil);
     return [controller deviceBeingCommissionedWithNodeID:@(nodeId) error:nullptr]
         ?: [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:controller];
+}
+
+MTRDevice * CHIPCommandBridge::DeviceWithNodeId(chip::NodeId nodeId)
+{
+    __auto_type * controller = CurrentCommissioner();
+    VerifyOrReturnValue(nil != controller, nil);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(nodeId) controller:controller];
+    VerifyOrReturnValue(nil != device, nil);
+
+    return device;
 }
 
 void CHIPCommandBridge::StopCommissioners()
