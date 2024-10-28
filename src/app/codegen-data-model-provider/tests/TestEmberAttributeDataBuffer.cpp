@@ -35,6 +35,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
+#include <math.h>
+
 #include <cmath>
 #include <limits>
 #include <optional>
