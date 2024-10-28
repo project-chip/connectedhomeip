@@ -27,6 +27,68 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+namespace detail {
+
+/*
+ * Base class of DecodableList to minimize template usage
+ */
+class DecodableListBase
+{
+public:
+    DecodableListBase() { ClearReader(); }
+
+    /*
+     * @brief
+     *
+     * This call stores a TLV reader positioned on the list this class is to manage.
+     *
+     * Specifically, the passed-in reader should be pointing into the list just after
+     * having called `OpenContainer` on the list element.
+     */
+    void SetReader(const TLV::TLVReader & reader) { mReader = reader; }
+
+    /*
+     * @brief
+     *
+     * This call clears the TLV reader managed by this class, so it can be reused.
+     */
+    void ClearReader() { mReader.Init(nullptr, 0); }
+
+    /*
+     * Compute the size of the list. This can fail if the TLV is malformed. If
+     * this succeeds, that does not guarantee that the individual items can be
+     * successfully decoded; consumers should check Iterator::GetStatus() when
+     * actually decoding them. If there is no list then the size is considered
+     * to be zero.
+     */
+    CHIP_ERROR ComputeSize(size_t * size) const
+    {
+        if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
+        {
+            *size = 0;
+            return CHIP_NO_ERROR;
+        }
+
+        return mReader.CountRemainingInContainer(size);
+    }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader)
+    {
+        VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
+        TLV::TLVType type;
+        ReturnErrorOnFailure(reader.EnterContainer(type));
+        SetReader(reader);
+        ReturnErrorOnFailure(reader.ExitContainer(type));
+        return CHIP_NO_ERROR;
+    }
+
+protected:
+    TLV::TLVReader mReader;
+    chip::Optional<FabricIndex> mFabricIndex;
+};
+
+} // namespace detail
+
 /*
  * @brief
  *
@@ -47,29 +109,12 @@ namespace DataModel {
  *
  */
 template <typename T>
-class DecodableList
+class DecodableList : public detail::DecodableListBase
 {
 public:
-    DecodableList() { ClearReader(); }
+    DecodableList() {}
 
     static constexpr bool kIsFabricScoped = DataModel::IsFabricScoped<T>::value;
-
-    /*
-     * @brief
-     *
-     * This call stores a TLV reader positioned on the list this class is to manage.
-     *
-     * Specifically, the passed-in reader should be pointing into the list just after
-     * having called `OpenContainer` on the list element.
-     */
-    void SetReader(const TLV::TLVReader & reader) { mReader = reader; }
-
-    /*
-     * @brief
-     *
-     * This call clears the TLV reader managed by this class, so it can be reused.
-     */
-    void ClearReader() { mReader.Init(nullptr, 0); }
 
     template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
     void SetFabricIndex(FabricIndex fabricIndex)
@@ -189,38 +234,6 @@ public:
     };
 
     Iterator begin() const { return Iterator(mReader, mFabricIndex); }
-
-    /*
-     * Compute the size of the list. This can fail if the TLV is malformed. If
-     * this succeeds, that does not guarantee that the individual items can be
-     * successfully decoded; consumers should check Iterator::GetStatus() when
-     * actually decoding them. If there is no list then the size is considered
-     * to be zero.
-     */
-    CHIP_ERROR ComputeSize(size_t * size) const
-    {
-        if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
-        {
-            *size = 0;
-            return CHIP_NO_ERROR;
-        }
-
-        return mReader.CountRemainingInContainer(size);
-    }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader)
-    {
-        VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
-        TLV::TLVType type;
-        ReturnErrorOnFailure(reader.EnterContainer(type));
-        SetReader(reader);
-        ReturnErrorOnFailure(reader.ExitContainer(type));
-        return CHIP_NO_ERROR;
-    }
-
-private:
-    TLV::TLVReader mReader;
-    chip::Optional<FabricIndex> mFabricIndex;
 };
 
 } // namespace DataModel
