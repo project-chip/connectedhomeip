@@ -456,8 +456,8 @@ CHIP_ERROR EmberAttributeDataBuffer::EncodeInteger(chip::TLV::TLVWriter & writer
     case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
     case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
     case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
-    case ZCL_INT56U_ATTRIBUTE_TYPE: // Signed 56-bit integer
-    case ZCL_INT64U_ATTRIBUTE_TYPE: // Signed 64-bit integer
+    case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
+    case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
         return writer.Put(tag, value.uint_value);
     case ZCL_INT8S_ATTRIBUTE_TYPE:  // Signed 8-bit integer
     case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
