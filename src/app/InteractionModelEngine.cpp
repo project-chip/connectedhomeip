@@ -151,7 +151,7 @@ bool HasValidEventPathForEndpoint(EndpointId aEndpoint, const EventPathParams & 
 
         for (decltype(endpointType->clusterCount) idx = 0; idx < endpointType->clusterCount; ++idx)
         {
-            bool hasValidPath = HasValidEventPathForEndpointAndCluster(
+            bool mayHaveAccessiblePath = MayHaveAccessibleEventPathForEndpointAndCluster(
                 ConcreteClusterPath(aEndpoint, endpointType->cluster[idx].clusterId), aEventPath, aSubjectDescriptor);
             if (hasValidPath)
             {
