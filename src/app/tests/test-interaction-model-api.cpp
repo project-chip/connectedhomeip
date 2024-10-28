@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "access/SubjectDescriptor.h"
 #include <app/tests/test-interaction-model-api.h>
 
 #include <app/InteractionModelEngine.h>
@@ -171,8 +172,13 @@ ActionReturnStatus TestImCustomDataModel::ReadAttribute(const ReadAttributeReque
 {
     AttributeEncodeState mutableState(&encoder.GetState()); // provide a state copy to start.
 
-    CHIP_ERROR err = ReadSingleClusterData(request.subjectDescriptor.value_or(Access::SubjectDescriptor()),
-                                           request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
+    Access::SubjectDescriptor subjectDescriptor;
+    if (request.subjectDescriptor != nullptr)
+    {
+        subjectDescriptor = *request.subjectDescriptor;
+    }
+
+    CHIP_ERROR err = ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
                                            TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
 
     // state must survive CHIP_ERRORs as it is used for chunking
