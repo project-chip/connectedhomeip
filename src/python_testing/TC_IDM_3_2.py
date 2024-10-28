@@ -70,7 +70,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         elif bytes in types_in_union or attribute_type == bytes:
             value = bytes("Hello World", "utf-8")
         elif IntFlag in types_in_union or attribute_type == IntFlag:
-            value = None  # Todo: Fill in 
+            value = None  # Todo: Fill in
         elif list in types_in_union or attribute_type == list:
             value = [1, 2, 3, 4, 5, 6]
         elif ClusterObjects.ClusterObjectFieldDescriptor(Type=MatterIntEnum).Type in types_in_union or attribute_type == ClusterObjects.ClusterObjectFieldDescriptor(Type=MatterIntEnum).Type:
@@ -162,7 +162,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
             output_1 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
 
-            if output_1: # Skip if no output -- e.g., happens with Objects.PumpConfigurationAndControl.Attributes.LifetimeRunningHours
+            if output_1:  # Skip if no output -- e.g., happens with Objects.PumpConfigurationAndControl.Attributes.LifetimeRunningHours
 
                 endpoint = next(iter(output_1.attributes))
 
@@ -202,7 +202,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                 value = self.pick_writable_value(chosen_writable_attribute)
                 await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, chosen_writable_attribute(value=value))])
                 output_2 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
-                
                 asserts.assert_not_equal(output_1.attributes[endpoint][chosen_writable_cluster][chosen_writable_attribute],
                                          output_2.attributes[endpoint][chosen_writable_cluster][chosen_writable_attribute],
                                          "Output did not change")
@@ -370,7 +369,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                     found_unsupported = True
                     break
         write_output = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, chosen_writable_attribute(value=original_value))])
-        asserts.assert_equal(output_3.attributes[endpoint][chosen_writable_cluster][chosen_writable_attribute], original_value, "Failure writing back to original value")
+        asserts.assert_equal(output_3.attributes[endpoint][chosen_writable_cluster]
+                             [chosen_writable_attribute], original_value, "Failure writing back to original value")
 
         # Step 16
 
