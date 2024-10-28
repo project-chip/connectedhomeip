@@ -117,7 +117,7 @@ bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revoke
                                                       const std::string & issuerNameBase64Str)
 {
     std::string certPEM;
-    [[maybe_unused]] const char * certType;
+    [[maybe_unused]] std::string certType;
 
     if (revokedSet.isMember("crl_signer_delegator"))
     {
@@ -134,8 +134,8 @@ bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revoke
     std::string keyId;   // crl signer or crl signer delegator SKID
     VerifyOrReturnValue(CHIP_NO_ERROR == GetSubjectAndKeyIdFromPEMCert(certPEM, subject, keyId), false);
 
-    ChipLogDetail(NotSpecified, "%s: Subject: %s", certType, subject.c_str());
-    ChipLogDetail(NotSpecified, "%s: SKID: %s", certType, keyId.c_str());
+    ChipLogDetail(NotSpecified, "%s: Subject: %s", certType.c_str(), subject.c_str());
+    ChipLogDetail(NotSpecified, "%s: SKID: %s", certType.c_str(), keyId.c_str());
 
     return (akidHexStr == keyId && issuerNameBase64Str == subject);
 }
@@ -315,8 +315,8 @@ void TestDACRevocationDelegateImpl::CheckForRevokedDACChain(
 
     if (mDeviceAttestationRevocationSetPath.empty())
     {
-
         onCompletion->mCall(onCompletion->mContext, info, attestationError);
+        return;
     }
 
     ChipLogDetail(NotSpecified, "Checking for revoked DAC in %s", mDeviceAttestationRevocationSetPath.c_str());
