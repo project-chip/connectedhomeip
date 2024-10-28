@@ -1120,6 +1120,13 @@ TEST(TestEmberAttributeBuffer, TestDecodeBool)
         EXPECT_TRUE(tester.TryDecode<DataModel::Nullable<bool>>(false, { 0 }).IsSuccess());
         EXPECT_TRUE(tester.TryDecode<DataModel::Nullable<bool>>(DataModel::NullNullable, { 0xFF }).IsSuccess());
     }
+
+    {
+        // Boolean that is NOT nullable
+        EncodeTester tester(CreateFakeMeta(ZCL_BOOLEAN_ATTRIBUTE_TYPE, false /* nullable */));
+        EXPECT_EQ(tester.TryDecode<DataModel::Nullable<bool>>(DataModel::NullNullable, { 0xFF }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryDecode<bool>(true, { 0xFF }), CHIP_ERROR_INVALID_ARGUMENT);
+    }
 }
 
 TEST(TestEmberAttributeBuffer, TestDecodeFloatingPoint)
