@@ -89,8 +89,8 @@ bool HasAccessibleEventPathForEndpointAndCluster(const ConcreteClusterPath & pat
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
-bool HasValidEventPathForEndpoint(DataModel::Provider * aProvider, EndpointId aEndpoint, const EventPathParams & aEventPath,
-                                  const Access::SubjectDescriptor & aSubjectDescriptor)
+bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, EndpointId aEndpoint,
+                                           const EventPathParams & aEventPath, const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     if (!aEventPath.HasWildcardClusterId())
     {
@@ -111,20 +111,20 @@ bool HasValidEventPathForEndpoint(DataModel::Provider * aProvider, EndpointId aE
     return false;
 }
 
-bool HasValidEventPath(DataModel::Provider * aProvider, const EventPathParams & aEventPath,
+bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPathParams & aEventPath,
                        const Access::SubjectDescriptor & subjectDescriptor)
 {
     VerifyOrReturnValue(aProvider != nullptr, false);
 
     if (!aEventPath.HasWildcardEndpointId())
     {
-        return HasValidEventPathForEndpoint(aProvider, aEventPath.mEndpointId, aEventPath, subjectDescriptor);
+        return MayHaveAccessibleEventPathForEndpoint(aProvider, aEventPath.mEndpointId, aEventPath, subjectDescriptor);
     }
 
     for (EndpointId endpointId = aProvider->FirstEndpoint(); endpointId != kInvalidEndpointId;
          endpointId            = aProvider->NextEndpoint(endpointId))
     {
-        if (HasValidEventPathForEndpoint(aProvider, endpointId, aEventPath, subjectDescriptor))
+        if (MayHaveAccessibleEventPathForEndpoint(aProvider, endpointId, aEventPath, subjectDescriptor))
         {
             return true;
         }
@@ -137,8 +137,8 @@ bool HasValidEventPath(DataModel::Provider * aProvider, const EventPathParams & 
 /**
  * Helper to handle wildcard clusters in the event path.
  */
-bool HasValidEventPathForEndpoint(EndpointId aEndpoint, const EventPathParams & aEventPath,
-                                  const Access::SubjectDescriptor & aSubjectDescriptor)
+bool MayHaveAccessibleEventPathForEndpoint(EndpointId aEndpoint, const EventPathParams & aEventPath,
+                                           const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     if (aEventPath.HasWildcardClusterId())
     {
@@ -172,13 +172,13 @@ bool HasValidEventPathForEndpoint(EndpointId aEndpoint, const EventPathParams & 
                                                        aSubjectDescriptor);
 }
 
-bool HasValidEventPath(const EventPathParams & aEventPath, const Access::SubjectDescriptor & aSubjectDescriptor)
+bool MayHaveAccessibleEventPath(const EventPathParams & aEventPath, const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     if (!aEventPath.HasWildcardEndpointId())
     {
         // No need to check whether the endpoint is enabled, because
         // emberAfFindEndpointType returns null for disabled endpoints.
-        return HasValidEventPathForEndpoint(aEventPath.mEndpointId, aEventPath, aSubjectDescriptor);
+        return MayHaveAccessibleEventPathForEndpoint(aEventPath.mEndpointId, aEventPath, aSubjectDescriptor);
     }
 
     for (uint16_t endpointIndex = 0; endpointIndex < emberAfEndpointCount(); ++endpointIndex)
@@ -187,7 +187,7 @@ bool HasValidEventPath(const EventPathParams & aEventPath, const Access::Subject
         {
             continue;
         }
-        if (HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), aEventPath, aSubjectDescriptor))
+        if (MayHaveAccessibleEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), aEventPath, aSubjectDescriptor))
         {
             return true;
         }
@@ -726,9 +726,9 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
         // The definition of "valid path" is "path exists and ACL allows
         // access".  We need to do some expansion of wildcards to handle that.
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-        aHasValidEventPath = HasValidEventPath(mDataModelProvider, eventPath, aSubjectDescriptor);
+        aHasValidEventPath = MayHaveAccessibleEventPath(mDataModelProvider, eventPath, aSubjectDescriptor);
 #else
-        aHasValidEventPath = HasValidEventPath(eventPath, aSubjectDescriptor);
+        aHasValidEventPath = MayHaveAccessibleEventPath(eventPath, aSubjectDescriptor);
 #endif
     }
 
@@ -1864,8 +1864,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
     const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
     const bool commandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
 #else
-    const bool commandNeedsTimedInvoke         = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
-    const bool commandIsFabricScoped           = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
+    const bool commandNeedsTimedInvoke = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
+    const bool commandIsFabricScoped   = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
 #endif
 
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
