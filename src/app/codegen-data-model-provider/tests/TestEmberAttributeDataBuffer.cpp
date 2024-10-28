@@ -37,7 +37,6 @@
 
 #include <math.h>
 
-#include <cmath>
 #include <limits>
 #include <optional>
 
@@ -114,7 +113,7 @@ template <>
 bool IsEqual<float>(const float & a, const float & b)
 {
 
-    if (std::isnan(a) && std::isnan(b))
+    if (isnan(a) && isnan(b))
     {
         return true;
     }
@@ -126,7 +125,7 @@ template <>
 bool IsEqual<double>(const double & a, const double & b)
 {
 
-    if (std::isnan(a) && std::isnan(b))
+    if (isnan(a) && isnan(b))
     {
         return true;
     }
@@ -1157,7 +1156,7 @@ TEST(TestEmberAttributeBuffer, TestDecodeFloatingPoint)
     {
         EncodeTester tester(CreateFakeMeta(ZCL_SINGLE_ATTRIBUTE_TYPE, false /* nullable */));
         // non-nullable float
-        EXPECT_TRUE(tester.TryDecode<float>(std::nan("0"), { 0, 0, 0xC0, 0x7F }).IsSuccess());
+        EXPECT_TRUE(tester.TryDecode<float>(NAN, { 0, 0, 0xC0, 0x7F }).IsSuccess());
     }
 
     {
@@ -1177,6 +1176,6 @@ TEST(TestEmberAttributeBuffer, TestDecodeFloatingPoint)
     {
         EncodeTester tester(CreateFakeMeta(ZCL_DOUBLE_ATTRIBUTE_TYPE, false /* nullable */));
         // non-nullable double
-        EXPECT_TRUE(tester.TryDecode<double>(std::nan("0"), { 0, 0, 0, 0, 0, 0, 0xF8, 0x7F }).IsSuccess());
+        EXPECT_TRUE(tester.TryDecode<double>(NAN, { 0, 0, 0, 0, 0, 0, 0xF8, 0x7F }).IsSuccess());
     }
 }
