@@ -203,7 +203,7 @@
 
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
-    // Not needed since this is a state udpate now
+    // Not needed since this is a state update now
 }
 
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
