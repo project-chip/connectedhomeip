@@ -154,10 +154,10 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithPerControllerStorage(NSArray<NSData 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     std::string commissionerName = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        __auto_type * uuidString = [NSString stringWithFormat:@"%@%@", @"8DCADB14-AF1F-45D0-B084-00000000000", @(i)];
+        __auto_type * fabricId = GetCommissionerFabricId(identities[i]);
+        __auto_type * uuidString = [NSString stringWithFormat:@"%@%@", @(kControllerIdPrefix), fabricId];
         __auto_type * controllerId = [[NSUUID alloc] initWithUUIDString:uuidString];
         __auto_type * vendorId = @(mCommissionerVendorId.ValueOr(chip::VendorId::TestVendor1));
-        __auto_type * fabricId = @(i + 1);
         __auto_type * nodeId = @(chip::kTestControllerNodeId);
 
         if (commissionerName.compare(identities[i]) == 0 && mCommissionerNodeId.HasValue()) {
@@ -218,7 +218,7 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithSharedStorage(NSArray<NSData *> * pr
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     std::string commissionerName = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        __auto_type * fabricId = @(i + 1);
+        __auto_type * fabricId = GetCommissionerFabricId(identities[i]);
         __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:certificateIssuer.ipk
                                                                             fabricID:fabricId
                                                                            nocSigner:certificateIssuer.signingKey];
@@ -264,14 +264,19 @@ MTRDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrent
 
 NSNumber * CHIPCommandBridge::CurrentCommissionerFabricId()
 {
-    if (mCurrentIdentity.compare(kIdentityAlpha) == 0) {
+    return GetCommissionerFabricId(mCurrentIdentity.c_str());
+}
+
+NSNumber * CHIPCommandBridge::GetCommissionerFabricId(const char * identity)
+{
+    if (strcmp(identity, kIdentityAlpha) == 0) {
         return @(1);
-    } else if (mCurrentIdentity.compare(kIdentityBeta) == 0) {
+    } else if (strcmp(identity, kIdentityBeta) == 0) {
         return @(2);
-    } else if (mCurrentIdentity.compare(kIdentityGamma) == 0) {
+    } else if (strcmp(identity, kIdentityGamma) == 0) {
         return @(3);
     } else {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", mCurrentIdentity.c_str(), kIdentityAlpha,
+        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", identity, kIdentityAlpha,
             kIdentityBeta, kIdentityGamma);
         chipDie();
     }
