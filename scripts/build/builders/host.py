@@ -501,7 +501,6 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('import("//build_overrides/pigweed.gni")')
             self.extra_gn_options.append('import("//build_overrides/googletest.gni")')
             self.extra_gn_options.append('pw_unit_test_BACKEND="$dir_pw_unit_test:googletest"')
-            self.extra_gn_options.append('pw_unit_test_MAIN="$dir_pigweed/third_party/googletest:gmock_main"')
             self.extra_gn_options.append('dir_pw_third_party_googletest="$dir_googletest"')
 
     def GnBuildArgs(self):
