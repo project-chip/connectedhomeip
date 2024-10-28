@@ -70,9 +70,6 @@ def compress_lzma_firmware(input_file, output_file):
     pb = 0  # Position bits
     dict_size = build_conf['CONFIG_COMPRESS_LZMA_DICTIONARY_SIZE'] # dictionary size
 
-    # Manually calculate the LZMA property byte
-    property_byte = (pb * 5 + lp) * 9 + lc
-
     # Create the LZMA compressor using the specified parameters
     compressor = lzma.LZMACompressor(
         format=lzma.FORMAT_RAW,  # Use raw format to match with `lzma_raw_decoder()` in C
@@ -93,12 +90,9 @@ def compress_lzma_firmware(input_file, output_file):
     # Compress the firmware data
     compressed_data = compressor.compress(firmware_data) + compressor.flush()
 
-    # Create a valid LZMA header using the calculated properties
-    lzma_properties = bytes([property_byte]) + (dict_size).to_bytes(4, 'little')
-
     # Write the compressed binary to output file
     with open(output_file, 'wb') as f:
-        f.write(lzma_properties + compressed_data)
+        f.write(compressed_data)
 
     print(f"Compressed {input_file} -> {output_file} (size reduced from {len(firmware_data)} to {len(compressed_data)} bytes)")
 
