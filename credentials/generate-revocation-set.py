@@ -279,51 +279,50 @@ class DCLDClient:
 
         return response["PkiRevocationDistributionPoint"]
 
-    def get_paa_cert_for_crl_issuer(self, crl_signer_certificate: x509.Certificate) -> Optional[x509.Certificate]:
+    def get_issuer_cert(self, cert: x509.Certificate) -> Optional[x509.Certificate]:
         '''
-        Get the PAA certificate for CRL signer certificate
+        Get the issuer certificate for
 
         Parameters
         ----------
-        crl_signer_certificate: x509.Certificate
-            CRL signer certificate
+        cert: x509.Certificate
+            Certificate
 
         Returns
         -------
         str
-            PAA certificate in PEM format
+            Issuer certificate in PEM format
         '''
-        crl_signer_issuer_name_b64 = get_issuer_b64(crl_signer_certificate)
-        crl_signer_akid = get_akid(crl_signer_certificate)
-        if crl_signer_akid is None:
+        issuer_name_b64 = get_issuer_b64(cert)
+        akid = get_akid(cert)
+        if akid is None:
             return
 
         # Convert CRL Signer AKID to colon separated hex
-        crl_signer_akid_hex = crl_signer_akid.hex().upper()
-        crl_signer_akid_hex = ':'.join([crl_signer_akid_hex[i:i+2]
-                                        for i in range(0, len(crl_signer_akid_hex), 2)])
+        akid_hex = akid.hex().upper()
+        akid_hex = ':'.join([akid_hex[i:i+2] for i in range(0, len(akid_hex), 2)])
 
         logging.debug(
-            f"Fetching PAA from:{self.rest_node_url}/dcl/pki/certificates/{crl_signer_issuer_name_b64}/{crl_signer_akid_hex}")
+            f"Fetching issuer from:{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}")
 
         if self.use_rest:
             response = requests.get(
-                f"{self.rest_node_url}/dcl/pki/certificates/{crl_signer_issuer_name_b64}/{crl_signer_akid_hex}").json()
+                f"{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}").json()
         else:
             response = self.get_dcld_cmd_output_json(
-                ['query', 'pki', 'x509-cert', '-u', crl_signer_issuer_name_b64, '-k', crl_signer_akid_hex])
+                ['query', 'pki', 'x509-cert', '-u', issuer_name_b64, '-k', akid_hex])
 
-        paa_certificate = response["approvedCertificates"]["certs"][0]["pemCert"]
+        issuer_certificate = response["approvedCertificates"]["certs"][0]["pemCert"]
 
-        logging.debug(f"PAA: {paa_certificate}")
+        logging.debug(f"issuer: {issuer_certificate}")
 
         try:
-            paa_certificate_object = x509.load_pem_x509_certificate(bytes(paa_certificate, 'utf-8'))
+            issuer_certificate_object = x509.load_pem_x509_certificate(bytes(issuer_certificate, 'utf-8'))
         except Exception:
             logging.error('Failed to parse PAA certificate')
             return
 
-        return paa_certificate_object
+        return issuer_certificate_object
 
     def get_revocations_points_by_skid(self, issuer_subject_key_id) -> list[dict]:
         '''
@@ -419,7 +418,7 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
             continue
 
         # 5. Validate the certification path containing CRLSignerCertificate.
-        paa_certificate_object = dcld_client.get_paa_cert_for_crl_issuer(crl_signer_certificate)
+        paa_certificate_object = dcld_client.get_issuer_cert(crl_signer_certificate)
         if paa_certificate_object is None:
             logging.warning("PAA Certificate not found, continue...")
             continue
