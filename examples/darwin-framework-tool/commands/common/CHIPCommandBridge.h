@@ -42,7 +42,7 @@ public:
             "commissioner-name. Interactive mode will only set a single commissioner on the inital command. "
             "The commissioner node ID will be persisted until a different one is specified.");
         AddArgument("commissioner-shared-storage", 0, 1, &mCommissionerSharedStorage,
-            "Use a shared storage instance instead of individual storage for each commissioner. Default is true.");
+            "Use a shared storage instance instead of individual storage for each commissioner. Default is false.");
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
             "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
             "directory.");

@@ -142,7 +142,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
         productAttestationAuthorityCertificates = nil;
     }
 
-    sUseSharedStorage = mCommissionerSharedStorage.ValueOr(true);
+    sUseSharedStorage = mCommissionerSharedStorage.ValueOr(false);
     if (sUseSharedStorage) {
         return SetUpStackWithSharedStorage(productAttestationAuthorityCertificates);
     }
@@ -188,6 +188,10 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithPerControllerStorage(NSArray<NSData 
                                                                                          intermediateCertificate:nil
                                                                                                  rootCertificate:certificateIssuer.rootCertificate];
         [params setOperationalCertificateIssuer:certificateIssuer queue:controllerStorageQueue];
+
+        __auto_type * otaDelegateQueue = dispatch_queue_create("com.chip.ota", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        [params setOTAProviderDelegate:mOTADelegate queue:otaDelegateQueue];
+
         params.productAttestationAuthorityCertificates = productAttestationAuthorityCertificates;
 
         __auto_type * controller = [[MTRDeviceController alloc] initWithParameters:params error:&error];
