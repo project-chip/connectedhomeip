@@ -200,6 +200,7 @@ def BuildHostTarget():
     target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-(check|enabled)')
     target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-(check|disabled)')
     target.AppendModifier('check-failure-die', chip_data_model_check_die_on_failure=True).OnlyIfRe('-data-model-check')
+    target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
 
     return target
 
