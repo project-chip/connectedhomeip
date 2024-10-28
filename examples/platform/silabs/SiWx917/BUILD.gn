@@ -91,22 +91,20 @@ source_set("test-event-trigger") {
   ]
 }
 
-source_set("siwx917-matter-shell") {
-  if (chip_build_libshell) {
-    defines = [ "ENABLE_CHIP_SHELL" ]
+source_set("matter-shell") {
+  defines = [ "ENABLE_CHIP_SHELL" ]
 
-    sources = [ "${silabs_common_plat_dir}/matter_shell.cpp" ]
-    include_dirs = [
-      ".",
-      "${silabs_common_plat_dir}",
-    ]
+  sources = [ "${silabs_common_plat_dir}/MatterShell.cpp" ]
+  include_dirs = [
+    ".",
+    "${silabs_common_plat_dir}",
+  ]
 
-    public_deps = [
-      "${chip_root}/examples/shell/shell_common:shell_common",
-      "${chip_root}/src/lib/shell:shell",
-      "${chip_root}/src/lib/shell:shell_core",
-    ]
-  }
+  public_deps = [
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib/shell:shell",
+    "${chip_root}/src/lib/shell:shell_core",
+  ]
 }
 
 config("siwx917-common-config") {
@@ -226,7 +224,11 @@ source_set("siwx917-common") {
   }
 
   if (chip_build_libshell) {
-    deps += [ ":siwx917-matter-shell" ]
+    deps += [ ":matter-shell" ]
+
+    if (chip_enable_icd_server) {
+      deps += [ "${silabs_common_plat_dir}/shell:icd" ]
+    }
   }
 
   # DIC

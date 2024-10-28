@@ -108,8 +108,13 @@ void WriteHandler::Close()
 std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePath & path)
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    VerifyOrReturnValue(mDataModelProvider != nullptr, std::nullopt,
-                        ChipLogError(DataManagement, "Null data model while checking attribute properties."));
+    if (mDataModelProvider == nullptr)
+    {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogError(DataManagement, "Null data model while checking attribute properties.");
+#endif
+        return std::nullopt;
+    }
 
     auto info = mDataModelProvider->GetAttributeInfo(path);
     if (!info.has_value())
@@ -774,7 +779,7 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSub
     DataModel::WriteAttributeRequest request;
 
     request.path                = aPath;
-    request.subjectDescriptor   = aSubject;
+    request.subjectDescriptor   = &aSubject;
     request.previousSuccessPath = mLastSuccessfullyWrittenPath;
     request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 

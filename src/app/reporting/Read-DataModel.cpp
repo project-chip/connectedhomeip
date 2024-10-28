@@ -47,7 +47,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     {
         readRequest.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
     }
-    readRequest.subjectDescriptor = subjectDescriptor;
+    readRequest.subjectDescriptor = &subjectDescriptor;
     readRequest.path              = path;
 
     DataVersion version = 0;
@@ -97,7 +97,9 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     if (!status.IsOutOfSpaceEncodingResponse())
     {
         DataModel::ActionReturnStatus::StringStorage storage;
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
         ChipLogError(DataManagement, "Failed to read attribute: %s", status.c_str(storage));
+#endif
     }
     return status;
 }
