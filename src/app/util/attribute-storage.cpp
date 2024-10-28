@@ -313,7 +313,7 @@ CHIP_ERROR emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpoint
         // TODO: make endpointType use a pointer to a list of EmberAfCluster* instead, so we can re-use cluster definitions
         //   instead of duplicating them here once for every instance.
         newClusters[i] = *cluster;
-        // sum up the needed storage, result must
+        // sum up the needed storage, result must fit into endpointSize member (which is smaller than size_t)
         endpointSize += cluster->clusterSize;
         if (!CanCastTo<typeof(endpointType.endpointSize)>(endpointSize))
         {

@@ -260,7 +260,7 @@ void emberAfEndpointConfigure();
 //   not present in the specified template endpoint, will cause the function to
 //   return CHIP_ERROR_NOT_FOUND and endpointType unmodified.
 //
-// Note: function may allocate memory for the endpoint declaration.
+// Note: function will allocate dynamic memory for the endpoint declaration.
 //   Use emberAfResetEndpointDeclaration to properly dispose of a dynamic endpoint declaration.
 CHIP_ERROR emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, chip::EndpointId templateEndpointId,
                                                   const chip::Span<const EmberAfClusterSpec> & templateClusterSpecs);
