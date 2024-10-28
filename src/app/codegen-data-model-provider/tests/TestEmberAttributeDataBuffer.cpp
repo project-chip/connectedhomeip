@@ -35,6 +35,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
+#include <cmath>
 #include <limits>
 #include <optional>
 
@@ -104,6 +105,28 @@ private:
 template <typename T>
 bool IsEqual(const T & a, const T & b)
 {
+    return a == b;
+}
+
+template <>
+bool IsEqual<float>(const float & a, const float & b)
+{
+
+    if (std::isnan(a) && std::isnan(b)) {
+        return true;
+    }
+
+    return a == b;
+}
+
+template <>
+bool IsEqual<double>(const double & a, const double & b)
+{
+
+    if (std::isnan(a) && std::isnan(b)) {
+        return true;
+    }
+
     return a == b;
 }
 
@@ -1122,8 +1145,8 @@ TEST(TestEmberAttributeBuffer, TestDecodeFloatingPoint)
 
     {
         EncodeTester tester(CreateFakeMeta(ZCL_SINGLE_ATTRIBUTE_TYPE, false /* nullable */));
-        EXPECT_EQ(tester.TryDecode<DataModel::Nullable<float>>(DataModel::NullNullable, { 0, 0, 0xC0, 0x7F }),
-                  CHIP_ERROR_INVALID_ARGUMENT);
+        // non-nullable float
+        EXPECT_TRUE(tester.TryDecode<float>(std::nan("0"), { 0, 0, 0xC0, 0x7F }).IsSuccess());
     }
 
     {
@@ -1143,7 +1166,6 @@ TEST(TestEmberAttributeBuffer, TestDecodeFloatingPoint)
     {
         EncodeTester tester(CreateFakeMeta(ZCL_DOUBLE_ATTRIBUTE_TYPE, false /* nullable */));
         // non-nullable double
-        EXPECT_EQ(tester.TryDecode<DataModel::Nullable<double>>(DataModel::NullNullable, { 0, 0, 0, 0, 0, 0, 0xF8, 0x7F }),
-                  CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_TRUE(tester.TryDecode<double>(std::nan("0"), { 0, 0, 0, 0, 0, 0, 0xF8, 0x7F }).IsSuccess());
     }
 }

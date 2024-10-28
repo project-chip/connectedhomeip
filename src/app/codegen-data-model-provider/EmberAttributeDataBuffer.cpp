@@ -523,9 +523,8 @@ CHIP_ERROR EmberAttributeDataBuffer::Encode(chip::TLV::TLVWriter & writer, TLV::
         {
             return endianReader.StatusCode();
         }
-        if (NumericAttributeTraits<float>::IsNullValue(value.value))
+        if (mIsNullable && NumericAttributeTraits<float>::IsNullValue(value.value))
         {
-            VerifyOrReturnError(mIsNullable, CHIP_ERROR_INVALID_ARGUMENT);
             return writer.PutNull(tag);
         }
         return writer.Put(tag, value.value);
@@ -541,9 +540,8 @@ CHIP_ERROR EmberAttributeDataBuffer::Encode(chip::TLV::TLVWriter & writer, TLV::
         {
             return endianReader.StatusCode();
         }
-        if (NumericAttributeTraits<double>::IsNullValue(value.value))
+        if (mIsNullable && NumericAttributeTraits<double>::IsNullValue(value.value))
         {
-            VerifyOrReturnError(mIsNullable, CHIP_ERROR_INVALID_ARGUMENT);
             return writer.PutNull(tag);
         }
         return writer.Put(tag, value.value);
