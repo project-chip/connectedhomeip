@@ -27,12 +27,17 @@
 #include <editline.h>
 #include <stdlib.h>
 
-constexpr char kInteractiveModePrompt[] = "Stop and restart stack: [Ctrl+_] & [Ctrl+^]\n"
-                                          "Trigger exit(0): [Ctrl+@]\n"
-                                          "Quit Interactive: 'quit()'\n"
-                                          ">>> ";
+constexpr char kInteractiveModeInstruction[] = "╔══════════════════════════════════════════════════════════════════╗\n"
+                                               "║                        Interactive Mode                          ║\n"
+                                               "╠══════════════════════════════════════════════════════════════════╣\n"
+                                               "║ Stop and restart stack: [Ctrl+_] & [Ctrl+^ ]                     ║\n"
+                                               "║ Trigger exit(0)       : [Ctrl+@]                                 ║\n"
+                                               "║ Quit Interactive      : 'quit()' or `quit`                       ║\n"
+                                               "╚══════════════════════════════════════════════════════════════════╝\n";
+constexpr char kInteractiveModePrompt[] = ">>> ";
 constexpr char kInteractiveModeHistoryFilePath[] = "/tmp/darwin_framework_tool_history";
 constexpr char kInteractiveModeStopCommand[] = "quit()";
+constexpr char kInteractiveModeStopAlternateCommand[] = "quit";
 constexpr char kCategoryError[] = "Error";
 constexpr char kCategoryProgress[] = "Info";
 constexpr char kCategoryDetail[] = "Debug";
@@ -277,6 +282,11 @@ char * GetCommand(const chip::Optional<char *> & mAdditionalPrompt, char * comma
         printf("%s\n", mAdditionalPrompt.Value());
         ClearLine();
     }
+
+    ClearLine();
+    printf("%s", kInteractiveModeInstruction);
+    ClearLine();
+
     command = readline(kInteractiveModePrompt);
 
     // Do not save empty lines
@@ -391,7 +401,7 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
 
 bool InteractiveCommand::ParseCommand(char * command, int * status)
 {
-    if (strcmp(command, kInteractiveModeStopCommand) == 0) {
+    if (strcmp(command, kInteractiveModeStopCommand) == 0 || strcmp(command, kInteractiveModeStopAlternateCommand) == 0) {
         ExecuteDeferredCleanups();
         return NO;
     }
