@@ -1647,10 +1647,12 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
+    Access::SubjectDescriptor subjectDescriptor = apCommandObj.GetSubjectDescriptor();
+
     DataModel::InvokeRequest request;
     request.path = aCommandPath;
     request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, apCommandObj.IsTimedInvoke());
-    request.subjectDescriptor = apCommandObj.GetSubjectDescriptor();
+    request.subjectDescriptor = &subjectDescriptor;
 
     std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->Invoke(request, apPayload, &apCommandObj);
 
@@ -1703,7 +1705,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest)
 {
-    if (!aRequest.subjectDescriptor.has_value())
+    if (aRequest.subjectDescriptor == nullptr)
     {
         return Status::UnsupportedAccess; // we require a subject for invoke
     }
