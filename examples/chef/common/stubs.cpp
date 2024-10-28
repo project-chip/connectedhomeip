@@ -256,10 +256,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
         // WIP Apply attribute change to Light
     }
+#ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
     else if (clusterId == FanControl::Id)
     {
         HandleFanControlAttributeChange(attributeId, type, size, value);
     }
+#endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
 }
 
 /** @brief OnOff Cluster Init
