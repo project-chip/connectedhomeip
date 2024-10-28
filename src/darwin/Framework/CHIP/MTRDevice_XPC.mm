@@ -66,14 +66,20 @@
 
 #import <os/lock.h>
 
-#define MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME) \
-    MTR_SIMPLE_REMOTE_XPC_GETTER([(MTRDeviceController_XPC *) [self deviceController] xpcConnection], NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController : [[self deviceController] uniqueIdentifier] nodeID : [self nodeID])
+#define MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)                                                                            \
+    MTR_SIMPLE_REMOTE_XPC_GETTER([(MTRDeviceController_XPC *) [self deviceController] xpcConnection], NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController \
+                                 : [[self deviceController] uniqueIdentifier] nodeID                                                                           \
+                                 : [self nodeID])
 
-#define MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS) \
-    MTR_COMPLEX_REMOTE_XPC_GETTER([(MTRDeviceController_XPC *) [self deviceController] xpcConnection], SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, deviceController : [[self deviceController] uniqueIdentifier] nodeID : [self nodeID])
+#define MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS)                                                                            \
+    MTR_COMPLEX_REMOTE_XPC_GETTER([(MTRDeviceController_XPC *) [self deviceController] xpcConnection], SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, deviceController \
+                                  : [[self deviceController] uniqueIdentifier] nodeID                                                                                         \
+                                  : [self nodeID])
 
-#define MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS) \
-    MTR_SIMPLE_REMOTE_XPC_COMMAND([(MTRDeviceController_XPC *) [self deviceController] xpcConnection], METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController : [[self deviceController] uniqueIdentifier] nodeID : [self nodeID])
+#define MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS)                                                                            \
+    MTR_SIMPLE_REMOTE_XPC_COMMAND([(MTRDeviceController_XPC *) [self deviceController] xpcConnection], METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController \
+                                  : [[self deviceController] uniqueIdentifier] nodeID                                                                           \
+                                  : [self nodeID])
 
 @implementation MTRDevice_XPC
 
@@ -113,16 +119,16 @@
     // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
 
     return [NSString stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, controller: %@ state: %ld>",
-        NSStringFromClass(self.class), self,
-        _deviceController.compressedFabricID.unsignedLongLongValue,
-        _nodeID.unsignedLongLongValue,
-        _nodeID.unsignedLongLongValue,
-        [self vendorID],
-        [self productID],
-        wifi,
-        thread,
-        _deviceController.uniqueIdentifier,
-        [self state]];
+                     NSStringFromClass(self.class), self,
+                     _deviceController.compressedFabricID.unsignedLongLongValue,
+                     _nodeID.unsignedLongLongValue,
+                     _nodeID.unsignedLongLongValue,
+                     [self vendorID],
+                     [self productID],
+                     wifi,
+                     thread,
+                     _deviceController.uniqueIdentifier,
+                     [self state]];
 }
 
 - (nullable NSNumber *)vendorID
@@ -308,18 +314,40 @@ static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKey
 #pragma mark - Remote Commands
 
 typedef NSDictionary<NSString *, id> * _Nullable ReadAttributeResponseType;
-MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID : (NSNumber *) endpointID clusterID : (NSNumber *) clusterID attributeID : (NSNumber *) attributeID params : (MTRReadParams * _Nullable) params,
-    ReadAttributeResponseType,
-    nil,
-    readAttributeWithEndpointID : endpointID clusterID : clusterID attributeID : attributeID params : params withReply)
+MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID
+                                     : (NSNumber *) endpointID clusterID
+                                     : (NSNumber *) clusterID attributeID
+                                     : (NSNumber *) attributeID params
+                                     : (MTRReadParams * _Nullable) params,
+                                     ReadAttributeResponseType,
+                                     nil,
+                                     readAttributeWithEndpointID
+                                     : endpointID clusterID
+                                     : clusterID attributeID
+                                     : attributeID params
+                                     : params withReply)
 
-MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID : (NSNumber *) endpointID clusterID : (NSNumber *) clusterID attributeID : (NSNumber *) attributeID value : (id) value expectedValueInterval : (NSNumber *) expectedValueInterval timedWriteTimeout : (NSNumber * _Nullable) timeout, writeAttributeWithEndpointID : endpointID clusterID : clusterID attributeID : attributeID value : value expectedValueInterval : expectedValueInterval timedWriteTimeout : timeout)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
+                                     : (NSNumber *) endpointID clusterID
+                                     : (NSNumber *) clusterID attributeID
+                                     : (NSNumber *) attributeID value
+                                     : (id) value expectedValueInterval
+                                     : (NSNumber *) expectedValueInterval timedWriteTimeout
+                                     : (NSNumber * _Nullable) timeout, writeAttributeWithEndpointID
+                                     : endpointID clusterID
+                                     : clusterID attributeID
+                                     : attributeID value
+                                     : value expectedValueInterval
+                                     : expectedValueInterval timedWriteTimeout
+                                     : timeout)
 
 typedef NSArray<NSDictionary<NSString *, id> *> * ReadAttributePathsResponseType;
-MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths : (NSArray<MTRAttributeRequestPath *> *) attributePaths,
-    ReadAttributePathsResponseType,
-    [NSArray array], // Default return value
-    readAttributePaths : attributePaths withReply)
+MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
+                                     : (NSArray<MTRAttributeRequestPath *> *) attributePaths,
+                                     ReadAttributePathsResponseType,
+                                     [NSArray array], // Default return value
+                                     readAttributePaths
+                                     : attributePaths withReply)
 
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
