@@ -1,17 +1,16 @@
 import inspect
 from enum import IntFlag
-import chip.clusters as Clusters
-from chip.tlv import uint
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.enum import MatterIntEnum
-from chip.clusters.ClusterObjects import ClusterObject
-from chip.testing import global_attribute_ids
-from matter_testing_infrastructure.chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from matter_testing_infrastructure.chip.testing.basic_composition import BasicCompositionTests
-from mobly import asserts
-# from spec_parsing_support import build_xml_clusters
-from matter_testing_infrastructure.chip.testing.spec_parsing import build_xml_clusters
 from typing import get_args, get_origin, Union
+import chip.clusters as Clusters
+from chip.clusters import ClusterObjects as ClusterObjects
+from chip.clusters.ClusterObjects import ClusterObject
+from chip.clusters.enum import MatterIntEnum
+from chip.testing import global_attribute_ids
+from chip.tlv import uint
+from matter_testing_infrastructure.chip.testing.basic_composition import BasicCompositionTests
+from matter_testing_infrastructure.chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_infrastructure.chip.testing.spec_parsing import build_xml_clusters
+from mobly import asserts
 
 
 class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
