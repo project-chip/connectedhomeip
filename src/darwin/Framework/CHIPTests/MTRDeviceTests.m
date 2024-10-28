@@ -27,6 +27,7 @@
 #import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRDeviceClusterData.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
@@ -1505,7 +1506,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [device unitTestInjectEventReport:@[ @{
             MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(1)],
             MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
-            MTREventTimestampDateKey : [NSDate date]
+            MTREventTimestampDateKey : [NSDate date],
+            MTREventIsHistoricalKey : @(NO),
+            MTREventPriorityKey : @(MTREventPriorityInfo),
+            MTREventNumberKey : @(1), // Doesn't matter, in practice
+            MTRDataKey : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[],
+            },
         } ]];
 #endif
     };
@@ -4139,7 +4147,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
         MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
         MTREventTimestampDateKey : [NSDate date],
-        // For unit test no real data is needed, but timestamp is required
+        MTREventIsHistoricalKey : @(NO),
+        MTREventPriorityKey : @(MTREventPriorityInfo),
+        MTREventNumberKey : @(1), // Doesn't matter, in practice
+        // Empty payload.
+        MTRDataKey : @ {
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[],
+        },
     };
 }
 
@@ -5183,6 +5198,306 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     for (NSDictionary * test in testData) {
         XCTAssertEqual(MTRDataValueDictionaryIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
+}
+
+- (void)test042_AttributeReportWellFormedness
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @[],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                },
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(1)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                },
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(1)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            // Missing both error and data
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @("abc"),
+                    },
+                },
+            ],
+            // Data dictionary is broken.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {},
+            // Input is not an array.
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTRAttributeReportIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
+}
+
+- (void)test043_EventReportWellFormedness
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+                    MTREventTimestampDateKey : [NSDate now],
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+                    MTREventTimestampDateKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong date type
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @("abc"),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong type of EventNumber
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @("abc"),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong type of EventPriority
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @("abc"),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong type of EventTimeType
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[ @(5) ],
+            // Wrong type of data entirely.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {},
+            // Not even an array.
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTREventReportIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
+}
+
+- (void)test044_InvokeResponseWellFormedness
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+            ],
+            // Multiple responses
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // Empty structure, valid
+                    },
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // Empty structure, valid
+                    },
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            // Having both data and error not valid.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(5),
+                    },
+                },
+            ],
+            // Data is not a struct.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @(6),
+                },
+            ],
+            // Data is not a data-value at all..
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTRInvokeResponseIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
             "input: %@", test[@"input"]);
     }
 }
