@@ -154,6 +154,9 @@ if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Error signing the image: {e}")
 
+    if build_conf.getboolean('CONFIG_TELINK_OTA_BUTTON_TEST'):
+        merge_binaries('merged.bin', build_conf['CONFIG_SIGNED_IMAGE_FILE_NAME'], 'merged.bin', build_conf['CONFIG_TELINK_OTA_PARTITION_ADDR'])
+
 # Merge Factory Data binary if configured
 if build_conf.getboolean('CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE'):
     if os.path.exists('merged.bin'):
