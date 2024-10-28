@@ -200,7 +200,7 @@ via `-o/--output-dir`.
 Rebuild the application.
 
 It is also recommended to run device composition tests to ensure the selected
-composition is spec compliant (see [Testing](../testing/index.md))
+composition is spec compliant (see [Testing](../testing))
 
 ### Compile-time code generation / pre-generated code
 
