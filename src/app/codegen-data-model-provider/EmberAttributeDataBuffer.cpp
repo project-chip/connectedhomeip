@@ -384,7 +384,7 @@ CHIP_ERROR EmberAttributeDataBuffer::EncodeInteger(chip::TLV::TLVWriter & writer
 
     uint8_t raw_bytes[8];
 
-    const bool isSigned = chip::app::IsSignedAttributeType(mAttributeType);
+    const bool isSigned = IsSignedAttributeType(mAttributeType);
 
     unsigned byteCount;
     uint64_t nullValueAsU64;
@@ -444,28 +444,15 @@ CHIP_ERROR EmberAttributeDataBuffer::EncodeInteger(chip::TLV::TLVWriter & writer
     // code prioritizes code size over readability here.
     if (mIsNullable && (value.uint_value == nullValueAsU64))
     {
-        // MaxValue is used for NULL setting
         return writer.PutNull(tag);
     }
 
-    switch (mAttributeType)
+    if (isSigned)
     {
-    case ZCL_INT8U_ATTRIBUTE_TYPE:  // Unsigned 8-bit integer
-    case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
-    case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-    case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
-    case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
-    case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
-    case ZCL_INT56U_ATTRIBUTE_TYPE: // Signed 56-bit integer
-    case ZCL_INT64U_ATTRIBUTE_TYPE: // Signed 64-bit integer
-        return writer.Put(tag, value.uint_value);
-    case ZCL_INT8S_ATTRIBUTE_TYPE:  // Signed 8-bit integer
-    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
-    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
-    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
-    default:
         return writer.Put(tag, value.int_value);
     }
+
+    return writer.Put(tag, value.uint_value);
 }
 
 CHIP_ERROR EmberAttributeDataBuffer::Encode(chip::TLV::TLVWriter & writer, TLV::Tag tag) const
