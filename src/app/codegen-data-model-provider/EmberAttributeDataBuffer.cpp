@@ -384,7 +384,7 @@ CHIP_ERROR EmberAttributeDataBuffer::EncodeInteger(chip::TLV::TLVWriter & writer
 
     uint8_t raw_bytes[8];
 
-    const bool isSigned = chip::app::IsSignedAttributeType(mAttributeType);
+    const bool isSigned = IsSignedAttributeType(mAttributeType);
 
     unsigned byteCount;
     uint64_t nullValueAsU64;
