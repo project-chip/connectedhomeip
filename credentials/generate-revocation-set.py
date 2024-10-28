@@ -160,7 +160,7 @@ def validate_cert_chain(crl_signer: x509.Certificate, crl_signer_delegator: x509
         return verify_cert(crl_signer, paa)
 
 
-def validate_vid_pid(revocation_point: dict, crl_signer_certificate: x509.Certificate) -> bool:
+def validate_vid_pid(revocation_point: dict, crl_signer_certificate: x509.Certificate, crl_signer_delegator_certificate: x509.Certificate) -> bool:
     crl_signer_vid, crl_signer_pid = parse_vid_pid_from_distinguished_name(crl_signer_certificate.subject)
 
     if revocation_point["isPAA"]:
@@ -169,11 +169,19 @@ def validate_vid_pid(revocation_point: dict, crl_signer_certificate: x509.Certif
                 logging.warning("VID in CRL Signer Certificate does not match with VID in revocation point, continue...")
                 return False
     else:
-        if crl_signer_vid is None or revocation_point["vid"] != crl_signer_vid:
+        vid_to_match = crl_signer_vid
+        pid_to_match = crl_signer_pid
+
+        # if the CRL Signer is delegated then match the VID and PID of the CRL Signer Delegator
+        if crl_signer_delegator_certificate:
+            vid_to_match, pid_to_match = parse_vid_pid_from_distinguished_name(crl_signer_delegator_certificate.subject)
+
+        if vid_to_match is None or revocation_point["vid"] != vid_to_match:
             logging.warning("VID in CRL Signer Certificate does not match with VID in revocation point, continue...")
             return False
-        if crl_signer_pid is not None:
-            if revocation_point["pid"] != crl_signer_pid:
+
+        if pid_to_match is not None:
+            if revocation_point["pid"] != pid_to_match:
                 logging.warning("PID in CRL Signer Certificate does not match with PID in revocation point, continue...")
                 return False
 
@@ -395,17 +403,7 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
             logging.warning("CRL Signer Certificate is not valid, continue...")
             continue
 
-        # 3. and 4. Validate VID/PID
-        if not validate_vid_pid(revocation_point, crl_signer_certificate):
-            logging.warning("Failed to validate VID/PID, continue...")
-            continue
-
-        # 5. Validate the certification path containing CRLSignerCertificate.
-        paa_certificate_object = dcld_client.get_paa_cert_for_crl_issuer(crl_signer_certificate)
-        if paa_certificate_object is None:
-            logging.warning("PAA Certificate not found, continue...")
-            continue
-
+        # Parse the crl signer delegator
         crl_signer_delegator_cert = None
         if "crlSignerDelegator" in revocation_point:
             crl_signer_delegator_cert_pem = revocation_point["crlSignerDelegator"]
@@ -414,6 +412,17 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
                 crl_signer_delegator_cert = x509.load_pem_x509_certificate(bytes(crl_signer_delegator_cert_pem, 'utf-8'))
             except Exception:
                 logging.warning("CRL Signer Delegator Certificate not found...")
+
+        # 3. and 4. Validate VID/PID
+        if not validate_vid_pid(revocation_point, crl_signer_certificate, crl_signer_delegator_cert):
+            logging.warning("Failed to validate VID/PID, continue...")
+            continue
+
+        # 5. Validate the certification path containing CRLSignerCertificate.
+        paa_certificate_object = dcld_client.get_paa_cert_for_crl_issuer(crl_signer_certificate)
+        if paa_certificate_object is None:
+            logging.warning("PAA Certificate not found, continue...")
+            continue
 
         if validate_cert_chain(crl_signer_certificate, crl_signer_delegator_cert, paa_certificate_object) is False:
             logging.warning("Failed to validate CRL Signer Certificate chain, continue...")
