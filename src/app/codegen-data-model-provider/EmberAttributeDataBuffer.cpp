@@ -384,14 +384,7 @@ CHIP_ERROR EmberAttributeDataBuffer::EncodeInteger(chip::TLV::TLVWriter & writer
 
     uint8_t raw_bytes[8];
 
-    bool isSigned = (mAttributeType == ZCL_INT8S_ATTRIBUTE_TYPE) //
-        || (mAttributeType == ZCL_INT16S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT24S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT32S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT40S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT48S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT56S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT64S_ATTRIBUTE_TYPE);
+    const bool isSigned = chip::app::IsSignedAttributeType(mAttributeType);
 
     unsigned byteCount;
     uint64_t nullValue;
