@@ -61,15 +61,15 @@ comments or with preprocessor `#if 0 ... #endif` semantics.
 
 We use the following auto-formatters on code:
 
-| Language   | Formatter          | Style File                                                                                                   |
-| ---------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
-| C++        | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format)                   |
-| ObjectiveC | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format)                   |
-| java       | google-java-format | N/A                                                                                                          |
-| Python     | pep8, isort        | [.restyled.yaml] (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml) (command line) |
-| YAML       | prettier           | None                                                                                                         |
-| JSON       | prettier           | None                                                                                                         |
-| markdown   | prettier           | None                                                                                                         |
+| Language   | Formatter          | Style File                                                                                                  |
+| ---------- | ------------------ | ----------------------------------------------------------------------------------------------------------- |
+| C++        | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format)                  |
+| ObjectiveC | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format)                  |
+| java       | google-java-format | N/A                                                                                                         |
+| Python     | pep8, isort        | [.restyled.yaml](https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml) (command line) |
+| YAML       | prettier           | None                                                                                                        |
+| JSON       | prettier           | None                                                                                                        |
+| markdown   | prettier           | None                                                                                                        |
 
 All pull requests run formatting checks using these tools before merge is
 allowed. Generated code is not run through restyle.
@@ -131,8 +131,7 @@ In either case, recommended resource allocation alternatives are:
 [CHIPMem.h](https://github.com/project-chip/connectedhomeip/blob/master/src/lib/support/CHIPMem.h)
 provides support for platform defined allocators.
 
-[Pool.h]
-(https://github.com/project-chip/connectedhomeip/blob/master/src/lib/support/Pool.h)
+[Pool.h](https://github.com/project-chip/connectedhomeip/blob/master/src/lib/support/Pool.h)
 is the Matter SDK pool allocator implementation.
 
 #### Prefer CopySpanToMutableSpan over memcpy when using spans
