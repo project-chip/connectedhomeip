@@ -115,10 +115,14 @@ hardware resource)
 
 #### Avoid Heap-based Resource Allocation and auto-resizing std containers
 
-Heap-based resource allocation should be avoided. This includes any container
+Heap-based resource allocation should be avoided in the core SDK for common code
+that may run on constrained embedded devices. This includes any container
 element in std that automatically re-sizes itself at runtime (ex. vector, string
 etc.) as these re-size operations are often large and can lead to memory
 exhaustion and fragmentation on embedded systems.
+
+Heap-based allocation is allowed for controller code and is at the discretion of
+platform vendors for platform-specific code.
 
 ##### Alternatives
 
