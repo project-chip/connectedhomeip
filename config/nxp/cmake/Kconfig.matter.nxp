@@ -25,7 +25,7 @@ config CHIP_NXP_PLATFORM
 	  for NXP platform related purposes.
 
 config CHIP_DEVICE_VENDOR_NAME
-	default "NXP Semiconductors"
+	default "\"NXP Semiconductors\""
 
 config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 	bool "Include default device information provider build"
@@ -78,11 +78,18 @@ config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
 	help
 	  Maximum acceptable length of rotating device ID unique ID in bytes.
 
+config CHIP_DEVICE_USE_TEST_PAIRING_CODE
+	string "Use a default pairing code"
+	default "\"CHIPUS\""
+	depends on !CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+	help
+		Use a default pairing code if one hasn't been provisioned in flash.
+
 if CHIP_FACTORY_DATA
 
 config CHIP_ENCRYPTED_FACTORY_DATA_AES128_KEY
 	string "AES128 key used to encrypt factory data."
-	default "2B7E151628AED2A6ABF7158809CF4F3C"
+	default "\"2B7E151628AED2A6ABF7158809CF4F3C\""
 	help
 	  AES128 key used to encrypt factory data.
 
@@ -209,8 +216,6 @@ config CHIP_FACTORY_RESET_ERASE_NVS
 	bool
 	default y
 
-endif
-
 config CHIP_LOG_SIZE_OPTIMIZATION
 	bool "Disable some detailed logs to decrease flash usage"
 	help
@@ -256,3 +261,5 @@ choice CHIP_OTA_REQUEST_UPGRADE_TYPE
 		  becomes permanent, otherwise the new image is reverted.
 
 endchoice
+
+endif # CHIP

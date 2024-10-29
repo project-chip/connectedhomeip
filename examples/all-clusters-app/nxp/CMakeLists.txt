@@ -24,6 +24,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../ REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
+get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
+get_filename_component(ALL_CLUSTERS_NXP_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/nxp/common REALPATH)
+get_filename_component(EXAMPLE_PLATFORM_NXP_COMMON_DIR ${CHIP_ROOT}/examples/platform/nxp/common REALPATH)
 
 list(APPEND EXTRA_MCUX_MODULES ${CHIP_ROOT}/config/nxp/chip-cmake-freertos)
 
@@ -35,11 +38,6 @@ find_package(McuxSDK 3.0.0)
 
 # Get compiler flags and includes and pass them to CHIP target
 list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS McuxSDK)
-
-get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
-get_filename_component(ALL_CLUSTERS_NXP_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/nxp/common REALPATH)
-get_filename_component(ALL_CLUSTERS_NXP_PLATFORM_DIR ${CHIP_ROOT}/examples/all-clusters-app/nxp/${CONFIG_CHIP_NXP_PLATFORM_NAME} REALPATH)
-get_filename_component(EXAMPLE_PLATFORM_NXP_COMMON_DIR ${CHIP_ROOT}/examples/platform/nxp/common REALPATH)
 
 include(${CHIP_ROOT}/third_party/nxp/nxp_matter_support/cmake/nxp_sdk_reconfig.cmake)
 
@@ -55,7 +53,6 @@ target_include_directories(app
     PRIVATE
     ${ALL_CLUSTERS_NXP_COMMON_DIR}/main/include
     ${ALL_CLUSTERS_COMMON_DIR}/include
-    ${ALL_CLUSTERS_NXP_PLATFORM_DIR}/include/config
     ${GEN_DIR}/app-common
     ${GEN_DIR}/all-clusters-app
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_manager/include

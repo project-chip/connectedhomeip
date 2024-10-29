@@ -66,7 +66,7 @@ config CHIP_DEVICE_PRODUCT_ID
 
 config CHIP_DEVICE_PRODUCT_NAME
 	string "Product name"
-	default "not-specified"
+	default "\"not-specified\""
 	help
 	  Provides a human-readable product name, such as the model number, assigned
 	  by the device manufacturer. The name is exposed as an attribute of the
@@ -82,7 +82,7 @@ config CHIP_DEVICE_HARDWARE_VERSION
 
 config CHIP_DEVICE_HARDWARE_VERSION_STRING
 	string "Hardware version string"
-	default "1.0"
+	default "\"1.0\""
 	help
 	  Provides a human-readable representation of the hardware version number.
 	  This must be an ASCII string of a length between 1 and 64 characters. The
@@ -103,7 +103,7 @@ config CHIP_DEVICE_SOFTWARE_VERSION
 
 config CHIP_DEVICE_SOFTWARE_VERSION_STRING
 	string "Software version string"
-	default "1.0"
+	default "\"1.0\""
 	help
 	  Provides a human-readable representation of the software version number.
 	  This must be an ASCII string of a length between 1 and 64 characters. The
@@ -113,13 +113,13 @@ config CHIP_DEVICE_SOFTWARE_VERSION_STRING
 
 config CHIP_DEVICE_MANUFACTURING_DATE
 	string "Manufacturing date (ISO 8601 format)"
-	default "2022-01-01"
+	default "\"2024-01-01\""
 	help
 	  Provides the device manufacturing date in the ISO 8601 format: YYYY-MM-DD.
 
 config CHIP_DEVICE_SERIAL_NUMBER
 	string "Device serial number"
-	default "11223344556677889900"
+	default "\"11223344556677889900\""
 	help
 	  Provides a human-readable representation of the device serial number that
 	  uniquely identifies the device. This must be an ASCII string of no more
@@ -127,7 +127,7 @@ config CHIP_DEVICE_SERIAL_NUMBER
 
 config CHIP_DEVICE_ROTATING_DEVICE_UID
 	string "Rotating device ID unique ID (HEX format)"
-	default "91a9c12a7c80700a31ddcfa7fce63e44"
+	default "\"91a9c12a7c80700a31ddcfa7fce63e44\""
 	help
 	  Provides a unique identifier of the device. This ID is used to derive the
 	  rotating device identifier, which allows commissioners to discover the
@@ -163,14 +163,14 @@ config CHIP_DEVICE_SPAKE2_PASSCODE
 
 config CHIP_DEVICE_SPAKE2_IT
 	int "SPAKE2+ iteration count"
-	default 1000
+	default 10000
 	help
 	  Provides the SPAKE2+ iteration count, which is one of the input parameters
 	  for the PBKDF operation, used to generate the SPAKE2+ verifier.
 
 config CHIP_DEVICE_SPAKE2_SALT
 	string "SPAKE2+ salt (base64 format)"
-	default "U1BBS0UyUCBLZXkgU2FsdA=="
+	default "\"UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA=\""
 	help
 	  Provides the SPAKE2+ salt, which is one of the input parameters for the
 	  PBKDF operation, used to generate the SPAKE2+ verifier. The salt must be
@@ -179,7 +179,7 @@ config CHIP_DEVICE_SPAKE2_SALT
 
 config CHIP_DEVICE_SPAKE2_TEST_VERIFIER
 	string "SPAKE2+ verifier for testing purposes (base64 format)"
-	default "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw=="
+	default "\"uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw==\""
 	help
 	  Provides the SPAKE2+ verifier that was generated using the configured
 	  SPAKE2+ passcode, iteration count and salt. This configuration option can
@@ -189,7 +189,7 @@ config CHIP_DEVICE_SPAKE2_TEST_VERIFIER
 
 config CHIP_DEVICE_ENABLE_KEY
 	string "Enable Key for triggering test actions (HEX format)"
-	default "00112233445566778899AABBCCDDEEFF"
+	default "\"00112233445566778899AABBCCDDEEFF\""
 	help
 	  Provides the Enable Key, which is a 16-byte value encoded in HEX that
 	  must be provided in the TestEventTrigger command to trigger a requested
@@ -198,7 +198,7 @@ config CHIP_DEVICE_ENABLE_KEY
 
 config CHIP_DEVICE_PRODUCT_FINISH
 	string "Description of the product's external case finish method"
-	default "other"
+	default "\"other\""
 	help
 	  provides a description of the product's external case finish method.
 	  Possible values:
@@ -447,7 +447,7 @@ if CHIP_OTA_IMAGE_BUILD
 
 config CHIP_OTA_IMAGE_FILE_NAME
 	string "OTA image file name"
-	default "matter.ota"
+	default "\"matter.ota\""
 	help
 	  Provides the file name of the generated Matter OTA image.
 
@@ -483,5 +483,11 @@ config USE_CHIP_DATA_MODEL_INTERFACE
       This enables a level of indiraction in the CHIP interaction model engine in 
       accessing underlying data and executing operations such as 
       wildcard-expansion, read, write and invoke.
+
+config MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+	int "MRP local active retry interval"
+	default (2000_ms32)
+	help
+	  Specify the retransmission interval of the Message Reliable Protocol (MRP) messages.
 
 endif # CHIP

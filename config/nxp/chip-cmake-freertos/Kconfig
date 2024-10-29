@@ -102,6 +102,12 @@ choice CHIP_CRYPTO
 			Use PSA API for crypto.
 endchoice
 
+config CHIP_USE_GENERATED_CONFIG
+	bool "Use generated config"
+	default y
+	help
+		Use the generated macro configs for CHIP configuration.
+
 # Thread network features
 
 if NET_L2_OPENTHREAD
