@@ -961,9 +961,9 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish()
 {
     GAutoPtr<GError> err;
 
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel publish_id: %d ! ", mpaf_info.peer_publish_id);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel publish_id: %d ! ", mpaf_reply_info.publish_id);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-    wpa_fi_w1_wpa_supplicant1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface, mpaf_info.peer_publish_id, nullptr,
+    wpa_fi_w1_wpa_supplicant1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface, mpaf_reply_info.publish_id, nullptr,
                                                                     &err.GetReceiver());
     return CHIP_NO_ERROR;
 }
@@ -1428,10 +1428,17 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
 
     GAutoPtr<GVariant> dataValue;
     GVariant * value;
+    uint32_t subscribe_id;
 
     value = g_variant_lookup_value(discov_info, "subscribe_id", G_VARIANT_TYPE_UINT32);
     dataValue.reset(value);
-    g_variant_get(dataValue.get(), "u", &mpaf_info.subscribe_id);
+    g_variant_get(dataValue.get(), "u", &subscribe_id);
+    if (subscribe_id == mpaf_info.subscribe_id)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: subscribe_id: %u (reentrance)", subscribe_id);
+        return;
+    }
+    mpaf_info.subscribe_id = subscribe_id;
 
     value = g_variant_lookup_value(discov_info, "publish_id", G_VARIANT_TYPE_UINT32);
     dataValue.reset(value);
