@@ -55,7 +55,8 @@ changing code wholesale for personal reasons without consulting others first.
 #### Commenting Out or Disabling Code
 
 Unused code shall not be disabled by commenting it out with C- or C++-style
-comments or with preprocessor `#if 0 ... #endif` semantics.
+comments or with preprocessor `#if 0 ... #endif` semantics. Unused code should
+be removed.
 
 #### Auto-formatters
 
