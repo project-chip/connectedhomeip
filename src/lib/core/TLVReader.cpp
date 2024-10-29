@@ -767,7 +767,7 @@ CHIP_ERROR TLVReader::ReadElement()
     // length bytes (if present), and for elements that don't have a length (e.g. integers), the value bytes.
     const uint8_t elemHeadBytes = static_cast<uint8_t>(1 + tagBytes + valOrLenBytes);
 
-    uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
+    uint8_t stagingBuf[17] = {0}; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
 
     // Read to handle also if the head of the element overlaps the end of the input buffer.
     // This reads the bytes into the staging buffer and arrange to parse them from there.
@@ -878,13 +878,9 @@ Tag TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p) const
 
 CHIP_ERROR TLVReader::ReadData(uint8_t * buf, uint32_t len)
 {
-    CHIP_ERROR err;
-
     while (len > 0)
     {
-        err = EnsureData(CHIP_ERROR_TLV_UNDERRUN);
-        if (err != CHIP_NO_ERROR)
-            return err;
+        ReturnErrorOnFailure(EnsureData(CHIP_ERROR_TLV_UNDERRUN));
 
         uint32_t remainingLen = static_cast<decltype(mMaxLen)>(mBufEnd - mReadPoint);
 
