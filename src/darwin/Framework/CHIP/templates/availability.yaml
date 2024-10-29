@@ -10028,6 +10028,11 @@
               - NullableGlobalStruct
               - ReadFailureCode
               - FailureInt32U
+          MicrowaveOvenControl:
+              # SupportedWatts and SelectedWattIndex are Provisional because WATTS is Provisional in Matter 1.3
+              # WATTS is provisional in 1.3 because no one has submitted a DUT for it
+              - SupportedWatts
+              - SelectedWattIndex
       commands:
           AccessControl:
               # Targeting 1.4
@@ -10055,6 +10060,10 @@
           DoorLock:
               GetCredentialStatusResponse:
                   - credentialData
+          MicrowaveOvenControl:
+              # wattSettingIndex is provisional because WATTS is provisional in Matter 1.3
+              # WATTS is provisional in 1.3 because no one has submitted a DUT for it
+              - wattSettingIndex
       structs:
           AccessControl:
               # Targeting 1.4
@@ -10185,6 +10194,11 @@
               Feature:
                   # Targeting 1.4
                   - DirectModeChange
+          MicrowaveOvenControl:
+              Feature:
+                  # PowerInWatts is provisional because WATTS is provisional in Matter 1.3
+                  # WATTS is provisional in 1.3 because no one has submitted a DUT for it
+                  - PowerInWatts
   renames:
       enums:
           ColorControl:
