@@ -755,27 +755,16 @@ CHIP_ERROR TLVReader::SkipToEndOfContainer()
 
 CHIP_ERROR TLVReader::ReadElement()
 {
-    CHIP_ERROR err;
-    uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
-    const uint8_t * p;
-    TLVElementType elemType;
-
     // Make sure we have input data. Return CHIP_END_OF_TLV if no more data is available.
-    err = EnsureData(CHIP_END_OF_TLV);
-    if (err != CHIP_NO_ERROR)
-        return err;
+    ReturnErrorOnFailure(EnsureData(CHIP_END_OF_TLV));
+    VerifyOrReturnError(mReadPoint != nullptr, CHIP_ERROR_INVALID_TLV_ELEMENT);
 
-    if (mReadPoint == nullptr)
-    {
-        return CHIP_ERROR_INVALID_TLV_ELEMENT;
-    }
     // Get the element's control byte.
     mControlByte = *mReadPoint;
 
     // Extract the element type from the control byte. Fail if it's invalid.
-    elemType = ElementType();
-    if (!IsValidTLVType(elemType))
-        return CHIP_ERROR_INVALID_TLV_ELEMENT;
+    TLVElementType elemType = ElementType();
+    VerifyOrReturnError(IsValidTLVType(elemType), CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     // Extract the tag control from the control byte.
     TLVTagControl tagControl = static_cast<TLVTagControl>(mControlByte & kTLVTagControlMask);
@@ -787,54 +776,29 @@ CHIP_ERROR TLVReader::ReadElement()
     TLVFieldSize lenOrValFieldSize = GetTLVFieldSize(elemType);
 
     // Determine the number of bytes in the length/value field.
-    uint8_t valOrLenBytes = TLVFieldSizeToBytes(lenOrValFieldSize);
+    const uint8_t valOrLenBytes = TLVFieldSizeToBytes(lenOrValFieldSize);
 
     // Determine the number of bytes in the element's 'head'. This includes: the control byte, the tag bytes (if present), the
     // length bytes (if present), and for elements that don't have a length (e.g. integers), the value bytes.
-    uint8_t elemHeadBytes = static_cast<uint8_t>(1 + tagBytes + valOrLenBytes);
+    const uint8_t elemHeadBytes = static_cast<uint8_t>(1 + tagBytes + valOrLenBytes);
 
-    // If the head of the element overlaps the end of the input buffer, read the bytes into the staging buffer
-    // and arrange to parse them from there. Otherwise read them directly from the input buffer.
-    if (elemHeadBytes > (mBufEnd - mReadPoint))
-    {
-        err = ReadData(stagingBuf, elemHeadBytes);
-        if (err != CHIP_NO_ERROR)
-            return err;
-        p = stagingBuf;
-    }
-    else
-    {
-        p = mReadPoint;
-        mReadPoint += elemHeadBytes;
-        mLenRead += elemHeadBytes;
-    }
+    uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
 
-    // Skip over the control byte.
-    p++;
+    // Read to handle also if the head of the element overlaps the end of the input buffer.
+    // This reads the bytes into the staging buffer and arrange to parse them from there.
+    ReturnErrorOnFailure(ReadData(stagingBuf, elemHeadBytes));
+
+    const uint8_t * p = stagingBuf + 1;
 
     // Read the tag field, if present.
-    mElemTag = ReadTag(tagControl, p);
+    mElemTag      = ReadTag(tagControl, p);
+    mElemLenOrVal = 0;
 
     // Read the length/value field, if present.
-    switch (lenOrValFieldSize)
-    {
-    case kTLVFieldSize_0Byte:
-        mElemLenOrVal = 0;
-        break;
-    case kTLVFieldSize_1Byte:
-        mElemLenOrVal = Read8(p);
-        break;
-    case kTLVFieldSize_2Byte:
-        mElemLenOrVal = LittleEndian::Read16(p);
-        break;
-    case kTLVFieldSize_4Byte:
-        mElemLenOrVal = LittleEndian::Read32(p);
-        break;
-    case kTLVFieldSize_8Byte:
-        mElemLenOrVal = LittleEndian::Read64(p);
-        VerifyOrReturnError(!TLVTypeHasLength(elemType) || (mElemLenOrVal <= UINT32_MAX), CHIP_ERROR_NOT_IMPLEMENTED);
-        break;
-    }
+    memcpy(&mElemLenOrVal, p, valOrLenBytes);
+    LittleEndian::HostSwap(mElemLenOrVal);
+
+    VerifyOrReturnError(!TLVTypeHasLength(elemType) || (mElemLenOrVal <= UINT32_MAX), CHIP_ERROR_NOT_IMPLEMENTED);
 
     return VerifyElement();
 }
