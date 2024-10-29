@@ -179,6 +179,13 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
             argumentIndex:1
                   ofReply:NO];
 
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+
+    [interface setClasses:allowedClasses
+              forSelector:@selector(controller:controllerConfigurationUpdated:)
+            argumentIndex:1
+                  ofReply:NO];
+
     return interface;
 }
 
@@ -432,6 +439,60 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 }
 
 #pragma mark - MTRDeviceController Protocol Client
+
+- (oneway void)controller:(NSUUID *)controller controllerConfigurationUpdated:(NSDictionary *)configuration
+{
+    // Reuse the same format as config dictionary, and add values for internal states
+    //  @{
+    //     MTRDeviceControllerRegistrationControllerContextKey: @{
+    //         MTRDeviceControllerRegistrationControllerNodeIDKey: controllerNodeID
+    //     }
+    //     MTRDeviceControllerRegistrationNodeIDsKey: @[
+    //        @{
+    //            MTRDeviceControllerRegistrationNodeIDKey: nodeID,
+    //            MTRDeviceControllerRegistrationDeviceInternalStateKey: deviceInternalStateDictionary
+    //        }
+    //     ]
+    //  }
+
+    NSDictionary * controllerContext = MTR_SAFE_CAST(configuration[MTRDeviceControllerRegistrationControllerContextKey], NSDictionary);
+    NSNumber * controllerNodeID = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey], NSNumber);
+    if (controllerNodeID && controllerNodeID) {
+        _controllerNodeID = controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey];
+    }
+
+    NSArray * deviceInfoList = MTR_SAFE_CAST(configuration[MTRDeviceControllerRegistrationNodeIDsKey], NSArray);
+
+    MTR_LOG("Received controllerConfigurationUpdated: controllerNode ID %@ deviceInfoList %@", self.controllerNodeID, deviceInfoList);
+
+    for (NSDictionary * deviceInfo in deviceInfoList) {
+        if (!MTR_SAFE_CAST(deviceInfo, NSDictionary)) {
+            MTR_LOG_ERROR(" - Missing or malformed device Info");
+        }
+
+        NSNumber * nodeID = MTR_SAFE_CAST(deviceInfo[MTRDeviceControllerRegistrationNodeIDKey], NSNumber);
+        if (!nodeID) {
+            MTR_LOG_ERROR(" - Missing or malformed nodeID");
+            continue;
+        }
+
+        NSDictionary * deviceInternalState = MTR_SAFE_CAST(deviceInfo[MTRDeviceControllerRegistrationDeviceInternalStateKey], NSDictionary);
+        if (!deviceInternalState) {
+            MTR_LOG_ERROR(" - Missing or malformed deviceInternalState");
+            continue;
+        }
+
+        auto * device = static_cast<MTRDevice_XPC *>([self deviceForNodeID:nodeID]);
+        [device device:nodeID internalStateUpdated:deviceInternalState];
+    }
+}
+
+// TODO: Create DeviceControllerRunningState that is a tri-state with "unknown", "not running", and "running" states
+- (BOOL)isRunning
+{
+    // For XPC controller, always return yes
+    return YES;
+}
 
 - (oneway void)controller:(NSUUID *)controller controllerConfigurationUpdated:(NSDictionary *)configuration
 {

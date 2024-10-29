@@ -981,6 +981,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             [delegate deviceCachePrimed:self];
         }
     }];
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 // assume lock is held
@@ -1015,6 +1016,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
             [delegate device:self stateChanged:state];
         }];
+        [self _notifyDelegateOfPrivateInternalPropertiesChanges];
     } else {
         MTR_LOG(
             "%@ Not reporting reachability state change, since no change in state %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
@@ -1062,6 +1064,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return _internalDeviceState;
 }
 #endif
+
+- (void)_updateEstimatedSubscriptionLatency:(NSNumber *)estimatedSubscriptionLatency
+{
+    os_unfair_lock_assert_owner(&_lock);
+    _estimatedSubscriptionLatency = estimatedSubscriptionLatency;
+
+    std::lock_guard lock(_descriptionLock);
+    _estimatedSubscriptionLatencyForDescription = estimatedSubscriptionLatency;
+}
 
 - (void)_updateEstimatedSubscriptionLatency:(NSNumber *)estimatedSubscriptionLatency
 {
@@ -1464,6 +1475,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             [delegate deviceBecameActive:self];
         }
     }];
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 
     // in case this is called during exponential back off of subscription
     // reestablishment, this starts the attempt right away
@@ -1802,6 +1814,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _deviceCachePrimedForDescription = deviceCachePrimed;
 }
 
+- (void)_updateDeviceCachePrimed:(BOOL)deviceCachePrimed
+{
+    os_unfair_lock_assert_owner(&_lock);
+    _deviceCachePrimed = deviceCachePrimed;
+
+    std::lock_guard lock(_descriptionLock);
+    _deviceCachePrimedForDescription = deviceCachePrimed;
+}
+
 - (void)_handleReportEnd
 {
     MTR_LOG("%@ handling report end", self);
@@ -2031,6 +2052,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     return filteredEvents;
+}
+
+- (void)_updateEstimatedStartTime:(NSDate *)estimatedStartTime
+{
+    os_unfair_lock_assert_owner(&_lock);
+    _estimatedStartTime = estimatedStartTime;
+
+    std::lock_guard lock(_descriptionLock);
+    _estimatedStartTimeForDescription = _estimatedStartTime;
 }
 
 - (void)_updateEstimatedStartTime:(NSDate *)estimatedStartTime
@@ -2467,7 +2497,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             mtr_strongify(self);
             VerifyOrReturn(self);
 
-            [self _markDeviceAsUnreachableIfNeverSubscribed];
+            if ( !HaveSubscriptionEstablishedRightNow(self->_internalDeviceState) )
+                [self _markDeviceAsUnreachableIfNeverSubscribed];
+
         });
     }
 
