@@ -63,26 +63,30 @@ class ProcessOutputCapture:
         err_wait = select.poll()
         err_wait.register(self.process.stderr, select.POLLIN | select.POLLHUP)
 
-        with open(self.output_path, "wt") as f:
+        with open(self.output_path, "wt", buffering=1) as f:
             f.write("PROCESS START: %s\n" % time.ctime())
+            f.flush()
             while not self.done:
-                changes = out_wait.poll(0.1)
-                if changes:
-                    out_line = self.process.stdout.readline()
-                    if not out_line:
-                        # stdout closed (otherwise readline should have at least \n)
-                        continue
-                    f.write(out_line)
-                    self.output_lines.put(out_line)
+                out_changes = out_wait.poll(0.1)
+                for fd, _ in out_changes:
+                    if fd == self.process.stdout.fileno():
+                        while True:
+                            out_line = self.process.stdout.readline()
+                            if not out_line:
+                                break
+                            f.write(out_line)
+                            f.flush()
+                            self.output_lines.put(out_line)
 
-                changes = err_wait.poll(0)
-                if changes:
-                    err_line = self.process.stderr.readline()
-                    if not err_line:
-                        # stderr closed (otherwise readline should have at least \n)
-                        continue
-                    f.write(f"!!STDERR!! : {err_line}")
+                err_changes = err_wait.poll(0)
+                for fd, _ in err_changes:
+                    if fd == self.process.stderr.fileno():
+                        err_line = self.process.stderr.readline()
+                        if err_line:
+                            f.write(f"!!STDERR!! : {err_line}")
+                            f.flush()
             f.write("PROCESS END: %s\n" % time.ctime())
+            f.flush()
 
     def __enter__(self):
         self.done = False
@@ -92,6 +96,7 @@ class ProcessOutputCapture:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            bufsize=1,
         )
         self.io_thread = threading.Thread(target=self._io_thread)
         self.io_thread.start()
