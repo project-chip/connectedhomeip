@@ -74,7 +74,7 @@ the wpa_supplicant integration with the Matter SDK.
         </method>
 
         <method name="NANCancelPublish">
-            <arg name="nan_args" type="i" direction="in" />
+            <arg name="nan_args" type="u" direction="in" />
         </method>
         <method name="NANUpdatePublish">
             <arg name="nan_args" type="a{sv}" direction="in" />
