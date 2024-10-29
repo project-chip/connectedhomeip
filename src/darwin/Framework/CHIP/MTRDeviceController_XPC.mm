@@ -450,7 +450,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
     NSDictionary * controllerContext = MTR_SAFE_CAST(configuration[MTRDeviceControllerRegistrationControllerContextKey], NSDictionary);
     NSNumber * controllerNodeID = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey], NSNumber);
-    if (controllerNodeID && controllerNodeID) {
+    if (controllerContext && controllerNodeID) {
         _controllerNodeID = controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey];
     }
 

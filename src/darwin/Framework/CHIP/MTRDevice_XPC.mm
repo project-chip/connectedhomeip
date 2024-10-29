@@ -133,12 +133,12 @@
 
 - (nullable NSNumber *)vendorID
 {
-    return [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyVendorID];
+    return [[self._internalState objectForKey:kMTRDeviceInternalPropertyKeyVendorID] copy];
 }
 
 - (nullable NSNumber *)productID
 {
-    return [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID];
+    return [[self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID] copy];
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
