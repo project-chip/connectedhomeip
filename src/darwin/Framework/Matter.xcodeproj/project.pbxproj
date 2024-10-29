@@ -356,6 +356,8 @@
 		B2E0D7B7245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7AE245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm */; };
 		B2E0D7B8245B0B5C003C5B48 /* MTRSetupPayload.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7AF245B0B5C003C5B48 /* MTRSetupPayload.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B9245B0B5C003C5B48 /* MTRSetupPayload.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7B0245B0B5C003C5B48 /* MTRSetupPayload.mm */; };
+		B409D0AE2CCFB89600A7ED5A /* DeviceDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = B409D0AC2CCFB89600A7ED5A /* DeviceDelegate.h */; };
+		B409D0AF2CCFB89600A7ED5A /* DeviceDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = B409D0AD2CCFB89600A7ED5A /* DeviceDelegate.mm */; };
 		B43B39EA2CB859A5006AA284 /* DumpMemoryGraphCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B43B39E62CB859A5006AA284 /* DumpMemoryGraphCommand.mm */; };
 		B43B39EB2CB859A5006AA284 /* LeaksTool.mm in Sources */ = {isa = PBXBuildFile; fileRef = B43B39E82CB859A5006AA284 /* LeaksTool.mm */; };
 		B43B39EC2CB859A5006AA284 /* DumpMemoryGraphCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = B43B39E52CB859A5006AA284 /* DumpMemoryGraphCommand.h */; };
@@ -830,6 +832,8 @@
 		B2E0D7AE245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRQRCodeSetupPayloadParser.mm; sourceTree = "<group>"; };
 		B2E0D7AF245B0B5C003C5B48 /* MTRSetupPayload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRSetupPayload.h; sourceTree = "<group>"; };
 		B2E0D7B0245B0B5C003C5B48 /* MTRSetupPayload.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRSetupPayload.mm; sourceTree = "<group>"; };
+		B409D0AC2CCFB89600A7ED5A /* DeviceDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceDelegate.h; sourceTree = "<group>"; };
+		B409D0AD2CCFB89600A7ED5A /* DeviceDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DeviceDelegate.mm; sourceTree = "<group>"; };
 		B43B39E42CB859A5006AA284 /* Commands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
 		B43B39E52CB859A5006AA284 /* DumpMemoryGraphCommand.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DumpMemoryGraphCommand.h; sourceTree = "<group>"; };
 		B43B39E62CB859A5006AA284 /* DumpMemoryGraphCommand.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DumpMemoryGraphCommand.mm; sourceTree = "<group>"; };
@@ -1043,6 +1047,8 @@
 		037C3D9B2991BD4F00B7EEE2 /* common */ = {
 			isa = PBXGroup;
 			children = (
+				B409D0AC2CCFB89600A7ED5A /* DeviceDelegate.h */,
+				B409D0AD2CCFB89600A7ED5A /* DeviceDelegate.mm */,
 				B43B39EF2CB99090006AA284 /* CertificateIssuer.h */,
 				B43B39F02CB99090006AA284 /* CertificateIssuer.mm */,
 				B43B39F12CB99090006AA284 /* ControllerStorage.h */,
@@ -1722,6 +1728,7 @@
 				B4F773CA2CB54B61008C6B23 /* LeakChecker.h in Headers */,
 				B43B39F82CB99090006AA284 /* CertificateIssuer.h in Headers */,
 				B43B39F92CB99090006AA284 /* PreferencesStorage.h in Headers */,
+				B409D0AE2CCFB89600A7ED5A /* DeviceDelegate.h in Headers */,
 				B43B39FA2CB99090006AA284 /* ControllerStorage.h in Headers */,
 				037C3DB82991BD5000B7EEE2 /* ClusterCommandBridge.h in Headers */,
 				037C3DC82991BD5100B7EEE2 /* CHIPToolKeypair.h in Headers */,
@@ -2120,6 +2127,7 @@
 				0382FA302992F40C00247BBB /* ComplexArgumentParser.cpp in Sources */,
 				039145E12993102B00257B3E /* main.mm in Sources */,
 				037C3DD42991BD5200B7EEE2 /* logging.mm in Sources */,
+				B409D0AF2CCFB89600A7ED5A /* DeviceDelegate.mm in Sources */,
 				512431282BA0C8BF000BC136 /* SetMRPParametersCommand.mm in Sources */,
 				512431292BA0C8BF000BC136 /* ResetMRPParametersCommand.mm in Sources */,
 				037C3DB32991BD5000B7EEE2 /* OpenCommissioningWindowCommand.mm in Sources */,
