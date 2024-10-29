@@ -143,6 +143,17 @@ class TizenBuilder(GnBuilder):
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
 
+    def lcov_args(self):
+        gcov = os.path.join(os.environ['TIZEN_SDK_TOOLCHAIN'], 'bin/arm-linux-gnueabi-gcov')
+        return [
+            'lcov', '--gcov-tool', gcov, '--ignore-errors', 'unused,mismatch', '--capture', '--directory', os.path.join(
+                self.output_dir, 'obj'),
+            '--exclude', '**/src/controller/*',
+            '--exclude', '**/connectedhomeip/zzz_generated/*',
+            '--exclude', '**/connectedhomeip/third_party/*',
+            '--exclude', '/opt/*',
+        ]
+
     def PreBuildCommand(self):
         if self.app == TizenApp.TESTS and self.use_coverage:
             cmd = ['ninja', '-C', self.output_dir]
@@ -154,25 +165,18 @@ class TizenBuilder(GnBuilder):
 
             self._Execute(cmd, title="Build-only")
 
-            gcov = os.path.join(os.environ['TIZEN_SDK_TOOLCHAIN'], 'bin/arm-linux-gnueabi-gcov')
-
-            self._Execute(['lcov', '--gcov-tool', gcov, '--initial', '--ignore-errors', 'unused', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
-                           '--exclude', '**/src/controller/*',
-                           '--exclude', '**/connectedhomeip/zzz_generated/*',
-                           '--exclude', '**/connectedhomeip/third_party/*',
-                           '--exclude', '/opt/*',
-                           '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
+            self._Execute(self.lcov_args() + [
+                '--initial',
+                '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')
+            ], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
         if self.app == TizenApp.TESTS and self.use_coverage:
-            gcov = os.path.join(os.environ['TIZEN_SDK_TOOLCHAIN'], 'bin/arm-linux-gnueabi-gcov')
 
-            self._Execute(['lcov', '--gcov-tool', gcov, '--ignore-errors', 'unused,mismatch', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
-                           '--exclude', '**/src/controller/*',
-                           '--exclude', '**/connectedhomeip/zzz_generated/*',
-                           '--exclude', '**/connectedhomeip/third_party/*',
-                           '--exclude', '/opt/*',
-                           '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
+            self._Execute(self.lcov_args() + ['--output-file', os.path.join(self.coverage_dir,
+                          'lcov_test.info')], title="Initial coverage baseline")
+
+            gcov = os.path.join(os.environ['TIZEN_SDK_TOOLCHAIN'], 'bin/arm-linux-gnueabi-gcov')
             self._Execute(['lcov', '--gcov-tool', gcov, '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),
                            '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_test.info'),
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_final.info')
