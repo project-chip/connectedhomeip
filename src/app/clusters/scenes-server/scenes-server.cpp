@@ -56,6 +56,7 @@ namespace {
 
 Protocols::InteractionModel::Status ResponseStatus(CHIP_ERROR err)
 {
+    // TODO : Properly fix mapping between error types (issue https://github.com/project-chip/connectedhomeip/issues/26885)
     if (CHIP_ERROR_NOT_FOUND == err)
     {
         return Protocols::InteractionModel::Status::NotFound;
