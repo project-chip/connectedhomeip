@@ -767,7 +767,11 @@ CHIP_ERROR TLVReader::ReadElement()
     // length bytes (if present), and for elements that don't have a length (e.g. integers), the value bytes.
     const uint8_t elemHeadBytes = static_cast<uint8_t>(1 + tagBytes + valOrLenBytes);
 
-    uint8_t stagingBuf[17] = {0}; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
+    uint8_t stagingBuf[17];
+
+    // Odd workaround: clang-tidy claims garbage value otherwise as it does not
+    // understand that ReadData initializes stagingBuf
+    stagingBuf[1] = 0;
 
     // Read to handle also if the head of the element overlaps the end of the input buffer.
     // This reads the bytes into the staging buffer and arrange to parse them from there.
