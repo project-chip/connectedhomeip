@@ -28,12 +28,15 @@
 #import "CHIPCommandStorageDelegate.h"
 #import "CertificateIssuer.h"
 #import "ControllerStorage.h"
+#import "DeviceDelegate.h"
 #include "MTRError_Utils.h"
 
 #include <map>
 #include <string>
 
 static CHIPToolPersistentStorageDelegate * storage = nil;
+static DeviceDelegate * sDeviceDelegate = nil;
+static dispatch_queue_t sDeviceDelegateDispatchQueue = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
 dispatch_queue_t CHIPCommandBridge::mOTAProviderCallbackQueue;
@@ -301,6 +304,18 @@ MTRDevice * CHIPCommandBridge::DeviceWithNodeId(chip::NodeId nodeId)
 
     __auto_type * device = [MTRDevice deviceWithNodeID:@(nodeId) controller:controller];
     VerifyOrReturnValue(nil != device, nil);
+
+    // The device delegate is initialized only once, when the first MTRDevice is created.
+    // As a result, subsequent commands using --use-mtr-device don’t need to specify the
+    // `--pretend-thread-enabled 1` argument again. Any further attempts to set it to `0` will also be ignored.
+    if (sDeviceDelegate == nil) {
+        sDeviceDelegate = [[DeviceDelegate alloc] init];
+        sDeviceDelegateDispatchQueue = dispatch_queue_create("com.chip.devicedelegate", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        if (mPretendThreadEnabled.ValueOr(false)) {
+            [sDeviceDelegate setPretendThreadEnabled:YES];
+        }
+    }
+    [device addDelegate:sDeviceDelegate queue:sDeviceDelegateDispatchQueue];
 
     return device;
 }

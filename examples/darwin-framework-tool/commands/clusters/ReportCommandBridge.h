@@ -105,9 +105,7 @@ public:
             LogNSError("Error reading attribute", error);
             RemoteDataModelLogger::LogAttributeErrorAsJSON(endpoint, cluster, attribute, error);
         } else {
-            for (id item in values) {
-                NSLog(@"Response Item: %@", [item description]);
-            }
+            NSLog(@"cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u: %@", mClusterId, mAttributeId, endpointId, values);
             RemoteDataModelLogger::LogAttributeAsJSON(endpoint, cluster, attribute, values);
         }
 
