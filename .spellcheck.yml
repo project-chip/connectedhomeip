@@ -65,7 +65,7 @@ matrix:
       # converts markdown to HTML
       - pyspelling.filters.markdown:
     sources:
-      - '**/*.md|!third_party/**|!examples/common/**/repo/**|!docs/ERROR_CODES.md|!docs/clusters.md|!docs/testing/yaml_schema.md|!docs/testing/yaml_pseudocluster.md|!docs/testing/python.md|!docs/testing/ChipDeviceCtrlAPI.md|!docs/issue_triage.md'
+      - '**/*.md|!third_party/**|!examples/common/**/repo/**|!docs/ids_and_codes/ERROR_CODES.md|!docs/clusters.md|!docs/testing/yaml_schema.md|!docs/testing/yaml_pseudocluster.md|!docs/testing/python.md|!docs/testing/ChipDeviceCtrlAPI.md|!docs/issue_triage.md'
     aspell:
       ignore-case: true
       camel-case: true
