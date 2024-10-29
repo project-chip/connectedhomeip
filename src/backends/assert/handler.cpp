@@ -38,5 +38,5 @@ void pw_assert_matter_HandleFailure(const char * file_name, int line_number, con
 
 extern "C" void pw_assert_HandleFailure(void)
 {
-    pw_assert_matter_HandleFailure(nullptr, -1, nullptr, "Crash: PW_ASSERT() or PW_DASSERT() failure");
+    pw_assert_matter_HandleFailure("<NOFILE>", -1, "<UNKNOWN_FUNCTION>", "Crash: PW_ASSERT() or PW_DASSERT() failure");
 }
