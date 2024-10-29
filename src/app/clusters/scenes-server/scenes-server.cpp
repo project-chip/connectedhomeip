@@ -99,6 +99,8 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
 template <typename ResponseType>
 CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, Status status)
 {
+    // TODO: this seems odd: we convert `status` to a CHIP_ERROR and then back to status. This seems
+    //       potentially lossy and not ideal.
     return AddResponseOnError(ctx, resp, StatusIB(status).ToChipError());
 }
 
