@@ -22,7 +22,7 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
