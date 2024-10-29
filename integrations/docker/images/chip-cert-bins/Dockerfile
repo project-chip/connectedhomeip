@@ -80,6 +80,7 @@ RUN set -x \
     pkg-config \
     python3 \
     python3-dev \
+    python3-pip \
     python3-venv \
     rsync \
     shellcheck \
@@ -93,18 +94,9 @@ RUN set -x \
     && git lfs install \
     && : # last line
 
-# Python 3 and PIP
 RUN set -x \
-    && DEBIAN_FRONTEND=noninteractive  apt-get install -y \
-    libgirepository1.0-dev \
-    software-properties-common \
-    && add-apt-repository universe \
-    && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-    && python3 get-pip.py --break-system-packages \
-    && : # last line
-
-RUN set -x \
-    && pip3 install attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate --break-system-packages \
+    && pip3 install --break-system-packages \
+    attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate \
     && : # last line
 
 # build and install gn
