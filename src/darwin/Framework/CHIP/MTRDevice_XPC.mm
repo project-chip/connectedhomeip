@@ -118,7 +118,7 @@
     // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
     // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
 
-    return [NSString stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, controller: %@ state: %ld>",
+    return [NSString stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, controller: %@ state: %lu>",
                      NSStringFromClass(self.class), self,
                      _deviceController.compressedFabricID.unsignedLongLongValue,
                      _nodeID.unsignedLongLongValue,
@@ -128,7 +128,7 @@
                      wifi,
                      thread,
                      _deviceController.uniqueIdentifier,
-                     [self state]];
+                     self.state];
 }
 
 - (nullable NSNumber *)vendorID
