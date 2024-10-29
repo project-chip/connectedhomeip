@@ -179,13 +179,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
             argumentIndex:1
                   ofReply:NO];
 
-    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
-
-    [interface setClasses:allowedClasses
-              forSelector:@selector(controller:controllerConfigurationUpdated:)
-            argumentIndex:1
-                  ofReply:NO];
-
     return interface;
 }
 
