@@ -917,7 +917,7 @@ CHIP_ERROR TLVReader::EnsureData(CHIP_ERROR noDataErr)
 
         // Cap mBufEnd so that we don't read beyond the user's specified maximum length, even
         // if the underlying buffer is larger.
-        bufLen = std::min(bufLen, mMaxLen - mLenRead);
+        bufLen  = std::min(bufLen, mMaxLen - mLenRead);
         mBufEnd = mReadPoint + bufLen;
     }
 
