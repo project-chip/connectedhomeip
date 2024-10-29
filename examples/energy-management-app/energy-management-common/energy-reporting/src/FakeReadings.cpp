@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <CommonMain.h>
 #include <DEMManufacturerDelegate.h>
+#include <EnergyManagementAppCommonMain.h>
 
 #include <EnergyTimeUtils.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>

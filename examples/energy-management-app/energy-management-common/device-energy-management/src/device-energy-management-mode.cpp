@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <CommonMain.h>
 #include <EnergyManagementAppCmdLineOptions.h>
+#include <EnergyManagementAppCommonMain.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <device-energy-management-modes.h>
 
@@ -93,14 +93,12 @@ void DeviceEnergyManagementMode::Shutdown()
 
 void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == kEvseEndpoint || endpointId == kWaterHeaterEndpoint);
-
     /* emberAfDeviceEnergyManagementModeClusterInitCallback() is called for all endpoints
-       that include this endpoint (even the one we disable dynamically). So here, we only
-       proceed when it's called for the right endpoint determined by GetMainAppEndpointId()
-       (a cmd line argument or #define).
+       that include this cluster (even the one we disable dynamically). So here, we only
+       proceed when it's called for the right endpoint determined by GetEnergyDeviceEndpointId()
+       (a cmd line argument on linux or #define on other platforms).
     */
-    if (endpointId != GetMainAppEndpointId())
+    if (endpointId != GetEnergyDeviceEndpointId())
     {
         return;
     }

@@ -18,12 +18,12 @@
 
 #include "EnergyManagementAppCmdLineOptions.h"
 
-#include <CommonMain.h>
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <ElectricalSensorInit.h>
 #include <EnergyEvseManager.h>
+#include <EnergyManagementAppCommonMain.h>
 #include <PowerTopologyDelegate.h>
 #include <device-energy-management-modes.h>
 #include <energy-evse-modes.h>

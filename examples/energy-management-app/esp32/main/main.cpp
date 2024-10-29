@@ -18,7 +18,7 @@
 #include "DeviceCallbacks.h"
 
 #include "esp_log.h"
-#include <CommonMain.h>
+#include <EnergyManagementAppCommonMain.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
@@ -88,6 +88,10 @@ static AppDeviceCallbacks EchoCallbacks;
 static DeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
 
 namespace {
+
+constexpr chip::EndpointId kEvseEndpoint        = 1;
+constexpr chip::EndpointId kWaterHeaterEndpoint = 2;
+
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -152,7 +156,7 @@ chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 #error Cannot define CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE and CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 #endif
 
-EndpointId GetMainAppEndpointId()
+EndpointId GetEnergyDeviceEndpointId()
 {
 #if defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
     return kWaterHeaterEndpoint;
@@ -166,13 +170,13 @@ void ApplicationInit()
     ESP_LOGD(TAG, "Energy Management App: ApplicationInit()");
 #if CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
-    EvseApplicationInit(kEvseEndpoint);
+    EvseApplicationInit();
     // Disable Water Heater Endpoint
     emberAfEndpointEnableDisable(kWaterHeaterEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    WaterHeaterApplicationInit(kWaterHeaterEndpoint);
+    WaterHeaterApplicationInit();
     // Disable EVSE Endpoint
     emberAfEndpointEnableDisable(kEvseEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE

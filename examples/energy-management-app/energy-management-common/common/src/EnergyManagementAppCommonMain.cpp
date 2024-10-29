@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
+#include "EnergyManagementAppCommonMain.h"
 #include "EnergyManagementAppCmdLineOptions.h"
-#include <CommonMain.h>
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <DeviceEnergyManagementManager.h>
 #include <ElectricalPowerMeasurementDelegate.h>
@@ -33,6 +33,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/data-model/Nullable.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -54,74 +55,7 @@ std::unique_ptr<PowerTopologyDelegate> gPTDelegate;
 std::unique_ptr<PowerTopologyInstance> gPTInstance;
 // Electrical Energy Measurement cluster uses ember to initialise
 std::unique_ptr<ElectricalEnergyMeasurementAttrAccess> gEEMAttrAccess;
-
-/*
- *  @brief  Creates a Delegate and Instance for DEM
- *
- * The Instance is a container around the Delegate, so
- * create the Delegate first, then wrap it in the Instance
- * Then call the Instance->Init() to register the attribute and command handlers
- */
-CHIP_ERROR DeviceEnergyManagementInit(chip::EndpointId endpointId)
-{
-    // TODO: support both EVSE and WaterHeater endpoints
-    if (gDEMDelegate || gDEMInstance)
-    {
-        ChipLogError(AppServer, "DEM Instance or Delegate already exist.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    gDEMDelegate = std::make_unique<DeviceEnergyManagementDelegate>();
-    if (!gDEMDelegate)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for DeviceEnergyManagementDelegate");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
-
-    /* Manufacturer may optionally not support all features, commands & attributes */
-    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(EndpointId(endpointId), *gDEMDelegate, featureMap);
-
-    if (!gDEMInstance)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for DeviceEnergyManagementManager");
-        gDEMDelegate.reset();
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    gDEMDelegate->SetDeviceEnergyManagementInstance(*gDEMInstance);
-
-    CHIP_ERROR err = gDEMInstance->Init(); /* Register Attribute & Command handlers */
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Init failed on gDEMInstance");
-        gDEMInstance.reset();
-        gDEMDelegate.reset();
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceEnergyManagementShutdown()
-{
-    // TODO: support both EVSE and WaterHeater endpoints
-    /* Do this in the order Instance first, then delegate
-     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
-     */
-    if (gDEMInstance)
-    {
-        /* deregister attribute & command handlers */
-        gDEMInstance->Shutdown();
-        gDEMInstance.reset();
-    }
-    if (gDEMDelegate)
-    {
-        gDEMDelegate.reset();
-    }
-    return CHIP_NO_ERROR;
-}
+bool gCommonClustersInitialized = false;
 
 /*
  *  @brief  Creates a Delegate and Instance for PowerTopology clusters
@@ -276,21 +210,101 @@ CHIP_ERROR ElectricalPowerMeasurementShutdown()
     return CHIP_NO_ERROR;
 }
 
+/*
+ *  @brief  Creates a Delegate and Instance for DEM
+ *
+ * The Instance is a container around the Delegate, so
+ * create the Delegate first, then wrap it in the Instance
+ * Then call the Instance->Init() to register the attribute and command handlers
+ */
+CHIP_ERROR DeviceEnergyManagementInit(chip::EndpointId endpointId)
+{
+    if (gDEMDelegate || gDEMInstance)
+    {
+        ChipLogError(AppServer, "DEM Instance or Delegate already exist.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    gDEMDelegate = std::make_unique<DeviceEnergyManagementDelegate>();
+    if (!gDEMDelegate)
+    {
+        ChipLogError(AppServer, "Failed to allocate memory for DeviceEnergyManagementDelegate");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
+
+    /* Manufacturer may optionally not support all features, commands & attributes */
+    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(endpointId, *gDEMDelegate, featureMap);
+
+    if (!gDEMInstance)
+    {
+        ChipLogError(AppServer, "Failed to allocate memory for DeviceEnergyManagementManager");
+        gDEMDelegate.reset();
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    gDEMDelegate->SetDeviceEnergyManagementInstance(*gDEMInstance);
+
+    CHIP_ERROR err = gDEMInstance->Init(); /* Register Attribute & Command handlers */
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Init failed on gDEMInstance");
+        gDEMInstance.reset();
+        gDEMDelegate.reset();
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void DeviceEnergyManagementShutdown()
+{
+    /* Do this in the order Instance first, then delegate
+     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
+     */
+    if (gDEMInstance)
+    {
+        /* deregister attribute & command handlers */
+        gDEMInstance->Shutdown();
+        gDEMInstance.reset();
+    }
+    if (gDEMDelegate)
+    {
+        gDEMDelegate.reset();
+    }
+}
+
+CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
+{
+    if (!gCommonClustersInitialized)
+    {
+        DeviceEnergyManagementInit(endpointId);
+        ElectricalPowerMeasurementInit(endpointId);
+        PowerTopologyInit(endpointId);
+    }
+    VerifyOrReturnError((!gDEMDelegate && !gDEMInstance), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError((!gEPMDelegate && !gEPMInstance), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError((!gPTDelegate && !gPTInstance), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError((!gEEMAttrAccess), CHIP_ERROR_INCORRECT_STATE);
+    gCommonClustersInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
 } // namespace
 
 void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == kEvseEndpoint || endpointId == kWaterHeaterEndpoint);
-
     /* emberAfElectricalEnergyMeasurementClusterInitCallback() is called for all endpoints
        that include the EEM endpoint (even the one we disable dynamically). So here, we only
-       proceed when it's called for the right endpoint determined by GetMainAppEndpointId()
-       (a cmd line argument or #define).
+       proceed when it's called for the right endpoint determined by GetEnergyDeviceEndpointId().
     */
-    if (endpointId != GetMainAppEndpointId())
+    if (endpointId != GetEnergyDeviceEndpointId())
     {
         return;
     }
+
+    VerifyOrDie(!gEEMAttrAccess); // Ensure it's not initialized yet.
 
     gEEMAttrAccess = std::make_unique<ElectricalEnergyMeasurementAttrAccess>(
         BitMask<ElectricalEnergyMeasurement::Feature, uint32_t>(
@@ -341,12 +355,10 @@ DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate()
     return gDEMDelegate.get();
 }
 
-void EvseApplicationInit(chip::EndpointId endpointId)
+void EvseApplicationInit()
 {
-    // Common Clusters Init
-    VerifyOrDie(DeviceEnergyManagementInit(endpointId) == CHIP_NO_ERROR);
-    VerifyOrDie(ElectricalPowerMeasurementInit(endpointId) == CHIP_NO_ERROR);
-    VerifyOrDie(PowerTopologyInit(endpointId) == CHIP_NO_ERROR);
+    auto endpointId = GetEnergyDeviceEndpointId();
+    VerifyOrDie(EnergyManagementCommonClustersInit(endpointId) == CHIP_NO_ERROR);
     VerifyOrDie(EnergyEvseInit(endpointId) == CHIP_NO_ERROR);
     VerifyOrDie(EVSEManufacturerInit(*gEPMInstance.get(), *gPTInstance.get(), *gDEMInstance.get(), *gDEMDelegate.get()) ==
                 CHIP_NO_ERROR);
@@ -354,7 +366,7 @@ void EvseApplicationInit(chip::EndpointId endpointId)
 
 void EvseApplicationShutdown()
 {
-    ChipLogDetail(AppServer, "Energy Management App (EVSE): ApplicationShutdown()");
+    ChipLogDetail(AppServer, "Energy Management App (EVSE): EvseApplicationShutdown()");
 
     /* Shutdown in reverse order that they were created */
     EVSEManufacturerShutdown();           /* Free the EVSEManufacturer */
@@ -367,12 +379,13 @@ void EvseApplicationShutdown()
     Clusters::EnergyEvseMode::Shutdown();
 }
 
-void WaterHeaterApplicationInit(EndpointId endpointId)
+void WaterHeaterApplicationInit()
 {
+    auto endpointId = GetEnergyDeviceEndpointId();
+    VerifyOrDie(EnergyManagementCommonClustersInit(endpointId) == CHIP_NO_ERROR);
     VerifyOrDie(WhmApplicationInit(endpointId) == CHIP_NO_ERROR);
 
     /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
-
     gDEMDelegate->SetESAState(ESAStateEnum::kOnline);
     gDEMDelegate->SetESAType(ESATypeEnum::kWaterHeating);
     gDEMDelegate->SetDEMManufacturerDelegate(*GetWhmManufacturer());
@@ -384,7 +397,7 @@ void WaterHeaterApplicationInit(EndpointId endpointId)
 
 void WaterHeaterApplicationShutdown()
 {
-    ChipLogDetail(AppServer, "Energy Management App (WaterHeater): ApplicationShutdown()");
+    ChipLogDetail(AppServer, "Energy Management App (WaterHeater): WaterHeaterShutdown()");
 
     /* Shutdown in reverse order that they were created */
     PowerTopologyShutdown();              /* Free the PowerTopology */
