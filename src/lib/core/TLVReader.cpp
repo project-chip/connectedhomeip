@@ -647,31 +647,18 @@ CHIP_ERROR TLVReader::Next(TLVType expectedType, Tag expectedTag)
 
 CHIP_ERROR TLVReader::Skip()
 {
-    CHIP_ERROR err;
-    TLVElementType elemType = ElementType();
-
-    if (elemType == TLVElementType::EndOfContainer)
-        return CHIP_END_OF_TLV;
+    const TLVElementType elemType = ElementType();
+    VerifyOrReturnError(elemType != TLVElementType::EndOfContainer, CHIP_END_OF_TLV);
 
     if (TLVTypeIsContainer(elemType))
     {
         TLVType outerContainerType;
-        err = EnterContainer(outerContainerType);
-        if (err != CHIP_NO_ERROR)
-            return err;
-        err = ExitContainer(outerContainerType);
-        if (err != CHIP_NO_ERROR)
-            return err;
+        ReturnErrorOnFailure(EnterContainer(outerContainerType));
+        return ExitContainer(outerContainerType);
     }
 
-    else
-    {
-        err = SkipData();
-        if (err != CHIP_NO_ERROR)
-            return err;
-
-        ClearElementState();
-    }
+    ReturnErrorOnFailure(SkipData());
+    ClearElementState();
 
     return CHIP_NO_ERROR;
 }
@@ -705,8 +692,6 @@ CHIP_ERROR TLVReader::SkipData()
     if (TLVTypeHasLength(elemType))
     {
         err = ReadData(nullptr, static_cast<uint32_t>(mElemLenOrVal));
-        if (err != CHIP_NO_ERROR)
-            return err;
     }
 
     return err;
