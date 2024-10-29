@@ -2497,9 +2497,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             mtr_strongify(self);
             VerifyOrReturn(self);
 
-            if ( !HaveSubscriptionEstablishedRightNow(self->_internalDeviceState) )
+            if (!HaveSubscriptionEstablishedRightNow(self->_internalDeviceState))
                 [self _markDeviceAsUnreachableIfNeverSubscribed];
-
         });
     }
 
