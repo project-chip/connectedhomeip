@@ -40,6 +40,7 @@ RUN set -x \
     clang \
     clang-format \
     clang-tidy \
+    cmake \
     curl \
     flex \
     gcc \
@@ -91,30 +92,6 @@ RUN set -x \
     zlib1g-dev \
     && git lfs install \
     && : # last line
-
-# Cmake (Mbed OS requires >=3.19.0-rc3 version which is not available in Ubuntu 20.04 repository)
-RUN case ${TARGETPLATFORM} in \
-    "linux/amd64") \
-    set -x \
-    && (cd /tmp \
-    && wget --progress=dot:giga https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-x86_64.sh \
-    && sh cmake-3.19.3-Linux-x86_64.sh --exclude-subdir --prefix=/usr/local \
-    && rm -rf cmake-3.19.3-Linux-x86_64.sh) \
-    && exec bash \
-    ;; \
-    "linux/arm64") \
-    set -x \
-    && (cd /tmp \
-    && wget --progress=dot:giga https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-aarch64.sh \
-    && sh cmake-3.19.3-Linux-aarch64.sh --exclude-subdir --prefix=/usr/local \
-    && rm -rf cmake-3.19.3-Linux-aarch64.sh) \
-    && exec bash \
-    ;; \
-    *) \
-    test -n "$TARGETPLATFORM" \
-    echo "Unsupported platform ${TARGETPLATFORM}" \
-    ;; \
-    esac
 
 # Python 3 and PIP
 RUN set -x \
