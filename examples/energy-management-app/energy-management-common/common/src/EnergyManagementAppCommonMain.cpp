@@ -283,10 +283,10 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
         ElectricalPowerMeasurementInit(endpointId);
         PowerTopologyInit(endpointId);
     }
-    VerifyOrReturnError((!gDEMDelegate && !gDEMInstance), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError((!gEPMDelegate && !gEPMInstance), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError((!gPTDelegate && !gPTInstance), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError((!gEEMAttrAccess), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gDEMDelegate && gDEMInstance, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gEPMDelegate && gEPMInstance, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gPTDelegate && gPTInstance, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gEEMAttrAccess, CHIP_ERROR_INCORRECT_STATE);
     gCommonClustersInitialized = true;
     return CHIP_NO_ERROR;
 }
