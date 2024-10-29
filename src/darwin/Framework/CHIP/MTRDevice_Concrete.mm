@@ -1074,15 +1074,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _estimatedSubscriptionLatencyForDescription = estimatedSubscriptionLatency;
 }
 
-- (void)_updateEstimatedSubscriptionLatency:(NSNumber *)estimatedSubscriptionLatency
-{
-    os_unfair_lock_assert_owner(&_lock);
-    _estimatedSubscriptionLatency = estimatedSubscriptionLatency;
-
-    std::lock_guard lock(_descriptionLock);
-    _estimatedSubscriptionLatencyForDescription = estimatedSubscriptionLatency;
-}
-
 // First Time Sync happens 2 minutes after reachability (this can be changed in the future)
 #define MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC (60 * 2)
 - (void)_handleSubscriptionEstablished
@@ -1814,15 +1805,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _deviceCachePrimedForDescription = deviceCachePrimed;
 }
 
-- (void)_updateDeviceCachePrimed:(BOOL)deviceCachePrimed
-{
-    os_unfair_lock_assert_owner(&_lock);
-    _deviceCachePrimed = deviceCachePrimed;
-
-    std::lock_guard lock(_descriptionLock);
-    _deviceCachePrimedForDescription = deviceCachePrimed;
-}
-
 - (void)_handleReportEnd
 {
     MTR_LOG("%@ handling report end", self);
@@ -2052,15 +2034,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     return filteredEvents;
-}
-
-- (void)_updateEstimatedStartTime:(NSDate *)estimatedStartTime
-{
-    os_unfair_lock_assert_owner(&_lock);
-    _estimatedStartTime = estimatedStartTime;
-
-    std::lock_guard lock(_descriptionLock);
-    _estimatedStartTimeForDescription = _estimatedStartTime;
 }
 
 - (void)_updateEstimatedStartTime:(NSDate *)estimatedStartTime
