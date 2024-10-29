@@ -723,8 +723,9 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
             uint16_t vendorId   = static_cast<uint16_t>(profileId >> 16);
             uint16_t profileNum = static_cast<uint16_t>(profileId);
 
-            if (tagNum < 65536)
+            if (tagNum <= std::numeric_limits<uint16_t>::max())
             {
+
                 writer.Put8(TLVTagControl::FullyQualified_6Bytes | elemType);
                 writer.Put16(vendorId);
                 writer.Put16(profileNum);
