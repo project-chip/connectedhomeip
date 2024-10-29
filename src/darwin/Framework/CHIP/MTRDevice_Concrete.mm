@@ -31,6 +31,7 @@
 #import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerOverXPC.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -54,6 +55,12 @@
 #import <app/InteractionModelEngine.h>
 #import <platform/LockTracker.h>
 #import <platform/PlatformManager.h>
+
+static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
+
+// Not static, because these are public API.
+NSString * const MTRPreviousDataKey = @"previousData";
+NSString * const MTRDataVersionKey = @"dataVersion";
 
 // allow readwrite access to superclass properties
 @interface MTRDevice_Concrete ()
@@ -208,7 +215,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // whatever lock protects the time sync bits.
 @property (nonatomic, readonly) os_unfair_lock timeSyncLock;
 
-@property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 @property (nonatomic) BOOL receivingReport;
 @property (nonatomic) BOOL receivingPrimingReport;
@@ -367,7 +373,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
         _timeSyncLock = OS_UNFAIR_LOCK_INIT;
         _descriptionLock = OS_UNFAIR_LOCK_INIT;
-        _fabricIndex = controller.fabricIndex;
         _queue
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _expectedValueCache = [NSMutableDictionary dictionary];
@@ -389,6 +394,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             mtr_weakify(self);
             _systemTimeChangeObserverToken = [[NSNotificationCenter defaultCenter] addObserverForName:NSSystemClockDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
                 mtr_strongify(self);
+                VerifyOrReturn(self);
+
                 std::lock_guard lock(self->_lock);
                 [self _resetStorageBehaviorState];
             }];
@@ -479,6 +486,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
 
     return properties;
+}
+
+- (nullable NSNumber *)vendorID
+{
+    std::lock_guard lock(_descriptionLock);
+    return [_vid copy];
+}
+
+- (nullable NSNumber *)productID
+{
+    std::lock_guard lock(_descriptionLock);
+    return [_pid copy];
 }
 
 - (void)_notifyDelegateOfPrivateInternalPropertiesChanges
@@ -760,6 +779,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             mtr_weakify(self);
             [self _scheduleSubscriptionPoolWork:^{
                 mtr_strongify(self);
+                VerifyOrReturn(self);
+
                 [self->_deviceController asyncDispatchToMatterQueue:^{
                     std::lock_guard lock(self->_lock);
                     [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
@@ -1168,16 +1189,16 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     mtr_weakify(self);
     dispatch_block_t workBlockToQueue = ^{
         mtr_strongify(self);
-        if (nil == self) {
-            // This block may be delayed by a specified number of nanoseconds, potentially running after the device is deallocated.
-            // If so, MTRAsyncWorkItem::initWithQueue will assert on a nil queue, which will cause a crash.
-            return;
-        }
+        // This block may be delayed by a specified number of nanoseconds, potentially running after the device is deallocated.
+        // If so, MTRAsyncWorkItem::initWithQueue will assert on a nil queue, which will cause a crash.
+        VerifyOrReturn(self);
 
         // In the case where a resubscription triggering event happened and already established, running the work block should result in a no-op
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
             mtr_strongify(self);
+            VerifyOrReturn(self);
+
             MTR_LOG("%@ - work item is ready to attempt pooled subscription", self);
             os_unfair_lock_lock(&self->_lock);
 #ifdef DEBUG
@@ -1257,6 +1278,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     mtr_weakify(self);
     auto resubscriptionBlock = ^{
         mtr_strongify(self);
+        VerifyOrReturn(self);
+
         [self->_deviceController asyncDispatchToMatterQueue:^{
             [self _triggerResubscribeWithReason:@"ResubscriptionNeeded timer fired" nodeLikelyReachable:NO];
         } errorHandler:^(NSError * _Nonnull error) {
@@ -1369,6 +1392,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     mtr_weakify(self);
     auto resubscriptionBlock = ^{
         mtr_strongify(self);
+        VerifyOrReturn(self);
+
         [self->_deviceController asyncDispatchToMatterQueue:^{
             std::lock_guard lock(self->_lock);
             [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
@@ -1874,8 +1899,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 }
 
 // BEGIN DRAGON: This is used by the XPC Server to inject reports into local cache and broadcast them
-- (void)_injectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
+- (void)_injectAttributeReport:(NSArray<MTRDeviceResponseValueDictionary> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
+    if (!MTRAttributeReportIsWellFormed(attributeReport)) {
+        MTR_LOG_ERROR("%@ injected attribute report is not well-formed: %@", self, attributeReport);
+        return;
+    }
+
     [_deviceController asyncDispatchToMatterQueue:^{
         MTR_LOG("%@ injected attribute report (%p) %@", self, attributeReport, attributeReport);
         [self _handleReportBegin];
@@ -1886,8 +1916,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     } errorHandler:nil];
 }
 
-- (void)_injectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+- (void)_injectEventReport:(NSArray<MTRDeviceResponseValueDictionary> *)eventReport
 {
+    if (!MTREventReportIsWellFormed(eventReport)) {
+        MTR_LOG_ERROR("%@ injected event report is not well-formed: %@", self, eventReport);
+        return;
+    }
+
     //    [_deviceController asyncDispatchToMatterQueue:^{ // TODO: This wasn't used previously, not sure why, so keeping it here for thought, but preserving existing behavior
     dispatch_async(self.queue, ^{
         [self _handleEventReport:eventReport];
@@ -2386,9 +2421,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         mtr_weakify(self);
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription) * static_cast<int64_t>(NSEC_PER_SEC)), self.queue, ^{
             mtr_strongify(self);
-            if (self != nil) {
-                [self _markDeviceAsUnreachableIfNeverSubscribed];
-            }
+            VerifyOrReturn(self);
+
+            [self _markDeviceAsUnreachableIfNeverSubscribed];
         });
     }
 
@@ -3242,6 +3277,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         mtr_weakify(self);
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (waitTime * NSEC_PER_SEC)), self.queue, ^{
             mtr_strongify(self);
+            VerifyOrReturn(self);
+
             [self _performScheduledExpirationCheck];
         });
     }
@@ -3290,22 +3327,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     return nil;
-}
-
-- (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther
-{
-    // Sanity check for nil cases
-    if (!one && !theOther) {
-        MTR_LOG_ERROR("%@ attribute data-value comparison does not expect comparing two nil dictionaries", self);
-        return YES;
-    }
-    if (!one || !theOther) {
-        // Comparing against nil is expected, and should return NO quietly
-        return NO;
-    }
-
-    // Attribute data-value dictionaries are equal if type and value are equal, and specifically, this should return true if values are both nil
-    return [one[MTRTypeKey] isEqual:theOther[MTRTypeKey]] && ((one[MTRValueKey] == theOther[MTRValueKey]) || [one[MTRValueKey] isEqual:theOther[MTRValueKey]]);
 }
 
 // Utility to return data value dictionary without data version
@@ -3523,9 +3544,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
     for (NSDictionary<NSString *, id> * attributeResponseValue in reportedAttributeValues) {
         MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
-        NSDictionary * attributeDataValue = attributeResponseValue[MTRDataKey];
-        NSError * attributeError = attributeResponseValue[MTRErrorKey];
-        NSDictionary * previousValue;
+        MTRDeviceDataValueDictionary _Nullable attributeDataValue = attributeResponseValue[MTRDataKey];
+        NSError * _Nullable attributeError = attributeResponseValue[MTRErrorKey];
+        MTRDeviceDataValueDictionary _Nullable previousValue;
 
         // sanity check either data value or error must exist
         if (!attributeDataValue && !attributeError) {

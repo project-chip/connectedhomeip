@@ -194,6 +194,8 @@ executable("darwin-framework-tool") {
     "commands/common/CertificateIssuer.mm",
     "commands/common/ControllerStorage.h",
     "commands/common/ControllerStorage.mm",
+    "commands/common/DeviceDelegate.h",
+    "commands/common/DeviceDelegate.mm",
     "commands/common/MTRDevice_Externs.h",
     "commands/common/MTRError.mm",
     "commands/common/MTRError_Utils.h",

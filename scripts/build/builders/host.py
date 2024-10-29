@@ -72,6 +72,7 @@ class HostApp(Enum):
     BRIDGE = auto()
     FABRIC_ADMIN = auto()
     FABRIC_BRIDGE = auto()
+    FABRIC_SYNC = auto()
     JAVA_MATTER_CONTROLLER = auto()
     KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
@@ -131,6 +132,8 @@ class HostApp(Enum):
             return 'fabric-admin'
         elif self == HostApp.FABRIC_BRIDGE:
             return 'fabric-bridge-app/linux'
+        elif self == HostApp.FABRIC_SYNC:
+            return 'fabric-sync'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
         elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
@@ -236,6 +239,9 @@ class HostApp(Enum):
         elif self == HostApp.FABRIC_BRIDGE:
             yield 'fabric-bridge-app'
             yield 'fabric-bridge-app.map'
+        elif self == HostApp.FABRIC_SYNC:
+            yield 'fabric-sync'
+            yield 'fabric-sync.map'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'
@@ -330,7 +336,8 @@ class HostBuilder(GnBuilder):
                  chip_casting_simplified: Optional[bool] = None,
                  data_model_interface: Optional[str] = None,
                  chip_data_model_check_die_on_failure: Optional[bool] = None,
-                 disable_shell=False
+                 disable_shell=False,
+                 use_googletest=False,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -489,6 +496,12 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.TESTS and fuzzing_type == HostFuzzingType.PW_FUZZTEST:
             self.build_command = 'pw_fuzz_tests'
+
+        if self.app == HostApp.TESTS and use_googletest:
+            self.extra_gn_options.append('import("//build_overrides/pigweed.gni")')
+            self.extra_gn_options.append('import("//build_overrides/googletest.gni")')
+            self.extra_gn_options.append('pw_unit_test_BACKEND="$dir_pw_unit_test:googletest"')
+            self.extra_gn_options.append('dir_pw_third_party_googletest="$dir_googletest"')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

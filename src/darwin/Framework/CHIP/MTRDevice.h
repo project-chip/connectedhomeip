@@ -108,6 +108,20 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, readonly, nullable, copy) NSNumber * estimatedSubscriptionLatency MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
+ * The Vendor Identifier associated with the device.
+ *
+ * A non-nil value if the vendor identifier has been determined from the device, nil if unknown.
+ */
+@property (nonatomic, readonly, nullable, copy) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
+
+/**
+ * The Product Identifier associated with the device.
+ *
+ * A non-nil value if the product identifier has been determined from the device, nil if unknown.
+ */
+@property (nonatomic, readonly, nullable, copy) NSNumber * productID MTR_NEWLY_AVAILABLE;
+
+/**
  * Set the delegate to receive asynchronous callbacks about the device.
  *
  * The delegate will be called on the provided queue, for attribute reports, event reports, and device state changes.

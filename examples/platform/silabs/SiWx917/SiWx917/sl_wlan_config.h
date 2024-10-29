@@ -29,11 +29,19 @@
 //! Disable feature
 #define RSI_DISABLE 0
 
+// Temmporary work-around for wifi-init failure in ACX modules with WiseConnect v3.3.3. This can be removed after integrating with
+// WiseConnect v3.4.0
+#if (SL_SI91X_ACX_MODULE == 1)
+#define REGION_CODE IGNORE_REGION
+#else
+#define REGION_CODE US
+#endif
+
 static const sl_wifi_device_configuration_t config = {
     .boot_option = LOAD_NWP_FW,
     .mac_address = NULL,
     .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-    .region_code = US,
+    .region_code = REGION_CODE,
     .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
                      .coex_mode = SL_SI91X_WLAN_BLE_MODE,
                      .feature_bit_map =

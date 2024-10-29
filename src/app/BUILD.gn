@@ -76,6 +76,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=${chip_build_controller_dynamic_server}",
     "CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP=${chip_enable_busy_handling_for_operational_session_setup}",
     "CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE=${chip_data_model_check_die_on_failure}",
+    "CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING=${chip_data_model_extra_logging}",
   ]
 
   if (chip_use_data_model_interface == "disabled") {
@@ -254,7 +255,6 @@ static_library("interaction-model") {
       "reporting/Read-Ember.cpp",
       "reporting/Read-Ember.h",
     ]
-    public_deps += [ "${chip_root}/src/app/ember_coupling" ]
   } else if (chip_use_data_model_interface == "check") {
     sources += [
       "reporting/Read-Checked.cpp",
@@ -264,10 +264,7 @@ static_library("interaction-model") {
       "reporting/Read-Ember.cpp",
       "reporting/Read-Ember.h",
     ]
-    public_deps += [
-      "${chip_root}/src/app/data-model-provider",
-      "${chip_root}/src/app/ember_coupling",
-    ]
+    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
   } else {  # enabled
     sources += [
       "reporting/Read-DataModel.cpp",

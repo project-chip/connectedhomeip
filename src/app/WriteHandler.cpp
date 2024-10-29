@@ -42,6 +42,31 @@
 namespace chip {
 namespace app {
 
+namespace {
+
+/// Wraps a EndpointIterator and ensures that `::Release()` is called
+/// for the iterator (assuming it is non-null)
+class AutoReleaseGroupEndpointIterator
+{
+public:
+    explicit AutoReleaseGroupEndpointIterator(Credentials::GroupDataProvider::EndpointIterator * iterator) : mIterator(iterator) {}
+    ~AutoReleaseGroupEndpointIterator()
+    {
+        if (mIterator != nullptr)
+        {
+            mIterator->Release();
+        }
+    }
+
+    bool IsNull() const { return mIterator == nullptr; }
+    bool Next(Credentials::GroupDataProvider::GroupEndpoint & item) { return mIterator->Next(item); }
+
+private:
+    Credentials::GroupDataProvider::EndpointIterator * mIterator;
+};
+
+} // namespace
+
 using namespace Protocols::InteractionModel;
 using Status = Protocols::InteractionModel::Status;
 
@@ -83,8 +108,13 @@ void WriteHandler::Close()
 std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePath & path)
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    VerifyOrReturnValue(mDataModelProvider != nullptr, std::nullopt,
-                        ChipLogError(DataManagement, "Null data model while checking attribute properties."));
+    if (mDataModelProvider == nullptr)
+    {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogError(DataManagement, "Null data model while checking attribute properties.");
+#endif
+        return std::nullopt;
+    }
 
     auto info = mDataModelProvider->GetAttributeInfo(path);
     if (!info.has_value())
@@ -319,7 +349,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mExchangeCtx, CHIP_ERROR_INTERNAL);
     const Access::SubjectDescriptor subjectDescriptor = mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
@@ -421,7 +451,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mExchangeCtx, CHIP_ERROR_INTERNAL);
     const Access::SubjectDescriptor subjectDescriptor =
         mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetSubjectDescriptor();
 
@@ -435,10 +465,6 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         AttributePathIB::Parser attributePath;
         ConcreteDataAttributePath dataAttributePath;
         TLV::TLVReader reader = aAttributeDataIBsReader;
-
-        Credentials::GroupDataProvider::GroupEndpoint mapping;
-        Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
-        Credentials::GroupDataProvider::EndpointIterator * iterator;
 
         err = element.Init(reader);
         SuccessOrExit(err);
@@ -461,8 +487,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
                       "Received group attribute write for Group=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                       groupId, ChipLogValueMEI(dataAttributePath.mClusterId), ChipLogValueMEI(dataAttributePath.mAttributeId));
 
-        iterator = groupDataProvider->IterateEndpoints(fabric);
-        VerifyOrExit(iterator != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        AutoReleaseGroupEndpointIterator iterator(Credentials::GetGroupDataProvider()->IterateEndpoints(fabric));
+        VerifyOrExit(!iterator.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
         bool shouldReportListWriteEnd = ShouldReportListWriteEnd(
             mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList), dataAttributePath);
@@ -470,7 +496,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
         std::optional<bool> isListAttribute = std::nullopt;
 
-        while (iterator->Next(mapping))
+        Credentials::GroupDataProvider::GroupEndpoint mapping;
+        while (iterator.Next(mapping))
         {
             if (groupId != mapping.group_id)
             {
@@ -552,7 +579,6 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         dataAttributePath.mEndpointId = kInvalidEndpointId;
         mStateFlags.Set(StateBits::kProcessingAttributeIsList, dataAttributePath.IsListOperation());
         mProcessingAttributePath.SetValue(dataAttributePath);
-        iterator->Release();
     }
 
     if (CHIP_END_OF_TLV == err)
@@ -753,7 +779,7 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSub
     DataModel::WriteAttributeRequest request;
 
     request.path                = aPath;
-    request.subjectDescriptor   = aSubject;
+    request.subjectDescriptor   = &aSubject;
     request.previousSuccessPath = mLastSuccessfullyWrittenPath;
     request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
