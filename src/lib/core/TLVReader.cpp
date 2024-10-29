@@ -907,29 +907,17 @@ CHIP_ERROR TLVReader::ReadData(uint8_t * buf, uint32_t len)
 
 CHIP_ERROR TLVReader::EnsureData(CHIP_ERROR noDataErr)
 {
-    CHIP_ERROR err;
-
     if (mReadPoint == mBufEnd)
     {
-        if (mLenRead == mMaxLen)
-            return noDataErr;
-
-        if (mBackingStore == nullptr)
-            return noDataErr;
+        VerifyOrReturnError((mLenRead != mMaxLen) && (mBackingStore != nullptr), noDataErr);
 
         uint32_t bufLen;
-        err = mBackingStore->GetNextBuffer(*this, mReadPoint, bufLen);
-        if (err != CHIP_NO_ERROR)
-            return err;
-        if (bufLen == 0)
-            return noDataErr;
+        ReturnErrorOnFailure(mBackingStore->GetNextBuffer(*this, mReadPoint, bufLen));
+        VerifyOrReturnError(bufLen > 0, noDataErr);
 
         // Cap mBufEnd so that we don't read beyond the user's specified maximum length, even
         // if the underlying buffer is larger.
-        uint32_t overallLenRemaining = mMaxLen - mLenRead;
-        if (overallLenRemaining < bufLen)
-            bufLen = overallLenRemaining;
-
+        bufLen = std::min(bufLen, mMaxLen - mLenRead);
         mBufEnd = mReadPoint + bufLen;
     }
 
