@@ -742,7 +742,8 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
     }
 
     uint8_t lengthSize = TLVFieldSizeToBytes(GetTLVFieldSize(elemType));
-    if (lengthSize > 0) {
+    if (lengthSize > 0)
+    {
         writer.EndianPut(lenOrVal, lengthSize);
     }
 
