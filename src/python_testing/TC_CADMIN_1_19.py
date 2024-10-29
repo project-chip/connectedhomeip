@@ -107,6 +107,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         fids = {}
         self.print_step("total fabrics", max_fabrics - initial_number_of_fabrics)
         for fid in range(1, max_fabrics - initial_number_of_fabrics):
+            self.print_step("commissioning iteration", fid)
             # Make sure that current test step is 5, resets here after each loop
             self.current_step_index = 5
 
@@ -121,8 +122,6 @@ class TC_CADMIN_1_19(MatterBaseTest):
             await fids[fid].CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
-
-            self.print_step("commissioning iteration", fid)
 
         self.step(6)
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster
@@ -145,7 +144,6 @@ class TC_CADMIN_1_19(MatterBaseTest):
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
 
         except ChipStackError as e:
-            self.print_step("err", e.err)
             # When attempting to create a new controller we are expected to get the following response:
             # src/credentials/FabricTable.cpp:833: CHIP Error 0x0000000B: No memory
             # Since the FabricTable is full and unable to create any new fabrics
