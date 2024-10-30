@@ -392,7 +392,7 @@ sl_status_t SetWifiConfigurations()
             .ip = {{{0}}},
         }
     };
-    // memcpy for now since the types dont match
+    // TODO: memcpy for now since the types dont match
     memcpy((char *) &profile.config.ssid.value, wfx_rsi.sec.ssid, wfx_rsi.sec.ssid_length);
 
     status = sl_net_set_profile((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
