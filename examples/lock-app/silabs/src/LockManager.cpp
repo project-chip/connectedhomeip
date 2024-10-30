@@ -29,7 +29,7 @@ using namespace ::chip::DeviceLayer::Internal;
 using namespace EFR32DoorLock::LockInitParams;
 
 namespace {
-    LockManager sLock;
+LockManager sLock;
 } // namespace
 
 LockManager & LockMgr()
@@ -264,8 +264,9 @@ void LockManager::UnlockAfterUnlatch()
     bool succes = false;
     if (mUnlatchContext.mEndpointId != kInvalidEndpointId)
     {
-        succes = setLockState(mUnlatchContext.mEndpointId, mUnlatchContext.mFabricIdx, mUnlatchContext.mNodeId,
-                              DlLockState::kUnlocked, MakeOptional(chip::ByteSpan(mUnlatchContext.mPinBuffer, mUnlatchContext.mPinLength)), mUnlatchContext.mErr);
+        succes = setLockState(
+            mUnlatchContext.mEndpointId, mUnlatchContext.mFabricIdx, mUnlatchContext.mNodeId, DlLockState::kUnlocked,
+            MakeOptional(chip::ByteSpan(mUnlatchContext.mPinBuffer, mUnlatchContext.mPinLength)), mUnlatchContext.mErr);
     }
 
     if (!succes)
