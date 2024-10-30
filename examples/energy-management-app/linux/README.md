@@ -593,6 +593,10 @@ Step-by-step:
 
 1. Set the default TestEventTrigger (`0x0094000000000000`):
 
+- `0x0094000000000000` corresponds to `kBasicInstallationTestEvent` from `WaterHeadermanagementTestEventTriggerHandler.h`
+- `hex:00010203...0e0f` is the `--enable-key` passed to the startup of chip-energy-management-app
+- `0x12344321` is the node-id that the app was commissioned on
+- final `0` is the endpoint on which the `GeneralDiagnostics` cluster exists to call the `TestEventTrigger` command 
     ```
     ./out/linux-x64-chip-tool-no-ble/chip-tool generaldiagnostics test-event-trigger hex:000102030405060708090a0b0c0d0e0f 0x0094000000000000 0x12344321 0
     ```
