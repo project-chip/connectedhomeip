@@ -58,7 +58,7 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
 {
     chip::Crypto::P256ECDSASignature signature;
     NSData * out_signature;
-    CHIP_ERROR signing_error = _mKeyPair.ECDSA_sign_msg((const uint8_t *) [message bytes], (size_t) [message length], signature);
+    CHIP_ERROR signing_error = _mKeyPair.ECDSA_sign_msg((const uint8_t *) [message bytes], (size_t)[message length], signature);
     if (signing_error != CHIP_NO_ERROR)
         return nil;
     out_signature = [NSData dataWithBytes:signature.Bytes() length:signature.Length()];
