@@ -405,7 +405,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
                                                            signingCertificate:root
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
                                                                      fabricID:fabricID
                                                                        nodeID:nodeID
                                                         caseAuthenticatedTags:caseAuthenticatedTags
