@@ -158,8 +158,9 @@ using namespace chip::Credentials;
         publicKey = [keypair copyPublicKey];
     } else {
         publicKey = [keypair publicKey];
-        if (publicKey)
+        if (publicKey) {
             CFRetain(publicKey);
+        }
     }
 
     CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(publicKey, &keypairPubKey);
