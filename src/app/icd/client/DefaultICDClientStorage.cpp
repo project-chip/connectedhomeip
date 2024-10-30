@@ -59,7 +59,7 @@ CHIP_ERROR DefaultICDClientStorage::StoreFabricList()
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     size_t counter = mFabricList.size();
     size_t total   = kFabricIndexTlvSize * counter + kArrayOverHead;
-    ReturnErrorCodeIf(!backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
     TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), total);
 
     TLV::TLVType arrayType;
@@ -81,7 +81,7 @@ CHIP_ERROR DefaultICDClientStorage::StoreFabricList()
 CHIP_ERROR DefaultICDClientStorage::LoadFabricList()
 {
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    ReturnErrorCodeIf(!backingBuffer.Calloc(kMaxFabricListTlvLength), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(backingBuffer.Calloc(kMaxFabricListTlvLength), CHIP_ERROR_NO_MEMORY);
     uint16_t length = kMaxFabricListTlvLength;
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDFabricList().KeyName(), backingBuffer.Get(), length));
@@ -182,7 +182,7 @@ CHIP_ERROR DefaultICDClientStorage::LoadCounter(FabricIndex fabricIndex, size_t 
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     size_t len = MaxICDCounterSize();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     uint16_t length = static_cast<uint16_t>(len);
 
     CHIP_ERROR err = mpClientInfoStore->SyncGetKeyValue(
@@ -220,7 +220,7 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
     size_t len = clientInfoSize * count + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     uint16_t length = static_cast<uint16_t>(len);
     CHIP_ERROR err  = mpClientInfoStore->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName(),
                                                          backingBuffer.Get(), length);
@@ -381,7 +381,7 @@ CHIP_ERROR DefaultICDClientStorage::StoreEntry(const ICDClientInfo & clientInfo)
     clientInfoVector.push_back(clientInfo);
     size_t total = clientInfoSize * clientInfoVector.size() + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    ReturnErrorCodeIf(!backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
     TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), total);
 
     ReturnErrorOnFailure(SerializeToTlv(writer, clientInfoVector));
@@ -428,7 +428,7 @@ CHIP_ERROR DefaultICDClientStorage::UpdateEntryCountForFabric(FabricIndex fabric
 
     size_t total = MaxICDCounterSize();
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    ReturnErrorCodeIf(!backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
     TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), total);
 
     TLV::TLVType structType;
@@ -467,7 +467,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
         mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(peerNode.GetFabricIndex()).KeyName()));
     size_t total = clientInfoSize * clientInfoVector.size() + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    ReturnErrorCodeIf(!backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
     TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), total);
 
     ReturnErrorOnFailure(SerializeToTlv(writer, clientInfoVector));

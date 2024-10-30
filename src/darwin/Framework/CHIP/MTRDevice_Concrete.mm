@@ -31,7 +31,7 @@
 #import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerOverXPC.h"
 #import "MTRDeviceController_Internal.h"
-#import "MTRDeviceDataValueDictionary.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -57,6 +57,10 @@
 #import <platform/PlatformManager.h>
 
 static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
+
+// Not static, because these are public API.
+NSString * const MTRPreviousDataKey = @"previousData";
+NSString * const MTRDataVersionKey = @"dataVersion";
 
 // allow readwrite access to superclass properties
 @interface MTRDevice_Concrete ()
@@ -471,17 +475,40 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (NSDictionary *)_internalProperties
 {
     NSMutableDictionary * properties = [NSMutableDictionary dictionary];
-    std::lock_guard lock(_descriptionLock);
+    {
+        std::lock_guard lock(_descriptionLock);
 
-    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyVendorID, _vid, properties);
-    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyProductID, _pid, properties);
-    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyNetworkFeatures, _allNetworkFeatures, properties);
-    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, [NSNumber numberWithUnsignedInteger:_internalDeviceStateForDescription], properties);
-    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, [NSNumber numberWithUnsignedInt:_lastSubscriptionAttemptWaitForDescription], properties);
-    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
-    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyVendorID, _vid, properties);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyProductID, _pid, properties);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyNetworkFeatures, _allNetworkFeatures, properties);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
+    }
+
+    {
+        std::lock_guard lock(_lock);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceInternalState, [NSNumber numberWithUnsignedInteger:_internalDeviceState], properties);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, [NSNumber numberWithUnsignedInt:_lastSubscriptionAttemptWait], properties);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTime, properties);
+
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, @(_state), properties);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceCachePrimed, @(_deviceCachePrimed), properties);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyEstimatedStartTime, _estimatedStartTime, properties);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyEstimatedSubscriptionLatency, _estimatedSubscriptionLatency, properties);
+    }
 
     return properties;
+}
+
+- (nullable NSNumber *)vendorID
+{
+    std::lock_guard lock(_descriptionLock);
+    return [_vid copy];
+}
+
+- (nullable NSNumber *)productID
+{
+    std::lock_guard lock(_descriptionLock);
+    return [_pid copy];
 }
 
 - (void)_notifyDelegateOfPrivateInternalPropertiesChanges
@@ -952,6 +979,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             [delegate deviceCachePrimed:self];
         }
     }];
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 // assume lock is held
@@ -982,6 +1010,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
             [delegate device:self stateChanged:state];
         }];
+        [self _notifyDelegateOfPrivateInternalPropertiesChanges];
     } else {
         MTR_LOG(
             "%@ Not reporting reachability state change, since no change in state %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
@@ -1422,6 +1451,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             [delegate deviceBecameActive:self];
         }
     }];
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 
     // in case this is called during exponential back off of subscription
     // reestablishment, this starts the attempt right away
@@ -1883,8 +1913,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 }
 
 // BEGIN DRAGON: This is used by the XPC Server to inject reports into local cache and broadcast them
-- (void)_injectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
+- (void)_injectAttributeReport:(NSArray<MTRDeviceResponseValueDictionary> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
+    if (!MTRAttributeReportIsWellFormed(attributeReport)) {
+        MTR_LOG_ERROR("%@ injected attribute report is not well-formed: %@", self, attributeReport);
+        return;
+    }
+
     [_deviceController asyncDispatchToMatterQueue:^{
         MTR_LOG("%@ injected attribute report (%p) %@", self, attributeReport, attributeReport);
         [self _handleReportBegin];
@@ -1895,8 +1930,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     } errorHandler:nil];
 }
 
-- (void)_injectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+- (void)_injectEventReport:(NSArray<MTRDeviceResponseValueDictionary> *)eventReport
 {
+    if (!MTREventReportIsWellFormed(eventReport)) {
+        MTR_LOG_ERROR("%@ injected event report is not well-formed: %@", self, eventReport);
+        return;
+    }
+
     //    [_deviceController asyncDispatchToMatterQueue:^{ // TODO: This wasn't used previously, not sure why, so keeping it here for thought, but preserving existing behavior
     dispatch_async(self.queue, ^{
         [self _handleEventReport:eventReport];
@@ -2397,7 +2437,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             mtr_strongify(self);
             VerifyOrReturn(self);
 
-            [self _markDeviceAsUnreachableIfNeverSubscribed];
+            if (!HaveSubscriptionEstablishedRightNow(self->_internalDeviceState)) {
+                [self _markDeviceAsUnreachableIfNeverSubscribed];
+            }
         });
     }
 
@@ -3303,22 +3345,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return nil;
 }
 
-- (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther
-{
-    // Sanity check for nil cases
-    if (!one && !theOther) {
-        MTR_LOG_ERROR("%@ attribute data-value comparison does not expect comparing two nil dictionaries", self);
-        return YES;
-    }
-    if (!one || !theOther) {
-        // Comparing against nil is expected, and should return NO quietly
-        return NO;
-    }
-
-    // Attribute data-value dictionaries are equal if type and value are equal, and specifically, this should return true if values are both nil
-    return [one[MTRTypeKey] isEqual:theOther[MTRTypeKey]] && ((one[MTRValueKey] == theOther[MTRValueKey]) || [one[MTRValueKey] isEqual:theOther[MTRValueKey]]);
-}
-
 // Utility to return data value dictionary without data version
 - (NSDictionary *)_dataValueWithoutDataVersion:(NSDictionary *)attributeValue
 {
@@ -3534,9 +3560,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
     for (NSDictionary<NSString *, id> * attributeResponseValue in reportedAttributeValues) {
         MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
-        NSDictionary * attributeDataValue = attributeResponseValue[MTRDataKey];
-        NSError * attributeError = attributeResponseValue[MTRErrorKey];
-        NSDictionary * previousValue;
+        MTRDeviceDataValueDictionary _Nullable attributeDataValue = attributeResponseValue[MTRDataKey];
+        NSError * _Nullable attributeError = attributeResponseValue[MTRErrorKey];
+        MTRDeviceDataValueDictionary _Nullable previousValue;
 
         // sanity check either data value or error must exist
         if (!attributeDataValue && !attributeError) {

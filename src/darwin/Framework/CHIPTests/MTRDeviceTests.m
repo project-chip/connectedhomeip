@@ -27,6 +27,7 @@
 #import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRDeviceClusterData.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
@@ -1505,7 +1506,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [device unitTestInjectEventReport:@[ @{
             MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(1)],
             MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
-            MTREventTimestampDateKey : [NSDate date]
+            MTREventTimestampDateKey : [NSDate date],
+            MTREventIsHistoricalKey : @(NO),
+            MTREventPriorityKey : @(MTREventPriorityInfo),
+            MTREventNumberKey : @(1), // Doesn't matter, in practice
+            MTRDataKey : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[],
+            },
         } ]];
 #endif
     };
@@ -4139,7 +4147,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
         MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
         MTREventTimestampDateKey : [NSDate date],
-        // For unit test no real data is needed, but timestamp is required
+        MTREventIsHistoricalKey : @(NO),
+        MTREventPriorityKey : @(MTREventPriorityInfo),
+        MTREventNumberKey : @(1), // Doesn't matter, in practice
+        // Empty payload.
+        MTRDataKey : @ {
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[],
+        },
     };
 }
 
@@ -4464,6 +4479,1026 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 continue;
             }
         }
+    }
+}
+
+- (void)test040_AttributeValueExpectationSatisfaction
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+
+    __auto_type * testData = @[
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7)
+            },
+            // Equal unsigned integer should satisfy expectation.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(9),
+            },
+            // Unequal unsigned integer should not satisfy expectation
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRSignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            // A signed integer does not satisfy expectation for an unsigned integer.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRNullValueType,
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRNullValueType,
+            },
+            // Null satisfies expectation for null.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(7),
+                        }
+                    },
+                ],
+            },
+            // A longer list does not satisfy expectation for a shorter array.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(7),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            // A shorter list does not satisfy expectation for a longer array.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            // An observed array identical to an expected one satisfies the expectation.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                ],
+            },
+            // An array with entries in a different order does not satisfy the expectation.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            // A struct that has the same fields in the same order satisfiess the
+            // expectation.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abcd"),
+                        },
+                    },
+                ],
+            },
+            // A struct that has different fields in the same order does not
+            // satisfy the expectation.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                ],
+            },
+            // A struct that has the same fields in a different order satisfies
+            // the expectation.
+            @"expectedComparison" : @(YES),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual([device _attributeDataValue:test[@"observed"] satisfiesValueExpectation:test[@"expected"]], [test[@"expectedComparison"] boolValue],
+            "observed: %@, expected: %@", test[@"observed"], test[@"expected"]);
+    }
+}
+
+- (void)test041_AttributeDataValueValidation
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRSignedIntegerValueType,
+                MTRValueKey : @(-5),
+            },
+            // -5 is a valid signed integer.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRSignedIntegerValueType,
+                MTRValueKey : @ {},
+            },
+            // A dictionary is not a valid signed integer.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            // 7 is a valid unsigned integer.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @("abc"),
+            },
+            // "abc" is not an unsigned integer.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRBooleanValueType,
+                MTRValueKey : @(YES),
+            },
+            // YES is a boolean.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRBooleanValueType,
+                MTRValueKey : [NSData data],
+            },
+            // NSData is not a boolean integer.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRFloatValueType,
+                MTRValueKey : @(8),
+            },
+            // 8 is a valid float.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRFloatValueType,
+                MTRValueKey : @(8.5),
+            },
+            // 8.5 is a valid float.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRFloatValueType,
+                MTRValueKey : @[],
+            },
+            // An array is not a float.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRDoubleValueType,
+                MTRValueKey : @(180),
+            },
+            // 180 is a valid double.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRDoubleValueType,
+                MTRValueKey : @(9.5),
+            },
+            // 9.5 is a valid double.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRDoubleValueType,
+                MTRValueKey : [NSDate date],
+            },
+            // A date is not a double.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRNullValueType,
+            },
+            // This is a valid null value.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRUTF8StringValueType,
+                MTRValueKey : @("def"),
+            },
+            // "def" is a valid string.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRUTF8StringValueType,
+                MTRValueKey : [NSData data],
+            },
+            // NSData is not a string.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTROctetStringValueType,
+                MTRValueKey : [NSData data],
+            },
+            // NSData is an octet string.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTROctetStringValueType,
+                MTRValueKey : @(7),
+            },
+            // 7 is not an octet string.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTROctetStringValueType,
+                MTRValueKey : @("abc"),
+            },
+            // "abc" is not an octet string.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[],
+            },
+            // This is a valid empty structure.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[],
+            },
+            // This is a valid empty structure.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(7),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRNullValueType
+                        },
+                    },
+                ],
+            },
+            // This is a valid structure, one null field.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRNullValueType
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(9)
+                        },
+                    },
+                ],
+            },
+            // This is a valid structure with two fields.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @(19),
+            },
+            // 19 is not a structure.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRNullValueType
+                        },
+                    },
+                ],
+            },
+            // Field does not have a context tag.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(7),
+                    },
+                ],
+            },
+            // Field does not have a value.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(7),
+                        MTRDataKey : @(5),
+                    },
+                ],
+            },
+            // Field value is a number, not a data-value
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(7),
+                        MTRDataKey : @[],
+                    },
+                ],
+            },
+            // Field value is an array, not a data-value
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(7),
+                        MTRDataKey : @ {},
+                    },
+                ],
+            },
+            // Field value is an invalid data-value
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @("abc"),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRNullValueType
+                        },
+                    },
+                ],
+            },
+            // Tag is not a number.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[],
+            },
+            // This is a valid empty array.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRNullValueType
+                        },
+                    },
+                ],
+            },
+            // This is an array with a single null value in it.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(8),
+                        },
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(10),
+                        },
+                    },
+                ],
+            },
+            // This is an array with two integers in it.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(8),
+                    },
+                ],
+            },
+            // This does not have a proper array-value in the array: missing MTRDataKey.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[ @(7) ],
+            },
+            // This does not have a proper array-value in the array: not a dictionary.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[ @{} ],
+            },
+            // This does not have a proper array-value in the array: empty
+            // dictionary, so no MTRDataKey.
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTRDataValueDictionaryIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
+}
+
+- (void)test042_AttributeReportWellFormedness
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @[],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                },
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(1)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                },
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(1)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            // Missing both error and data
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @("abc"),
+                    },
+                },
+            ],
+            // Data dictionary is broken.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {},
+            // Input is not an array.
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTRAttributeReportIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
+}
+
+- (void)test043_EventReportWellFormedness
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+                    MTREventTimestampDateKey : [NSDate now],
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+                    MTREventTimestampDateKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong date type
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @("abc"),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong type of EventNumber
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @("abc"),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong type of EventPriority
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @("abc"),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong type of EventTimeType
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[ @(5) ],
+            // Wrong type of data entirely.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {},
+            // Not even an array.
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTREventReportIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
+}
+
+- (void)test044_InvokeResponseWellFormedness
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+            ],
+            // Multiple responses
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // Empty structure, valid
+                    },
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // Empty structure, valid
+                    },
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            // Having both data and error not valid.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(5),
+                    },
+                },
+            ],
+            // Data is not a struct.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @(6),
+                },
+            ],
+            // Data is not a data-value at all..
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTRInvokeResponseIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
     }
 }
 

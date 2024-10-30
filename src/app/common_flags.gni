@@ -40,4 +40,11 @@ declare_args() {
   # If/once the chip_use_data_model_interface flag is removed or does not support
   # a `check` option, this should alwo be removed
   chip_data_model_check_die_on_failure = false
+
+  # This controls if more logging is supposed to be enabled into the data models.
+  # This is an optimization for small-flash size devices as extra logging requires
+  # additional flash for messages & code for formatting.
+  chip_data_model_extra_logging =
+      current_os == "linux" || current_os == "ios" || current_os == "mac" ||
+      current_os == "android"
 }

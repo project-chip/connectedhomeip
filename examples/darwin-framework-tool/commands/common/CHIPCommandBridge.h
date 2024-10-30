@@ -30,6 +30,7 @@
 inline constexpr char kIdentityAlpha[] = "alpha";
 inline constexpr char kIdentityBeta[] = "beta";
 inline constexpr char kIdentityGamma[] = "gamma";
+inline constexpr char kControllerIdPrefix[] = "8DCADB14-AF1F-45D0-B084-00000000000";
 
 class CHIPCommandBridge : public Command {
 public:
@@ -42,7 +43,7 @@ public:
             "commissioner-name. Interactive mode will only set a single commissioner on the inital command. "
             "The commissioner node ID will be persisted until a different one is specified.");
         AddArgument("commissioner-shared-storage", 0, 1, &mCommissionerSharedStorage,
-            "Use a shared storage instance instead of individual storage for each commissioner. Default is true.");
+            "Use a shared storage instance instead of individual storage for each commissioner. Default is false.");
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
             "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
             "directory.");
@@ -51,6 +52,7 @@ public:
         AddArgument("commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
             "The vendor id to use for darwin-framework-tool. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will be "
             "used.");
+        AddArgument("pretend-thread-enabled", 0, 1, &mPretendThreadEnabled, "When the command is issued using an MTRDevice (via -use-mtr-device), instructs the MTRDevice to treat the target device as a Thread device.");
     }
 
     /////////// Command Interface /////////
@@ -68,6 +70,8 @@ public:
     }
 
     static OTAProviderDelegate * mOTADelegate;
+
+    static NSNumber * GetCommissionerFabricId(const char * identity);
 
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
@@ -96,6 +100,10 @@ protected:
     // Returns the MTRBaseDevice for the specified node ID.
     // Will utilize an existing PASE connection if the device is being commissioned.
     MTRBaseDevice * BaseDeviceWithNodeId(chip::NodeId nodeId);
+
+    // Returns the MTRDevice for the specified node ID.
+    // Will utilize an existing PASE connection if the device is being commissioned.
+    MTRDevice * DeviceWithNodeId(chip::NodeId nodeId);
 
     // Will log the given string and given error (as progress if success, error
     // if failure).
@@ -157,4 +165,5 @@ private:
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<chip::VendorId> mCommissionerVendorId;
     std::string mCurrentIdentity;
+    chip::Optional<bool> mPretendThreadEnabled;
 };

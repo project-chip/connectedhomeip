@@ -16,7 +16,9 @@
  *    limitations under the License.
  */
 #include "AppConfig.h"
-#include "matter_shell.h"
+#ifdef ENABLE_CHIP_SHELL
+#include "MatterShell.h" // nogncheck
+#endif
 #include <cmsis_os2.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <sl_cmsis_os2_common.h>
@@ -38,7 +40,6 @@ extern "C" {
 #include "rsi_board.h"
 #include "rsi_debug.h"
 #include "rsi_rom_egpio.h"
-#include "sl_si91x_usart.h"
 #else // For EFR32
 #if (_SILICON_LABS_32B_SERIES < 3)
 #include "em_core.h"

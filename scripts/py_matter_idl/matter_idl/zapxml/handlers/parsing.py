@@ -81,10 +81,12 @@ def AttrsToAttribute(attrs) -> Attribute:
     if 'max' in attrs:
         data_type.max_value = ParseInt(attrs['max'], data_type)
 
+    name = attrs['name'] if 'name' in attrs else ''
+
     field = Field(
         data_type=data_type,
         code=ParseInt(attrs['code']),
-        name='',
+        name=name,
         is_list=(attrs['type'].lower() == 'array')
     )
 

@@ -66,6 +66,18 @@ def load_module_info() -> None:
             platforms = set(filter(None, platforms))
             assert not (
                 platforms - ALL_PLATFORMS), "Submodule's platform not contained in ALL_PLATFORMS"
+
+            # Check for explicitly excluded platforms
+            excluded_platforms = module.get('excluded-platforms', '').split(',')
+            excluded_platforms = set(filter(None, excluded_platforms))
+            assert not (
+                excluded_platforms - ALL_PLATFORMS), "Submodule excluded on platforms not contained in ALL_PLATFORMS"
+
+            if len(excluded_platforms) != 0:
+                if len(platforms) == 0:
+                    platforms = ALL_PLATFORMS
+                platforms = platforms - excluded_platforms
+
             recursive = module.getboolean('recursive', False)
             name = name.replace('submodule "', '').replace('"', '')
             yield Module(name=name, path=module['path'], platforms=platforms, recursive=recursive)

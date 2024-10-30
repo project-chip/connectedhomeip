@@ -164,6 +164,10 @@ MTR_DIRECT_MEMBERS
 - (void)controllerSuspended;
 - (void)controllerResumed;
 
+// Methods for comparing attribute data values.
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)one isEqualToDataValue:(MTRDeviceDataValueDictionary)theOther;
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)observed satisfiesValueExpectation:(MTRDeviceDataValueDictionary)expected;
+
 @end
 
 #pragma mark - MTRDevice internal state monitoring
@@ -183,9 +187,13 @@ static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage"
 static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
 static NSString * const kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalStateKeyProductID";
 static NSString * const kMTRDeviceInternalPropertyNetworkFeatures = @"MTRDeviceInternalPropertyNetworkFeatures";
-static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
+static NSString * const kMTRDeviceInternalPropertyDeviceInternalState = @"MTRDeviceInternalPropertyDeviceInternalState";
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionAttemptWait = @"kMTRDeviceInternalPropertyLastSubscriptionAttemptWait";
 static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDeviceInternalPropertyMostRecentReportTime";
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
+static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
+static NSString * const kMTRDeviceInternalPropertyDeviceCachePrimed = @"MTRDeviceInternalPropertyDeviceCachePrimed";
+static NSString * const kMTRDeviceInternalPropertyEstimatedStartTime = @"MTRDeviceInternalPropertyEstimatedStartTime";
+static NSString * const kMTRDeviceInternalPropertyEstimatedSubscriptionLatency = @"MTRDeviceInternalPropertyEstimatedSubscriptionLatency";
 
 NS_ASSUME_NONNULL_END
