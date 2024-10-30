@@ -99,8 +99,7 @@ static_library("nxp_platform") {
         "OTAHooks.cpp",
       ]
 
-      if (nxp_use_factory_data &&
-          nxp_enable_ota_factory_data_processor) {
+      if (nxp_use_factory_data && nxp_enable_ota_factory_data_processor) {
         sources += [
           "OTAFactoryDataProcessor.cpp",
           "OTAFactoryDataProcessor.h",

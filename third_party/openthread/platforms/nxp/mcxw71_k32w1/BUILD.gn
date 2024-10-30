@@ -16,8 +16,8 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
-import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/device.gni")
 
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
@@ -114,7 +114,7 @@ source_set("libopenthread-k32w1") {
   if (!nxp_external_sdk) {
     public_deps += [
       "${nxp_sdk_build_root}:nxp_mbedtls",
-      nxp_sdk_target
+      nxp_sdk_target,
     ]
   }
 }

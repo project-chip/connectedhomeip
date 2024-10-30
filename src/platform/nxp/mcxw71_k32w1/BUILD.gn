@@ -26,8 +26,7 @@ import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 assert(chip_device_platform == "nxp")
 assert(nxp_platform == "mcxw71_k32w1")
 
-assert(!nxp_use_low_power ||
-           (nxp_use_low_power && !nxp_enable_ot_cli),
+assert(!nxp_use_low_power || (nxp_use_low_power && !nxp_enable_ot_cli),
        "Please disable low power if openthread CLI is needed!")
 
 source_set("nxp_factory_data") {
@@ -64,8 +63,7 @@ source_set("nxp_ota") {
     "../common/ota/OTATlvProcessor.h",
   ]
 
-  if (nxp_use_factory_data &&
-      nxp_enable_ota_factory_data_processor) {
+  if (nxp_use_factory_data && nxp_enable_ota_factory_data_processor) {
     sources += [
       "../common/ota/OTAFactoryDataProcessor.cpp",
       "../common/ota/OTAFactoryDataProcessor.h",
