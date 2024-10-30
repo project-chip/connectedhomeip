@@ -62,15 +62,22 @@ be removed.
 
 We use the following auto-formatters on code:
 
-| Language   | Formatter          | Style File                                                                                                                                                                                                                                                                |
-| ---------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C++        | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format)                                                                                                                                                                                |
-| ObjectiveC | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format)                                                                                                                                                                                |
-| java       | google-java-format | N/A                                                                                                                                                                                                                                                                       |
-| Python     | pep8, isort, ruff  | [.restyled.yaml](https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml) (command line),[isort](https://github.com/project-chip/connectedhomeip/blob/master/.isort.cfg) [ruff](https://github.com/project-chip/connectedhomeip/blob/master/ruff.toml) |
-| YAML       | prettier           | None                                                                                                                                                                                                                                                                      |
-| JSON       | prettier           | None                                                                                                                                                                                                                                                                      |
-| markdown   | prettier           | None                                                                                                                                                                                                                                                                      |
+| Language   | Formatter          | Style File                                                                                 |
+| ---------- | ------------------ | ------------------------------------------------------------------------------------------ |
+| C++        | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format) |
+| ObjectiveC | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format) |
+| java       | google-java-format | N/A                                                                                        |
+| Python     | pep8, isort, ruff  | [.restyled.yaml][restyle_link] (command line), [isort][isort_link], [ruff][ruff_link]      |
+| YAML       | prettier           | None                                                                                       |
+| JSON       | prettier           | None                                                                                       |
+| markdown   | prettier           | None                                                                                       |
+
+[restyle_link]:
+    https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml
+[isort_link]:
+    https://github.com/project-chip/connectedhomeip/blob/master/.isort.cfg
+[ruff_link]:
+    https://github.com/project-chip/connectedhomeip/blob/master/ruff.toml
 
 All pull requests run formatting checks using these tools before merge is
 allowed. Generated code is not run through restyle.
