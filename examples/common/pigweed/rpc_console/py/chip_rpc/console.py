@@ -52,7 +52,6 @@ from boolean_state_service import boolean_state_service_pb2
 from button_service import button_service_pb2
 from descriptor_service import descriptor_service_pb2
 from device_service import device_service_pb2
-from echo_service import echo_pb2
 from fabric_admin_service import fabric_admin_service_pb2
 from fabric_bridge_service import fabric_bridge_service_pb2
 from lighting_service import lighting_service_pb2
@@ -137,7 +136,6 @@ def show_console(device: str, baudrate: int,
                 button_service_pb2,
                 descriptor_service_pb2,
                 device_service_pb2,
-                echo_pb2,
                 fabric_admin_service_pb2,
                 fabric_bridge_service_pb2,
                 lighting_service_pb2,
