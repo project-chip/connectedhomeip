@@ -27,7 +27,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
-#     quiet: false
+#     quiet: true
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -39,7 +39,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: false
-#     quiet: false
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -53,7 +53,7 @@ from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.tlv import TLVReader
 from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, MatterStackState, TestStep, async_test_body,
-                                                                       default_matter_test_main)
+                                                                       default_matter_test_main, get_test_info)
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
