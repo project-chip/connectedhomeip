@@ -577,7 +577,7 @@ Step-by-step:
     rm /tmp/chip_* && ./out/linux-x64-energy-management-no-ble/chip-energy-management-app --application water-heater --trace-to json:log --enable-key 000102030405060708090a0b0c0d0e0f
     ```
 
-1. Commission with the chip-tool:
+1. Commission with chip-tool as node `0x12344321`:
 
     ```
     ./out/linux-x64-chip-tool-no-ble/chip-tool pairing code 0x12344321 MT:-24J0AFN00KA0648G00
