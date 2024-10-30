@@ -18,14 +18,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDsKey MTR_NEWLY_AVAILABLE;
-MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDKey MTR_NEWLY_AVAILABLE;
-MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerContextKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDsKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerContextKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey MTR_NEWLY_AVAILABLE;
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey MTR_NEWLY_AVAILABLE;
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey MTR_NEWLY_AVAILABLE;
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID getStateWithReply:(void (^)(MTRDeviceState state))reply;
@@ -53,7 +53,7 @@ MTR_NEWLY_AVAILABLE
 
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol_MTRDeviceController <NSObject>
 
 @optional
@@ -76,7 +76,7 @@ MTR_NEWLY_AVAILABLE
 
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol <NSObject, MTRXPCServerProtocol_MTRDevice, MTRXPCServerProtocol_MTRDeviceController>
 @optional
 - (oneway void)deviceController:(NSUUID *)controller checkInWithContext:(NSDictionary *)context;
