@@ -17,4 +17,3 @@
 #pragma once
 
 #include "pw_log_matter/log_matter.h"
-

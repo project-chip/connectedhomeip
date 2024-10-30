@@ -24,26 +24,20 @@
 #define _PW_ASSERT_MATTER_FUNCTION_NAME __PRETTY_FUNCTION__
 #else
 #define _PW_ASSERT_MATTER_FUNCTION_NAME __func__
-#endif  // __GNUC__
+#endif // __GNUC__
 
 // Die with a message with many attributes included. This is the crash macro
 // frontend that funnels everything into the C handler provided by the user,
 // pw_assert_MATTER_HandleFailure().
-#define PW_HANDLE_CRASH(...)     \
-  pw_assert_matter_HandleFailure( \
-      __FILE__,                  \
-      __LINE__,                  \
-      _PW_ASSERT_MATTER_FUNCTION_NAME PW_COMMA_ARGS(__VA_ARGS__))
+#define PW_HANDLE_CRASH(...)                                                                                                       \
+    pw_assert_matter_HandleFailure(__FILE__, __LINE__, _PW_ASSERT_MATTER_FUNCTION_NAME PW_COMMA_ARGS(__VA_ARGS__))
 
 // Die with a message with many attributes included. This is the crash macro
 // frontend that funnels everything into the C handler provided by the user,
 // pw_assert_matter_HandleFailure().
-#define PW_HANDLE_ASSERT_FAILURE(condition_string, message, ...)  \
-  pw_assert_matter_HandleFailure(__FILE__,                         \
-                                __LINE__,                         \
-                                _PW_ASSERT_MATTER_FUNCTION_NAME,   \
-                                "Check failed: " condition_string \
-                                ". " message PW_COMMA_ARGS(__VA_ARGS__))
+#define PW_HANDLE_ASSERT_FAILURE(condition_string, message, ...)                                                                   \
+    pw_assert_matter_HandleFailure(__FILE__, __LINE__, _PW_ASSERT_MATTER_FUNCTION_NAME,                                            \
+                                   "Check failed: " condition_string ". " message PW_COMMA_ARGS(__VA_ARGS__))
 
 // Sample assert failure message produced by the below implementation:
 //

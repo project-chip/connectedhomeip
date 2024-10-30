@@ -40,9 +40,7 @@ pw_source_set("log") {
     ":backend_config",
     ":public_include_path",
   ]
-  public = [
-    "public/pw_log_matter/log_matter.h",
-  ]
+  public = [ "public/pw_log_matter/log_matter.h" ]
   public_deps = [ ":handler.facade" ]
 }
 
@@ -64,5 +62,5 @@ pw_source_set("log.impl") {
     "$dir_pw_string:builder",
     "${chip_root}/src/lib/support",
   ]
-  sources = [ ]
+  sources = []
 }

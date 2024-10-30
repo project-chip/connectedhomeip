@@ -40,9 +40,7 @@ pw_source_set("assert") {
     ":backend_config",
     ":public_include_path",
   ]
-  public = [
-    "public/pw_assert_matter/handler.h",
-  ]
+  public = [ "public/pw_assert_matter/handler.h" ]
   public_deps = [ ":handler.facade" ]
 }
 
