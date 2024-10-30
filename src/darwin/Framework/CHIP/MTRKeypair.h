@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @brief Returns public key for the keypair. DEPRECATED - please use copyPublicKey, otherwise this will leak
  */
 
-- (SecKeyRef)publicKey MTR_DEPRECATED("Please implement copyPublicKey, this will leak otherwise", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
+- (SecKeyRef)publicKey MTR_DEPRECATED("Please implement copyPublicKey, this will leak otherwise", ios(16.4, 18.3), macos(13.3, 15.3), watchos(9.4, 11.3), tvos(16.4, 18.3));
 
 /**
  * @brief A function to sign a message using ECDSA
