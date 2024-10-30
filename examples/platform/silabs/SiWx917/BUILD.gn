@@ -192,8 +192,8 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/wifi/wfx_rsi_host.cpp",
     "SiWxWifiInterface.cpp",
 
-    # Wi-Fi Config
-    "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
+    # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
+    "${sdk_support_root}/components/service/network_manager/src/sl_net_for_lwip.c",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {
