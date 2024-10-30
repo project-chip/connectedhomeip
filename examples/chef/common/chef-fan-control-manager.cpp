@@ -161,15 +161,15 @@ FanControl::FanModeEnum ChefFanControlManager::SpeedToFanMode(uint8_t speed)
     {
         return FanControl::FanModeEnum::kOff;
     }
-    else if (speed <= FAN_MODE_LOW_UPPER_BOUND)
+    if (speed <= FAN_MODE_LOW_UPPER_BOUND)
     {
         return FanControl::FanModeEnum::kLow;
     }
-    else if (speed <= FAN_MODE_MEDIUM_UPPER_BOUND)
+    if (speed <= FAN_MODE_MEDIUM_UPPER_BOUND)
     {
         return FanControl::FanModeEnum::kMedium;
     }
-    else if (speed <= FAN_MODE_HIGH_UPPER_BOUND)
+    if (speed <= FAN_MODE_HIGH_UPPER_BOUND)
     {
         return FanControl::FanModeEnum::kHigh;
     }
@@ -180,15 +180,16 @@ void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
 {
     if (aNewPercentCurrent != mPercentCurrent)
     {
-        ChipLogDetail(NotSpecified, "ChefFanControlManager::SetPercentCurrent: %d", aNewPercentCurrent);
-        mPercentCurrent = aNewPercentCurrent;
-        Status status   = FanControl::Attributes::PercentCurrent::Set(mEndpoint, mPercentCurrent);
-        if (status != Status::Success)
-        {
-            ChipLogError(NotSpecified, "ChefFanControlManager::SetPercentCurrent: failed to set PercentCurrent attribute: %d",
-                         to_underlying(status));
-            return;
-        }
+        return;
+    }
+
+    ChipLogDetail(NotSpecified, "ChefFanControlManager::SetPercentCurrent: %d", aNewPercentCurrent);
+    mPercentCurrent = aNewPercentCurrent;
+    Status status   = FanControl::Attributes::PercentCurrent::Set(mEndpoint, mPercentCurrent);
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "ChefFanControlManager::SetPercentCurrent: failed to set PercentCurrent attribute: %d",
+                     to_underlying(status));
     }
 }
 
@@ -196,20 +197,22 @@ void ChefFanControlManager::SetSpeedCurrent(uint8_t aNewSpeedCurrent)
 {
     if (aNewSpeedCurrent != mSpeedCurrent)
     {
-        ChipLogDetail(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: %d", aNewSpeedCurrent);
-        mSpeedCurrent = aNewSpeedCurrent;
-        Status status = FanControl::Attributes::SpeedCurrent::Set(mEndpoint, aNewSpeedCurrent);
-        if (status != Status::Success)
-        {
-            ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: failed to set SpeedCurrent attribute: %d",
-                         to_underlying(status));
-        }
+        return;
+    }
+
+    ChipLogDetail(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: %d", aNewSpeedCurrent);
+    mSpeedCurrent = aNewSpeedCurrent;
+    Status status = FanControl::Attributes::SpeedCurrent::Set(mEndpoint, aNewSpeedCurrent);
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: failed to set SpeedCurrent attribute: %d",
+                     to_underlying(status));
     }
 }
 
 void ChefFanControlManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode)
 {
-    ChipLogDetail(NotSpecified, "ChefFanControlManager::FanModeWriteCallback: %d", (uint8_t) aNewFanMode);
+    ChipLogDetail(NotSpecified, "ChefFanControlManager::FanModeWriteCallback: %d", to_underlying(aNewFanMode));
     switch (aNewFanMode)
     {
     case FanControl::FanModeEnum::kOff: {
