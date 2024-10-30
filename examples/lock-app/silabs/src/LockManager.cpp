@@ -25,10 +25,17 @@
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
 
-LockManager LockManager::sLock;
-
 using namespace ::chip::DeviceLayer::Internal;
 using namespace EFR32DoorLock::LockInitParams;
+
+namespace {
+LockManager sLock;
+} // namespace
+
+LockManager & LockMgr()
+{
+    return sLock;
+}
 
 CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam)
 {
@@ -257,8 +264,9 @@ void LockManager::UnlockAfterUnlatch()
     bool succes = false;
     if (mUnlatchContext.mEndpointId != kInvalidEndpointId)
     {
-        succes = setLockState(mUnlatchContext.mEndpointId, mUnlatchContext.mFabricIdx, mUnlatchContext.mNodeId,
-                              DlLockState::kUnlocked, mUnlatchContext.mPin, mUnlatchContext.mErr);
+        succes = setLockState(
+            mUnlatchContext.mEndpointId, mUnlatchContext.mFabricIdx, mUnlatchContext.mNodeId, DlLockState::kUnlocked,
+            MakeOptional(chip::ByteSpan(mUnlatchContext.mPinBuffer, mUnlatchContext.mPinLength)), mUnlatchContext.mErr);
     }
 
     if (!succes)
