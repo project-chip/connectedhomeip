@@ -134,7 +134,6 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
     case FanControl::Attributes::SpeedSetting::Id: {
         ChipLogProgress(NotSpecified, "ChefFanControlManager::HandleFanControlAttributeChange  SpeedSetting");
 
-        // DataModel::Nullable<uint8_t> speedSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
         DataModel::Nullable<uint8_t> speedSetting = NumericAttributeTraits<DataModel::Nullable<uint8_t>>::StorageToWorking(*value);
         SetSpeedCurrent(speedSetting.IsNull() ? 0 : speedSetting.Value());
         // Determine if the speed change should also change the fan mode
