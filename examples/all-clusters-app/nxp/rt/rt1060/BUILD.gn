@@ -167,7 +167,7 @@ rt_executable("all_cluster_app") {
     "${chip_root}/examples/${app_common_folder}/src/static-supported-modes-manager.cpp",
   ]
 
-  if (chip_enable_matter_cli) {
+  if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
     deps += [
       "${chip_root}/examples/shell/shell_common:shell_common",

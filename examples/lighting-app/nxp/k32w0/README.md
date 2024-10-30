@@ -256,8 +256,8 @@ Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
 to zero. The argument chip_with_OM15082 is set to zero by default.
 
-In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
-set to 1.
+In case that Openthread CLI is needed, `nxp_enable_ot_cli` build argument must
+be set to true.
 
 In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
 running oscillator as a clock source. In this case one must set the use_fro_32k
@@ -348,10 +348,10 @@ CHIPProjectConfig.h.
 Regarding factory data provider, there are two options:
 
 -   use the default factory data provider: `FactoryDataProviderImpl` by setting
-    `chip_with_factory_data=1` in the gn build command.
+    `nxp_use_factory_data=true` in the gn build command.
 -   use a custom factory data provider: please see
     [Guide for implementing a custom factory data provider](../../../platform/nxp/k32w0/doc/CustomFactoryDataProvider.md).
-    This can be enabled when `chip_with_factory_data=1` by setting
+    This can be enabled when `nxp_use_factory_data=true` by setting
     `use_custom_factory_provider=1` in the gn build command.
 
 ## Flashing and debugging
@@ -669,9 +669,9 @@ factory data TLV value.
 
 A user can select which default processors to enable:
 
--   `chip_enable_ota_firmware_processor=1` to enable default firmware (app/SSBL)
-    update processor (enabled by default).
--   `chip_enable_ota_factory_data_processor=1` to enable default factory data
+-   `nxp_enable_ota_firmware_processor=true` to enable default firmware
+    (app/SSBL) update processor (enabled by default).
+-   `nxp_enable_ota_factory_data_processor=true` to enable default factory data
     update processor (disabled by default).
 
 The address for storing the custom OTA entry can also be specified:

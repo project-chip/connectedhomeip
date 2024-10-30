@@ -65,7 +65,7 @@ TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
 static QueueHandle_t sAppEventQueue;
 
-#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
 static LEDWidget sStatusLED;
 static LEDWidget sContactSensorLED;
 #endif
@@ -225,7 +225,7 @@ CHIP_ERROR AppTask::Init()
     AppTask::PrintOnboardingInfo();
 
     /* HW init leds */
-#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
     LED_Init();
 
     /* start with all LEDS turnedd off */
@@ -365,7 +365,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     {
         TickType_t xTicksToWait = pdMS_TO_TICKS(10);
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
         xTicksToWait = portMAX_DELAY;
 #endif
 
@@ -403,7 +403,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         //
         // Otherwise, blink the LED ON for a very short time.
 
-#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
         if (sAppTask.mFunction != Function::kFactoryReset && sAppTask.mFunction != Function::kIdentify)
         {
             if (sIsThreadProvisioned)
@@ -580,7 +580,7 @@ void AppTask::ResetActionEventHandler(void * aGenericEvent)
         sAppTask.CancelTimer();
         sAppTask.mFunction = Function::kNoneSelected;
 
-#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
         /* restore initial state for the LED indicating contact state */
         if (!ContactSensorMgr().IsContactClosed())
         {
@@ -608,7 +608,7 @@ void AppTask::ResetActionEventHandler(void * aGenericEvent)
         sAppTask.mFunction = Function::kFactoryReset;
 
         /* LEDs will start blinking to signal that a Factory Reset was scheduled */
-#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
         sStatusLED.Set(false);
         sContactSensorLED.Set(false);
 
@@ -706,7 +706,7 @@ void AppTask::BleStartAdvertising(intptr_t arg)
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
-#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
         sStatusLED.Set(false);
 #endif
         K32W_LOG("Stopped BLE Advertising!");
@@ -717,7 +717,7 @@ void AppTask::BleStartAdvertising(intptr_t arg)
 
         if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
         {
-#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
             sStatusLED.Set(true);
 #endif
             K32W_LOG("Started BLE Advertising!");
@@ -845,14 +845,14 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
     if (ContactSensorManager::State::kContactClosed == aState)
     {
         K32W_LOG("Contact state changed to closed.")
-#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
         sContactSensorLED.Set(true);
 #endif
     }
     else if (ContactSensorManager::State::kContactOpened == aState)
     {
         K32W_LOG("Contact state changed to opened.")
-#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
         sContactSensorLED.Set(false);
 #endif
     }
@@ -876,7 +876,7 @@ void AppTask::OnIdentifyStart(Identify * identify)
         }
         K32W_LOG("Identify process has started. Status LED should blink every 0.5 seconds.");
         sAppTask.mFunction = Function::kIdentify;
-#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
         sStatusLED.Set(false);
         sStatusLED.Blink(500);
 #endif
@@ -926,7 +926,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
     /* specific processing for events sent from App_PostCallbackMessage (see main.cpp) */
     if (aEvent->Type == AppEvent::kEventType_Lp)
     {
@@ -974,7 +974,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 
     /* get onoff attribute value */
     (void) app::Clusters::BooleanState::Attributes::StateValue::Get(1, &stateValueAttrValue);
-#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
     /* set the device state */
     sContactSensorLED.Set(stateValueAttrValue);
 #endif
