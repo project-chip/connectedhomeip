@@ -179,6 +179,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)invalidateCASESessionForNode:(NSNumber *)nodeID;
 
 /**
+ * Invalidate the CASE session establishment for the specified node ID.
+ * Must not be called on the Matter event queue.
+ */
+- (void)invalidateCASESessionEstablishmentForNode:(NSNumber *)nodeID;
+
+/**
  * Download log of the desired type from the device.
  */
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID

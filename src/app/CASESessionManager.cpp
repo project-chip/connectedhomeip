@@ -188,6 +188,12 @@ Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNode
         peerId, MakeOptional(Transport::SecureSession::Type::kCASE), transportPayloadCapability);
 }
 
+void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
+{
+    auto * session = mConfig.sessionSetupPool->FindSessionSetup(peerId, false);
+    ReleaseSession(session);
+}
+
 void CASESessionManager::ReleaseSession(OperationalSessionSetup * session)
 {
     if (session != nullptr)

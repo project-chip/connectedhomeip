@@ -204,6 +204,16 @@ public:
         return nullptr;
     }
 
+    CASESessionManager * CASESessionMgr()
+    {
+        if (mSystemState)
+        {
+            return mSystemState->CASESessionMgr();
+        }
+
+        return nullptr;
+    }
+
     Messaging::ExchangeManager * ExchangeMgr()
     {
         if (mSystemState != nullptr)
