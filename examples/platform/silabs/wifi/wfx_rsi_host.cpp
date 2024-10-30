@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+// SL MATTER WI-FI INTERFACE
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,11 +64,11 @@ sl_status_t wfx_wifi_start(void)
     wfx_rsi.dev_state |= WFX_RSI_ST_STARTED;
 
     // Creating a Wi-Fi driver thread
-    sWlanThread = osThreadNew(wfx_rsi_task, NULL, &kWlanTaskAttr);
+    sWlanThread = osThreadNew(sl_matter_wifi_task, NULL, &kWlanTaskAttr);
 
     VerifyOrReturnError(sWlanThread != NULL, SL_STATUS_FAIL);
 
-    ChipLogProgress(DeviceLayer, "wfx_rsi_task created successfully");
+    ChipLogProgress(DeviceLayer, "sl_matter_wifi_task created successfully");
     return SL_STATUS_OK;
 }
 
@@ -175,7 +177,7 @@ sl_status_t wfx_connect_to_ap(void)
     ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
     WfxEvent_t event;
     event.eventType = WFX_EVT_STA_START_JOIN;
-    WfxPostEvent(&event);
+    sl_matter_wifi_post_event(&event);
     return SL_STATUS_OK;
 }
 
@@ -221,7 +223,7 @@ sl_status_t wfx_power_save(void)
 void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
 {
     /*
-     * TODO: Implement IPV6 setup, currently in wfx_rsi_task()
+     * TODO: Implement IPV6 setup, currently in sl_matter_wifi_task()
      * This is hooked with MATTER code.
      */
 }
@@ -256,17 +258,17 @@ wifi_mode_t wfx_get_wifi_mode(void)
 }
 
 /*********************************************************************
- * @fn  sl_status_t wfx_sta_discon(void)
+ * @fn  sl_status_t sl_matter_wifi_disconnect(void)
  * @brief
  *      called fuction when STA disconnected
  * @param[in]  None
  * @return  return SL_STATUS_OK if successful,
  *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
-sl_status_t wfx_sta_discon(void)
+sl_status_t sl_matter_wifi_disconnect(void)
 {
     sl_status_t status;
-    status = wfx_rsi_disconnect();
+    status = sl_wifi_platform_disconnect();
     wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTED;
     return status;
 }
@@ -376,7 +378,7 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 
     WfxEvent_t event;
     event.eventType = WFX_EVT_SCAN;
-    WfxPostEvent(&event);
+    sl_matter_wifi_post_event(&event);
 
     return true;
 }
