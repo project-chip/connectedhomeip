@@ -49,4 +49,4 @@ constexpr chip::Logging::LogCategory PwLogLevelToChipLogCategory(int level)
 //
 // This is the main macro that functions not included above will use
 #define PW_HANDLE_LOG(level, module, flags, message, ...)                                                                          \
-    ChipInternalLogImpl(Application, PwLogLevelToChipLogCategory(level), message, __VA_ARGS__)
+    ChipInternalLogImpl(NotSpecified, PwLogLevelToChipLogCategory(level), message, __VA_ARGS__)
