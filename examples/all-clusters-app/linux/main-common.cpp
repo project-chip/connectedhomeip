@@ -131,11 +131,6 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp4TagList[] = { {
 extern void MatterDishwasherAlarmServerInit();
 #endif
 
-EndpointId GetEnergyDeviceEndpointId()
-{
-    return chip::EndpointId(1);
-}
-
 void OnIdentifyStart(::Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
