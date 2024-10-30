@@ -72,13 +72,6 @@ def _parse_args():
                         default=115200,
                         help='the baud rate to use')
     parser.add_argument(
-        '-o',
-        '--output',
-        type=argparse.FileType('wb'),
-        default=sys.stdout.buffer,
-        help=('The file to which to write device output (HDLC channel 1); '
-              'provide - or omit for stdout.'))
-    parser.add_argument(
         '-r',
         '--raw_serial',
         action="store_true",
@@ -98,7 +91,7 @@ def _parse_args():
 
 def show_console(device: str, baudrate: int,
                  token_databases: Collection[Path],
-                 socket_addr: str, output: Any, raw_serial: bool) -> int:
+                 socket_addr: str, raw_serial: bool) -> int:
 
     # TODO: this shows a default console with little customization
     #       Ideally we should at least customize the default messages
@@ -113,7 +106,6 @@ def show_console(device: str, baudrate: int,
         device=device,
         baudrate=baudrate,
         socket_addr=socket_addr,
-        output=output,
         hdlc_encoding=not raw_serial,
         token_databases=token_databases,
         logfile="",
@@ -121,14 +113,10 @@ def show_console(device: str, baudrate: int,
         channel_id=rpc.DEFAULT_CHANNEL_ID,
 
         # Defaults beyond the original console
-        proto_globs=[],
         ticks_per_second=None,
         host_logfile="",
         json_logfile="",
         rpc_logging=False,
-        # the pt-python based console seems to break on python 3.1 with
-        # "set_wakeup_fd only works in main thread of the main interpreter"
-        use_ipython=True,
         compiled_protos=[
                 actions_service_pb2,
                 attributes_service_pb2,
