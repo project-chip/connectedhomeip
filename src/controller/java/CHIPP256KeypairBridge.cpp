@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "platform/android/CHIPP256KeypairBridge.h"
+#include "CHIPP256KeypairBridge.h"
 #include "lib/core/CHIPError.h"
 #include "lib/support/CHIPJNIError.h"
 #include "lib/support/JniReferences.h"
@@ -26,7 +26,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <jni.h>
-#include <platform/PlatformManager.h>
 #include <string.h>
 #include <type_traits>
 
