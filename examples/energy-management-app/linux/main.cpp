@@ -17,7 +17,6 @@
  */
 
 #include <AppMain.h>
-#include <EnergyEvseMain.h>
 #include <EnergyManagementAppCmdLineOptions.h>
 #include <EnergyManagementAppCommonMain.h>
 #include <app-common/zap-generated/cluster-objects.h>

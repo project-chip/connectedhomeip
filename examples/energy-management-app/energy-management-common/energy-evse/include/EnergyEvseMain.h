@@ -24,14 +24,11 @@
 #include <PowerTopologyDelegate.h>
 #include <lib/core/CHIPError.h>
 
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ElectricalPowerMeasurement;
-using namespace chip::app::Clusters::PowerTopology;
-using namespace chip::app::Clusters::DeviceEnergyManagement;
-
 CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId);
 CHIP_ERROR EnergyEvseShutdown();
 
-CHIP_ERROR EVSEManufacturerInit(ElectricalPowerMeasurementInstance & epmInstance, PowerTopologyInstance & ptInstance,
-                                DeviceEnergyManagementManager & demInstance, DeviceEnergyManagementDelegate & demDelegate);
+CHIP_ERROR EVSEManufacturerInit(chip::app::Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance & epmInstance,
+                                chip::app::Clusters::PowerTopology::PowerTopologyInstance & ptInstance,
+                                chip::app::Clusters::DeviceEnergyManagementManager & demInstance,
+                                chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate & demDelegate);
 CHIP_ERROR EVSEManufacturerShutdown();
