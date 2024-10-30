@@ -174,7 +174,7 @@ class TizenBuilder(GnBuilder):
         if self.app == TizenApp.TESTS and self.use_coverage:
 
             self._Execute(self.lcov_args() + ['--output-file', os.path.join(self.coverage_dir,
-                          'lcov_test.info')], title="Initial coverage baseline")
+                          'lcov_test.info')], title="Update coverage")
 
             gcov = os.path.join(os.environ['TIZEN_SDK_TOOLCHAIN'], 'bin/arm-linux-gnueabi-gcov')
             self._Execute(['lcov', '--gcov-tool', gcov, '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),
