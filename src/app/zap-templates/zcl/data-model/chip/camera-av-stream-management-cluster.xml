@@ -380,6 +380,7 @@ Git: 0.9-fall2024-411-g9835b5cd7
 
     <command code="0x0B" source="client" name="CaptureSnapshot" optional="true">
       <description>This command SHALL return a Snapshot from the camera.</description>
+      <quality largeMessage="true"/>
       <access op="invoke" privilege="manage"/>
       <arg id="0" name="SnapshotStreamID" type="int16u"/>
       <arg id="1" name="RequestedResolution" type="VideoResolutionStruct"/>
@@ -387,6 +388,7 @@ Git: 0.9-fall2024-411-g9835b5cd7
 
     <command code="0x0C" source="server" name="CaptureSnapshotResponse" optional="true" disableDefaultResponse="true">
       <description>This command SHALL be sent by the device in response to the CaptureSnapshot command, carrying the requested snapshot.</description>
+      <quality largeMessage="true"/>
       <arg id="0" name="Data" type="octet_string"/>
       <arg id="1" name="ImageCodec" type="ImageCodecEnum" min="0x00" max="0x00"/>
       <arg id="2" name="Resolution" type="VideoResolutionStruct"/>
