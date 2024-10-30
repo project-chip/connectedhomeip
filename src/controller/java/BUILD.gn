@@ -136,6 +136,8 @@ shared_library("jni") {
     "AttestationTrustStoreBridge.cpp",
     "AttestationTrustStoreBridge.h",
     "CHIPDeviceController-JNI.cpp",
+    "CHIPP256KeypairBridge.cpp",
+    "CHIPP256KeypairBridge.h",
     "DeviceAttestation-JNI.cpp",
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",

@@ -42,9 +42,7 @@
 #include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
-#ifndef JAVA_MATTER_CONTROLLER_TEST
-#include <platform/android/CHIPP256KeypairBridge.h>
-#endif // JAVA_MATTER_CONTROLLER_TEST
+
 using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Credentials;
@@ -54,13 +52,11 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
     mController->Shutdown();
 
-#ifndef JAVA_MATTER_CONTROLLER_TEST
     if (mKeypairBridge != nullptr)
     {
         chip::Platform::Delete(mKeypairBridge);
         mKeypairBridge = nullptr;
     }
-#endif // JAVA_MATTER_CONTROLLER_TEST
 
     if (mDeviceAttestationDelegateBridge != nullptr)
     {
@@ -298,7 +294,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 
     // The lifetime of the ephemeralKey variable must be kept until SetupParams is saved.
     Crypto::P256Keypair ephemeralKey;
-#ifndef JAVA_MATTER_CONTROLLER_TEST
     if (rootCertificate != nullptr && nodeOperationalCertificate != nullptr && keypairDelegate != nullptr)
     {
         CHIPP256KeypairBridge * nativeKeypairBridge = wrapper->GetP256KeypairBridge();
@@ -335,7 +330,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.controllerNOC  = chip::ByteSpan(wrapper->mNocCertificate.data(), wrapper->mNocCertificate.size());
     }
     else
-#endif // JAVA_MATTER_CONTROLLER_TEST
     {
         ChipLogProgress(Controller,
                         "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer");
