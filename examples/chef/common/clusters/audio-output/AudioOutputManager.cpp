@@ -17,8 +17,8 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/util/config.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/util/config.h>
 #include <map>
 
 #ifdef MATTER_DM_PLUGIN_AUDIO_OUTPUT_SERVER
@@ -43,7 +43,7 @@ AudioOutputManager::AudioOutputManager(chip::EndpointId endpoint) : mEndpoint(en
 uint8_t AudioOutputManager::HandleGetCurrentOutput()
 {
     uint8_t currentOutput = 1;
-    Status status        = Attributes::CurrentOutput::Get(mEndpoint, &currentOutput);
+    Status status         = Attributes::CurrentOutput::Get(mEndpoint, &currentOutput);
     if (Status::Success != status)
     {
         ChipLogError(Zcl, "Unable to get CurrentOutput attribute, err:0x%x", to_underlying(status));
