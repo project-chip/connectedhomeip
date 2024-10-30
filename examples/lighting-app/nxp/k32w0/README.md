@@ -256,8 +256,8 @@ Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
 to zero. The argument chip_with_OM15082 is set to zero by default.
 
-In case that Openthread CLI is needed, `nxp_enable_ot_cli` build argument must be
-set to true.
+In case that Openthread CLI is needed, `nxp_enable_ot_cli` build argument must
+be set to true.
 
 In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
 running oscillator as a clock source. In this case one must set the use_fro_32k
@@ -669,8 +669,8 @@ factory data TLV value.
 
 A user can select which default processors to enable:
 
--   `nxp_enable_ota_firmware_processor=true` to enable default firmware (app/SSBL)
-    update processor (enabled by default).
+-   `nxp_enable_ota_firmware_processor=true` to enable default firmware
+    (app/SSBL) update processor (enabled by default).
 -   `nxp_enable_ota_factory_data_processor=true` to enable default factory data
     update processor (disabled by default).
 

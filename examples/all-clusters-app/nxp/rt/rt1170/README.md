@@ -243,8 +243,8 @@ Optional GN options that can be added when building an application:
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
-    specific flash area the argument `nxp_use_factory_data=true` must be added to
-    the _gn gen_ command. For more information, see
+    specific flash area the argument `nxp_use_factory_data=true` must be added
+    to the _gn gen_ command. For more information, see
     [Guide for writing manufacturing data on NXP devices](../../../../../docs/platforms/nxp/nxp_manufacturing_flow.md)
 -   To build the application with the OTA Requestor enabled, the arguments
     `chip_enable_ota_requestor=true no_mcuboot=false` must be added to the _gn

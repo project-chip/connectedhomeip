@@ -236,8 +236,8 @@ Supported platforms:
 
 there are three implementations for factory data protection
 
--   whole factory data protection with AES encryption ( nxp_use_factory_data=true
-    nxp_enable_secure_whole_factory_data=true )
+-   whole factory data protection with AES encryption (
+    nxp_use_factory_data=true nxp_enable_secure_whole_factory_data=true )
     `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp`\
     `src/platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.cpp`
 

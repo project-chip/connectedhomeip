@@ -83,8 +83,8 @@ if changed, the names must be updated in `app.ld`. See
 `SMU2` memory range size.
 
 When compiling the application as an OT Full Thread Device
-(`chip_openthread_ftd=true`), using `nxp_use_smu2_static=true` gn arg will cause the
-following symbols to be moved to `SMU2` area:
+(`chip_openthread_ftd=true`), using `nxp_use_smu2_static=true` gn arg will cause
+the following symbols to be moved to `SMU2` area:
 
 | symbol name                         | file                         |
 | ----------------------------------- | ---------------------------- |
@@ -93,12 +93,12 @@ following symbols to be moved to `SMU2` area:
 | `Server::sServer`                   | `Server.cpp`                 |
 | `ThreadStackManagerImpl::sInstance` | `ThreadStackManagerImpl.cpp` |
 
-Additionally, using `nxp_use_smu2_dynamic=true` will cause the OpenThread buffers to
-be dynamically allocated from a 13KB `SMU2` range after a successful
+Additionally, using `nxp_use_smu2_dynamic=true` will cause the OpenThread
+buffers to be dynamically allocated from a 13KB `SMU2` range after a successful
 commissioning process.
 
-`nxp_use_smu2_static` and `nxp_use_smu2_dynamic` are set to `true` in the default
-example.
+`nxp_use_smu2_static` and `nxp_use_smu2_dynamic` are set to `true` in the
+default example.
 
 ### LED PWM
 

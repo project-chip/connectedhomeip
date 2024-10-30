@@ -165,8 +165,8 @@ Optional GN options that can be added when building an application:
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
-    specific flash area the argument `nxp_use_factory_data=true` must be added to
-    the _gn gen_ command. (for more information see
+    specific flash area the argument `nxp_use_factory_data=true` must be added
+    to the _gn gen_ command. (for more information see
     [Guide for writing manufacturing data on NXP devices](../../../../../docs/platforms/nxp/nxp_manufacturing_flow.md).
 -   To build the application with the OTA Requestor enabled, the arguments
     `chip_enable_ota_requestor=true no_mcuboot=false` must be added to the _gn
@@ -187,8 +187,8 @@ software key before flashing them to the device flash.
 Using DAC private key secure usage: Experimental feature, contain some
 limitation: potential concurrent access issue during sign with dac key operation
 due to the lack of protection between multiple access to `ELS` crypto module.
-The argument `nxp_enable_secure_dac_private_key_storage=true` must be added to the
-_gn gen_ command to enable secure private DAC key usage with S50.
+The argument `nxp_enable_secure_dac_private_key_storage=true` must be added to
+the _gn gen_ command to enable secure private DAC key usage with S50.
 `nxp_use_factory_data=true` must have been added to the _gn gen_ command
 
 DAC private key generation: The argument `chip_convert_dac_private_key=1` must
