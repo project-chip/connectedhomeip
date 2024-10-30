@@ -189,6 +189,7 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
         status = Status::kUnknownError;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     if (status == Status::kSuccess && ThreadStackMgrImpl().IsThreadAttached())
     {
         Thread::OperationalDataset currentDataset;
@@ -206,6 +207,7 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
             status = Status::kUnknownError;
         }
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     if (status == Status::kSuccess &&
         DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, callback) != CHIP_NO_ERROR)
