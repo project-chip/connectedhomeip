@@ -63,28 +63,26 @@ class ProcessOutputCapture:
         err_wait = select.poll()
         err_wait.register(self.process.stderr, select.POLLIN | select.POLLHUP)
 
-        with open(self.output_path, "wt", buffering=1) as f:
+        with open(self.output_path, "wt", buffering=1) as f:  # Enable line buffering for immediate output
             f.write("PROCESS START: %s\n" % time.ctime())
             f.flush()
             while not self.done:
                 out_changes = out_wait.poll(0.1)
-                for fd, _ in out_changes:
-                    if fd == self.process.stdout.fileno():
-                        while True:
-                            out_line = self.process.stdout.readline()
-                            if not out_line:
-                                break
-                            f.write(out_line)
-                            f.flush()
-                            self.output_lines.put(out_line)
+                if self.process.stdout.fileno() in [fd for (fd, _) in out_changes]:
+                    while True:
+                        out_line = self.process.stdout.readline()
+                        if not out_line:
+                            break
+                        f.write(out_line)
+                        f.flush()
+                        self.output_lines.put(out_line)
 
                 err_changes = err_wait.poll(0)
-                for fd, _ in err_changes:
-                    if fd == self.process.stderr.fileno():
-                        err_line = self.process.stderr.readline()
-                        if err_line:
-                            f.write(f"!!STDERR!! : {err_line}")
-                            f.flush()
+                if self.process.stderr.fileno() in [fd for (fd, _) in err_changes]:
+                    err_line = self.process.stderr.readline()
+                    if err_line:
+                        f.write(f"!!STDERR!! : {err_line}")
+                        f.flush()
             f.write("PROCESS END: %s\n" % time.ctime())
             f.flush()
 
@@ -96,7 +94,7 @@ class ProcessOutputCapture:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            bufsize=1,
+            bufsize=1,  # Enable line buffering for immediate output from subprocess
         )
         self.io_thread = threading.Thread(target=self._io_thread)
         self.io_thread.start()
