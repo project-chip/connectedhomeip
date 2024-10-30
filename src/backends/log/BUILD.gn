@@ -31,7 +31,10 @@ config("backend_config") {
 pw_facade("handler") {
   backend = "${chip_root}/src/backends/log:log.impl"
   public_configs = [ ":public_include_path" ]
-  public_deps = [ "$dir_pw_preprocessor" ]
+  public_deps = [
+    "$dir_pw_preprocessor",
+    "${chip_root}/src/lib/support:text_only_logging",
+  ]
   public = [
     "public/pw_log_matter/log_matter.h",
     "public_overrides/pw_log_backend/log_backend.h",
@@ -44,7 +47,10 @@ pw_source_set("log") {
     ":public_include_path",
   ]
   public = [ "public/pw_log_matter/log_matter.h" ]
-  public_deps = [ ":handler.facade" ]
+  public_deps = [
+    ":handler.facade",
+    "${chip_root}/src/lib/support:text_only_logging",
+  ]
 }
 
 # A basic handler backend using pw_sys_io.
