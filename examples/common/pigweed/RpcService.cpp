@@ -96,20 +96,6 @@ void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uar
     PW_DASSERT(RegisterServices != nullptr);
     uart_mutex = uart_mutex_;
 
-    // Send log messages to HDLC address 1. This prevents logs from interfering
-    // with pw_rpc communications.
-    pw::log_basic::SetOutput([](std::string_view log) {
-        if (uart_mutex)
-        {
-            uart_mutex->Lock();
-        }
-        pw::hdlc::WriteUIFrame(1, pw::as_bytes(pw::span(log)), sysIoWriter);
-        if (uart_mutex)
-        {
-            uart_mutex->Unlock();
-        }
-    });
-
     // Set up the server and start processing data.
     RegisterServices(server);
 
