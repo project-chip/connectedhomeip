@@ -212,7 +212,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *         documentation for MTRDeviceResponseHandler.  Each one will have an
  *         MTRAttributePathKey and an MTRDataKey.
  */
-- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths MTR_NEWLY_AVAILABLE;
+- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 /**
  * Invoke a command with a designated command path
