@@ -339,10 +339,8 @@ sl_status_t InitiateScan()
         osSemaphoreAcquire(sScanCompleteSemaphore, kWifiScanTimeoutTicks);
         status = SL_STATUS_OK;
     }
-    else
-    {
-        osSemaphoreRelease(sScanInProgressSemaphore);
-    }
+
+    osSemaphoreRelease(sScanInProgressSemaphore);
 #endif
 
     return status;
@@ -799,10 +797,8 @@ void ProcessEvent(WfxEvent_t inEvent)
             {
                 osSemaphoreAcquire(sScanCompleteSemaphore, kWifiScanTimeoutTicks);
             }
-            else
-            {
-                osSemaphoreRelease(sScanInProgressSemaphore);
-            }
+
+            osSemaphoreRelease(sScanInProgressSemaphore);
         }
         break;
 #endif /* SL_WFX_CONFIG_SCAN */

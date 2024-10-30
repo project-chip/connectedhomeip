@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-// MATTER INTERFACE
+// SL MATTER WI-FI INTERFACE
 
 #include <stdbool.h>
 #include <stdio.h>
