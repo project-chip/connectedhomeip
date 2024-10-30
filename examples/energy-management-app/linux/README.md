@@ -239,7 +239,7 @@ data (e.g. fabric info).
 ## CHIP-REPL Interaction
 
 -   See chip-repl documentation in
-    [Matter_REPL_Intro](../../../docs/guides/repl/Matter_REPL_Intro.ipynb)
+    [Matter_REPL_Intro](../../../docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb)
 
 ### Building chip-repl:
 
