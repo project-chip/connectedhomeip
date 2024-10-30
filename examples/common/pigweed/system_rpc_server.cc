@@ -40,9 +40,7 @@ rpc::Server server(channels);
 
 } // namespace
 
-void Init()
-{
-}
+void Init() {}
 
 rpc::Server & Server()
 {
