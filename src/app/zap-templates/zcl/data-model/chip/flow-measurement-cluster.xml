@@ -24,10 +24,18 @@ limitations under the License.
     <define>FLOW_MEASUREMENT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="FLOW_MEASURED_VALUE" type="int16u" writable="false" optional="false" isNullable="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="FLOW_MIN_MEASURED_VALUE" type="int16u" writable="false" optional="false" isNullable="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="FLOW_MAX_MEASURED_VALUE" type="int16u" writable="false" optional="false" isNullable="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="FLOW_TOLERANCE" type="int16u" min="0x0000" max="0x0800" writable="false" default="0" optional="true">Tolerance</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="FLOW_MEASURED_VALUE" type="int16u" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="FLOW_MIN_MEASURED_VALUE" type="int16u" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="FLOW_MAX_MEASURED_VALUE" type="int16u" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0003" name="Tolerance" define="FLOW_TOLERANCE" type="int16u" max="0x0800" default="0" optional="true">
+      <optionalConform/>
+    </attribute>
   </cluster>
 
 </configurator>
