@@ -16,20 +16,5 @@
  */
 #pragma once
 
-#include "pw_preprocessor/compiler.h"
-#include "pw_preprocessor/util.h"
+#include "pw_log_matter/log_matter.h"
 
-PW_EXTERN_C_START
-
-// Application-defined assert failure handler for pw_assert_basic.
-// file_name - may be nullptr if not available
-// line_number - may be -1 if not available
-// function_name - may be nullptr if not available
-// format & varags - The assert reason can be built using the format string and
-//     the varargs.
-//
-// Applications must define this function; it is not defined by pw_assert_basic.
-void pw_assert_matter_HandleFailure(const char * file_name, int line_number, const char * function_name, const char * format, ...)
-    PW_PRINTF_FORMAT(4, 5) PW_NO_RETURN;
-
-PW_EXTERN_C_END
