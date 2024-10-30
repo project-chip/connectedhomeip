@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (SecKeyRef)copyPublicKey MTR_NEWLY_AVAILABLE;
 
 /**
- * @brief Returns public key for the keypair. DEPRECATED - please use copyPublicKey, otherwise this will leak
+ * @brief Returns public key for the keypair without adding a reference. DEPRECATED - please use copyPublicKey, otherwise this will leak.
  */
 
 - (SecKeyRef)publicKey MTR_DEPRECATED("Please implement copyPublicKey, this will leak otherwise", ios(16.4, 18.3), macos(13.3, 15.3), watchos(9.4, 11.3), tvos(16.4, 18.3));
