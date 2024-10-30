@@ -201,41 +201,23 @@ constexpr uint16_t kWifiScanTimeoutTicks = 10000;
 
 void DHCPTimerEventHandler(void * arg)
 {
-    WfxEvent_t event;
-    event.eventType = WFX_EVT_DHCP_POLL;
+    WfxEvent_t event = { .eventType = WFX_EVT_DHCP_POLL };
     sl_matter_wifi_post_event(&event);
 }
 
 void CancelDHCPTimer(void)
 {
-    osStatus_t status;
-
-    // Check if timer started
-    if (!osTimerIsRunning(sDHCPTimer))
-    {
-        ChipLogDetail(DeviceLayer, "CancelDHCPTimer: timer not running");
-        return;
-    }
-
-    status = osTimerStop(sDHCPTimer);
-    if (status != osOK)
-    {
-        ChipLogError(DeviceLayer, "CancelDHCPTimer: failed to stop timer: %d", status);
-    }
+    VerifyOrReturn(osTimerIsRunning(sDHCPTimer), ChipLogDetail(DeviceLayer, "CancelDHCPTimer: timer not running"));
+    VerifyOrReturn(osTimerStop(sDHCPTimer) == osOK, ChipLogError(DeviceLayer, "CancelDHCPTimer: failed to stop timer"));
 }
 
 void StartDHCPTimer(uint32_t timeout)
 {
-    osStatus_t status;
-
     // Cancel timer if already started
     CancelDHCPTimer();
 
-    status = osTimerStart(sDHCPTimer, pdMS_TO_TICKS(timeout));
-    if (status != osOK)
-    {
-        ChipLogError(DeviceLayer, "StartDHCPTimer: failed to start timer: %d", status);
-    }
+    VerifyOrReturn(osTimerStart(sDHCPTimer, pdMS_TO_TICKS(timeout)) == osOK,
+                   ChipLogError(DeviceLayer, "StartDHCPTimer: failed to start timer"));
 }
 
 sl_status_t sl_wifi_siwx917_init(void)
@@ -344,6 +326,7 @@ sl_status_t InitiateScan()
 
     ssid.length = wfx_rsi.sec.ssid_length;
 
+    // TODO: workaround because the string management with the null termination is flawed
     chip::Platform::CopyString((char *) &ssid.value[0], ssid.length + 1, wfx_rsi.sec.ssid);
     sl_wifi_set_scan_callback(ScanCallback, NULL);
 

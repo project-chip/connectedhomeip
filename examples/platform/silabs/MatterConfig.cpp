@@ -171,7 +171,7 @@ void ApplicationStart(void * unused)
     SetDeviceAttestationCredentialsProvider(&Provision::Manager::GetInstance().GetStorage());
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    ChipLogProgress(AppServer, "Starting App Task");
+    ChipLogProgress(DeviceLayer, "Starting App Task");
     err = AppTask::GetAppTask().StartAppTask();
     if (err != CHIP_NO_ERROR)
         appError(err);
@@ -204,9 +204,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // initialization.
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 #endif
-    ChipLogProgress(AppServer, "==================================================");
-    ChipLogProgress(AppServer, "%s starting", appName);
-    ChipLogProgress(AppServer, "==================================================");
+    ChipLogProgress(DeviceLayer, "==================================================");
+    ChipLogProgress(DeviceLayer, "%s starting", appName);
+    ChipLogProgress(DeviceLayer, "==================================================");
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();
