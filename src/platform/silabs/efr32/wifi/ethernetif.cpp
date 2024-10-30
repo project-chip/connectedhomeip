@@ -51,7 +51,6 @@ extern "C" {
 #endif // WF200_WIFI
 
 #include "wfx_host_events.h"
-#include "wifi_config.h"
 #ifdef WF200_WIFI
 #include "sl_wfx.h"
 #endif

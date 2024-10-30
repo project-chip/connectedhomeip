@@ -316,7 +316,7 @@ void wfx_clear_wifi_provision(void);
 sl_status_t wfx_connect_to_ap(void);
 void wfx_setup_ip6_link_local(sl_wfx_interface_t);
 bool wfx_is_sta_connected(void);
-sl_status_t wfx_sta_discon(void);
+sl_status_t sl_matter_wifi_disconnect(void);
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 bool wfx_have_ipv4_addr(sl_wfx_interface_t);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
@@ -328,14 +328,14 @@ void wfx_cancel_scan(void);
 /*
  * Call backs into the Matter Platform code
  */
-void wfx_started_notify(void);
+void sl_matter_wifi_task_started(void);
 void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap);
 void wfx_disconnected_notify(int32_t status);
+
 /* Implemented for LWIP */
-void wfx_host_received_sta_frame_cb(uint8_t * buf, int len);
 void wfx_lwip_set_sta_link_up(void);
 void wfx_lwip_set_sta_link_down(void);
-void wfx_lwip_start(void);
+void sl_matter_lwip_start(void);
 struct netif * wfx_get_netif(sl_wfx_interface_t interface);
 
 bool wfx_hw_ready(void);

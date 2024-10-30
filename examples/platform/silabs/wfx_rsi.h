@@ -91,19 +91,24 @@ typedef struct wfx_rsi_s
 
 extern WfxRsi_t wfx_rsi;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-void wfx_rsidev_init(void);
-void wfx_rsi_task(void * arg);
+void sl_matter_wifi_task(void * arg);
+
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+
 int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
-int32_t wfx_rsi_disconnect();
-int32_t wfx_wifi_rsi_init(void);
+int32_t sl_wifi_platform_disconnect();
+
+// TODO : this needs to be extern otherwise we get a linking error. We need to figure out why in the header clean up
+// NCP files are including this while being c files
+#ifdef __cplusplus
+extern "C" {
+#endif
+sl_status_t sl_matter_wifi_platform_init(void);
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
 void sl_si91x_invoke_btn_press_event();
@@ -114,11 +119,14 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
 int32_t wfx_rsi_power_save();
 #endif /* SLI_SI917 */
 #endif /* SL_ICD_ENABLED */
-
-/// WfxPostEvent
-/// @brief Allows to allocate an event to the WFX task event queue from outside of sl_wifi_if.c
-/// @param event The event that will be allocated to the event queue
-void WfxPostEvent(WfxEvent_t * event);
 #ifdef __cplusplus
 }
 #endif
+
+/**
+ * @brief Posts an event to the Wi-Fi task
+ *
+ * @param[in] event Event to process. Must be valid ptr
+ */
+// TODO: Can't be a const & since the ncp builds are still using c files
+void sl_matter_wifi_post_event(WfxEvent_t * event);

@@ -18,8 +18,8 @@ import("//build_overrides/openthread.gni")
 
 import("//build_overrides/openthread.gni")
 
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
-import("${efr32_sdk_build_root}/silabs_board.gni")
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
+import("${silabs_sdk_build_root}/silabs_board.gni")
 
 config("openthread_efr32_config") {
   defines = [
@@ -48,7 +48,7 @@ source_set("openthread_core_config_efr32") {
     "${sl_ot_efr32_root}/openthread-core-efr32-config.h",
   ]
 
-  public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
+  public_deps = [ "${silabs_sdk_build_root}:silabs_sdk" ]
 
   public_configs = [ ":openthread_efr32_config" ]
 }

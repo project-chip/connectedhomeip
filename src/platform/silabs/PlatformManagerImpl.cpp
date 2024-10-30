@@ -84,10 +84,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(SLI_SI91X_MCU_INTERFACE)
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(SLI_SI91X_MCU_INTERFACE)
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 

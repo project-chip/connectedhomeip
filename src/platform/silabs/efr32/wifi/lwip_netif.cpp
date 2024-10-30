@@ -26,7 +26,6 @@
 #include "em_usart.h"
 
 #include "wfx_host_events.h"
-#include "wifi_config.h"
 
 #include "dhcp_client.h"
 #include "ethernetif.h"
@@ -121,13 +120,13 @@ void wfx_lwip_set_sta_link_down(void)
 }
 
 /***************************************************************************
- * @fn  void wfx_lwip_start(void)
+ * @fn  void sl_matter_lwip_start(void)
  * @brief
  * Initialize the LwIP stack
  * @param[in] None
  * @return None
  *****************************************************************************/
-void wfx_lwip_start(void)
+void sl_matter_lwip_start(void)
 {
     /* Initialize the LwIP stack */
     netif_config(&sta_netif, NULL);
