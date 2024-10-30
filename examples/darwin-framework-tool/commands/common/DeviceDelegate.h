@@ -19,5 +19,6 @@
 #import <Matter/Matter.h>
 
 @interface DeviceDelegate : NSObject <MTRDeviceDelegate>
+- (void)setMaxIntervalForSubscription:(NSNumber *)maxInterval;
 - (void)setPretendThreadEnabled:(BOOL)threadEnabled;
 @end

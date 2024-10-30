@@ -23,6 +23,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DeviceDelegate ()
+@property (nonatomic, readwrite) NSNumber * maxIntervalForSubscription;
 @property (nonatomic, readwrite) BOOL threadEnabled;
 @end
 
@@ -30,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+        _maxIntervalForSubscription = nil;
         _threadEnabled = NO;
     }
     return self;
@@ -53,6 +55,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)deviceConfigurationChanged:(MTRDevice *)device
 {
+}
+
+- (void)setMaxIntervalForSubscription:(NSNumber *)maxInterval
+{
+    _maxIntervalForSubscription = maxInterval;
+}
+
+- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device
+{
+    return _maxIntervalForSubscription;
 }
 
 - (void)setPretendThreadEnabled:(BOOL)threadEnabled
