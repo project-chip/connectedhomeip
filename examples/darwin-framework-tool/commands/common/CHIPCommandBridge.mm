@@ -306,14 +306,9 @@ MTRDevice * CHIPCommandBridge::DeviceWithNodeId(chip::NodeId nodeId)
     VerifyOrReturnValue(nil != device, nil);
 
     // The device delegate is initialized only once, when the first MTRDevice is created.
-    // As a result, subsequent commands using --use-mtr-device don’t need to specify the
-    // `--pretend-thread-enabled 1` argument again. Any further attempts to set it to `0` will also be ignored.
     if (sDeviceDelegate == nil) {
         sDeviceDelegate = [[DeviceDelegate alloc] init];
         sDeviceDelegateDispatchQueue = dispatch_queue_create("com.chip.devicedelegate", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        if (mPretendThreadEnabled.ValueOr(false)) {
-            [sDeviceDelegate setPretendThreadEnabled:YES];
-        }
     }
     [device addDelegate:sDeviceDelegate queue:sDeviceDelegateDispatchQueue];
 

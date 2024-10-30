@@ -52,7 +52,6 @@ public:
         AddArgument("commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
             "The vendor id to use for darwin-framework-tool. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will be "
             "used.");
-        AddArgument("pretend-thread-enabled", 0, 1, &mPretendThreadEnabled, "When the command is issued using an MTRDevice (via -use-mtr-device), instructs the MTRDevice to treat the target device as a Thread device.");
     }
 
     /////////// Command Interface /////////
@@ -165,5 +164,4 @@ private:
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<chip::VendorId> mCommissionerVendorId;
     std::string mCurrentIdentity;
-    chip::Optional<bool> mPretendThreadEnabled;
 };
