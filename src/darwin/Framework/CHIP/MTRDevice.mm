@@ -81,16 +81,18 @@
 #pragma mark - MTRAttributeValueWaiter
 
 // Represents the state of a single attribute being waited for: has the path and
-// value being waited for in the response-value and whether the value has been reached.
+// value being waited for in the response-value and whether the value has been
+// reached.
+MTR_DIRECT_MEMBERS
 @interface MTRAwaitedAttributeState : NSObject
 @property (nonatomic, assign, readwrite) BOOL valueSatisfied;
-@property (nonatomic, retain, readonly) MTRDeviceResponseValueDictionary value;
+@property (nonatomic, retain, readonly) MTRDeviceDataValueDictionary value;
 
-- (instancetype)initWithValue:(MTRDeviceResponseValueDictionary)value;
+- (instancetype)initWithValue:(MTRDeviceDataValueDictionary)value;
 @end
 
 @implementation MTRAwaitedAttributeState
-- (instancetype)initWithValue:(MTRDeviceResponseValueDictionary)value
+- (instancetype)initWithValue:(MTRDeviceDataValueDictionary)value
 {
     if (self = [super init]) {
         _valueSatisfied = NO;
@@ -102,15 +104,16 @@
 @end
 
 // Represents the data passed to waitForAttributeValues:
+MTR_DIRECT_MEMBERS
 @interface MTRAttributeValueWaiter : NSObject
-@property (nonatomic, retain) NSArray<MTRAwaitedAttributeState *> * valueExpectations;
+@property (nonatomic, retain) NSDictionary<MTRAttributePath *, MTRAwaitedAttributeState *> * valueExpectations;
 @property (nonatomic, retain) dispatch_queue_t queue;
 @property (nonatomic) MTRStatusCompletion completion;
 
 @property (nonatomic, readonly) BOOL allValuesSatisfied;
 @property (nonatomic, retain, readwrite, nullable) dispatch_source_t expirationTimer;
 
-- (instancetype)initWithValues:(NSArray<NSDictionary<NSString *, id> *> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion;
+- (instancetype)initWithValues:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion;
 
 // Returns YES if after this report the waiter might be done waiting, NO otherwise.
 - (BOOL)attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path byDevice:(MTRDevice *)device;
@@ -120,13 +123,13 @@
 @end
 
 @implementation MTRAttributeValueWaiter
-- (instancetype)initWithValues:(NSArray<NSDictionary<NSString *, id> *> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion
+- (instancetype)initWithValues:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion
 {
     if (self = [super init]) {
-        auto * valueExpectations = [NSMutableArray arrayWithCapacity:values.count];
-        for (NSDictionary<NSString *, id> * value in values) {
-            auto * valueExpectation = [[MTRAwaitedAttributeState alloc] initWithValue:value];
-            [valueExpectations addObject:valueExpectation];
+        auto * valueExpectations = [NSDictionary dictionaryWithCapacity:values.count];
+        for (MTRAttributePath * path in values) {
+            auto * valueExpectation = [[MTRAwaitedAttributeState alloc] initWithValue:values[path]];
+            valueExpectations[path] = value;
         }
         _valueExpectations = valueExpectations;
         _queue = queue;
@@ -138,20 +141,20 @@
 
 - (BOOL)attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path byDevice:(MTRDevice *)device
 {
-    for (MTRAwaitedAttributeState * valueExpectation in self.valueExpectations) {
-        MTRDeviceResponseValueDictionary expectedValue = valueExpectation.value;
-        if ([path isEqual:expectedValue[MTRAttributePathKey]]) {
-            valueExpectation.valueSatisfied = [device _attributeDataValue:value satisfiesValueExpectation:expectedValue[MTRDataKey]];
-            return valueExpectation.valueSatisfied;
-        }
+    MTRAwaitedAttributeState * valueExpectation = self.valueExpectations[path];
+    if (!valueExpectation) {
+        // We don't care about this one.
+        return NO;
     }
 
-    return NO;
+    MTRDeviceDataValueDictionary expectedValue = valueExpectation.value;
+    valueExpectation.valueSatisfied = [device _attributeDataValue:value satisfiesValueExpectation:expectedValue];
+    return valueExpectation.valueSatisfied;
 }
 
 - (BOOL)allValuesSatisfied
 {
-    for (MTRAwaitedAttributeState * valueExpectation in self.valueExpectations) {
+    for (MTRAwaitedAttributeState * valueExpectation in [self.valueExpectations allValues]) {
         if (!valueExpectation.valueSatisfied) {
             return NO;
         }
@@ -189,7 +192,8 @@
 #endif
 
 @interface MTRDevice ()
-@property (nonatomic, readonly) NSMutableSet<MTRAttributeValueWaiter *> * attributeValueWaiters;
+// nil until the first time we need it.
+@property (nonatomic, readonly, nullable) NSMutableSet<MTRAttributeValueWaiter *> * attributeValueWaiters;
 @end
 
 @implementation MTRDevice
@@ -202,7 +206,6 @@
         _deviceController = controller;
         _nodeID = nodeID;
         _state = MTRDeviceStateUnknown;
-        _attributeValueWaiters = [NSMutableSet set];
     }
 
     return self;
@@ -729,10 +732,14 @@
             }
 
             MTRDeviceDataValueDictionary observedDataValue = observedEntry[MTRDataKey];
-            MTRDeviceDataValueDictionary expectedDataValue = expectedEntry[MTRDataKey];
+            if (!MTR_SAFE_CAST(observedDataValue, NSDictionary)) {
+                MTR_LOG_ERROR("%@ observed data-value is not an NSDictionary: %@", self, observedDataValue);
+                return NO;
+            }
 
-            if (![observedDataValue isKindOfClass:NSDictionary.class] || ![expectedDataValue isKindOfClass:NSDictionary.class]) {
-                MTR_LOG_ERROR("%@ expected or observed data-value id not an NSDictionary: %@, %@", self, observedDataValue, expectedDataValue);
+            MTRDeviceDataValueDictionary expectedDataValue = expectedEntry[MTRDataKey];
+            if (!MTR_SAFE_CAST(expectedDataValue, NSDictionary)) {
+                MTR_LOG_ERROR("%@ expected data-value is not an NSDictionary: %@", self, expectedDataValue);
                 return NO;
             }
 
@@ -817,23 +824,17 @@
 
 #pragma mark - Handling of waits for attribute values
 
-- (void)waitForAttributeValues:(NSArray<MTRDeviceResponseValueDictionary> *)values timeout:(NSTimeInterval)timeout queue:(dispatch_queue_t)queue completion:(void (^)(NSError * _Nullable error))completion
+- (void)waitForAttributeValues:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values timeout:(NSTimeInterval)timeout queue:(dispatch_queue_t)queue completion:(void (^)(NSError * _Nullable error))completion
 {
     // Check that all the values are in fact attribute response-values.
     for (MTRDeviceResponseValueDictionary value in values) {
-        if (!value[MTRAttributePathKey] || !value[MTRDataKey]) {
-            MTR_LOG_ERROR("%@ waitForAttributeValues passed a non-attribute value %@", self, value);
-            dispatch_async(queue, ^{
-                completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-            });
-            return;
-        }
+        MTRVerifyArgumentOrDie(value[MTRAttributePathKey] != nil, @"response-value must have MTRAttributePathKey");
+        MTRVerifyArgumentOrDie(value[MTRDataKey] != nil, @"response-value must have MTRDataKey");
     }
 
     // Check whether we have all these values already.
     NSMutableArray<MTRAttributeRequestPath *> * requestPaths = [NSMutableArray arrayWithCapacity:values.count];
-    for (NSDictionary<NSString *, id> * value in values) {
-        MTRAttributePath * path = value[MTRAttributePathKey];
+    for (MTRAttributePath * path in values) {
         [requestPaths addObject:[MTRAttributeRequestPath requestPathWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute]];
     }
 
@@ -857,6 +858,9 @@
     }
 
     // Otherwise, wait for the values to arrive or our timeout.
+    if (!self.attributeValueWaiters) {
+        _attributeValueWaiters = [NSMutableSet set];
+    }
     [self.attributeValueWaiters addObject:attributeWaiter];
 
     // Clamp timeout to 5 minutes.
@@ -892,12 +896,17 @@
 {
     os_unfair_lock_assert_owner(&_lock);
 
-    // Check whether anyone was waiting for this attribute.  Iterate over a copy
-    // of the set, so we can remove waiters that are done waiting.
-    for (MTRAttributeValueWaiter * attributeValueWaiter in [self.attributeValueWaiters copy]) {
+    // Check whether anyone was waiting for this attribute.
+    NSMutableSet * satisfiedWaiters = [NSMutableSet set];
+    for (MTRAttributeValueWaiter * attributeValueWaiter in self.attributeValueWaiters) {
         if ([attributeValueWaiter attributeValue:value reportedForPath:path byDevice:self] && attributeValueWaiter.allValuesSatisfied) {
-            [self _handleAttributeWaitComplete:attributeValueWaiter];
+            [satisfiedWaiters addObject:attributeValueWaiter];
         }
+    }
+
+    [self.attributeValueWaiters minusSet:satisfiedWaiters];
+    for (MTRAttributeValueWaiter * attributeValueWaiter in satisfiedWaiters) {
+            [self _handleAttributeWaitComplete:attributeValueWaiter];
     }
 }
 

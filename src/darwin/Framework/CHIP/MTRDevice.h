@@ -345,12 +345,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * The completion is also called with an error on input errors.
  *
- * The values to wait for are represented as an array of response-values which
- * have an MTRAttributePathKey and MTRDataKey.
+ * The attributes and values to wait for are represented as a dictionary which
+ * has the attribute paths as keys and the expected data-values as values.
  *
  * If the provided timeout is larger than 5 minutes, it will be capped to 5 minutes.
  */
-- (void)waitForAttributeValues:(NSArray<NSDictionary<NSString *, id> *> *)values
+- (void)waitForAttributeValues:(NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)values
                        timeout:(NSTimeInterval)timeout
                          queue:(dispatch_queue_t)queue
                     completion:(void (^)(NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
