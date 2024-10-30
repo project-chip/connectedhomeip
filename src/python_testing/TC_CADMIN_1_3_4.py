@@ -351,7 +351,8 @@ class TC_CADMIN(MatterBaseTest):
         try:
             th2_cam_rcac = TLVReader(base64.b64decode(
                 self.certificate_authority_manager.activeCaList[3]._persistentStorage._jsonData["sdk-config"]["f/4/r"])).get()["Any"][9]
-        except:
+
+        except IndexError:
             th2_cam_rcac = TLVReader(base64.b64decode(
                 self.certificate_authority_manager.activeCaList[2]._persistentStorage._jsonData["sdk-config"]["f/3/r"])).get()["Any"][9]
 
