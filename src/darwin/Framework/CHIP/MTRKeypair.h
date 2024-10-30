@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
+#import <Matter/Matter.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,19 +32,19 @@ NS_ASSUME_NONNULL_BEGIN
  * framework APIs.
  */
 @protocol MTRKeypair <NSObject>
-@required
-/**
- * @brief Return a copy of the public key for the keypair.
- */
-@property (nonatomic, readonly, copy) SecKeyRef copyPublicKey MTR_NEWLY_AVAILABLE;
-
-/**
- * @brief Return public key for the keypair. DEPRECATED
- */
-
-@property (nonatomic, readonly, copy) SecKeyRef publicKey MTR_DEPRECATED("Please implement copyPublicKey", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
 
 @optional
+/**
+ * @brief Returns a copy of the public key for the keypair.
+ */
+- (SecKeyRef)copyPublicKey MTR_NEWLY_AVAILABLE;
+
+/**
+ * @brief Returns public key for the keypair. DEPRECATED - please use copyPublicKey, otherwise this will leak
+ */
+
+- (SecKeyRef)publicKey MTR_DEPRECATED("Please implement copyPublicKey, this will leak otherwise", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
+
 /**
  * @brief A function to sign a message using ECDSA
  *
