@@ -336,43 +336,66 @@ public:
         AppContext::TearDown();
     }
 
+    void TestICDProcessSubscribeRequestInfMaxIntervalCeiling();
+    void TestICDProcessSubscribeRequestInvalidIdleModeDuration();
+    void TestICDProcessSubscribeRequestMaxMinInterval();
+    void TestICDProcessSubscribeRequestSupMaxIntervalCeiling();
+    void TestICDProcessSubscribeRequestSupMinInterval();
+    void TestPostSubscribeRoundtripChunkReport();
+    void TestPostSubscribeRoundtripChunkReportTimeout();
+    void TestPostSubscribeRoundtripChunkStatusReportTimeout();
+    void TestPostSubscribeRoundtripStatusReportTimeout();
+    void TestProcessSubscribeRequest();
+    void TestReadChunking();
+    void TestReadChunkingInvalidSubscriptionId();
+    void TestReadChunkingStatusReportTimeout();
     void TestReadClient();
-    void TestReadUnexpectedSubscriptionId();
-    void TestReadHandler();
-    void TestReadHandlerSetMaxReportingInterval();
     void TestReadClientGenerateAttributePathList();
     void TestReadClientGenerateInvalidAttributePathList();
-    void TestReadClientInvalidReport();
-    void TestReadClientInvalidAttributeId();
-    void TestReadHandlerInvalidAttributePath();
     void TestReadClientGenerateOneEventPaths();
     void TestReadClientGenerateTwoEventPaths();
-    void TestProcessSubscribeRequest();
-    void TestICDProcessSubscribeRequestSupMaxIntervalCeiling();
-    void TestICDProcessSubscribeRequestInfMaxIntervalCeiling();
-    void TestICDProcessSubscribeRequestSupMinInterval();
-    void TestICDProcessSubscribeRequestMaxMinInterval();
-    void TestICDProcessSubscribeRequestInvalidIdleModeDuration();
-    void TestSubscribeRoundtrip();
-    void TestSubscribeEarlyReport();
-    void TestSubscribeUrgentWildcardEvent();
-    void TestSubscribeInvalidAttributePathRoundtrip();
-    void TestPostSubscribeRoundtripStatusReportTimeout();
+    void TestReadClientInvalidAttributeId();
+    void TestReadClientInvalidReport();
     void TestReadClientReceiveInvalidMessage();
-    void TestSubscribeClientReceiveInvalidStatusResponse();
-    void TestSubscribeClientReceiveWellFormedStatusResponse();
-    void TestSubscribeClientReceiveInvalidReportMessage();
-    void TestSubscribeClientReceiveUnsolicitedInvalidReportMessage();
-    void TestSubscribeClientReceiveInvalidSubscribeResponseMessage();
-    void TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId();
-    void TestReadChunkingInvalidSubscriptionId();
-    void TestReadHandlerMalformedSubscribeRequest();
+    void TestReadHandler();
+    void TestReadHandlerInvalidAttributePath();
+    void TestReadHandlerInvalidSubscribeRequest();
     void TestReadHandlerMalformedReadRequest1();
     void TestReadHandlerMalformedReadRequest2();
-    void TestSubscribeSendUnknownMessage();
-    void TestSubscribeSendInvalidStatusReport();
-    void TestReadHandlerInvalidSubscribeRequest();
+    void TestReadHandlerMalformedSubscribeRequest();
+    void TestReadHandlerSetMaxReportingInterval();
+    void TestReadInvalidAttributePathRoundtrip();
+    void TestReadReportFailure();
+    void TestReadRoundtrip();
+    void TestReadRoundtripWithDataVersionFilter();
+    void TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter();
+    void TestReadRoundtripWithNoMatchPathDataVersionFilter();
+    void TestReadRoundtripWithSameDifferentPathsDataVersionFilter();
+    void TestReadShutdown();
+    void TestReadUnexpectedSubscriptionId();
+    void TestReadWildcard();
+    void TestSetDirtyBetweenChunks();
     void TestShutdownSubscription();
+    void TestSubscribeClientReceiveInvalidReportMessage();
+    void TestSubscribeClientReceiveInvalidStatusResponse();
+    void TestSubscribeClientReceiveInvalidSubscribeResponseMessage();
+    void TestSubscribeClientReceiveUnsolicitedInvalidReportMessage();
+    void TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId();
+    void TestSubscribeClientReceiveWellFormedStatusResponse();
+    void TestSubscribeEarlyReport();
+    void TestSubscribeEarlyShutdown();
+    void TestSubscribeInvalidateFabric();
+    void TestSubscribeInvalidAttributePathRoundtrip();
+    void TestSubscribeInvalidInterval();
+    void TestSubscribePartialOverlap();
+    void TestSubscribeRoundtrip();
+    void TestSubscribeRoundtripChunkStatusReportTimeout();
+    void TestSubscribeRoundtripStatusReportTimeout();
+    void TestSubscribeSendInvalidStatusReport();
+    void TestSubscribeSendUnknownMessage();
+    void TestSubscribeSetDirtyFullyOverlap();
+    void TestSubscribeUrgentWildcardEvent();
+    void TestSubscribeWildcard();
     void TestSubscriptionReportWithDefunctSession();
 
     enum class ReportType : uint8_t
@@ -951,7 +974,9 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths()
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestReadInteraction, TestReadRoundtrip)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadRoundtrip)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadRoundtrip)
+void TestReadInteraction::TestReadRoundtrip()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -1028,7 +1053,9 @@ TEST_F(TestReadInteraction, TestReadRoundtrip)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestReadInteraction, TestReadRoundtripWithDataVersionFilter)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadRoundtripWithDataVersionFilter)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadRoundtripWithDataVersionFilter)
+void TestReadInteraction::TestReadRoundtripWithDataVersionFilter()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -1080,7 +1107,9 @@ TEST_F(TestReadInteraction, TestReadRoundtripWithDataVersionFilter)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestReadInteraction, TestReadRoundtripWithNoMatchPathDataVersionFilter)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadRoundtripWithNoMatchPathDataVersionFilter)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadRoundtripWithNoMatchPathDataVersionFilter)
+void TestReadInteraction::TestReadRoundtripWithNoMatchPathDataVersionFilter()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -1136,7 +1165,9 @@ TEST_F(TestReadInteraction, TestReadRoundtripWithNoMatchPathDataVersionFilter)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestReadInteraction, TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter)
+void TestReadInteraction::TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -1193,7 +1224,9 @@ TEST_F(TestReadInteraction, TestReadRoundtripWithMultiSamePathDifferentDataVersi
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestReadInteraction, TestReadRoundtripWithSameDifferentPathsDataVersionFilter)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadRoundtripWithSameDifferentPathsDataVersionFilter)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadRoundtripWithSameDifferentPathsDataVersionFilter)
+void TestReadInteraction::TestReadRoundtripWithSameDifferentPathsDataVersionFilter()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -1250,7 +1283,9 @@ TEST_F(TestReadInteraction, TestReadRoundtripWithSameDifferentPathsDataVersionFi
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestReadInteraction, TestReadWildcard)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadWildcard)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadWildcard)
+void TestReadInteraction::TestReadWildcard()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -1296,7 +1331,9 @@ TEST_F(TestReadInteraction, TestReadWildcard)
 }
 
 // TestReadChunking will try to read a few large attributes, the report won't fit into the MTU and result in chunking.
-TEST_F(TestReadInteraction, TestReadChunking)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadChunking)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadChunking)
+void TestReadInteraction::TestReadChunking()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -1348,7 +1385,9 @@ TEST_F(TestReadInteraction, TestReadChunking)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestReadInteraction, TestSetDirtyBetweenChunks)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSetDirtyBetweenChunks)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSetDirtyBetweenChunks)
+void TestReadInteraction::TestSetDirtyBetweenChunks()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -1496,7 +1535,9 @@ TEST_F(TestReadInteraction, TestSetDirtyBetweenChunks)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestReadInteraction, TestReadInvalidAttributePathRoundtrip)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadInvalidAttributePathRoundtrip)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadInvalidAttributePathRoundtrip)
+void TestReadInteraction::TestReadInvalidAttributePathRoundtrip()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -2546,7 +2587,9 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent()
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestReadInteraction, TestSubscribeWildcard)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeWildcard)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeWildcard)
+void TestReadInteraction::TestSubscribeWildcard()
 {
     // This test in particular is completely tied to the DefaultMockConfig in the mock
     // attribute storage, so reset to that (figuring out chunking location is extra hard to
@@ -2684,7 +2727,9 @@ TEST_F(TestReadInteraction, TestSubscribeWildcard)
 }
 
 // Subscribe (wildcard, C3, A1), then setDirty (E2, C3, wildcard), receive one attribute after setDirty
-TEST_F(TestReadInteraction, TestSubscribePartialOverlap)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribePartialOverlap)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribePartialOverlap)
+void TestReadInteraction::TestSubscribePartialOverlap()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -2754,7 +2799,9 @@ TEST_F(TestReadInteraction, TestSubscribePartialOverlap)
 }
 
 // Subscribe (E2, C3, A1), then setDirty (wildcard, wildcard, wildcard), receive one attribute after setDirty
-TEST_F(TestReadInteraction, TestSubscribeSetDirtyFullyOverlap)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeSetDirtyFullyOverlap)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeSetDirtyFullyOverlap)
+void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -2823,7 +2870,9 @@ TEST_F(TestReadInteraction, TestSubscribeSetDirtyFullyOverlap)
 
 // Verify that subscription can be shut down just after receiving SUBSCRIBE RESPONSE,
 // before receiving any subsequent REPORT DATA.
-TEST_F(TestReadInteraction, TestSubscribeEarlyShutdown)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeEarlyShutdown)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeEarlyShutdown)
+void TestReadInteraction::TestSubscribeEarlyShutdown()
 {
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     InteractionModelEngine & engine    = *InteractionModelEngine::GetInstance();
@@ -2940,7 +2989,9 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip()
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestReadInteraction, TestReadShutdown)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadShutdown)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadShutdown)
+void TestReadInteraction::TestReadShutdown()
 {
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     app::ReadClient * pClients[4];
@@ -2977,7 +3028,9 @@ TEST_F(TestReadInteraction, TestReadShutdown)
     Platform::Delete(pClients[2]);
 }
 
-TEST_F(TestReadInteraction, TestSubscribeInvalidInterval)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeInvalidInterval)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeInvalidInterval)
+void TestReadInteraction::TestSubscribeInvalidInterval()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -3140,7 +3193,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout()
     CreateSessionBobToAlice();
 }
 
-TEST_F(TestReadInteraction, TestSubscribeRoundtripStatusReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeRoundtripStatusReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeRoundtripStatusReportTimeout)
+void TestReadInteraction::TestSubscribeRoundtripStatusReportTimeout()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -3213,7 +3268,9 @@ TEST_F(TestReadInteraction, TestSubscribeRoundtripStatusReportTimeout)
     CreateSessionBobToAlice();
 }
 
-TEST_F(TestReadInteraction, TestReadChunkingStatusReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadChunkingStatusReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadChunkingStatusReportTimeout)
+void TestReadInteraction::TestReadChunkingStatusReportTimeout()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -3265,7 +3322,9 @@ TEST_F(TestReadInteraction, TestReadChunkingStatusReportTimeout)
 // ReadClient sends the read request, but handler fails to send the one report (SendMessage returns an error).
 // Since this is an un-chunked read, we are not in the AwaitingReportResponse state, so the "reports in flight"
 // counter should not increase.
-TEST_F(TestReadInteraction, TestReadReportFailure)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadReportFailure)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadReportFailure)
+void TestReadInteraction::TestReadReportFailure()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -3309,7 +3368,9 @@ TEST_F(TestReadInteraction, TestReadReportFailure)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestReadInteraction, TestSubscribeRoundtripChunkStatusReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeRoundtripChunkStatusReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeRoundtripChunkStatusReportTimeout)
+void TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -3377,7 +3438,9 @@ TEST_F(TestReadInteraction, TestSubscribeRoundtripChunkStatusReportTimeout)
     CreateSessionBobToAlice();
 }
 
-TEST_F(TestReadInteraction, TestPostSubscribeRoundtripChunkStatusReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestPostSubscribeRoundtripChunkStatusReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestPostSubscribeRoundtripChunkStatusReportTimeout)
+void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -3476,7 +3539,9 @@ TEST_F(TestReadInteraction, TestPostSubscribeRoundtripChunkStatusReportTimeout)
     CreateSessionBobToAlice();
 }
 
-TEST_F(TestReadInteraction, TestPostSubscribeRoundtripChunkReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestPostSubscribeRoundtripChunkReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestPostSubscribeRoundtripChunkReportTimeout)
+void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -3574,7 +3639,9 @@ TEST_F(TestReadInteraction, TestPostSubscribeRoundtripChunkReportTimeout)
     CreateSessionBobToAlice();
 }
 
-TEST_F(TestReadInteraction, TestPostSubscribeRoundtripChunkReport)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestPostSubscribeRoundtripChunkReport)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestPostSubscribeRoundtripChunkReport)
+void TestReadInteraction::TestPostSubscribeRoundtripChunkReport()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4715,7 +4782,9 @@ void TestReadInteraction::TestReadHandlerInvalidSubscribeRequest()
 
 // Create the subscription, then remove the corresponding fabric in client and handler, the corresponding
 // client and handler would be released as well.
-TEST_F(TestReadInteraction, TestSubscribeInvalidateFabric)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeInvalidateFabric)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeInvalidateFabric)
+void TestReadInteraction::TestSubscribeInvalidateFabric()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
