@@ -84,7 +84,7 @@ public:
 //   - IsClusterDataVersionEqual returning true on everything is odd
 //   - IsDeviceTypeOnEndpoint returning true on every value seems odd
 
-Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+static Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // The Mock cluster catalog -- only have one command on one cluster on one endpoint.
     using Protocols::InteractionModel::Status;

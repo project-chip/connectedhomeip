@@ -93,8 +93,6 @@ const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePat
 
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath);
 
-Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath);
-
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj);
 

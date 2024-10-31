@@ -102,16 +102,6 @@ Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventP
 }
 
 // strong defintion in TestCommandInteraction.cpp
-__attribute__((weak)) Protocols::InteractionModel::Status
-ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath)
-{
-    // Mock cluster catalog, only support commands on one cluster on one endpoint.
-    using Protocols::InteractionModel::Status;
-
-    return Status::Success;
-}
-
-// strong defintion in TestCommandInteraction.cpp
 __attribute__((weak)) void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath,
                                                         chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {}

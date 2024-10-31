@@ -135,35 +135,6 @@ bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
     return DetermineAttributeStatus(aPath, /* aIsWrite = */ false) == Status::UnsupportedAccess;
 }
 
-Status ServerClusterCommandExists(const ConcreteCommandPath & aPath)
-{
-    // TODO: Consider making this configurable for applications that are not
-    // trying to be an OTA provider.
-    using namespace OtaSoftwareUpdateProvider::Commands;
-
-    if (aPath.mEndpointId != kSupportedEndpoint)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-
-    if (aPath.mClusterId != OtaSoftwareUpdateProvider::Id)
-    {
-        return Status::UnsupportedCluster;
-    }
-
-    switch (aPath.mCommandId)
-    {
-    case QueryImage::Id:
-        FALLTHROUGH;
-    case ApplyUpdateRequest::Id:
-        FALLTHROUGH;
-    case NotifyUpdateApplied::Id:
-        return Status::Success;
-    }
-
-    return Status::UnsupportedCommand;
-}
-
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
 {
     // Will never be called anyway; we have no attributes.

@@ -481,24 +481,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     }
 }
 
-Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
-{
-    // Mock cluster catalog, only support commands on one cluster on one endpoint.
-    using Protocols::InteractionModel::Status;
-
-    if (aCommandPath.mEndpointId != DataModelTests::kTestEndpointId)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-
-    if (aCommandPath.mClusterId != Clusters::UnitTesting::Id)
-    {
-        return Status::UnsupportedCluster;
-    }
-
-    return Status::Success;
-}
-
 CustomDataModel & CustomDataModel::Instance()
 {
     static CustomDataModel model;
