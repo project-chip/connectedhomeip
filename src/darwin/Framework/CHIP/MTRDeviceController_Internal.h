@@ -68,8 +68,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, assign) os_unfair_lock_t deviceMapLock;
 
 @property (readwrite, nonatomic) NSUUID * uniqueIdentifier;
-
-// queue used to serialize all work performed by the MTRDeviceController
 // (moved here so subclasses can initialize differently)
 
 - (instancetype)initForSubclasses:(BOOL)startSuspended;
