@@ -43,7 +43,7 @@ namespace app {
  *
  * A initialized iterator will return the first valid path, no need to call Next() before calling Get() for the first time.
  *
- * Note: The Next() and Get() are two separate operations by design since a possible call of this iterator might be:
+ * Note: Next() and Get() are two separate operations by design since a possible call of this iterator might be:
  * - Get()
  * - Chunk full, return
  * - In a new chunk, Get()
