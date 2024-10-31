@@ -35,7 +35,7 @@ source_set("without-logging") {
     "${chip_root}/src/transport",
   ]
 
-  if (chip_device_config_enable_wifipaf == true) {
+  if (chip_device_config_enable_wifipaf) {
     public_deps += [ "${chip_root}/src/wifipaf" ]
   }
 
