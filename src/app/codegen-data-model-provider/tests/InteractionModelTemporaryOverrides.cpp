@@ -54,14 +54,6 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeEncodeState * apEncoderState)
-{
-    // this is just to get things to compile. eventually this method should NOT be used
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 } // namespace app
 } // namespace chip
 

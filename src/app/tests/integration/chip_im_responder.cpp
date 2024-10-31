@@ -119,13 +119,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
     statusCodeFlipper = !statusCodeFlipper;
 }
 
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeEncodeState * apEncoderState)
-{
-    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0).Encode(kTestFieldValue1);
-}
-
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
 {
     return Protocols::InteractionModel::Status::Success;
