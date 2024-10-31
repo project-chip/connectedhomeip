@@ -36,11 +36,6 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
     return true;
 }
 
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aPath)
-{
-    return emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-}
-
 Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
 {
     // TODO: this is just a noop which may be potentially invalid

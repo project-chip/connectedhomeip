@@ -624,14 +624,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     // Nothing todo.
 }
 
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
-{
-    // Note: This test does not make use of the real attribute metadata.
-    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint32_t(0)) };
-    return &stub;
-}
-
-
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
 {
     return Protocols::InteractionModel::Status::Success;
