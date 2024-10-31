@@ -47,6 +47,7 @@ NSString * const MTRDeviceControllerRegistrationNodeIDKey = @"MTRDeviceControlle
 NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey = @"MTRDeviceControllerRegistrationControllerNodeID";
 NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey = @"MTRDeviceControllerRegistrationControllerIsRunning";
 NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey = @"MTRDeviceControllerRegistrationDeviceInternalState";
+NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey = @"MTRDeviceControllerRegistrationControllerCompressedFabricID";
 
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
@@ -95,6 +96,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
 #pragma mark - XPC
 @synthesize controllerNodeID = _controllerNodeID;
+@synthesize compressedFabricID = _compressedFabricID;
 
 + (NSMutableSet *)_allowedClasses
 {
@@ -450,9 +452,16 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
     //  }
 
     NSDictionary * controllerContext = MTR_SAFE_CAST(configuration[MTRDeviceControllerRegistrationControllerContextKey], NSDictionary);
-    NSNumber * controllerNodeID = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey], NSNumber);
-    if (controllerContext && controllerNodeID) {
-        _controllerNodeID = controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey];
+    if (controllerContext) {
+        NSNumber * controllerNodeID = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey], NSNumber);
+        if (controllerNodeID) {
+            _controllerNodeID = controllerNodeID;
+        }
+
+        NSNumber * compressedFabricID = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationControllerCompressedFabricIDKey], NSNumber);
+        if (compressedFabricID) {
+            _compressedFabricID = compressedFabricID;
+        }
     }
 
     NSArray * deviceInfoList = MTR_SAFE_CAST(configuration[MTRDeviceControllerRegistrationNodeIDsKey], NSArray);
