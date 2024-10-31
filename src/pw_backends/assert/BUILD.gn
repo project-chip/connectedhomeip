@@ -29,7 +29,7 @@ config("backend_config") {
 }
 
 pw_facade("handler") {
-  backend = "${chip_root}/src/backends/assert:assert.impl"
+  backend = "${chip_root}/src/pw_backends/assert:assert.impl"
   public_configs = [ ":public_include_path" ]
   public_deps = [ "$dir_pw_preprocessor" ]
   public = [ "public/pw_assert_matter/handler.h" ]

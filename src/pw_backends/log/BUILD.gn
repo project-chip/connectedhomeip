@@ -29,7 +29,7 @@ config("backend_config") {
 }
 
 pw_facade("handler") {
-  backend = "${chip_root}/src/backends/log:log.impl"
+  backend = "${chip_root}/src/pw_backends/log:log.impl"
   public_configs = [ ":public_include_path" ]
   public_deps = [
     "$dir_pw_preprocessor",

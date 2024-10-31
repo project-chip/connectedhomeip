@@ -15,8 +15,8 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
-pw_log_BACKEND = "${chip_root}/src/backends/log"
-pw_assert_BACKEND = "${chip_root}/src/backends/assert"
+pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
+pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
 pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
 pw_sys_io_BACKEND = "${chip_root}/examples/platform/nxp/pw_sys_io:pw_sys_io_nxp"
 
