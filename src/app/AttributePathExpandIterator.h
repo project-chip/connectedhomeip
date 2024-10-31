@@ -37,8 +37,8 @@ namespace app {
  * ConcreteAttributePath path;
  * for (AttributePathExpandIterator iterator(AttributePathParams); iterator.Get(path); iterator.Next()) {...}
  *
- * The iterator does not copy the given AttributePathParams. The given AttributePathParams must remain valid when using the iterator.
- * If the set of endpoints, clusters, or attributes that are supported changes, AttributePathExpandIterator must be
+ * The iterator does not copy the given AttributePathParams. The given AttributePathParams must remain valid when using the
+ * iterator. If the set of endpoints, clusters, or attributes that are supported changes, AttributePathExpandIterator must be
  * reinitialized.
  *
  * A initialized iterator will return the first valid path, no need to call Next() before calling Get() for the first time.
