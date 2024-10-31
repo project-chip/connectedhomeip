@@ -26,7 +26,6 @@
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
 #include <app/util/DataModelHandler.h>
-#include <app/util/ember-compatibility-functions.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
@@ -83,7 +82,6 @@ using chip::Transport::TcpListenParameters;
 
 namespace {
 
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
 {
 public:
@@ -95,30 +93,12 @@ public:
         {
             if (type->deviceTypeId == deviceType)
             {
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-                VerifyOrDie(chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
-#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
                 return true;
             }
         }
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        VerifyOrDie(!chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
-#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
         return false;
     }
 } sDeviceTypeResolver;
-#else // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-
-// Ember implementation of the device type resolver
-class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
-{
-public:
-    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
-    {
-        return chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
-    }
-} sDeviceTypeResolver;
-#endif
 
 } // namespace
 

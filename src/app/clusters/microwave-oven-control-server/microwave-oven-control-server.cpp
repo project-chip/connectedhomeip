@@ -24,7 +24,6 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -250,12 +249,8 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     {
         ConcreteCommandPath commandPath(mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id);
 
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        bool commandExists = ServerClusterCommandExists(commandPath) == Status::Success;
-#else
         bool commandExists =
             InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetAcceptedCommandInfo(commandPath).has_value();
-#endif
         VerifyOrExit(
             commandExists, status = Status::InvalidCommand; ChipLogError(
                 Zcl,

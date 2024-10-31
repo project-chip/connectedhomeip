@@ -161,8 +161,6 @@
 		5143851E2A65885500EDC8E6 /* MTRSwiftPairingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5143851D2A65885500EDC8E6 /* MTRSwiftPairingTests.swift */; };
 		514654492A72F9DF00904E61 /* MTRDemuxingStorage.mm in Sources */ = {isa = PBXBuildFile; fileRef = 514654482A72F9DF00904E61 /* MTRDemuxingStorage.mm */; };
 		5146544B2A72F9F500904E61 /* MTRDemuxingStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 5146544A2A72F9F500904E61 /* MTRDemuxingStorage.h */; };
-		514C79ED2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79EC2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp */; };
-		514C79EE2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79EC2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp */; };
 		514C79F02B62ADDA00DD6D7B /* descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */; };
 		514C79F12B62ADDA00DD6D7B /* descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */; };
 		514C79F32B62ED5500DD6D7B /* attribute-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */; };
@@ -641,7 +639,6 @@
 		5143851D2A65885500EDC8E6 /* MTRSwiftPairingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTRSwiftPairingTests.swift; sourceTree = "<group>"; };
 		514654482A72F9DF00904E61 /* MTRDemuxingStorage.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDemuxingStorage.mm; sourceTree = "<group>"; };
 		5146544A2A72F9F500904E61 /* MTRDemuxingStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDemuxingStorage.h; sourceTree = "<group>"; };
-		514C79EC2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-compatibility-functions.cpp"; path = "util/ember-compatibility-functions.cpp"; sourceTree = "<group>"; };
 		514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = descriptor.cpp; path = clusters/descriptor/descriptor.cpp; sourceTree = "<group>"; };
 		514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-storage.cpp"; path = "util/attribute-storage.cpp"; sourceTree = "<group>"; };
 		514C79F52B62F0B900DD6D7B /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = util/util.cpp; sourceTree = "<group>"; };
@@ -1162,7 +1159,6 @@
 				5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */,
 				514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */,
 				514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */,
-				514C79EC2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp */,
 				E04AC67C2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp */,
 				E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */,
 				516415FE2B6B132200D5CE11 /* DataModelHandler.cpp */,
@@ -2102,7 +2098,6 @@
 				039546A62991E151006D42A8 /* InteractionModel.cpp in Sources */,
 				B4FCD5722B603A6300832859 /* DownloadLogCommand.mm in Sources */,
 				75A202E62BA8DBAC00A771DD /* reporting.cpp in Sources */,
-				514C79EE2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp in Sources */,
 				039145E82993179300257B3E /* GetCommissionerNodeIdCommand.mm in Sources */,
 				0395469F2991DFC5006D42A8 /* json_reader.cpp in Sources */,
 				514C79F42B62ED5500DD6D7B /* attribute-storage.cpp in Sources */,
@@ -2178,7 +2173,6 @@
 				516415FF2B6B132200D5CE11 /* DataModelHandler.cpp in Sources */,
 				75139A6F2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.mm in Sources */,
 				51E95DFC2A78443C00A434F0 /* MTRSessionResumptionStorageBridge.mm in Sources */,
-				514C79ED2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp in Sources */,
 				7534F12828BFF20300390851 /* MTRDeviceAttestationDelegate.mm in Sources */,
 				B4C8E6B72B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm in Sources */,
 				2C5EEEF7268A85C400CAE3D3 /* MTRDeviceConnectionBridge.mm in Sources */,

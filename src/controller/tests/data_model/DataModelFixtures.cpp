@@ -85,9 +85,9 @@ CommandHandler::Handle gAsyncCommandHandle;
 
 } // namespace DataModelTests
 
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeEncodeState * apEncoderState)
+static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+                                        const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
+                                        AttributeEncodeState * apEncoderState)
 {
     if (aPath.mEndpointId >= chip::Test::kMockEndpointMin)
     {
@@ -224,175 +224,6 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return CHIP_NO_ERROR;
 }
 
-bool IsClusterDataVersionEqual(const app::ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    if (aRequiredVersion == kDataVersion)
-    {
-        return true;
-    }
-    if (Test::GetVersion() == aRequiredVersion)
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-{
-    return false;
-}
-
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
-{
-    // Note: This test does not make use of the real attribute metadata.
-    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint32_t(0)) };
-    return &stub;
-}
-
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
-{
-    static ListIndex listStructOctetStringElementCount = 0;
-
-    if (aPath.mDataVersion.HasValue() && aPath.mDataVersion.Value() == kRejectedDataVersion)
-    {
-        return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
-    }
-
-    if (aPath.mClusterId == Clusters::UnitTesting::Id &&
-        aPath.mAttributeId == Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
-    {
-        if (gWriteResponseDirective == WriteResponseDirective::kSendAttributeSuccess)
-        {
-            if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
-            {
-
-                Attributes::ListStructOctetString::TypeInfo::DecodableType value;
-
-                ReturnErrorOnFailure(DataModel::Decode(aReader, value));
-
-                auto iter                         = value.begin();
-                listStructOctetStringElementCount = 0;
-                while (iter.Next())
-                {
-                    auto & item = iter.GetValue();
-
-                    VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
-                    listStructOctetStringElementCount++;
-                }
-
-                aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
-            }
-            else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
-            {
-                Structs::TestListStructOctet::DecodableType item;
-                ReturnErrorOnFailure(DataModel::Decode(aReader, item));
-                VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
-                listStructOctetStringElementCount++;
-
-                aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
-            }
-            else
-            {
-                return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-            }
-        }
-        else
-        {
-            aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Failure);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-    if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::ListFabricScoped::Id)
-    {
-        // Mock an invalid SubjectDescriptor.
-        // NOTE: completely ignores the passed-in subjectDescriptor
-        AttributeValueDecoder decoder(aReader, Access::SubjectDescriptor());
-        if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
-        {
-            Attributes::ListFabricScoped::TypeInfo::DecodableType value;
-
-            ReturnErrorOnFailure(decoder.Decode(value));
-
-            auto iter = value.begin();
-            while (iter.Next())
-            {
-                auto & item = iter.GetValue();
-                (void) item;
-            }
-
-            aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
-        }
-        else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
-        {
-            Structs::TestFabricScoped::DecodableType item;
-            ReturnErrorOnFailure(decoder.Decode(item));
-
-            aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
-        }
-        else
-        {
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-        return CHIP_NO_ERROR;
-    }
-
-    // Boolean attribute of unit testing cluster triggers "multiple errors" case.
-    if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
-    {
-        Protocols::InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
-
-        if (gWriteResponseDirective == WriteResponseDirective::kSendMultipleSuccess)
-        {
-            status = Protocols::InteractionModel::Status::Success;
-        }
-        else if (gWriteResponseDirective == WriteResponseDirective::kSendMultipleErrors)
-        {
-            status = Protocols::InteractionModel::Status::Failure;
-        }
-        else
-        {
-            VerifyOrDie(false);
-        }
-
-        for (size_t i = 0; i < 4; ++i)
-        {
-            aWriteHandler->AddStatus(aPath, status);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-
-    if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::Int8u::TypeInfo::GetAttributeId())
-    {
-        Protocols::InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
-        if (gWriteResponseDirective == WriteResponseDirective::kSendClusterSpecificSuccess)
-        {
-            status = Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
-        }
-        else if (gWriteResponseDirective == WriteResponseDirective::kSendClusterSpecificFailure)
-        {
-            status = Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure);
-        }
-        else
-        {
-            VerifyOrDie(false);
-        }
-
-        aWriteHandler->AddStatus(aPath, status);
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
 {
@@ -481,24 +312,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     }
 }
 
-Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
-{
-    // Mock cluster catalog, only support commands on one cluster on one endpoint.
-    using Protocols::InteractionModel::Status;
-
-    if (aCommandPath.mEndpointId != DataModelTests::kTestEndpointId)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-
-    if (aCommandPath.mClusterId != Clusters::UnitTesting::Id)
-    {
-        return Status::UnsupportedCluster;
-    }
-
-    return Status::Success;
-}
-
 CustomDataModel & CustomDataModel::Instance()
 {
     static CustomDataModel model;
@@ -508,20 +321,6 @@ CustomDataModel & CustomDataModel::Instance()
 ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     AttributeEncodeState mutableState(&encoder.GetState()); // provide a state copy to start.
-
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    if ((request.path.mEndpointId < chip::Test::kMockEndpointMin) &&
-        (gReadResponseDirective == ReadResponseDirective::kSendDataResponse) &&
-        (request.path.mClusterId == app::Clusters::UnitTesting::Id) &&
-        (request.path.mAttributeId == app::Clusters::UnitTesting::Attributes::Int16u::Id))
-    {
-        // gInt16uTotalReadCount is a global that keeps changing. Further more, encoding
-        // size differs when moving from 0xFF to 0x100, so encoding sizes in TLV differ.
-        //
-        // This is a HACKISH workaround as it relies that we ember-read before datamodel-read
-        gInt16uTotalReadCount--;
-    }
-#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
     Access::SubjectDescriptor subjectDescriptor;
     if (request.subjectDescriptor != nullptr)

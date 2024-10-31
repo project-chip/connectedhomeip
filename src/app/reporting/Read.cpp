@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/reporting/Read-DataModel.h>
+#include <app/reporting/Read.h>
 
 #include <app/AppConfig.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
@@ -26,20 +26,17 @@
 namespace chip {
 namespace app {
 namespace reporting {
-namespace DataModelImpl {
+namespace Impl {
 
 DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel,
                                                   const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
                                                   AttributeReportIBs::Builder & reportBuilder,
                                                   const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
-    // Odd ifdef is to only do this if the `Read-Check` does not do it already.
-#if !CHIP_CONFIG_USE_EMBER_DATA_MODEL
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
                   path.mAttributeId);
     DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
                                                           DataModelCallbacks::OperationOrder::Pre, path);
-#endif // !CHIP_CONFIG_USE_EMBER_DATA_MODEL
 
     DataModel::ReadAttributeRequest readRequest;
 
@@ -70,7 +67,6 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     if (status.IsSuccess())
     {
         // Odd ifdef is to only do this if the `Read-Check` does not do it already.
-#if !CHIP_CONFIG_USE_EMBER_DATA_MODEL
         // TODO: this callback being only executed on success is awkward. The Write callback is always done
         //       for both read and write.
         //
@@ -78,7 +74,6 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
         //       call this.
         DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
                                                               DataModelCallbacks::OperationOrder::Post, path);
-#endif // !CHIP_CONFIG_USE_EMBER_DATA_MODEL
         return status;
     }
 
@@ -115,7 +110,7 @@ bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const Concrete
     return (info->dataVersion == dataVersion);
 }
 
-} // namespace DataModelImpl
+} // namespace Impl
 } // namespace reporting
 } // namespace app
 } // namespace chip

@@ -35,7 +35,6 @@
 #include <lib/core/Global.h>
 #include <lib/core/NodeId.h>
 
-#include <app/util/ember-compatibility-functions.h>
 #include <app/util/privilege-storage.h>
 
 using namespace chip;
@@ -47,7 +46,14 @@ class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver {
 public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override
     {
-        return app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
+        app::DataModel::Provider * model = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+
+        for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type)) {
+            if (type->deviceTypeId == deviceType) {
+                return true;
+            }
+        }
+        return false;
     }
 };
 

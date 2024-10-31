@@ -60,78 +60,15 @@ private:
     AttributeValueDecoder & mDecoder;
 };
 
-// Used by the code in TestWriteInteraction.cpp (and generally tests that interact with the WriteHandler may need this).
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
-{
-    // Note: This test does not make use of the real attribute metadata.
-    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint32_t(0)) };
-    return &stub;
-}
-
-// Used by the code in TestWriteInteraction.cpp (and generally tests that interact with the WriteHandler may need this).
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
-{
-    if (aPath.mDataVersion.HasValue() && aPath.mDataVersion.Value() == Test::kRejectedDataVersion)
-    {
-        return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
-    }
-
-    TLV::TLVWriter writer;
-    writer.Init(chip::Test::attributeDataTLV);
-    writer.CopyElement(TLV::AnonymousTag(), aReader);
-    chip::Test::attributeDataTLVLen = writer.GetLengthWritten();
-    return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
-}
-
-// Used by the code in TestAclAttribute.cpp (and generally tests that interact with the InteractionModelEngine may need this).
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return aPath.mClusterId != Test::kTestDeniedClusterId1;
-}
-
-// Used by the code in TestAclAttribute.cpp (and generally tests that interact with the InteractionModelEngine may need this).
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    if (aPath.mClusterId == Test::kTestDeniedClusterId1)
-    {
-        return Protocols::InteractionModel::Status::UnsupportedCluster;
-    }
-
-    return Protocols::InteractionModel::Status::Success;
-}
-
-// strong defintion in TestCommandInteraction.cpp
-__attribute__((weak)) Protocols::InteractionModel::Status
-ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath)
-{
-    // Mock cluster catalog, only support commands on one cluster on one endpoint.
-    using Protocols::InteractionModel::Status;
-
-    return Status::Success;
-}
-
 // strong defintion in TestCommandInteraction.cpp
 __attribute__((weak)) void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath,
                                                         chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {}
 
 // Used by the code in TestReadInteraction.cpp (and generally tests that interact with the Reporting Engine may need this).
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    return (Test::kTestDataVersion1 == aRequiredVersion);
-}
-
-// Used by the code in TestReadInteraction.cpp.
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-{
-    return false;
-}
-
-// Used by the code in TestReadInteraction.cpp (and generally tests that interact with the Reporting Engine may need this).
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeEncodeState * apEncoderState)
+static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+                                        const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
+                                        AttributeEncodeState * apEncoderState)
 {
     if (aPath.mClusterId >= Test::kMockEndpointMin)
     {

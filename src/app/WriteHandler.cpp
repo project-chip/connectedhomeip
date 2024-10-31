@@ -28,7 +28,6 @@
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
@@ -74,10 +73,8 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
 {
     VerifyOrReturnError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(apWriteHandlerDelegate, CHIP_ERROR_INVALID_ARGUMENT);
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     VerifyOrReturnError(apProvider, CHIP_ERROR_INVALID_ARGUMENT);
     mDataModelProvider = apProvider;
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
     mDelegate = apWriteHandlerDelegate;
     MoveToState(State::Initialized);
@@ -99,15 +96,12 @@ void WriteHandler::Close()
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
     mStateFlags.Clear(StateBits::kSuppressResponse);
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     mDataModelProvider = nullptr;
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     MoveToState(State::Uninitialized);
 }
 
 std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePath & path)
 {
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     if (mDataModelProvider == nullptr)
     {
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
@@ -123,15 +117,6 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
     }
 
     return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
-#else
-    constexpr uint8_t kListAttributeType = 0x48;
-    const auto attributeMetadata         = GetAttributeMetadata(path);
-    if (attributeMetadata == nullptr)
-    {
-        return std::nullopt;
-    }
-    return (attributeMetadata->attributeType == kListAttributeType);
-#endif
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -613,9 +598,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     // our callees hand out Status as well.
     Status status = Status::InvalidAction;
 
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     mLastSuccessfullyWrittenPath = std::nullopt;
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
     reader.Init(std::move(aPayload));
 
@@ -773,7 +756,6 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSub
 {
     // Writes do not have a checked-path. If data model interface is enabled (both checked and only version)
     // the write is done via the DataModel interface
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     DataModel::WriteAttributeRequest request;
@@ -790,9 +772,6 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSub
     mLastSuccessfullyWrittenPath = status.IsSuccess() ? std::make_optional(aPath) : std::nullopt;
 
     return AddStatusInternal(aPath, StatusIB(status.GetStatusCode()));
-#else
-    return WriteSingleClusterData(aSubject, aPath, aData, this);
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 }
 
 } // namespace app

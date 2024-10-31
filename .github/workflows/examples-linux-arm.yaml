@@ -65,7 +65,7 @@ jobs:
                         --target linux-arm64-chip-tool-nodeps-ipv6only \
                         --target linux-arm64-lock-clang \
                         --target linux-arm64-minmdns-clang \
-                        --target linux-arm64-light-data-model-enabled-rpc-ipv6only-clang \
+                        --target linux-arm64-light-rpc-ipv6only-clang \
                         --target linux-arm64-thermostat-no-ble-clang \
                         --target linux-arm64-lit-icd-no-ble-clang \
                         --target linux-arm64-fabric-admin-clang-rpc \

@@ -71,15 +71,7 @@ macro(chip_app_component_zapgen ZAP_NAME)
 
     add_dependencies(${COMPONENT_LIB} app-zapgen)
     target_include_directories(${COMPONENT_LIB} PUBLIC "${APP_TEMPLATE_GEN_DIR}")
-    target_sources(${COMPONENT_LIB} PRIVATE ${APP_TEMPLATE_GEN_FILES})
-
-    # When data model interface is used, provide a default code-generation data model as
-    # part of zapgen. See `chip_data_model.cmake` for similar logic
-    set(CHIP_DATA_MODEL_INTERFACE "enabled" CACHE STRING "Data model interface option to use: enabled or disabled")
-
-    if ("${CHIP_DATA_MODEL_INTERFACE}" STREQUAL "enabled")
-      target_sources(${COMPONENT_LIB} PRIVATE ${CODEGEN_DATA_MODEL_SOURCES})
-    endif()
+    target_sources(${COMPONENT_LIB} PRIVATE ${APP_TEMPLATE_GEN_FILES} ${CODEGEN_DATA_MODEL_SOURCES})
 
   endif()
 endmacro()

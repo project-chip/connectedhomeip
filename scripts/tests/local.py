@@ -587,11 +587,8 @@ def build_fabric_sync():
 
 
 @cli.command()
-@click.option(
-    "--data-model-interface", type=click.Choice(["enabled", "disabled", "check"])
-)
 @click.option("--asan", is_flag=True, default=False, show_default=True)
-def build_casting_apps(data_model_interface, asan):
+def build_casting_apps(asan):
     """
     Builds Applications used for tv casting tests
     """
@@ -602,10 +599,6 @@ def build_casting_apps(data_model_interface, asan):
 
     tv_args.append('chip_crypto="boringssl"')
     casting_args.append('chip_crypto="boringssl"')
-
-    if data_model_interface:
-        tv_args.append(f'chip_use_data_model_interface="{data_model_interface}"')
-        casting_args.append(f'chip_use_data_model_interface="{data_model_interface}"')
 
     if asan:
         tv_args.append("is_asan=true is_clang=true")
