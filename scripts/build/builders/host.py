@@ -502,6 +502,7 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('import("//build_overrides/googletest.gni")')
             self.extra_gn_options.append('pw_unit_test_BACKEND="$dir_pw_unit_test:googletest"')
             self.extra_gn_options.append('dir_pw_third_party_googletest="$dir_googletest"')
+            self.extra_gn_options.append('chip_build_tests_googletest=true')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
