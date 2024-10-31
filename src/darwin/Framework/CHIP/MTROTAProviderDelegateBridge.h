@@ -17,6 +17,8 @@
 
 #import <Matter/MTROTAProviderDelegate.h>
 
+#import "MTRDeviceController_Concrete.h"
+
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -35,7 +37,7 @@ public:
 
     // ControllerShuttingDown must be called on the Matter work queue, since it
     // touches Matter objects.
-    void ControllerShuttingDown(MTRDeviceController * controller);
+    void ControllerShuttingDown(MTRDeviceController_Concrete * controller);
 
     void HandleQueryImage(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,

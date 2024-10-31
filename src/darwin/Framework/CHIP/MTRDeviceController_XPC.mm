@@ -20,6 +20,7 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_XPC.h"
 #import "MTRDevice_XPC_Internal.h"
+#import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"

@@ -112,7 +112,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void ControllerShuttingDown(MTRDeviceController * controller)
+    void ControllerShuttingDown(MTRDeviceController_Concrete * controller)
     {
         assertChipStackLockedByCurrentThread();
 
@@ -506,7 +506,7 @@ CHIP_ERROR MTROTAProviderDelegateBridge::Init(System::Layer * systemLayer, Messa
 
 void MTROTAProviderDelegateBridge::Shutdown() { gOtaSender->Shutdown(); }
 
-void MTROTAProviderDelegateBridge::ControllerShuttingDown(MTRDeviceController * controller)
+void MTROTAProviderDelegateBridge::ControllerShuttingDown(MTRDeviceController_Concrete * controller)
 {
     gOtaSender->ControllerShuttingDown(controller);
 }

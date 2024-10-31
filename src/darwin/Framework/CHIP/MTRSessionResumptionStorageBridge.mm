@@ -18,6 +18,7 @@
 
 #import "MTRConversion.h"
 #import "MTRDeviceControllerFactory_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
@@ -58,7 +59,7 @@ CHIP_ERROR MTRSessionResumptionStorageBridge::FindByResumptionId(ConstResumption
     auto * resumptionIDData = AsData(resumptionId);
 
     auto * controllerList = [mFactory getRunningControllers];
-    for (MTRDeviceController * controller in controllerList) {
+    for (MTRDeviceController_Concrete * controller in controllerList) {
         FabricIndex fabricIndex = controller.fabricIndex;
         if (!IsValidFabricIndex(fabricIndex)) {
             // This controller is not sufficiently "running"; it does not have a

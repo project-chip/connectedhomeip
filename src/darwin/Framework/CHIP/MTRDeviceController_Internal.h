@@ -25,9 +25,6 @@
 #import "MTRDeviceConnectionBridge.h" // For MTRInternalDeviceConnectionCallback
 #import "MTRDeviceController.h"
 
-#include <lib/core/CHIPError.h>
-#include <lib/core/DataModelTypes.h>
-
 #import <os/lock.h>
 
 #import "MTRBaseDevice.h"
@@ -37,11 +34,8 @@
 #import "MTRDeviceControllerDelegate.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 
-#import <Matter/MTRP256KeypairBridge.h>
-
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
 @class MTRDeviceControllerParameters;
@@ -51,14 +45,6 @@
 @protocol MTRDevicePairingDelegate;
 @protocol MTRDeviceControllerDelegate;
 @class MTRDevice_Concrete;
-
-namespace chip {
-class FabricTable;
-
-namespace Controller {
-    class DeviceCommissioner;
-}
-} // namespace chip
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -73,11 +59,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initForSubclasses:(BOOL)startSuspended;
 
 #pragma mark - MTRDeviceControllerFactory methods
-
-/**
- * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.
- */
-@property (readonly) chip::FabricIndex fabricIndex;
 
 /**
  * Will return the compressed fabric id of the fabric if the controller is

@@ -221,6 +221,11 @@ NS_ASSUME_NONNULL_BEGIN
                             queue:(dispatch_queue_t)queue
                        completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
+/**
+ * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.
+ */
+@property (readonly) chip::FabricIndex fabricIndex;
+
 @end
 
 NS_ASSUME_NONNULL_END
