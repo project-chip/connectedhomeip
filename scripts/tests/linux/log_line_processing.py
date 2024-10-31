@@ -16,6 +16,7 @@ import logging
 import queue
 import subprocess
 import threading
+import time
 from typing import List
 
 
@@ -43,6 +44,7 @@ class ProcessOutputCapture:
     def __init__(self, command: List[str], output_path: str):
         # in/out/err are pipes
         self.command = command
+        self.output_file = None  # Output file handle
         self.output_path = output_path
         self.output_lines = queue.Queue()
         self.process = None
@@ -52,18 +54,13 @@ class ProcessOutputCapture:
         self.done = False
 
     def _write_to_file(self, line: str, is_error_line=False):
-        """Writes a line to an output file in a thread-safe manner.
-
-        Opens file in append-text mode ('at') with line buffering 
-        for immediate output to ensure all writes are appended.
-        """
+        """Writes a line to an output file in a thread-safe manner."""
         with self.lock:
-            with open(self.output_path, "at", buffering=1) as f:
-                if is_error_line:
-                    f.write(f"!!STDERR!! : {line}")
-                else:
-                    f.write(line)
-                f.flush()
+            if is_error_line:
+                self.output_file.write(f"!!STDERR!! : {line}")
+            else:
+                self.output_file.write(line)
+            self.output_file.flush()
 
     def _stdout_thread(self):
         """Reads stdout process lines and writes them to an output file.
@@ -103,6 +100,8 @@ class ProcessOutputCapture:
         self.stderr_thread = threading.Thread(target=self._stderr_thread)
         self.stdout_thread.start()
         self.stderr_thread.start()
+        self.output_file = open(self.output_path, "wt", buffering=1)  # Enable line buffering
+        self._write_to_file(f"### PROCESS START: {time.ctime()} ###\n")
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
@@ -116,6 +115,10 @@ class ProcessOutputCapture:
 
         if self.stderr_thread:
             self.stderr_thread.join()
+
+        if self.output_file:
+            self._write_to_file(f"### PROCESS END: {time.ctime()} ###\n")
+            self.output_file.close()
 
         if exception_value:
             # When we fail because of an exception, report the entire log content
