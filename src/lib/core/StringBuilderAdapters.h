@@ -70,4 +70,4 @@ namespace chip {
 /// This enhances the readability and diagnostic information in GoogleTest test logs.
 void PrintTo(const CHIP_ERROR & err, std::ostream * os);
 } // namespace chip
-#endif //CHIP_CONFIG_TEST_GOOGLETEST
+#endif // CHIP_CONFIG_TEST_GOOGLETEST

@@ -43,4 +43,4 @@ void PrintTo(const CHIP_ERROR & err, std::ostream * os)
     *os << "CHIP_ERROR:<" << err.Format() << ">";
 }
 } // namespace chip
-#endif //CHIP_CONFIG_TEST_GOOGLETEST
+#endif // CHIP_CONFIG_TEST_GOOGLETEST
