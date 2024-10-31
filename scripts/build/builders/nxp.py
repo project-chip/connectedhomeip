@@ -344,11 +344,6 @@ class NxpBuilder(GnBuilder):
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2")
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING=\"2.0\"")
 
-        if self.data_model_interface:
-            # NOTE: this is not supporting "check"
-            enabled = "y" if self.data_model_interface.lower() == "enabled" else "n"
-            flags.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={enabled}")
-
         if self.enable_ota:
             flags.append("-DCONFIG_CHIP_OTA_REQUESTOR=true")
             if self.os_env == NxpOsUsed.FREERTOS and self.board == NxpBoard.RW61X:
