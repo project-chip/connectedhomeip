@@ -172,7 +172,7 @@ void ApplicationShutdown()
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    FullWhmApplicationShutdown();
+    WaterHeaterApplicationShutdown();
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
