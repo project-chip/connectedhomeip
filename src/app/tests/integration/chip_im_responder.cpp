@@ -25,6 +25,7 @@
  */
 
 #include "MockEvents.h"
+#include "common.h"
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
@@ -82,8 +83,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 {
     static bool statusCodeFlipper = false;
 
-    if (ServerClusterCommandExists(aRequestCommandPath) != Protocols::InteractionModel::Status::Success)
-    {
+    if (aRequestCommandPath != ConcreteCommandPath(kTestEndpointId, kTestClusterId, kTestCommandId)) {
         return;
     }
 
