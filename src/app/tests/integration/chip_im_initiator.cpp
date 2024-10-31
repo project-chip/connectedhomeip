@@ -651,10 +651,6 @@ const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePat
     return &stub;
 }
 
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return true;
-}
 
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
 {

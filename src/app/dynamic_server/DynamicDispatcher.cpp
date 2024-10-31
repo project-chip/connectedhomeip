@@ -130,11 +130,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     return aAttributeReports.EncodeAttributeStatus(aPath, StatusIB(status));
 }
 
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return DetermineAttributeStatus(aPath, /* aIsWrite = */ false) == Status::UnsupportedAccess;
-}
-
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
 {
     // Will never be called anyway; we have no attributes.

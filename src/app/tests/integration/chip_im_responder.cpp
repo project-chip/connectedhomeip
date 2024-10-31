@@ -78,34 +78,9 @@ public:
 //   every data version compare is the same etc.".
 //
 // The following override implementation need changing:
-//   - ServerClusterCommandExists - should have a proper data mmodel
-//   - ConcreteAttributePathExists - cannot say "Yes" on all paths when query for EP/Cluster would fail
 //   - CheckEventSupportStatus - cannot say yes for invalid endpoints/clusters
 //   - IsClusterDataVersionEqual returning true on everything is odd
 //   - IsDeviceTypeOnEndpoint returning true on every value seems odd
-
-static Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
-{
-    // The Mock cluster catalog -- only have one command on one cluster on one endpoint.
-    using Protocols::InteractionModel::Status;
-
-    if (aCommandPath.mEndpointId != kTestEndpointId)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-
-    if (aCommandPath.mClusterId != kTestClusterId)
-    {
-        return Status::UnsupportedCluster;
-    }
-
-    if (aCommandPath.mCommandId != kTestCommandId)
-    {
-        return Status::UnsupportedCommand;
-    }
-
-    return Status::Success;
-}
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
@@ -149,11 +124,6 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                                  AttributeEncodeState * apEncoderState)
 {
     return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0).Encode(kTestFieldValue1);
-}
-
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return true;
 }
 
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)

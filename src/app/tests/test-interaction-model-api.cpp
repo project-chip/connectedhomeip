@@ -85,12 +85,6 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 }
 
 // Used by the code in TestAclAttribute.cpp (and generally tests that interact with the InteractionModelEngine may need this).
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return aPath.mClusterId != Test::kTestDeniedClusterId1;
-}
-
-// Used by the code in TestAclAttribute.cpp (and generally tests that interact with the InteractionModelEngine may need this).
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
 {
     if (aPath.mClusterId == Test::kTestDeniedClusterId1)
