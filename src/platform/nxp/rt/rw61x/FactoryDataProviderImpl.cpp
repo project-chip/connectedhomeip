@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020-2022 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright 2023-2024 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,6 +24,14 @@ extern "C" {
 
 #include "ELSFactoryData.h"
 #include "mflash_drv.h"
+
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+#if defined(PSA_CRYPTO_DRIVER_THREAD_EN)
+#include "mcux_psa_els_pkc_common_init.h"
+#else
+#include "els_pkc_mbedtls.h"
+#endif /* defined(PSA_CRYPTO_DRIVER_THREAD_EN) */
+#endif /* defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
 
 #include "fsl_adapter_flash.h"
 
@@ -123,6 +131,7 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
 
 CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer)
 {
+    CHIP_ERROR res = CHIP_NO_ERROR;
     uint8_t els_key_blob[kPrivateKeyBlobLength];
     size_t els_key_blob_size = sizeof(els_key_blob);
     uint16_t keySize         = 0;
@@ -146,6 +155,9 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
 
     PLOG_DEBUG_BUFFER("els_key_blob", els_key_blob, els_key_blob_size);
 
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+    (void)mcux_els_mutex_lock();
+#endif
     /* Import blob DAC key into SE50 (reserved key slot) */
     status = import_die_int_wrapped_key_into_els(els_key_blob, els_key_blob_size, plain_key_properties, &key_index);
     STATUS_SUCCESS_OR_EXIT_MSG("import_die_int_wrapped_key_into_els failed: 0x%08x", status);
@@ -162,7 +174,13 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
 
     /* Calculate message HASH to sign */
     memset(&digest[0], 0, sizeof(digest));
-    ReturnErrorOnFailure(Hash_SHA256(digestToSign.data(), digestToSign.size(), &digest[0]));
+    res = Hash_SHA256(digestToSign.data(), digestToSign.size(), &digest[0]);
+    if (res != CHIP_NO_ERROR){
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+        (void)mcux_els_mutex_unlock();
+#endif
+        return res;
+    }
 
     PLOG_DEBUG_BUFFER("digestToSign", digestToSign.data(), digestToSign.size());
 
@@ -173,10 +191,16 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     els_delete_key(key_index);
 
     /* Generate MutableByteSpan with ECC signature and ECC signature size */
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+    (void)mcux_els_mutex_unlock();
+#endif
     return CopySpanToMutableSpan(ByteSpan{ ecc_signature, MCUXCLELS_ECC_SIGNATURE_SIZE }, outSignBuffer);
 
 exit:
     els_delete_key(key_index);
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+    (void)mcux_els_mutex_unlock();
+#endif
     return CHIP_ERROR_INVALID_SIGNATURE;
 }
 
