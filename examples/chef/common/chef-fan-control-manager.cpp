@@ -56,9 +56,9 @@ private:
     // Fan Mode Limits
     struct Range
     {
-        const bool Contains(int value) const { return value >= low && value <= high; }
-        const int Low() const { return low; }
-        const int High() const { return high; }
+        bool Contains(int value) const { return value >= low && value <= high; }
+        int Low() const { return low; }
+        int High() const { return high; }
 
         int low;
         int high;
