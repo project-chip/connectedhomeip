@@ -83,7 +83,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 {
     static bool statusCodeFlipper = false;
 
-    if (aRequestCommandPath != ConcreteCommandPath(kTestEndpointId, kTestClusterId, kTestCommandId)) {
+    if (aRequestCommandPath != ConcreteCommandPath(kTestEndpointId, kTestClusterId, kTestCommandId))
+    {
         return;
     }
 
