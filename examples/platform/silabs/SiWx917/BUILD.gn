@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/examples/platform/silabs/args.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/silabs/wifi_args.gni")
@@ -50,10 +51,7 @@ assert(chip_enable_wifi)
 silabs_plat_dir = "${chip_root}/src/platform/silabs"
 silabs_plat_si91x_wifi_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
 
-import("${silabs_common_plat_dir}/args.gni")
 config("chip_examples_project_config") {
-  include_dirs = [ "project_include" ]
-
   # Link options that provide a replacement for dynamic memory operations in standard
   # library with the sl_memory_manager in platform code.
   ldflags = [
@@ -104,6 +102,40 @@ source_set("matter-shell") {
     "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib/shell:shell",
     "${chip_root}/src/lib/shell:shell_core",
+  ]
+}
+
+config("wifi-interface-config") {
+  include_dirs = [
+    "${silabs_plat_dir}/wifi",
+    "${silabs_common_plat_dir}/wifi",
+  ]
+}
+
+source_set("wifi-interface") {
+  sources = [
+    "${silabs_common_plat_dir}/wifi/WifiInterfaceAbstraction.cpp",
+    "SiWxWifiInterface.cpp",
+
+    # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
+    "${sdk_support_root}/components/service/network_manager/src/sl_net_for_lwip.c",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform:platform",
+    "${chip_root}/src/platform/silabs/SiWx917:SiWx917",
+    "${lwip_root}:lwip",
+  ]
+
+  public_configs = [
+    ":siwx917-common-config",
+    "${silabs_sdk_build_root}:silabs_config",
+    ":chip_examples_project_config",
+    ":wifi-interface-config",
+    ":silabs-wifi-config",
   ]
 }
 
@@ -167,7 +199,11 @@ config("silabs-wifi-config") {
 source_set("siwx917-common") {
   deps = [ "${silabs_common_plat_dir}/provision:storage" ]
   defines = []
-  public_deps = [ "${lwip_root}:lwip" ]
+  public_deps = [
+    ":wifi-interface",
+    "${lwip_root}:lwip",
+  ]
+
   public_configs = [
     ":siwx917-common-config",
     "${silabs_sdk_build_root}:silabs_config",
@@ -176,6 +212,7 @@ source_set("siwx917-common") {
 
   include_dirs = [
     "${silabs_plat_dir}/wifi",
+    "${silabs_common_plat_dir}/wifi",
     "${silabs_plat_si91x_wifi_dir}",
     "${silabs_common_plat_dir}",
   ]
@@ -188,12 +225,6 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
-    "${silabs_common_plat_dir}/wifi/wfx_notify.cpp",
-    "${silabs_common_plat_dir}/wifi/wfx_rsi_host.cpp",
-    "SiWxWifiInterface.cpp",
-
-    # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
-    "${sdk_support_root}/components/service/network_manager/src/sl_net_for_lwip.c",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {
