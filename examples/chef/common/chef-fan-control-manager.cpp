@@ -195,7 +195,7 @@ FanControl::FanModeEnum ChefFanControlManager::SpeedToFanMode(uint8_t speed)
 
 void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
 {
-    if (aNewPercentCurrent != mPercentCurrent)
+    if (aNewPercentCurrent == mPercentCurrent)
     {
         return;
     }
@@ -212,7 +212,7 @@ void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
 
 void ChefFanControlManager::SetSpeedCurrent(uint8_t aNewSpeedCurrent)
 {
-    if (aNewSpeedCurrent != mSpeedCurrent)
+    if (aNewSpeedCurrent == mSpeedCurrent)
     {
         return;
     }
