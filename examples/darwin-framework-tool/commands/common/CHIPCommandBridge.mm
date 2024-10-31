@@ -358,6 +358,16 @@ void CHIPCommandBridge::ShutdownCommissioner()
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
 
+void CHIPCommandBridge::SuspendOrResumeCommissioners()
+{
+    for (auto & pair : mControllers) {
+        __auto_type * commissioner = pair.second;
+        if (commissioner.running) {
+            commissioner.suspended ? [commissioner resume] : [commissioner suspend];
+        }
+    }
+}
+
 CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration)
 {
     auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
