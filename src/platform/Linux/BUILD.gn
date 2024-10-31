@@ -150,7 +150,7 @@ static_library("Linux") {
   }
 
   if (chip_device_config_enable_wifipaf) {
-    public_deps += [ "${chip_root}/src/wifipaf:wifipaf" ]
+    public_deps += [ "${chip_root}/src/wifipaf" ]
   }
 }
 
