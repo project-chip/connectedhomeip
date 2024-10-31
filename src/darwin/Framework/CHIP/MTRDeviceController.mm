@@ -542,40 +542,6 @@ using namespace chip::Tracing::DarwinFramework;
     errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
 }
 
-- (void)syncRunOnWorkQueue:(SyncWorkQueueBlock)block error:(NSError * __autoreleasing *)error
-{
-    VerifyOrDie(!chip::DeviceLayer::PlatformMgrImpl().IsWorkQueueCurrentQueue());
-    VerifyOrReturn([self checkIsRunning:error]);
-
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-        block();
-    });
-}
-
-- (id)syncRunOnWorkQueueWithReturnValue:(SyncWorkQueueBlockWithReturnValue)block error:(NSError * __autoreleasing *)error
-{
-    __block id rv = nil;
-    auto adapter = ^{
-        rv = block();
-    };
-
-    [self syncRunOnWorkQueue:adapter error:error];
-
-    return rv;
-}
-
-- (BOOL)syncRunOnWorkQueueWithBoolReturnValue:(SyncWorkQueueBlockWithBoolReturnValue)block error:(NSError * __autoreleasing *)error
-{
-    __block BOOL success = NO;
-    auto adapter = ^{
-        success = block();
-    };
-    [self syncRunOnWorkQueue:adapter error:error];
-
-    return success;
-}
-
 - (chip::FabricIndex)fabricIndex
 {
     return _storedFabricIndex;
