@@ -122,40 +122,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, retain, nullable) NSData * rootPublicKey;
 
 /**
- * Ensure we have a CASE session to the given node ID and then call the provided
- * connection callback.  This may be called on any queue (including the Matter
- * event queue) and on success will always call the provided connection callback
- * on the Matter queue, asynchronously.  Consumers must be prepared to run on
- * the Matter queue (an in particular must not use any APIs that will try to do
- * sync dispatch to the Matter queue).
- *
- * If the controller is not running when this function is called, it will
- * synchronously invoke the completion with an error, on whatever queue
- * getSessionForNode was called on.
- *
- * If the controller is not running when the async dispatch on the Matter queue
- * happens, the completion will be invoked with an error on the Matter queue.
- */
-- (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
-
-/**
- * Get a session for the commissionee device with the given device id.  This may
- * be called on any queue (including the Matter event queue) and on success will
- * always call the provided connection callback on the Matter queue,
- * asynchronously.  Consumers must be prepared to run on the Matter queue (an in
- * particular must not use any APIs that will try to do sync dispatch to the
- * Matter queue).
- *
- * If the controller is not running when this function is called, it will
- * synchronously invoke the completion with an error, on whatever queue
- * getSessionForCommissioneeDevice was called on.
- *
- * If the controller is not running when the async dispatch on the Matter queue
- * happens, the completion will be invoked with an error on the Matter queue.
- */
-- (void)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion;
-
-/**
  * Try to asynchronously dispatch the given block on the Matter queue.  If the
  * controller is not running either at call time or when the block would be
  * about to run, the provided error handler will be called with an error.  Note

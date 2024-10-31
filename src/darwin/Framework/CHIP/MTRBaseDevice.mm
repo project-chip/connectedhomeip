@@ -233,11 +233,6 @@ static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode,
 
 @end
 
-@interface MTRBaseDevice ()
-// Will return nil if our controller is not in fact a concrete controller.
-@property (nullable, nonatomic, strong, readonly) MTRDeviceController_Concrete * concreteController;
-@end
-
 @implementation MTRBaseDevice
 
 - (instancetype)initWithPASEDevice:(chip::DeviceProxy *)device controller:(MTRDeviceController *)controller

@@ -19,6 +19,7 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
@@ -209,6 +210,11 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                     timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                                 queue:(dispatch_queue_t)queue
                            completion:(MTRDeviceResponseHandler)completion;
+
+/**
+ * Will return nil if our controller is not in fact a concrete controller.
+ */
+@property (nullable, nonatomic, strong, readonly) MTRDeviceController_Concrete * concreteController;
 
 @end
 

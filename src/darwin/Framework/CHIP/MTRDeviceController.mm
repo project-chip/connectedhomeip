@@ -535,18 +535,6 @@ using namespace chip::Tracing::DarwinFramework;
     return NO;
 }
 
-- (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
-{
-    MTR_ABSTRACT_METHOD();
-    completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-}
-
-- (void)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion
-{
-    MTR_ABSTRACT_METHOD();
-    completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-}
-
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {
     // TODO: Figure out how to get callsites to have an MTRDeviceController_Concrete.
