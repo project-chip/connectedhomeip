@@ -26,7 +26,6 @@
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
 
-// Enable UDP listening on demand in the CHIPDeviceController
 
 #define INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT 0
 
