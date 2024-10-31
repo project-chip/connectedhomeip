@@ -286,28 +286,23 @@ namespace app {
 using Seconds16      = System::Clock::Seconds16;
 using Milliseconds32 = System::Clock::Milliseconds32;
 
-// TODO: Add support for a 2nd Test Context by making sSyncScheduler = true (this was not ported from NL Tests yet)
 class TestReadInteraction : public chip::Test::AppContext
 {
-
 public:
-    static void SetUpTestSuite()
+    static void SetUpTestSuiteCommon(bool syncScheduler = false)
     {
         AppContext::SetUpTestSuite();
 
         gRealClock = &chip::System::SystemClock();
         chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
 
-        if (sSyncScheduler)
-        {
-            gReportScheduler = chip::app::reporting::GetSynchronizedReportScheduler();
-            sUsingSubSync    = true;
-        }
-        else
-        {
-            gReportScheduler = chip::app::reporting::GetDefaultReportScheduler();
-        }
+        sUsingSubSync    = syncScheduler;
+        gReportScheduler = syncScheduler ? chip::app::reporting::GetSynchronizedReportScheduler()
+                                         : chip::app::reporting::GetDefaultReportScheduler();
     }
+
+    static void SetUpTestSuite() { SetUpTestSuiteCommon(false); }
+
     static void TearDownTestSuite()
     {
         chip::System::Clock::Internal::SetSystemClockForTesting(gRealClock);
@@ -332,6 +327,7 @@ public:
         chip::Test::SetMockNodeConfig(TestMockNodeConfig());
         chip::Test::SetVersionTo(chip::Test::kTestDataVersion1);
     }
+
     void TearDown() override
     {
         chip::Test::ResetMockNodeConfig();
@@ -385,16 +381,23 @@ public:
         kInvalidNoAttributeId,
         kInvalidOutOfRangeAttributeId,
     };
+
     static void GenerateReportData(System::PacketBufferHandle & aPayload, ReportType aReportType, bool aSuppressResponse,
                                    bool aHasSubscriptionId);
 
 protected:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
-    static bool sSyncScheduler;
     chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
-bool TestReadInteraction::sSyncScheduler = false;
+class TestReadInteractionSync : public TestReadInteraction
+{
+public:
+    static void SetUpTestSuite() { TestReadInteraction::SetUpTestSuiteCommon(true); }
+    static void TearDownTestSuite() { TestReadInteraction::TearDownTestSuite(); }
+    void SetUp() { TestReadInteraction::SetUp(); }
+    void TearDown() { TestReadInteraction::TearDown(); }
+};
 
 void TestReadInteraction::GenerateReportData(System::PacketBufferHandle & aPayload, ReportType aReportType, bool aSuppressResponse,
                                              bool aHasSubscriptionId = false)
@@ -476,7 +479,9 @@ void TestReadInteraction::GenerateReportData(System::PacketBufferHandle & aPaylo
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClient)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClient)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClient)
+void TestReadInteraction::TestReadClient()
 {
     MockInteractionModelApp delegate;
     app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
@@ -497,7 +502,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClient)
     EXPECT_EQ(readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction), CHIP_NO_ERROR);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadUnexpectedSubscriptionId)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadUnexpectedSubscriptionId)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadUnexpectedSubscriptionId)
+void TestReadInteraction::TestReadUnexpectedSubscriptionId()
 {
     MockInteractionModelApp delegate;
     app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
@@ -520,7 +527,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadUnexpectedSubscriptionId)
               CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandler)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadHandler)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadHandler)
+void TestReadInteraction::TestReadHandler()
 {
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -569,7 +578,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandler)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerSetMaxReportingInterval)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadHandlerSetMaxReportingInterval)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadHandlerSetMaxReportingInterval)
+void TestReadInteraction::TestReadHandlerSetMaxReportingInterval()
 {
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -678,7 +689,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerSetMaxReportingInterval)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientGenerateAttributePathList)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientGenerateAttributePathList)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientGenerateAttributePathList)
+void TestReadInteraction::TestReadClientGenerateAttributePathList()
 {
     MockInteractionModelApp delegate;
     System::PacketBufferHandle msgBuf;
@@ -703,7 +716,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientGenerateAttributePathList
     EXPECT_EQ(readClient.GenerateAttributePaths(attributePathListBuilder, attributePaths), CHIP_NO_ERROR);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientGenerateInvalidAttributePathList)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientGenerateInvalidAttributePathList)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientGenerateInvalidAttributePathList)
+void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList()
 {
     MockInteractionModelApp delegate;
     System::PacketBufferHandle msgBuf;
@@ -729,7 +744,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientGenerateInvalidAttributeP
               CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientInvalidReport)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientInvalidReport)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientInvalidReport)
+void TestReadInteraction::TestReadClientInvalidReport()
 {
     MockInteractionModelApp delegate;
 
@@ -753,7 +770,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientInvalidReport)
               CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientInvalidAttributeId)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientInvalidAttributeId)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientInvalidAttributeId)
+void TestReadInteraction::TestReadClientInvalidAttributeId()
 {
     MockInteractionModelApp delegate;
 
@@ -783,7 +802,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientInvalidAttributeId)
     EXPECT_FALSE(delegate.mReadError);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerInvalidAttributePath)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadHandlerInvalidAttributePath)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadHandlerInvalidAttributePath)
+void TestReadInteraction::TestReadHandlerInvalidAttributePath()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -840,7 +861,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerInvalidAttributePath)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientGenerateOneEventPaths)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientGenerateOneEventPaths)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientGenerateOneEventPaths)
+void TestReadInteraction::TestReadClientGenerateOneEventPaths()
 {
     MockInteractionModelApp delegate;
     System::PacketBufferHandle msgBuf;
@@ -881,7 +904,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientGenerateOneEventPaths)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientGenerateTwoEventPaths)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientGenerateTwoEventPaths)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientGenerateTwoEventPaths)
+void TestReadInteraction::TestReadClientGenerateTwoEventPaths()
 {
     MockInteractionModelApp delegate;
     System::PacketBufferHandle msgBuf;
@@ -1358,8 +1383,7 @@ TEST_F(TestReadInteraction, TestSetDirtyBetweenChunks)
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 
@@ -1513,7 +1537,9 @@ TEST_F(TestReadInteraction, TestReadInvalidAttributePathRoundtrip)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestProcessSubscribeRequest)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestProcessSubscribeRequest)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestProcessSubscribeRequest)
+void TestReadInteraction::TestProcessSubscribeRequest()
 {
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -1570,7 +1596,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestProcessSubscribeRequest)
  * @brief Test validates that an ICD will choose its IdleModeDuration (GetPublisherSelectedIntervalLimit)
  *        as MaxInterval when the MaxIntervalCeiling is superior.
  */
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMaxIntervalCeiling)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestICDProcessSubscribeRequestSupMaxIntervalCeiling)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestICDProcessSubscribeRequestSupMaxIntervalCeiling)
+void TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling()
 {
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -1638,7 +1666,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMaxInt
  * @brief Test validates that an ICD will choose its IdleModeDuration (GetPublisherSelectedIntervalLimit)
  *        as MaxInterval when the MaxIntervalCeiling is inferior.
  */
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInfMaxIntervalCeiling)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestICDProcessSubscribeRequestInfMaxIntervalCeiling)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestICDProcessSubscribeRequestInfMaxIntervalCeiling)
+void TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling()
 {
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -1706,7 +1736,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInfMaxInt
  * @brief Test validates that an ICD will choose a multiple of its IdleModeDuration (GetPublisherSelectedIntervalLimit)
  *        as MaxInterval when the MinInterval > IdleModeDuration.
  */
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMinInterval)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestICDProcessSubscribeRequestSupMinInterval)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestICDProcessSubscribeRequestSupMinInterval)
+void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval()
 {
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -1774,7 +1806,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMinInt
  * @brief Test validates that an ICD will choose a maximal value for an uint16 if the multiple of the IdleModeDuration
  *        is greater than variable size.
  */
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestMaxMinInterval)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestICDProcessSubscribeRequestMaxMinInterval)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestICDProcessSubscribeRequestMaxMinInterval)
+void TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval()
 {
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -1840,7 +1874,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestMaxMinInt
  * @brief Test validates that an ICD will choose the MaxIntervalCeiling as MaxInterval if the next multiple after the MinInterval
  *        is greater than the IdleModeDuration and MaxIntervalCeiling
  */
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInvalidIdleModeDuration)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestICDProcessSubscribeRequestInvalidIdleModeDuration)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestICDProcessSubscribeRequestInvalidIdleModeDuration)
+void TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeDuration()
 {
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -1904,7 +1940,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInvalidId
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeRoundtrip)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeRoundtrip)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeRoundtrip)
+void TestReadInteraction::TestSubscribeRoundtrip()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -2099,7 +2137,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeRoundtrip)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeEarlyReport)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeEarlyReport)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeEarlyReport)
+void TestReadInteraction::TestSubscribeEarlyReport()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -2260,7 +2300,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeEarlyReport)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeUrgentWildcardEvent)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeUrgentWildcardEvent)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeUrgentWildcardEvent)
+void TestReadInteraction::TestSubscribeUrgentWildcardEvent()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -2830,7 +2872,9 @@ TEST_F(TestReadInteraction, TestSubscribeEarlyShutdown)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeInvalidAttributePathRoundtrip)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeInvalidAttributePathRoundtrip)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeInvalidAttributePathRoundtrip)
+void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -2977,7 +3021,9 @@ TEST_F(TestReadInteraction, TestSubscribeInvalidInterval)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestPostSubscribeRoundtripStatusReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestPostSubscribeRoundtripStatusReportTimeout)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestPostSubscribeRoundtripStatusReportTimeout)
+void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout()
 {
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
@@ -3641,7 +3687,9 @@ void CheckForInvalidAction(Test::MessageCapturer & messageLog)
 
 // Read Client sends the read request, Read Handler drops the response, then test injects unknown status reponse message for
 // Read Client.
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientReceiveInvalidMessage)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientReceiveInvalidMessage)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientReceiveInvalidMessage)
+void TestReadInteraction::TestReadClientReceiveInvalidMessage()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -3726,7 +3774,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadClientReceiveInvalidMessage)
 
 // Read Client sends the subscribe request, Read Handler drops the response, then test injects unknown status response message
 // for Read Client.
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveInvalidStatusResponse)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeClientReceiveInvalidStatusResponse)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeClientReceiveInvalidStatusResponse)
+void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -3817,7 +3867,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveInvalidStatus
 
 // Read Client sends the subscribe request, Read Handler drops the response, then test injects well-formed status response
 // message with Success for Read Client, we expect the error with CHIP_ERROR_INVALID_MESSAGE_TYPE
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveWellFormedStatusResponse)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeClientReceiveWellFormedStatusResponse)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeClientReceiveWellFormedStatusResponse)
+void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -3907,7 +3959,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveWellFormedSta
 
 // Read Client sends the subscribe request, Read Handler drops the response, then test injects invalid report message for Read
 // Client.
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveInvalidReportMessage)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeClientReceiveInvalidReportMessage)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeClientReceiveInvalidReportMessage)
+void TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -3997,7 +4051,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveInvalidReport
 
 // Read Client create the subscription, handler sends unsolicited malformed report to client,
 // InteractionModelEngine::OnUnsolicitedReportData would process this malformed report and sends out status report
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveUnsolicitedInvalidReportMessage)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeClientReceiveUnsolicitedInvalidReportMessage)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeClientReceiveUnsolicitedInvalidReportMessage)
+void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMessage()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4068,7 +4124,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveUnsolicitedIn
 
 // Read Client sends the subscribe request, Read Handler drops the subscribe response, then test injects invalid subscribe
 // response message
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveInvalidSubscribeResponseMessage)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeClientReceiveInvalidSubscribeResponseMessage)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeClientReceiveInvalidSubscribeResponseMessage)
+void TestReadInteraction::TestSubscribeClientReceiveInvalidSubscribeResponseMessage()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4159,7 +4217,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveInvalidSubscr
 
 // Read Client create the subscription, handler sends unsolicited malformed report with invalid subscription id to client,
 // InteractionModelEngine::OnUnsolicitedReportData would process this malformed report and sends out status report
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId)
+void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4235,7 +4295,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeClientReceiveUnsolicitedRe
 // TestReadChunkingInvalidSubscriptionId will try to read a few large attributes, the report won't fit into the MTU and result
 // in chunking, second report has different subscription id from the first one, read client sends out the status report with
 // invalid subscription
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadChunkingInvalidSubscriptionId)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadChunkingInvalidSubscriptionId)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadChunkingInvalidSubscriptionId)
+void TestReadInteraction::TestReadChunkingInvalidSubscriptionId()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4325,7 +4387,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadChunkingInvalidSubscriptionId)
 
 // Read Client sends a malformed subscribe request, interaction model engine fails to parse the request and generates a status
 // report to client, and client is closed.
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerMalformedSubscribeRequest)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadHandlerMalformedSubscribeRequest)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadHandlerMalformedSubscribeRequest)
+void TestReadInteraction::TestReadHandlerMalformedSubscribeRequest()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4369,7 +4433,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerMalformedSubscribeReques
 
 // Read Client sends a malformed read request, interaction model engine fails to parse the request and generates a status report
 // to client, and client is closed.
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerMalformedReadRequest1)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadHandlerMalformedReadRequest1)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadHandlerMalformedReadRequest1)
+void TestReadInteraction::TestReadHandlerMalformedReadRequest1()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4411,7 +4477,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerMalformedReadRequest1)
 
 // Read Client sends a malformed read request, read handler fails to parse the request and generates a status report to client,
 // and client is closed.
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerMalformedReadRequest2)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadHandlerMalformedReadRequest2)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadHandlerMalformedReadRequest2)
+void TestReadInteraction::TestReadHandlerMalformedReadRequest2()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4454,7 +4522,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerMalformedReadRequest2)
 
 // Read Client creates a subscription with the server, server sends chunked reports, after the handler sends out the first
 // chunked report, client sends out invalid write request message, handler sends status report with invalid action and closes
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeSendUnknownMessage)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeSendUnknownMessage)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeSendUnknownMessage)
+void TestReadInteraction::TestSubscribeSendUnknownMessage()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4528,7 +4598,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeSendUnknownMessage)
 
 // Read Client creates a subscription with the server, server sends chunked reports, after the handler sends out invalid status
 // report, client sends out invalid status report message, handler sends status report with invalid action and close
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeSendInvalidStatusReport)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeSendInvalidStatusReport)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeSendInvalidStatusReport)
+void TestReadInteraction::TestSubscribeSendInvalidStatusReport()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4599,7 +4671,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeSendInvalidStatusReport)
 
 // Read Client sends a malformed subscribe request, the server fails to parse the request and generates a status report to the
 // client, and client closes itself.
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerInvalidSubscribeRequest)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadHandlerInvalidSubscribeRequest)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadHandlerInvalidSubscribeRequest)
+void TestReadInteraction::TestReadHandlerInvalidSubscribeRequest()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4696,7 +4770,9 @@ TEST_F(TestReadInteraction, TestSubscribeInvalidateFabric)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestShutdownSubscription)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestShutdownSubscription)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestShutdownSubscription)
+void TestReadInteraction::TestShutdownSubscription()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
@@ -4747,7 +4823,9 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestShutdownSubscription)
  * session it has is defunct.  Makes sure we correctly tear down the ReadHandler
  * and don't increment the "reports in flight" count.
  */
-TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscriptionReportWithDefunctSession)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscriptionReportWithDefunctSession)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscriptionReportWithDefunctSession)
+void TestReadInteraction::TestSubscriptionReportWithDefunctSession()
 {
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
