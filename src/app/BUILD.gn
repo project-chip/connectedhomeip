@@ -79,27 +79,6 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING=${chip_data_model_extra_logging}",
   ]
 
-  if (chip_use_data_model_interface == "disabled") {
-    defines += [
-      "CHIP_CONFIG_USE_DATA_MODEL_INTERFACE=0",
-      "CHIP_CONFIG_USE_EMBER_DATA_MODEL=1",
-    ]
-  } else if (chip_use_data_model_interface == "check") {
-    defines += [
-      "CHIP_CONFIG_USE_DATA_MODEL_INTERFACE=1",
-      "CHIP_CONFIG_USE_EMBER_DATA_MODEL=1",
-    ]
-  } else {
-    # only one of disabled/check/enabled must be used
-    assert(chip_use_data_model_interface == "enabled",
-           "chip_use_data_model_interface must use a supported value")
-
-    defines += [
-      "CHIP_CONFIG_USE_DATA_MODEL_INTERFACE=1",
-      "CHIP_CONFIG_USE_EMBER_DATA_MODEL=0",
-    ]
-  }
-
   visibility = [ ":app_config" ]
 }
 

@@ -509,20 +509,6 @@ ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & r
 {
     AttributeEncodeState mutableState(&encoder.GetState()); // provide a state copy to start.
 
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    if ((request.path.mEndpointId < chip::Test::kMockEndpointMin) &&
-        (gReadResponseDirective == ReadResponseDirective::kSendDataResponse) &&
-        (request.path.mClusterId == app::Clusters::UnitTesting::Id) &&
-        (request.path.mAttributeId == app::Clusters::UnitTesting::Attributes::Int16u::Id))
-    {
-        // gInt16uTotalReadCount is a global that keeps changing. Further more, encoding
-        // size differs when moving from 0xFF to 0x100, so encoding sizes in TLV differ.
-        //
-        // This is a HACKISH workaround as it relies that we ember-read before datamodel-read
-        gInt16uTotalReadCount--;
-    }
-#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-
     Access::SubjectDescriptor subjectDescriptor;
     if (request.subjectDescriptor != nullptr)
     {

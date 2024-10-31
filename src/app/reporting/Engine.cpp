@@ -47,17 +47,12 @@ using Protocols::InteractionModel::Status;
 
 Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
 {
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-
     if (!model->GetClusterInfo(eventPath).has_value())
     {
         return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
     }
 
     return Status::Success;
-#else
-    return CheckEventSupportStatus(eventPath);
-#endif
 }
 
 } // namespace
