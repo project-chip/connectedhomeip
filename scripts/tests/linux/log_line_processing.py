@@ -96,12 +96,12 @@ class ProcessOutputCapture:
             text=True,
             bufsize=1,  # Enable line buffering for immediate output from subprocess
         )
+        self.output_file = open(self.output_path, "wt", buffering=1)  # Enable line buffering for immediate output
+        self._write_to_file(f"### PROCESS START: {time.ctime()} ###\n")
         self.stdout_thread = threading.Thread(target=self._stdout_thread)
         self.stderr_thread = threading.Thread(target=self._stderr_thread)
         self.stdout_thread.start()
         self.stderr_thread.start()
-        self.output_file = open(self.output_path, "wt", buffering=1)  # Enable line buffering
-        self._write_to_file(f"### PROCESS START: {time.ctime()} ###\n")
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
