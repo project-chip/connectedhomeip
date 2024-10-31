@@ -26,7 +26,6 @@
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
 
-
 #define INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT 0
 
 // Uncomment this for a large Tunnel MTU.
