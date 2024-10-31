@@ -18,7 +18,7 @@
 #import "MTRBaseDevice.h"
 #import <Foundation/Foundation.h>
 
-#import "MTRDeviceDataValueDictionary.h"
+#import "MTRDefines_Internal.h"
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>

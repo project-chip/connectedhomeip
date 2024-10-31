@@ -19,7 +19,7 @@ import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/silabs/wifi_args.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
-import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
+import("${silabs_sdk_build_root}/SiWx917_sdk.gni")
 
 declare_args() {
   enable_heap_monitoring = false
@@ -91,22 +91,20 @@ source_set("test-event-trigger") {
   ]
 }
 
-source_set("siwx917-matter-shell") {
-  if (chip_build_libshell) {
-    defines = [ "ENABLE_CHIP_SHELL" ]
+source_set("matter-shell") {
+  defines = [ "ENABLE_CHIP_SHELL" ]
 
-    sources = [ "${silabs_common_plat_dir}/matter_shell.cpp" ]
-    include_dirs = [
-      ".",
-      "${silabs_common_plat_dir}",
-    ]
+  sources = [ "${silabs_common_plat_dir}/MatterShell.cpp" ]
+  include_dirs = [
+    ".",
+    "${silabs_common_plat_dir}",
+  ]
 
-    public_deps = [
-      "${chip_root}/examples/shell/shell_common:shell_common",
-      "${chip_root}/src/lib/shell:shell",
-      "${chip_root}/src/lib/shell:shell_core",
-    ]
-  }
+  public_deps = [
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib/shell:shell",
+    "${chip_root}/src/lib/shell:shell_core",
+  ]
 }
 
 config("siwx917-common-config") {
@@ -169,18 +167,17 @@ config("silabs-wifi-config") {
 source_set("siwx917-common") {
   deps = [ "${silabs_common_plat_dir}/provision:storage" ]
   defines = []
-  public_deps = []
+  public_deps = [ "${lwip_root}:lwip" ]
   public_configs = [
     ":siwx917-common-config",
-    "${efr32_sdk_build_root}:silabs_config",
+    "${silabs_sdk_build_root}:silabs_config",
     ":chip_examples_project_config",
   ]
 
   include_dirs = [
-    ".",
-    "SiWx917/",
     "${silabs_plat_dir}/wifi",
     "${silabs_plat_si91x_wifi_dir}",
+    "${silabs_common_plat_dir}",
   ]
 
   #TO-DO Cleanup to be done for all the wifi files into common folder
@@ -193,10 +190,10 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
     "${silabs_common_plat_dir}/wifi/wfx_notify.cpp",
     "${silabs_common_plat_dir}/wifi/wfx_rsi_host.cpp",
-    "${silabs_plat_dir}/wifi/dhcp_client.cpp",
-    "${silabs_plat_si91x_wifi_dir}/ethernetif.cpp",
-    "${silabs_plat_si91x_wifi_dir}/lwip_netif.cpp",
-    "SiWx917/sl_wifi_if.cpp",
+    "SiWxWifiInterface.cpp",
+
+    # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
+    "${sdk_support_root}/components/service/network_manager/src/sl_net_for_lwip.c",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {
@@ -226,7 +223,11 @@ source_set("siwx917-common") {
   }
 
   if (chip_build_libshell) {
-    deps += [ ":siwx917-matter-shell" ]
+    deps += [ ":matter-shell" ]
+
+    if (chip_enable_icd_server) {
+      deps += [ "${silabs_common_plat_dir}/shell:icd" ]
+    }
   }
 
   # DIC

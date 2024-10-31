@@ -197,6 +197,11 @@ via `-o/--output-dir`.
 ./scripts/tools/zap/generate.py $PATH_TO_ZAP_FILE
 ```
 
+Rebuild the application.
+
+It is also recommended to run device composition tests to ensure the selected
+composition is spec compliant (see [Testing](../testing))
+
 ### Compile-time code generation / pre-generated code
 
 A subset of code generation (both `codegen.py` and `zap-cli`) is done at compile

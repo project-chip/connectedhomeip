@@ -38,7 +38,7 @@ pw_unit_test_BACKEND = "$dir_pw_unit_test:light"
 # Override the executable type and the test main's target.
 pw_unit_test_EXECUTABLE_TARGET_TYPE = "silabs_executable"
 pw_unit_test_EXECUTABLE_TARGET_TYPE_FILE =
-    "${efr32_sdk_build_root}/silabs_executable.gni"
+    "${silabs_sdk_build_root}/silabs_executable.gni"
 pw_unit_test_MAIN = "//:efr32_test_main"
 
 # Additional variables needed by silabs_executable that must be passed in to pw_test.

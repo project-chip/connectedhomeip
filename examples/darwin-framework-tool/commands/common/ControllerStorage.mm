@@ -143,6 +143,20 @@ NSString * const kDarwinFrameworkToolControllerDomain = @"com.apple.darwin-frame
     self.storage[controllerKey] = value;
 }
 
+- (void)print
+{
+    NSLog(@"%@ (%@)", kDarwinFrameworkToolControllerDomain, _keyScopingPrefix);
+    for (NSString * controllerKey in self.storage) {
+        if (![self _isControllerScopedKey:controllerKey]) {
+            continue;
+        }
+
+        __auto_type * key = [self _controllerScopedKeyToKey:controllerKey];
+        __auto_type * data = self.storage[controllerKey];
+        NSLog(@" * %@: %@", key, data);
+    }
+}
+
 - (NSString *)_keyToControllerScopedKey:(NSString *)key
 {
     return [NSString stringWithFormat:@"%@%@", _keyScopingPrefix, key];

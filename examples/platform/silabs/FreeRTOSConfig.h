@@ -103,8 +103,6 @@
 extern "C" {
 #endif
 
-#include <CHIPProjectConfig.h>
-
 #include <stdint.h>
 #include <stdio.h>
 
