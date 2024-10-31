@@ -83,7 +83,12 @@ config COMMON_LIBC_MALLOC_ARENA_SIZE
     default 12288
 
 config NET_IPV6_MLD
-    default n
+    default n if PM
+    default y
+
+config NET_IF_MCAST_IPV6_ADDR_COUNT
+    default 8 if PM
+    default 15
 
 # Network buffers
 config NET_PKT_RX_COUNT
@@ -271,6 +276,10 @@ config OPENTHREAD_MANUAL_START
 config OPENTHREAD_DEFAULT_TX_POWER
     default 3 if PM
     default 9
+
+config OPENTHREAD_IP6_MAX_EXT_MCAST_ADDRS
+    default 2 if PM
+    default 8
 
 endif # NET_L2_OPENTHREAD
 
