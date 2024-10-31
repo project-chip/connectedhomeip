@@ -35,6 +35,7 @@
 #include <string>
 
 static CHIPToolPersistentStorageDelegate * storage = nil;
+static MTRDevice * sLastUsedDevice = nil;
 static DeviceDelegate * sDeviceDelegate = nil;
 static dispatch_queue_t sDeviceDelegateDispatchQueue = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
@@ -312,6 +313,7 @@ MTRDevice * CHIPCommandBridge::DeviceWithNodeId(chip::NodeId nodeId)
     }
     [device addDelegate:sDeviceDelegate queue:sDeviceDelegateDispatchQueue];
 
+    sLastUsedDevice = device;
     return device;
 }
 
@@ -366,6 +368,11 @@ void CHIPCommandBridge::SuspendOrResumeCommissioners()
             commissioner.suspended ? [commissioner resume] : [commissioner suspend];
         }
     }
+}
+
+MTRDevice * CHIPCommandBridge::GetLastUsedDevice()
+{
+    return sLastUsedDevice;
 }
 
 CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration)

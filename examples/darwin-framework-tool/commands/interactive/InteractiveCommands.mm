@@ -32,6 +32,7 @@ constexpr char kInteractiveModeInstruction[] = "╔═════════�
                                                "╠══════════════════════════════════════════════════════════════════╣\n"
                                                "║ Stop and restart stack    : [Ctrl+_] & [Ctrl+^ ]                 ║\n"
                                                "║ Suspend/Resume controllers: [Ctrl+Z]                             ║\n"
+                                               "║ Trigger Resubscription    : [Ctrl+G]                             ║\n"
                                                "║ Trigger exit(0)           : [Ctrl+@]                             ║\n"
                                                "║ Quit Interactive          : 'quit()' or `quit`                   ║\n"
                                                "╚══════════════════════════════════════════════════════════════════╝\n";
@@ -42,6 +43,10 @@ constexpr char kInteractiveModeStopAlternateCommand[] = "quit";
 constexpr char kCategoryError[] = "Error";
 constexpr char kCategoryProgress[] = "Info";
 constexpr char kCategoryDetail[] = "Debug";
+
+@interface MTRDevice ()
+- (void)_deviceMayBeReachable;
+@end
 
 namespace {
 
@@ -87,6 +92,25 @@ public:
     CHIP_ERROR RunCommand() override
     {
         SuspendOrResumeCommissioners();
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
+};
+
+class TriggerResubscriptionCommand : public CHIPCommandBridge {
+public:
+    TriggerResubscriptionCommand()
+        : CHIPCommandBridge("trigger-resubscription")
+    {
+    }
+
+    CHIP_ERROR RunCommand() override
+    {
+        __auto_type * device = GetLastUsedDevice();
+        if (nil != device) {
+            [device _deviceMayBeReachable];
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -336,6 +360,13 @@ el_status_t SuspendOrResumeFunction()
     return CSstay;
 }
 
+el_status_t TriggerResubscriptionFunction()
+{
+    TriggerResubscriptionCommand cmd;
+    cmd.RunCommand();
+    return CSstay;
+}
+
 el_status_t ExitFunction()
 {
     exit(0);
@@ -358,6 +389,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     el_bind_key(CTL('_'), StopFunction);
     el_bind_key(CTL('@'), ExitFunction);
     el_bind_key(CTL('Z'), SuspendOrResumeFunction);
+    el_bind_key(CTL('G'), TriggerResubscriptionFunction);
 
     char * command = nullptr;
     int status;
