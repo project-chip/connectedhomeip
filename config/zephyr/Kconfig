@@ -581,3 +581,4 @@ config CHIP_BLE_ADVERTISING_DURATION
 	  If CHIP_BLE_EXT_ADVERTISING is set to false, the maximum duration time is 15 minutes, 
 	  else the maximum duration time can be extended to 2880 minutes (48h).
 
+endif
