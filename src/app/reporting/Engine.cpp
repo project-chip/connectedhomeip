@@ -28,7 +28,6 @@
 #include <app/reporting/Read.h>
 #include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -1041,8 +1040,7 @@ void Engine::MarkDirty(const AttributePathParams & path)
 } // namespace app
 } // namespace chip
 
-// TODO: MatterReportingAttributeChangeCallback should just live in libCHIP,
-// instead of being in ember-compatibility-functions.  It does not depend on any
+// TODO: MatterReportingAttributeChangeCallback should just live in libCHIP, It does not depend on any
 // app-specific generated bits.
 void __attribute__((weak))
 MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)

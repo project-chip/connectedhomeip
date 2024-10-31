@@ -40,7 +40,6 @@
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -84,7 +83,6 @@ bool MayHaveAccessibleEventPathForEndpointAndCluster(const ConcreteClusterPath &
 
     return (Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requiredPrivilege) == CHIP_NO_ERROR);
 }
-
 
 bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, EndpointId aEndpoint,
                                            const EventPathParams & aEventPath, const Access::SubjectDescriptor & aSubjectDescriptor)

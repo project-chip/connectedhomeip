@@ -24,7 +24,6 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip;
 using namespace chip::app;

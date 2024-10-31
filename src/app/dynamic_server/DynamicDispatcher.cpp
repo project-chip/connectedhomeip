@@ -15,8 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/util/ember-compatibility-functions.h>
-
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -43,9 +41,8 @@
 
 /**
  * This file defines the APIs needed to handle interaction model dispatch.
- * These are the APIs normally defined in
- * src/app/util/ember-compatibility-functions.cpp and the generated
- * IMClusterCommandHandler.cpp but we want a different implementation of these
+ * These are the APIs normally defined generated ember code,
+ * however we want a different implementation of these
  * to enable more dynamic behavior, since not all framework consumers will be
  * implementing the same server clusters.
  */
