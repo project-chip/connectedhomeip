@@ -66,34 +66,6 @@ namespace app {
 using Access::SubjectDescriptor;
 using Protocols::InteractionModel::Status;
 
-namespace {
-
-bool IsSupportedGlobalAttribute(AttributeId aAttribute)
-{
-    // We don't have any non-global attributes.
-    using namespace Globals::Attributes;
-
-    for (auto & attr : GlobalAttributesNotInMetadata)
-    {
-        if (attr == aAttribute)
-        {
-            return true;
-        }
-    }
-
-    switch (aAttribute)
-    {
-    case FeatureMap::Id:
-        FALLTHROUGH;
-    case ClusterRevision::Id:
-        return true;
-    }
-
-    return false;
-}
-
-} // anonymous namespace
-
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
 {
     // This command passed ServerClusterCommandExists so we know it's one of our
