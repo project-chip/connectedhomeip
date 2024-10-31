@@ -200,6 +200,7 @@ def BuildHostTarget():
     target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-(check|enabled)')
     target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-(check|disabled)')
     target.AppendModifier('check-failure-die', chip_data_model_check_die_on_failure=True).OnlyIfRe('-data-model-check')
+    target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
 
     return target
 
@@ -259,6 +260,7 @@ def BuildEfr32Target():
         TargetPart('brd2703a', board=Efr32Board.BRD2703A),
         TargetPart('brd4338a', board=Efr32Board.BRD4338A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd2605a', board=Efr32Board.BRD2605A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd4343a', board=Efr32Board.BRD4343A, enable_wifi=True, enable_917_soc=True),
     ])
 
     # apps
@@ -690,6 +692,8 @@ def BuildTizenTarget():
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("asan", use_asan=True)
     target.AppendModifier("ubsan", use_ubsan=True)
+    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
+        '-tests')
     target.AppendModifier('with-ui', with_ui=True)
 
     return target

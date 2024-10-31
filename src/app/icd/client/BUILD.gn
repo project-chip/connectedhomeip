@@ -46,7 +46,6 @@ source_set("handler") {
   ]
   public_deps = [
     ":manager",
-    "${chip_root}/src/app",
     "${chip_root}/src/controller",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging",

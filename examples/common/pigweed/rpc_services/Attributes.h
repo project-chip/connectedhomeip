@@ -224,7 +224,7 @@ private:
         app::DataModel::ReadAttributeRequest request;
         request.path = path;
         request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
-        request.subjectDescriptor = subjectDescriptor;
+        request.subjectDescriptor = &subjectDescriptor;
 
         std::optional<app::DataModel::ClusterInfo> info = provider->GetClusterInfo(path);
         if (!info.has_value())

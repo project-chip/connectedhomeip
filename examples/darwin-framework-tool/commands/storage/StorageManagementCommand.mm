@@ -49,11 +49,22 @@ CHIP_ERROR StorageClearAll::Run()
 
 CHIP_ERROR StorageViewAll::Run()
 {
-    __auto_type * domains = GetDomains();
-    for (NSString * domain in domains) {
-        __auto_type * storage = [[PreferencesStorage alloc] initWithDomain:domain];
-        [storage print];
+    if (!mCommissionerName.HasValue()) {
+        __auto_type * domains = GetDomains();
+        for (NSString * domain in domains) {
+            __auto_type * storage = [[PreferencesStorage alloc] initWithDomain:domain];
+            [storage print];
+        }
+
+        return CHIP_NO_ERROR;
     }
+
+    const char * commissionerName = mCommissionerName.Value();
+    __auto_type * fabricId = CHIPCommandBridge::GetCommissionerFabricId(commissionerName);
+    __auto_type * uuidString = [NSString stringWithFormat:@"%@%@", @(kControllerIdPrefix), fabricId];
+    __auto_type * controllerId = [[NSUUID alloc] initWithUUIDString:uuidString];
+    __auto_type * storage = [[ControllerStorage alloc] initWithControllerID:controllerId];
+    [storage print];
 
     return CHIP_NO_ERROR;
 }
