@@ -94,7 +94,6 @@ using namespace chip::Tracing::DarwinFramework;
 @implementation MTRDeviceController {
     os_unfair_lock _underlyingDeviceMapLock;
 
-    std::atomic<chip::FabricIndex> _storedFabricIndex;
     std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
 
     // For now, we just ensure that access to _suspended is atomic, but don't
@@ -501,11 +500,6 @@ using namespace chip::Tracing::DarwinFramework;
     // TODO: Figure out how to get callsites to have an MTRDeviceController_Concrete.
     MTR_ABSTRACT_METHOD();
     errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
-}
-
-- (chip::FabricIndex)fabricIndex
-{
-    return _storedFabricIndex;
 }
 
 - (nullable NSNumber *)compressedFabricID
