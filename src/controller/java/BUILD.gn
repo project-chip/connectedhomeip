@@ -19,6 +19,7 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/app/codegen-data-model-provider/model.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -171,6 +172,15 @@ shared_library("jni") {
     defines += [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
 
     deps += [ "${chip_root}/src/controller:nodatamodel" ]
+
+    # Temporary dependency: InteractionModelEngine NEEDS a codegen data model instance
+    # defined and application is supposed to provide it. This adds the sources
+    # in the same way "data_model" implementations do
+    #
+    # DynamicDispatcher in src/app:interaction-model implements the actual required
+    # ember callbacks in this case...
+    sources += codegen_data_model_SOURCES
+    public_deps = codegen_data_model_PUBLIC_DEPS
   } else {
     deps += [ "${chip_root}/src/controller/data_model" ]
   }
