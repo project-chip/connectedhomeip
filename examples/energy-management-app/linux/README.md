@@ -552,3 +552,62 @@ When we re-read the events:
     state was `kPluggedInCharging` prior to the EV being not detected (normally
     in a graceful shutdown this would be `kPluggedInNoDemand` or
     `kPluggedInDemand`).
+
+## Water Heater App: Interaction using the chip-tool and TestEventTriggers
+
+This section demonstrates how to run the Water Heater application and interact
+with it using the `chip-tool` and `TestEventTriggers`. By default (at the time
+of writing), the WaterHeater app does not configure some of its attributes with
+simulated values (most default to 0). The steps below set the
+[default](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h#L47)
+`TestEventTrigger` which
+`Simulate installation in a 100L tank full of water at 20C, with a target temperature of 60C, in OFF mode`.
+
+Step-by-step:
+
+1. Build the `energy-management-app` for linux:
+
+    ```
+    ./scripts/build/build_examples.py --target linux-x64-energy-management-no-ble build
+    ```
+
+1. Run the Water Heater application:
+
+    ```
+    rm /tmp/chip_* && ./out/linux-x64-energy-management-no-ble/chip-energy-management-app --application water-heater --trace-to json:log --enable-key 000102030405060708090a0b0c0d0e0f
+    ```
+
+1. Commission with chip-tool as node `0x12344321`:
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool pairing code 0x12344321 MT:-24J0AFN00KA0648G00
+    ```
+
+1. Read the `TankVolume` attribute (expect 0 by default):
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool waterheatermanagement read tank-volume 0x12344321 2 | grep TOO
+
+    [1730306361.511] [2089549:2089552] [TOO]   TankVolume: 0
+    ```
+
+1. Set the default TestEventTrigger (`0x0094000000000000`):
+
+-   `0x0094000000000000` corresponds to `kBasicInstallationTestEvent` from
+    `WaterHeadermanagementTestEventTriggerHandler.h`
+-   `hex:00010203...0e0f` is the `--enable-key` passed to the startup of
+    chip-energy-management-app
+-   `0x12344321` is the node-id that the app was commissioned on
+-   final `0` is the endpoint on which the `GeneralDiagnostics` cluster exists
+    to call the `TestEventTrigger` command
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool generaldiagnostics test-event-trigger hex:000102030405060708090a0b0c0d0e0f 0x0094000000000000 0x12344321 0
+    ```
+
+1. Read TankVolume attribute again (now expect 100):
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool waterheatermanagement read tank-volume 0x12344321 2 | grep TOO
+
+    [1730312762.703] [2153606:2153609] [TOO]   TankVolume: 100
+    ```
