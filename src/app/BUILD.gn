@@ -226,6 +226,10 @@ static_library("interaction-model") {
 
   deps = [ "${chip_root}/src/app:events" ]
 
+  # Temporary dependency: codegen data provider instance should be provided
+  # by the application
+  deps += [ "${chip_root}/src/app/codegen-data-model-provider:instance-header" ]
+
   public_deps = [
     ":app_config",
     ":command-handler-impl",
@@ -233,7 +237,6 @@ static_library("interaction-model") {
     ":paths",
     ":subscription-info-provider",
     "${chip_root}/src/app/MessageDef",
-    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:manager",
@@ -291,13 +294,23 @@ static_library("interaction-model") {
       "clusters/ota-provider/ota-provider.cpp",
       "dynamic_server/AccessControl.cpp",
       "dynamic_server/AccessControl.h",
+    ]
+
+    # DynamicDispatcher is actually an ember-override that takes over
+    # util/attribute-storage.cpp and util/attribute-table.cpp functions.
+    #
+    # We likely should formalize and change this with a proper DataModel::Provider that
+    # is consistent instead
+    sources += [
+      "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
+      "${chip_root}/src/app/util/ember-io-storage.cpp",
       "dynamic_server/DynamicDispatcher.cpp",
     ]
 
     public_deps += [
       ":global-attributes",
       "${chip_root}/src/access",
-      "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
+      "${chip_root}/src/app/common:attribute-type",
     ]
 
     public_configs += [ ":config-controller-dynamic-server" ]

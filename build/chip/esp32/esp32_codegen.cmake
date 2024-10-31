@@ -75,7 +75,7 @@ macro(chip_app_component_zapgen ZAP_NAME)
 
     # When data model interface is used, provide a default code-generation data model as
     # part of zapgen. See `chip_data_model.cmake` for similar logic
-    set(CHIP_DATA_MODEL_INTERFACE "disabled" CACHE STRING "Data model interface option to use: enabled or disabled")
+    set(CHIP_DATA_MODEL_INTERFACE "enabled" CACHE STRING "Data model interface option to use: enabled or disabled")
 
     if ("${CHIP_DATA_MODEL_INTERFACE}" STREQUAL "enabled")
       target_sources(${COMPONENT_LIB} PRIVATE ${CODEGEN_DATA_MODEL_SOURCES})

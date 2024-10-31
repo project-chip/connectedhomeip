@@ -32,7 +32,9 @@
 #include <app/WriteHandler.h>
 #include <app/data-model/Decode.h>
 #include <app/util/att-storage.h>
+#include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
+#include <cstddef>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
@@ -56,6 +58,8 @@ namespace {
 // TODO: Maybe consider making this configurable?  See also
 // AccessControl.cpp.
 constexpr EndpointId kSupportedEndpoint = 0;
+
+DataVersion gMockDataVersion = 0;
 
 } // anonymous namespace
 
@@ -379,5 +383,65 @@ const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId c
         return &otaProviderCluster;
     }
 
+    return nullptr;
+}
+
+unsigned emberAfMetadataStructureGeneration()
+{
+    // DynamicDispatcher at this point hardcodes a single OTA provider cluster.
+    // The structure does not change over time, so the current version stays at 0.
+    return 0;
+}
+
+Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
+{
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord,
+                                                             const EmberAfAttributeMetadata ** metadata, uint8_t * buffer,
+                                                             uint16_t readLength, bool write)
+{
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                             AttributesChangedListener * listener)
+{
+    gMockDataVersion++;
+    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
+}
+
+DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClusterPath)
+{
+    return &gMockDataVersion;
+}
+
+Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
+                                                               const EmberAfWriteDataInput & input)
+{
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned endpointIndex, CHIP_ERROR & err)
+{
+    err = CHIP_ERROR_NOT_IMPLEMENTED;
+    return Span<const EmberAfDeviceType>();
+}
+
+const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, ClusterId clusterId,
+                                                EmberAfClusterMask mask, uint8_t * index)
+{
+    if ((endpointType == &otaProviderEndpoint) && (clusterId == Clusters::OtaSoftwareUpdateProvider::Id))
+    {
+        return &otaProviderCluster;
+    }
+
+    return nullptr;
+}
+
+const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
+{
+    // no known attributes even for OTA
     return nullptr;
 }

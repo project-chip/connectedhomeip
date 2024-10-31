@@ -113,7 +113,7 @@ if (CONFIG_MBED_BSD_SOCKET_TRACE)
 endif()
 
 # Option can be set with `-DCHIP_DATA_MODEL_INTERFACE=enabled` or similar on the command line
-set(CHIP_DATA_MODEL_INTERFACE "disabled" CACHE STRING "Data model interface option to use: enabled or disabled")
+set(CHIP_DATA_MODEL_INTERFACE "enabled" CACHE STRING "Data model interface option to use: enabled or disabled")
 
 # ==============================================================================
 # Generate configuration for CHIP GN build system

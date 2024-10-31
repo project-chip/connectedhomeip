@@ -70,7 +70,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-k32w0-freertos-lighting-factory \
+                      --target nxp-k32w0-freertos-lighting-factory-log-progress \
                       --target nxp-k32w0-freertos-contact-sensor-low-power-factory \
                       build \
                       --copy-artifacts-to out/artifacts \
@@ -79,7 +79,7 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp k32w0+release light \
-                    out/artifacts/nxp-k32w0-freertos-lighting-factory/chip-k32w0x-light-example.elf \
+                    out/artifacts/nxp-k32w0-freertos-lighting-factory-log-progress/chip-k32w0x-light-example.elf \
                     /tmp/bloat_reports/
             - name: Get K32W0 contact sensor size stats
               run: |
