@@ -393,14 +393,14 @@ thermostat application for now.
 -   Build Matter with Border Router configuration with ble-wifi commissioning:
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true w8801_transceiver=true chip_enable_matter_cli=true chip_config_network_layer_ble=true chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/path/to/ot-rcp/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\" hci_spinel_single_uart=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true w8801_transceiver=true nxp_enable_matter_cli=true chip_config_network_layer_ble=true chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/path/to/ot-rcp/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\" hci_spinel_single_uart=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
 -   Build Matter with Border Router configuration with onnetwork commissioning:
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true w8801_transceiver=true chip_enable_matter_cli=true chip_config_network_layer_ble=false wifi_auto_connect_at_boot=true wifi_auto_connect_at_boot_ssid=\"your_wifi_ssid\" wifi_auto_connect_at_boot_password=\"your_wifi_password\" chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/path/to/ot-rcp/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\"" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true w8801_transceiver=true nxp_enable_matter_cli=true chip_config_network_layer_ble=false wifi_auto_connect_at_boot=true wifi_auto_connect_at_boot_ssid=\"your_wifi_ssid\" wifi_auto_connect_at_boot_password=\"your_wifi_password\" chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/path/to/ot-rcp/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\"" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
@@ -419,15 +419,15 @@ Optional GN options that can be added when building an application:
     Wifi + OpenThread Border Router configuration. Note that is only supported
     on the on the thermostat application for now.
 -   To enable the [matter CLI](README.md#matter-shell), the argument
-    `chip_enable_matter_cli=true` must be added to the _gn gen_ command.
+    `nxp_enable_matter_cli=true` must be added to the _gn gen_ command.
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
 -   By default, the MIMXRT1060-EVK-B will be chosen. To switch to an
     MIMXRT1060-EVK, the argument `evkname=\"evkmimxrt1060\"` must be added to
     the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
-    specific flash area the argument `chip_with_factory_data=1` must be added to
-    the _gn gen_ command. For more information, see
+    specific flash area the argument `nxp_use_factory_data=true` must be added
+    to the _gn gen_ command. For more information, see
     [Guide for writing manufacturing data on NXP devices](../../../../../docs/platforms/nxp/nxp_manufacturing_flow.md)
 
 <a name="manufacturing"></a>

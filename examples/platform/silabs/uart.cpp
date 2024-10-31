@@ -16,7 +16,9 @@
  *    limitations under the License.
  */
 #include "AppConfig.h"
-#include "matter_shell.h"
+#ifdef ENABLE_CHIP_SHELL
+#include "MatterShell.h" // nogncheck
+#endif
 #include <cmsis_os2.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <sl_cmsis_os2_common.h>

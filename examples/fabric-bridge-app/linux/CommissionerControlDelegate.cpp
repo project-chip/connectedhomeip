@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "CommissionerControl.h"
+#include "CommissionerControlDelegate.h"
 #include "RpcClient.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
