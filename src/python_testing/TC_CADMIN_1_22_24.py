@@ -38,7 +38,7 @@ from time import sleep
 
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.exceptions import ChipStackError 
+from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -95,7 +95,8 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         self.step(4)
         window_status = await self.get_window_status()
         if window_status != Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen:
-            asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen, "Commissioning window is expected to be closed, but was found to be open")
+            asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
+                                 "Commissioning window is expected to be closed, but was found to be open")
 
         self.step(5)
         try:
@@ -153,7 +154,8 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
             window_status = await self.get_window_status()
 
         if window_status != Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen:
-            asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen, "Commissioning window is expected to be closed, but was found to be open")
+            asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
+                                 "Commissioning window is expected to be closed, but was found to be open")
 
         self.step(5)
         try:
@@ -171,6 +173,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         window_status2 = await self.get_window_status()
         if window_status2 != Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen:
             asserts.assert_equal(await window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen, "Commissioning window is expected to be closed, but was found to be open")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
