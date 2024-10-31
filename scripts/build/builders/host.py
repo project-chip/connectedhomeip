@@ -334,7 +334,6 @@ class HostBuilder(GnBuilder):
                  enable_test_event_triggers=None,
                  enable_dnssd_tests: Optional[bool] = None,
                  chip_casting_simplified: Optional[bool] = None,
-                 chip_data_model_check_die_on_failure: Optional[bool] = None,
                  disable_shell=False,
                  use_googletest=False,
                  ):
@@ -433,13 +432,7 @@ class HostBuilder(GnBuilder):
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
-            self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
             self.build_command = 'check'
-        elif chip_data_model_check_die_on_failure is not None:
-            if chip_data_model_check_die_on_failure:
-                self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
-            else:
-                self.extra_gn_options.append('chip_data_model_check_die_on_failure=false')
 
         if app == HostApp.EFR32_TEST_RUNNER:
             self.build_command = 'runner'
