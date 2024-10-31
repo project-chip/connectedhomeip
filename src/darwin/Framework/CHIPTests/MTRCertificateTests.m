@@ -126,13 +126,16 @@
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
+    __auto_type * intermediatePublicKey = intermediateKeys.copyPublicKey;
+    XCTAssert(intermediatePublicKey != NULL);
+    CFAutorelease(intermediatePublicKey);
 
     __auto_type * intermediateCert = [MTRCertificates createIntermediateCertificate:rootKeys
-                                                                    rootCertificate:rootCert
-                                                              intermediatePublicKey:[intermediateKeys.copyPublicKey autorelease]
-                                                                           issuerID:nil
-                                                                           fabricID:nil
-                                                                              error:nil];
+                                                                rootCertificate:rootCert
+                                                          intermediatePublicKey:intermediatePublicKey
+                                                                       issuerID:nil
+                                                                       fabricID:nil
+                                                                          error:nil];
     XCTAssertNotNil(intermediateCert);
 
     // Test round-trip through TLV format.
@@ -155,13 +158,16 @@
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
+    __auto_type * intermediatePublicKey = intermediateKeys.copyPublicKey;
+    XCTAssert(intermediatePublicKey != NULL);
+    CFAutorelease(intermediatePublicKey);
 
     __auto_type * startDate = [MTRCertificateTests startDateWithTimeIntervalSinceNow:300];
     __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate duration:400];
 
     __auto_type * intermediateCert = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                     rootCertificate:rootCert
-                                                              intermediatePublicKey:[intermediateKeys.copyPublicKey autorelease]
+                                                              intermediatePublicKey:intermediatePublicKey
                                                                            issuerID:nil
                                                                            fabricID:nil
                                                                      validityPeriod:validityPeriod
@@ -192,13 +198,16 @@
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
+    __auto_type * intermediatePublicKey = intermediateKeys.copyPublicKey;
+    XCTAssert(intermediatePublicKey != NULL);
+    CFAutorelease(intermediatePublicKey);
 
     __auto_type * startDate = [MTRCertificateTests startDateWithTimeIntervalSinceNow:300];
     __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate endDate:[NSDate distantFuture]];
 
     __auto_type * intermediateCert = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                     rootCertificate:rootCert
-                                                              intermediatePublicKey:[intermediateKeys.copyPublicKey autorelease]
+                                                              intermediatePublicKey:intermediatePublicKey
                                                                            issuerID:nil
                                                                            fabricID:nil
                                                                      validityPeriod:validityPeriod
@@ -229,6 +238,9 @@
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
+    __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
+    XCTAssert(operationalPublicKey != NULL);
+    CFAutorelease(operationalPublicKey);
 
     __auto_type * cats = [[NSMutableSet alloc] initWithCapacity:3];
     // High bits are identifier, low bits are version.
@@ -238,7 +250,7 @@
 
     __auto_type * operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
                                                                signingCertificate:rootCert
-                                                             operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                                             operationalPublicKey:operationalPublicKey
                                                                          fabricID:@1
                                                                            nodeID:@1
                                                             caseAuthenticatedTags:cats
@@ -265,6 +277,9 @@
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
+    __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
+    XCTAssert(operationalPublicKey != NULL);
+    CFAutorelease(operationalPublicKey);
 
     __auto_type * cats = [[NSMutableSet alloc] initWithCapacity:3];
     // High bits are identifier, low bits are version.
@@ -277,7 +292,7 @@
 
     __auto_type * operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
                                                                signingCertificate:rootCert
-                                                             operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                                             operationalPublicKey:operationalPublicKey
                                                                          fabricID:@1
                                                                            nodeID:@1
                                                             caseAuthenticatedTags:cats
@@ -309,6 +324,9 @@
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
+    __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
+    XCTAssert(operationalPublicKey != NULL);
+    CFAutorelease(operationalPublicKey);
 
     __auto_type * cats = [[NSMutableSet alloc] initWithCapacity:3];
     // High bits are identifier, low bits are version.
@@ -321,7 +339,7 @@
 
     __auto_type * operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
                                                                signingCertificate:rootCert
-                                                             operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                                             operationalPublicKey:operationalPublicKey
                                                                          fabricID:@1
                                                                            nodeID:@1
                                                             caseAuthenticatedTags:cats
@@ -353,10 +371,13 @@
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
+    __auto_type * intermediatePublicKey = [intermediateKeys copyPublicKey];
+    XCTAssert(intermediatePublicKey != NULL);
+    CFAutorelease(intermediatePublicKey);
 
     __auto_type * intermediateCert = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                     rootCertificate:rootCert
-                                                              intermediatePublicKey:[intermediateKeys.copyPublicKey autorelease]
+                                                              intermediatePublicKey:intermediatePublicKey
                                                                            issuerID:nil
                                                                            fabricID:nil
                                                                               error:nil];
@@ -364,10 +385,13 @@
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
+    __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
+    XCTAssert(operationalPublicKey != NULL);
+    CFAutorelease(operationalPublicKey);
 
     __auto_type * operationalCert = [MTRCertificates createOperationalCertificate:intermediateKeys
                                                                signingCertificate:intermediateCert
-                                                             operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                                             operationalPublicKey:operationalPublicKey
                                                                          fabricID:@1
                                                                            nodeID:@1
                                                             caseAuthenticatedTags:nil
@@ -394,6 +418,9 @@
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
+    __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
+    XCTAssert(operationalPublicKey != NULL);
+    CFAutorelease(operationalPublicKey);
 
     __auto_type * longCats = [[NSMutableSet alloc] initWithCapacity:4];
     [longCats addObject:@0x00010001];
@@ -415,7 +442,7 @@
     // Check basic case works
     __auto_type * operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
                                                                signingCertificate:rootCert
-                                                             operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                                             operationalPublicKey:operationalPublicKey
                                                                          fabricID:@1
                                                                            nodeID:@1
                                                             caseAuthenticatedTags:nil
@@ -425,7 +452,7 @@
     // CATs too long
     operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
                                                  signingCertificate:rootCert
-                                               operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                               operationalPublicKey:operationalPublicKey
                                                            fabricID:@1
                                                              nodeID:@1
                                               caseAuthenticatedTags:longCats
@@ -435,7 +462,7 @@
     // Multiple CATs with the same identifier but different versions
     operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
                                                  signingCertificate:rootCert
-                                               operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                               operationalPublicKey:operationalPublicKey
                                                            fabricID:@1
                                                              nodeID:@1
                                               caseAuthenticatedTags:catsWithSameIdentifier
@@ -445,7 +472,7 @@
     // CAT with invalid version
     operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
                                                  signingCertificate:rootCert
-                                               operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                               operationalPublicKey:operationalPublicKey
                                                            fabricID:@1
                                                              nodeID:@1
                                               caseAuthenticatedTags:catsWithInvalidVersion
@@ -455,7 +482,7 @@
     // Signing key mismatch
     operationalCert = [MTRCertificates createOperationalCertificate:operationalKeys
                                                  signingCertificate:rootCert
-                                               operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                               operationalPublicKey:operationalPublicKey
                                                            fabricID:@1
                                                              nodeID:@1
                                               caseAuthenticatedTags:nil
@@ -465,7 +492,7 @@
     // Invalid fabric id
     operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
                                                  signingCertificate:rootCert
-                                               operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                               operationalPublicKey:operationalPublicKey
                                                            fabricID:@0
                                                              nodeID:@1
                                               caseAuthenticatedTags:nil
@@ -475,7 +502,7 @@
     // Undefined node id
     operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
                                                  signingCertificate:rootCert
-                                               operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                               operationalPublicKey:operationalPublicKey
                                                            fabricID:@1
                                                              nodeID:@0
                                               caseAuthenticatedTags:nil
@@ -485,7 +512,7 @@
     // Non-operational node id
     operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
                                                  signingCertificate:rootCert
-                                               operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
+                                               operationalPublicKey:operationalPublicKey
                                                            fabricID:@1
                                                              nodeID:@(0xFFFFFFFFFFFFFFFFLLU)
                                               caseAuthenticatedTags:nil
