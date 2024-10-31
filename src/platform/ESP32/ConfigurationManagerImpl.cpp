@@ -267,7 +267,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 
     return err;
 #else
-    location = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
+    location       = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
     return CHIP_NO_ERROR;
 #endif // CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
 }
