@@ -24,7 +24,6 @@
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
-#include <app/reporting/Read-Checked.h>
 #include <app/reporting/Read.h>
 #include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
