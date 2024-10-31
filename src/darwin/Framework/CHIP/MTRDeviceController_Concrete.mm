@@ -1619,17 +1619,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     [self syncRunOnWorkQueue:block error:nil];
 }
 
-- (void)invalidateCASESessionEstablishmentForNode:(NSNumber *)nodeID;
-{
-    auto block = ^{
-        auto caseSessionMgr = self->_cppCommissioner->CASESessionMgr();
-        VerifyOrDie(caseSessionMgr != nullptr);
-        caseSessionMgr->ReleaseSession(self->_cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue));
-    };
-
-    [self syncRunOnWorkQueue:block error:nil];
-}
-
 - (void)operationalInstanceAdded:(NSNumber *)nodeID
 {
     // Don't use deviceForNodeID here, because we don't want to create the
