@@ -131,11 +131,11 @@
     CFAutorelease(intermediatePublicKey);
 
     __auto_type * intermediateCert = [MTRCertificates createIntermediateCertificate:rootKeys
-                                                                rootCertificate:rootCert
-                                                          intermediatePublicKey:intermediatePublicKey
-                                                                       issuerID:nil
-                                                                       fabricID:nil
-                                                                          error:nil];
+                                                                    rootCertificate:rootCert
+                                                              intermediatePublicKey:intermediatePublicKey
+                                                                           issuerID:nil
+                                                                           fabricID:nil
+                                                                              error:nil];
     XCTAssertNotNil(intermediateCert);
 
     // Test round-trip through TLV format.
