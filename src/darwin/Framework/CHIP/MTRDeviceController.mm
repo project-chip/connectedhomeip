@@ -14,20 +14,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#import <Matter/MTRCommissionableBrowserResult.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerParameters.h>
 
 #import "MTRDeviceController_Internal.h"
 
 #import "MTRAsyncWorkQueue.h"
-#import "MTRAttestationTrustStoreBridge.h"
 #import "MTRBaseDevice_Internal.h"
-#import "MTRCommissionableBrowser.h"
-#import "MTRCommissionableBrowserResult_Internal.h"
 #import "MTRCommissioningParameters.h"
 #import "MTRConversion.h"
 #import "MTRDefines_Internal.h"
-#import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
@@ -43,40 +40,16 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
-#import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
-#import "MTRServerEndpoint_Internal.h"
 #import "MTRSetupPayload.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
-#import <setup_payload/ManualSetupPayloadGenerator.h>
-#import <setup_payload/SetupPayload.h>
-#import <zap-generated/MTRBaseClusters.h>
 
-#import "MTRDeviceAttestationDelegateBridge.h"
-#import "MTRDeviceConnectionBridge.h"
-
-#include <platform/CHIPDeviceConfig.h>
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/data-model/List.h>
 #include <app/server/Dnssd.h>
-#include <controller/CHIPDeviceController.h>
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/CommissioningWindowOpener.h>
-#include <credentials/FabricTable.h>
-#include <credentials/GroupDataProvider.h>
-#include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
-#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
-#include <inet/InetInterface.h>
-#include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <platform/LockTracker.h>
-#include <platform/PlatformManager.h>
-#include <setup_payload/ManualSetupPayloadGenerator.h>
-#include <system/SystemClock.h>
+#include <crypto/CHIPCryptoPAL.h>
 
 #include <atomic>
 #include <dns_sd.h>
@@ -119,22 +92,10 @@ using namespace chip::Tracing::DarwinFramework;
 @end
 
 @implementation MTRDeviceController {
-    chip::Credentials::PartialDACVerifier * _partialDACVerifier;
-    chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
-    MTRDeviceControllerDelegateBridge * _deviceControllerDelegateBridge;
-    MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     os_unfair_lock _underlyingDeviceMapLock;
-    MTRCommissionableBrowser * _commissionableBrowser;
-    MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
 
-    // _serverEndpoints is only touched on the Matter queue.
-    NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
-
-    MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
     std::atomic<chip::FabricIndex> _storedFabricIndex;
     std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
-    MTRP256KeypairBridge _signingKeypairBridge;
-    MTRP256KeypairBridge _operationalKeypairBridge;
 
     // For now, we just ensure that access to _suspended is atomic, but don't
     // guarantee atomicity of the the entire suspend/resume operation.  The
