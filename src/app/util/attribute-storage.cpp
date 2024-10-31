@@ -291,7 +291,7 @@ CHIP_ERROR emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpoint
     VerifyOrReturnError(endpointType.clusterCount == 0, CHIP_ERROR_INVALID_ARGUMENT);
     // check cluster count fits target struct's clusterCount field
     size_t clusterCount = templateClusterSpecs.size();
-    VerifyOrReturnError(CanCastTo<typeof(endpointType.clusterCount)>(clusterCount), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(CanCastTo<decltype(endpointType.clusterCount)>(clusterCount), CHIP_ERROR_NO_MEMORY);
     // allocate new cluster array
     auto newClusters = new EmberAfCluster[clusterCount];
     VerifyOrReturnError(newClusters != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -315,16 +315,16 @@ CHIP_ERROR emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpoint
         newClusters[i] = *cluster;
         // sum up the needed storage, result must fit into endpointSize member (which is smaller than size_t)
         endpointSize += cluster->clusterSize;
-        if (!CanCastTo<typeof(endpointType.endpointSize)>(endpointSize))
+        if (!CanCastTo<decltype(endpointType.endpointSize)>(endpointSize))
         {
             delete[] newClusters;
             return CHIP_ERROR_NO_MEMORY;
         }
     }
     // set up dynamic endpoint
-    endpointType.clusterCount = static_cast<typeof(endpointType.clusterCount)>(clusterCount);
+    endpointType.clusterCount = static_cast<decltype(endpointType.clusterCount)>(clusterCount);
     endpointType.cluster      = newClusters;
-    endpointType.endpointSize = static_cast<typeof(endpointType.endpointSize)>(endpointSize);
+    endpointType.endpointSize = static_cast<decltype(endpointType.endpointSize)>(endpointSize);
     return CHIP_NO_ERROR;
 }
 
