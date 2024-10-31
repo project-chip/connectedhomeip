@@ -29,3 +29,18 @@ StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffe
 }
 
 } // namespace pw
+
+#if CHIP_CONFIG_TEST_GOOGLETEST
+namespace chip {
+
+void PrintTo(const CHIP_ERROR & err, std::ostream * os)
+{
+    if (CHIP_ERROR::IsSuccess(err))
+    {
+        *os << "CHIP_NO_ERROR";
+        return;
+    }
+    *os << "CHIP_ERROR:<" << err.Format() << ">";
+}
+} // namespace chip
+#endif // CHIP_CONFIG_TEST_GOOGLETEST

@@ -42,6 +42,7 @@
 ///    Actual: CHIP_ERROR:<src/lib/core/TLVReader.cpp:889: Error 0x00000022> == CHIP_NO_ERROR
 
 #include <pw_string/string_builder.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPError.h>
 
@@ -51,3 +52,22 @@ template <>
 StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer);
 
 } // namespace pw
+#if CHIP_CONFIG_TEST_GOOGLETEST
+
+namespace chip {
+
+/// The following function is for usage with GoogleTest.
+/// This implementation of PrintTo allows GoogleTest to print CHIP_ERROR for better logs in the event of a failure.
+/// Example output with PrintTo():
+///
+///   src/lib/core/tests/TestTLV.cpp:382: Failure
+///   Expected equality of these values:
+///           err
+///             Which is: CHIP_ERROR:<src/lib/core/TLVWriter.cpp:674: Error 0x00000024>
+///           CHIP_ERROR(0, "src/lib/core/tests/TestTLV.cpp", 382)
+///             Which is: CHIP_NO_ERROR
+///
+/// This enhances the readability and diagnostic information in GoogleTest test logs.
+void PrintTo(const CHIP_ERROR & err, std::ostream * os);
+} // namespace chip
+#endif // CHIP_CONFIG_TEST_GOOGLETEST
