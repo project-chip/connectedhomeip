@@ -26,6 +26,7 @@
 #import <Matter/MTRDeviceStorageBehaviorConfiguration.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
+#import "MTRAsyncWorkQueue.h"
 #import "MTRDeviceConnectionBridge.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 
@@ -225,6 +226,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.
  */
 @property (readonly) chip::FabricIndex fabricIndex;
+
+/**
+ * A queue with a fixed width that allows a number of MTRDevice objects to perform
+ * subscription at the same time.
+ */
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 
 @end
 
