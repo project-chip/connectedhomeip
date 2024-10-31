@@ -41,7 +41,6 @@
 @class MTRDeviceControllerParameters;
 @class MTRDeviceControllerFactory;
 @class MTRDevice;
-@class MTRAsyncWorkQueue;
 @protocol MTRDevicePairingDelegate;
 @protocol MTRDeviceControllerDelegate;
 @class MTRDevice_Concrete;
@@ -77,12 +76,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
 @property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
-
-/**
- * A queue with a fixed width that allows a number of MTRDevice objects to perform
- * subscription at the same time.
- */
-@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 
 /**
  * Fabric ID tied to controller
