@@ -787,6 +787,10 @@ CHIP_ERROR TLVReader::ReadElement()
     mElemLenOrVal = 0;
 
     // Read the length/value field, if present.
+    // NOTE: this is works because even though we only memcpy a subset of values and leave
+    //       the rest 0. Value looks like "<le-byte> <le-byte> ... <le-byte> 0 0 ... 0"
+    //       which is the TLV format. HostSwap ensures this becomes a real host value
+    //       (should be a NOOP on LE machines, will full-swap on big-endian machines)
     memcpy(&mElemLenOrVal, p, valOrLenBytes);
     LittleEndian::HostSwap(mElemLenOrVal);
 
