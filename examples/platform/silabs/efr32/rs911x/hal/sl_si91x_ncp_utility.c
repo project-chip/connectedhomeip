@@ -49,7 +49,6 @@
 #include "sl_si91x_ncp_utility.h"
 #include "wfx_host_events.h"
 
-
 #if SL_MX25CTRL_MUX
 sl_status_t sl_wfx_host_spiflash_cs_assert(void);
 sl_status_t sl_wfx_host_spiflash_cs_deassert(void);
