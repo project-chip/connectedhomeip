@@ -272,7 +272,7 @@ data (e.g. fabric info).
 -   Step 3: (In chip-repl) Commissioning OnNetwork
 
 ```python
-    devCtrl.CommissionOnNetwork(1234,20202021)   # Commission with NodeID 1234
+    await devCtrl.CommissionOnNetwork(1234,20202021)   # Commission with NodeID 1234
 Established secure session with Device
 Commissioning complete
 Out[2]: <chip.native.PyChipError object at 0x7f2432b16140>
