@@ -92,34 +92,6 @@ bool IsSupportedGlobalAttribute(AttributeId aAttribute)
     return false;
 }
 
-Status DetermineAttributeStatus(const ConcreteAttributePath & aPath, bool aIsWrite)
-{
-    // TODO: Consider making this configurable for applications that are not
-    // trying to be an OTA provider, though in practice it just affects which
-    // error is returned.
-    if (aPath.mEndpointId != kSupportedEndpoint)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-
-    // TODO: Consider making this configurable for applications that are not
-    // trying to be an OTA provider, though in practice it just affects which
-    // error is returned.
-    if (aPath.mClusterId != OtaSoftwareUpdateProvider::Id)
-    {
-        return Status::UnsupportedCluster;
-    }
-
-    if (!IsSupportedGlobalAttribute(aPath.mAttributeId))
-    {
-        return Status::UnsupportedAttribute;
-    }
-
-    // No permissions for this for read, and none of these are writable for
-    // write.  The writable-or-not check happens before the ACL check.
-    return aIsWrite ? Status::UnsupportedWrite : Status::UnsupportedAccess;
-}
-
 } // anonymous namespace
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
