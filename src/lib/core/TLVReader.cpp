@@ -774,7 +774,7 @@ CHIP_ERROR TLVReader::ReadElement()
     // understand that ReadData initializes stagingBuf
     stagingBuf[1] = 0;
 
-    // If the head of the element goes past the end of the current input buffer, 
+    // If the head of the element goes past the end of the current input buffer,
     // we need to read it into the staging buffer to parse it.  Just do that unconditionally,
     // even if the head does not go past end of current buffer, to save codesize.
     ReturnErrorOnFailure(ReadData(stagingBuf, elemHeadBytes));
