@@ -33,6 +33,11 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
                                                   AttributeReportIBs::Builder & reportBuilder,
                                                   const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
+    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
+                  path.mAttributeId);
+    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
+                                                          DataModelCallbacks::OperationOrder::Pre, path);
+
     DataModel::ReadAttributeRequest readRequest;
 
     if (isFabricFiltered)
