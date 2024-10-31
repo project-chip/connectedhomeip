@@ -42,6 +42,7 @@ namespace CameraAVStreamMgmt {
 
 CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId,
                                                    ClusterId aClusterId, BitMask<Feature> aFeature,
+                                                   OptionalAttributes aOptionalAttrs,
                                                    uint8_t aMaxConcurrentVideoEncoders, uint32_t aMaxEncodedPixelRate,
                                                    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
                                                    const VideoResolutionStruct & aMinViewPort, uint32_t aMaxContentBufferSize,
@@ -50,7 +51,7 @@ CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & 
                                                    TwoWayTalkSupportTypeEnum aTwoWayTalkSupport, uint32_t aMaxNetworkBandwidth) :
     CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
     AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(aClusterId), mFeature(aFeature), mMaxConcurrentVideoEncoders(aMaxConcurrentVideoEncoders),
+    mClusterId(aClusterId), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs), mMaxConcurrentVideoEncoders(aMaxConcurrentVideoEncoders),
     mMaxEncodedPixelRate(aMaxEncodedPixelRate), mVideoSensorParams(aVideoSensorParams), mNightVisionCapable(aNightVisionCapable),
     mMinViewPort(aMinViewPort), mMaxContentBufferSize(aMaxContentBufferSize), mMicrophoneCapabilities(aMicrophoneCapabilities),
     mSpeakerCapabilities(aSpeakerCapabilities), mTwoWayTalkSupport(aTwoWayTalkSupport), mMaxNetworkBandwidth(aMaxNetworkBandwidth)
@@ -80,6 +81,11 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
 bool CameraAVStreamMgmtServer::HasFeature(Feature feature) const
 {
     return mFeature.Has(feature);
+}
+
+bool CameraAVStreamMgmtServer::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
+{
+    return mOptionalAttrs.Has(aOptionalAttrs);
 }
 
 bool CameraAVStreamMgmtServer::IsLocalVideoRecordingEnabled() const
@@ -592,7 +598,24 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
 
     switch (aPath.mAttributeId)
     {
+    case HDRModeEnabled::Id: {
+        // Optional Attribute if Video is supported
+        if ((!HasFeature(Feature::kVideo)) ||
+            (!SupportsOptAttr(OptionalAttributes::kSupportsHDRModeEnabled)))
+        {
+            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set HDRModeEnabled, feature is not supported");
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        }
+
+        bool newValue;
+        ReturnErrorOnFailure(aDecoder.Decode(newValue));
+        ReturnErrorOnFailure(SetHDRModeEnabled(newValue));
+        return CHIP_NO_ERROR;
+    }
     case RankedVideoStreamPrioritiesList::Id: {
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "CameraAVStreamMgmt: can not write to RankedVideoStreamPrioritiesList, feature is not supported"));
         uint8_t newValue;
         ReturnErrorOnFailure(aDecoder.Decode(newValue));
         ReturnErrorOnFailure(mDelegate.SetRankedVideoStreamPrioritiesList(newValue));

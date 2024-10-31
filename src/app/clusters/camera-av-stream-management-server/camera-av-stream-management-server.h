@@ -158,6 +158,16 @@ protected:
     CameraAVStreamMgmtServer * GetCameraAVStreamMgmtServer() const { return mCameraAVStreamMgmtServer; }
 };
 
+enum class OptionalAttributes : uint32_t
+{
+    kSupportsHDRModeEnabled       = 0x0001,
+    kSupportsHardPrivacyModeOn    = 0x0002,
+    kSupportsNightVision          = 0x0004,
+    kSupportsNightVisionIllum     = 0x0008,
+    kSupportsMicrophoneAGCEnabled = 0x0010,
+    kSupportsDepthSensorStatus    = 0x0020,
+};
+
 class CameraAVStreamMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
@@ -171,7 +181,7 @@ public:
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
      */
     CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
-                             BitMask<CameraAVStreamMgmt::Feature> aFeature, uint8_t aMaxConVideoEncoders,
+                             BitMask<CameraAVStreamMgmt::Feature> aFeature, OptionalAttributes aOptionalAttrs, uint8_t aMaxConVideoEncoders,
                              uint32_t aMaxEncodedPixelRate, VideoSensorParamsStruct aVideoSensorParams, bool aNightVisionCapable,
                              VideoResolutionStruct minViewPort, uint32_t aMaxContentBufferSize,
                              AudioCapabilitiesStruct aMicCapabilities, AudioCapabilitiesStruct aSpkrCapabilities,
@@ -189,6 +199,8 @@ public:
     CHIP_ERROR Init();
 
     bool HasFeature(Feature feature) const;
+
+    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
 
     bool IsLocalVideoRecordingEnabled() const;
 
@@ -257,6 +269,7 @@ private:
     EndpointId mEndpointId;
     ClusterId mClusterId;
     BitMask<Feature> mFeature;
+    BitMask<OptionalAttributes> mOptionalAttrs;
 
     // Attributes with F quality
     const uint8_t mMaxConcurrentVideoEncoders;
