@@ -54,12 +54,23 @@ private:
     uint8_t mSpeedCurrent;
 
     // Fan Mode Limits
-    static constexpr int FAN_MODE_LOW_LOWER_BOUND    = 1;
-    static constexpr int FAN_MODE_LOW_UPPER_BOUND    = 3;
-    static constexpr int FAN_MODE_MEDIUM_LOWER_BOUND = 4;
-    static constexpr int FAN_MODE_MEDIUM_UPPER_BOUND = 7;
-    static constexpr int FAN_MODE_HIGH_LOWER_BOUND   = 8;
-    static constexpr int FAN_MODE_HIGH_UPPER_BOUND   = 10;
+    struct Range
+    {
+        const bool Contains(int value) const { return value >= low && value <= high; }
+        const int Low() const { return low; }
+        const int High() const { return High(); }
+
+        int low;
+        int high;
+    };
+    static constexpr Range kFanModeLowSpeedRange    = { 1, 3 };
+    static constexpr Range kFanModeMediumSpeedRange = { 4, 7 };
+    static constexpr Range kFanModeHighSpeedRange   = { 8, 10 };
+
+    static_assert(kFanModeLowSpeedRange.low <= kFanModeLowSpeedRange.high);
+    static_assert(kFanModeLowSpeedRange.high + 1 == kFanModeMediumSpeedRange.low);
+    static_assert(kFanModeMediumSpeedRange.high + 1 == kFanModeHighSpeedRange.low);
+    static_assert(kFanModeHighSpeedRange.low <= kFanModeHighSpeedRange.high);
 
     void FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode);
     void SetSpeedCurrent(uint8_t aNewSpeedCurrent);
@@ -123,10 +134,11 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
         DataModel::Nullable<Percent> percentSetting =
             NumericAttributeTraits<DataModel::Nullable<Percent>>::StorageToWorking(*value);
 
-        // If the PercentSetting was set to Null (likely the mode was set to kAuto).
-        // Update PercentCurrent to 0 here as it can't be nullable and we don't have a "real"
-        // value for the Fan percentage. The spec doesn't specify what to do in this case.
-        // If not Null, PercentCurrent tracks PercentSetting's value.
+        // The cluster code in fan-control-server.cpp is the only one allowed to set PercentSetting to null.
+        // This happens as a consequence of setting the FanMode to kAuto. In auto mode, percentCurrent should continue to report the
+        // real fan speed percentage. In this example, we set PercentCurrent to 0 here as we don't have a real value for the Fan
+        // speed or a FanAutoMode simulator.
+        // When not Null, SpeedCurrent tracks SpeedSetting's value.
         SetPercentCurrent(percentSetting.IsNull() ? 0 : percentSetting.Value());
         break;
     }
@@ -135,6 +147,11 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
         ChipLogProgress(NotSpecified, "ChefFanControlManager::HandleFanControlAttributeChange  SpeedSetting");
 
         DataModel::Nullable<uint8_t> speedSetting = NumericAttributeTraits<DataModel::Nullable<uint8_t>>::StorageToWorking(*value);
+        // The cluster code in fan-control-server.cpp is the only one allowed to set speedSetting to null.
+        // This happens as a consequence of setting the FanMode to kAuto. In auto mode, speedCurrent should continue to report the
+        // real fan speed. In this example, we set SpeedCurrent to 0 here as we don't have a real value for the Fan speed or a
+        // FanAutoMode simulator.
+        // When not Null, SpeedCurrent tracks SpeedSetting's value.
         SetSpeedCurrent(speedSetting.IsNull() ? 0 : speedSetting.Value());
         // Determine if the speed change should also change the fan mode
         FanControl::Attributes::FanMode::Set(mEndpoint, SpeedToFanMode(mSpeedCurrent));
@@ -161,15 +178,15 @@ FanControl::FanModeEnum ChefFanControlManager::SpeedToFanMode(uint8_t speed)
     {
         return FanControl::FanModeEnum::kOff;
     }
-    if (speed <= FAN_MODE_LOW_UPPER_BOUND)
+    if (kFanModeLowSpeedRange.Contains(speed))
     {
         return FanControl::FanModeEnum::kLow;
     }
-    if (speed <= FAN_MODE_MEDIUM_UPPER_BOUND)
+    if (kFanModeMediumSpeedRange.Contains(speed))
     {
         return FanControl::FanModeEnum::kMedium;
     }
-    if (speed <= FAN_MODE_HIGH_UPPER_BOUND)
+    if (kFanModeHighSpeedRange.Contains(speed))
     {
         return FanControl::FanModeEnum::kHigh;
     }
@@ -224,26 +241,26 @@ void ChefFanControlManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFan
         break;
     }
     case FanControl::FanModeEnum::kLow: {
-        if (mSpeedCurrent < FAN_MODE_LOW_LOWER_BOUND || mSpeedCurrent > FAN_MODE_LOW_UPPER_BOUND)
+        if (!kFanModeLowSpeedRange.Contains(mSpeedCurrent))
         {
-            DataModel::Nullable<uint8_t> speedSetting(FAN_MODE_LOW_LOWER_BOUND);
+            DataModel::Nullable<uint8_t> speedSetting(kFanModeLowSpeedRange.Low());
             SetSpeedSetting(speedSetting);
         }
         break;
     }
     case FanControl::FanModeEnum::kMedium: {
-        if (mSpeedCurrent < FAN_MODE_MEDIUM_LOWER_BOUND || mSpeedCurrent > FAN_MODE_MEDIUM_UPPER_BOUND)
+        if (!kFanModeMediumSpeedRange.Contains(mSpeedCurrent))
         {
-            DataModel::Nullable<uint8_t> speedSetting(FAN_MODE_MEDIUM_LOWER_BOUND);
+            DataModel::Nullable<uint8_t> speedSetting(kFanModeMediumSpeedRange.Low());
             SetSpeedSetting(speedSetting);
         }
         break;
     }
     case FanControl::FanModeEnum::kOn:
     case FanControl::FanModeEnum::kHigh: {
-        if (mSpeedCurrent < FAN_MODE_HIGH_LOWER_BOUND || mSpeedCurrent > FAN_MODE_HIGH_UPPER_BOUND)
+        if (!kFanModeHighSpeedRange.Contains(mSpeedCurrent))
         {
-            DataModel::Nullable<uint8_t> speedSetting(FAN_MODE_HIGH_LOWER_BOUND);
+            DataModel::Nullable<uint8_t> speedSetting(kFanModeHighSpeedRange.High());
             SetSpeedSetting(speedSetting);
         }
         break;
