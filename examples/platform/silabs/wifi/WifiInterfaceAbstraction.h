@@ -18,13 +18,8 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 #include <cmsis_os2.h>
-#include <event_groups.h>
 #include <sl_cmsis_os2_common.h>
 #include <wfx_host_events.h>
-
-#ifndef RSI_BLE_ENABLE
-#define RSI_BLE_ENABLE (1)
-#endif
 
 /*
  * Interface to RSI Sapis
