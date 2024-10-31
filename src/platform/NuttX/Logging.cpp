@@ -12,10 +12,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#if CHIP_USE_PW_LOGGING
-#include <pw_log/log.h>
-#endif // CHIP_USE_PW_LOGGING
-
 namespace chip {
 namespace DeviceLayer {
 
