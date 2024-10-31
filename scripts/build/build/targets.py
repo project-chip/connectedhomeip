@@ -113,8 +113,8 @@ def BuildHostTarget():
         TargetPart('chip-tool', app=HostApp.CHIP_TOOL),
         TargetPart('thermostat', app=HostApp.THERMOSTAT),
         # TODO: controllers depending on a datamodel is odd. For now fix compile dependencies on ember.
-        TargetPart('java-matter-controller', app=HostApp.JAVA_MATTER_CONTROLLER, data_model_interface="disabled"),
-        TargetPart('kotlin-matter-controller', app=HostApp.KOTLIN_MATTER_CONTROLLER, data_model_interface="disabled"),
+        TargetPart('java-matter-controller', app=HostApp.JAVA_MATTER_CONTROLLER),
+        TargetPart('kotlin-matter-controller', app=HostApp.KOTLIN_MATTER_CONTROLLER),
         TargetPart('minmdns', app=HostApp.MIN_MDNS),
         TargetPart('light', app=HostApp.LIGHT),
         TargetPart('light-data-model-no-unique-id', app=HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID),
@@ -196,10 +196,6 @@ def BuildHostTarget():
     target.AppendModifier('enable-dnssd-tests', enable_dnssd_tests=True).OnlyIfRe('-tests')
     target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
-    target.AppendModifier('data-model-check', data_model_interface="check").ExceptIfRe('-data-model-(enabled|disabled)')
-    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-(check|enabled)')
-    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-(check|disabled)')
-    target.AppendModifier('check-failure-die', chip_data_model_check_die_on_failure=True).OnlyIfRe('-data-model-check')
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
 
     return target
@@ -236,8 +232,6 @@ def BuildEsp32Target():
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('ipv6only', enable_ipv4=False)
     target.AppendModifier('tracing', enable_insights_trace=True).OnlyIfRe("light")
-    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -339,8 +333,6 @@ def BuildNrfTarget():
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
-    target.AppendModifier('data-model-disabled', use_data_model_interface=False).ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', use_data_model_interface=True).ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -426,8 +418,6 @@ def BuildMbedTarget():
         '-(release|debug)')
     target.AppendModifier('debug', profile=MbedProfile.DEBUG).ExceptIfRe(
         '-(release|develop)')
-    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -556,8 +546,6 @@ def BuildNxpTarget():
     target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x_eth-zephyr')
     target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
-    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
     target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x')
     target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).OnlyIfRe('rw61x')
@@ -649,8 +637,6 @@ def BuildQorvoTarget():
     ])
 
     target.AppendModifier('updateimage', update_image=True)
-    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -814,8 +800,6 @@ def BuildTelinkTarget():
     target.AppendModifier('4mb', enable_4mb_flash=True)
     target.AppendModifier('mars', mars_board_config=True)
     target.AppendModifier('usb', usb_board_config=True)
-    target.AppendModifier('data-model-disabled', use_data_model_interface=False).ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', use_data_model_interface=True).ExceptIfRe('-data-model-disabled')
 
     return target
 

@@ -200,6 +200,8 @@ static_library("interaction-model") {
     #
     #       This breaks having `.h` and `.cpp` based off the same compilation unit and
     #       should ideally be cleaned up.
+    "reporting/Read-DataModel.cpp",
+    "reporting/Read-DataModel.h",
     "reporting/reporting.h",
   ]
 
@@ -215,11 +217,11 @@ static_library("interaction-model") {
     ":constants",
     ":paths",
     ":subscription-info-provider",
-    "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
+    "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/address_resolve",
@@ -231,29 +233,6 @@ static_library("interaction-model") {
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
-
-  if (chip_use_data_model_interface == "disabled") {
-    sources += [
-      "reporting/Read-Ember.cpp",
-      "reporting/Read-Ember.h",
-    ]
-  } else if (chip_use_data_model_interface == "check") {
-    sources += [
-      "reporting/Read-Checked.cpp",
-      "reporting/Read-Checked.h",
-      "reporting/Read-DataModel.cpp",
-      "reporting/Read-DataModel.h",
-      "reporting/Read-Ember.cpp",
-      "reporting/Read-Ember.h",
-    ]
-    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
-  } else {  # enabled
-    sources += [
-      "reporting/Read-DataModel.cpp",
-      "reporting/Read-DataModel.h",
-    ]
-    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
-  }
 
   if (chip_enable_read_client) {
     sources += [ "ReadClient.cpp" ]

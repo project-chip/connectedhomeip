@@ -190,7 +190,6 @@ class NxpBuilder(GnBuilder):
                  enable_ethernet: bool = False,
                  enable_shell: bool = False,
                  enable_ota: bool = False,
-                 data_model_interface: Optional[str] = None,
                  enable_factory_data_build: bool = False,
                  disable_pairing_autostart: bool = False,
                  iw416_transceiver: bool = False,
@@ -220,7 +219,6 @@ class NxpBuilder(GnBuilder):
         self.enable_ethernet = enable_ethernet
         self.enable_ota = enable_ota
         self.enable_shell = enable_shell
-        self.data_model_interface = data_model_interface
         self.enable_factory_data_build = enable_factory_data_build
         self.disable_pairing_autostart = disable_pairing_autostart
         self.board_variant = board_variant
@@ -308,9 +306,6 @@ class NxpBuilder(GnBuilder):
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
             if self.board == NxpBoard.RT1170:
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
-
-        if self.data_model_interface is not None:
-            args.append(f'chip_use_data_model_interface="{self.data_model_interface}"')
 
         if self.board_variant:
             if self.board == NxpBoard.RT1060:

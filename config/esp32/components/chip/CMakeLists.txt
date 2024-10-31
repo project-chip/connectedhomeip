@@ -66,12 +66,6 @@ macro(chip_gn_arg_bool arg boolean)
     endif()
 endmacro()
 
-if ("${CHIP_DATA_MODEL_INTERFACE}" STREQUAL "enabled")
-    chip_gn_arg_append("chip_use_data_model_interface" "\"enabled\"")
-else()
-    chip_gn_arg_append("chip_use_data_model_interface" "\"disabled\"")
-endif()
-
 # ESP-IDF lets user set software version string by two ways:
 # 1. Project's CMakeLists.txt file and 2. Config option
 # It depends on CONFIG_APP_PROJECT_VER_FROM_CONFIG option
