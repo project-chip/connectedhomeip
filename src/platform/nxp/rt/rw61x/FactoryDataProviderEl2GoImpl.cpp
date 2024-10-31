@@ -25,6 +25,10 @@ extern "C" {
 #include "ELSFactoryData.h"
 #include "mflash_drv.h"
 
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+#include "els_pkc_mbedtls.h"
+#endif /* defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
+
 #include "fsl_adapter_flash.h"
 
 /* mbedtls */
@@ -195,6 +199,7 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
 
 CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer)
 {
+    CHIP_ERROR res = CHIP_NO_ERROR;
     status_t status = STATUS_SUCCESS;
     uint8_t el2go_blob[EL2GO_MAX_BLOB_SIZE] = {0U};
     size_t el2go_blob_size = 0U;
@@ -214,6 +219,17 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kEl2GoBlob, NULL, 0, BlobSize, &Addr));
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kEl2GoDacKeyId, (uint8_t *) &el2go_dac_key_id, sizeof(el2go_dac_key_id), KeyIdSize));
 
+    /* Calculate message HASH to sign */
+    memset(&digest[0], 0, sizeof(digest));
+    res = Hash_SHA256(digestToSign.data(), digestToSign.size(), &digest[0]);
+    if (res != CHIP_NO_ERROR){
+        return res;
+    }
+
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+    (void)mcux_els_mutex_lock();
+#endif
+
     /* Read DAC key from EL2GO data*/
     status = read_el2go_blob((uint8_t *) Addr, (size_t) BlobSize, el2go_dac_key_id, el2go_blob, EL2GO_MAX_BLOB_SIZE, &el2go_blob_size);
     STATUS_SUCCESS_OR_EXIT_MSG("DAC Provate key not found: 0x%08x", status);
@@ -225,10 +241,6 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     status = els_keygen(key_index, public_key, &public_key_size);
     STATUS_SUCCESS_OR_EXIT_MSG("els_keygen failed: 0x%08x", status);
 
-     /* Calculate message HASH to sign */
-    memset(&digest[0], 0, sizeof(digest));
-    ReturnErrorOnFailure(Hash_SHA256(digestToSign.data(), digestToSign.size(), &digest[0]));
-
     // Compute signature
     status = ELS_sign_hash(hash, ecc_signature, &sign_options, key_index);
     CopySpanToMutableSpan(ByteSpan{ ecc_signature, MCUXCLELS_ECC_SIGNATURE_SIZE }, outSignBuffer);
@@ -236,9 +248,15 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
 
     status = els_delete_key(key_index);
     STATUS_SUCCESS_OR_EXIT_MSG("Deletion of el2goimport_auth failed", status);
-
+    
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+    (void)mcux_els_mutex_unlock();
+#endif
     return CHIP_NO_ERROR;
 exit:
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+    (void)mcux_els_mutex_unlock();
+#endif
     return CHIP_ERROR_INTERNAL;
 }
 
