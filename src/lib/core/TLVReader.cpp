@@ -774,8 +774,9 @@ CHIP_ERROR TLVReader::ReadElement()
     // understand that ReadData initializes stagingBuf
     stagingBuf[1] = 0;
 
-    // Read to handle also if the head of the element overlaps the end of the input buffer.
-    // This reads the bytes into the staging buffer and arrange to parse them from there.
+    // If the head of the element goes past the end of the current input buffer, 
+    // we need to read it into the staging buffer to parse it.  Just do that unconditionally,
+    // even if the head does not go past end of current buffer, to save codesize.
     ReturnErrorOnFailure(ReadData(stagingBuf, elemHeadBytes));
 
     const uint8_t * p = stagingBuf + 1;
