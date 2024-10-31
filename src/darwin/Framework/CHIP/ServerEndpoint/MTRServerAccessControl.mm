@@ -46,7 +46,7 @@ class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver {
 public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override
     {
-        chip::app::DataModel::Provider * model = chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+        app::DataModel::Provider * model = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
 
         for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type)) {
             if (type->deviceTypeId == deviceType) {
