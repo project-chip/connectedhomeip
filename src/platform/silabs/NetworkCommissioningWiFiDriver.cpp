@@ -140,7 +140,7 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Disconecting for current wifi");
-        status = wfx_sta_discon();
+        status = sl_matter_wifi_disconnect();
         if (status != SL_STATUS_OK)
         {
             return CHIP_ERROR_INTERNAL;

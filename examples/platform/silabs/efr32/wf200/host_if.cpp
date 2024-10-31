@@ -28,8 +28,6 @@
 #include "em_usart.h"
 #include "gpiointerrupt.h"
 
-#include "wifi_config.h"
-
 #include "AppConfig.h"
 #include "sl_wfx_board.h"
 #include "sl_wfx_host.h"
@@ -715,8 +713,8 @@ static void wfx_wifi_hw_start(void)
     {
         /* Initialize the LwIP stack */
         ChipLogDetail(DeviceLayer, "WF200:Start LWIP");
-        wfx_lwip_start();
-        wfx_started_notify();
+        sl_matter_lwip_start();
+        sl_matter_wifi_task_started();
         wifiContext.state = SL_WFX_STARTED; /* Really this is a bit mask */
         ChipLogDetail(DeviceLayer, "WF200:ready..");
     }
@@ -736,7 +734,7 @@ int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
     int32_t signal_strength;
 
-    ap->ssid_length = strnlen(ap_info.ssid, chip::min<size_t>(sizeof(ap_info.ssid), WFX_MAX_SSID_LENGTH));
+    ap->ssid_length = strnlen(ap_info.ssid, std::min<size_t>(sizeof(ap_info.ssid), WFX_MAX_SSID_LENGTH));
     chip::Platform::CopyString(ap->ssid, ap->ssid_length, ap_info.ssid);
     memcpy(ap->bssid, ap_info.bssid, sizeof(ap_info.bssid));
     ap->security = ap_info.security;
@@ -1071,7 +1069,7 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
  * @returns Returns SL_STATUS_OK if successful,
  *             SL_STATUS_FAIL otherwise
  *****************************************************************************/
-sl_status_t wfx_sta_discon(void)
+sl_status_t sl_matter_wifi_disconnect(void)
 {
     ChipLogProgress(DeviceLayer, "STA-Disconnecting");
     int32_t status = sl_wfx_send_disconnect_command();

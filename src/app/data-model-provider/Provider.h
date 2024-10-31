@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include "access/SubjectDescriptor.h"
+#include "app/EventPathParams.h"
 #include "lib/core/CHIPError.h"
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>

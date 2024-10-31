@@ -60,13 +60,13 @@ static void RetryConnectionTimerHandler(void * arg)
     }
 }
 /***********************************************************************************
- * @fn  wfx_started_notify(void)
+ * @fn  sl_matter_wifi_task_started(void)
  * @brief
  *       Wifi device started notification
  * @param[in]: None
  * @return None
  *************************************************************************************/
-void wfx_started_notify(void)
+void sl_matter_wifi_task_started(void)
 {
     sl_wfx_startup_ind_t evt;
     sl_wfx_mac_address_t mac;

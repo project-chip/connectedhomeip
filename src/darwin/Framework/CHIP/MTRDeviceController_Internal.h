@@ -20,7 +20,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRBaseDevice.h> // for MTRClusterPath
 
 #import "MTRDeviceConnectionBridge.h" // For MTRInternalDeviceConnectionCallback
@@ -32,6 +31,7 @@
 #import <os/lock.h>
 
 #import "MTRBaseDevice.h"
+#import "MTRDeviceClusterData.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerDataStore.h"
 #import "MTRDeviceControllerDelegate.h"
@@ -122,38 +122,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, retain, nullable) NSData * rootPublicKey;
 
 /**
- * Check whether this controller is running on the given fabric, as represented
- * by the provided FabricTable and fabric index.  The provided fabric table may
- * not be the same as the fabric table this controller is using. This method
- * MUST be called from the Matter work queue.
- *
- * Might return failure, in which case we don't know whether it's running on the
- * given fabric.  Otherwise it will set *isRunning to the right boolean value.
- *
- * Only MTRDeviceControllerFactory should be calling this.
- */
-- (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
-                    fabricIndex:(chip::FabricIndex)fabricIndex
-                      isRunning:(BOOL *)isRunning;
-
-/**
- * Shut down the underlying C++ controller.  Must be called on the Matter work
- * queue or after the Matter work queue has been shut down.
- *
- * Only MTRDeviceControllerFactory should be calling this.
- */
-- (void)shutDownCppController;
-
-/**
- * Notification that the MTRDeviceControllerFactory has finished shutting down
- * this controller and will not be touching it anymore.  This is guaranteed to
- * be called after initWithFactory succeeds.
- *
- * Only MTRDeviceControllerFactory should be calling this.
- */
-- (void)deinitFromFactory;
-
-/**
  * Ensure we have a CASE session to the given node ID and then call the provided
  * connection callback.  This may be called on any queue (including the Matter
  * event queue) and on success will always call the provided connection callback
@@ -188,34 +156,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
- * Returns the transport used by the current session with the given device,
- * or `MTRTransportTypeUndefined` if no session is currently active.
- */
-- (MTRTransportType)sessionTransportTypeForDevice:(MTRBaseDevice *)device;
-
-/**
- * Invalidate the CASE session for the given node ID.  This is a temporary thing
- * just to support MTRBaseDevice's invalidateCASESession.  Must not be called on
- * the Matter event queue.
- */
-- (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
-
-/**
- * Try to asynchronously dispatch the given block on the Matter queue.  If the
- * controller is not running either at call time or when the block would be
- * about to run, the provided error handler will be called with an error.  Note
- * that this means the error handler might be called on an arbitrary queue, and
- * might be called before this function returns or after it returns.
- *
- * The DeviceCommissioner pointer passed to the callback should only be used
- * synchronously during the callback invocation.
- *
- * If the error handler is nil, failure to run the block will be silent.
- */
-- (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
-                             errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
-
-/**
  * Try to asynchronously dispatch the given block on the Matter queue.  If the
  * controller is not running either at call time or when the block would be
  * about to run, the provided error handler will be called with an error.  Note
@@ -233,38 +173,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID;
 
-/**
- * Notify the controller that a new operational instance with the given node id
- * and a compressed fabric id that matches this controller has been observed.
- */
-- (void)operationalInstanceAdded:(chip::NodeId)nodeID;
-
-/**
- * Download log of the desired type from the device.
- */
-- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
-                             type:(MTRDiagnosticLogType)type
-                          timeout:(NSTimeInterval)timeout
-                            queue:(dispatch_queue_t)queue
-                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
-
-/**
- * Get the access grants that apply for the given cluster path.
- */
-- (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath;
-
-/**
- * Get the privilege level needed to read the given attribute.  There's no
- * endpoint provided because the expectation is that this information is the
- * same for all cluster instances.
- *
- * Returns nil if we have no such attribute defined on any endpoint, otherwise
- * one of MTRAccessControlEntry* constants wrapped in NSNumber.
- *
- * Only called on the Matter queue.
- */
-- (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
-
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
@@ -274,23 +182,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData;
 - (void)removeDevice:(MTRDevice *)device;
-
-/**
- * Since getSessionForNode now enqueues by the subscription pool for Thread
- * devices, MTRDevice needs a direct non-queued access because it already
- * makes use of the subscription pool.
- */
-- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
-
-/**
- * This method returns TRUE if this controller matches the fabric reference and node ID as listed in the parameters.
- */
-- (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate;
-
-/**
- * Clear any pending shutdown request.
- */
-- (void)clearPendingShutdown;
 
 @end
 
@@ -320,8 +211,6 @@ static NSString * const kDeviceControllerErrorKeyAllocation = @"Generating new o
 static NSString * const kDeviceControllerErrorCSRValidation = @"Extracting public key from CSR failed";
 static NSString * const kDeviceControllerErrorGetCommissionee = @"Failure obtaining device being commissioned";
 static NSString * const kDeviceControllerErrorGetAttestationChallenge = @"Failure getting attestation challenge";
-static NSString * const kDeviceControllerErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
-static NSString * const kDeviceControllerErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
 static NSString * const kDeviceControllerErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 
 NS_ASSUME_NONNULL_END

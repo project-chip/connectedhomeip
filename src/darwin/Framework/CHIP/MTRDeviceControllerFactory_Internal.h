@@ -51,27 +51,27 @@ NS_ASSUME_NONNULL_BEGIN
 MTR_DIRECT_MEMBERS
 @interface MTRDeviceControllerFactory ()
 
-- (void)controllerShuttingDown:(MTRDeviceController *)controller;
+- (void)controllerShuttingDown:(MTRDeviceController_Concrete *)controller;
 
 /**
  * Get the list of running controllers.  This will include controllers that are
  * in the middle of starting up or shutting down.
  */
-- (NSArray<MTRDeviceController *> *)getRunningControllers;
+- (NSArray<MTRDeviceController_Concrete *> *)getRunningControllers;
 
 /**
  * Find a running controller, if any, for the given fabric index.
  */
-- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex;
+- (nullable MTRDeviceController_Concrete *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex;
 
 /**
  * Find a running controller, if any, for the given fabric index.  Allows
  * controlling whether to include a controller that is in the middle of startup
  * or shutdown.
  */
-- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
-                                      includeControllerStartingUp:(BOOL)includeControllerStartingUp
-                                    includeControllerShuttingDown:(BOOL)includeControllerShuttingDown;
+- (nullable MTRDeviceController_Concrete *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
+                                               includeControllerStartingUp:(BOOL)includeControllerStartingUp
+                                             includeControllerShuttingDown:(BOOL)includeControllerShuttingDown;
 
 /**
  * Notify the controller factory that a new operational instance with the given
@@ -83,7 +83,7 @@ MTR_DIRECT_MEMBERS
  * Download log of the desired type from the device.
  */
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
-                       controller:(MTRDeviceController *)controller
+                       controller:(MTRDeviceController_Concrete *)controller
                              type:(MTRDiagnosticLogType)type
                           timeout:(NSTimeInterval)timeout
                             queue:(dispatch_queue_t)queue
@@ -92,9 +92,9 @@ MTR_DIRECT_MEMBERS
 /**
  * Initialize an MTRDeviceController_Concrete with the given parameters.
  */
-- (nullable MTRDeviceController *)initializeController:(MTRDeviceController_Concrete *)controller
-                                        withParameters:(MTRDeviceControllerParameters *)parameters
-                                                 error:(NSError * __autoreleasing *)error;
+- (nullable MTRDeviceController_Concrete *)initializeController:(MTRDeviceController_Concrete *)controller
+                                                 withParameters:(MTRDeviceControllerParameters *)parameters
+                                                          error:(NSError * __autoreleasing *)error;
 
 /**
  * Add a server endpoint.  This will verify that there is no existing server

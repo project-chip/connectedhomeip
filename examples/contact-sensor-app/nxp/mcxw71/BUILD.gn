@@ -86,7 +86,7 @@ mcxw71_k32w1_sdk("sdk") {
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
   ]
 
-  if (chip_key_storage == "littlefs") {
+  if (nxp_nvm_component == "littlefs") {
     include_dirs += [ "${example_platform_dir}/board" ]
     sources += [
       "${example_platform_dir}/board/peripherals.c",
@@ -116,7 +116,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     defines += [ "CONFIG_DIAG_LOGS_DEMO=1" ]
   }
 
-  if (chip_with_low_power == 1) {
+  if (nxp_use_low_power) {
     defines += [ "CONFIG_LOW_POWER=1" ]
   } else {
     defines += [
@@ -148,15 +148,20 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     "${common_example_dir}/clusters/source/ZclCallbacks.cpp",
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
+    "${common_example_dir}/matter_button/source/ButtonApp.cpp",
+    "${common_example_dir}/matter_button/source/ButtonBle.cpp",
+    "${common_example_dir}/matter_button/source/ButtonManager.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationAppAndBle.cpp",
+    "${common_example_dir}/matter_button/source/ButtonWithTimer.cpp",
     "${common_example_dir}/operational_keystore/source/OperationalKeystoreS200.cpp",
     "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
   ]
 
-  if (chip_with_low_power == 1) {
+  if (nxp_use_low_power) {
     sources += [ "${common_example_dir}/low_power/source/LowPower.cpp" ]
   }
 
-  if (chip_with_factory_data == 1) {
+  if (nxp_use_factory_data) {
     include_dirs +=
         [ "${chip_root}/src/platform/nxp/common/factory_data/legacy" ]
     deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
@@ -192,10 +197,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     "${example_platform_dir}/button",
   ]
 
-  sources += [
-    "${example_platform_dir}/button/ButtonManager.cpp",
-    "${example_platform_dir}/clusters/Identify.cpp",
-  ]
+  sources += [ "${example_platform_dir}/clusters/Identify.cpp" ]
 
   if (chip_enable_ota_requestor) {
     sources += [ "${example_platform_dir}/ota/OtaUtils.cpp" ]
@@ -213,7 +215,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     "../common/main.cpp",
   ]
 
-  if (chip_with_low_power == 0) {
+  if (!nxp_use_low_power) {
     sources += [
       "${common_example_dir}/ui_feedback/source/LedManager.cpp",
       "${example_platform_dir}/util/LedOnOff.cpp",
@@ -260,7 +262,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     "-T" + rebase_path(ldscript, root_build_dir),
   ]
 
-  if (chip_with_factory_data == 1) {
+  if (nxp_use_factory_data) {
     ldflags += [ "-Wl,--defsym=gUseFactoryData_d=1" ]
   }
 

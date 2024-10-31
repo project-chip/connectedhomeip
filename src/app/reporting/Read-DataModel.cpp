@@ -14,13 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model-provider/ActionReturnStatus.h"
-#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/reporting/Read-DataModel.h>
 
 #include <app/AppConfig.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/util/MatterCallbacks.h>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -46,7 +47,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     {
         readRequest.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
     }
-    readRequest.subjectDescriptor = subjectDescriptor;
+    readRequest.subjectDescriptor = &subjectDescriptor;
     readRequest.path              = path;
 
     DataVersion version = 0;
@@ -96,9 +97,22 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     if (!status.IsOutOfSpaceEncodingResponse())
     {
         DataModel::ActionReturnStatus::StringStorage storage;
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
         ChipLogError(DataManagement, "Failed to read attribute: %s", status.c_str(storage));
+#endif
     }
     return status;
+}
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
+{
+    std::optional<DataModel::ClusterInfo> info = dataModel->GetClusterInfo(path);
+    if (!info.has_value())
+    {
+        return false;
+    }
+
+    return (info->dataVersion == dataVersion);
 }
 
 } // namespace DataModelImpl

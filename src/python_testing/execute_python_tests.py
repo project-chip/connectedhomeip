@@ -53,27 +53,19 @@ def main(search_directory, env_file):
     # Define the base command to run tests
     base_command = os.path.join(chip_root, "scripts/tests/run_python_test.py")
 
-    # Define the files and patterns to exclude
+    # Define the test python script files and patterns to exclude
     excluded_patterns = {
         "MinimalRepresentation.py",  # Code/Test not being used or not shared code for any other tests
         "TC_CNET_4_4.py",  # It has no CI execution block, is not executed in CI
-        "TC_CCTRL_2_1.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
-        "TC_CCTRL_2_2.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
-        "TC_CCTRL_2_3.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
         "TC_DGGEN_3_2.py",  # src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test of this test
         "TC_EEVSE_Utils.py",  # Shared code for TC_EEVSE, not a standalone test
-        "TC_ECOINFO_2_1.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
-        "TC_ECOINFO_2_2.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
         "TC_EWATERHTRBase.py",  # Shared code for TC_EWATERHTR, not a standalone test
         "TC_EnergyReporting_Utils.py",  # Shared code for TC_EEM and TC_EPM, not a standalone test
         "TC_OpstateCommon.py",  # Shared code for TC_OPSTATE, not a standalone test
         "TC_pics_checker.py",  # Currently isn't enabled because we don't have any examples with conformant PICS
         "TC_TMP_2_1.py",  # src/python_testing/test_testing/test_TC_TMP_2_1.py is the Unit test of this test
-        "TC_MCORE_FS_1_2.py",  # This test requires a TH_SERVER application, hence not ready run with CI
-        "TC_MCORE_FS_1_5.py",  # This test requires a TH_SERVER application, hence not ready run with CI
         "TC_OCC_3_1.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
         "TC_OCC_3_2.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
-        "TC_BRBINFO_4_1.py",  # This test requires a TH_ICD_SERVER application, hence not ready run with CI
         "TestCommissioningTimeSync.py",  # Code/Test not being used or not shared code for any other tests
         "TestConformanceSupport.py",  # Unit test - does not run against an app
         "TestChoiceConformanceSupport.py",  # Unit test - does not run against an app
@@ -92,14 +84,6 @@ def main(search_directory, env_file):
         "hello_test.py",  # Is a template for tests
         "test_plan_support.py",  # Shared code for TC_*, not a standalone test
         "test_plan_table_generator.py",  # Code/Test not being used or not shared code for any other tests
-        "basic_composition_support.py",  # Test support/shared code script, not a standalone test
-        "choice_conformance_support.py",  # Test support/shared code script, not a standalone test
-        "conformance_support.py",  # Test support/shared code script, not a standalone test
-        "global_attribute_ids.py",  # Test support/shared code script, not a standalone test
-        "matter_testing_support.py",  # Test support/shared code script, not a standalone test
-        "pics_support.py",  # Test support/shared code script, not a standalone test
-        "spec_parsing_support.py",  # Test support/shared code script, not a standalone test
-        "taglist_and_topology_test_support.py"  # Test support/shared code script, not a standalone test
     }
 
     # Get all .py files in the directory

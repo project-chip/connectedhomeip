@@ -24,7 +24,6 @@
 #include <lib/support/ScopedBuffer.h>
 
 using namespace chip;
-using namespace std;
 
 namespace {
 
@@ -38,7 +37,7 @@ public:
 TEST_F(TestQRCodeTLV, TestOptionalDataAddRemove)
 {
     SetupPayload payload = GetDefaultPayload();
-    vector<OptionalQRCodeInfo> optionalData;
+    std::vector<OptionalQRCodeInfo> optionalData;
     CHIP_ERROR err;
 
     optionalData = payload.getAllOptionalVendorData();
@@ -86,11 +85,11 @@ TEST_F(TestQRCodeTLV, TestSimpleWrite)
     SetupPayload inPayload = GetDefaultPayload();
 
     QRCodeSetupPayloadGenerator generator(inPayload);
-    string result;
+    std::string result;
     CHIP_ERROR err = generator.payloadBase38Representation(result);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    string result2;
+    std::string result2;
     err = generator.payloadBase38RepresentationWithAutoTLVBuffer(result2);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -103,7 +102,7 @@ TEST_F(TestQRCodeTLV, TestSimpleRead)
     SetupPayload outPayload;
 
     QRCodeSetupPayloadGenerator generator(inPayload);
-    string result;
+    std::string result;
     CHIP_ERROR err = generator.payloadBase38Representation(result);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -139,7 +138,7 @@ TEST_F(TestQRCodeTLV, TestSerialNumberAddRemove)
 {
     SetupPayload inPayload = GetDefaultPayload();
 
-    string sn;
+    std::string sn;
     EXPECT_EQ(inPayload.getSerialNumber(sn), CHIP_ERROR_KEY_NOT_FOUND);
     EXPECT_EQ(inPayload.removeSerialNumber(), CHIP_ERROR_KEY_NOT_FOUND);
 
@@ -149,7 +148,7 @@ TEST_F(TestQRCodeTLV, TestSerialNumberAddRemove)
 
     EXPECT_EQ(inPayload.addSerialNumber(kSerialNumberDefaultUInt32Value), CHIP_NO_ERROR);
     EXPECT_EQ(inPayload.getSerialNumber(sn), CHIP_NO_ERROR);
-    EXPECT_EQ(sn, to_string(kSerialNumberDefaultUInt32Value));
+    EXPECT_EQ(sn, std::to_string(kSerialNumberDefaultUInt32Value));
 
     EXPECT_EQ(inPayload.removeSerialNumber(), CHIP_NO_ERROR);
     EXPECT_EQ(inPayload.getSerialNumber(sn), CHIP_ERROR_KEY_NOT_FOUND);
@@ -164,7 +163,7 @@ TEST_F(TestQRCodeTLV, TestOptionalDataWriteSerial)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     QRCodeSetupPayloadGenerator generator(inPayload);
-    string result;
+    std::string result;
     err = generator.payloadBase38Representation(result);
     EXPECT_NE(err, CHIP_NO_ERROR);
 
@@ -172,7 +171,7 @@ TEST_F(TestQRCodeTLV, TestOptionalDataWriteSerial)
     err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    string result2;
+    std::string result2;
     err = generator.payloadBase38RepresentationWithAutoTLVBuffer(result2);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -184,12 +183,12 @@ TEST_F(TestQRCodeTLV, TestOptionalDataWrite)
     SetupPayload inPayload = GetDefaultPayloadWithOptionalDefaults();
 
     QRCodeSetupPayloadGenerator generator(inPayload);
-    string result;
+    std::string result;
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
     CHIP_ERROR err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    string result2;
+    std::string result2;
     err = generator.payloadBase38RepresentationWithAutoTLVBuffer(result2);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -235,7 +234,7 @@ TEST_F(TestQRCodeTLV, TestOptionalDataWriteNoBuffer)
     SetupPayload inPayload = GetDefaultPayloadWithOptionalDefaults();
 
     QRCodeSetupPayloadGenerator generator(inPayload);
-    string result;
+    std::string result;
     CHIP_ERROR err = generator.payloadBase38Representation(result);
     EXPECT_NE(err, CHIP_NO_ERROR);
 }
@@ -245,7 +244,7 @@ TEST_F(TestQRCodeTLV, TestOptionalDataWriteSmallBuffer)
     SetupPayload inPayload = GetDefaultPayloadWithOptionalDefaults();
 
     QRCodeSetupPayloadGenerator generator(inPayload);
-    string result;
+    std::string result;
     uint8_t optionalInfo[kSmallBufferSizeInBytes];
     CHIP_ERROR err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     EXPECT_NE(err, CHIP_NO_ERROR);

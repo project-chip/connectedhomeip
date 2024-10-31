@@ -860,10 +860,27 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
         return;
     }
 
+    // Our response will need to include the index of the next occupied credential slot
+    // after credentialIndex, if there is one.
+    //
+    // We want to figure this out before we call emberAfPluginDoorLockGetCredential, because to do
+    // so we will also need to call emberAfPluginDoorLockGetCredential, and the
+    // EmberAfPluginDoorLockCredentialInfo we get might be pointing into some application-static
+    // buffers (for its credential data and whatnot).
+    DataModel::Nullable<uint16_t> nextCredentialIndex;
+    {
+        uint16_t foundNextCredentialIndex;
+        if (findOccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
+                                       foundNextCredentialIndex))
+        {
+            nextCredentialIndex.SetNonNull(foundNextCredentialIndex);
+        }
+    }
+
     uint16_t maxNumberOfCredentials = 0;
     if (!credentialIndexValid(commandPath.mEndpointId, credentialType, credentialIndex, maxNumberOfCredentials))
     {
-        sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, 0, nullptr, false);
+        sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, nextCredentialIndex, 0, nullptr, false);
         return;
     }
 
@@ -896,16 +913,34 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
         }
     }
 
-    sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, userIndexWithCredential, &credentialInfo,
-                              credentialExists);
+    sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, nextCredentialIndex,
+                              userIndexWithCredential, &credentialInfo, credentialExists);
 }
+
+namespace {
+bool IsAliroCredentialType(CredentialTypeEnum credentialType)
+{
+    switch (credentialType)
+    {
+    case CredentialTypeEnum::kAliroCredentialIssuerKey:
+    case CredentialTypeEnum::kAliroEvictableEndpointKey:
+    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
+        return true;
+    default:
+        return false;
+    }
+}
+} // anonymous namespace
 
 void DoorLockServer::sendGetCredentialResponse(chip::app::CommandHandler * commandObj,
                                                const chip::app::ConcreteCommandPath & commandPath,
                                                CredentialTypeEnum credentialType, uint16_t credentialIndex,
-                                               uint16_t userIndexWithCredential,
+                                               DataModel::Nullable<uint16_t> nextCredentialIndex, uint16_t userIndexWithCredential,
                                                EmberAfPluginDoorLockCredentialInfo * credentialInfo, bool credentialExists)
 {
+    // Important: We have to make sure nothing in this function calls
+    // emberAfPluginDoorLockGetCredential, because that might stomp on the data
+    // pointed to by credentialInfo.
     Commands::GetCredentialStatusResponse::Type response{ .credentialExists = credentialExists };
     if (credentialExists && !(nullptr == credentialInfo))
     {
@@ -921,24 +956,27 @@ void DoorLockServer::sendGetCredentialResponse(chip::app::CommandHandler * comma
         {
             response.lastModifiedFabricIndex.SetNonNull(credentialInfo->lastModifiedBy);
         }
+        if (IsAliroCredentialType(credentialType))
+        {
+            response.credentialData.Emplace(credentialInfo->credentialData);
+        }
     }
     else
     {
         response.userIndex.SetNull();
+        if (IsAliroCredentialType(credentialType))
+        {
+            response.credentialData.Emplace(NullNullable);
+        }
     }
-    uint16_t nextCredentialIndex = 0;
-    if (findOccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
-                                   nextCredentialIndex))
-    {
-        response.nextCredentialIndex.SetNonNull(nextCredentialIndex);
-    }
+    response.nextCredentialIndex = nextCredentialIndex;
     commandObj->AddResponse(commandPath, response);
 
     ChipLogProgress(Zcl,
                     "[GetCredentialStatus] Prepared credential status "
                     "[endpointId=%d,credentialType=%u,credentialIndex=%d,userIndex=%d,nextCredentialIndex=%d]",
                     commandPath.mEndpointId, to_underlying(credentialType), credentialIndex, userIndexWithCredential,
-                    nextCredentialIndex);
+                    nextCredentialIndex.ValueOr(0));
 }
 
 void DoorLockServer::clearCredentialCommandHandler(
@@ -4407,16 +4445,19 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
         return ReadAliroSupportedBLEUWBProtocolVersions(aEncoder, delegate);
     }
     case AliroBLEAdvertisingVersion::Id: {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
         uint8_t bleAdvertisingVersion = delegate->GetAliroBLEAdvertisingVersion();
         ReturnErrorOnFailure(aEncoder.Encode(bleAdvertisingVersion));
         return CHIP_NO_ERROR;
     }
     case NumberOfAliroCredentialIssuerKeysSupported::Id: {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
         uint16_t numberOfCredentialIssuerKeysSupported = delegate->GetNumberOfAliroCredentialIssuerKeysSupported();
         ReturnErrorOnFailure(aEncoder.Encode(numberOfCredentialIssuerKeysSupported));
         return CHIP_NO_ERROR;
     }
     case NumberOfAliroEndpointKeysSupported::Id: {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
         uint16_t numberOfEndpointKeysSupported = delegate->GetNumberOfAliroEndpointKeysSupported();
         ReturnErrorOnFailure(aEncoder.Encode(numberOfEndpointKeysSupported));
         return CHIP_NO_ERROR;

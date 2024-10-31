@@ -16,13 +16,70 @@
  */
 #pragma once
 
-#include "app/data-model-provider/ActionReturnStatus.h"
+#include "app/ConcreteCommandPath.h"
 #include <app/data-model-provider/Provider.h>
 
+#include <app/CommandHandlerInterface.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/util/af-types.h>
 
 namespace chip {
 namespace app {
+
+namespace detail {
+
+/// Handles going through callback-based enumeration of generated/accepted commands
+/// for CommandHandlerInterface based items.
+///
+/// Offers the ability to focus on some operation for finding a given
+/// command id:
+///   - FindFirst will return the first found element
+///   - FindExact finds the element with the given id
+///   - FindNext finds the element following the given id
+class EnumeratorCommandFinder
+{
+public:
+    using HandlerCallbackFunction = CHIP_ERROR (CommandHandlerInterface::*)(const ConcreteClusterPath &,
+                                                                            CommandHandlerInterface::CommandIdCallback, void *);
+
+    enum class Operation
+    {
+        kFindFirst, // Find the first value in the list
+        kFindExact, // Find the given value
+        kFindNext   // Find the value AFTER this value
+    };
+
+    EnumeratorCommandFinder(HandlerCallbackFunction callback) :
+        mCallback(callback), mOperation(Operation::kFindFirst), mTarget(kInvalidCommandId)
+    {}
+
+    /// Find the given command ID that matches the given operation/path.
+    ///
+    /// If operation is kFindFirst, then path commandID is ignored. Otherwise it is used as a key to
+    /// kFindExact or kFindNext.
+    ///
+    /// Returns:
+    ///    - std::nullopt if no command found using the command handler interface
+    ///    - kInvalidCommandId if the find failed (but command handler interface does provide a list)
+    ///    - valid id if command handler interface usage succeeds
+    std::optional<CommandId> FindCommandId(Operation operation, const ConcreteCommandPath & path);
+
+private:
+    HandlerCallbackFunction mCallback;
+    Operation mOperation;
+    CommandId mTarget;
+    std::optional<CommandId> mFound = std::nullopt;
+
+    Loop HandlerCallback(CommandId id);
+
+    static Loop HandlerCallbackFn(CommandId id, void * context)
+    {
+        auto self = static_cast<EnumeratorCommandFinder *>(context);
+        return self->HandlerCallback(id);
+    }
+};
+
+} // namespace detail
 
 /// An implementation of `InteractionModel::Model` that relies on code-generation
 /// via zap/ember.
@@ -63,11 +120,26 @@ private:
 
         /// Checks if the given command id exists in the given list
         bool Exists(const CommandId * list, CommandId toCheck);
+
+        void Reset() { mCurrentList = mCurrentHint = nullptr; }
     };
 
 public:
+    /// clears out internal caching. Especially useful in unit tests,
+    /// where path caching does not really apply (the same path may result in different outcomes)
+    void Reset()
+    {
+        mAcceptedCommandsIterator.Reset();
+        mGeneratedCommandsIterator.Reset();
+        mPreviouslyFoundCluster = std::nullopt;
+    }
+
     /// Generic model implementations
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Shutdown() override
+    {
+        Reset();
+        return CHIP_NO_ERROR;
+    }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -79,6 +151,11 @@ public:
     /// attribute tree iteration
     EndpointId FirstEndpoint() override;
     EndpointId NextEndpoint(EndpointId before) override;
+    bool EndpointExists(EndpointId endpoint) override;
+
+    std::optional<DataModel::DeviceTypeEntry> FirstDeviceType(EndpointId endpoint) override;
+    std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,
+                                                             const DataModel::DeviceTypeEntry & previous) override;
 
     DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
@@ -98,9 +175,10 @@ public:
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
-    uint16_t mEndpointIterationHint  = 0;
-    unsigned mClusterIterationHint   = 0;
-    unsigned mAttributeIterationHint = 0;
+    uint16_t mEndpointIterationHint   = 0;
+    unsigned mClusterIterationHint    = 0;
+    unsigned mAttributeIterationHint  = 0;
+    unsigned mDeviceTypeIterationHint = 0;
     EmberCommandListIterator mAcceptedCommandsIterator;
     EmberCommandListIterator mGeneratedCommandsIterator;
 
@@ -114,6 +192,7 @@ private:
         ClusterReference(const ConcreteClusterPath p, const EmberAfCluster * c) : path(p), cluster(c) {}
     };
     std::optional<ClusterReference> mPreviouslyFoundCluster;
+    unsigned mEmberMetadataStructureGeneration = 0;
 
     /// Finds the specified ember cluster
     ///
@@ -128,6 +207,12 @@ private:
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(chip::EndpointId id) const;
+
+    using CommandListGetter = const chip::CommandId *(const EmberAfCluster &);
+
+    CommandId FindCommand(const ConcreteCommandPath & path, detail::EnumeratorCommandFinder & handlerFinder,
+                          detail::EnumeratorCommandFinder::Operation operation,
+                          CodegenDataModelProvider::EmberCommandListIterator & emberIterator, CommandListGetter commandListGetter);
 };
 
 } // namespace app
