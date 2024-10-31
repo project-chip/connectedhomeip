@@ -779,6 +779,7 @@ CHIP_ERROR TLVReader::ReadElement()
     // even if the head does not go past end of current buffer, to save codesize.
     ReturnErrorOnFailure(ReadData(stagingBuf, elemHeadBytes));
 
+    // +1 to skip over the control byte
     const uint8_t * p = stagingBuf + 1;
 
     // Read the tag field, if present.
