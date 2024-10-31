@@ -122,24 +122,6 @@ Status DetermineAttributeStatus(const ConcreteAttributePath & aPath, bool aIsWri
 
 } // anonymous namespace
 
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    // Will never be called anyway; we have no attributes.
-    return false;
-}
-
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-{
-    return false;
-}
-
-CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
-{
-    Status status = DetermineAttributeStatus(aPath, /* aIsWrite = */ true);
-    return aWriteHandler->AddStatus(aPath, status);
-}
-
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
 {
     // This command passed ServerClusterCommandExists so we know it's one of our
@@ -186,11 +168,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
     {
         aCommandObj->AddStatus(aPath, Status::InvalidCommand);
     }
-}
-
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    return Protocols::InteractionModel::Status::UnsupportedEvent;
 }
 
 } // namespace app

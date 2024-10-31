@@ -83,15 +83,8 @@ namespace app {
 
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
 
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler);
-
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath);
-
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj);
-
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
 
 /// A customized class for read/write/invoke that matches functionality
 /// with the ember-compatibility-functions functionality here.

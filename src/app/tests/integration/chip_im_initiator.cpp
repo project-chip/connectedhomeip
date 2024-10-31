@@ -624,36 +624,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     // Nothing todo.
 }
 
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler *)
-{
-    if (aPath.mClusterId != kTestClusterId || aPath.mEndpointId != kTestEndpointId)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    if (aReader.GetLength() != 0)
-    {
-        chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
-    }
-    return CHIP_NO_ERROR;
-}
-
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    return true;
-}
-
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-{
-    return false;
-}
-
 } // namespace app
 } // namespace chip
 

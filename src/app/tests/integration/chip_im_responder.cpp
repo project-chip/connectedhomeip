@@ -76,11 +76,6 @@ public:
 //
 //   We cannot just say "every attribut exist, every device on every endpoint exists,
 //   every data version compare is the same etc.".
-//
-// The following override implementation need changing:
-//   - CheckEventSupportStatus - cannot say yes for invalid endpoints/clusters
-//   - IsClusterDataVersionEqual returning true on everything is odd
-//   - IsDeviceTypeOnEndpoint returning true on every value seems odd
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
@@ -117,30 +112,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
         apCommandObj->AddResponse(path, kTestCommandId, testData);
     }
     statusCodeFlipper = !statusCodeFlipper;
-}
-
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ConcreteDataAttributePath attributePath(2, 3, 4);
-    err = apWriteHandler->AddStatus(attributePath, Protocols::InteractionModel::Status::Success);
-    return err;
-}
-
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    return true;
-}
-
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-{
-    return false;
 }
 
 } // namespace app
