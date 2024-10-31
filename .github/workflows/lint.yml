@@ -114,8 +114,6 @@ jobs:
                      --known-failure app/util/config.h \
                      --known-failure app/util/DataModelHandler.cpp \
                      --known-failure app/util/DataModelHandler.h \
-                     --known-failure app/util/ember-compatibility-functions.cpp \
-                     --known-failure app/util/ember-compatibility-functions.h \
                      --known-failure app/util/ember-global-attribute-access-interface.h \
                      --known-failure app/util/ember-io-storage.h \
                      --known-failure app/util/endpoint-config-api.h \
@@ -299,7 +297,6 @@ jobs:
                       ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp'                               \
                       ':(exclude)src/app/util/attribute-table.cpp'                                           \
                       ':(exclude)src/app/util/attribute-table.h'                                             \
-                      ':(exclude)src/app/util/ember-compatibility-functions.cpp'                             \
                       ':(exclude)src/app/util/mock/CodegenEmberMocks.cpp'                                    \
                       ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt'          \
                       ':(exclude)src/darwin/Framework/CHIP/ServerEndpoint/MTRIMDispatch.mm'                  \
