@@ -37,6 +37,7 @@
 @property (nonnull, atomic, readwrite, retain) MTRXPCDeviceControllerParameters * xpcParameters;
 @property (atomic, readwrite, assign) NSTimeInterval xpcRetryTimeInterval;
 @property (atomic, readwrite, assign) BOOL xpcConnectedOrConnecting;
+@property (nonatomic, readonly, retain) dispatch_queue_t workQueue;
 
 @end
 
@@ -194,7 +195,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
         self.xpcRetryTimeInterval = 0.5;
         mtr_weakify(self);
 
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.chipWorkQueue, ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.workQueue, ^{
             mtr_strongify(self);
             [self _xpcConnectionRetry];
         });
@@ -214,7 +215,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
             self.xpcRetryTimeInterval = MIN(60.0, self.xpcRetryTimeInterval);
             mtr_weakify(self);
 
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.chipWorkQueue, ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.workQueue, ^{
                 mtr_strongify(self);
                 [self _xpcConnectionRetry];
             });
@@ -302,7 +303,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
         self.uniqueIdentifier = UUID;
         self.xpcParameters = xpcParameters;
-        self.chipWorkQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        _workQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
 
         if (![self _setupXPCConnection]) {
             return nil;
