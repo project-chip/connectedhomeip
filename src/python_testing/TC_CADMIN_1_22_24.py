@@ -31,6 +31,7 @@
 #     quiet: false
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import random
 from time import sleep
@@ -94,7 +95,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         self.step(4)
         window_status = await self.get_window_status()
         if window_status != Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen:
-            asserts.assert_equal(await window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen, "Commissioning window is expected to be closed, but was found to be open")
+            asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen, "Commissioning window is expected to be closed, but was found to be open")
 
         self.step(5)
         try:
@@ -121,7 +122,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 180 seconds",
                      "DUT_CE opens its Commissioning window to allow a second commissioning"),
-            TestStep(3, "TH_CR1 sends an RevokeCommissioning command to the DUT"),
+            TestStep(3, "Wait for the commissioning window in step 2 to timeout"),
             TestStep(4, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
                      "DUT_CE windows status shows the window is closed"),
             TestStep(5, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 179 seconds",
@@ -141,15 +142,18 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
             nodeid=self.dut_node_id, timeout=180, iteration=10000, discriminator=self.discriminator, option=1)
 
         self.step(3)
-        revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
-        # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-        sleep(1)
+        sleep(180)
 
         self.step(4)
-        window_status = await self.get_window_status()
+        # TODO: Issue noticed when initially attempting to check window status after waiting for timeout to occur, issue is detailed here: https://github.com/project-chip/connectedhomeip/issues/35983
+        # Workaround in place below until above issue resolved
+        try:
+            window_status = await self.get_window_status()
+        except asyncio.CancelledError:
+            window_status = await self.get_window_status()
+
         if window_status != Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen:
-            asserts.assert_equal(await window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen, "Commissioning window is expected to be closed, but was found to be open")
+            asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen, "Commissioning window is expected to be closed, but was found to be open")
 
         self.step(5)
         try:
