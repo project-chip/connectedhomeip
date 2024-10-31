@@ -52,8 +52,7 @@ template <>
 StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer);
 
 } // namespace pw
-#if CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_TIZEN ||                         \
-    CHIP_DEVICE_LAYER_TARGET_ANDROID
+#if CHIP_CONFIG_TEST_GOOGLETEST
 
 namespace chip {
 
@@ -71,4 +70,4 @@ namespace chip {
 /// This enhances the readability and diagnostic information in GoogleTest test logs.
 void PrintTo(const CHIP_ERROR & err, std::ostream * os);
 } // namespace chip
-#endif
+#endif //CHIP_CONFIG_TEST_GOOGLETEST
