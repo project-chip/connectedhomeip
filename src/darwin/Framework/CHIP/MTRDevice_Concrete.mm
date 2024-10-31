@@ -898,6 +898,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             subscriptionCallback->ResetResubscriptionBackoff();
         }
         readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
+    } else if (_internalDeviceState == MTRInternalDeviceStateSubscribing && nodeLikelyReachable) {
+        // If we have reason to suspect that the node is now reachable and we haven’t established a
+        // CASE session yet, let’s consider it to be stalled and invalidate the pairing session.
+        [[self _concreteController] asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+            auto caseSessionMgr = commissioner->CASESessionMgr();
+            VerifyOrDie(caseSessionMgr != nullptr);
+            caseSessionMgr->ReleaseSession(commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue));
+        } errorHandler:nil /* not much we can do */];
     }
 }
 

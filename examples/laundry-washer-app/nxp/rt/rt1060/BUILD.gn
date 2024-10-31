@@ -170,7 +170,7 @@ rt_executable("laundry-washer") {
     "../../common/main/operational-state-delegate-impl.cpp",
   ]
 
-  if (chip_enable_matter_cli) {
+  if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
     deps += [
       "${chip_root}/examples/shell/shell_common:shell_common",

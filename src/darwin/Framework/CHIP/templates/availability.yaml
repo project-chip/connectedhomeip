@@ -9682,8 +9682,12 @@
                   - Presets
                   - MatterScheduleConfiguration
 
-- release: "Future"
-  versions: "future"
+- release: "6C44AB2F-2F6B-4B57-B523-5CD89584986F"
+  versions:
+      iOS: "18.2"
+      macOS: "15.2"
+      watchOS: "11.2"
+      tvOS: "18.2"
   introduced:
       enums:
           ColorControl:
@@ -10077,3 +10081,12 @@
                   - ColorLoop
                   - XY
                   - ColorTemperature
+
+- release: "Future"
+  versions: "future"
+  provisional:
+      device types:
+          - BatteryStorage
+          - HeatPump
+          - SolarPower
+          - WaterHeater

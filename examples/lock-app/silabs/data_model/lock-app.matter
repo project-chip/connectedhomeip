@@ -3261,7 +3261,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x7DB3;
+    ram      attribute featureMap default = 0x1DB3;
     ram      attribute clusterRevision default = 7;
 
     handle command LockDoor;

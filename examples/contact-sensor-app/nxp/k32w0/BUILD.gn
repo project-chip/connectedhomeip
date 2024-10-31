@@ -100,7 +100,7 @@ k32w0_executable("contact_sensor_app") {
     "main/main.cpp",
   ]
 
-  if (chip_with_factory_data == 1 && use_custom_factory_provider == 1) {
+  if (nxp_use_factory_data && use_custom_factory_provider == 1) {
     sources += [
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.cpp",
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
