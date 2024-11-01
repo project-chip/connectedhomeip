@@ -30,7 +30,8 @@ c_uint8_p = POINTER(c_uint8)
 
 
 _OnTransferObtainedCallbackFunct = CFUNCTYPE(
-    None, py_object, PyChipError, c_void_p, c_uint8, c_uint16, c_uint64, c_uint64, c_uint8_p, c_uint16, c_uint8_p, c_size_t)
+    None, py_object, c_void_p, c_uint8, c_uint16, c_uint64, c_uint64, c_uint8_p, c_uint16, c_uint8_p, c_size_t)
+_OnFailedToObtainTransferCallbackFunct = CFUNCTYPE(None, py_object, PyChipError)
 _OnDataReceivedCallbackFunct = CFUNCTYPE(None, py_object, c_uint8_p, c_size_t)
 _OnTransferCompletedCallbackFunct = CFUNCTYPE(None, py_object, PyChipError)
 
@@ -71,31 +72,33 @@ class AsyncTransferCompletedTransaction:
 
 
 @_OnTransferObtainedCallbackFunct
-def _OnTransferObtainedCallback(transaction: AsyncTransferObtainedTransaction, result: PyChipError, bdxTransfer, transferControlFlags: int, maxBlockSize: int,
-                                startOffset: int, length: int, fileDesignator, fileDesignatorLength: int, metadata,
-                                metadataLength: int):
-    if result.is_success:
-        fileDesignatorData = ctypes.string_at(fileDesignator, fileDesignatorLength)
-        metadataData = ctypes.string_at(metadata, metadataLength)
+def _OnTransferObtainedCallback(transaction: AsyncTransferObtainedTransaction, bdxTransfer, transferControlFlags: int,
+                                maxBlockSize: int, startOffset: int, length: int, fileDesignator, fileDesignatorLength: int,
+                                metadata, metadataLength: int):
+    fileDesignatorData = ctypes.string_at(fileDesignator, fileDesignatorLength)
+    metadataData = ctypes.string_at(metadata, metadataLength)
 
-        initMessage = BdxTransfer.InitMessage(
-            transferControlFlags,
-            maxBlockSize,
-            startOffset,
-            length,
-            fileDesignatorData[:],
-            metadataData[:],
-        )
+    initMessage = BdxTransfer.InitMessage(
+        transferControlFlags,
+        maxBlockSize,
+        startOffset,
+        length,
+        fileDesignatorData[:],
+        metadataData[:],
+    )
 
-        transaction.handleTransfer(bdxTransfer, initMessage)
-    else:
-        transaction.handleError(result)
+    transaction.handleTransfer(bdxTransfer, initMessage)
+
+
+@_OnFailedToObtainTransferCallbackFunct
+def _OnFailedToObtainTransferCallback(transaction: AsyncTransferObtainedTransaction, result: PyChipError):
+    transaction.handleError(result)
 
 
 @_OnDataReceivedCallbackFunct
-def _OnDataReceivedCallback(context, dataBuffer, bufferLength: int):
+def _OnDataReceivedCallback(context, dataBuffer: c_uint8_p, bufferLength: int):
     data = ctypes.string_at(dataBuffer, bufferLength)
-    context(data[:])
+    context(data)
 
 
 @_OnTransferCompletedCallbackFunct
@@ -174,7 +177,8 @@ def Init():
         setter.Set('pychip_Bdx_RejectTransfer',
                    PyChipError, [c_void_p])
         setter.Set('pychip_Bdx_InitCallbacks', None, [
-                   _OnTransferObtainedCallbackFunct, _OnDataReceivedCallbackFunct, _OnTransferCompletedCallbackFunct])
+                   _OnTransferObtainedCallbackFunct, _OnFailedToObtainTransferCallbackFunct, _OnDataReceivedCallbackFunct,
+                   _OnTransferCompletedCallbackFunct])
 
     handle.pychip_Bdx_InitCallbacks(
-        _OnTransferObtainedCallback, _OnDataReceivedCallback, _OnTransferCompletedCallback)
+        _OnTransferObtainedCallback, _OnFailedToObtainTransferCallback, _OnDataReceivedCallback, _OnTransferCompletedCallback)

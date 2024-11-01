@@ -37,7 +37,7 @@ class BdxTransfer:
     def __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data: bytes=None):
         self.init_message = init_message
         self._bdx_transfer = bdx_transfer
-        self._data = data
+        self._data = bytearray(data) if data else None
 
     async def accept(self):
         eventLoop = asyncio.get_running_loop()
@@ -48,11 +48,11 @@ class BdxTransfer:
             res.raise_on_error()
             return await future
         else:
-            self._data = []
+            self._data = bytearray()
             res = Bdx.AcceptSendTransfer(self._bdx_transfer, lambda data: self._data.extend(data), future)
             res.raise_on_error()
             await future
-            return self._data
+            return self._data[:]
 
     async def reject(self):
         res = await Bdx.RejectTransfer(self._bdx_transfer)

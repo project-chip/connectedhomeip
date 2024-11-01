@@ -25,27 +25,46 @@
 #include <controller/python/chip/bdx/test-bdx-transfer-server.h>
 #include <controller/python/chip/native/PyChipError.h>
 
+// The BDX transfer system is split into:
+// * BdxTransfer: A transfer object that contains the information about a transfer and is an ExchangeDelegate.
+//   It owns the data for a transfer, either copying what was sent from Python or requiring the Python side to
+//   copy it during a callback.
+// * TransferMap: A map that associates the BdxTransfer object with its Python context using TransferInfo objects.
+//   It owns the TransferInfo objects but doesn't own the BdxTransfer objects or the Python context objects.
+// * TransferDelegate: A delegate that calls back into Python when certain events happen in C++. It uses the
+//   TransferMap but doesn't own it.
+// TestBdxTransferServer: A server that listens for incoming BDX messages, creates BdxTransfer objects, and
+//   informs the delegate when certain events happen. It owns the BdxTransfer objects but not the delegate. A
+//   BdxTransfer object is created when a BDX message is received and destroyed when the transfer completes or
+//   fails.
+// The TransferMap, TransferDelegate, and TestBdxTransferServer instances are all owned by this file.
+
 using PyObject = void *;
 
 namespace chip {
 namespace python {
 
 // The Python callbacks to call when certain events happen.
-using OnTransferObtainedCallback  = void (*)(PyObject context, PyChipError result, void * bdxTransfer,
-                                            bdx::TransferControlFlags transferControlFlags, uint16_t maxBlockSize,
-                                            uint64_t startOffset, uint64_t length, const uint8_t * fileDesignator,
-                                            uint16_t fileDesignatorLength, const uint8_t * metadata, size_t metadataLength);
-using OnDataReceivedCallback      = void (*)(PyObject context, const uint8_t * dataBuffer, size_t bufferLength);
-using OnTransferCompletedCallback = void (*)(PyObject context, PyChipError result);
+using OnTransferObtainedCallback       = void (*)(PyObject context, void * bdxTransfer,
+                                                  bdx::TransferControlFlags transferControlFlags, uint16_t maxBlockSize,
+                                                  uint64_t startOffset, uint64_t length, const uint8_t * fileDesignator,
+                                                  uint16_t fileDesignatorLength, const uint8_t * metadata, size_t metadataLength);
+using OnFailedToObtainTransferCallback = void (*)(PyObject context, PyChipError result);
+using OnDataReceivedCallback           = void (*)(PyObject context, const uint8_t * dataBuffer, size_t bufferLength);
+using OnTransferCompletedCallback      = void (*)(PyObject context, PyChipError result);
 
-OnTransferObtainedCallback gOnTransferObtainedCallback   = nullptr;
-OnDataReceivedCallback gOnDataReceivedCallback           = nullptr;
-OnTransferCompletedCallback gOnTransferCompletedCallback = nullptr;
+// The callback methods provided by python.
+OnTransferObtainedCallback gOnTransferObtainedCallback             = nullptr;
+OnFailedToObtainTransferCallback gOnFailedToObtainTransferCallback = nullptr;
+OnDataReceivedCallback gOnDataReceivedCallback                     = nullptr;
+OnTransferCompletedCallback gOnTransferCompletedCallback           = nullptr;
 
 // The information for a single transfer.
 struct TransferInfo
 {
+    // The transfer object. Owned by the transfer server.
     bdx::BdxTransfer * Transfer         = nullptr;
+    // The contexts for different python callbacks. Owned by the python side.
     PyObject OnTransferObtainedContext  = nullptr;
     PyObject OnDataReceivedContext      = nullptr;
     PyObject OnTransferCompletedContext = nullptr;
@@ -118,8 +137,8 @@ public:
         if (gOnTransferObtainedCallback && transferInfo)
         {
             transferInfo->Transfer = transfer;
-            gOnTransferObtainedCallback(transferInfo->OnTransferObtainedContext, ToPyChipError(CHIP_NO_ERROR), transfer,
-                                        init_data.TransferCtlFlags, init_data.MaxBlockSize, init_data.StartOffset, init_data.Length,
+            gOnTransferObtainedCallback(transferInfo->OnTransferObtainedContext, transfer, init_data.TransferCtlFlags,
+                                        init_data.MaxBlockSize, init_data.StartOffset, init_data.Length,
                                         init_data.FileDesignator, init_data.FileDesLength, init_data.Metadata,
                                         init_data.MetadataLength);
         }
@@ -141,10 +160,9 @@ public:
         {
             // The transfer failed during initialisation.
             transferInfo = mTransfers->NextUnassociatedTransferInfo();
-            if (gOnTransferObtainedCallback && transferInfo)
+            if (gOnFailedToObtainTransferCallback && transferInfo)
             {
-                gOnTransferObtainedCallback(transferInfo->OnTransferObtainedContext, ToPyChipError(result), nullptr,
-                                            static_cast<bdx::TransferControlFlags>(0), 0, 0, 0, nullptr, 0, nullptr, 0);
+                gOnFailedToObtainTransferCallback(transferInfo->OnTransferObtainedContext, ToPyChipError(result));
             }
         }
         else if (gOnTransferCompletedCallback && transferInfo)
@@ -183,10 +201,13 @@ using namespace chip::python;
 extern "C" {
 
 // Initialises the BDX system.
-void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallback, OnDataReceivedCallback onDataReceivedCallback,
+void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallback,
+                              OnFailedToObtainTransferCallback onFailedToObtainTransferCallback,
+                              OnDataReceivedCallback onDataReceivedCallback,
                               OnTransferCompletedCallback onTransferCompletedCallback)
 {
     gOnTransferObtainedCallback                         = onTransferObtainedCallback;
+    gOnFailedToObtainTransferCallback                   = onFailedToObtainTransferCallback;
     gOnDataReceivedCallback                             = onDataReceivedCallback;
     gOnTransferCompletedCallback                        = onTransferCompletedCallback;
     chip::Controller::DeviceControllerFactory & factory = chip::Controller::DeviceControllerFactory::GetInstance();
