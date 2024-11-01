@@ -126,10 +126,8 @@
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
-    // TODO:  there are several places in our tests where we call `copyPublicKey` on objects without first
-    // seeing if it's implemented by the receiver.  (the `MTRKeypair` protocol says both `publicKey` and
-    // `copyPublicKey` are optional.)
-    __auto_type * intermediatePublicKey = intermediateKeys.copyPublicKey;
+
+    __auto_type * intermediatePublicKey = [intermediateKeys copyPublicKey];
     XCTAssert(intermediatePublicKey != NULL);
     CFAutorelease(intermediatePublicKey);
 
