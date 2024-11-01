@@ -370,21 +370,16 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         all_clusters = set(list(ClusterObjects.ALL_CLUSTERS.keys()))
 
         for endpoint_id, endpoint in self.endpoints.items():
-            for cluster_type, cluster in endpoint.items():
-                if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
-                    continue
+            dut_standard_clusters = set([x.id for x in endpoint.keys() if global_attribute_ids.cluster_id_type(x.id) == global_attribute_ids.ClusterIdType.kStandard])
+            unsupported = [id for id in list(all_clusters - dut_standard_clusters) if global_attribute_ids.attribute_id_type(id)
+                           == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
 
-                dut_clusters = set(list(x.id for x in endpoint.keys()))
+            if unsupported:
+                unsupported_attribute = (ClusterObjects.ALL_ATTRIBUTES[unsupported[0]])[0]
 
-                unsupported = [id for id in list(all_clusters - dut_clusters) if global_attribute_ids.attribute_id_type(id)
-                               == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
-
-                if unsupported:
-                    unsupported_attribute = (ClusterObjects.ALL_ATTRIBUTES[unsupported[0]])[0]
-
-                    result = await self.read_single_attribute_expect_error(endpoint=endpoint_id, cluster=ClusterObjects.ALL_CLUSTERS[unsupported[0]], attribute=unsupported_attribute, error=Status.UnsupportedCluster)
-                    asserts.assert_true(isinstance(result.Reason, InteractionModelError),
-                                        msg="Unexpected success reading invalid cluster")
+                result = await self.read_single_attribute_expect_error(endpoint=endpoint_id, cluster=ClusterObjects.ALL_CLUSTERS[unsupported[0]], attribute=unsupported_attribute, error=Status.UnsupportedCluster)
+                asserts.assert_true(isinstance(result.Reason, InteractionModelError),
+                                    msg="Unexpected success reading invalid cluster")
 
         # Step 21
         # TH sends the Read Request Message to the DUT to read an unsupported attribute
