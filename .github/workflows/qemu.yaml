@@ -32,7 +32,7 @@ env:
 jobs:
 
     qemu-esp32:
-        name: ESP32
+        name: ESP32_QEMU
 
         env:
             BUILD_TYPE: esp32-qemu
