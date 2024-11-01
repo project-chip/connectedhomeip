@@ -71,6 +71,9 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 @property (nonatomic, readwrite, nullable, copy) NSNumber * estimatedSubscriptionLatency;
 @property (nonatomic, readwrite, assign) BOOL suspended;
 
+// nullable because technically _deviceController is nullable.
+@property (nonatomic, readonly, nullable) MTRDeviceController_Concrete * _concreteController;
+
 @end
 
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
@@ -901,7 +904,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     } else if (_internalDeviceState == MTRInternalDeviceStateSubscribing && nodeLikelyReachable) {
         // If we have reason to suspect that the node is now reachable and we haven’t established a
         // CASE session yet, let’s consider it to be stalled and invalidate the pairing session.
-        [[self _concreteController] asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+        [self._concreteController asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
             auto caseSessionMgr = commissioner->CASESessionMgr();
             VerifyOrDie(caseSessionMgr != nullptr);
             caseSessionMgr->ReleaseSession(commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue));
@@ -1245,7 +1248,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
             workBlock();
         }];
-        [[[self _concreteController] concurrentSubscriptionPool] enqueueWorkItem:workItem description:description];
+        [self._concreteController.concurrentSubscriptionPool enqueueWorkItem:workItem description:description];
         MTR_LOG("%@ - enqueued in the subscription pool", self);
     };
 
@@ -1547,7 +1550,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // storage implementation, which will try to read them later.  Make sure
     // we snapshot the state here instead of handing out live copies.
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = [self _clusterDataToPersistSnapshot];
-    [_deviceController.controllerDataStore storeClusterData:clusterData forNodeID:_nodeID];
+    [self._concreteController.controllerDataStore storeClusterData:clusterData forNodeID:_nodeID];
     for (MTRClusterPath * clusterPath in _clusterDataToPersist) {
         [_persistedClusterData setObject:_clusterDataToPersist[clusterPath] forKey:clusterPath];
         [_persistedClusters addObject:clusterPath];
@@ -2140,7 +2143,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     NSMutableSet * clusterPathsToRemove = [NSMutableSet set];
     for (MTRClusterPath * clusterPath in _persistedClusters) {
-        MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
+        MTRDeviceClusterData * data = [self._concreteController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
         if (!data) {
             [clusterPathsToRemove addObject:clusterPath];
         }
@@ -2175,13 +2178,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return nil;
     }
 
-    NSAssert(_deviceController.controllerDataStore != nil,
+    NSAssert(self._concreteController.controllerDataStore != nil,
         @"How can _persistedClusters have an entry if we have no persistence?");
     NSAssert(_persistedClusterData != nil,
         @"How can _persistedClusterData not exist if we have persisted clusters?");
 
     // Page in the stored value for the data.
-    MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
+    MTRDeviceClusterData * data = [self._concreteController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
     MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, MTR_YES_NO(data));
     if (data != nil) {
         [_persistedClusterData setObject:data forKey:clusterPath];
@@ -2456,7 +2459,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MATTER_LOG_METRIC_BEGIN(kMetricMTRDeviceInitialSubscriptionSetup);
 
     // Call directlyGetSessionForNode because the subscription setup already goes through the subscription pool queue
-    [[self _concreteController]
+    [self._concreteController
         directlyGetSessionForNode:_nodeID.unsignedLongLongValue
                        completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
                            const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error,
@@ -3429,7 +3432,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         [_persistedClusterData removeObjectForKey:path];
         [_clusterDataToPersist removeObjectForKey:path];
         if (doRemoveFromDataStore) {
-            [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:path.endpoint clusterID:path.cluster];
+            [self._concreteController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:path.endpoint clusterID:path.cluster];
         }
     }
 }
@@ -3443,7 +3446,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
     // Just clear out the NSCache entry for this cluster, so we'll load it from storage as needed.
     [_persistedClusterData removeObjectForKey:clusterPath];
-    [self.deviceController.controllerDataStore removeAttributes:attributes fromCluster:clusterPath forNodeID:self.nodeID];
+    [self._concreteController.controllerDataStore removeAttributes:attributes fromCluster:clusterPath forNodeID:self.nodeID];
 }
 
 - (void)_pruneEndpointsIn:(MTRDeviceDataValueDictionary)previousPartsListValue
@@ -3464,7 +3467,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
         }
         [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:NO];
-        [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:endpoint];
+        [self._concreteController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:endpoint];
 
         [_deviceController asyncDispatchToMatterQueue:^{
             std::lock_guard lock(self->_lock);
@@ -3792,7 +3795,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    auto datastore = _deviceController.controllerDataStore;
+    auto datastore = self._concreteController.controllerDataStore;
     if (datastore == nil) {
         // No way to store.
         return;
@@ -4207,7 +4210,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self _ensureSubscriptionForExistingDelegates:@"Controller resumed"];
 }
 
-// nullable because technically _deviceController is nullable.
 - (nullable MTRDeviceController_Concrete *)_concreteController
 {
     // We know our _deviceController is actually an MTRDeviceController_Concrete, since that's what
