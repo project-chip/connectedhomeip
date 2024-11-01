@@ -31,9 +31,8 @@
     return (__bridge_transfer NSData *) SecKeyCopyExternalRepresentation([self publicKey], nil);
 }
 
-- (SecKeyRef)copyPublicKey {
-    // because this varies significantly from the actual implementations,
-    // it's probably not a great idea to rely on this for memory leak behavior information.
+- (SecKeyRef)copyPublicKey
+{
     CFRetain(_publicKey);
     return _publicKey;
 }
