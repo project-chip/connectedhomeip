@@ -28,6 +28,7 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDeviceConnectionBridge.h"
+#import "MTRDeviceControllerDataStore.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 
 #include <credentials/FabricTable.h>
@@ -232,6 +233,11 @@ NS_ASSUME_NONNULL_BEGIN
  * subscription at the same time.
  */
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+
+/**
+ * The per-controller data store this controller was initialized with, if any.
+ */
+@property (nonatomic, readonly, nullable) MTRDeviceControllerDataStore * controllerDataStore;
 
 @end
 
