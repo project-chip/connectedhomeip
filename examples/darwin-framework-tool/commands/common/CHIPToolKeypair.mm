@@ -65,7 +65,7 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
     return out_signature;
 }
 
-- (SecKeyRef)copyPublicKey
+- (SecKeyRef)publicKey
 {
     if (_mPublicKey == nil) {
         chip::Crypto::P256PublicKey publicKey = _mKeyPair.Pubkey();
@@ -79,13 +79,7 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
         };
         _mPublicKey = SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, nullptr);
     }
-
-    if (_mPublicKey) {
-        CFRetain(_mPublicKey);
-        return _mPublicKey;
-    }
-
-    return NULL;
+    return _mPublicKey;
 }
 
 - (CHIP_ERROR)Deserialize:(chip::Crypto::P256SerializedKeypair &)input

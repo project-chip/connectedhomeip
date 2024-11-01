@@ -31,12 +31,6 @@
     return (__bridge_transfer NSData *) SecKeyCopyExternalRepresentation([self publicKey], nil);
 }
 
-- (SecKeyRef)copyPublicKey
-{
-    CFRetain(_publicKey);
-    return _publicKey;
-}
-
 - (instancetype)init
 {
     if (!(self = [super init])) {
