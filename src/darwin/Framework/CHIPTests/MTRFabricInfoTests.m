@@ -157,13 +157,10 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
-    __auto_type * intermediatePublicKey = intermediateKeys.copyPublicKey;
-    XCTAssert(intermediatePublicKey != NULL);
-    CFAutorelease(intermediatePublicKey);
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediatePublicKey
+                                                          intermediatePublicKey:intermediateKeys.publicKey
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
