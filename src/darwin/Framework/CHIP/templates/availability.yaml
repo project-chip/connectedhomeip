@@ -8236,16 +8236,12 @@
   provisional:
       clusters:
           # Targeting Spring 2024 Matter release
-          - MicrowaveOvenControl
-          - MicrowaveOvenMode
           - DemandResponseLoadControl
           - BooleanStateConfiguration
           - ValveConfigurationAndControl
           - Timer
-          - OvenMode
           - LaundryDryerControls
           - EnergyEVSE
-          - OvenCavityOperationalState
           - ContentControl
           - ContentAppObserver
           - DeviceEnergyManagement
