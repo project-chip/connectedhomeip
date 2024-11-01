@@ -53,7 +53,6 @@
 
 #include <atomic>
 #include <dns_sd.h>
-#include <optional>
 #include <string>
 
 #import <os/lock.h>
@@ -93,8 +92,6 @@ using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRDeviceController {
     os_unfair_lock _underlyingDeviceMapLock;
-
-    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
 
     // For now, we just ensure that access to _suspended is atomic, but don't
     // guarantee atomicity of the the entire suspend/resume operation.  The
@@ -504,8 +501,8 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (nullable NSNumber *)compressedFabricID
 {
-    auto storedValue = _storedCompressedFabricID.load();
-    return storedValue.has_value() ? @(storedValue.value()) : nil;
+    MTR_ABSTRACT_METHOD();
+    return nil;
 }
 
 #ifdef DEBUG
