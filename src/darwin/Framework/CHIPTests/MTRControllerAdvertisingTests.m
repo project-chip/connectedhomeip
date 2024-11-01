@@ -164,13 +164,10 @@ static const DNSServiceFlags kBrowseFlags = 0;
     __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:@(1) fabricID:nil error:error];
     XCTAssertNil(*error);
     XCTAssertNotNil(root);
-    __auto_type * publicKey = operationalKeys.copyPublicKey;
-    XCTAssert(publicKey != NULL);
-    CFAutorelease(publicKey);
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
                                                            signingCertificate:root
-                                                         operationalPublicKey:publicKey
+                                                         operationalPublicKey:operationalKeys.publicKey
                                                                      fabricID:fabricID
                                                                        nodeID:nodeID
                                                         caseAuthenticatedTags:nil
