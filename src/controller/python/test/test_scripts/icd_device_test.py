@@ -35,13 +35,12 @@ GROUP_ID = 0
 
 
 async def waitForActiveAndTriggerCheckIn(test, nodeid):
-    coro = test.TestWaitForActive(nodeid=nodeid)
-    await test.TestTriggerTestEventHandler(nodeid, bytes.fromhex("00112233445566778899aabbccddeeff"), 0x0046 << 48)
+    coro = test.TestWaitForActive(nodeid=nodeid, stayActiveDurationMs=10)
     return await coro
 
 
-async def invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeid):
-    await test.TestTriggerTestEventHandler(nodeid, bytes.fromhex("00112233445566778899aabbccddeeff"), (0x0046 << 48) | 0x03)
+async def invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeid, testEventKey):
+    await test.TestTriggerTestEventHandler(nodeid, bytes.fromhex(testEventKey), 0x0046_0000_0000_0003)
     return await waitForActiveAndTriggerCheckIn(test, nodeid)
 
 
@@ -113,6 +112,15 @@ async def main():
         help="Discovery type of commissioning. (0: networkOnly 1: networkOnlyWithoutPASEAutoRetry 2: All<Ble & Network>)",
         metavar="<discovery-type>"
     )
+    optParser.add_option(
+        "--test-event-key",
+        action="store",
+        dest="testEventKey",
+        default="00112233445566778899aabbccddeeff",
+        type=str,
+        help="Enable key of Test event trigger.",
+        metavar="<test-event-key>"
+    )
 
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
 
@@ -136,7 +144,7 @@ async def main():
     logger.info("Successfully handled wait-for-active")
 
     logger.info("Testing InvalidateHalfCounterValues for refresh key")
-    FailIfNot(await invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeid=options.nodeid), "Failed to test wait for active")
+    FailIfNot(await invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeid=options.nodeid, testEventKey=options.testEventKey), "Failed to test wait for active")
     logger.info("Successfully handled key refresh")
 
     timeoutTicker.stop()
