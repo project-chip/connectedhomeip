@@ -23,7 +23,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @interface MTRDeviceType : NSObject
 
 /**

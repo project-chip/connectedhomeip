@@ -89,6 +89,7 @@ class TizenBuilder(GnBuilder):
                  use_asan: bool = False,
                  use_tsan: bool = False,
                  use_ubsan: bool = False,
+                 use_coverage: bool = False,
                  with_ui: bool = False,
                  ):
         super(TizenBuilder, self).__init__(
@@ -130,8 +131,58 @@ class TizenBuilder(GnBuilder):
             raise Exception("TSAN sanitizer not supported by Tizen toolchain")
         if use_ubsan:
             self.extra_gn_options.append('is_ubsan=true')
+        self.use_coverage = use_coverage
+        if use_coverage:
+            self.extra_gn_options.append('use_coverage=true')
         if with_ui:
             self.extra_gn_options.append('chip_examples_enable_ui=true')
+
+    def generate(self):
+        super(TizenBuilder, self).generate()
+        if self.app == TizenApp.TESTS and self.use_coverage:
+            self.coverage_dir = os.path.join(self.output_dir, 'coverage')
+            self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
+
+    def lcov_args(self):
+        gcov = os.path.join(os.environ['TIZEN_SDK_TOOLCHAIN'], 'bin/arm-linux-gnueabi-gcov')
+        return [
+            'lcov', '--gcov-tool', gcov, '--ignore-errors', 'unused,mismatch', '--capture', '--directory', os.path.join(
+                self.output_dir, 'obj'),
+            '--exclude', '**/src/controller/*',
+            '--exclude', '**/connectedhomeip/zzz_generated/*',
+            '--exclude', '**/connectedhomeip/third_party/*',
+            '--exclude', '/opt/*',
+        ]
+
+    def PreBuildCommand(self):
+        if self.app == TizenApp.TESTS and self.use_coverage:
+            cmd = ['ninja', '-C', self.output_dir]
+
+            if self.ninja_jobs is not None:
+                cmd.append('-j' + str(self.ninja_jobs))
+
+            cmd.append('Tizen')
+
+            self._Execute(cmd, title="Build-only")
+
+            self._Execute(self.lcov_args() + [
+                '--initial',
+                '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')
+            ], title="Initial coverage baseline")
+
+    def PostBuildCommand(self):
+        if self.app == TizenApp.TESTS and self.use_coverage:
+
+            self._Execute(self.lcov_args() + ['--output-file', os.path.join(self.coverage_dir,
+                          'lcov_test.info')], title="Update coverage")
+
+            gcov = os.path.join(os.environ['TIZEN_SDK_TOOLCHAIN'], 'bin/arm-linux-gnueabi-gcov')
+            self._Execute(['lcov', '--gcov-tool', gcov, '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),
+                           '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_test.info'),
+                           '--output-file', os.path.join(self.coverage_dir, 'lcov_final.info')
+                           ], title="Final coverage info")
+            self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
+                           os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
 
     def GnBuildArgs(self):
         # Make sure that required ENV variables are defined

@@ -141,13 +141,11 @@ class NrfConnectBuilder(Builder):
                  app: NrfApp = NrfApp.LIGHT,
                  board: NrfBoard = NrfBoard.NRF52840DK,
                  enable_rpcs: bool = False,
-                 use_data_model_interface: Optional[bool] = None,
                  ):
         super(NrfConnectBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
-        self.use_data_model_interface = use_data_model_interface
 
     def generate(self):
         if not os.path.exists(self.output_dir):
@@ -190,10 +188,6 @@ class NrfConnectBuilder(Builder):
 
             if self.options.pregen_dir:
                 flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
-
-            if self.use_data_model_interface is not None:
-                value = 'y' if self.use_data_model_interface else 'n'
-                flags.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={value}")
 
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 

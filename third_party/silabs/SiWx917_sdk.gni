@@ -16,12 +16,11 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
-
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/silabs/wifi_args.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("silabs_board.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
@@ -682,7 +681,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c",
-      "${wifi_sdk_root}/components/service/network_manager/si91x/sl_net_si91x.c",
 
       # modified hal
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default_common_linker.c",
@@ -829,7 +827,7 @@ template("siwx917_sdk") {
         "${_mbedtls_root}/library/ssl_srv.c",
         "${_mbedtls_root}/library/ssl_tls.c",
         "${_mbedtls_root}/library/x509.c",
-        "${efr32_sdk_build_root}/mqtt/stack/mqtt.c",
+        "${silabs_sdk_build_root}/mqtt/stack/mqtt.c",
       ]
     }
 

@@ -45,7 +45,7 @@ declare_args() {
   generate_compilation_database = false
 
   # Enable automatic leak checks before the application exits
-  enable_leak_checking = false
+  enable_leak_checking = !is_asan && target_os == "mac"
 }
 
 sdk = "macosx"
@@ -194,6 +194,8 @@ executable("darwin-framework-tool") {
     "commands/common/CertificateIssuer.mm",
     "commands/common/ControllerStorage.h",
     "commands/common/ControllerStorage.mm",
+    "commands/common/DeviceDelegate.h",
+    "commands/common/DeviceDelegate.mm",
     "commands/common/MTRDevice_Externs.h",
     "commands/common/MTRError.mm",
     "commands/common/MTRError_Utils.h",

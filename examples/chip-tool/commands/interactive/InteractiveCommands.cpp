@@ -25,13 +25,14 @@
 #include <string>
 #include <vector>
 
-constexpr char kInteractiveModePrompt[]          = ">>> ";
-constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
-constexpr char kInteractiveModeStopCommand[]     = "quit()";
-constexpr char kCategoryError[]                  = "Error";
-constexpr char kCategoryProgress[]               = "Info";
-constexpr char kCategoryDetail[]                 = "Debug";
-constexpr char kCategoryAutomation[]             = "Automation";
+constexpr char kInteractiveModePrompt[]               = ">>> ";
+constexpr char kInteractiveModeHistoryFileName[]      = "chip_tool_history";
+constexpr char kInteractiveModeStopCommand[]          = "quit()";
+constexpr char kInteractiveModeStopAlternateCommand[] = "quit";
+constexpr char kCategoryError[]                       = "Error";
+constexpr char kCategoryProgress[]                    = "Info";
+constexpr char kCategoryDetail[]                      = "Debug";
+constexpr char kCategoryAutomation[]                  = "Automation";
 
 namespace {
 
@@ -387,7 +388,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
 
 bool InteractiveCommand::ParseCommand(char * command, int * status)
 {
-    if (strcmp(command, kInteractiveModeStopCommand) == 0)
+    if (strcmp(command, kInteractiveModeStopCommand) == 0 || strcmp(command, kInteractiveModeStopAlternateCommand) == 0)
     {
         // If scheduling the cleanup fails, there is not much we can do.
         // But if something went wrong while the application is leaving it could be because things have

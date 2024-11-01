@@ -487,7 +487,7 @@ jobs:
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
-                      --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test-data-model-check-check-failure-die \
+                      --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test \
@@ -504,7 +504,7 @@ jobs:
             - name: Generate an argument environment file
               run: |
                   echo -n "" >/tmp/test_env.yaml
-                  echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test-data-model-check-check-failure-die/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app" >> /tmp/test_env.yaml
                   echo "ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
                   echo "LIT_ICD_APP: out/linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
@@ -523,7 +523,7 @@ jobs:
                   mkdir -p out/trace_data
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/test/test_scripts/mobile-device-test.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing'
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test-data-model-check-check-failure-die/chip-all-clusters-app'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestIdChecks.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestSpecParsingDeviceType.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestConformanceSupport.py'
