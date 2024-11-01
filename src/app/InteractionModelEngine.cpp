@@ -40,7 +40,6 @@
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -51,11 +50,9 @@
 #include <lib/support/FibonacciUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 // TODO: defaulting to codegen should eventually be an application choice and not
 //       hard-coded in the interaction model
 #include <app/codegen-data-model-provider/Instance.h>
-#endif
 
 namespace chip {
 namespace app {
@@ -86,8 +83,6 @@ bool MayHaveAccessibleEventPathForEndpointAndCluster(const ConcreteClusterPath &
 
     return (Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requiredPrivilege) == CHIP_NO_ERROR);
 }
-
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
 bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, EndpointId aEndpoint,
                                            const EventPathParams & aEventPath, const Access::SubjectDescriptor & aSubjectDescriptor)
@@ -131,72 +126,6 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
     }
     return false;
 }
-
-#else
-
-/**
- * Helper to handle wildcard clusters in the event path.
- */
-bool MayHaveAccessibleEventPathForEndpoint(EndpointId aEndpoint, const EventPathParams & aEventPath,
-                                           const Access::SubjectDescriptor & aSubjectDescriptor)
-{
-    if (aEventPath.HasWildcardClusterId())
-    {
-        auto * endpointType = emberAfFindEndpointType(aEndpoint);
-        if (endpointType == nullptr)
-        {
-            // Not going to have any valid paths in here.
-            return false;
-        }
-
-        for (decltype(endpointType->clusterCount) idx = 0; idx < endpointType->clusterCount; ++idx)
-        {
-            bool mayHaveAccessiblePath = MayHaveAccessibleEventPathForEndpointAndCluster(
-                ConcreteClusterPath(aEndpoint, endpointType->cluster[idx].clusterId), aEventPath, aSubjectDescriptor);
-            if (mayHaveAccessiblePath)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    auto * cluster = emberAfFindServerCluster(aEndpoint, aEventPath.mClusterId);
-    if (cluster == nullptr)
-    {
-        // Nothing valid here.
-        return false;
-    }
-    return MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, cluster->clusterId), aEventPath,
-                                                           aSubjectDescriptor);
-}
-
-bool MayHaveAccessibleEventPath(const EventPathParams & aEventPath, const Access::SubjectDescriptor & aSubjectDescriptor)
-{
-    if (!aEventPath.HasWildcardEndpointId())
-    {
-        // No need to check whether the endpoint is enabled, because
-        // emberAfFindEndpointType returns null for disabled endpoints.
-        return MayHaveAccessibleEventPathForEndpoint(aEventPath.mEndpointId, aEventPath, aSubjectDescriptor);
-    }
-
-    for (uint16_t endpointIndex = 0; endpointIndex < emberAfEndpointCount(); ++endpointIndex)
-    {
-        if (!emberAfEndpointIndexIsEnabled(endpointIndex))
-        {
-            continue;
-        }
-        if (MayHaveAccessibleEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), aEventPath, aSubjectDescriptor))
-        {
-            return true;
-        }
-    }
-
-    // none of the paths matched
-    return false;
-}
-#endif
 
 } // namespace
 
@@ -244,15 +173,6 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     mReportingEngine.Init();
 
     StatusIB::RegisterErrorFormatter();
-
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    ChipLogError(InteractionModel, "WARNING ┌────────────────────────────────────────────────────");
-    ChipLogError(InteractionModel, "WARNING │ Interaction Model Engine running in 'Checked' mode.");
-    ChipLogError(InteractionModel, "WARNING │ This executes BOTH ember and data-model code paths.");
-    ChipLogError(InteractionModel, "WARNING │ which is inefficient and consumes more flash space.");
-    ChipLogError(InteractionModel, "WARNING │ This should be done for testing only.");
-    ChipLogError(InteractionModel, "WARNING └────────────────────────────────────────────────────");
-#endif
 
     mState = State::kInitialized;
     return CHIP_NO_ERROR;
@@ -725,11 +645,7 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
 
         // The definition of "valid path" is "path exists and ACL allows
         // access".  We need to do some expansion of wildcards to handle that.
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
         aHasValidEventPath = MayHaveAccessibleEventPath(mDataModelProvider, eventPath, aSubjectDescriptor);
-#else
-        aHasValidEventPath = MayHaveAccessibleEventPath(eventPath, aSubjectDescriptor);
-#endif
     }
 
     if (err == CHIP_ERROR_END_OF_TLV)
@@ -1628,19 +1544,7 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNo
 
 bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath & path)
 {
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-    bool providerResult = GetDataModelProvider()->GetAttributeInfo(path).has_value();
-
-    bool emberResult = emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
-
-    // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
-    VerifyOrDie(providerResult == emberResult);
-#endif
     return GetDataModelProvider()->GetAttributeInfo(path).has_value();
-#else
-    return emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
-#endif
 }
 
 void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths)
@@ -1767,8 +1671,6 @@ CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectL
 void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                              TLV::TLVReader & apPayload)
 {
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-
     Access::SubjectDescriptor subjectDescriptor = apCommandObj.GetSubjectDescriptor();
 
     DataModel::InvokeRequest request;
@@ -1785,26 +1687,6 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
     {
         apCommandObj.AddStatus(aCommandPath, status->GetStatusCode());
     }
-#else
-    CommandHandlerInterface * handler =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
-
-    if (handler)
-    {
-        CommandHandlerInterface::HandlerContext context(apCommandObj, aCommandPath, apPayload);
-        handler->InvokeCommand(context);
-
-        //
-        // If the command was handled, don't proceed any further and return successfully.
-        //
-        if (context.mCommandHandled)
-        {
-            return;
-        }
-    }
-
-    DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
@@ -1836,13 +1718,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
                                      .endpoint    = aRequest.path.mEndpointId,
                                      .requestType = Access::RequestType::kCommandInvokeRequest,
                                      .entityId    = aRequest.path.mCommandId };
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
     Access::Privilege minimumRequiredPrivilege =
         commandInfo.has_value() ? commandInfo->invokePrivilege : Access::Privilege::kOperate;
-#else
-    Access::Privilege minimumRequiredPrivilege = RequiredPrivilege::ForInvokeCommand(aRequest.path);
-#endif
+
     CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, minimumRequiredPrivilege);
     if (err != CHIP_NO_ERROR)
     {
@@ -1858,17 +1737,12 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
 
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest)
 {
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
     // This is checked by previous validations, so it should not happen
     VerifyOrDie(commandInfo.has_value());
 
     const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
     const bool commandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
-#else
-    const bool commandNeedsTimedInvoke         = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
-    const bool commandIsFabricScoped           = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
-#endif
 
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
     {
@@ -1893,13 +1767,9 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
 
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistence(const ConcreteCommandPath & aCommandPath)
 {
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     auto provider = GetDataModelProvider();
     if (provider->GetAcceptedCommandInfo(aCommandPath).has_value())
     {
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::Success);
-#endif
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -1907,9 +1777,6 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
     //
     if (provider->GetClusterInfo(aCommandPath).has_value())
     {
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::UnsupportedCommand);
-#endif
         return Protocols::InteractionModel::Status::UnsupportedCommand; // cluster exists, so command is invalid
     }
 
@@ -1920,22 +1787,13 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
     {
         if (endpoint == aCommandPath.mEndpointId)
         {
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-            VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::UnsupportedCluster);
-#endif
             // endpoint exists, so cluster is invalid
             return Protocols::InteractionModel::Status::UnsupportedCluster;
         }
     }
 
     // endpoint not found
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-    VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::UnsupportedEndpoint);
-#endif
     return Protocols::InteractionModel::Status::UnsupportedEndpoint;
-#else
-    return ServerClusterCommandExists(aCommandPath);
-#endif
 }
 
 DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model)
@@ -1974,14 +1832,12 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
 
 DataModel::Provider * InteractionModelEngine::GetDataModelProvider()
 {
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     if (mDataModelProvider == nullptr)
     {
         // These should be called within the CHIP processing loop.
         assertChipStackLockedByCurrentThread();
         SetDataModelProvider(CodegenDataModelProviderInstance());
     }
-#endif
     return mDataModelProvider;
 }
 

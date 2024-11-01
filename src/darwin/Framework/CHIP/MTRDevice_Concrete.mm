@@ -1245,7 +1245,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
             workBlock();
         }];
-        [self->_deviceController.concurrentSubscriptionPool enqueueWorkItem:workItem description:description];
+        [[[self _concreteController] concurrentSubscriptionPool] enqueueWorkItem:workItem description:description];
         MTR_LOG("%@ - enqueued in the subscription pool", self);
     };
 
