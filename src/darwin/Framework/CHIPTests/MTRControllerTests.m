@@ -620,7 +620,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
-    __auto_type * intermediatePublicKey = intermediateKeys.copyPublicKey;
+    __auto_type * intermediatePublicKey = [intermediateKeys copyPublicKey];
     XCTAssert(intermediatePublicKey != NULL);
     CFAutorelease(intermediatePublicKey);
 
