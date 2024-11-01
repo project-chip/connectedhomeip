@@ -40,6 +40,11 @@ async def waitForActiveAndTriggerCheckIn(test, nodeid):
     return await coro
 
 
+async def invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeid):
+    await test.TestTriggerTestEventHandler(nodeid, bytes.fromhex("00112233445566778899aabbccddeeff"), (0x0046 << 48) | 0x03)
+    return await waitForActiveAndTriggerCheckIn(test, nodeid)
+
+
 async def main():
     optParser = OptionParser()
     optParser.add_option(
@@ -125,9 +130,14 @@ async def main():
                                            nodeid=options.nodeid),
               "Failed to finish key exchange")
     logger.info("Commissioning completed")
+
     logger.info("Testing wait for active")
     FailIfNot(await waitForActiveAndTriggerCheckIn(test, nodeid=options.nodeid), "Failed to test wait for active")
-    logger.info('Successfully handled wait-for-active')
+    logger.info("Successfully handled wait-for-active")
+
+    logger.info("Testing InvalidateHalfCounterValues for refresh key")
+    FailIfNot(await invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeid=options.nodeid), "Failed to test wait for active")
+    logger.info("Successfully handled key refresh")
 
     timeoutTicker.stop()
 
