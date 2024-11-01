@@ -823,7 +823,6 @@ const char srv_name[] = "_matterc._udp";
 /*
     NAN-USD Service Protocol Type: ref: Table 58 of Wi-Fi Aware Specificaiton
 */
-#define MAX_PAF_PUBLISH_SSI_BUFLEN 512
 #define NAN_PUBLISH_SSI_TAG " ssi="
 
 #pragma pack(push, 1)
@@ -835,8 +834,6 @@ struct PAFPublishSSI
     uint16_t VendorId;
 };
 
-#define MAX_NAN_SRV_NAME_LEN 256
-#define NAN_FREQ_LIST_ALL 0xff
 enum nan_service_protocol_type
 {
     NAN_SRV_PROTO_BONJOUR    = 1,
@@ -849,21 +846,14 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
 {
     GAutoPtr<GError> err;
     gint publish_id;
-    uint16_t freq_list_buf[0xff];
-    uint16_t * pfreq_lst                          = freq_list_buf;
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
-    unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT;
+    unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS;
     unsigned int freq                             = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
-    unsigned int freq_list_len;
-    unsigned int ssi_len = sizeof(struct PAFPublishSSI);
+    unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
 
     // Add the freq_list:
-    freq_list_len = InArgs.freq_list_len;
-    if ((freq_list_len > 0) && (freq_list_len != NAN_FREQ_LIST_ALL))
-    {
-        pfreq_lst = InArgs.pfreq_list;
-    }
-    GVariant * freq_array_variant = g_variant_new_fixed_array(G_VARIANT_TYPE_UINT16, pfreq_lst, freq_list_len, sizeof(guint16));
+    GVariant * freq_array_variant =
+        g_variant_new_fixed_array(G_VARIANT_TYPE_UINT16, InArgs.freq_list.get(), InArgs.freq_list_len, sizeof(guint16));
     if (freq_array_variant == nullptr)
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: freq_array_variant is NULL ");
@@ -1596,7 +1586,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
     GAutoPtr<GError> err;
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
     uint8_t is_active                             = 1;
-    unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT;
+    unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS;
     unsigned int freq                             = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
     unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
     struct PAFPublishSSI PafPublish_ssi;

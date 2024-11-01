@@ -379,67 +379,36 @@ public:
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-void int_array_add_unique(uint16_t ** res, uint16_t a)
+/*
+    Get the freq_list from args.
+    Format:
+        "freq_list=[freq#1],[freq#2]...[freq#n]"
+            [freq#1] - [freq#n]: frequence number, separated by ','
+*/
+static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[]> & freq_list)
 {
-    size_t reslen, max_size;
-    uint16_t * n;
-
-    for (reslen = 0; *res && (*res)[reslen]; reslen++)
+    const char hdstr[] = "freq_list=";
+    std::vector<uint16_t> freq_vect;
+    const std::string argstrn(args);
+    auto pos = argstrn.find(hdstr);
+    if (pos == std::string::npos)
     {
-        if ((*res)[reslen] == a)
-            return; /* already in the list */
+        return 0;
     }
-    max_size = (size_t) -1;
-    if (reslen > max_size - 2)
+    std::string nums = argstrn.substr(pos + strlen(hdstr));
+    std::stringstream ss(nums);
+    std::string item;
+    while (std::getline(ss, item, ','))
     {
-        /* This should not really happen in practice, but if it did,
-         * something would overflow. Do not try to add the new value;
-         * instead, make this behave like memory allocation failure to
-         * avoid messing up memory. */
-        free(*res);
-        *res = NULL;
-        return;
+        freq_vect.push_back(std::stoi(item));
     }
-    n = (uint16_t *) realloc(*res, (reslen + 2) * sizeof(uint16_t));
-    if (n == NULL)
+    uint16_t freq_size = freq_vect.size();
+    freq_list          = std::make_unique<uint16_t[]>(freq_size);
+    for (int i = 0; i < freq_size; i++)
     {
-        free(*res);
-        *res = NULL;
-        return;
+        freq_list.get()[i] = freq_vect[i];
     }
-    n[reslen]     = a;
-    n[reslen + 1] = 0;
-    *res          = n;
-}
-
-static uint16_t WiFiPAFGet_FreqList(char * ArgStrn, uint16_t ** pfreq_list)
-{
-    char * token;
-    uint16_t * freq_list = NULL;
-    uint16_t len         = 0;
-
-    while ((token = strtok(ArgStrn, " ")))
-    {
-        if (strncmp(token, "freq_list=", 10) == 0)
-        {
-            char * pos = token + 10;
-            if (strcmp(pos, "all") == 0)
-            {
-                return NAN_FREQ_LIST_ALL;
-            }
-            while (pos && pos[0])
-            {
-                int_array_add_unique(&freq_list, atoi(pos));
-                len++;
-                pos = strchr(pos, ',');
-                if (pos)
-                    pos++;
-            }
-            *pfreq_list = freq_list;
-            break;
-        }
-    }
-    return len;
+    return freq_size;
 }
 #endif
 
@@ -577,14 +546,10 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         {
             ChipLogProgress(NotSpecified, "Wi-Fi Management started");
             DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
+
             args.enable        = LinuxDeviceOptions::GetInstance().mWiFiPAF;
-            args.freq_list_len = WiFiPAFGet_FreqList((char *) LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, &args.pfreq_list);
+            args.freq_list_len = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, args.freq_list);
             DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
-            if ((args.freq_list_len > 0) && (args.freq_list_len != NAN_FREQ_LIST_ALL))
-            {
-                free(args.pfreq_list);
-                args.pfreq_list = nullptr;
-            }
         }
     }
 #endif
