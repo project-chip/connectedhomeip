@@ -201,7 +201,7 @@ constexpr uint16_t kWifiScanTimeoutTicks = 10000;
 
 void DHCPTimerEventHandler(void * arg)
 {
-    WfxEvent_t event = { .eventType = WFX_EVT_DHCP_POLL };
+    WfxEvent_t event = { .eventType = WifiEvent::kStationDhcpPoll };
     sl_matter_wifi_post_event(&event);
 }
 
@@ -280,7 +280,7 @@ sl_status_t sl_wifi_siwx917_init(void)
                         ChipLogError(DeviceLayer, "sl_si91x_trng_program_key failed: 0x%lx", static_cast<uint32_t>(status)));
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
-    wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
+    wfx_rsi.dev_state.Set(WifiState::kStationInit);
     osSemaphoreRelease(sl_rs_ble_init_sem);
     return status;
 }
@@ -401,11 +401,12 @@ sl_status_t SetWifiConfigurations()
 
 sl_status_t JoinWifiNetwork(void)
 {
-    VerifyOrReturnError(!(wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED)), SL_STATUS_IN_PROGRESS);
+    VerifyOrReturnError(!wfx_rsi.dev_state.HasAny(WifiState::kStationConnecting, WifiState::kStationConnected),
+                        SL_STATUS_IN_PROGRESS);
     sl_status_t status = SL_STATUS_OK;
 
     // Start Join Network
-    wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTING;
+    wfx_rsi.dev_state.Set(WifiState::kStationConnecting);
 
     status = SetWifiConfigurations();
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "Failure to set the Wifi Configurations!"));
@@ -415,7 +416,7 @@ sl_status_t JoinWifiNetwork(void)
     if (status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS)
     {
         WfxEvent_t event;
-        event.eventType = WFX_EVT_STA_CONN;
+        event.eventType = WifiEvent::kStationConnect;
         sl_matter_wifi_post_event(&event);
         return status;
     }
@@ -424,12 +425,12 @@ sl_status_t JoinWifiNetwork(void)
     ChipLogError(DeviceLayer, "sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
     VerifyOrReturnError((wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
 
-    wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
+    wfx_rsi.dev_state.Clear(WifiState::kStationConnecting, WifiState::kStationConnected);
     ChipLogProgress(DeviceLayer, "Connection retry attempt %d", wfx_rsi.join_retries);
     wfx_retry_connection(++wfx_rsi.join_retries);
 
     WfxEvent_t event;
-    event.eventType = WFX_EVT_STA_START_JOIN;
+    event.eventType = WifiEvent::kStationStartJoin;
     sl_matter_wifi_post_event(&event);
 
     return status;
@@ -625,7 +626,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
     }
 
     // cleanup and return
-    wfx_rsi.dev_state &= ~WFX_RSI_ST_SCANSTARTED;
+    wfx_rsi.dev_state.Clear(WifiState::kScanStarted);
     wfx_rsi.scan_cb((wfx_wifi_scan_result_t *) 0);
     wfx_rsi.scan_cb = nullptr;
     if (wfx_rsi.scan_ssid)
@@ -667,7 +668,7 @@ void HandleDHCPPolling(void)
     {
         wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
         hasNotifiedIPV4 = true;
-        event.eventType = WFX_EVT_STA_DHCP_DONE;
+        event.eventType = WifiEvent::kStationDhcpDone;
         sl_matter_wifi_post_event(&event);
         NotifyConnectivity();
     }
@@ -687,7 +688,7 @@ void HandleDHCPPolling(void)
         ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
         wfx_ipv6_notify(GET_IPV6_SUCCESS);
         hasNotifiedIPV6 = true;
-        event.eventType = WFX_EVT_STA_DHCP_DONE;
+        event.eventType = WifiEvent::kStationDhcpDone;
         sl_matter_wifi_post_event(&event);
         NotifyConnectivity();
     }
@@ -704,7 +705,7 @@ void sl_matter_wifi_post_event(WfxEvent_t * event)
 
 /// ResetDHCPNotificationFlags
 /// @brief Reset the flags that are used to notify the application about DHCP connectivity
-///        and emits a WFX_EVT_STA_DO_DHCP event to trigger DHCP polling checks. Helper function for ProcessEvent.
+///        and emits a WifiEvent::kStationDoDhcp event to trigger DHCP polling checks. Helper function for ProcessEvent.
 void ResetDHCPNotificationFlags(void)
 {
     WfxEvent_t outEvent;
@@ -715,7 +716,7 @@ void ResetDHCPNotificationFlags(void)
     hasNotifiedIPV6             = false;
     hasNotifiedWifiConnectivity = false;
 
-    outEvent.eventType = WFX_EVT_STA_DO_DHCP;
+    outEvent.eventType = WifiEvent::kStationDoDhcp;
     sl_matter_wifi_post_event(&outEvent);
 }
 
@@ -724,18 +725,18 @@ void ProcessEvent(WfxEvent_t inEvent)
     // Process event
     switch (inEvent.eventType)
     {
-    case WFX_EVT_STA_CONN:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_STA_CONN");
-        wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTED;
+    case WifiEvent::kStationConnect:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationConnect");
+        wfx_rsi.dev_state.Set(WifiState::kStationConnected);
         ResetDHCPNotificationFlags();
 
         break;
 
-    case WFX_EVT_STA_DISCONN:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_STA_DISCONN");
+    case WifiEvent::kStationDisconnect:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationDisconnect");
         // TODO: This event is not being posted anywhere, seems to be a dead code or we are missing something
-        wfx_rsi.dev_state &=
-            ~(WFX_RSI_ST_STA_READY | WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE);
+        wfx_rsi.dev_state.Clear(WifiState::kStationReady, WifiState::kStationConnecting, WifiState::kStationConnected,
+                                WifiState::kStationDhcpDone);
         /* TODO: Implement disconnect notify */
         ResetDHCPNotificationFlags();
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -745,20 +746,20 @@ void ProcessEvent(WfxEvent_t inEvent)
         wfx_ipv6_notify(GET_IPV6_FAIL);
         break;
 
-    case WFX_EVT_AP_START:
+    case WifiEvent::kAPStart:
         // TODO: Currently unimplemented
         break;
-    case WFX_EVT_AP_STOP:
+    case WifiEvent::kAPStart:
         // TODO: Currently unimplemented
         break;
 
-    case WFX_EVT_SCAN:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_SCAN");
+    case WifiEvent::kScan:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kScan");
 
 #ifdef SL_WFX_CONFIG_SCAN
-        if (!(wfx_rsi.dev_state & WFX_RSI_ST_SCANSTARTED))
+        if (!(wfx_rsi.dev_state.Has(WifiState::kScanStarted)))
         {
-            ChipLogDetail(DeviceLayer, "WFX_EVT_SCAN");
+            ChipLogDetail(DeviceLayer, "WifiEvent::kScan");
             sl_wifi_scan_configuration_t wifi_scan_configuration;
             memset(&wifi_scan_configuration, 0, sizeof(wifi_scan_configuration));
 
@@ -778,7 +779,7 @@ void ProcessEvent(WfxEvent_t inEvent)
                 return;
             }
 
-            if (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED)
+            if (wfx_rsi.dev_state.Has(WifiState::kStationConnected))
             {
                 /* Terminate with end of scan which is no ap sent back */
                 wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
@@ -789,7 +790,7 @@ void ProcessEvent(WfxEvent_t inEvent)
                 wifi_scan_configuration = default_wifi_scan_configuration;
             }
             sl_wifi_set_scan_callback(bg_scan_callback_handler, nullptr);
-            wfx_rsi.dev_state |= WFX_RSI_ST_SCANSTARTED;
+            wfx_rsi.dev_state.Set(WifiState::kScanStarted);
 
             osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
             status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, nullptr, &wifi_scan_configuration);
@@ -802,8 +803,8 @@ void ProcessEvent(WfxEvent_t inEvent)
         }
 #endif /* SL_WFX_CONFIG_SCAN */
         break;
-    case WFX_EVT_STA_START_JOIN:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_STA_START_JOIN");
+    case WifiEvent::kStationStartJoin:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationStartJoin");
 
         // Trigger Netwrok scan
         InitiateScan();
@@ -812,16 +813,16 @@ void ProcessEvent(WfxEvent_t inEvent)
         JoinWifiNetwork();
         break;
 
-    case WFX_EVT_STA_DO_DHCP:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_STA_DO_DHCP");
+    case WifiEvent::kStationDoDhcp:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationDoDhcp");
         StartDHCPTimer(WFX_RSI_DHCP_POLL_INTERVAL);
         break;
-    case WFX_EVT_STA_DHCP_DONE:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_STA_DHCP_DONE");
+    case WifiEvent::kStationDhcpDone:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationDhcpDone");
         CancelDHCPTimer();
         break;
-    case WFX_EVT_DHCP_POLL:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_DHCP_POLL");
+    case WifiEvent::kStationDhcpPoll:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationDhcpPoll");
         HandleDHCPPolling();
     default:
         break;
@@ -919,8 +920,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     ChipLogDetail(DeviceLayer, "DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
                   wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
-    wfx_rsi.dev_state |= WFX_RSI_ST_STA_DHCP_DONE;
+    wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone, WifiState::kStationReady);
     wfx_ip_changed_notify(IP_STATUS_SUCCESS);
-    wfx_rsi.dev_state |= WFX_RSI_ST_STA_READY;
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
