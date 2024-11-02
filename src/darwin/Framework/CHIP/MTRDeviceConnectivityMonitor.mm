@@ -120,6 +120,10 @@ static dispatch_queue_t sSharedResolverQueue;
 {
     std::lock_guard lock(sConnectivityMonitorLock);
 
+    if (hostName == NULL) {
+        MTR_LOG_ERROR("%@ NULL host resolved, ignoring", self);
+        return;
+    }
     // dns_sd.h: must check and call deallocate if error is kDNSServiceErr_ServiceNotRunning
     if (error == kDNSServiceErr_ServiceNotRunning) {
         MTR_LOG_ERROR("%@ disconnected from dns-sd subsystem", self);
