@@ -22,6 +22,7 @@
 @interface CHIPToolKeypair : NSObject <MTRKeypair>
 - (BOOL)initialize;
 - (NSData *)signMessageECDSA_RAW:(NSData *)message;
+- (SecKeyRef)publicKey MTR_DEPRECATED("Please implement copyPublicKey, this will leak otherwise", ios(16.1, 18.3), macos(13.0, 15.3), watchos(9.1, 11.3), tvos(16.1, 18.3));
 - (SecKeyRef)copyPublicKey;
 - (CHIP_ERROR)Serialize:(chip::Crypto::P256SerializedKeypair &)output;
 - (CHIP_ERROR)Deserialize:(chip::Crypto::P256SerializedKeypair &)input;
