@@ -61,6 +61,7 @@ extern "C" {
 #include <lib/support/logging/CHIPLogging.h>
 
 #define WFX_QUEUE_SIZE 10
+#define WFX_RSI_BUF_SZ (1024 * 10)
 
 static osThreadId_t sDrvThread;
 constexpr uint32_t kDrvTaskSize = 1792;
