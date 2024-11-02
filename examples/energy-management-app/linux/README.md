@@ -239,8 +239,8 @@ data (e.g. fabric info).
 ## CHIP-REPL Interaction
 
 -   See chip-repl documentation in:
-    - [Working with Python CHIP Controller](../../../docs/development_controllers/chip-repl/python_chip_controller_building.md)
-    - [Matter_REPL_Intro](../../../docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb)
+    -   [Working with Python CHIP Controller](../../../docs/development_controllers/chip-repl/python_chip_controller_building.md)
+    -   [Matter_REPL_Intro](../../../docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb)
 
 ### Building chip-repl:
 
