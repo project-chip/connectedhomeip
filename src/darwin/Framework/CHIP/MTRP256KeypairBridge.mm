@@ -132,7 +132,14 @@ CHIP_ERROR MTRP256KeypairBridge::ECDH_derive_secret(
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR MTRP256KeypairBridge::setPubkey() { return MatterPubKeyFromSecKeyRef([mKeypair publicKey], &mPubkey); }
+CHIP_ERROR MTRP256KeypairBridge::setPubkey()
+{
+    if ([mKeypair respondsToSelector:@selector(copyPublicKey)]) {
+        return MatterPubKeyFromSecKeyRef([mKeypair copyPublicKey], &mPubkey);
+    } else {
+        return MatterPubKeyFromSecKeyRef([mKeypair publicKey], &mPubkey);
+    }
+}
 
 CHIP_ERROR MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(SecKeyRef pubkeyRef, P256PublicKey * matterPubKey)
 {

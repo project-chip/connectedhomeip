@@ -532,7 +532,13 @@
     __auto_type * publicKey = [MTRCertificates publicKeyFromCSR:csr error:nil];
     XCTAssertNotNil(publicKey);
 
-    SecKeyRef originalKeyRef = [testKeys publicKey];
+    SecKeyRef originalKeyRef;
+    if ([testKeys respondsToSelector:@selector(copyPublicKey)]) {
+        originalKeyRef = [testKeys copyPublicKey];
+    } else {
+        originalKeyRef = [testKeys publicKey];
+    }
+
     XCTAssertTrue(originalKeyRef != NULL);
 
     NSData * originalPublicKey = (__bridge_transfer NSData *) SecKeyCopyExternalRepresentation(originalKeyRef, nil);
