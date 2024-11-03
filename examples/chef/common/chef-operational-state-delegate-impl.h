@@ -118,6 +118,7 @@ public:
     OperationalStateDelegate()
     {
         GenericOperationalStateDelegateImpl::mOperationalStateList = Span<const GenericOperationalState>(opStateList);
+        GenericOperationalStateDelegateImpl::mOperationalPhaseList = Span<const CharSpan>(opPhaseList);
     }
 
     /**
