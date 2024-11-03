@@ -110,7 +110,7 @@ private:
         GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
     };
-    const char* opPhaseList[3] = { "pre-soak", "rinse", "spin" };
+    const char * opPhaseList[3] = { "pre-soak", "rinse", "spin" };
 
 public:
     const uint32_t kExampleCountDown = 30;
