@@ -151,6 +151,7 @@ public:
     void OnNanSubscribeTerminated(guint subscribe_id, gchar * reason);
     CHIP_ERROR _WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf);
     WiFiPAF::WiFiPAFLayer * _GetWiFiPAF();
+    void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
 #endif
 
     void PostNetworkConnect();
@@ -267,6 +268,7 @@ private:
     OnConnectionErrorFunct mOnPafSubscribeError;
     WiFiPAF::WiFiPAFLayer * pmWiFiPAF;
     void * mAppState;
+    uint16_t mApFreq;
     CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFUpdatePublish();
