@@ -50,8 +50,8 @@ public:
     DataModel::Nullable<Percent> GetPercentSetting();
 
 private:
-    uint8_t mPercentCurrent;
-    uint8_t mSpeedCurrent;
+    uint8_t mPercentCurrent = 0;
+    uint8_t mSpeedCurrent = 0;
 
     // Fan Mode Limits
     struct Range
@@ -139,7 +139,7 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
         // real fan speed percentage. In this example, we set PercentCurrent to 0 here as we don't have a real value for the Fan
         // speed or a FanAutoMode simulator.
         // When not Null, SpeedCurrent tracks SpeedSetting's value.
-        SetPercentCurrent(percentSetting.IsNull() ? 0 : percentSetting.Value());
+        SetPercentCurrent(percentSetting.ValueOr(0));
         break;
     }
 
@@ -152,7 +152,7 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
         // real fan speed. In this example, we set SpeedCurrent to 0 here as we don't have a real value for the Fan speed or a
         // FanAutoMode simulator.
         // When not Null, SpeedCurrent tracks SpeedSetting's value.
-        SetSpeedCurrent(speedSetting.IsNull() ? 0 : speedSetting.Value());
+        SetSpeedCurrent(speedSetting.ValueOr(0));
         // Determine if the speed change should also change the fan mode
         FanControl::Attributes::FanMode::Set(mEndpoint, SpeedToFanMode(mSpeedCurrent));
         break;
@@ -281,7 +281,7 @@ void ChefFanControlManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpe
 {
     if (aNewSpeedSetting.IsNull())
     {
-        ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: invalid value");
+        ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: null value is invalid");
         return;
     }
 
@@ -298,11 +298,8 @@ void ChefFanControlManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpe
 
 void ChefFanControlManager::Init()
 {
-    DataModel::Nullable<Percent> percentSetting = GetPercentSetting();
-    SetPercentCurrent(percentSetting.IsNull() ? 0 : percentSetting.Value());
-
-    DataModel::Nullable<uint8_t> speedSetting = GetSpeedSetting();
-    SetSpeedCurrent(speedSetting.IsNull() ? 0 : speedSetting.Value());
+    SetPercentCurrent(GetPercentSetting().ValueOr(0));
+    SetSpeedCurrent(GetSpeedSetting().ValueOr(0));
 }
 
 DataModel::Nullable<Percent> ChefFanControlManager::GetPercentSetting()
