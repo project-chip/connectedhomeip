@@ -362,7 +362,7 @@ def python_tests(
                 as_runner(f'out/{target_prefix}-fabric-admin-rpc-ipv6only-clang-boringssl/fabric-admin')}
             FABRIC_BRIDGE_APP: {
                 as_runner(f'out/{target_prefix}-fabric-bridge-rpc-ipv6only-clang-boringssl/fabric-bridge-app')}
-            LIGHTING_APP_NO_UNIQUE_ID: {as_runnter(f'out/{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app')}
+            LIGHTING_APP_NO_UNIQUE_ID: {as_runner(f'out/{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app')}
             TRACE_APP: out/trace_data/app-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_JSON: out/trace_data/test-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_PERFETTO: out/trace_data/test-{{SCRIPT_BASE_NAME}}
