@@ -21,6 +21,8 @@
 #include <commands/common/CHIPCommand.h>
 #include <device_manager/PairingManager.h>
 
+namespace admin {
+
 // Constants
 constexpr uint32_t kCommissionPrepareTimeMs = 500;
 
@@ -136,3 +138,5 @@ private:
 
     CHIP_ERROR RunCommand(chip::EndpointId remoteId);
 };
+
+} // namespace admin
