@@ -50,7 +50,6 @@ namespace SiWxPlatformInterface {
 /**
  * @brief      Required to invoke button press event during sleep as falling edge is not detected
  * @param[in]  none.
- * @return     none.
  * @note       flow is GPIO wakeup due to BTN0 press -> check button state in idle task required as the GPIO interrupt is not
  * detected during sleep for BUTTON RELEASED
  */
@@ -63,7 +62,6 @@ inline void sl_si91x_btn_event_handler()
 /**
  * @brief      Required to enable MATTER shell UART with ICD feature flag
  * @param[in]  none.
- * @return     none.
  * @note       this requires hardware jumping of the GPIO PINs to work with the baseboard.
  */
 void sl_si91x_uart_power_requirement_handler();
