@@ -43,6 +43,7 @@ namespace chip {
 namespace app {
 
 using Status = Protocols::InteractionModel::Status;
+using ClusterStatusCode = Protocols::InteractionModel::ClusterStatusCode;
 
 ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr, Callback & apCallback,
                        InteractionType aInteractionType) :
@@ -1269,6 +1270,15 @@ CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
     {
         ChipLogProgress(DataManagement, "ICD device is inactive, skipping scheduling resubscribe within DefaultResubscribePolicy");
         return CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
+    }
+
+    if (aTerminationCause.IsIMStatus() && ClusterStatusCode(aTerminationCause).GetStatus() == Status::InvalidAction)
+    {
+        // InvalidAction in most cases means some Interaction Model mismatch with the target device
+        // That's not something that could be fixed by retry
+        ChipLogError(DataManagement, "Stop resubscription due to unrecoverable error %" CHIP_ERROR_FORMAT,
+                     aTerminationCause.Format());
+        return aTerminationCause;
     }
 
     VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
