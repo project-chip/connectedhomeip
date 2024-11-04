@@ -51,7 +51,7 @@ public:
 
 private:
     uint8_t mPercentCurrent = 0;
-    uint8_t mSpeedCurrent = 0;
+    uint8_t mSpeedCurrent   = 0;
 
     // Fan Mode Limits
     struct Range
