@@ -10298,24 +10298,24 @@
       command fields:
           MicrowaveOvenControl:
               SetCookingParameters:
-                - wattSettingIndex
+                  - wattSettingIndex
       bitmap values:
           MicrowaveOvenControl:
               Feature:
                   - PowerInWatts
   removed:
-    attributes:
-        OvenMode:
-            - StartUpMode
-            - OnMode
-    commands:
-        OvenCavityOperationalState:
-            - Pause
-            - Resume
-    bitmap values:
-        OvenMode:
-            Feature:
-                - OnOff
-        MicrowaveOvenMode:
-            Feature:
-                - OnOff
+      attributes:
+          OvenMode:
+              - StartUpMode
+              - OnMode
+      commands:
+          OvenCavityOperationalState:
+              - Pause
+              - Resume
+      bitmap values:
+          OvenMode:
+              Feature:
+                  - OnOff
+          MicrowaveOvenMode:
+              Feature:
+                  - OnOff
