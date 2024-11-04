@@ -193,16 +193,16 @@ endif()
 
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     if (CONFIG_COMPRESS_LZMA)
-        # Assuming zephyr.signed.lzma.signed.bin is generated
         add_custom_command(
-            OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_IMAGE_FILE_NAME}
+            OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME}
             COMMAND ${CMAKE_COMMAND} -E true
-            COMMENT "Fake command, zephyr.signed.lzma.signed.bin file will be created in process_binaries targed"
+            COMMENT "Fake command, ${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME} file created in process_binaries target"
+            DEPENDS ${ZEPHYR_FINAL_EXECUTABLE}
         )
     endif()
 
     chip_ota_image(chip-ota-image
-        INPUT_FILES ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_IMAGE_FILE_NAME}
+        INPUT_FILES ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME}
         OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
     )
     add_dependencies(chip-ota-image process_binaries)

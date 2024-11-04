@@ -71,7 +71,7 @@ config CHIP_OTA_IMAGE_BUILD
 	bool
 	default y if CHIP_OTA_REQUESTOR
 
-config SIGNED_IMAGE_FILE_NAME
+config SIGNED_OTA_IMAGE_FILE_NAME
 	string "Zephyr signed image file name"
 	default "zephyr.signed.lzma.signed.bin" if COMPRESS_LZMA
 	default "zephyr.signed.bin"
