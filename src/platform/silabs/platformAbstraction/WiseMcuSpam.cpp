@@ -161,7 +161,8 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
     {
         // if the btn was not pressed and only a release event came, ignore it
         // if the btn was already pressed and another press event came, ignore it
-        VerifyOrReturn(btnAction ^ btn0_pressed);
+        // essentially, if both of them are in the same state then ignore it.
+        VerifyOrReturn(btnAction != btn0_pressed);
 
         if ((btnAction == BUTTON_PRESSED) && (btn0_pressed == false))
         {
