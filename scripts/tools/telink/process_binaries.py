@@ -59,6 +59,7 @@ def merge_binaries(input_file1, input_file2, output_file, offset):
 # Obtain build configuration
 build_conf = BuildConfiguration(os.path.join(os.getcwd(), os.pardir))
 
+
 def compress_lzma_firmware(input_file, output_file):
     # Read the input firmware binary
     with open(input_file, 'rb') as f:
@@ -68,7 +69,7 @@ def compress_lzma_firmware(input_file, output_file):
     lc = 1  # Literal context bits
     lp = 2  # Literal position bits
     pb = 0  # Position bits
-    dict_size = build_conf['CONFIG_COMPRESS_LZMA_DICTIONARY_SIZE'] # dictionary size
+    dict_size = build_conf['CONFIG_COMPRESS_LZMA_DICTIONARY_SIZE']  # dictionary size
 
     # Create the LZMA compressor using the specified parameters
     compressor = lzma.LZMACompressor(
@@ -80,7 +81,7 @@ def compress_lzma_firmware(input_file, output_file):
                 "lc": lc,                 # Literal context bits
                 "lp": lp,                 # Literal position bits
                 "pb": pb,                 # Position bits
-                "mode": lzma.MODE_NORMAL, # Normal compression mode
+                "mode": lzma.MODE_NORMAL,  # Normal compression mode
                 "mf": lzma.MF_BT4,        # Match finder algorithm
                 "depth": 0                # Default match finder depth
             }
@@ -95,6 +96,7 @@ def compress_lzma_firmware(input_file, output_file):
         f.write(compressed_data)
 
     print(f"Compressed {input_file} -> {output_file} (size reduced from {len(firmware_data)} to {len(compressed_data)} bytes)")
+
 
 # Clean up merged.bin from previous build
 if os.path.exists('merged.bin'):
@@ -155,7 +157,8 @@ if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
             raise RuntimeError(f"Error signing the image: {e}")
 
     if build_conf.getboolean('CONFIG_TELINK_OTA_BUTTON_TEST'):
-        merge_binaries('merged.bin', build_conf['CONFIG_SIGNED_OTA_IMAGE_FILE_NAME'], 'merged.bin', build_conf['CONFIG_TELINK_OTA_PARTITION_ADDR'])
+        merge_binaries('merged.bin', build_conf['CONFIG_SIGNED_OTA_IMAGE_FILE_NAME'],
+                       'merged.bin', build_conf['CONFIG_TELINK_OTA_PARTITION_ADDR'])
 
 # Merge Factory Data binary if configured
 if build_conf.getboolean('CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE'):
