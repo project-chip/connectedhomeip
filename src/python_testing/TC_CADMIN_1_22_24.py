@@ -106,7 +106,8 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
             # Since we provided 901 seconds as the timeout duration,
             # we should not be able to open comm window as duration is too long.
             # we are expected receive Failed to open commissioning window: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
-            asserts.assert_equal(e.err,  0x00000585,
+            _INVALID_COMMAND = 0x00000585
+            asserts.assert_equal(e.err,  _INVALID_COMMAND,
                                  "Expected to error as we provided failure value for opening commissioning window")
 
         self.step(6)
