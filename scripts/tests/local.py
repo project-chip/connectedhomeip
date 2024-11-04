@@ -33,6 +33,7 @@ import alive_progress
 import click
 import coloredlogs
 import tabulate
+import yaml
 
 # We compile for the local architecture. Figure out what platform we need
 
@@ -43,12 +44,12 @@ def _get_native_machine_target():
     """
     current_system_info = platform.uname()
     arch = current_system_info.machine
-    if arch == 'x86_64':
-        arch = 'x64'
-    elif arch == 'i386' or arch == 'i686':
-        arch = 'x86'
-    elif arch in ('aarch64', 'aarch64_be', 'armv8b', 'armv8l'):
-        arch = 'arm64'
+    if arch == "x86_64":
+        arch = "x64"
+    elif arch == "i386" or arch == "i686":
+        arch = "x86"
+    elif arch in ("aarch64", "aarch64_be", "armv8b", "armv8l"):
+        arch = "arm64"
 
     return f"{current_system_info.system.lower()}-{arch}"
 
@@ -165,14 +166,17 @@ def _do_build_apps():
         f"{target_prefix}-all-clusters-no-ble-clang-boringssl",
         f"{target_prefix}-bridge-no-ble-clang-boringssl",
         f"{target_prefix}-energy-management-no-ble-clang-boringssl",
+        f"{target_prefix}-fabric-admin-rpc-ipv6only-clang-boringssl",
+        f"{target_prefix}-fabric-bridge-rpc-ipv6only-clang-boringssl",
+        f"{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang",
         f"{target_prefix}-lit-icd-no-ble-clang-boringssl",
         f"{target_prefix}-lock-no-ble-clang-boringssl",
         f"{target_prefix}-microwave-oven-no-ble-clang-boringssl",
+        f"{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl",
         f"{target_prefix}-ota-provider-no-ble-clang-boringssl",
         f"{target_prefix}-ota-requestor-no-ble-clang-boringssl",
         f"{target_prefix}-rvc-no-ble-clang-boringssl",
         f"{target_prefix}-tv-app-no-ble-clang-boringssl",
-        f"{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl",
     ]
 
     cmd = ["./scripts/build/build_examples.py"]
@@ -354,6 +358,11 @@ def python_tests(
             CHIP_RVC_APP: {as_runner(f'out/{target_prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app')}
             NETWORK_MANAGEMENT_APP: {
                 as_runner(f'out/{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl/matter-network-manager-app')}
+            FABRIC_ADMIN_APP: {
+                as_runner(f'out/{target_prefix}-fabric-admin-rpc-ipv6only-clang-boringssl/fabric-admin')}
+            FABRIC_BRIDGE_APP: {
+                as_runner(f'out/{target_prefix}-fabric-bridge-rpc-ipv6only-clang-boringssl/fabric-bridge-app')}
+            LIGHTING_APP_NO_UNIQUE_ID: {as_runner(f'out/{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app')}
             TRACE_APP: out/trace_data/app-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_JSON: out/trace_data/test-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_PERFETTO: out/trace_data/test-{{SCRIPT_BASE_NAME}}
@@ -382,58 +391,11 @@ def python_tests(
     if not os.path.exists("out/trace_data"):
         os.mkdir("out/trace_data")
 
-    # IGNORES are taken out of `src/python_testing/execute_python_tests.py` in the SDK
-    excluded_patterns = {
-        "MinimalRepresentation.py",
-        "TC_CNET_4_4.py",
-        "TC_CCTRL_2_1.py",
-        "TC_CCTRL_2_2.py",
-        "TC_CCTRL_2_3.py",
-        "TC_DGGEN_3_2.py",
-        "TC_EEVSE_Utils.py",
-        "TC_ECOINFO_2_1.py",
-        "TC_ECOINFO_2_2.py",
-        "TC_EWATERHTRBase.py",
-        "TC_EWATERHTR_2_1.py",
-        "TC_EWATERHTR_2_2.py",
-        "TC_EWATERHTR_2_3.py",
-        "TC_EnergyReporting_Utils.py",
-        "TC_OpstateCommon.py",
-        "TC_pics_checker.py",
-        "TC_TMP_2_1.py",
-        "TC_MCORE_FS_1_1.py",
-        "TC_MCORE_FS_1_2.py",
-        "TC_MCORE_FS_1_3.py",
-        "TC_MCORE_FS_1_4.py",
-        "TC_MCORE_FS_1_5.py",
-        "TC_OCC_3_1.py",
-        "TC_OCC_3_2.py",
-        "TC_BRBINFO_4_1.py",
-        "TestCommissioningTimeSync.py",
-        "TestConformanceSupport.py",
-        "TestChoiceConformanceSupport.py",
-        "TC_DEMTestBase.py",
-        "choice_conformance_support.py",
-        "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app.
-        "TestIdChecks.py",
-        "TestSpecParsingDeviceType.py",
-        "TestMatterTestingSupport.py",
-        "TestSpecParsingSupport.py",
-        "TestTimeSyncTrustedTimeSource.py",
-        "basic_composition_support.py",
-        "conformance_support.py",
-        "drlk_2_x_common.py",
-        "execute_python_tests.py",
-        "global_attribute_ids.py",
-        "hello_external_runner.py",
-        "hello_test.py",
-        "matter_testing_support.py",
-        "pics_support.py",
-        "spec_parsing_support.py",
-        "taglist_and_topology_test_support.py",
-        "test_plan_support.py",
-        "test_plan_table_generator.py",
-    }
+    metadata = yaml.full_load(open("src/python_testing/test_metadata.yaml"))
+    excluded_patterns = set([item["name"] for item in metadata["not_automated"]])
+
+    # NOTE: for slow tests. we add logs to not get impatient
+    slow_test_duration = dict([(item["name"], item["duration"]) for item in metadata["slow_tests"]])
 
     if not os.path.isdir("src/python_testing"):
         raise Exception(
@@ -447,31 +409,6 @@ def python_tests(
         test_scripts.append(file)
     test_scripts.append("src/controller/python/test/test_scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
-
-    # NOTE: VERY slow tests. we add logs to not get impatient
-    slow_test_duration = {
-        "mobile-device-test.py": "3 minutes",
-        "TC_AccessChecker.py": "1.5 minutes",
-        "TC_CADMIN_1_9.py": "40 seconds",
-        "TC_CC_2_2.py": "1.5 minutes",
-        "TC_DEM_2_10.py": "40 seconds",
-        "TC_DeviceBasicComposition.py": "25 seconds",
-        "TC_DRLK_2_12.py": "30 seconds",
-        "TC_DRLK_2_3.py": "30 seconds",
-        "TC_EEVSE_2_6.py": "30 seconds",
-        "TC_FAN_3_1.py": "15 seconds",
-        "TC_OPSTATE_2_5.py": "1.25 minutes",
-        "TC_OPSTATE_2_6.py": "35 seconds",
-        "TC_PS_2_3.py": "30 seconds",
-        "TC_RR_1_1.py": "25 seconds",
-        "TC_SWTCH.py": "1 minute",
-        "TC_TIMESYNC_2_10.py": "20 seconds",
-        "TC_TIMESYNC_2_11.py": "30 seconds",
-        "TC_TIMESYNC_2_12.py": "20 seconds",
-        "TC_TIMESYNC_2_7.py": "20 seconds",
-        "TC_TIMESYNC_2_8.py": "1.5 minutes",
-        "TC_ICDM_5_1.py": "TODO",
-    }
 
     execution_times = []
     try:
@@ -698,7 +635,10 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
 
     target_prefix = _get_native_machine_target()
     cmd.extend(
-        ["--chip-tool", f"./out/{target_prefix}-chip-tool-no-ble-clang-boringssl/chip-tool"]
+        [
+            "--chip-tool",
+            f"./out/{target_prefix}-chip-tool-no-ble-clang-boringssl/chip-tool",
+        ]
     )
 
     if target is not None:
