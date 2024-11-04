@@ -18,6 +18,7 @@
 #import <Matter/Matter.h>
 #import <os/lock.h>
 
+#import "MTRAttributeValueWaiter_Internal.h"
 #import "MTRBaseClusters.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCluster.h"
@@ -78,101 +79,6 @@
 #endif
 @end
 
-#pragma mark - MTRAttributeValueWaiter
-
-// Represents the state of a single attribute being waited for: has the path and
-// value being waited for in the response-value and whether the value has been
-// reached.
-MTR_DIRECT_MEMBERS
-@interface MTRAwaitedAttributeState : NSObject
-@property (nonatomic, assign, readwrite) BOOL valueSatisfied;
-@property (nonatomic, retain, readonly) MTRDeviceDataValueDictionary value;
-
-- (instancetype)initWithValue:(MTRDeviceDataValueDictionary)value;
-@end
-
-@implementation MTRAwaitedAttributeState
-- (instancetype)initWithValue:(MTRDeviceDataValueDictionary)value
-{
-    if (self = [super init]) {
-        _valueSatisfied = NO;
-        _value = value;
-    }
-
-    return self;
-}
-@end
-
-// Represents the data passed to waitForAttributeValues:
-MTR_DIRECT_MEMBERS
-@interface MTRAttributeValueWaiter : NSObject
-@property (nonatomic, retain) NSDictionary<MTRAttributePath *, MTRAwaitedAttributeState *> * valueExpectations;
-@property (nonatomic, retain) dispatch_queue_t queue;
-@property (nonatomic) MTRStatusCompletion completion;
-
-@property (nonatomic, readonly) BOOL allValuesSatisfied;
-@property (nonatomic, retain, readwrite, nullable) dispatch_source_t expirationTimer;
-
-- (instancetype)initWithValues:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion;
-
-// Returns YES if after this report the waiter might be done waiting, NO otherwise.
-- (BOOL)attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path byDevice:(MTRDevice *)device;
-
-- (void)cancelTimerIfNeeded;
-
-@end
-
-@implementation MTRAttributeValueWaiter
-- (instancetype)initWithValues:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion
-{
-    if (self = [super init]) {
-        auto * valueExpectations = [NSDictionary dictionaryWithCapacity:values.count];
-        for (MTRAttributePath * path in values) {
-            auto * valueExpectation = [[MTRAwaitedAttributeState alloc] initWithValue:values[path]];
-            valueExpectations[path] = value;
-        }
-        _valueExpectations = valueExpectations;
-        _queue = queue;
-        _completion = completion;
-    }
-
-    return self;
-}
-
-- (BOOL)attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path byDevice:(MTRDevice *)device
-{
-    MTRAwaitedAttributeState * valueExpectation = self.valueExpectations[path];
-    if (!valueExpectation) {
-        // We don't care about this one.
-        return NO;
-    }
-
-    MTRDeviceDataValueDictionary expectedValue = valueExpectation.value;
-    valueExpectation.valueSatisfied = [device _attributeDataValue:value satisfiesValueExpectation:expectedValue];
-    return valueExpectation.valueSatisfied;
-}
-
-- (BOOL)allValuesSatisfied
-{
-    for (MTRAwaitedAttributeState * valueExpectation in [self.valueExpectations allValues]) {
-        if (!valueExpectation.valueSatisfied) {
-            return NO;
-        }
-    }
-
-    return YES;
-}
-
-- (void)cancelTimerIfNeeded
-{
-    if (self.expirationTimer != nil) {
-        dispatch_source_cancel(self.expirationTimer);
-        self.expirationTimer = nil;
-    }
-}
-
-@end
-
 #pragma mark - MTRDevice
 
 // Declaring selector so compiler won't complain about testing and calling it in _handleReportEnd
@@ -192,8 +98,8 @@ MTR_DIRECT_MEMBERS
 #endif
 
 @interface MTRDevice ()
-// nil until the first time we need it.
-@property (nonatomic, readonly, nullable) NSMutableSet<MTRAttributeValueWaiter *> * attributeValueWaiters;
+// nil until the first time we need it.  Access guarded by our lock.
+@property (nonatomic, readwrite, nullable) NSHashTable<MTRAttributeValueWaiter *> * attributeValueWaiters;
 @end
 
 @implementation MTRDevice
@@ -224,6 +130,9 @@ MTR_DIRECT_MEMBERS
 {
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
     MTR_LOG("MTRDevice dealloc: %p", self);
+
+    std::lock_guard lock(_lock);
+    [self _cancelAllAttributeValueWaiters];
 }
 
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -328,6 +237,7 @@ MTR_DIRECT_MEMBERS
     std::lock_guard lock(_lock);
 
     [_delegates removeAllObjects];
+    [self _cancelAllAttributeValueWaiters];
 }
 
 - (BOOL)_delegateExists
@@ -773,7 +683,7 @@ MTR_DIRECT_MEMBERS
     }
 
     for (NSDictionary<NSString *, id> * expectedField in expectedArray) {
-        if (![expectedField isKindOfClass:NSDictionary.class] || ![expectedField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![expectedField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
+        if (!MTR_SAFE_CAST(expectedField, NSDictionary) || !MTR_SAFE_CAST(expectedField[MTRContextTagKey], NSNumber) || !MTR_SAFE_CAST(expectedField[MTRDataKey], NSDictionary)) {
             MTR_LOG_ERROR("%@ expected structure-value contains invalid field %@", self, expectedField);
             return NO;
         }
@@ -784,7 +694,7 @@ MTR_DIRECT_MEMBERS
         // pretty small arrays, so the O(N^2) behavior here is ok.
         BOOL found = NO;
         for (NSDictionary<NSString *, id> * observedField in observedArray) {
-            if (![observedField isKindOfClass:NSDictionary.class] || ![observedField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![observedField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
+            if (!MTR_SAFE_CAST(observedField, NSDictionary) || !MTR_SAFE_CAST(observedField[MTRContextTagKey], NSNumber) || !MTR_SAFE_CAST(observedField[MTRDataKey], NSDictionary)) {
                 MTR_LOG_ERROR("%@ observed structure-value contains invalid field %@", self, observedField);
                 return NO;
             }
@@ -824,14 +734,8 @@ MTR_DIRECT_MEMBERS
 
 #pragma mark - Handling of waits for attribute values
 
-- (void)waitForAttributeValues:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values timeout:(NSTimeInterval)timeout queue:(dispatch_queue_t)queue completion:(void (^)(NSError * _Nullable error))completion
+- (MTRAttributeValueWaiter * _Nullable)waitForAttributeValues:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values timeout:(NSTimeInterval)timeout queue:(dispatch_queue_t)queue completion:(void (^)(NSError * _Nullable error))completion
 {
-    // Check that all the values are in fact attribute response-values.
-    for (MTRDeviceResponseValueDictionary value in values) {
-        MTRVerifyArgumentOrDie(value[MTRAttributePathKey] != nil, @"response-value must have MTRAttributePathKey");
-        MTRVerifyArgumentOrDie(value[MTRDataKey] != nil, @"response-value must have MTRDataKey");
-    }
-
     // Check whether we have all these values already.
     NSMutableArray<MTRAttributeRequestPath *> * requestPaths = [NSMutableArray arrayWithCapacity:values.count];
     for (MTRAttributePath * path in values) {
@@ -841,25 +745,23 @@ MTR_DIRECT_MEMBERS
     NSArray<MTRDeviceResponseValueDictionary> * currentValues = [self readAttributePaths:requestPaths];
 
     std::lock_guard lock(_lock);
-    auto * attributeWaiter = [[MTRAttributeValueWaiter alloc] initWithValues:values queue:queue completion:completion];
+    auto * attributeWaiter = [[MTRAttributeValueWaiter alloc] initWithDevice:self values:values queue:queue completion:completion];
 
     for (MTRDeviceResponseValueDictionary currentValue in currentValues) {
         // Pretend as if this got reported, for purposes of the attribute
         // waiter.
-        [attributeWaiter attributeValue:currentValue[MTRDataKey] reportedForPath:currentValue[MTRAttributePathKey] byDevice:self];
+        [attributeWaiter _attributeValue:currentValue[MTRDataKey] reportedForPath:currentValue[MTRAttributePathKey] byDevice:self];
     }
 
     if (attributeWaiter.allValuesSatisfied) {
         MTR_LOG("%@ waitForAttributeValues no need to wait, values already match: %@", self, values);
-        dispatch_async(queue, ^{
-            completion(nil);
-        });
-        return;
+        [attributeWaiter _notifyWithError:nil];
+        return attributeWaiter;
     }
 
     // Otherwise, wait for the values to arrive or our timeout.
     if (!self.attributeValueWaiters) {
-        _attributeValueWaiters = [NSMutableSet set];
+        self.attributeValueWaiters = [NSHashTable weakObjectsHashTable];
     }
     [self.attributeValueWaiters addObject:attributeWaiter];
 
@@ -890,6 +792,7 @@ MTR_DIRECT_MEMBERS
     });
 
     dispatch_resume(timerSource);
+    return attributeWaiter;
 }
 
 - (void)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path
@@ -897,53 +800,55 @@ MTR_DIRECT_MEMBERS
     os_unfair_lock_assert_owner(&_lock);
 
     // Check whether anyone was waiting for this attribute.
-    NSMutableSet * satisfiedWaiters = [NSMutableSet set];
+    NSHashTable * satisfiedWaiters = [NSHashTable weakObjectsHashTable];
     for (MTRAttributeValueWaiter * attributeValueWaiter in self.attributeValueWaiters) {
-        if ([attributeValueWaiter attributeValue:value reportedForPath:path byDevice:self] && attributeValueWaiter.allValuesSatisfied) {
+        if ([attributeValueWaiter _attributeValue:value reportedForPath:path byDevice:self] && attributeValueWaiter.allValuesSatisfied) {
             [satisfiedWaiters addObject:attributeValueWaiter];
         }
     }
 
-    [self.attributeValueWaiters minusSet:satisfiedWaiters];
+    [self.attributeValueWaiters minusHashTable:satisfiedWaiters];
     for (MTRAttributeValueWaiter * attributeValueWaiter in satisfiedWaiters) {
-            [self _handleAttributeWaitComplete:attributeValueWaiter];
+        [self _notifyAttributeValueWaiter:attributeValueWaiter withError:nil];
     }
-}
-
-- (void)_handleAttributeWaitComplete:(MTRAttributeValueWaiter *)attributeValueWaiter
-{
-    os_unfair_lock_assert_owner(&_lock);
-
-    MTR_LOG("%@ wait for attribute values complete: %@", self, attributeValueWaiter.valueExpectations);
-
-    [self _notifyAttributeValueWaiter:attributeValueWaiter withError:nil];
 }
 
 - (void)_attributeWaitTimedOut:(MTRAttributeValueWaiter *)attributeValueWaiter
 {
     std::lock_guard lock(_lock);
-
-    if (![self.attributeValueWaiters containsObject:attributeValueWaiter]) {
-        // Nothing to do here anymore.
-        [attributeValueWaiter cancelTimerIfNeeded];
-        return;
-    }
-
-    MTR_LOG("%@ wait for attribute values timed out: %@", self, attributeValueWaiter.valueExpectations);
-
     [self _notifyAttributeValueWaiter:attributeValueWaiter withError:[MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT]];
+}
+
+- (void)_attributeWaitCanceled:(MTRAttributeValueWaiter *)attributeValueWaiter
+{
+    std::lock_guard lock(_lock);
+    [self _doAttributeWaitCanceled:attributeValueWaiter];
+}
+
+- (void)_doAttributeWaitCanceled:(MTRAttributeValueWaiter *)attributeValueWaiter
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    [self _notifyAttributeValueWaiter:attributeValueWaiter withError:[MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]];
 }
 
 - (void)_notifyAttributeValueWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter withError:(NSError * _Nullable)error
 {
-    [attributeValueWaiter cancelTimerIfNeeded];
+    os_unfair_lock_assert_owner(&_lock);
 
     [self.attributeValueWaiters removeObject:attributeValueWaiter];
+    [attributeValueWaiter _notifyWithError:error];
+}
 
-    auto completion = attributeValueWaiter.completion;
-    dispatch_async(attributeValueWaiter.queue, ^{
-        completion(error);
-    });
+- (void)_cancelAllAttributeValueWaiters
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    auto * attributeValueWaiters = self.attributeValueWaiters;
+    self.attributeValueWaiters = nil;
+    for (MTRAttributeValueWaiter * attributeValueWaiter in attributeValueWaiters) {
+        [self _doAttributeWaitCanceled:attributeValueWaiter];
+    }
 }
 
 @end

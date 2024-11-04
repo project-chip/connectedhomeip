@@ -16,6 +16,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRAttributeValueWaiter.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
 
@@ -340,20 +341,26 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 /**
  * Wait until a set of attributes reaches certain values or the provided timeout
- * (if any) is reached.  The completion is called at that point, with an error
- * if a timeout occurred.
+ * (if any) is reached.  The completion is called at that point, with an
+ * MTREErrorCodeTimeout error if a timeout occurred.
  *
- * The completion is also called with an error on input errors.
+ * If the MTRAttributeValueWaiter is canceled or is destroyed before the
+ * completion is called, the completion will be called with an
+ * MTRErrorCodeCancelled error.
  *
  * The attributes and values to wait for are represented as a dictionary which
  * has the attribute paths as keys and the expected data-values as values.
  *
- * If the provided timeout is larger than 5 minutes, it will be capped to 5 minutes.
+ * If the provided timeout is larger than 5 minutes, it will be capped to 5
+ * minutes.
+ *
+ * Nil will be returned if for some reason the wait could not be started
+ * (e.g. invalid input).
  */
-- (void)waitForAttributeValues:(NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)values
-                       timeout:(NSTimeInterval)timeout
-                         queue:(dispatch_queue_t)queue
-                    completion:(void (^)(NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+- (MTRAttributeValueWaiter * _Nullable)waitForAttributeValues:(NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)values
+                                                      timeout:(NSTimeInterval)timeout
+                                                        queue:(dispatch_queue_t)queue
+                                                   completion:(void (^)(NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 @end
 

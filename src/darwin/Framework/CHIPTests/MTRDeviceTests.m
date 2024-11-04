@@ -1589,29 +1589,32 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Some quick tests for waitForAttributeValues.  First, values that we know
     // are already there:
     XCTestExpectation * deviceTypesWaitExpectation = [self expectationWithDescription:@"deviceTypes is already the value we expect"];
-    [device waitForAttributeValues:deviceTypes timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+    __auto_type * deviceTypesToWaitFor = [NSMutableDictionary dictionary];
+    for (NSDictionary<NSString *, id> * deviceTypesValue in deviceTypes) {
+        deviceTypesToWaitFor[deviceTypesValue[MTRAttributePathKey]] = deviceTypesValue[MTRDataKey];
+    }
+    __auto_type * waiter1 = [device waitForAttributeValues:deviceTypesToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [deviceTypesWaitExpectation fulfill];
     }];
+    (void) waiter1; // Just there to keep it alive
     [self waitForExpectations:@[ deviceTypesWaitExpectation ] timeout:kTimeoutInSeconds];
 
     // Now values that we know will never be there (the type is wrong).
-    __auto_type * bogusDeviceTypes = @[
-        @{
-            MTRAttributePathKey : deviceTypes[0][MTRAttributePathKey],
-            MTRDataKey : @ {
-                MTRTypeKey : MTROctetStringValueType,
-                MTRValueKey : @"abc",
-            },
+    __auto_type * bogusDeviceType = @{
+        deviceTypes[0][MTRAttributePathKey] : @ {
+            MTRTypeKey : MTROctetStringValueType,
+            MTRValueKey : @"abc",
         },
-    ];
+    };
     XCTestExpectation * bogusDeviceTypesWaitExpectation = [self expectationWithDescription:@"bogusDeviceTypes wait should time out"];
-    [device waitForAttributeValues:bogusDeviceTypes timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
+    __auto_type * waiter2 = [device waitForAttributeValues:bogusDeviceType timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, MTRErrorDomain);
         XCTAssertEqual(error.code, MTRErrorCodeTimeout);
         [bogusDeviceTypesWaitExpectation fulfill];
     }];
+    (void) waiter2; // Just there to keep it alive
     [self waitForExpectations:@[ bogusDeviceTypesWaitExpectation ] timeout:kTimeoutInSeconds];
 
     // Before resubscribe, first test write failure and expected value effects
@@ -1642,19 +1645,18 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Also test that waitForAttributeValues does not pick up the transition to
     // the expected value.
     XCTestExpectation * nonexistentAttributeValueWaitExpectation = [self expectationWithDescription:@"waiting for a value for an attribute that does not exist should time out"];
-    [device waitForAttributeValues:@[
-        @{
-            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID],
-            MTRDataKey : writeValue,
-        }
-    ]
-                           timeout:0.5
-                             queue:queue completion:^(NSError * _Nullable error) {
-                                 XCTAssertNotNil(error);
-                                 XCTAssertEqual(error.domain, MTRErrorDomain);
-                                 XCTAssertEqual(error.code, MTRErrorCodeTimeout);
-                                 [nonexistentAttributeValueWaitExpectation fulfill];
-                             }];
+    __auto_type * waiter3 = [device waitForAttributeValues:@{
+        [MTRAttributePath attributePathWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID] : writeValue,
+    }
+                                                   timeout:0.5
+                                                     queue:queue
+                                                completion:^(NSError * _Nullable error) {
+                                                    XCTAssertNotNil(error);
+                                                    XCTAssertEqual(error.domain, MTRErrorDomain);
+                                                    XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+                                                    [nonexistentAttributeValueWaitExpectation fulfill];
+                                                }];
+    (void) waiter3; // Just there to keep it alive
 
     [device writeAttributeWithEndpointID:testEndpointID
                                clusterID:testClusterID
@@ -1703,30 +1705,57 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Also set up a few attribute value waits to see what happens.
     __auto_type * onTimeValueToWaitFor = @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID)
-                                                                attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)],
-        MTRDataKey : writeOnTimeValue,
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID)
+                                          attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)] : writeOnTimeValue,
     };
 
     XCTestExpectation * waitingForOnTimeValue1Expectation = [self expectationWithDescription:@"OnTime value is now the expected value"];
-    [device waitForAttributeValues:@[ onTimeValueToWaitFor ] timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+    __auto_type * waiter4 = [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [waitingForOnTimeValue1Expectation fulfill];
     }];
+    (void) waiter4; // Just there to keep it alive
 
     XCTestExpectation * waitingForOnTimeValue2Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is the expected value"];
-    [device waitForAttributeValues:@[ onTimeValueToWaitFor, deviceTypes[0] ] timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+    __auto_type * onTimeAndDeviceTypeValuesToWaitFor = [NSMutableDictionary dictionaryWithDictionary:onTimeValueToWaitFor];
+    onTimeAndDeviceTypeValuesToWaitFor[deviceTypes[0][MTRAttributePathKey]] = deviceTypes[0][MTRDataKey];
+
+    __auto_type * waiter5 = [device waitForAttributeValues:onTimeAndDeviceTypeValuesToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [waitingForOnTimeValue2Expectation fulfill];
     }];
+    (void) waiter5; // Just there to keep it alive
 
     XCTestExpectation * waitingForOnTimeValue3Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is bogus, or we timed out"];
-    [device waitForAttributeValues:@[ onTimeValueToWaitFor, bogusDeviceTypes[0] ] timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
+    __auto_type * onTimeAndBogusDeviceTypeValuesToWaitFor = [NSMutableDictionary dictionaryWithDictionary:onTimeValueToWaitFor];
+    [onTimeAndBogusDeviceTypeValuesToWaitFor addEntriesFromDictionary:bogusDeviceType];
+    __auto_type * waiter6 = [device waitForAttributeValues:onTimeAndBogusDeviceTypeValuesToWaitFor timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, MTRErrorDomain);
         XCTAssertEqual(error.code, MTRErrorCodeTimeout);
         [waitingForOnTimeValue3Expectation fulfill];
     }];
+    (void) waiter6; // Just there to keep it alive
+
+    XCTestExpectation * waitingForOnTimeValue4Expectation = [self expectationWithDescription:@"Waiter should have been canceled"];
+    __auto_type * waiter7 = [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeCancelled);
+        [waitingForOnTimeValue4Expectation fulfill];
+    }];
+    [waiter7 cancel];
+
+    XCTestExpectation * waitingForOnTimeValue5Expectation = [self expectationWithDescription:@"Waiter should have been canceled due to being destroyed"];
+    @autoreleasepool {
+        // To force the waiter created here to die quickly.
+        [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+            XCTAssertNotNil(error);
+            XCTAssertEqual(error.domain, MTRErrorDomain);
+            XCTAssertEqual(error.code, MTRErrorCodeCancelled);
+            [waitingForOnTimeValue5Expectation fulfill];
+        }];
+    }
 
     [device writeAttributeWithEndpointID:@(1)
                                clusterID:@(MTRClusterIDTypeOnOffID)
@@ -1741,6 +1770,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         waitingForOnTimeValue1Expectation,
         waitingForOnTimeValue2Expectation,
         waitingForOnTimeValue3Expectation,
+        waitingForOnTimeValue4Expectation,
+        waitingForOnTimeValue5Expectation,
     ]
                       timeout:10];
 

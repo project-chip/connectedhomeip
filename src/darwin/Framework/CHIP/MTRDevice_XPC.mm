@@ -168,13 +168,13 @@
 
     std::lock_guard lock(_lock);
     for (NSDictionary<NSString *, id> * report in attributeReport) {
-        if (![report isKindOfClass:NSDictionary.class]) {
+        if (!MTR_SAFE_CAST(report, NSDictionary)) {
             MTR_LOG_ERROR("%@ handed a response-value that is not a dictionary: %@", self, report);
             continue;
         }
 
         MTRAttributePath * path = report[MTRAttributePathKey];
-        if (![path isKindOfClass:MTRAttributePath.class]) {
+        if (!MTR_SAFE_CAST(path, MTRAttributePath)) {
             MTR_LOG_ERROR("%@ no valid path for attribute report %@", self, report);
             continue;
         }
@@ -185,7 +185,7 @@
             continue;
         }
 
-        if (![value isKindOfClass:NSDictionary.class]) {
+        if (!MTR_SAFE_CAST(value, NSDictionary)) {
             MTR_LOG_ERROR("%@ invalid data-value reported: %@", self, report);
             continue;
         }

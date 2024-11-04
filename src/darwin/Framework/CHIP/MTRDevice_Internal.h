@@ -169,7 +169,14 @@ MTR_DIRECT_MEMBERS
 - (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)observed satisfiesValueExpectation:(MTRDeviceDataValueDictionary)expected;
 
 // Hook for subclasses to notify us that an attribute value has been reported.
+//
+// For the MTRDevice_Concrete case this will be an actual reported value from
+// the device. For the MTRDevice_XPC case, this might be an expected, not
+// actual, value that is getting reported to us, if something sets up an
+// expected value for the relevant attribute.
 - (void)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path;
+
+- (void)_attributeWaitCanceled:(MTRAttributeValueWaiter *)attributeValueWaiter;
 
 @end
 
