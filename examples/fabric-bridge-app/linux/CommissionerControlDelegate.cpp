@@ -186,13 +186,13 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const Commissioning
     VerifyOrReturnError(mNextStep == Step::kStartCommissionNode, CHIP_ERROR_INCORRECT_STATE);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    err = CommissionNode(Controller::CommissioningWindowPasscodeParams()
-                             .SetSetupPIN(kSetupPinCode)
-                             .SetTimeout(params.commissioningTimeout)
-                             .SetDiscriminator(params.discriminator)
-                             .SetIteration(params.iterations)
-                             .SetSalt(params.salt),
-                         mVendorId, mProductId);
+    err = bridge::CommissionNode(Controller::CommissioningWindowPasscodeParams()
+                                     .SetSetupPIN(kSetupPinCode)
+                                     .SetTimeout(params.commissioningTimeout)
+                                     .SetDiscriminator(params.discriminator)
+                                     .SetIteration(params.iterations)
+                                     .SetSalt(params.salt),
+                                 mVendorId, mProductId);
 #else
     ChipLogProgress(NotSpecified, "Failed to reverse commission bridge: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
     err = CHIP_ERROR_NOT_IMPLEMENTED;
@@ -208,6 +208,8 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const Commissioning
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+namespace bridge {
 
 CHIP_ERROR CommissionerControlInit()
 {
@@ -262,3 +264,5 @@ CHIP_ERROR CommissionerControlShutdown()
 
     return CHIP_NO_ERROR;
 }
+
+} // namespace bridge
