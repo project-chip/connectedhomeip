@@ -2611,10 +2611,10 @@ void TestReadInteraction::TestSubscribeWildcard()
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mEventPathParamsListSize = 0;
 
-    std::unique_ptr<chip::app::AttributePathParams[]> attributePathParams(new chip::app::AttributePathParams[2]);
-    // Subscribe to full wildcard paths, repeat twice to ensure chunking.
-    readPrepareParams.mpAttributePathParamsList    = attributePathParams.get();
     readPrepareParams.mAttributePathParamsListSize = 2;
+    auto attributePathParams = std::make_unique<chip::app::AttributePathParams[]>(readPrepareParams.mAttributePathParamsListSize);
+    // Subscribe to full wildcard paths, repeat twice to ensure chunking.
+    readPrepareParams.mpAttributePathParamsList = attributePathParams.get();
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 1;
@@ -2745,11 +2745,11 @@ void TestReadInteraction::TestSubscribePartialOverlap()
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mEventPathParamsListSize = 0;
 
-    std::unique_ptr<chip::app::AttributePathParams[]> attributePathParams(new chip::app::AttributePathParams[2]);
-    attributePathParams[0].mClusterId              = chip::Test::MockClusterId(3);
-    attributePathParams[0].mAttributeId            = chip::Test::MockAttributeId(1);
-    readPrepareParams.mpAttributePathParamsList    = attributePathParams.get();
     readPrepareParams.mAttributePathParamsListSize = 1;
+    auto attributePathParams = std::make_unique<chip::app::AttributePathParams[]>(readPrepareParams.mAttributePathParamsListSize);
+    attributePathParams[0].mClusterId           = chip::Test::MockClusterId(3);
+    attributePathParams[0].mAttributeId         = chip::Test::MockAttributeId(1);
+    readPrepareParams.mpAttributePathParamsList = attributePathParams.get();
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 1;
@@ -2817,12 +2817,12 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap()
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mEventPathParamsListSize = 0;
 
-    std::unique_ptr<chip::app::AttributePathParams[]> attributePathParams(new chip::app::AttributePathParams[1]);
-    attributePathParams[0].mClusterId              = chip::Test::kMockEndpoint2;
-    attributePathParams[0].mClusterId              = chip::Test::MockClusterId(3);
-    attributePathParams[0].mAttributeId            = chip::Test::MockAttributeId(1);
-    readPrepareParams.mpAttributePathParamsList    = attributePathParams.get();
     readPrepareParams.mAttributePathParamsListSize = 1;
+    auto attributePathParams = std::make_unique<chip::app::AttributePathParams[]>(readPrepareParams.mAttributePathParamsListSize);
+    attributePathParams[0].mEndpointId          = chip::Test::kMockEndpoint2;
+    attributePathParams[0].mClusterId           = chip::Test::MockClusterId(3);
+    attributePathParams[0].mAttributeId         = chip::Test::MockAttributeId(1);
+    readPrepareParams.mpAttributePathParamsList = attributePathParams.get();
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 1;
@@ -4799,12 +4799,13 @@ void TestReadInteraction::TestSubscribeInvalidateFabric()
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
-    readPrepareParams.mpAttributePathParamsList    = new chip::app::AttributePathParams[1];
-    readPrepareParams.mAttributePathParamsListSize = 1;
 
-    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = chip::Test::kMockEndpoint3;
-    readPrepareParams.mpAttributePathParamsList[0].mClusterId   = chip::Test::MockClusterId(2);
-    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = chip::Test::MockAttributeId(1);
+    readPrepareParams.mAttributePathParamsListSize = 1;
+    auto attributePathParams = std::make_unique<chip::app::AttributePathParams[]>(readPrepareParams.mAttributePathParamsListSize);
+    attributePathParams[0].mEndpointId          = chip::Test::kMockEndpoint3;
+    attributePathParams[0].mClusterId           = chip::Test::MockClusterId(2);
+    attributePathParams[0].mAttributeId         = chip::Test::MockAttributeId(1);
+    readPrepareParams.mpAttributePathParamsList = attributePathParams.get();
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 0;
@@ -4815,6 +4816,7 @@ void TestReadInteraction::TestSubscribeInvalidateFabric()
 
         delegate.mGotReport = false;
 
+        attributePathParams.release();
         EXPECT_EQ(readClient.SendAutoResubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
 
         DrainAndServiceIO();
@@ -4856,12 +4858,13 @@ void TestReadInteraction::TestShutdownSubscription()
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
-    readPrepareParams.mpAttributePathParamsList    = new chip::app::AttributePathParams[1];
-    readPrepareParams.mAttributePathParamsListSize = 1;
 
-    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = chip::Test::kMockEndpoint3;
-    readPrepareParams.mpAttributePathParamsList[0].mClusterId   = chip::Test::MockClusterId(2);
-    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = chip::Test::MockAttributeId(1);
+    readPrepareParams.mAttributePathParamsListSize = 1;
+    auto attributePathParams = std::make_unique<chip::app::AttributePathParams[]>(readPrepareParams.mAttributePathParamsListSize);
+    attributePathParams[0].mEndpointId          = chip::Test::kMockEndpoint3;
+    attributePathParams[0].mClusterId           = chip::Test::MockClusterId(2);
+    attributePathParams[0].mAttributeId         = chip::Test::MockAttributeId(1);
+    readPrepareParams.mpAttributePathParamsList = attributePathParams.get();
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 0;
@@ -4872,6 +4875,7 @@ void TestReadInteraction::TestShutdownSubscription()
 
         delegate.mGotReport = false;
 
+        attributePathParams.release();
         EXPECT_EQ(readClient.SendAutoResubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
 
         DrainAndServiceIO();
