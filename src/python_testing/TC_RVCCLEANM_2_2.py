@@ -112,6 +112,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
             app_pid = self.matter_test_config.app_pid
             if app_pid == 0:
                 asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
+            self.app_pipe = self.app_pipe + str(app_pid)
 
         self.print_step(1, "Commissioning, already done")
 
