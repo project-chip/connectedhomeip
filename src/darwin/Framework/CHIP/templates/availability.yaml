@@ -10081,7 +10081,7 @@
 - release: "Future"
   versions: "future"
   introduced:
-      device types:
+      clusters:
           - MicrowaveOvenControl
           - MicrowaveOvenMode
           - OvenMode
@@ -10134,10 +10134,16 @@
           MicrowaveOvenControl:
               - SetCookingParameters
               - AddMoreTime
+          MicrowaveOvenMode:
+              - ChangeToMode
+              - ChangeToModeResponse
           OvenCavityOperationalState:
               - Stop
               - Start
               - OperationalCommandResponse
+          OvenMode:
+              - ChangeToMode
+              - ChangeToModeResponse
       command fields:
           MicrowaveOvenControl:
               SetCookingParameters:
@@ -10216,10 +10222,34 @@
       enum values:
           MicrowaveOvenMode:
               ModeTag:
+                  # generic mode tags
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  # MicrowaveOvenMode-specific tags
                   - Normal
                   - Defrost
           OvenMode:
               ModeTag:
+                  # generic mode tags
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  # OvenMode-specific tags
                   - Bake
                   - Convection
                   - Grill
@@ -10267,8 +10297,25 @@
               - SelectedWattIndex
       command fields:
           MicrowaveOvenControl:
-              - wattSettingIndex
-      bitmapValues:
+              SetCookingParameters:
+                - wattSettingIndex
+      bitmap values:
           MicrowaveOvenControl:
               Feature:
                   - PowerInWatts
+  removed:
+    attributes:
+        OvenMode:
+            - StartUpMode
+            - OnMode
+    commands:
+        OvenCavityOperationalState:
+            - Pause
+            - Resume
+    bitmap values:
+        OvenMode:
+            Feature:
+                - OnOff
+        MicrowaveOvenMode:
+            Feature:
+                - OnOff
