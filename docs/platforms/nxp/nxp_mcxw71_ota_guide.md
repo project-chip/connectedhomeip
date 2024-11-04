@@ -61,7 +61,7 @@ version.
 A user can update the factory data through OTA, at the same time the application
 firmware is updated by enabling the following processor in the `gn args`:
 
--   `chip_enable_ota_factory_data_processor=1` to enable default factory data
+-   `nxp_enable_ota_factory_data_processor=true` to enable default factory data
     update processor (disabled by default).
 
 The OTA image used must be updated to include the new factory data.

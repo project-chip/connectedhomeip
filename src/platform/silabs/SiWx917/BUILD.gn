@@ -103,7 +103,6 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
     "${silabs_platform_dir}/wifi/wfx_host_events.h",
     "wifi/wfx_msgs.h",
-    "wifi/wifi_config.h",
   ]
   public_configs = [ ":siwx917-platform-wifi-config" ]
 }

@@ -64,6 +64,9 @@ gcc_toolchain("chip_pw_fuzztest") {
     dir_pw_third_party_fuzztest = "//third_party/fuzztest"
     dir_pw_third_party_googletest = "$dir_googletest"
 
+    # Since pw_fuzzer uses GoogleTest, activating this allows us to benefit from supporting functions
+    chip_build_tests_googletest = true
+
     # TODO: Seems that re2 support within FuzzTest was deprecated, keeping it defined is triggering warning
     # Remove if re2 is indeed not needed
     # dir_pw_third_party_re2 = "//third_party/re2/src"

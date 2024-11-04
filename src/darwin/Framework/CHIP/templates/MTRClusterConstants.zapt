@@ -236,4 +236,4 @@ typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
   MTRDeviceTypeIDType{{asUpperCamelCase caption preserveAcronyms=true}}ID {{availability "" deviceType=(asUpperCamelCase caption preserveAcronyms=true)}} = {{asHex code 8}},
   {{/if}}
   {{/zcl_device_types}}
-} MTR_NEWLY_AVAILABLE;
+} MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));

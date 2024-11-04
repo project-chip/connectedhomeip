@@ -23,7 +23,7 @@
 #include "BridgedDeviceBasicInformationImpl.h"
 #include "BridgedDeviceManager.h"
 #include "CommissionableInit.h"
-#include "CommissionerControl.h"
+#include "CommissionerControlDelegate.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -35,6 +35,12 @@
 #include "RpcServer.h"
 #endif
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::AdministratorCommissioning;
+using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
+
 // This is declared here and not in a header because zap/embr assumes all clusters
 // are defined in a static endpoint in the .zap file. From there, the codegen will
 // automatically use PluginApplicationCallbacksHeader.jinja to declare and call
@@ -42,12 +48,6 @@
 // ever on a dynamic endpoint, this doesn't get declared and called for us, so we
 // need to declare and call it ourselves where the application is initialized.
 void MatterEcosystemInformationPluginServerInitCallback();
-
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::AdministratorCommissioning;
-using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 
 namespace {
 
@@ -57,8 +57,6 @@ constexpr uint16_t kRetryIntervalS = 3;
 
 uint16_t gFabricAdminServerPort = 33001;
 uint16_t gLocalServerPort       = 33002;
-
-BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 
 constexpr uint16_t kOptionFabricAdminServerPortNumber = 0xFF01;
 constexpr uint16_t kOptionLocalServerPortNumber       = 0xFF02;
@@ -239,6 +237,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
 }
 
 BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
+BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 

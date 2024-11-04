@@ -171,7 +171,7 @@ source_set("app-test-stubs") {
     "test-ember-api.cpp",
     "test-ember-api.h",
 
-    # The overrides in these files are overrides from ember-compatibility-functions
+    # The overrides in these files are overrides from ember generated code
     # and the data model interface is NOT aware of such functionality
     #
     # TODO: ideally tests should have been written via mock ember, however mock ember did
