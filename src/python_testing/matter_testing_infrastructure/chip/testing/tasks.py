@@ -123,7 +123,7 @@ class Subprocess(threading.Thread):
                 # hang on the join call in our thread entry point in case of
                 # Python process termination (not-caught exception).
                 self.p.terminate()
-                raise TimeoutError("Expected output not found")
+                raise TimeoutError("Expected output '%r' not found within %s seconds" % (expected_output, timeout))
             self.expected_output = None
 
     def send(self, message: str, end: str = "\n",
