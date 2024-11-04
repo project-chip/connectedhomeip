@@ -65,7 +65,8 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
     return out_signature;
 }
 
-- (void)_populatePublicKeyIfNecessary {
+- (void)_populatePublicKeyIfNecessary
+{
     if (_mPublicKey == nil) {
         chip::Crypto::P256PublicKey publicKey = _mKeyPair.Pubkey();
         NSData * publicKeyNSData = [NSData dataWithBytes:publicKey.Bytes() length:publicKey.Length()];
