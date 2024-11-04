@@ -16,10 +16,10 @@
 # limitations under the License.
 #
 
+import lzma
 import os
 import subprocess
 import sys
-import lzma
 
 ZEPHYR_BASE = os.environ.get('ZEPHYR_BASE')
 if ZEPHYR_BASE is None:
