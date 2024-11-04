@@ -1587,7 +1587,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
     uint8_t is_active                             = 1;
     unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS;
-    unsigned int freq                             = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
+    unsigned int freq                             = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
     unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
     struct PAFPublishSSI PafPublish_ssi;
 
@@ -1623,7 +1623,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
     args = g_variant_builder_end(&builder);
     wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface, args, &subscribe_id, nullptr, &err.GetReceiver());
 
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%d]", subscribe_id);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%d], freq: %u", subscribe_id, freq);
     mpresubscribe_id        = subscribe_id;
     mOnPafSubscribeComplete = onSuccess;
     mOnPafSubscribeError    = onError;
