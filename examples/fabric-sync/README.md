@@ -83,12 +83,42 @@ defined:
     ### For Linux host example:
 
     ```
-    ./scripts/examples/gn_build_example.sh examples/fabric-sync out/debug/standalone
+    source scripts/activate.sh
+    ./scripts/build/build_examples.py --target linux-x64-fabric-sync-no-ble build
     ```
 
     ### For Raspberry Pi 4 example:
 
-    TODO
+    Pull Docker Images
+
+    ```
+    docker pull ghcr.io/project-chip/chip-build-crosscompile:81
+    ```
+
+    Run docker
+
+    ```
+    docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:81 /bin/bash
+    ```
+
+    Build
+
+    ```
+    cd /var/connectedhomeip
+
+    git config --global --add safe.directory /var/connectedhomeip
+
+    ./scripts/run_in_build_env.sh \
+     "./scripts/build/build_examples.py \
+        --target linux-arm64-fabric-sync-no-ble-clang \
+        build"
+    ```
+
+    Transfer the fabric-bridge-app binary to a Raspberry Pi
+
+    ```
+    scp ./fabric-sync ubuntu@xxx.xxx.xxx.xxx:/home/ubuntu
+    ```
 
 ## Running the Complete Example on Ubuntu
 

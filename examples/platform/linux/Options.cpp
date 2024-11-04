@@ -46,6 +46,10 @@
 #include <system/SystemFaultInjection.h>
 #endif
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#include <messaging/ReliableMessageProtocolConfig.h>
+#endif
+
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Platform;
@@ -112,6 +116,9 @@ enum
     kDeviceOption_WiFiSupports5g,
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     kDeviceOption_SubscriptionResumptionRetryIntervalSec,
+    kDeviceOption_IdleRetransmitTimeout,
+    kDeviceOption_ActiveRetransmitTimeout,
+    kDeviceOption_ActiveThresholdTime,
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     kDeviceOption_FaultInjection,
@@ -187,6 +194,9 @@ OptionDef sDeviceOptionDefs[] = {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     { "subscription-capacity", kArgumentRequired, kDeviceOption_SubscriptionCapacity },
     { "subscription-resumption-retry-interval", kArgumentRequired, kDeviceOption_SubscriptionResumptionRetryIntervalSec },
+    { "idle-retransmit-timeout", kArgumentRequired, kDeviceOption_IdleRetransmitTimeout },
+    { "active-retransmit-timeout", kArgumentRequired, kDeviceOption_ActiveRetransmitTimeout },
+    { "active-threshold-time", kArgumentRequired, kDeviceOption_ActiveThresholdTime },
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
@@ -335,6 +345,19 @@ const char * sDeviceOptionHelp =
     "       Max number of subscriptions the device will allow\n"
     "  --subscription-resumption-retry-interval\n"
     "       subscription timeout resumption retry interval in seconds\n"
+    "  --idle-retransmit-timeout <timeout>\n"
+    "      Sets the MRP idle retry interval (in milliseconds).\n"
+    "      This interval is used by the peer to calculate the retransmission timeout when the current device is considered idle.\n"
+    "\n"
+    "  --active-retransmit-timeout <timeout>\n"
+    "      Sets the MRP active retry interval (in milliseconds).\n"
+    "      This interval is used by the peer to calculate the retransmission timeout when the current device is considered "
+    "active.\n"
+    "\n"
+    "  --active-threshold-time <time>\n"
+    "      Sets the MRP active threshold (in milliseconds).\n"
+    "      Specifies the time after which the device transitions from active to idle.\n"
+    "\n"
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     "  --faults <fault-string,...>\n"
@@ -663,6 +686,32 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_SubscriptionResumptionRetryIntervalSec:
         LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec = static_cast<int32_t>(atoi(aValue));
         break;
+    case kDeviceOption_IdleRetransmitTimeout: {
+        auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+        auto idleRetransTimeout   = System::Clock::Milliseconds32(static_cast<uint32_t>(strtoul(aValue, nullptr, 0)));
+        auto activeRetransTimeout = mrpConfig.mActiveRetransTimeout;
+        auto activeThresholdTime  = mrpConfig.mActiveThresholdTime;
+        OverrideLocalMRPConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
+        break;
+    }
+
+    case kDeviceOption_ActiveRetransmitTimeout: {
+        auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+        auto idleRetransTimeout   = mrpConfig.mIdleRetransTimeout;
+        auto activeRetransTimeout = System::Clock::Milliseconds32(static_cast<uint32_t>(strtoul(aValue, nullptr, 0)));
+        auto activeThresholdTime  = mrpConfig.mActiveThresholdTime;
+        OverrideLocalMRPConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
+        break;
+    }
+
+    case kDeviceOption_ActiveThresholdTime: {
+        auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+        auto idleRetransTimeout   = mrpConfig.mIdleRetransTimeout;
+        auto activeRetransTimeout = mrpConfig.mActiveRetransTimeout;
+        auto activeThresholdTime  = System::Clock::Milliseconds16(static_cast<uint16_t>(strtoul(aValue, nullptr, 0)));
+        OverrideLocalMRPConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
+        break;
+    }
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     case kDeviceOption_FaultInjection: {

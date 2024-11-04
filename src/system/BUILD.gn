@@ -177,7 +177,7 @@ source_set("system_config_header") {
       public_deps += [ "${lwip_root}:lwip" ]
     } else {
       if (chip_device_platform == "efr32") {
-        public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
+        public_deps += [ "${silabs_sdk_build_root}:silabs_sdk" ]
       }
       if (chip_device_platform == "qpg") {
         public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]

@@ -29,6 +29,11 @@
 #include <platform/silabs/MigrationManager.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <silabs_creds.h>
+#ifndef NDEBUG
+#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
+#include <sl_matter_test_event_trigger_config.h>
+#endif // defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
+#endif // NDEBUG
 #ifdef OTA_ENCRYPTION_ENABLE
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif // OTA_ENCRYPTION_ENABLE
@@ -398,14 +403,14 @@ CHIP_ERROR Storage::GetManufacturingDate(uint8_t * value, size_t max, size_t & s
     return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_ManufacturingDate, (char *) value, max, size);
 }
 
-CHIP_ERROR Storage::SetUniqueId(const uint8_t * value, size_t size)
+CHIP_ERROR Storage::SetPersistentUniqueId(const uint8_t * value, size_t size)
 {
-    return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_UniqueId, value, size);
+    return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_PersistentUniqueId, value, size);
 }
 
-CHIP_ERROR Storage::GetUniqueId(uint8_t * value, size_t max, size_t & size)
+CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & size)
 {
-    return SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_UniqueId, value, max, size);
+    return SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_PersistentUniqueId, value, max, size);
 }
 
 //

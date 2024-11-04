@@ -95,7 +95,7 @@ void ApplicationShutdown()
     }
 }
 
-extern "C" int main(int argc, char * argv[])
+int main(int argc, char * argv[])
 {
     if (ChipLinuxAppInit(argc, argv) != 0)
     {

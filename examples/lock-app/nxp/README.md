@@ -123,7 +123,7 @@ corresponding to data model target.
 
 ### Manufacturing data
 
-Use `chip_with_factory_data=1` in the gn build command to enable factory data.
+Use `nxp_use_factory_data=true` in the gn build command to enable factory data.
 
 For a full guide on manufacturing flow, please see
 [Guide for writing manufacturing data on NXP devices](../../../docs/platforms/nxp/nxp_manufacturing_flow.md).
