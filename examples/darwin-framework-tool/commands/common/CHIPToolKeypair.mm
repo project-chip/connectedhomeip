@@ -65,9 +65,7 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
     return out_signature;
 }
 
-// TODO:  dedupe shared parts of below once this passes tests
-- (SecKeyRef)publicKey
-{
+- (void)_populatePublicKeyIfNecessary {
     if (_mPublicKey == nil) {
         chip::Crypto::P256PublicKey publicKey = _mKeyPair.Pubkey();
         NSData * publicKeyNSData = [NSData dataWithBytes:publicKey.Bytes() length:publicKey.Length()];
@@ -80,24 +78,18 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
         };
         _mPublicKey = SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, nullptr);
     }
+}
+
+- (SecKeyRef)publicKey
+{
+    [self _populatePublicKeyIfNecessary];
 
     return _mPublicKey;
 }
 
 - (SecKeyRef)copyPublicKey
 {
-    if (_mPublicKey == nil) {
-        chip::Crypto::P256PublicKey publicKey = _mKeyPair.Pubkey();
-        NSData * publicKeyNSData = [NSData dataWithBytes:publicKey.Bytes() length:publicKey.Length()];
-        NSDictionary * attributes = @{
-            (__bridge NSString *) kSecAttrKeyClass : (__bridge NSString *) kSecAttrKeyClassPublic,
-            (NSString *) kSecAttrKeyType : (NSString *) kSecAttrKeyTypeECSECPrimeRandom,
-            (NSString *) kSecAttrKeySizeInBits : @Public_KeySize,
-            (NSString *) kSecAttrLabel : kCHIPToolKeychainLabel,
-            (NSString *) kSecAttrApplicationTag : @CHIPPlugin_CAKeyTag,
-        };
-        _mPublicKey = SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, nullptr);
-    }
+    [self _populatePublicKeyIfNecessary];
 
     if (_mPublicKey) {
         CFRetain(_mPublicKey);
