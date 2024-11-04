@@ -19,12 +19,14 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
-#include <sl_si91x_button.h>
-#include <sl_si91x_button_pin_config.h>
-#include <sl_si91x_driver_gpio.h>
-extern "C" {
+#include "sl_si91x_button.h"
+#include "sl_si91x_button_pin_config.h"
+#include "sl_si91x_driver_gpio.h"
 /**
  * @brief      invoked when button press event is received when in sleep
  * @param[in]  pin_intr GPIO pin interrupt number.
@@ -32,9 +34,11 @@ extern "C" {
  * @note       this is a callback from the Wiseconnect SDK
  */
 void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr);
-}
 #endif // SLI_SI91X_MCU_INTERFACE
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#ifdef __cplusplus
+}
+#endif
 
 namespace chip {
 namespace DeviceLayer {
