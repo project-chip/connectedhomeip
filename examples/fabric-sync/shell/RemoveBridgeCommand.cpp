@@ -23,8 +23,7 @@
 
 using namespace ::chip;
 
-// Define the global unique pointer
-std::unique_ptr<RemoveBridgeCommand> gRemoveBridgeCmd = nullptr;
+namespace commands {
 
 void RemoveBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
 {
@@ -46,8 +45,7 @@ void RemoveBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
                      ChipLogValueX64(deviceId), err.Format());
     }
 
-    mBridgeNodeId = kUndefinedNodeId;
-    gRemoveBridgeCmd.reset();
+    CommandRegistry::Instance().ResetActiveCommand();
 }
 
 CHIP_ERROR RemoveBridgeCommand::RunCommand()
@@ -57,9 +55,8 @@ CHIP_ERROR RemoveBridgeCommand::RunCommand()
     if (bridgeNodeId == kUndefinedNodeId)
     {
         // print to console
-        Shell::streamer_t * sout = Shell::streamer_get();
-        Shell::streamer_printf(sout, "Remote Fabric Bridge is not configured yet, nothing to remove.\n");
-        return CHIP_NO_ERROR;
+        fprintf(stderr, "Remote Fabric Bridge is not configured yet, nothing to remove.\n");
+        return CHIP_ERROR_BUSY;
     }
 
     mBridgeNodeId = bridgeNodeId;
@@ -69,3 +66,5 @@ CHIP_ERROR RemoveBridgeCommand::RunCommand()
 
     return CHIP_NO_ERROR;
 }
+
+} // namespace commands

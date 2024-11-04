@@ -18,19 +18,37 @@
 
 #pragma once
 
-#include <CommandRegistry.h>
 #include <admin/PairingManager.h>
 
 namespace commands {
 
-class RemoveBridgeCommand : public Command, public PairingDelegate
+class Command
 {
 public:
-    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
-    CHIP_ERROR RunCommand() override;
+    virtual ~Command()              = default;
+    virtual CHIP_ERROR RunCommand() = 0;
+};
+
+class CommandRegistry
+{
+public:
+    static CommandRegistry & Instance()
+    {
+        static CommandRegistry instance;
+        return instance;
+    }
+
+    void SetActiveCommand(std::unique_ptr<Command> command) { mActiveCommand = std::move(command); }
+
+    Command * GetActiveCommand() { return mActiveCommand.get(); }
+
+    void ResetActiveCommand() { mActiveCommand.reset(); }
+
+    bool IsCommandActive() const { return mActiveCommand != nullptr; }
 
 private:
-    chip::NodeId mBridgeNodeId = chip::kUndefinedNodeId;
+    CommandRegistry() = default;
+    std::unique_ptr<Command> mActiveCommand;
 };
 
 } // namespace commands

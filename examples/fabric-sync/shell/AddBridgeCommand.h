@@ -18,17 +18,17 @@
 
 #pragma once
 
+#include <CommandRegistry.h>
 #include <admin/PairingManager.h>
 
-class AddBridgeCommand;
-extern std::unique_ptr<AddBridgeCommand> gAddBridgeCmd;
+namespace commands {
 
-class AddBridgeCommand : public CommissioningDelegate
+class AddBridgeCommand : public Command, public CommissioningDelegate
 {
 public:
     AddBridgeCommand(chip::NodeId nodeId, uint32_t setupPINCode, const char * remoteAddr, uint16_t remotePort);
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) override;
-    CHIP_ERROR RunCommand();
+    CHIP_ERROR RunCommand() override;
 
 private:
     chip::NodeId mBridgeNodeId;
@@ -36,3 +36,5 @@ private:
     const char * mRemoteAddr;
     uint16_t mRemotePort;
 };
+
+} // namespace commands

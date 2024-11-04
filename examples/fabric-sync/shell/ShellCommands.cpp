@@ -33,9 +33,6 @@
 namespace chip {
 namespace Shell {
 
-// Global pointer to hold the AddBridgeCommand instance
-static std::unique_ptr<AddBridgeCommand> gAddBridgeCommand;
-
 static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
@@ -59,16 +56,28 @@ static CHIP_ERROR HandleAddBridgeCommand(int argc, char ** argv)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    // Check if there is already an active command
+    if (commands::CommandRegistry::Instance().IsCommandActive())
+    {
+        fprintf(stderr, "Another command is currently active. Please wait until it completes.\n");
+        return CHIP_ERROR_BUSY;
+    }
+
     // Parse arguments
     chip::NodeId nodeId     = static_cast<chip::NodeId>(strtoull(argv[1], nullptr, 10));
     uint32_t setupPINCode   = static_cast<uint32_t>(strtoul(argv[2], nullptr, 10));
     const char * remoteAddr = argv[3];
     uint16_t remotePort     = static_cast<uint16_t>(strtoul(argv[4], nullptr, 10));
 
-    gAddBridgeCmd.reset();
-    gAddBridgeCmd = std::make_unique<AddBridgeCommand>(nodeId, setupPINCode, remoteAddr, remotePort);
+    auto command = std::make_unique<commands::AddBridgeCommand>(nodeId, setupPINCode, remoteAddr, remotePort);
 
-    return gAddBridgeCmd->RunCommand();
+    CHIP_ERROR result = command->RunCommand();
+    if (result == CHIP_NO_ERROR)
+    {
+        commands::CommandRegistry::Instance().SetActiveCommand(std::move(command));
+    }
+
+    return result;
 }
 
 static CHIP_ERROR HandleRemoveBridgeCommand(int argc, char ** argv)
@@ -79,10 +88,22 @@ static CHIP_ERROR HandleRemoveBridgeCommand(int argc, char ** argv)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    gRemoveBridgeCmd.reset();
-    gRemoveBridgeCmd = std::make_unique<RemoveBridgeCommand>();
+    // Check if there is already an active command
+    if (commands::CommandRegistry::Instance().IsCommandActive())
+    {
+        fprintf(stderr, "Another command is currently active. Please wait until it completes.\n");
+        return CHIP_ERROR_BUSY;
+    }
 
-    return gRemoveBridgeCmd->RunCommand();
+    auto command = std::make_unique<commands::RemoveBridgeCommand>();
+
+    CHIP_ERROR result = command->RunCommand();
+    if (result == CHIP_NO_ERROR)
+    {
+        commands::CommandRegistry::Instance().SetActiveCommand(std::move(command));
+    }
+
+    return result;
 }
 
 static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
@@ -104,11 +125,6 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
     else if (strcmp(argv[0], "remove-bridge") == 0)
     {
         return HandleRemoveBridgeCommand(argc, argv);
-    }
-    else if (strcmp(argv[0], "sync-device") == 0)
-    {
-        // TODO
-        return CHIP_NO_ERROR;
     }
     else
     {

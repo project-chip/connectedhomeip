@@ -80,6 +80,12 @@ CHIP_ERROR DeviceManager::PairRemoteFabricBridge(NodeId nodeId, uint32_t setupPI
 
 CHIP_ERROR DeviceManager::UnpairRemoteFabricBridge()
 {
+    if (mRemoteBridgeNodeId == kUndefinedNodeId)
+    {
+        ChipLogError(NotSpecified, "Remote bridge node ID is undefined; cannot unpair device.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     CHIP_ERROR err = PairingManager::Instance().UnpairDevice(mRemoteBridgeNodeId);
     if (err != CHIP_NO_ERROR)
     {

@@ -23,8 +23,7 @@
 
 using namespace ::chip;
 
-// Define the global unique pointer
-std::unique_ptr<AddBridgeCommand> gAddBridgeCmd = nullptr;
+namespace commands {
 
 AddBridgeCommand::AddBridgeCommand(chip::NodeId nodeId, uint32_t setupPINCode, const char * remoteAddr, uint16_t remotePort) :
     mBridgeNodeId(nodeId), mSetupPINCode(setupPINCode), mRemoteAddr(remoteAddr), mRemotePort(remotePort)
@@ -61,8 +60,7 @@ void AddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
                      ChipLogValueX64(deviceId), err.Format());
     }
 
-    mBridgeNodeId = kUndefinedNodeId;
-    gAddBridgeCmd.reset();
+    CommandRegistry::Instance().ResetActiveCommand();
 }
 
 CHIP_ERROR AddBridgeCommand::RunCommand()
@@ -70,13 +68,13 @@ CHIP_ERROR AddBridgeCommand::RunCommand()
     if (DeviceMgr().IsFabricSyncReady())
     {
         // print to console
-        Shell::streamer_t * sout = Shell::streamer_get();
-        Shell::streamer_printf(sout, "Remote Fabric Bridge has already been configured.\n");
-
-        return CHIP_NO_ERROR;
+        fprintf(stderr, "Remote Fabric Bridge has already been configured.\n");
+        return CHIP_ERROR_BUSY;
     }
 
     PairingManager::Instance().SetCommissioningDelegate(this);
 
     return DeviceMgr().PairRemoteFabricBridge(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
 }
+
+} // namespace commands
