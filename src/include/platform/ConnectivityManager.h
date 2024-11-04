@@ -188,6 +188,7 @@ public:
     CHIP_ERROR WiFiPAFCancelIncompleteConnect();
     CHIP_ERROR WiFiPAFSend(System::PacketBufferHandle && msgBuf);
     WiFiPAF::WiFiPAFLayer * GetWiFiPAF();
+    void WiFiPafSetApFreq(const uint16_t freq);
 #endif
 
     // WiFi AP methods
@@ -515,6 +516,11 @@ inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
 inline WiFiPAF::WiFiPAFLayer * ConnectivityManager::GetWiFiPAF()
 {
     return static_cast<ImplClass *>(this)->_GetWiFiPAF();
+}
+
+inline void ConnectivityManager::WiFiPafSetApFreq(const uint16_t freq)
+{
+    static_cast<ImplClass *>(this)->_WiFiPafSetApFreq(freq);
 }
 #endif
 
