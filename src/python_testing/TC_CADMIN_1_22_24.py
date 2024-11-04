@@ -95,7 +95,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         self.step(4)
         window_status = await self.get_window_status()
         asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
-                                 "Commissioning window is expected to be closed, but was found to be open")
+                             "Commissioning window is expected to be closed, but was found to be open")
 
         self.step(5)
         try:
