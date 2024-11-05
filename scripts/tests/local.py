@@ -166,8 +166,8 @@ def _do_build_apps():
         f"{target_prefix}-all-clusters-no-ble-clang-boringssl",
         f"{target_prefix}-bridge-no-ble-clang-boringssl",
         f"{target_prefix}-energy-management-no-ble-clang-boringssl",
-        f"{target_prefix}-fabric-admin-no-ble-rpc-ipv6only-clang-boringssl",
-        f"{target_prefix}-fabric-bridge-no-ble-rpc-ipv6only-clang-boringssl",
+        f"{target_prefix}-fabric-admin-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
+        f"{target_prefix}-fabric-bridge-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
         f"{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang",
         f"{target_prefix}-lit-icd-no-ble-clang-boringssl",
         f"{target_prefix}-lock-no-ble-clang-boringssl",
@@ -366,9 +366,9 @@ def python_tests(
             NETWORK_MANAGEMENT_APP: {
                 as_runner(f'out/{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl/matter-network-manager-app')}
             FABRIC_ADMIN_APP: {
-                as_runner(f'out/{target_prefix}-fabric-admin-no-ble-rpc-ipv6only-clang-boringssl/fabric-admin')}
+                as_runner(f'out/{target_prefix}-fabric-admin-no-ble-no-wifi-rpc-ipv6only-clang-boringssl/fabric-admin')}
             FABRIC_BRIDGE_APP: {
-                as_runner(f'out/{target_prefix}-fabric-bridge-no-ble-rpc-ipv6only-clang-boringssl/fabric-bridge-app')}
+                as_runner(f'out/{target_prefix}-fabric-bridge-no-ble-no-wifi-rpc-ipv6only-clang-boringssl/fabric-bridge-app')}
             LIGHTING_APP_NO_UNIQUE_ID: {as_runner(f'out/{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app')}
             TRACE_APP: out/trace_data/app-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_JSON: out/trace_data/test-{{SCRIPT_BASE_NAME}}
@@ -506,8 +506,8 @@ def _do_build_fabric_sync_apps():
     """
     target_prefix = _get_native_machine_target()
     targets = [
-        f"{target_prefix}-fabric-admin-no-ble-rpc-ipv6only-clang-boringssl",
-        f"{target_prefix}-fabric-bridge-no-ble-rpc-ipv6only-clang-boringssl",
+        f"{target_prefix}-fabric-admin-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
+        f"{target_prefix}-fabric-bridge-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
         f"{target_prefix}-all-clusters-boringssl-no-ble",
     ]
 
