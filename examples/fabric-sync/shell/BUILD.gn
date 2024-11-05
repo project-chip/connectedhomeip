@@ -12,48 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${chip_root}/build/chip/tools.gni")
-import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
 
-assert(chip_build_tools)
-
-executable("fabric-sync") {
-  cflags = [ "-Wconversion" ]
-
-  defines = []
-
-  if (chip_build_libshell) {
-    defines += [ "ENABLE_CHIP_SHELL" ]
-  }
-
+config("config") {
   include_dirs = [
     ".",
-    "${chip_root}/src/lib",
+    "${chip_root}/examples/common",
+    "${chip_root}/examples/fabric-sync",
   ]
+}
 
-  if (chip_build_libshell) {
-    include_dirs += [ "shell" ]
-  }
+source_set("shell") {
+  public_configs = [ ":config" ]
 
-  sources = [ "main.cpp" ]
+  sources = [
+    "AddBridgeCommand.cpp",
+    "AddBridgeCommand.h",
+    "CommandRegistry.h",
+    "RemoveBridgeCommand.cpp",
+    "RemoveBridgeCommand.h",
+    "ShellCommands.cpp",
+    "ShellCommands.h",
+  ]
 
   deps = [
     "${chip_root}/examples/fabric-sync/admin:fabric-admin-lib",
     "${chip_root}/examples/fabric-sync/bridge:fabric-bridge-lib",
-    "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
-    "${chip_root}/third_party/inipp",
   ]
-
-  if (chip_build_libshell) {
-    deps += [ "${chip_root}/examples/fabric-sync/shell" ]
-  }
-
-  output_dir = root_out_dir
-}
-
-group("default") {
-  deps = [ ":fabric-sync" ]
 }
