@@ -29,7 +29,7 @@ def forward_f(f_in: BinaryIO,
     This function can optionally post-process received lines using a callback
     function.
     """
-    while line := f_in.readline():
+    for line in f_in.readlines():
         if cb is not None:
             line = cb(line, is_stderr)
         f_out.write(line)
@@ -85,7 +85,9 @@ class Subprocess(threading.Thread):
         self.p = subprocess.Popen([self.program] + list(self.args),
                                   stdin=subprocess.PIPE,
                                   stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE)
+                                  stderr=subprocess.PIPE,
+                                  bufsize=1,
+                                  text=True)
         self.event_started.set()
 
         # Forward stdout and stderr with a tag attached.
