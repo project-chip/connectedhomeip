@@ -10274,10 +10274,6 @@
       bitmaps:
           MicrowaveOvenControl:
               - Feature
-          MicrowaveOvenMode:
-              - Feature
-          OvenMode:
-              - Feature
       bitmap values:
           MicrowaveOvenControl:
               Feature:
@@ -10312,6 +10308,13 @@
           OvenCavityOperationalState:
               - Pause
               - Resume
+      bitmaps:
+          # MicrowaveOvenMode and OvenMode Feature bitmaps removed because
+          # an NS_ENUM must have at least one value and without ONOFF they have none
+          MicrowaveOvenMode:
+              - Feature
+          OvenMode:
+              - Feature
       bitmap values:
           OvenMode:
               Feature:
