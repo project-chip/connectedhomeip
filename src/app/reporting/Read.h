@@ -16,31 +16,25 @@
  */
 #pragma once
 
-#include <app/AppConfig.h>
-
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-#include <app/reporting/Read-Checked.h>
-#else
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-#include <app/reporting/Read-DataModel.h>
-#else
-#include <app/reporting/Read-Ember.h>
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#include <access/SubjectDescriptor.h>
+#include <app/AttributeEncodeState.h>
+#include <app/MessageDef/AttributeReportIBs.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/Provider.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace app {
 namespace reporting {
+namespace Impl {
 
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-namespace Impl = CheckedImpl;
-#else
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-namespace Impl = DataModelImpl;
-#else
-namespace Impl = EmberImpl;
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel,
+                                                  const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
+                                                  AttributeReportIBs::Builder & reportBuilder,
+                                                  const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState);
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion);
+} // namespace Impl
 
 } // namespace reporting
 } // namespace app

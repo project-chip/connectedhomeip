@@ -111,6 +111,11 @@ protected:
     static void StartWiFiHandler(AppEvent * aEvent);
 #endif
 
+#if CONFIG_TELINK_OTA_BUTTON_TEST
+    static void TestOTAButtonEventHandler(void);
+    static void TestOTAHandler(AppEvent * aEvent);
+#endif
+
     static void ExampleActionButtonEventHandler(void);
 
     void SetExampleButtonCallbacks(EventHandler aAction_CB);

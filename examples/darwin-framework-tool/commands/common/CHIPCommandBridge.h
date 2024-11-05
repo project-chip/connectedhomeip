@@ -30,6 +30,7 @@
 inline constexpr char kIdentityAlpha[] = "alpha";
 inline constexpr char kIdentityBeta[] = "beta";
 inline constexpr char kIdentityGamma[] = "gamma";
+inline constexpr char kControllerIdPrefix[] = "8DCADB14-AF1F-45D0-B084-00000000000";
 
 class CHIPCommandBridge : public Command {
 public:
@@ -42,7 +43,7 @@ public:
             "commissioner-name. Interactive mode will only set a single commissioner on the inital command. "
             "The commissioner node ID will be persisted until a different one is specified.");
         AddArgument("commissioner-shared-storage", 0, 1, &mCommissionerSharedStorage,
-            "Use a shared storage instance instead of individual storage for each commissioner. Default is true.");
+            "Use a shared storage instance instead of individual storage for each commissioner. Default is false.");
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
             "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
             "directory.");
@@ -68,6 +69,8 @@ public:
     }
 
     static OTAProviderDelegate * mOTADelegate;
+
+    static NSNumber * GetCommissionerFabricId(const char * identity);
 
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
@@ -97,6 +100,10 @@ protected:
     // Will utilize an existing PASE connection if the device is being commissioned.
     MTRBaseDevice * BaseDeviceWithNodeId(chip::NodeId nodeId);
 
+    // Returns the MTRDevice for the specified node ID.
+    // Will utilize an existing PASE connection if the device is being commissioned.
+    MTRDevice * DeviceWithNodeId(chip::NodeId nodeId);
+
     // Will log the given string and given error (as progress if success, error
     // if failure).
     void LogNSError(const char * logString, NSError * error);
@@ -120,6 +127,10 @@ protected:
     void StopCommissioners();
 
     void RestartCommissioners();
+
+    void SuspendOrResumeCommissioners();
+
+    MTRDevice * GetLastUsedDevice();
 
 private:
     CHIP_ERROR InitializeCommissioner(

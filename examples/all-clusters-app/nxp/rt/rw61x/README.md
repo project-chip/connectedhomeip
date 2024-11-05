@@ -137,7 +137,7 @@ thermostat application for now.
     (ble-wifi) :
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true chip_enable_openthread=true chip_enable_matter_cli=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true chip_enable_openthread=true nxp_enable_matter_cli=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ ninja -C out/debug
 ```
 
@@ -157,7 +157,7 @@ Optional GN options that can be added when building an application:
     on the on the thermostat application for now.
 -   To enable the
     [matter CLI](README.md#testing-the-all-clusters-application-with-matter-cli-enabled),
-    the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
+    the argument `nxp_enable_matter_cli=true` must be added to the _gn gen_
     command.
 -   By default, the `NXP RD-RW612-BGA` board revision will be chosen. To switch
     to `NXP FRDM-RW612` board revision, the argument `board_version=\"frdm\"`
@@ -165,8 +165,8 @@ Optional GN options that can be added when building an application:
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
-    specific flash area the argument `chip_with_factory_data=1` must be added to
-    the _gn gen_ command. (for more information see
+    specific flash area the argument `nxp_use_factory_data=true` must be added
+    to the _gn gen_ command. (for more information see
     [Guide for writing manufacturing data on NXP devices](../../../../../docs/platforms/nxp/nxp_manufacturing_flow.md).
 -   To build the application with the OTA Requestor enabled, the arguments
     `chip_enable_ota_requestor=true no_mcuboot=false` must be added to the _gn
@@ -187,13 +187,13 @@ software key before flashing them to the device flash.
 Using DAC private key secure usage: Experimental feature, contain some
 limitation: potential concurrent access issue during sign with dac key operation
 due to the lack of protection between multiple access to `ELS` crypto module.
-The argument `chip_enable_secure_dac_private_key_storage=1` must be added to the
-_gn gen_ command to enable secure private DAC key usage with S50.
-`chip_with_factory_data=1` must have been added to the _gn gen_ command
+The argument `nxp_enable_secure_dac_private_key_storage=true` must be added to
+the _gn gen_ command to enable secure private DAC key usage with S50.
+`nxp_use_factory_data=true` must have been added to the _gn gen_ command
 
 DAC private key generation: The argument `chip_convert_dac_private_key=1` must
 be added to the _gn gen_ command to enable DAC private plain key conversion to
-blob with S50. `chip_enable_secure_dac_private_key_storage=1` must have been
+blob with S50. `nxp_enable_secure_dac_private_key_storage=1` must have been
 added to the _gn gen_ command
 
 `ELS` contain concurrent access risks. They must be fixed before enabling it by

@@ -33,7 +33,7 @@ if (bridge_enable_pw_rpc) {
 executable("fabric-bridge-app") {
   sources = [
     "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common/include/CHIPProjectAppConfig.h",
-    "CommissionerControl.cpp",
+    "CommissionerControlDelegate.cpp",
     "main.cpp",
   ]
 

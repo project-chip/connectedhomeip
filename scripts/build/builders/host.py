@@ -334,9 +334,8 @@ class HostBuilder(GnBuilder):
                  enable_test_event_triggers=None,
                  enable_dnssd_tests: Optional[bool] = None,
                  chip_casting_simplified: Optional[bool] = None,
-                 data_model_interface: Optional[str] = None,
-                 chip_data_model_check_die_on_failure: Optional[bool] = None,
-                 disable_shell=False
+                 disable_shell=False,
+                 use_googletest=False,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -373,9 +372,6 @@ class HostBuilder(GnBuilder):
 
         if use_ubsan:
             self.extra_gn_options.append('is_ubsan=true')
-
-        if data_model_interface is not None:
-            self.extra_gn_options.append(f'chip_use_data_model_interface="{data_model_interface}"')
 
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
@@ -436,13 +432,7 @@ class HostBuilder(GnBuilder):
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
-            self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
             self.build_command = 'check'
-        elif chip_data_model_check_die_on_failure is not None:
-            if chip_data_model_check_die_on_failure:
-                self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
-            else:
-                self.extra_gn_options.append('chip_data_model_check_die_on_failure=false')
 
         if app == HostApp.EFR32_TEST_RUNNER:
             self.build_command = 'runner'
@@ -495,6 +485,13 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.TESTS and fuzzing_type == HostFuzzingType.PW_FUZZTEST:
             self.build_command = 'pw_fuzz_tests'
+
+        if self.app == HostApp.TESTS and use_googletest:
+            self.extra_gn_options.append('import("//build_overrides/pigweed.gni")')
+            self.extra_gn_options.append('import("//build_overrides/googletest.gni")')
+            self.extra_gn_options.append('pw_unit_test_BACKEND="$dir_pw_unit_test:googletest"')
+            self.extra_gn_options.append('dir_pw_third_party_googletest="$dir_googletest"')
+            self.extra_gn_options.append('chip_build_tests_googletest=true')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

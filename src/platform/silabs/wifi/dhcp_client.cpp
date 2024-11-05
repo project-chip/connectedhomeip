@@ -24,7 +24,6 @@
 #include "dhcp_client.h"
 #include "lwip/dhcp.h"
 #include "wfx_host_events.h"
-#include "wifi_config.h"
 
 #include "FreeRTOS.h"
 #include "event_groups.h"

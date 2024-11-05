@@ -190,7 +190,6 @@ class NxpBuilder(GnBuilder):
                  enable_ethernet: bool = False,
                  enable_shell: bool = False,
                  enable_ota: bool = False,
-                 data_model_interface: Optional[str] = None,
                  enable_factory_data_build: bool = False,
                  disable_pairing_autostart: bool = False,
                  iw416_transceiver: bool = False,
@@ -220,7 +219,6 @@ class NxpBuilder(GnBuilder):
         self.enable_ethernet = enable_ethernet
         self.enable_ota = enable_ota
         self.enable_shell = enable_shell
-        self.data_model_interface = data_model_interface
         self.enable_factory_data_build = enable_factory_data_build
         self.disable_pairing_autostart = disable_pairing_autostart
         self.board_variant = board_variant
@@ -236,18 +234,18 @@ class NxpBuilder(GnBuilder):
         args = []
 
         if self.low_power:
-            args.append('chip_with_low_power=1')
+            args.append('nxp_use_low_power=true')
             if self.board == NxpBoard.K32W0:
                 args.append('chip_pw_tokenizer_logging=false chip_with_OM15082=0')
 
         if self.smu2:
-            args.append('use_smu2_static=true use_smu2_dynamic=true')
+            args.append('nxp_use_smu2_static=true nxp_use_smu2_dynamic=true')
 
         if self.enable_factory_data:
-            args.append('chip_with_factory_data=1')
+            args.append('nxp_use_factory_data=true')
 
         if self.convert_dac_pk:
-            args.append('chip_convert_dac_private_key=1')
+            args.append('nxp_convert_dac_private_key=true')
 
         if self.use_fro32k:
             args.append('use_fro_32k=1')
@@ -298,7 +296,7 @@ class NxpBuilder(GnBuilder):
             args.append('chip_enable_ble=false')
 
         if self.enable_shell:
-            args.append('chip_enable_matter_cli=true')
+            args.append('nxp_enable_matter_cli=true')
 
         if self.enable_thread:
             # thread is enabled by default on kw32
@@ -308,9 +306,6 @@ class NxpBuilder(GnBuilder):
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
             if self.board == NxpBoard.RT1170:
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
-
-        if self.data_model_interface is not None:
-            args.append(f'chip_use_data_model_interface="{self.data_model_interface}"')
 
         if self.board_variant:
             if self.board == NxpBoard.RT1060:
@@ -348,11 +343,6 @@ class NxpBuilder(GnBuilder):
         if self.has_sw_version_2:
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2")
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING=\"2.0\"")
-
-        if self.data_model_interface:
-            # NOTE: this is not supporting "check"
-            enabled = "y" if self.data_model_interface.lower() == "enabled" else "n"
-            flags.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={enabled}")
 
         if self.enable_ota:
             flags.append("-DCONFIG_CHIP_OTA_REQUESTOR=true")
