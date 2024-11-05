@@ -405,7 +405,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
     XCTAssert(operationalPublicKey != NULL);
-    CFAutorelease(operationalPublicKey);
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
                                                            signingCertificate:root
@@ -414,6 +413,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                                                        nodeID:nodeID
                                                         caseAuthenticatedTags:caseAuthenticatedTags
                                                                         error:error];
+    CFRelease(operationalPublicKey);
+
     XCTAssertNil(*error);
     XCTAssertNotNil(operational);
 
