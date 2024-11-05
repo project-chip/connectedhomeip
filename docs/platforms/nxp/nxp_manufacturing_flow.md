@@ -232,7 +232,7 @@ The user can use the DAC private in plain text instead of using the `SSS` by
 adding the following gn argument `chip_use_plain_dac_key=true`.
 
 When using EdgeLock 2Go provisioning (chip_with_factory_data=1
-    chip_enable_secure_EL2GO_factory_data=true), do not use --dac_cert and --dac_key arguments.
+    nxp_enable_secure_EL2GO_factory_data=true), do not use --dac_cert and --dac_key arguments.
 
 ### 6.2 RW61X
 
@@ -247,20 +247,13 @@ there are three implementations for factory data protection
     `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp`\
     `src/platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.cpp`
 
--   only dac private key protection ( nxp_use_factory_data=true
-    nxp_enable_secure_dac_private_key_storage=true )
+-   only dac private key protection using secure element( nxp_use_factory_data=true )
     `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp`
     \
     `src/platform/nxp/rt/rw61x/FactoryDataProviderImpl.cpp`
 
--   whole factory data protection with hard-coded AES key (
-    nxp_use_factory_data=true )
-    `examples/platform/nxp/common/factory_data/source/AppFactoryDataDefaultImpl.cpp`
-    \
-    `src/platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.cpp`
-
--   EdgeLock 2go DAC key and certificate provisioning (chip_with_factory_data=1
-    chip_enable_secure_EL2GO_factory_data=true )  
+-   EdgeLock 2go DAC key and certificate provisioning (chip_with_factory_data=true
+    nxp_enable_secure_EL2GO_factory_data=true )  
     `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp`
     \
     `src/platform/nxp/rt/rw61x/FactoryDataProviderEl2GoImpl.cpp`
@@ -288,17 +281,25 @@ and hash, and re-write the factory data. when device is doing matter
 commissioning, the blob is retrieved and provisioned into Edge Lock and the
 signing can be done using the returned key index in Edge Lock.
 
-the factory data should be plain text for the first programming. it will check
-whether there is dac private key blob (base on the size of blob, should be 48)
-in factory data when in each initialization, if not, the dac private key is
-converted and the result is stored into flash, it run only once.
+At generation the factory data should be encrypted by an AES-128 key using "--aes128_key"
+option in "generate.py" script file. During the 1st boot the matter application 
+will decrypt the encrypted factory data, encrypt the DAC key using the secure 
+element and save in flash the plain factory data with encrypted DAC key
 
-for the third one, it is a little similar to the first one, the whole factory
-data is encrypted by an AES key, but there are two differences:
-
--   the AES key is hard-coded and not provisioned into Edge Lock
+-   the AES key used to decrypt the factory data for the 1st boot is hard-coded 
+    and not provisioned into Edge Lock
 -   the factory data should be encrypted by AES-128 key using "--aes128_key"
     option in "generate.py" script file.
+-   During the 1st boot the DAC key is encrypted using the secure element and 
+    store in factory data TLV
 
-for the fourth, it is similar to the second one but factory data binary didn't contain DAC key and certificate. 
-They are provisioned by the EdgeLock 2Go server into a specific flash section as a blob.
+for the third one, the EdgeLock 2go server provide a secure binary wich contains
+the encrypted DAC key and encrypted DAC certificate. This secure 
+binary could be decrypt by a single device using the secure element. This secure 
+binary is integreated into the factory data TLV when using the generate.py script 
+to generate new factory data with parameters:
+ -  --EL2GO_bin to specify the path of the EdgeLock 2go secure binary
+ -  --EL2GO_DAC_KEY_ID the DAC key identifier customized into EdgeLock 2go server
+ -  --EL2GO_DAC_CERT_ID the DAC identifier customized into EdgeLock 2go server
+For this implementation, do not use --aes128_key or --aes256_key when running
+generate.py options.
