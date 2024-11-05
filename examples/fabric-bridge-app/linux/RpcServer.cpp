@@ -37,6 +37,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
+namespace bridge {
+
 namespace {
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
@@ -256,3 +258,5 @@ void InitRpcServer(uint16_t rpcServerPort)
     std::thread rpc_service(RunRpcService);
     rpc_service.detach();
 }
+
+} // namespace bridge

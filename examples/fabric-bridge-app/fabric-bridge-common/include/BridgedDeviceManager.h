@@ -24,6 +24,8 @@
 
 #include <memory>
 
+namespace bridge {
+
 class BridgedDeviceManager
 {
 public:
@@ -134,3 +136,5 @@ inline BridgedDeviceManager & BridgeDeviceMgr()
 {
     return BridgedDeviceManager::sInstance;
 }
+
+} // namespace bridge

@@ -89,5 +89,9 @@ private:
 } // namespace app
 } // namespace chip
 
+namespace bridge {
+
 CHIP_ERROR CommissionerControlInit();
 CHIP_ERROR CommissionerControlShutdown();
+
+} // namespace bridge

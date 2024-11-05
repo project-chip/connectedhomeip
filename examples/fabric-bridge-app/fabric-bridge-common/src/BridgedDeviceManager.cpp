@@ -45,6 +45,8 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
+namespace bridge {
+
 namespace {
 
 constexpr uint8_t kMaxRetries      = 10;
@@ -343,3 +345,5 @@ std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByScopedNodeId(chip::S
     }
     return std::nullopt;
 }
+
+} // namespace bridge
