@@ -735,9 +735,9 @@ void ProcessEvent(WifiEvent event)
         // TODO: This event is not being posted anywhere, seems to be a dead code or we are missing something
 
         wfx_rsi.dev_state.Clear(WifiState::kStationReady)
-                .Clear(WifiState::kStationConnecting)
-                .Clear(WifiState::kStationConnected)
-                .Clear(WifiState::kStationDhcpDone);
+            .Clear(WifiState::kStationConnecting)
+            .Clear(WifiState::kStationConnected)
+            .Clear(WifiState::kStationDhcpDone);
 
         /* TODO: Implement disconnect notify */
         ResetDHCPNotificationFlags();
