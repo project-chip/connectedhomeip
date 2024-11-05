@@ -61,7 +61,7 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & curTime)
 #ifdef CONFIG_ENABLE_AMEBA_SNTP
     time_t seconds = 0, uSeconds = 0;
 
-    if(matter_sntp_rtc_is_sync()) // if RTC is already sync with SNTP, read directly from RTC
+    if (matter_sntp_rtc_is_sync()) // if RTC is already sync with SNTP, read directly from RTC
     {
         seconds = matter_rtc_read(); // ameba rtc precission is in seconds only
     }
