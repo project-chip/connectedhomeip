@@ -41,7 +41,7 @@
 #endif
 
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
-#include "wfx_rsi.h"
+#include "WifiInterfaceAbstraction.h"
 #endif // SLI_SI91X_MCU_INTERFACE
 
 #include <crypto/CHIPCryptoPAL.h>

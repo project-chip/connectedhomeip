@@ -1846,5 +1846,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
 /**
+ *  @def CHIP_CONFIG_TEST_GOOGLETEST
+ *
+ *  @brief
+ *    If asserted (1), enable APIs that support unit tests built with the GoogleTest framework
+ *
+ */
+#ifndef CHIP_CONFIG_TEST_GOOGLETEST
+#define CHIP_CONFIG_TEST_GOOGLETEST 0
+#endif // CHIP_CONFIG_TEST_GOOGLETEST
+
+/**
  * @}
  */

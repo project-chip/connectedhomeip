@@ -28,6 +28,7 @@
 #endif // SL_MATTER_GN_BUILD
 
 #include "FreeRTOS.h"
+#include "WifiInterfaceAbstraction.h"
 #include "ble_config.h"
 #include "dhcp_client.h"
 #include "event_groups.h"
@@ -36,7 +37,6 @@
 #include "sl_wifi_device.h"
 #include "task.h"
 #include "wfx_host_events.h"
-#include "wfx_rsi.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <inet/IPAddress.h>
 #include <lib/support/CHIPMem.h>
@@ -800,8 +800,8 @@ void ProcessEvent(WfxEvent_t inEvent)
 
             osSemaphoreRelease(sScanInProgressSemaphore);
         }
-        break;
 #endif /* SL_WFX_CONFIG_SCAN */
+        break;
     case WFX_EVT_STA_START_JOIN:
         ChipLogDetail(DeviceLayer, "WFX_EVT_STA_START_JOIN");
 

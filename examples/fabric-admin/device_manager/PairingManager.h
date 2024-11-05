@@ -25,6 +25,8 @@
 #include <controller/CurrentFabricRemover.h>
 #include <crypto/CHIPCryptoPAL.h>
 
+namespace admin {
+
 // Constants
 constexpr uint16_t kMaxManualCodeLength = 22;
 
@@ -214,3 +216,5 @@ private:
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
     chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
 };
+
+} // namespace admin

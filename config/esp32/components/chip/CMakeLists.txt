@@ -33,8 +33,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
 set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
 
-set(CHIP_DATA_MODEL_INTERFACE "enabled" CACHE STRING "Data model interface option to use: enabled or disabled")
-
 if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
     list(APPEND CHIP_REQUIRE_COMPONENTS mdns)
 endif()
@@ -65,12 +63,6 @@ macro(chip_gn_arg_bool arg boolean)
         string(APPEND chip_gn_args "${arg} = false\n")
     endif()
 endmacro()
-
-if ("${CHIP_DATA_MODEL_INTERFACE}" STREQUAL "enabled")
-    chip_gn_arg_append("chip_use_data_model_interface" "\"enabled\"")
-else()
-    chip_gn_arg_append("chip_use_data_model_interface" "\"disabled\"")
-endif()
 
 # ESP-IDF lets user set software version string by two ways:
 # 1. Project's CMakeLists.txt file and 2. Config option

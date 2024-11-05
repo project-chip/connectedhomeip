@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -15,30 +16,12 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <app/AttributePathExpandIterator-DataModel.h>
-#include <app/AttributePathExpandIterator-Ember.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
-namespace app {
+namespace Shell {
 
-class AttributePathExpandIteratorChecked
-{
-public:
-    AttributePathExpandIteratorChecked(DataModel::Provider * dataModel, SingleLinkedListNode<AttributePathParams> * attributePath);
+void RegisterCommands();
 
-    bool Next();
-    bool Get(ConcreteAttributePath & aPath);
-    void ResetCurrentCluster();
-    void ResetTo(SingleLinkedListNode<AttributePathParams> * paths);
-
-private:
-    AttributePathExpandIteratorDataModel mDataModelIterator;
-    AttributePathExpandIteratorEmber mEmberIterator;
-
-    void CheckOutputsIdentical(const char * msg);
-};
-
-} // namespace app
+} // namespace Shell
 } // namespace chip

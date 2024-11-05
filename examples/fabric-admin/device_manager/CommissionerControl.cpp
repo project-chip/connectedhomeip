@@ -1,7 +1,9 @@
 #include "CommissionerControl.h"
-#include <device_manager/DeviceManager.h>
+#include "DeviceManager.h"
 
 using namespace ::chip;
+
+namespace admin {
 
 void CommissionerControl::Init(Controller::DeviceCommissioner & commissioner, NodeId nodeId, EndpointId endpointId)
 {
@@ -102,6 +104,9 @@ void CommissionerControl::OnDone(app::CommandSender * client)
 
 CHIP_ERROR CommissionerControl::SendCommandForType(CommandType commandType, DeviceProxy * device)
 {
+    ChipLogProgress(AppServer, "Sending command with Endpoint ID: %d, Command Type: %d", mEndpointId,
+                    static_cast<int>(commandType));
+
     switch (commandType)
     {
     case CommandType::kRequestCommissioningApproval:
@@ -139,3 +144,5 @@ void CommissionerControl::OnDeviceConnectionFailureFn(void * context, const Scop
     VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
     self->OnDone(nullptr);
 }
+
+} // namespace admin

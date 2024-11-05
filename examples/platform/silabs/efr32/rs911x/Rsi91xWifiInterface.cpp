@@ -49,11 +49,11 @@ extern "C" {
 }
 #endif
 
+#include "WifiInterfaceAbstraction.h"
 #include "dhcp_client.h"
 #include "ethernetif.h"
 #include "lwip/nd6.h"
 #include "silabs_utils.h"
-#include "wfx_rsi.h"
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>

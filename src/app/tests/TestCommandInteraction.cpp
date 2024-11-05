@@ -193,7 +193,7 @@ struct BadFields
     }
 };
 
-Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath)
+static Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath)
 {
     // Mock cluster catalog, only support commands on one cluster on one endpoint.
     if (aRequestCommandPath.mEndpointId != kTestEndpointId)

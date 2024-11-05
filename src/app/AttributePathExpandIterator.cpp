@@ -14,17 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/support/CodeUtils.h"
-#include <app/AttributePathExpandIterator-DataModel.h>
+#include <app/AttributePathExpandIterator.h>
+
 #include <app/GlobalAttributes.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip::app::DataModel;
 
 namespace chip {
 namespace app {
 
-AttributePathExpandIteratorDataModel::AttributePathExpandIteratorDataModel(
-    DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath) :
+AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * provider,
+                                                         SingleLinkedListNode<AttributePathParams> * attributePath) :
     mDataModelProvider(provider),
     mpAttributePath(attributePath), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
 
@@ -36,7 +37,7 @@ AttributePathExpandIteratorDataModel::AttributePathExpandIteratorDataModel(
     Next();
 }
 
-bool AttributePathExpandIteratorDataModel::IsValidAttributeId(AttributeId attributeId)
+bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
 {
     switch (attributeId)
     {
@@ -52,7 +53,7 @@ bool AttributePathExpandIteratorDataModel::IsValidAttributeId(AttributeId attrib
     return mDataModelProvider->GetAttributeInfo(attributePath).has_value();
 }
 
-std::optional<AttributeId> AttributePathExpandIteratorDataModel::NextAttributeId()
+std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 {
     if (mOutputPath.mAttributeId == kInvalidAttributeId)
     {
@@ -107,7 +108,7 @@ std::optional<AttributeId> AttributePathExpandIteratorDataModel::NextAttributeId
     return GlobalAttributesNotInMetadata[0];
 }
 
-std::optional<ClusterId> AttributePathExpandIteratorDataModel::NextClusterId()
+std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
 {
 
     if (mOutputPath.mClusterId == kInvalidClusterId)
@@ -134,7 +135,7 @@ std::optional<ClusterId> AttributePathExpandIteratorDataModel::NextClusterId()
     return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
 }
 
-std::optional<ClusterId> AttributePathExpandIteratorDataModel::NextEndpointId()
+std::optional<ClusterId> AttributePathExpandIterator::NextEndpointId()
 {
     if (mOutputPath.mEndpointId == kInvalidEndpointId)
     {
@@ -153,7 +154,7 @@ std::optional<ClusterId> AttributePathExpandIteratorDataModel::NextEndpointId()
     return (id != kInvalidEndpointId) ? std::make_optional(id) : std::nullopt;
 }
 
-void AttributePathExpandIteratorDataModel::ResetCurrentCluster()
+void AttributePathExpandIterator::ResetCurrentCluster()
 {
     // If this is a null iterator, or the attribute id of current cluster info is not a wildcard attribute id, then this function
     // will do nothing, since we won't be expanding the wildcard attribute ids under a cluster.
@@ -165,7 +166,7 @@ void AttributePathExpandIteratorDataModel::ResetCurrentCluster()
     Next();
 }
 
-bool AttributePathExpandIteratorDataModel::AdvanceOutputPath()
+bool AttributePathExpandIterator::AdvanceOutputPath()
 {
     if (!mpAttributePath->mValue.IsWildcardPath())
     {
@@ -218,7 +219,7 @@ bool AttributePathExpandIteratorDataModel::AdvanceOutputPath()
     }
 }
 
-bool AttributePathExpandIteratorDataModel::Next()
+bool AttributePathExpandIterator::Next()
 {
     while (mpAttributePath != nullptr)
     {
