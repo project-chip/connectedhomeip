@@ -2803,7 +2803,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster LocalizationConfiguration {
@@ -2845,7 +2845,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster GeneralCommissioning {
@@ -2858,7 +2858,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2971,7 +2971,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3089,7 +3089,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command GetTargetsResponse;
     handle command Disable;
@@ -3116,7 +3116,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
@@ -3129,7 +3129,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
@@ -3147,7 +3147,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
   }
@@ -3266,7 +3266,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster Thermostat {
