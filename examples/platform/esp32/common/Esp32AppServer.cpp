@@ -40,18 +40,6 @@
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#if CONFIG_BT_ENABLED
-#include "esp_bt.h"
-#if CONFIG_BT_NIMBLE_ENABLED
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-#include "esp_nimble_hci.h"
-#endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-#include "nimble/nimble_port.h"
-#endif // CONFIG_BT_NIMBLE_ENABLED
-#endif // CONFIG_BT_ENABLED
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
 #ifdef CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/commands/WiFi.h>
 #endif
