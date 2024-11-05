@@ -171,10 +171,10 @@ jobs:
               # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-light-switch-ota-compress_lzma-shell-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-light-switch-ota-compress-lzma-shell-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9528a light-switch-app-ota-compress_lzma-shell-factory-data \
-                    out/telink-tlsr9528a-light-switch-ota-compress_lzma-shell-factory-data/zephyr/zephyr.elf \
+                    telink tlsr9528a light-switch-app-ota-compress-lzma-shell-factory-data \
+                    out/telink-tlsr9528a-light-switch-ota-compress-lzma-shell-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
