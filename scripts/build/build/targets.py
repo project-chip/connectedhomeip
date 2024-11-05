@@ -800,6 +800,7 @@ def BuildTelinkTarget():
     target.AppendModifier('4mb', enable_4mb_flash=True)
     target.AppendModifier('mars', mars_board_config=True)
     target.AppendModifier('usb', usb_board_config=True)
+    target.AppendModifier('compress-lzma', compress_lzma_config=True)
 
     return target
 
