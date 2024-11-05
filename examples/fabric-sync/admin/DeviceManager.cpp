@@ -26,6 +26,7 @@
 
 using namespace chip;
 
+namespace admin {
 // Define the static member
 DeviceManager DeviceManager::sInstance;
 
@@ -109,3 +110,5 @@ void DeviceManager::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
 
     ChipLogProgress(NotSpecified, "Synced device with NodeId:" ChipLogFormatX64 " has been removed.", ChipLogValueX64(deviceId));
 }
+
+} // namespace admin

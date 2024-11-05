@@ -23,6 +23,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
 
+namespace admin {
+
 class DeviceManager : public PairingDelegate
 {
 public:
@@ -97,3 +99,5 @@ inline DeviceManager & DeviceMgr()
     }
     return DeviceManager::sInstance;
 }
+
+} // namespace admin
