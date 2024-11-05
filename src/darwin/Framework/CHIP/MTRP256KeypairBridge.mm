@@ -135,7 +135,10 @@ CHIP_ERROR MTRP256KeypairBridge::ECDH_derive_secret(
 CHIP_ERROR MTRP256KeypairBridge::setPubkey()
 {
     if ([mKeypair respondsToSelector:@selector(copyPublicKey)]) {
-        return MatterPubKeyFromSecKeyRef([mKeypair copyPublicKey], &mPubkey);
+        SecKeyRef publicKey = [mKeypair copyPublicKey];
+        auto copyResult = MatterPubKeyFromSecKeyRef(publicKey, &mPubkey);
+        CFRelease(publicKey);
+        return copyResult;
     } else {
         return MatterPubKeyFromSecKeyRef([mKeypair publicKey], &mPubkey);
     }
