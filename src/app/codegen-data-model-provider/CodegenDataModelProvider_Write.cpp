@@ -261,5 +261,18 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     return CHIP_NO_ERROR;
 }
 
+void CodegenDataModelProvider::ReportAttributeChanged(const AttributePathParams & path)
+{
+    ContextAttributesChangeListener change_listener(CurrentContext());
+    if (path.mClusterId != kInvalidClusterId)
+    {
+        emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, &change_listener);
+    }
+    else
+    {
+        change_listener.MarkDirty(path);
+    }
+}
+
 } // namespace app
 } // namespace chip

@@ -105,6 +105,16 @@ public:
     virtual std::optional<ActionReturnStatus> Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                      CommandHandler * handler) = 0;
 
+    /// Report attribute changed
+    ///
+    /// When this is invoked, the caller is expected to increase the cluster data version and the attribute path
+    /// should be marked as dirty by the data model provider listener so that the reporter can report the attribute
+    /// changes to the subscriber.
+    ///
+    /// It should be invoked when attribute managed by access override is changed but the change is not caused by
+    /// WriteAttribute(Such as LastNetworkingStatus in NetworkCommissioning cluster).
+    virtual void ReportAttributeChanged(const AttributePathParams & path) = 0;
+
 private:
     InteractionModelContext mContext = { nullptr };
 };
