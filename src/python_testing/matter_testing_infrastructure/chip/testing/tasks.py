@@ -14,6 +14,7 @@
 
 import logging
 import re
+import shlex
 import subprocess
 import sys
 import threading
@@ -29,7 +30,9 @@ def forward_f(f_in: BinaryIO,
     This function can optionally post-process received lines using a callback
     function.
     """
-    for line in f_in.readlines():
+
+    # NOTE: readlines would block here, so read line by line instead
+    while line := f_in.readline():
         if cb is not None:
             line = cb(line, is_stderr)
         f_out.write(line)
@@ -81,8 +84,10 @@ class Subprocess(threading.Thread):
     def run(self):
         """Thread entry point."""
 
-        logging.info("RUN: %s %s", self.program, " ".join(self.args))
-        self.p = subprocess.Popen([self.program] + list(self.args),
+        command = [self.program] + list(self.args)
+
+        logging.info("RUN: %s", shlex.join(command))
+        self.p = subprocess.Popen(command,
                                   stdin=subprocess.PIPE,
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE,
