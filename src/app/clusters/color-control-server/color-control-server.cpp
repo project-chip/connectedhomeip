@@ -2764,49 +2764,35 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
 }
 
 /**
- * @brief move color temp command
- *
- * @param moveMode
- * @param rate
- * @param colorTemperatureMinimum
- * @param colorTemperatureMaximum
- * @param optionsMask
- * @param optionsOverride
- * @return true
- * @return false
+ * @brief executes move color temp command
+ * @param endpoint endpointId of the recipient Color control cluster
+ * @param commandData Struct containing the parameters of the command
+ * @return Status::Success when successful,
+ *         Status::InvalidCommand when a rate of 0 for a non-stop move or an unknown HueMoveMode is provided
+ *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state,
  */
-bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                              const Commands::MoveColorTemperature::DecodableType & commandData)
+Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
+                                                const Commands::MoveColorTemperature::DecodableType & commandData)
 {
-    auto moveMode                          = commandData.moveMode;
-    uint16_t rate                          = commandData.rate;
-    uint16_t colorTemperatureMinimum       = commandData.colorTemperatureMinimumMireds;
-    uint16_t colorTemperatureMaximum       = commandData.colorTemperatureMaximumMireds;
-    BitMask<OptionsBitmap> optionsMask     = commandData.optionsMask;
-    BitMask<OptionsBitmap> optionsOverride = commandData.optionsOverride;
-    EndpointId endpoint                    = commandPath.mEndpointId;
-    Status status                          = Status::Success;
-    uint16_t tempPhysicalMin               = MIN_TEMPERATURE_VALUE;
-    uint16_t tempPhysicalMax               = MAX_TEMPERATURE_VALUE;
-    uint16_t transitionTime;
-
-    Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
-    VerifyOrExit(colorTempTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    auto moveMode                = commandData.moveMode;
+    auto rate                    = commandData.rate;
+    auto colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
+    auto colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
+    auto optionsMask             = commandData.optionsMask;
+    auto optionsOverride         = commandData.optionsOverride;
 
     // check moveMode and rate before any operation is done on the transition states
     // rate value is ignored if the MoveMode is stop
-    if (moveMode == HueMoveMode::kUnknownEnumValue || (rate == 0 && moveMode != HueMoveMode::kStop))
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
-    }
+    VerifyOrReturnValue(moveMode != HueMoveMode::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue((rate != 0 || moveMode == HueMoveMode::kStop), Status::InvalidCommand);
 
-    if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
-    {
-        commandObj->AddStatus(commandPath, Status::Success);
-        return true;
-    }
+    Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
+    VerifyOrReturnValue(colorTempTransitionState != nullptr, Status::UnsupportedEndpoint);
 
+    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
+
+    uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
+    uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
     Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
     Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
@@ -2815,12 +2801,8 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
-
-    if (moveMode == HueMoveMode::kStop)
-    {
-        commandObj->AddStatus(commandPath, Status::Success);
-        return true;
-    }
+    // For HueMoveMode::kStop we are done here.
+    VerifyOrReturnValue(moveMode != HueMoveMode::kStop, Status::Success);
 
     // Per spec, colorTemperatureMinimumMireds field is limited to ColorTempPhysicalMinMireds and
     // when colorTemperatureMinimumMireds field is 0, ColorTempPhysicalMinMireds shall be used (always > 0)
@@ -2866,7 +2848,8 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
             colorTempTransitionState->finalValue = tempPhysicalMin;
         }
     }
-    transitionTime                           = computeTransitionTimeFromStateAndRate(colorTempTransitionState, rate);
+
+    uint16_t transitionTime                  = computeTransitionTimeFromStateAndRate(colorTempTransitionState, rate);
     colorTempTransitionState->stepsRemaining = transitionTime;
     colorTempTransitionState->stepsTotal     = transitionTime;
     colorTempTransitionState->timeRemaining  = transitionTime;
@@ -2879,63 +2862,62 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureTempEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
-
-exit:
-    commandObj->AddStatus(commandPath, status);
-    return true;
+    return Status::Success;
 }
 
-bool ColorControlServer::moveToColorTempCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Commands::MoveToColorTemperature::DecodableType & commandData)
+/**
+ * @brief executes move to color temp command
+ * @param endpoint endpointId of the recipient Color control cluster
+ * @param commandData Struct containing the parameters of the command
+ * @return Status::Success when successful,
+ *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color XY transition state (verified in
+ * moveToColorTemp function).
+ */
+Status ColorControlServer::moveToColorTempCommand(EndpointId endpoint,
+                                                  const Commands::MoveToColorTemperature::DecodableType & commandData)
 {
-    if (!shouldExecuteIfOff(commandPath.mEndpointId, commandData.optionsMask, commandData.optionsOverride))
-    {
-        commandObj->AddStatus(commandPath, Status::Success);
-        return true;
-    }
+    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
-    Status status = moveToColorTemp(commandPath.mEndpointId, commandData.colorTemperatureMireds, commandData.transitionTime);
+    Status status = moveToColorTemp(endpoint, commandData.colorTemperatureMireds, commandData.transitionTime);
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
+    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    commandObj->AddStatus(commandPath, status);
-    return true;
+    return status;
 }
 
-bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                              const Commands::StepColorTemperature::DecodableType & commandData)
+/**
+ * @brief executes step color temp command
+ * @param endpoint endpointId of the recipient Color control cluster
+ * @param commandData Struct containing the parameters of the command
+ * @return Status::Success when successful,
+ *         Status::InvalidCommand when stepSize is 0 or an unknown stepMode is provided
+ *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state,
+ */
+Status ColorControlServer::stepColorTempCommand(EndpointId endpoint,
+                                                const Commands::StepColorTemperature::DecodableType & commandData)
 {
-    auto stepMode                          = commandData.stepMode;
-    uint16_t stepSize                      = commandData.stepSize;
-    uint16_t transitionTime                = commandData.transitionTime;
-    uint16_t colorTemperatureMinimum       = commandData.colorTemperatureMinimumMireds;
-    uint16_t colorTemperatureMaximum       = commandData.colorTemperatureMaximumMireds;
-    BitMask<OptionsBitmap> optionsMask     = commandData.optionsMask;
-    BitMask<OptionsBitmap> optionsOverride = commandData.optionsOverride;
-    EndpointId endpoint                    = commandPath.mEndpointId;
-    Status status                          = Status::Success;
-    uint16_t tempPhysicalMin               = MIN_TEMPERATURE_VALUE;
-    uint16_t tempPhysicalMax               = MAX_TEMPERATURE_VALUE;
-
-    Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
-    VerifyOrExit(colorTempTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+    auto stepMode                = commandData.stepMode;
+    auto stepSize                = commandData.stepSize;
+    auto transitionTime          = commandData.transitionTime;
+    auto colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
+    auto colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
+    auto optionsMask             = commandData.optionsMask;
+    auto optionsOverride         = commandData.optionsOverride;
 
     // Confirm validity of the step mode and step size received
-    if (stepMode == HueStepMode::kUnknownEnumValue || stepSize == 0)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
-    }
+    VerifyOrReturnValue(stepMode != HueStepMode::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(stepSize != 0, Status::InvalidCommand);
 
-    if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
-    {
-        commandObj->AddStatus(commandPath, Status::Success);
-        return true;
-    }
+    Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
+    VerifyOrReturnValue(colorTempTransitionState != nullptr, Status::UnsupportedEndpoint);
+
+    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
 
+    uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
+    uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
     Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
     Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
@@ -3002,10 +2984,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureTempEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
-
-exit:
-    commandObj->AddStatus(commandPath, status);
-    return true;
+    return Status::Success;
 }
 
 void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
@@ -3323,21 +3302,27 @@ bool emberAfColorControlClusterMoveToColorTemperatureCallback(app::CommandHandle
                                                               const app::ConcreteCommandPath & commandPath,
                                                               const Commands::MoveToColorTemperature::DecodableType & commandData)
 {
-    return ColorControlServer::Instance().moveToColorTempCommand(commandObj, commandPath, commandData);
+    Status status = ColorControlServer::Instance().moveToColorTempCommand(commandPath.mEndpointId, commandData);
+    commandObj->AddStatus(commandPath, status);
+    return true;
 }
 
 bool emberAfColorControlClusterMoveColorTemperatureCallback(app::CommandHandler * commandObj,
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::MoveColorTemperature::DecodableType & commandData)
 {
-    return ColorControlServer::Instance().moveColorTempCommand(commandObj, commandPath, commandData);
+    Status status = ColorControlServer::Instance().moveColorTempCommand(commandPath.mEndpointId, commandData);
+    commandObj->AddStatus(commandPath, status);
+    return true;
 }
 
 bool emberAfColorControlClusterStepColorTemperatureCallback(app::CommandHandler * commandObj,
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::StepColorTemperature::DecodableType & commandData)
 {
-    return ColorControlServer::Instance().stepColorTempCommand(commandObj, commandPath, commandData);
+    Status status = ColorControlServer::Instance().stepColorTempCommand(commandPath.mEndpointId, commandData);
+    commandObj->AddStatus(commandPath, status);
+    return true;
 }
 
 void emberAfPluginLevelControlCoupledColorTempChangeCallback(EndpointId endpoint)
