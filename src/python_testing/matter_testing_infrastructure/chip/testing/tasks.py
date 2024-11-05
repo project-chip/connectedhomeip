@@ -39,7 +39,7 @@ def forward_f(f_in: BinaryIO,
 class Subprocess(threading.Thread):
     """Run a subprocess in a thread."""
 
-    def __init__(self, program: str, *args: List[str],
+    def __init__(self, program: str, *args,
                  output_cb: Optional[Callable[[bytes, bool], bytes]] = None,
                  f_stdout: BinaryIO = sys.stdout.buffer,
                  f_stderr: BinaryIO = sys.stderr.buffer):
@@ -62,7 +62,7 @@ class Subprocess(threading.Thread):
         self.output_cb = output_cb
         self.f_stdout = f_stdout
         self.f_stderr = f_stderr
-        self.output_match = None
+        self.output_match: Optional[re.Pattern] = None
         self.returncode = None
 
     def _set_output_match(self, pattern: Union[str, re.Pattern]):
@@ -86,8 +86,7 @@ class Subprocess(threading.Thread):
                                   stdin=subprocess.PIPE,
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE,
-                                  bufsize=1,
-                                  text=True)
+                                  bufsize=0)
         self.event_started.set()
 
         # Forward stdout and stderr with a tag attached.
