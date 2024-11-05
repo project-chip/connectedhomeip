@@ -4,22 +4,22 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
--   [Matter EFR32 Pump Example](#matter-efr32-pump-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Notes](#notes)
-    -   [Device Tracing](#device-tracing)
-    -   [Memory settings](#memory-settings)
-    -   [OTA Software Update](#ota-software-update)
-    -   [Group Communication (Multicast)](#group-communication-multicast)
-    -   [Building options](#building-options)
-        -   [Disabling logging](#disabling-logging)
-        -   [Debug build / release build](#debug-build--release-build)
-        -   [Disabling LCD](#disabling-lcd)
-        -   [KVS maximum entry count](#kvs-maximum-entry-count)
+- [Matter EFR32 Pump Example](#matter-efr32-pump-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Flashing the Application](#flashing-the-application)
+  - [Viewing Logging Output](#viewing-logging-output)
+  - [Running the Complete Example](#running-the-complete-example)
+    - [Notes](#notes)
+  - [Device Tracing](#device-tracing)
+  - [Memory settings](#memory-settings)
+  - [OTA Software Update](#ota-software-update)
+  - [Group Communication (Multicast)](#group-communication-multicast)
+  - [Building options](#building-options)
+    - [Disabling logging](#disabling-logging)
+    - [Debug build / release build](#debug-build--release-build)
+    - [Disabling LCD](#disabling-lcd)
+    - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -242,6 +242,7 @@ combination with JLinkRTTClient as follows:
         -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
             for 30 seconds. The device will then switch to a slower interval advertisement.
             After 15 minutes, the advertisement stops.
+            Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
 
         -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
