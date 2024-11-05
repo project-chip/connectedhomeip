@@ -323,13 +323,20 @@ def _add_target_to_cmd(cmd, flag, path, runner):
     help="At the end of the execution, show how many seconds each test took.",
 )
 @click.option(
+    "--keep-going",
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help="Keep going on errors. Will report all failed tests at the end.",
+)
+@click.option(
     "--runner",
     default="none",
     type=click.Choice(list(__RUNNERS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output",
 )
 def python_tests(
-    test_filter, from_filter, from_skip_filter, dry_run, show_timings, runner
+    test_filter, from_filter, from_skip_filter, dry_run, show_timings, runner, keep_going
 ):
     """
     Run python tests via `run_python_test.py`
@@ -411,6 +418,7 @@ def python_tests(
     test_scripts.sort()  # order consistent
 
     execution_times = []
+    failed_tests = []
     try:
         to_run = []
         for script in fnmatch.filter(test_scripts, test_filter or "*.*"):
@@ -463,7 +471,9 @@ def python_tests(
                     logging.error("Test failed: %s", script)
                     logging.info("STDOUT:\n%s", result.stdout.decode("utf8"))
                     logging.warning("STDERR:\n%s", result.stderr.decode("utf8"))
-                    sys.exit(1)
+                    if not keep_going:
+                        sys.exit(1)
+                    failed_tests.append(script)
 
                 time_info = ExecutionTimeInfo(
                     script=base_name, duration_sec=(tend - tstart)
@@ -478,6 +488,11 @@ def python_tests(
                     )
                 bar()
     finally:
+        if failed_tests and keep_going:
+            logging.error("FAILED TESTS:")
+            for name in failed_tests:
+                logging.error("  %s", name)
+
         if execution_times and show_timings:
             execution_times.sort(key=lambda v: v.duration_sec)
             print(
