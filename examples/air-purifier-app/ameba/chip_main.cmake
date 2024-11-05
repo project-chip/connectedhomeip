@@ -145,6 +145,11 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
+    ${chip_dir}/examples/air-purifier-app/air-purifier-common/src/air-purifier-manager.cpp
+    ${chip_dir}/examples/air-purifier-app/air-purifier-common/src/air-quality-sensor-manager.cpp
+    ${chip_dir}/examples/air-purifier-app/air-purifier-common/src/filter-delegates.cpp
+    ${chip_dir}/examples/air-purifier-app/air-purifier-common/src/thermostat-manager.cpp
+
     ${chip_dir}/examples/air-purifier-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/air-purifier-app/ameba/main/DeviceCallbacks.cpp
     ${chip_dir}/examples/air-purifier-app/ameba/main/CHIPDeviceManager.cpp
@@ -188,6 +193,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/air-purifier-app
     ${chip_dir}/zzz_generated/air-purifier-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
+    ${chip_dir}/examples/all-clusters-app/ameba/main/include #to get AmebaObserver.h
     ${chip_dir}/examples/air-purifier-app/air-purifier-common
     ${chip_dir}/examples/air-purifier-app/air-purifier-common/include
     ${chip_dir}/examples/air-purifier-app/ameba/main/include

@@ -192,6 +192,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/lighting-app
     ${chip_dir}/zzz_generated/lighting-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
+    ${chip_dir}/examples/all-clusters-app/ameba/main/include #to get AmebaObserver.h
     ${chip_dir}/examples/lighting-app/lighting-common
     ${chip_dir}/examples/lighting-app/lighting-common/include
     ${chip_dir}/examples/lighting-app/ameba/main/include

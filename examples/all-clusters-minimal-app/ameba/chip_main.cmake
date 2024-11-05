@@ -173,6 +173,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/all-clusters-minimal-app
     ${chip_dir}/zzz_generated/all-clusters-minimal-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
+    ${chip_dir}/examples/all-clusters-app/ameba/main/include #to get AmebaObserver.h
     ${chip_dir}/examples/all-clusters-app/all-clusters-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
     ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/include
