@@ -2138,8 +2138,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster OvenMode attributes
     MTRAttributeIDTypeClusterOvenModeAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterOvenModeAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterOvenModeAttributeStartUpModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterOvenModeAttributeOnModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterOvenModeAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterOvenModeAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterOvenModeAttributeAttributeListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -6267,15 +6265,13 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterTimerCommandReduceTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
 
     // Cluster OvenCavityOperationalState commands
-    MTRCommandIDTypeClusterOvenCavityOperationalStateCommandPauseID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterOvenCavityOperationalStateCommandStopID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterOvenCavityOperationalStateCommandStartID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterOvenCavityOperationalStateCommandResumeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRCommandIDTypeClusterOvenCavityOperationalStateCommandOperationalCommandResponseID MTR_NEWLY_AVAILABLE = 0x00000004,
 
     // Cluster OvenMode commands
-    MTRCommandIDTypeClusterOvenModeCommandChangeToModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterOvenModeCommandChangeToModeResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterOvenModeCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterOvenModeCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster ModeSelect deprecated command id names
     MTRClusterModeSelectCommandChangeToModeID

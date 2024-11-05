@@ -2737,14 +2737,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterOvenModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterOvenModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -9254,20 +9246,12 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         switch (commandID) {
 
-        case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandPauseID:
-            result = @"Pause";
-            break;
-
         case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandStopID:
             result = @"Stop";
             break;
 
         case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandStartID:
             result = @"Start";
-            break;
-
-        case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandResumeID:
-            result = @"Resume";
             break;
 
         default:

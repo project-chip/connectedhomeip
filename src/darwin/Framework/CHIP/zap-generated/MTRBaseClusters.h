@@ -4371,14 +4371,6 @@ MTR_NEWLY_AVAILABLE
 @interface MTRBaseClusterOvenCavityOperationalState : MTRGenericBaseCluster
 
 /**
- * Command Pause
- *
- * Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server.
- */
-- (void)pauseWithParams:(MTROvenCavityOperationalStateClusterPauseParams * _Nullable)params completion:(void (^)(MTROvenCavityOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)pauseWithCompletion:(void (^)(MTROvenCavityOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
-    MTR_PROVISIONALLY_AVAILABLE;
-/**
  * Command Stop
  *
  * Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted.
@@ -4394,14 +4386,6 @@ MTR_NEWLY_AVAILABLE
 - (void)startWithParams:(MTROvenCavityOperationalStateClusterStartParams * _Nullable)params completion:(void (^)(MTROvenCavityOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)startWithCompletion:(void (^)(MTROvenCavityOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * Command Resume
- *
- * Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press).
- */
-- (void)resumeWithParams:(MTROvenCavityOperationalStateClusterResumeParams * _Nullable)params completion:(void (^)(MTROvenCavityOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)resumeWithCompletion:(void (^)(MTROvenCavityOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
-    MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributePhaseListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributePhaseListWithParams:(MTRSubscribeParams *)params
@@ -4500,7 +4484,7 @@ MTR_NEWLY_AVAILABLE
  * This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
  */
-- (void)changeToModeWithParams:(MTROvenModeClusterChangeToModeParams *)params completion:(void (^)(MTROvenModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)changeToModeWithParams:(MTROvenModeClusterChangeToModeParams *)params completion:(void (^)(MTROvenModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeSupportedModesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeSupportedModesWithParams:(MTRSubscribeParams *)params
@@ -4513,22 +4497,6 @@ MTR_NEWLY_AVAILABLE
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
 + (void)readAttributeCurrentModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-
-- (void)readAttributeStartUpModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeStartUpModeWithParams:(MTRSubscribeParams *)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeStartUpModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeOnModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeOnModeWithParams:(MTRSubscribeParams *)params
-                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeOnModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -17332,16 +17300,16 @@ typedef NS_ENUM(uint8_t, MTROvenCavityOperationalStateOperationalState) {
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTROvenModeModeTag) {
-    MTROvenModeModeTagAuto MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTROvenModeModeTagQuick MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTROvenModeModeTagQuiet MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTROvenModeModeTagLowNoise MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTROvenModeModeTagLowEnergy MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTROvenModeModeTagVacation MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTROvenModeModeTagMin MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTROvenModeModeTagMax MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTROvenModeModeTagNight MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTROvenModeModeTagDay MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTROvenModeModeTagAuto MTR_NEWLY_AVAILABLE = 0x00,
+    MTROvenModeModeTagQuick MTR_NEWLY_AVAILABLE = 0x01,
+    MTROvenModeModeTagQuiet MTR_NEWLY_AVAILABLE = 0x02,
+    MTROvenModeModeTagLowNoise MTR_NEWLY_AVAILABLE = 0x03,
+    MTROvenModeModeTagLowEnergy MTR_NEWLY_AVAILABLE = 0x04,
+    MTROvenModeModeTagVacation MTR_NEWLY_AVAILABLE = 0x05,
+    MTROvenModeModeTagMin MTR_NEWLY_AVAILABLE = 0x06,
+    MTROvenModeModeTagMax MTR_NEWLY_AVAILABLE = 0x07,
+    MTROvenModeModeTagNight MTR_NEWLY_AVAILABLE = 0x08,
+    MTROvenModeModeTagDay MTR_NEWLY_AVAILABLE = 0x09,
     MTROvenModeModeTagBake MTR_NEWLY_AVAILABLE = 0x4000,
     MTROvenModeModeTagConvection MTR_NEWLY_AVAILABLE = 0x4001,
     MTROvenModeModeTagGrill MTR_NEWLY_AVAILABLE = 0x4002,
@@ -17351,10 +17319,6 @@ typedef NS_ENUM(uint16_t, MTROvenModeModeTag) {
     MTROvenModeModeTagConvectionRoast MTR_NEWLY_AVAILABLE = 0x4006,
     MTROvenModeModeTagWarming MTR_NEWLY_AVAILABLE = 0x4007,
     MTROvenModeModeTagProofing MTR_NEWLY_AVAILABLE = 0x4008,
-} MTR_NEWLY_AVAILABLE;
-
-typedef NS_OPTIONS(uint32_t, MTROvenModeFeature) {
-    MTROvenModeFeatureOnOff MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRLaundryDryerControlsDrynessLevel) {
@@ -17583,22 +17547,18 @@ typedef NS_OPTIONS(uint32_t, MTRDishwasherAlarmFeature) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTRMicrowaveOvenModeModeTag) {
-    MTRMicrowaveOvenModeModeTagAuto MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRMicrowaveOvenModeModeTagQuick MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRMicrowaveOvenModeModeTagQuiet MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRMicrowaveOvenModeModeTagLowNoise MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRMicrowaveOvenModeModeTagLowEnergy MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRMicrowaveOvenModeModeTagVacation MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRMicrowaveOvenModeModeTagMin MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRMicrowaveOvenModeModeTagMax MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRMicrowaveOvenModeModeTagNight MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRMicrowaveOvenModeModeTagDay MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRMicrowaveOvenModeModeTagAuto MTR_NEWLY_AVAILABLE = 0x00,
+    MTRMicrowaveOvenModeModeTagQuick MTR_NEWLY_AVAILABLE = 0x01,
+    MTRMicrowaveOvenModeModeTagQuiet MTR_NEWLY_AVAILABLE = 0x02,
+    MTRMicrowaveOvenModeModeTagLowNoise MTR_NEWLY_AVAILABLE = 0x03,
+    MTRMicrowaveOvenModeModeTagLowEnergy MTR_NEWLY_AVAILABLE = 0x04,
+    MTRMicrowaveOvenModeModeTagVacation MTR_NEWLY_AVAILABLE = 0x05,
+    MTRMicrowaveOvenModeModeTagMin MTR_NEWLY_AVAILABLE = 0x06,
+    MTRMicrowaveOvenModeModeTagMax MTR_NEWLY_AVAILABLE = 0x07,
+    MTRMicrowaveOvenModeModeTagNight MTR_NEWLY_AVAILABLE = 0x08,
+    MTRMicrowaveOvenModeModeTagDay MTR_NEWLY_AVAILABLE = 0x09,
     MTRMicrowaveOvenModeModeTagNormal MTR_NEWLY_AVAILABLE = 0x4000,
     MTRMicrowaveOvenModeModeTagDefrost MTR_NEWLY_AVAILABLE = 0x4001,
-} MTR_NEWLY_AVAILABLE;
-
-typedef NS_OPTIONS(uint32_t, MTRMicrowaveOvenModeFeature) {
-    MTRMicrowaveOvenModeFeatureOnOff MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRMicrowaveOvenControlFeature) {
