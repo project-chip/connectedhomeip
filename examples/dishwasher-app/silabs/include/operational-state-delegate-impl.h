@@ -76,7 +76,8 @@ private:
 
     EndpointId mEndpointId;
 
-    DataModel::List<const GenericOperationalState> mOperationalStateList = Span<const GenericOperationalState>(dishwasherOpStateList);
+    DataModel::List<const GenericOperationalState> mOperationalStateList =
+        Span<const GenericOperationalState>(dishwasherOpStateList);
     const Span<const CharSpan> mOperationalPhaseList;
 };
 
