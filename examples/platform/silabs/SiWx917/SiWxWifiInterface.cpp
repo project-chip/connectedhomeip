@@ -424,8 +424,7 @@ sl_status_t JoinWifiNetwork(void)
     ChipLogError(DeviceLayer, "sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
     VerifyOrReturnError((wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
 
-    WifiStateFlags flagsToClear = WifiStateFlags(WifiState::kStationConnecting, WifiState::kStationConnected);
-    wfx_rsi.dev_state.Clear(flagsToClear);
+    wfx_rsi.dev_state.Clear(WifiState::kStationConnecting).Clear(WifiState::kStationConnected);
 
     ChipLogProgress(DeviceLayer, "Connection retry attempt %d", wfx_rsi.join_retries);
     wfx_retry_connection(++wfx_rsi.join_retries);
@@ -735,9 +734,10 @@ void ProcessEvent(WifiEvent event)
         ChipLogDetail(DeviceLayer, "WifiEvent::kStationDisconnect");
         // TODO: This event is not being posted anywhere, seems to be a dead code or we are missing something
 
-        WifiStateFlags flagsToClear = WifiStateFlags(WifiState::kStationReady, WifiState::kStationConnecting,
-                                                     WifiState::kStationConnected, WifiState::kStationDhcpDone);
-        wfx_rsi.dev_state.Clear(flagsToClear);
+        wfx_rsi.dev_state.Clear(WifiState::kStationReady)
+                .Clear(WifiState::kStationConnecting)
+                .Clear(WifiState::kStationConnected)
+                .Clear(WifiState::kStationDhcpDone);
 
         /* TODO: Implement disconnect notify */
         ResetDHCPNotificationFlags();
@@ -922,7 +922,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     ChipLogDetail(DeviceLayer, "DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
                   wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
-    wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone, WifiState::kStationReady);
+    wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone).Set(WifiState::kStationReady);
     wfx_ip_changed_notify(IP_STATUS_SUCCESS);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */

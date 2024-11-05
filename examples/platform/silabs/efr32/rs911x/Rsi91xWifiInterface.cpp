@@ -320,8 +320,7 @@ static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
     ChipLogError(DeviceLayer, "wfx_rsi_join_fail_cb: status: %d", status);
     wfx_rsi.join_retries += 1;
 
-    WifiStateFlags flagsToClear = WifiStateFlags(WifiState::kStationConnecting, WifiState::kStationConnected);
-    wfx_rsi.dev_state.Clear(flagsToClear);
+    wfx_rsi.dev_state.Clear(WifiState::kStationConnecting).Clear(WifiState::kStationConnected);
 
     WifiEvent event = WifiEvent::kStationStartJoin;
     sl_matter_wifi_post_event(event);
