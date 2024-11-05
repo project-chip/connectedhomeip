@@ -26,6 +26,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <set>
 
+namespace admin {
+
 constexpr uint32_t kDefaultSetupPinCode    = 20202021;
 constexpr uint16_t kDefaultLocalBridgePort = 5540;
 constexpr uint16_t kResponseTimeoutSeconds = 30;
@@ -226,3 +228,5 @@ inline DeviceManager & DeviceMgr()
     }
     return DeviceManager::sInstance;
 }
+
+} // namespace admin

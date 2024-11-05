@@ -35,6 +35,8 @@
 using namespace ::chip;
 using namespace ::chip::Controller;
 
+namespace admin {
+
 namespace {
 
 CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
@@ -655,3 +657,5 @@ CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
         }
     });
 }
+
+} // namespace admin

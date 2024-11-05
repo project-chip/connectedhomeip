@@ -24,6 +24,8 @@
 #include <memory>
 #include <optional>
 
+namespace admin {
+
 /**
  * @brief Class used to get UniqueID from Bridged Device Basic Information Cluster
  *
@@ -73,3 +75,5 @@ private:
     char mUniqueId[33];
     chip::EndpointId mEndpointId;
 };
+
+} // namespace admin

@@ -22,6 +22,8 @@ using namespace ::chip;
 using namespace ::chip::app;
 using chip::app::ReadClient;
 
+namespace admin {
+
 namespace {
 
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
@@ -119,3 +121,5 @@ void FabricSyncGetter::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CH
 
     OnDone(nullptr);
 }
+
+} // namespace admin

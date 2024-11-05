@@ -28,6 +28,8 @@
 
 using namespace chip;
 
+namespace admin {
+
 namespace {
 
 // Constants
@@ -227,3 +229,5 @@ CHIP_ERROR DeviceReachableChanged(const chip_rpc_ReachabilityChanged & data)
 
     return WaitForResponse(call);
 }
+
+} // namespace admin

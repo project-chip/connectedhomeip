@@ -22,6 +22,8 @@ using namespace ::chip;
 using namespace ::chip::app;
 using chip::app::ReadClient;
 
+namespace admin {
+
 namespace {
 
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
@@ -139,3 +141,5 @@ void UniqueIdGetter::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP
 
     OnDone(nullptr);
 }
+
+} // namespace admin

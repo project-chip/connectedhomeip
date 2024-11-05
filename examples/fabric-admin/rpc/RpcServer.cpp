@@ -38,6 +38,8 @@
 
 using namespace ::chip;
 
+namespace admin {
+
 namespace {
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
@@ -254,3 +256,5 @@ void InitRpcServer(uint16_t rpcServerPort)
     std::thread rpc_service(RunRpcService);
     rpc_service.detach();
 }
+
+} // namespace admin

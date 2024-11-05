@@ -30,6 +30,8 @@
 
 using namespace ::chip;
 
+namespace admin {
+
 void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 {
     if (mBridgeNodeId != deviceId)
@@ -305,3 +307,5 @@ CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
 
     return CHIP_NO_ERROR;
 }
+
+} // namespace admin

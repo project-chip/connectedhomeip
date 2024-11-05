@@ -17,11 +17,13 @@
  */
 
 #include "BridgeSubscription.h"
-#include <device_manager/DeviceManager.h>
+#include "DeviceManager.h"
 
 using namespace ::chip;
 using namespace ::chip::app;
 using chip::app::ReadClient;
+
+namespace admin {
 
 namespace {
 
@@ -157,3 +159,5 @@ void BridgeSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, 
     ChipLogError(NotSpecified, "BridgeSubscription failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     OnDone(nullptr);
 }
+
+} // namespace admin

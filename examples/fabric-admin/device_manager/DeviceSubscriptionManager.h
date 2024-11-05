@@ -25,6 +25,8 @@
 
 #include <memory>
 
+namespace admin {
+
 class DeviceSubscriptionManager
 {
 public:
@@ -52,3 +54,5 @@ private:
 
     std::unordered_map<chip::ScopedNodeId, std::unique_ptr<DeviceSubscription>, ScopedNodeIdHasher> mDeviceSubscriptionMap;
 };
+
+} // namespace admin

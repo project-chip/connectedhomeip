@@ -24,6 +24,8 @@
 #include <memory>
 #include <optional>
 
+namespace admin {
+
 /**
  * @brief Class used to get FabricSynchronization from SupportedDeviceCategories attribute of Commissioner Control Cluster.
  *
@@ -73,3 +75,5 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 };
+
+} // namespace admin
