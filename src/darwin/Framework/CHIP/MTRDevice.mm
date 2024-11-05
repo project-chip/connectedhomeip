@@ -26,6 +26,7 @@
 #import "MTRConversion.h"
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
@@ -736,6 +737,13 @@
 
 - (MTRAttributeValueWaiter * _Nullable)waitForAttributeValues:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values timeout:(NSTimeInterval)timeout queue:(dispatch_queue_t)queue completion:(void (^)(NSError * _Nullable error))completion
 {
+    // Check whether the values coming in make sense.
+    for (MTRAttributePath * path in values) {
+        if (!MTRDataValueDictionaryIsWellFormed(values[path])) {
+            return nil;
+        }
+    }
+
     // Check whether we have all these values already.
     NSMutableArray<MTRAttributeRequestPath *> * requestPaths = [NSMutableArray arrayWithCapacity:values.count];
     for (MTRAttributePath * path in values) {
@@ -765,15 +773,13 @@
     }
     [self.attributeValueWaiters addObject:attributeWaiter];
 
-    // Clamp timeout to 5 minutes.
-    timeout = std::min(timeout, 5.0 * 60);
+    MTR_LOG("%@ waitForAttributeValues will wait up to %f seconds for %@", self, timeout, values);
     dispatch_source_t timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
     attributeWaiter.expirationTimer = timerSource;
 
     // Set a timer to go off after timeout, and not repeat.
     dispatch_source_set_timer(timerSource, dispatch_time(DISPATCH_TIME_NOW, static_cast<uint64_t>(timeout * static_cast<double>(NSEC_PER_SEC))), DISPATCH_TIME_FOREVER,
-        // Allow .5 seconds of leeway; should be plenty,
-        // in practice.
+        // Allow .5 seconds of leeway; should be plenty, in practice.
         static_cast<uint64_t>(0.5 * static_cast<double>(NSEC_PER_SEC)));
 
     mtr_weakify(attributeWaiter);

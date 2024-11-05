@@ -351,9 +351,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * The attributes and values to wait for are represented as a dictionary which
  * has the attribute paths as keys and the expected data-values as values.
  *
- * If the provided timeout is larger than 5 minutes, it will be capped to 5
- * minutes.
- *
  * Nil will be returned if for some reason the wait could not be started
  * (e.g. invalid input).
  */

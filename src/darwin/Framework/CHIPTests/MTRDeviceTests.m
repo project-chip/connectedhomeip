@@ -1597,14 +1597,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertNil(error);
         [deviceTypesWaitExpectation fulfill];
     }];
-    (void) waiter1; // Just there to keep it alive
+    XCTAssertNotNil(waiter1);
     [self waitForExpectations:@[ deviceTypesWaitExpectation ] timeout:kTimeoutInSeconds];
 
     // Now values that we know will never be there (the type is wrong).
     __auto_type * bogusDeviceType = @{
         deviceTypes[0][MTRAttributePathKey] : @ {
             MTRTypeKey : MTROctetStringValueType,
-            MTRValueKey : @"abc",
+            MTRValueKey : [@"abc" dataUsingEncoding:NSUTF8StringEncoding],
         },
     };
     XCTestExpectation * bogusDeviceTypesWaitExpectation = [self expectationWithDescription:@"bogusDeviceTypes wait should time out"];
@@ -1614,7 +1614,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertEqual(error.code, MTRErrorCodeTimeout);
         [bogusDeviceTypesWaitExpectation fulfill];
     }];
-    (void) waiter2; // Just there to keep it alive
+    XCTAssertNotNil(waiter2);
     [self waitForExpectations:@[ bogusDeviceTypesWaitExpectation ] timeout:kTimeoutInSeconds];
 
     // Before resubscribe, first test write failure and expected value effects
@@ -1656,7 +1656,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                                     XCTAssertEqual(error.code, MTRErrorCodeTimeout);
                                                     [nonexistentAttributeValueWaitExpectation fulfill];
                                                 }];
-    (void) waiter3; // Just there to keep it alive
+    XCTAssertNotNil(waiter3);
 
     [device writeAttributeWithEndpointID:testEndpointID
                                clusterID:testClusterID
@@ -1714,7 +1714,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertNil(error);
         [waitingForOnTimeValue1Expectation fulfill];
     }];
-    (void) waiter4; // Just there to keep it alive
+    XCTAssertNotNil(waiter4);
 
     XCTestExpectation * waitingForOnTimeValue2Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is the expected value"];
     __auto_type * onTimeAndDeviceTypeValuesToWaitFor = [NSMutableDictionary dictionaryWithDictionary:onTimeValueToWaitFor];
@@ -1724,7 +1724,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertNil(error);
         [waitingForOnTimeValue2Expectation fulfill];
     }];
-    (void) waiter5; // Just there to keep it alive
+    XCTAssertNotNil(waiter5);
 
     XCTestExpectation * waitingForOnTimeValue3Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is bogus, or we timed out"];
     __auto_type * onTimeAndBogusDeviceTypeValuesToWaitFor = [NSMutableDictionary dictionaryWithDictionary:onTimeValueToWaitFor];
@@ -1735,7 +1735,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertEqual(error.code, MTRErrorCodeTimeout);
         [waitingForOnTimeValue3Expectation fulfill];
     }];
-    (void) waiter6; // Just there to keep it alive
+    XCTAssertNotNil(waiter6);
 
     XCTestExpectation * waitingForOnTimeValue4Expectation = [self expectationWithDescription:@"Waiter should have been canceled"];
     __auto_type * waiter7 = [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
@@ -1744,6 +1744,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertEqual(error.code, MTRErrorCodeCancelled);
         [waitingForOnTimeValue4Expectation fulfill];
     }];
+    XCTAssertNotNil(waiter7);
     [waiter7 cancel];
 
     XCTestExpectation * waitingForOnTimeValue5Expectation = [self expectationWithDescription:@"Waiter should have been canceled due to being destroyed"];
