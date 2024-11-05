@@ -39,7 +39,6 @@ extern void xPortSysTickHandler(void);
 /* RSI Driver include file */
 #include "rsi_driver.h"
 /* RSI WLAN Config include file */
-#include "WifiInterfaceAbstraction.h"
 #include "rsi_bootup_config.h"
 #include "rsi_common_apis.h"
 #include "rsi_data_types.h"

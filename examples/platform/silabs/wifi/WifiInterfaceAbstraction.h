@@ -57,12 +57,6 @@ enum class WifiState : uint16_t
 };
 using WifiStateFlags = chip::BitFlags<WifiState>;
 
-typedef struct WfxEvent_s
-{
-    WifiEvent eventType;
-    void * eventData; // event data TODO: confirm needed
-} WfxEvent_t;
-
 typedef struct wfx_rsi_s
 {
     WifiStateFlags dev_state;
@@ -120,7 +114,6 @@ int32_t wfx_rsi_power_save();
 /**
  * @brief Posts an event to the Wi-Fi task
  *
- * @param[in] event Event to process. Must be valid ptr
+ * @param[in] event Event to process.
  */
-// TODO: Can't be a const & since the ncp builds are still using c files
-void sl_matter_wifi_post_event(WfxEvent_t * event);
+void sl_matter_wifi_post_event(WifiEvent event);

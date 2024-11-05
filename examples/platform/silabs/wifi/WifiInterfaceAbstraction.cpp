@@ -34,6 +34,8 @@
 using namespace chip;
 using namespace chip::DeviceLayer;
 
+using WifiStateFlags = chip::BitFlags<WifiState>;
+
 namespace {
 
 constexpr uint8_t kWlanMinRetryIntervalsInSec = 1;
@@ -88,8 +90,8 @@ void RetryConnectionTimerHandler(void * arg)
  ***********************************************************************/
 sl_status_t wfx_wifi_start(void)
 {
-    VerifyOrReturnError(!(wfx_rsi.dev_state & WifiState::kStationStarted), SL_STATUS_OK);
-    wfx_rsi.dev_state |= WifiState::kStationStarted;
+    VerifyOrReturnError(!(wfx_rsi.dev_state.Has(WifiState::kStationStarted)), SL_STATUS_OK);
+    wfx_rsi.dev_state.Set(WifiState::kStationStarted);
 
     // Creating a Wi-Fi driver thread
     sWlanThread = osThreadNew(sl_matter_wifi_task, NULL, &kWlanTaskAttr);
@@ -201,9 +203,9 @@ sl_status_t wfx_connect_to_ap(void)
     VerifyOrReturnError(wfx_rsi.sec.ssid_length, SL_STATUS_INVALID_CREDENTIALS);
     VerifyOrReturnError(wfx_rsi.sec.ssid_length <= WFX_MAX_SSID_LENGTH, SL_STATUS_HAS_OVERFLOWED);
     ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
-    WfxEvent_t event;
-    event.eventType = WifiEvent::kStationStartJoin;
-    sl_matter_wifi_post_event(&event);
+
+    WifiEvent event = WifiEvent::kStationStartJoin;
+    sl_matter_wifi_post_event(event);
     return SL_STATUS_OK;
 }
 
@@ -401,9 +403,8 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
     VerifyOrReturnError(wfx_rsi.scan_ssid != nullptr, false);
     chip::Platform::CopyString(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length, ssid);
 
-    WfxEvent_t event;
-    event.eventType = WifiEvent::kScan;
-    sl_matter_wifi_post_event(&event);
+    WifiEvent event = WifiEvent::kScan;
+    sl_matter_wifi_post_event(event);
 
     return true;
 }

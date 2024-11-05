@@ -201,8 +201,8 @@ constexpr uint16_t kWifiScanTimeoutTicks = 10000;
 
 void DHCPTimerEventHandler(void * arg)
 {
-    WfxEvent_t event = { .eventType = WifiEvent::kStationDhcpPoll };
-    sl_matter_wifi_post_event(&event);
+    WifiEvent event = WifiEvent::kStationDhcpPoll;
+    sl_matter_wifi_post_event(event);
 }
 
 void CancelDHCPTimer(void)
@@ -415,9 +415,8 @@ sl_status_t JoinWifiNetwork(void)
 
     if (status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS)
     {
-        WfxEvent_t event;
-        event.eventType = WifiEvent::kStationConnect;
-        sl_matter_wifi_post_event(&event);
+        WifiEvent event = WifiEvent::kStationConnect;
+        sl_matter_wifi_post_event(event);
         return status;
     }
 
@@ -425,13 +424,14 @@ sl_status_t JoinWifiNetwork(void)
     ChipLogError(DeviceLayer, "sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
     VerifyOrReturnError((wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
 
-    wfx_rsi.dev_state.Clear(WifiState::kStationConnecting, WifiState::kStationConnected);
+    WifiStateFlags flagsToClear = WifiStateFlags(WifiState::kStationConnecting, WifiState::kStationConnected);
+    wfx_rsi.dev_state.Clear(flagsToClear);
+
     ChipLogProgress(DeviceLayer, "Connection retry attempt %d", wfx_rsi.join_retries);
     wfx_retry_connection(++wfx_rsi.join_retries);
 
-    WfxEvent_t event;
-    event.eventType = WifiEvent::kStationStartJoin;
-    sl_matter_wifi_post_event(&event);
+    WifiEvent event = WifiEvent::kStationStartJoin;
+    sl_matter_wifi_post_event(event);
 
     return status;
 }
@@ -656,7 +656,7 @@ void NotifyConnectivity(void)
 
 void HandleDHCPPolling(void)
 {
-    WfxEvent_t event;
+    WifiEvent event;
 
     // TODO: Notify the application that the interface is not set up or Chipdie here because we are in an unkonwn state
     struct netif * sta_netif = &wifi_client_context.netif;
@@ -668,8 +668,8 @@ void HandleDHCPPolling(void)
     {
         wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
         hasNotifiedIPV4 = true;
-        event.eventType = WifiEvent::kStationDhcpDone;
-        sl_matter_wifi_post_event(&event);
+        event           = WifiEvent::kStationDhcpDone;
+        sl_matter_wifi_post_event(event);
         NotifyConnectivity();
     }
     else if (dhcp_state == DHCP_OFF)
@@ -688,27 +688,27 @@ void HandleDHCPPolling(void)
         ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
         wfx_ipv6_notify(GET_IPV6_SUCCESS);
         hasNotifiedIPV6 = true;
-        event.eventType = WifiEvent::kStationDhcpDone;
-        sl_matter_wifi_post_event(&event);
+        event           = WifiEvent::kStationDhcpDone;
+        sl_matter_wifi_post_event(event);
         NotifyConnectivity();
     }
 }
-
-void sl_matter_wifi_post_event(WfxEvent_t * event)
+void sl_matter_wifi_post_event(WifiEvent event)
 {
-    if (osMessageQueuePut(sWifiEventQueue, event, 0, 0) != osOK)
+    sl_status_t status = osMessageQueuePut(sWifiEventQueue, &event, 0, 0);
+
+    if (status != osOK)
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_post_event: failed to post event.")
-        // TODO: Handle error, requeue event depending on queue size or notify relevant task, Chipdie, etc.
+        ChipLogError(DeviceLayer, "sl_matter_wifi_post_event: failed to post event with status: %ld", status);
+        // TODO: Handle error, requeue event depending on queue size or notify relevant task,
+        // Chipdie, etc.
     }
 }
-
 /// ResetDHCPNotificationFlags
 /// @brief Reset the flags that are used to notify the application about DHCP connectivity
 ///        and emits a WifiEvent::kStationDoDhcp event to trigger DHCP polling checks. Helper function for ProcessEvent.
 void ResetDHCPNotificationFlags(void)
 {
-    WfxEvent_t outEvent;
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
     hasNotifiedIPV4 = false;
@@ -716,27 +716,29 @@ void ResetDHCPNotificationFlags(void)
     hasNotifiedIPV6             = false;
     hasNotifiedWifiConnectivity = false;
 
-    outEvent.eventType = WifiEvent::kStationDoDhcp;
-    sl_matter_wifi_post_event(&outEvent);
+    WifiEvent event = WifiEvent::kStationDoDhcp;
+    sl_matter_wifi_post_event(event);
 }
 
-void ProcessEvent(WfxEvent_t inEvent)
+void ProcessEvent(WifiEvent event)
 {
     // Process event
-    switch (inEvent.eventType)
+    switch (event)
     {
     case WifiEvent::kStationConnect:
         ChipLogDetail(DeviceLayer, "WifiEvent::kStationConnect");
         wfx_rsi.dev_state.Set(WifiState::kStationConnected);
         ResetDHCPNotificationFlags();
-
         break;
 
-    case WifiEvent::kStationDisconnect:
+    case WifiEvent::kStationDisconnect: {
         ChipLogDetail(DeviceLayer, "WifiEvent::kStationDisconnect");
         // TODO: This event is not being posted anywhere, seems to be a dead code or we are missing something
-        wfx_rsi.dev_state.Clear(WifiState::kStationReady, WifiState::kStationConnecting, WifiState::kStationConnected,
-                                WifiState::kStationDhcpDone);
+
+        WifiStateFlags flagsToClear = WifiStateFlags(WifiState::kStationReady, WifiState::kStationConnecting,
+                                                     WifiState::kStationConnected, WifiState::kStationDhcpDone);
+        wfx_rsi.dev_state.Clear(flagsToClear);
+
         /* TODO: Implement disconnect notify */
         ResetDHCPNotificationFlags();
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -744,11 +746,9 @@ void ProcessEvent(WfxEvent_t inEvent)
         wfx_ip_changed_notify(IP_STATUS_FAIL);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         wfx_ipv6_notify(GET_IPV6_FAIL);
-        break;
+    }
+    break;
 
-    case WifiEvent::kAPStart:
-        // TODO: Currently unimplemented
-        break;
     case WifiEvent::kAPStart:
         // TODO: Currently unimplemented
         break;
@@ -803,13 +803,11 @@ void ProcessEvent(WfxEvent_t inEvent)
         }
 #endif /* SL_WFX_CONFIG_SCAN */
         break;
+
     case WifiEvent::kStationStartJoin:
         ChipLogDetail(DeviceLayer, "WifiEvent::kStationStartJoin");
 
-        // Trigger Netwrok scan
         InitiateScan();
-
-        // Joining to the network
         JoinWifiNetwork();
         break;
 
@@ -817,13 +815,17 @@ void ProcessEvent(WfxEvent_t inEvent)
         ChipLogDetail(DeviceLayer, "WifiEvent::kStationDoDhcp");
         StartDHCPTimer(WFX_RSI_DHCP_POLL_INTERVAL);
         break;
+
     case WifiEvent::kStationDhcpDone:
         ChipLogDetail(DeviceLayer, "WifiEvent::kStationDhcpDone");
         CancelDHCPTimer();
         break;
+
     case WifiEvent::kStationDhcpPoll:
         ChipLogDetail(DeviceLayer, "WifiEvent::kStationDhcpPoll");
         HandleDHCPPolling();
+        break;
+
     default:
         break;
     }
@@ -850,7 +852,7 @@ sl_status_t sl_matter_wifi_platform_init(void)
     VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
 
     // Create the message queue
-    sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WfxEvent_t), nullptr);
+    sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiEvent), nullptr);
     VerifyOrReturnError(sWifiEventQueue != nullptr, SL_STATUS_ALLOCATION_FAILED);
 
     // Create timer for DHCP polling
@@ -875,7 +877,7 @@ sl_status_t sl_matter_wifi_platform_init(void)
 void sl_matter_wifi_task(void * arg)
 {
     (void) arg;
-    WfxEvent_t wfxEvent;
+    WifiEvent event;
     sl_status_t status = SL_STATUS_OK;
 
     status = sl_wifi_siwx917_init();
@@ -888,9 +890,9 @@ void sl_matter_wifi_task(void * arg)
     ChipLogDetail(DeviceLayer, "sl_matter_wifi_task: starting event loop");
     for (;;)
     {
-        if (osMessageQueueGet(sWifiEventQueue, &wfxEvent, nullptr, osWaitForever) == osOK)
+        if (osMessageQueueGet(sWifiEventQueue, &event, nullptr, osWaitForever) == osOK)
         {
-            ProcessEvent(wfxEvent);
+            ProcessEvent(event);
         }
         else
         {
