@@ -27,6 +27,10 @@ if (!nxp_external_sdk) {
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 assert(chip_device_platform == "nxp")
+assert(nxp_platform == "mcxw72")
+
+assert(!nxp_use_low_power || (nxp_use_low_power && !nxp_enable_ot_cli),
+       "Please disable low power if openthread CLI is needed!")
 
 source_set("nxp_factory_data") {
   sources = [
@@ -96,7 +100,11 @@ static_library("nxp_platform") {
     "-Wno-sign-compare",
   ]
   deps = []
-  defines = [ "NXP_USE_MML=1" ]
+  defines = [
+    "NXP_DEVICE_K32W1_MCXW7X=1",
+    "NXP_USE_MML=1",
+  ]
+
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
@@ -135,6 +143,11 @@ static_library("nxp_platform") {
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  if (nxp_use_low_power) {
+    sources += [ "../mcxw71_k32w1/LowPowerHooks.cpp" ]
+  }
+
 
   deps += [ 
     "${chip_root}/src/platform/logging:headers",

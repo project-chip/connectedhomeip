@@ -111,18 +111,25 @@ mcxw72_executable("lock_app") {
 
   # Defines used by common code
   defines += [
-    "APP_QUEUE_TICKS_TO_WAIT=pdMS_TO_TICKS(10)",
     "CONFIG_NET_L2_OPENTHREAD=1",
     "CONFIG_NETWORK_LAYER_BLE=1",
     "CONFIG_THREAD_DEVICE_TYPE=kThreadDeviceType_SleepyEndDevice",
     "CONFIG_APP_FREERTOS_OS=1",
     "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
-    "CONFIG_ENABLE_FEEDBACK=1",
-    "LED_MANAGER_ENABLE_STATUS_LED=1",
   ]
 
   if (chip_with_diag_logs_demo) {
     defines += [ "CONFIG_DIAG_LOGS_DEMO=1" ]
+  }
+
+  if (nxp_use_low_power) {
+    defines += [ "CONFIG_LOW_POWER=1" ]
+  } else {
+    defines += [
+      "CONFIG_ENABLE_FEEDBACK=1",
+      "LED_MANAGER_ENABLE_STATUS_LED=1",
+      "APP_QUEUE_TICKS_TO_WAIT=pdMS_TO_TICKS(10)",
+    ]
   }
 
   # App common files
@@ -140,6 +147,8 @@ mcxw72_executable("lock_app") {
     "${common_example_dir}/operational_keystore/include",
     "${common_example_dir}/ui_feedback/include",
     "${common_example_dir}/app_ble/include",
+    "${common_example_dir}/low_power/include",
+    "${support_common_platform_dir}/low_power",
   ]
 
   sources += [
@@ -154,7 +163,16 @@ mcxw72_executable("lock_app") {
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
     "${common_example_dir}/factory_data/source/AppFactoryDataDefaultImpl.cpp",
+    "${common_example_dir}/../mcxw71_k32w1/clusters/Identify.cpp",
   ]
+
+  if (nxp_use_low_power) {
+    sources += [
+      "${common_example_dir}/low_power/source/LowPower.cpp",
+      "${support_common_platform_dir}/low_power/freertos_lp_hooks.c",
+    ]
+
+  }
 
   if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
@@ -227,11 +245,12 @@ mcxw72_executable("lock_app") {
     "../common/main/main.cpp",
   ]
 
-  sources += [
-    "${common_example_dir}/ui_feedback/source/LedManager.cpp",
-    "${common_example_dir}/../mcxw71_k32w1/clusters/Identify.cpp",
-    "${common_example_dir}/../mcxw71_k32w1/util/LedOnOff.cpp",
-  ]
+  if (!nxp_use_low_power) {
+    sources += [
+      "${common_example_dir}/ui_feedback/source/LedManager.cpp",
+      "${common_example_dir}/../mcxw71_k32w1/util/LedOnOff.cpp",
+    ]
+  }
 
   deps += [
     "${chip_root}/examples/providers:device_info_provider",
@@ -264,6 +283,8 @@ mcxw72_executable("lock_app") {
   ldflags = [
     "-Wl,--defsym=__heap_size__=0",
     "-Wl,--defsym=__stack_size__=0x480",
+    "-Wl,--defsym=lp_ram_lower_limit=0x04000000",
+    "-Wl,--defsym=lp_ram_upper_limit=0x2001C000",
     "-Wl,-print-memory-usage",
     "-Wl,--no-warn-rwx-segments",
     "-Wl,--defsym=gUseNVMLink_d=1",
