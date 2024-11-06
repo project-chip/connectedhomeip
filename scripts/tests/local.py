@@ -31,6 +31,7 @@ from typing import List
 
 import alive_progress
 import click
+import colorama
 import coloredlogs
 import tabulate
 import yaml
@@ -95,6 +96,7 @@ class ExecutionTimeInfo:
 
     script: str
     duration_sec: float
+    status: str
 
 
 # Top level command, groups all other commands for the purpose of having
@@ -316,8 +318,8 @@ def _add_target_to_cmd(cmd, flag, path, runner):
     help="Don't actually execute the tests, just print out the command that would be run.",
 )
 @click.option(
-    "--show_timings",
-    default=False,
+    "--no-show-timings",
+    default=True,
     is_flag=True,
     show_default=True,
     help="At the end of the execution, show how many seconds each test took.",
@@ -336,7 +338,13 @@ def _add_target_to_cmd(cmd, flag, path, runner):
     help="Determines the verbosity of script output",
 )
 def python_tests(
-    test_filter, from_filter, from_skip_filter, dry_run, show_timings, runner, keep_going
+    test_filter,
+    from_filter,
+    from_skip_filter,
+    dry_run,
+    no_show_timings,
+    runner,
+    keep_going,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -402,7 +410,9 @@ def python_tests(
     excluded_patterns = set([item["name"] for item in metadata["not_automated"]])
 
     # NOTE: for slow tests. we add logs to not get impatient
-    slow_test_duration = dict([(item["name"], item["duration"]) for item in metadata["slow_tests"]])
+    slow_test_duration = dict(
+        [(item["name"], item["duration"]) for item in metadata["slow_tests"]]
+    )
 
     if not os.path.isdir("src/python_testing"):
         raise Exception(
@@ -476,7 +486,13 @@ def python_tests(
                     failed_tests.append(script)
 
                 time_info = ExecutionTimeInfo(
-                    script=base_name, duration_sec=(tend - tstart)
+                    script=base_name,
+                    duration_sec=(tend - tstart),
+                    status=(
+                        "PASS"
+                        if result.returncode == 0
+                        else colorama.Fore.RED + "FAILURE" + colorama.Fore.RESET
+                    ),
                 )
                 execution_times.append(time_info)
 
@@ -493,11 +509,19 @@ def python_tests(
             for name in failed_tests:
                 logging.error("  %s", name)
 
-        if execution_times and show_timings:
-            execution_times.sort(key=lambda v: v.duration_sec)
-            print(
-                tabulate.tabulate(execution_times, headers=["Script", "Duration(sec)"])
+        if execution_times and not no_show_timings:
+            execution_times.sort(
+                key=lambda v: (0 if v.status == "PASS" else 1, v.duration_sec),
             )
+            print(
+                tabulate.tabulate(
+                    execution_times, headers=["Script", "Duration(sec)", "Status"]
+                )
+            )
+
+        if failed_tests:
+            # Propagate the final failure
+            sys.exit(1)
 
 
 def _do_build_fabric_sync_apps():
