@@ -183,7 +183,6 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithPerControllerStorage(NSArray<NSData 
             CFAutorelease(publicKey);
         }
 
-
         VerifyOrReturnError(nil == error, MTRErrorToCHIPErrorCode(error), ChipLogError(chipTool, "Can not issue an operational certificate: %@", error));
 
         __auto_type * controllerStorageQueue = dispatch_queue_create("com.chip.storage", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
