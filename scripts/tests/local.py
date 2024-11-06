@@ -319,9 +319,8 @@ def _add_target_to_cmd(cmd, flag, path, runner):
 )
 @click.option(
     "--no-show-timings",
-    default=True,
+    default=False,
     is_flag=True,
-    show_default=True,
     help="At the end of the execution, show how many seconds each test took.",
 )
 @click.option(
