@@ -535,7 +535,9 @@
     SecKeyRef originalKeyRef;
     if ([testKeys respondsToSelector:@selector(copyPublicKey)]) {
         originalKeyRef = [testKeys copyPublicKey];
-        CFAutorelease(originalKeyRef);
+        if (originalKeyRef != NULL) {
+            CFAutorelease(originalKeyRef);
+        }
     } else {
         originalKeyRef = [testKeys publicKey];
     }
