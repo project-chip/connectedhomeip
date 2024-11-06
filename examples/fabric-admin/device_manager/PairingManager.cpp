@@ -550,7 +550,12 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     if (err == CHIP_NO_ERROR)
     {
         // print to console
-        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 "has been successfully removed.\n", ChipLogValueX64(nodeId));
+        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 " has been successfully removed.\n", ChipLogValueX64(nodeId));
+
+        if (self->mPairingDelegate)
+        {
+            self->mPairingDelegate->OnDeviceRemoved(nodeId, err);
+        }
 
 #if defined(PW_RPC_ENABLED)
         FabricIndex fabricIndex = self->CurrentCommissioner().GetFabricIndex();

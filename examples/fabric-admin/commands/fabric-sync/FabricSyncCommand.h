@@ -124,8 +124,8 @@ public:
         AddArgument("endpointid", 0, UINT16_MAX, &mRemoteEndpointId);
     }
 
-    void OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload) override;
-    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err) override;
+    void OnCommissioningWindowOpened(chip::NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload) override;
+    void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) override;
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override { return RunCommand(mRemoteEndpointId); }
@@ -136,7 +136,7 @@ private:
     chip::EndpointId mRemoteEndpointId = chip::kInvalidEndpointId;
     chip::NodeId mAssignedNodeId       = chip::kUndefinedNodeId;
 
-    CHIP_ERROR RunCommand(chip::EndpointId remoteId);
+    CHIP_ERROR RunCommand(chip::EndpointId remoteEndpointId);
 };
 
 } // namespace admin
