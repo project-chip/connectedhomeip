@@ -212,7 +212,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         time_remaining = report_waiting_timeout_delay_sec
 
         parts_list_endpoint_count_from_step_1 = len(step_1_dut_parts_list)
-        step_3_dut_parts_list = None
+        step_3_dut_parts_list = []
         while time_remaining > 0:
             try:
                 item = parts_list_queue.get(block=True, timeout=time_remaining)
@@ -304,16 +304,20 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
                 endpoint, attribute, value = item['endpoint'], item['attribute'], item['value']
 
                 # Record arrival of an expected subscription change when seen
-                if endpoint == newly_added_endpoint and attribute == Clusters.AdministratorCommissioning.Attributes.WindowStatus:
+                if endpoint == newly_added_endpoint and attribute == cadmin_attr.WindowStatus:
+                    if value != th_server_direct_cadmin[cadmin_attr.WindowStatus]:
+                        logging.info("Window status is %r, waiting for %r", value,
+                                     th_server_direct_cadmin[cadmin_attr.WindowStatus])
+                        continue
                     cadmin_sub_new_data = True
                     break
-
             except queue.Empty:
                 # No error, we update timeouts and keep going
                 pass
-
-            elapsed = time.time() - start_time
-            time_remaining = report_waiting_timeout_delay_sec - elapsed
+            finally:
+                # each iteration will alter timing
+                elapsed = time.time() - start_time
+                time_remaining = report_waiting_timeout_delay_sec - elapsed
 
         asserts.assert_true(cadmin_sub_new_data,
                             "Timed out waiting for DUT to reflect AdministratorCommissioning attributes for bridged device")

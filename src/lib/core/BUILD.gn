@@ -48,7 +48,6 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE=${chip_log_message_max_size}",
     "CHIP_AUTOMATION_LOGGING=${chip_automation_logging}",
     "CHIP_PW_TOKENIZER_LOGGING=${chip_pw_tokenizer_logging}",
-    "CHIP_USE_PW_LOGGING=${chip_use_pw_logging}",
     "CHIP_EXCHANGE_NODE_ID_LOGGING=${chip_exchange_node_id_logging}",
     "CHIP_CONFIG_SHORT_ERROR_STR=${chip_config_short_error_str}",
     "CHIP_CONFIG_ENABLE_ARG_PARSER=${chip_config_enable_arg_parser}",

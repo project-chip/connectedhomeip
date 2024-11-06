@@ -354,6 +354,7 @@ class HostBuilder(GnBuilder):
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
+            self.extra_gn_options.append('chip_enable_ble=false')
 
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')

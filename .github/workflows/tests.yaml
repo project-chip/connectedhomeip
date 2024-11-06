@@ -494,7 +494,7 @@ jobs:
                       --target linux-x64-microwave-oven-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-rvc-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-network-manager-ipv6only-no-ble-no-wifi-tsan-clang-test \
-                      --target linux-x64-fabric-admin-rpc-ipv6only-clang \
+                      --target linux-x64-fabric-admin-rpc-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-python-bindings \
@@ -511,7 +511,7 @@ jobs:
                   echo "CHIP_MICROWAVE_OVEN_APP: out/linux-x64-microwave-oven-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-microwave-oven-app" >> /tmp/test_env.yaml
                   echo "CHIP_RVC_APP: out/linux-x64-rvc-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-rvc-app" >> /tmp/test_env.yaml
                   echo "NETWORK_MANAGEMENT_APP: out/linux-x64-network-manager-ipv6only-no-ble-no-wifi-tsan-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
-                  echo "FABRIC_ADMIN_APP: out/linux-x64-fabric-admin-rpc-ipv6only-clang/fabric-admin" >> /tmp/test_env.yaml
+                  echo "FABRIC_ADMIN_APP: out/linux-x64-fabric-admin-rpc-ipv6only-no-ble-no-wifi-clang/fabric-admin" >> /tmp/test_env.yaml
                   echo "FABRIC_BRIDGE_APP: out/linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: out/linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
