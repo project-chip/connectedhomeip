@@ -59,7 +59,7 @@ CHIP_ERROR WaitForResponse(CallType & call)
     }
     else
     {
-        fprintf(stderr, "RPC Response timed out!");
+        fprintf(stderr, "RPC Response timed out!\n");
         return CHIP_ERROR_TIMEOUT;
     }
 }
