@@ -26,7 +26,7 @@ namespace admin {
 // Constants
 constexpr uint32_t kCommissionPrepareTimeMs = 500;
 
-class FabricSyncAddBridgeCommand : public CHIPCommand, public CommissioningDelegate
+class FabricSyncAddBridgeCommand : public CHIPCommand, public PairingDelegate
 {
 public:
     FabricSyncAddBridgeCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("add-bridge", credIssuerCommands)
@@ -71,7 +71,7 @@ private:
     chip::NodeId mBridgeNodeId;
 };
 
-class FabricSyncAddLocalBridgeCommand : public CHIPCommand, public CommissioningDelegate
+class FabricSyncAddLocalBridgeCommand : public CHIPCommand, public PairingDelegate
 {
 public:
     FabricSyncAddLocalBridgeCommand(CredentialIssuerCommands * credIssuerCommands) :
@@ -116,7 +116,7 @@ private:
     chip::NodeId mLocalBridgeNodeId;
 };
 
-class FabricSyncDeviceCommand : public CHIPCommand, public CommissioningWindowDelegate, public CommissioningDelegate
+class FabricSyncDeviceCommand : public CHIPCommand, public CommissioningWindowDelegate, public PairingDelegate
 {
 public:
     FabricSyncDeviceCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("sync-device", credIssuerCommands)
