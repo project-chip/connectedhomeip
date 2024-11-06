@@ -4148,8 +4148,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedZoneSources";
         case chip::app::Clusters::ZoneManagement::Attributes::Zones::Id:
             return "Zones";
-        case chip::app::Clusters::ZoneManagement::Attributes::TimeControl::Id:
-            return "TimeControl";
+        case chip::app::Clusters::ZoneManagement::Attributes::Triggers::Id:
+            return "Triggers";
         case chip::app::Clusters::ZoneManagement::Attributes::Sensitivity::Id:
             return "Sensitivity";
         case chip::app::Clusters::ZoneManagement::Attributes::GeneratedCommandList::Id:

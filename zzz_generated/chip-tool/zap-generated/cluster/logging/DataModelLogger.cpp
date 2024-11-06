@@ -5246,9 +5246,9 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(
-    const char * label, size_t indent,
-    const chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -5280,6 +5280,14 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BlindDuration'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Sensitivity", indent + 1, value.sensitivity);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Sensitivity'");
             return err;
         }
     }
@@ -18438,12 +18446,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Zones", 1, value);
         }
-        case ZoneManagement::Attributes::TimeControl::Id: {
+        case ZoneManagement::Attributes::Triggers::Id: {
             chip::app::DataModel::DecodableList<
-                chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::DecodableType>
+                chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("TimeControl", 1, value);
+            return DataModelLogger::LogValue("Triggers", 1, value);
         }
         case ZoneManagement::Attributes::Sensitivity::Id: {
             uint8_t value;

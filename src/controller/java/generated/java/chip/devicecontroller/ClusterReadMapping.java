@@ -18204,17 +18204,17 @@ public class ClusterReadMapping {
           readZoneManagementZonesCommandParams
         );
         result.put("readZonesAttribute", readZoneManagementZonesAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readZoneManagementTimeControlCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readZoneManagementTimeControlAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readZoneManagementTriggersCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementTriggersAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ZoneManagementCluster) cluster).readTimeControlAttribute(
-              (ChipClusters.ZoneManagementCluster.TimeControlAttributeCallback) callback
+            ((ChipClusters.ZoneManagementCluster) cluster).readTriggersAttribute(
+              (ChipClusters.ZoneManagementCluster.TriggersAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedZoneManagementClusterTimeControlAttributeCallback(),
-          readZoneManagementTimeControlCommandParams
+          () -> new ClusterInfoMapping.DelegatedZoneManagementClusterTriggersAttributeCallback(),
+          readZoneManagementTriggersCommandParams
         );
-        result.put("readTimeControlAttribute", readZoneManagementTimeControlAttributeInteractionInfo);
+        result.put("readTriggersAttribute", readZoneManagementTriggersAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readZoneManagementSensitivityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readZoneManagementSensitivityAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
