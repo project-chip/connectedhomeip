@@ -2774,12 +2774,12 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
 Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
                                                 const Commands::MoveColorTemperature::DecodableType & commandData)
 {
-    auto moveMode                = commandData.moveMode;
-    auto rate                    = commandData.rate;
-    auto colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
-    auto colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
-    auto optionsMask             = commandData.optionsMask;
-    auto optionsOverride         = commandData.optionsOverride;
+    HueMoveMode moveMode                   = commandData.moveMode;
+    uint16_t rate                          = commandData.rate;
+    uint16_t colorTemperatureMinimum       = commandData.colorTemperatureMinimumMireds;
+    uint16_t colorTemperatureMaximum       = commandData.colorTemperatureMaximumMireds;
+    BitMask<OptionsBitmap> optionsMask     = commandData.optionsMask;
+    BitMask<OptionsBitmap> optionsOverride = commandData.optionsOverride;
 
     // check moveMode and rate before any operation is done on the transition states
     // rate value is ignored if the MoveMode is stop
@@ -2896,13 +2896,13 @@ Status ColorControlServer::moveToColorTempCommand(EndpointId endpoint,
 Status ColorControlServer::stepColorTempCommand(EndpointId endpoint,
                                                 const Commands::StepColorTemperature::DecodableType & commandData)
 {
-    auto stepMode                = commandData.stepMode;
-    auto stepSize                = commandData.stepSize;
-    auto transitionTime          = commandData.transitionTime;
-    auto colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
-    auto colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
-    auto optionsMask             = commandData.optionsMask;
-    auto optionsOverride         = commandData.optionsOverride;
+    HueStepMode stepMode                   = commandData.stepMode;
+    uint16_t stepSize                      = commandData.stepSize;
+    uint16_t transitionTime                = commandData.transitionTime;
+    uint16_t colorTemperatureMinimum       = commandData.colorTemperatureMinimumMireds;
+    uint16_t colorTemperatureMaximum       = commandData.colorTemperatureMaximumMireds;
+    BitMask<OptionsBitmap> optionsMask     = commandData.optionsMask;
+    BitMask<OptionsBitmap> optionsOverride = commandData.optionsOverride;
 
     // Confirm validity of the step mode and step size received
     VerifyOrReturnValue(stepMode != HueStepMode::kUnknownEnumValue, Status::InvalidCommand);
