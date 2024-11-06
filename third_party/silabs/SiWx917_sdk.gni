@@ -321,9 +321,12 @@ template("siwx917_sdk") {
         "SL_ACTIVE_MODE_DURATION_MS=${sl_active_mode_duration_ms}",
         "SL_IDLE_MODE_DURATION_S=${sl_idle_mode_duration_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
-        "SL_SI91X_NPSS_GPIO_BTN_HANDLER=1",
         "SL_SI91X_POWER_MANAGER_UC_AVAILABLE=1",
         "SL_SI91X_TICKLESS_MODE=1",
+
+        # Enable Wakeup source for ICD
+        "SL_ENABLE_GPIO_WAKEUP_SOURCE=1",
+        "ENABLE_NPSS_GPIO_2=1",
       ]
     }
 
