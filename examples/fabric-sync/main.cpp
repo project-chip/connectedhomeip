@@ -99,7 +99,7 @@ int main(int argc, char * argv[])
     Shell::RegisterCommands();
 #endif
 
-    CHIP_ERROR err = PairingManager::Instance().Init(GetDeviceCommissioner());
+    CHIP_ERROR err = admin::PairingManager::Instance().Init(GetDeviceCommissioner());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Failed to init PairingManager: %s ", ErrorStr(err));

@@ -18,6 +18,8 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 
+namespace bridge {
+
 class BridgedDeviceBasicInformationImpl : public chip::app::AttributeAccessInterface
 {
 public:
@@ -30,3 +32,5 @@ public:
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & path, chip::app::AttributeValueEncoder & encoder) override;
     CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & path, chip::app::AttributeValueDecoder & decoder) override;
 };
+
+} // namespace bridge

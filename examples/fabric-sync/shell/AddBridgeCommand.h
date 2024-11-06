@@ -23,7 +23,7 @@
 
 namespace commands {
 
-class AddBridgeCommand : public Command, public CommissioningDelegate
+class AddBridgeCommand : public Command, public admin::CommissioningDelegate
 {
 public:
     AddBridgeCommand(chip::NodeId nodeId, uint32_t setupPINCode, const char * remoteAddr, uint16_t remotePort);

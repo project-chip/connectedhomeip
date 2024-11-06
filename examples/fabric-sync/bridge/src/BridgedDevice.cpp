@@ -27,6 +27,8 @@
 using namespace chip;
 using namespace chip::app::Clusters::Actions;
 
+namespace bridge {
+
 BridgedDevice::BridgedDevice(ScopedNodeId scopedNodeId)
 {
     mReachable    = false;
@@ -116,3 +118,5 @@ void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttr
         }
     });
 }
+
+} // namespace bridge
