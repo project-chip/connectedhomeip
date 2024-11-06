@@ -340,24 +340,23 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
- * Wait until a set of attributes reaches certain values or the provided timeout
- * (if any) is reached.  The completion is called at that point, with an
- * MTREErrorCodeTimeout error if a timeout occurred.
+ * Sets up the provided completion to be called when any of the following
+ * happens:
  *
- * If the MTRAttributeValueWaiter is canceled or is destroyed before the
- * completion is called, the completion will be called with an
- * MTRErrorCodeCancelled error.
+ * 1) A set of attributes reaches certain values: completion called with nil.
+ * 2) The provided timeout expires: completion called with MTRErrorCodeTimeout error.
+ * 3) The wait is canceled: completion called with MTRErrorCodeCancelled error.
+ *
+ * If the MTRAttributeValueWaiter is destroyed before the
+ * completion is called, that is treated the same as canceling the waiter.
  *
  * The attributes and values to wait for are represented as a dictionary which
  * has the attribute paths as keys and the expected data-values as values.
- *
- * Nil will be returned if for some reason the wait could not be started
- * (e.g. invalid input).
  */
-- (MTRAttributeValueWaiter * _Nullable)waitForAttributeValues:(NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)values
-                                                      timeout:(NSTimeInterval)timeout
-                                                        queue:(dispatch_queue_t)queue
-                                                   completion:(void (^)(NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+- (MTRAttributeValueWaiter *)waitForAttributeValues:(NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)values
+                                            timeout:(NSTimeInterval)timeout
+                                              queue:(dispatch_queue_t)queue
+                                         completion:(void (^)(NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 @end
 

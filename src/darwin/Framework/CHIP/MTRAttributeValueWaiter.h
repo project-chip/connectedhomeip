@@ -31,7 +31,7 @@ MTR_NEWLY_AVAILABLE
  */
 - (void)cancel;
 
-@property (readonly, nonatomic) NSUUID * waiterID;
+@property (readonly, nonatomic) NSUUID * UUID;
 
 @end
 

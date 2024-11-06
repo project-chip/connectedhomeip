@@ -98,6 +98,7 @@
 @end
 #endif
 
+MTR_DIRECT_MEMBERS
 @interface MTRDevice ()
 // nil until the first time we need it.  Access guarded by our lock.
 @property (nonatomic, readwrite, nullable) NSHashTable<MTRAttributeValueWaiter *> * attributeValueWaiters;
@@ -132,6 +133,7 @@
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
     MTR_LOG("MTRDevice dealloc: %p", self);
 
+    // Locking because _cancelAllAttributeValueWaiters has os_unfair_lock_assert_owner(&_lock)
     std::lock_guard lock(_lock);
     [self _cancelAllAttributeValueWaiters];
 }
@@ -735,13 +737,12 @@
 
 #pragma mark - Handling of waits for attribute values
 
-- (MTRAttributeValueWaiter * _Nullable)waitForAttributeValues:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values timeout:(NSTimeInterval)timeout queue:(dispatch_queue_t)queue completion:(void (^)(NSError * _Nullable error))completion
+- (MTRAttributeValueWaiter *)waitForAttributeValues:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values timeout:(NSTimeInterval)timeout queue:(dispatch_queue_t)queue completion:(void (^)(NSError * _Nullable error))completion
 {
     // Check whether the values coming in make sense.
     for (MTRAttributePath * path in values) {
-        if (!MTRDataValueDictionaryIsWellFormed(values[path])) {
-            return nil;
-        }
+        MTRVerifyArgumentOrDie(MTRDataValueDictionaryIsWellFormed(values[path]),
+            [NSString stringWithFormat:@"waitForAttributeValues handed invalid data-value %@ for path %@", path, values[path]]);
     }
 
     // Check whether we have all these values already.
@@ -784,16 +785,12 @@
 
     mtr_weakify(attributeWaiter);
     mtr_weakify(self);
-    mtr_weakify(timerSource);
     dispatch_source_set_event_handler(timerSource, ^{
+        dispatch_source_cancel(timerSource);
         mtr_strongify(self);
         mtr_strongify(attributeWaiter);
-        mtr_strongify(timerSource);
         if (self != nil && attributeWaiter != nil) {
             [self _attributeWaitTimedOut:attributeWaiter];
-        } else if (timerSource != nil) {
-            // Make sure to cancel the timer ourselves, if we can't call _attributeWaitTimedOut.
-            dispatch_source_cancel(timerSource);
         }
     });
 
@@ -806,14 +803,16 @@
     os_unfair_lock_assert_owner(&_lock);
 
     // Check whether anyone was waiting for this attribute.
-    NSHashTable * satisfiedWaiters = [NSHashTable weakObjectsHashTable];
+    NSMutableArray * satisfiedWaiters;
     for (MTRAttributeValueWaiter * attributeValueWaiter in self.attributeValueWaiters) {
         if ([attributeValueWaiter _attributeValue:value reportedForPath:path byDevice:self] && attributeValueWaiter.allValuesSatisfied) {
+            if (!satisfiedWaiters) {
+                satisfiedWaiters = [NSMutableArray array];
+            }
             [satisfiedWaiters addObject:attributeValueWaiter];
         }
     }
 
-    [self.attributeValueWaiters minusHashTable:satisfiedWaiters];
     for (MTRAttributeValueWaiter * attributeValueWaiter in satisfiedWaiters) {
         [self _notifyAttributeValueWaiter:attributeValueWaiter withError:nil];
     }

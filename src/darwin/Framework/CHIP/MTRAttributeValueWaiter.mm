@@ -34,16 +34,16 @@
 }
 @end
 
+MTR_DIRECT_MEMBERS
 @interface MTRAttributeValueWaiter ()
 @property (nonatomic, retain) NSDictionary<MTRAttributePath *, MTRAwaitedAttributeState *> * valueExpectations;
 // Protected by the MTRDevice's lock.
 @property (nonatomic, readwrite, retain) dispatch_queue_t queue;
-@property (nonatomic, readwrite, nullable) MTRStatusCompletion completion;
+@property (nonatomic, readwrite, retain, nullable) MTRStatusCompletion completion;
+@property (nonatomic, readonly, retain) MTRDevice * device;
 @end
 
-@implementation MTRAttributeValueWaiter {
-    MTRDevice * _device;
-};
+@implementation MTRAttributeValueWaiter
 
 - (instancetype)initWithDevice:(MTRDevice *)device values:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion
 {
@@ -57,7 +57,7 @@
         _queue = queue;
         _completion = completion;
         _device = device;
-        _waiterID = [NSUUID UUID];
+        _UUID = [NSUUID UUID];
     }
 
     return self;
@@ -70,7 +70,7 @@
 
 - (void)cancel
 {
-    [_device _attributeWaitCanceled:self];
+    [self.device _attributeWaitCanceled:self];
 }
 
 - (BOOL)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path byDevice:(MTRDevice *)device
@@ -131,7 +131,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %@>", NSStringFromClass(self.class), self.waiterID];
+    return [NSString stringWithFormat:@"<%@: %@>", NSStringFromClass(self.class), self.UUID];
 }
 
 @end

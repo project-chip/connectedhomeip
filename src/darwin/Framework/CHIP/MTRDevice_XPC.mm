@@ -173,8 +173,8 @@
             continue;
         }
 
-        MTRAttributePath * path = report[MTRAttributePathKey];
-        if (!MTR_SAFE_CAST(path, MTRAttributePath)) {
+        MTRAttributePath * path = MTR_SAFE_CAST(report[MTRAttributePathKey], MTRAttributePath);
+        if (!path) {
             MTR_LOG_ERROR("%@ no valid path for attribute report %@", self, report);
             continue;
         }
