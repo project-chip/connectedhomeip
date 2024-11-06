@@ -39,7 +39,7 @@ MTR_DIRECT_MEMBERS
 @property (nonatomic, retain) NSDictionary<MTRAttributePath *, MTRAwaitedAttributeState *> * valueExpectations;
 // Protected by the MTRDevice's lock.
 @property (nonatomic, readwrite, retain) dispatch_queue_t queue;
-@property (nonatomic, readwrite, retain, nullable) MTRStatusCompletion completion;
+@property (nonatomic, readwrite, copy, nullable) MTRStatusCompletion completion;
 @property (nonatomic, readonly, retain) MTRDevice * device;
 @end
 

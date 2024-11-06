@@ -742,7 +742,7 @@ MTR_DIRECT_MEMBERS
     // Check whether the values coming in make sense.
     for (MTRAttributePath * path in values) {
         MTRVerifyArgumentOrDie(MTRDataValueDictionaryIsWellFormed(values[path]),
-            [NSString stringWithFormat:@"waitForAttributeValues handed invalid data-value %@ for path %@", path, values[path]]);
+            ([NSString stringWithFormat:@"waitForAttributeValues handed invalid data-value %@ for path %@", path, values[path]]));
     }
 
     // Check whether we have all these values already.
