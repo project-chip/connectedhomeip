@@ -29,6 +29,8 @@ using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
 
+namespace bridge {
+
 CHIP_ERROR BridgedDeviceBasicInformationImpl::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)
 {
     // Registration is done for the bridged device basic information only
@@ -105,3 +107,5 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Write(const ConcreteDataAttributeP
 
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
+
+} // namespace bridge
