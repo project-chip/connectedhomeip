@@ -2774,22 +2774,15 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
 Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
                                                 const Commands::MoveColorTemperature::DecodableType & commandData)
 {
-    HueMoveMode moveMode                   = commandData.moveMode;
-    uint16_t rate                          = commandData.rate;
-    uint16_t colorTemperatureMinimum       = commandData.colorTemperatureMinimumMireds;
-    uint16_t colorTemperatureMaximum       = commandData.colorTemperatureMaximumMireds;
-    BitMask<OptionsBitmap> optionsMask     = commandData.optionsMask;
-    BitMask<OptionsBitmap> optionsOverride = commandData.optionsOverride;
-
     // check moveMode and rate before any operation is done on the transition states
     // rate value is ignored if the MoveMode is stop
-    VerifyOrReturnValue(moveMode != HueMoveMode::kUnknownEnumValue, Status::InvalidCommand);
-    VerifyOrReturnValue((rate != 0 || moveMode == HueMoveMode::kStop), Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.moveMode != HueMoveMode::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue((commandData.rate != 0 || commandData.moveMode == HueMoveMode::kStop), Status::InvalidCommand);
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     VerifyOrReturnValue(colorTempTransitionState != nullptr, Status::UnsupportedEndpoint);
 
-    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
+    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
     uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
@@ -2802,10 +2795,11 @@ Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
     // For HueMoveMode::kStop we are done here.
-    VerifyOrReturnValue(moveMode != HueMoveMode::kStop, Status::Success);
+    VerifyOrReturnValue(commandData.moveMode != HueMoveMode::kStop, Status::Success);
 
     // Per spec, colorTemperatureMinimumMireds field is limited to ColorTempPhysicalMinMireds and
     // when colorTemperatureMinimumMireds field is 0, ColorTempPhysicalMinMireds shall be used (always > 0)
+    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
     if (colorTemperatureMinimum < tempPhysicalMin)
     {
         colorTemperatureMinimum = tempPhysicalMin;
@@ -2813,6 +2807,7 @@ Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
 
     // Per spec, colorTemperatureMaximumMireds field is limited to ColorTempPhysicalMaxMireds and
     // when colorTemperatureMaximumMireds field is 0, ColorTempPhysicalMaxMireds shall be used
+    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
     if ((colorTemperatureMaximum == 0) || (colorTemperatureMaximum > tempPhysicalMax))
     {
         colorTemperatureMaximum = tempPhysicalMax;
@@ -2826,7 +2821,7 @@ Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
     Attributes::ColorTemperatureMireds::Get(endpoint, &colorTempTransitionState->initialValue);
     colorTempTransitionState->currentValue = colorTempTransitionState->initialValue;
 
-    if (moveMode == HueMoveMode::kUp)
+    if (commandData.moveMode == HueMoveMode::kUp)
     {
         if (tempPhysicalMax > colorTemperatureMaximum)
         {
@@ -2849,7 +2844,7 @@ Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
         }
     }
 
-    uint16_t transitionTime                  = computeTransitionTimeFromStateAndRate(colorTempTransitionState, rate);
+    uint16_t transitionTime                  = computeTransitionTimeFromStateAndRate(colorTempTransitionState, commandData.rate);
     colorTempTransitionState->stepsRemaining = transitionTime;
     colorTempTransitionState->stepsTotal     = transitionTime;
     colorTempTransitionState->timeRemaining  = transitionTime;
@@ -2896,22 +2891,14 @@ Status ColorControlServer::moveToColorTempCommand(EndpointId endpoint,
 Status ColorControlServer::stepColorTempCommand(EndpointId endpoint,
                                                 const Commands::StepColorTemperature::DecodableType & commandData)
 {
-    HueStepMode stepMode                   = commandData.stepMode;
-    uint16_t stepSize                      = commandData.stepSize;
-    uint16_t transitionTime                = commandData.transitionTime;
-    uint16_t colorTemperatureMinimum       = commandData.colorTemperatureMinimumMireds;
-    uint16_t colorTemperatureMaximum       = commandData.colorTemperatureMaximumMireds;
-    BitMask<OptionsBitmap> optionsMask     = commandData.optionsMask;
-    BitMask<OptionsBitmap> optionsOverride = commandData.optionsOverride;
-
     // Confirm validity of the step mode and step size received
-    VerifyOrReturnValue(stepMode != HueStepMode::kUnknownEnumValue, Status::InvalidCommand);
-    VerifyOrReturnValue(stepSize != 0, Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.stepMode != HueStepMode::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.stepSize != 0, Status::InvalidCommand);
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     VerifyOrReturnValue(colorTempTransitionState != nullptr, Status::UnsupportedEndpoint);
 
-    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
+    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
@@ -2926,6 +2913,7 @@ Status ColorControlServer::stepColorTempCommand(EndpointId endpoint,
 
     // Per spec, colorTemperatureMinimumMireds field is limited to ColorTempPhysicalMinMireds and
     // when colorTemperatureMinimumMireds field is 0, ColorTempPhysicalMinMireds shall be used (always > 0)
+    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
     if (colorTemperatureMinimum < tempPhysicalMin)
     {
         colorTemperatureMinimum = tempPhysicalMin;
@@ -2933,6 +2921,7 @@ Status ColorControlServer::stepColorTempCommand(EndpointId endpoint,
 
     // Per spec, colorTemperatureMaximumMireds field is limited to ColorTempPhysicalMaxMireds and
     // when colorTemperatureMaximumMireds field is 0, ColorTempPhysicalMaxMireds shall be used
+    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
     if ((colorTemperatureMaximum == 0) || (colorTemperatureMaximum > tempPhysicalMax))
     {
         colorTemperatureMaximum = tempPhysicalMax;
@@ -2948,9 +2937,10 @@ Status ColorControlServer::stepColorTempCommand(EndpointId endpoint,
 
     colorTempTransitionState->currentValue = colorTempTransitionState->initialValue;
 
-    if (stepMode == HueStepMode::kUp)
+    if (commandData.stepMode == HueStepMode::kUp)
     {
-        uint32_t finalValue32u = static_cast<uint32_t>(colorTempTransitionState->initialValue) + static_cast<uint32_t>(stepSize);
+        uint32_t finalValue32u =
+            static_cast<uint32_t>(colorTempTransitionState->initialValue) + static_cast<uint32_t>(commandData.stepSize);
         if (finalValue32u > UINT16_MAX)
         {
             colorTempTransitionState->finalValue = UINT16_MAX;
@@ -2960,9 +2950,10 @@ Status ColorControlServer::stepColorTempCommand(EndpointId endpoint,
             colorTempTransitionState->finalValue = static_cast<uint16_t>(finalValue32u);
         }
     }
-    else if (stepMode == HueStepMode::kDown)
+    else if (commandData.stepMode == HueStepMode::kDown)
     {
-        uint32_t finalValue32u = static_cast<uint32_t>(colorTempTransitionState->initialValue) - static_cast<uint32_t>(stepSize);
+        uint32_t finalValue32u =
+            static_cast<uint32_t>(colorTempTransitionState->initialValue) - static_cast<uint32_t>(commandData.stepSize);
         if (finalValue32u > UINT16_MAX)
         {
             colorTempTransitionState->finalValue = 0;
@@ -2972,18 +2963,19 @@ Status ColorControlServer::stepColorTempCommand(EndpointId endpoint,
             colorTempTransitionState->finalValue = static_cast<uint16_t>(finalValue32u);
         }
     }
-    colorTempTransitionState->stepsRemaining = std::max<uint16_t>(transitionTime, 1);
+    colorTempTransitionState->stepsRemaining = std::max<uint16_t>(commandData.transitionTime, 1);
     colorTempTransitionState->stepsTotal     = colorTempTransitionState->stepsRemaining;
-    colorTempTransitionState->timeRemaining  = transitionTime;
-    colorTempTransitionState->transitionTime = transitionTime;
+    colorTempTransitionState->timeRemaining  = commandData.transitionTime;
+    colorTempTransitionState->transitionTime = commandData.transitionTime;
     colorTempTransitionState->endpoint       = endpoint;
     colorTempTransitionState->lowLimit       = colorTemperatureMinimum;
     colorTempTransitionState->highLimit      = colorTemperatureMaximum;
 
-    SetQuietReportRemainingTime(endpoint, transitionTime, true /* isNewTransition */);
+    SetQuietReportRemainingTime(endpoint, commandData.transitionTime, true /* isNewTransition */);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureTempEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
+    scheduleTimerCallbackMs(configureTempEventControl(endpoint),
+                            commandData.transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
     return Status::Success;
 }
 
