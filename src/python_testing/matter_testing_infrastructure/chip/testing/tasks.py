@@ -18,7 +18,7 @@ import shlex
 import subprocess
 import sys
 import threading
-from typing import BinaryIO, Callable, List, Optional, Union
+from typing import BinaryIO, Callable, Optional, Union
 
 
 def forward_f(f_in: BinaryIO,
