@@ -1555,19 +1555,6 @@ endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
 
-  server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command Identify;
-    handle command TriggerEffect;
-  }
-
   server cluster Descriptor {
     callback attribute deviceTypeList;
     callback attribute serverList;
@@ -1808,6 +1795,19 @@ endpoint 0 {
 endpoint 1 {
   device type ma_refrigerator = 112, version 1;
 
+
+  server cluster Identify {
+    ram      attribute identifyTime default = 0x0;
+    ram      attribute identifyType default = 0x00;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 4;
+
+    handle command Identify;
+    handle command TriggerEffect;
+  }
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
