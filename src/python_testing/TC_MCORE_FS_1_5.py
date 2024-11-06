@@ -311,13 +311,13 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
                         continue
                     cadmin_sub_new_data = True
                     break
-
             except queue.Empty:
                 # No error, we update timeouts and keep going
                 pass
-
-            elapsed = time.time() - start_time
-            time_remaining = report_waiting_timeout_delay_sec - elapsed
+            finally:
+                # each iteration will alter timing
+                elapsed = time.time() - start_time
+                time_remaining = report_waiting_timeout_delay_sec - elapsed
 
         asserts.assert_true(cadmin_sub_new_data,
                             "Timed out waiting for DUT to reflect AdministratorCommissioning attributes for bridged device")
