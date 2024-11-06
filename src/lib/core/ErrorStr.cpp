@@ -50,8 +50,25 @@ static ErrorFormatter * sErrorFormatterList = nullptr;
  */
 DLL_EXPORT const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation)
 {
-    char * formattedError   = sErrorStr;
-    uint16_t formattedSpace = sizeof(sErrorStr);
+    ErrorStr(err, withSourceLocation, sErrorStr, sizeof(sErrorStr));
+    return sErrorStr;
+}
+
+/**
+ * This routine writess a human-readable NULL-terminated C string into the buf
+ * which describes the provided error.
+ *
+ * @param[in] err                      The error for format and describe.
+ * @param[in] withSourceLocation       Whether or not to include the source
+ * @param[in] buf                      Provided buf to write into
+ * @param[in] bufSize                  Size of the buf
+ * location in the output string. Only used if CHIP_CONFIG_ERROR_SOURCE &&
+ * !CHIP_CONFIG_SHORT_ERROR_STR. Defaults to true.
+ */
+DLL_EXPORT void ErrorStr(CHIP_ERROR err, bool withSourceLocation, char * buf, uint16_t bufSize)
+{
+    char * formattedError   = buf;
+    uint16_t formattedSpace = sizeof(buf);
 
 #if CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
 
@@ -65,20 +82,13 @@ DLL_EXPORT const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation)
         formattedError += n;
         formattedSpace = static_cast<uint16_t>(formattedSpace - n);
     }
+#endif // CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
+
     if (err == CHIP_NO_ERROR)
     {
         (void) snprintf(formattedError, formattedSpace, CHIP_NO_ERROR_STRING);
-        return sErrorStr;
+        return;
     }
-
-#else // CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
-
-    if (err == CHIP_NO_ERROR)
-    {
-        return CHIP_NO_ERROR_STRING;
-    }
-
-#endif // CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
 
     // Search the registered error formatter for one that will format the given
     // error code.
@@ -86,13 +96,13 @@ DLL_EXPORT const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation)
     {
         if (errFormatter->FormatError(formattedError, formattedSpace, err))
         {
-            return sErrorStr;
+            return;
         }
     }
 
     // Use a default formatting if no formatter found.
     FormatError(formattedError, formattedSpace, nullptr, err, nullptr);
-    return sErrorStr;
+    return;
 }
 
 /**
