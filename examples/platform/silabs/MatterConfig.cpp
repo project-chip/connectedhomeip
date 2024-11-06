@@ -41,6 +41,7 @@
 #endif
 
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
+#include "SiWxPlatformInterface.h"
 #include "WifiInterfaceAbstraction.h"
 #endif // SLI_SI91X_MCU_INTERFACE
 
@@ -328,6 +329,7 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 extern "C" void vApplicationIdleHook(void)
 {
 #if (SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER)
-    sl_si91x_invoke_btn_press_event();
+    SiWxPlatformInterface::sl_si91x_btn_event_handler();
+    SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
 #endif
 }
