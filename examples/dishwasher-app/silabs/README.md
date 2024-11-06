@@ -4,13 +4,13 @@ An example showing the use of Matter on the Silicon Labs EFR32 MG24 boards.
 
 <hr>
 
-- [Matter Silabs dishwasher Example](#matter-silabs-dishwasher-example)
-  - [Introduction](#introduction)
-  - [Building](#building)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
-  - [Running the Complete Example](#running-the-complete-example)
-    - [Commissioning](#commissioning)
+-   [Matter Silabs dishwasher Example](#matter-silabs-dishwasher-example)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
+    -   [Running the Complete Example](#running-the-complete-example)
+        -   [Commissioning](#commissioning)
 
 <hr>
 
