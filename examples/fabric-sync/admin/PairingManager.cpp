@@ -29,6 +29,8 @@
 using namespace ::chip;
 using namespace ::chip::Controller;
 
+namespace admin {
+
 namespace {
 
 CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
@@ -451,7 +453,7 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     if (err == CHIP_NO_ERROR)
     {
         // print to console
-        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 "has been successfully removed.\n", ChipLogValueX64(nodeId));
+        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 " has been successfully removed.\n", ChipLogValueX64(nodeId));
     }
     else
     {
@@ -548,3 +550,5 @@ CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
         }
     });
 }
+
+} // namespace admin

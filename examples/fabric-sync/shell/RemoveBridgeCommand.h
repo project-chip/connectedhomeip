@@ -23,7 +23,7 @@
 
 namespace commands {
 
-class RemoveBridgeCommand : public Command, public PairingDelegate
+class RemoveBridgeCommand : public Command, public admin::PairingDelegate
 {
 public:
     void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
