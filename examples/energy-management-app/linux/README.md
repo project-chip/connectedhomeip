@@ -24,6 +24,7 @@ details.
         -   [Activating python virtual env](#activating-python-virtual-env)
         -   [Interacting with CHIP-REPL and the example app](#interacting-with-chip-repl-and-the-example-app)
         -   [Using chip-repl to Fake a charging session](#using-chip-repl-to-fake-a-charging-session)
+    -   [Water Heater App: Interaction using the chip-tool and TestEventTriggers](#water-heater-app-interaction-using-the-chip-tool-and-testeventtriggers)
 
 <hr>
 
