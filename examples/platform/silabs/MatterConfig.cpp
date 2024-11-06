@@ -25,7 +25,6 @@
 #include <mbedtls/platform.h>
 
 #ifdef SL_WIFI
-#include "SiWxPlatformInterface.h"
 #include "wfx_host_events.h"
 #endif /* SL_WIFI */
 
@@ -42,6 +41,7 @@
 #endif
 
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
+#include "SiWxPlatformInterface.h"
 #include "WifiInterfaceAbstraction.h"
 #endif // SLI_SI91X_MCU_INTERFACE
 
