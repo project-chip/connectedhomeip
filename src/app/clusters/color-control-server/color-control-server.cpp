@@ -1734,26 +1734,21 @@ Status ColorControlServer::stepHueCommand(EndpointId endpoint, HueStepMode stepM
 Status ColorControlServer::moveSaturationCommand(EndpointId endpoint, const Commands::MoveSaturation::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("moveSaturation", "ColorControl");
-    auto & moveMode        = commandData.moveMode;
-    auto & rate            = commandData.rate;
-    auto & optionsMask     = commandData.optionsMask;
-    auto & optionsOverride = commandData.optionsOverride;
-
     // check moveMode and rate before any operation is done on the transition states
     // rate value is ignored if the MoveMode is stop
-    VerifyOrReturnValue(moveMode != SaturationMoveMode::kUnknownEnumValue, Status::InvalidCommand);
-    VerifyOrReturnValue(rate != 0 || moveMode == SaturationMoveMode::kStop, Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.moveMode != SaturationMoveMode::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.rate != 0 || commandData.moveMode == SaturationMoveMode::kStop, Status::InvalidCommand);
 
     uint16_t epIndex                                         = getEndpointIndex(endpoint);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionStateByIndex(epIndex);
     VerifyOrReturnValue(colorSaturationTransitionState != nullptr, Status::UnsupportedEndpoint);
 
-    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
+    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
     // now, kick off the state machine.
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
-    if (moveMode == SaturationMoveMode::kStop)
+    if (commandData.moveMode == SaturationMoveMode::kStop)
     {
         // Per spec any hue transition must also be cancelled.
         ColorHueTransitionState * hueState = getColorHueTransitionStateByIndex(epIndex);
@@ -1764,16 +1759,16 @@ Status ColorControlServer::moveSaturationCommand(EndpointId endpoint, const Comm
     // Handle color mode transition, if necessary.
     handleModeSwitch(endpoint, EnhancedColorMode::kCurrentHueAndCurrentSaturation);
 
-    if (moveMode == SaturationMoveMode::kUp)
+    if (commandData.moveMode == SaturationMoveMode::kUp)
     {
         colorSaturationTransitionState->finalValue = MAX_SATURATION_VALUE;
     }
-    else if (moveMode == SaturationMoveMode::kDown)
+    else if (commandData.moveMode == SaturationMoveMode::kDown)
     {
         colorSaturationTransitionState->finalValue = MIN_SATURATION_VALUE;
     }
 
-    uint16_t transitionTime                        = computeTransitionTimeFromStateAndRate(colorSaturationTransitionState, rate);
+    uint16_t transitionTime = computeTransitionTimeFromStateAndRate(colorSaturationTransitionState, commandData.rate);
     colorSaturationTransitionState->stepsRemaining = transitionTime;
     colorSaturationTransitionState->stepsTotal     = transitionTime;
     colorSaturationTransitionState->timeRemaining  = transitionTime;
@@ -1823,20 +1818,14 @@ Status ColorControlServer::moveToSaturationCommand(EndpointId endpoint,
 Status ColorControlServer::stepSaturationCommand(EndpointId endpoint, const Commands::StepSaturation::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("stepSaturation", "ColorControl");
-    auto & stepMode        = commandData.stepMode;
-    auto & stepSize        = commandData.stepSize;
-    auto & transitionTime  = commandData.transitionTime;
-    auto & optionsMask     = commandData.optionsMask;
-    auto & optionsOverride = commandData.optionsOverride;
-
     // Confirm validity of the step mode and step size received
-    VerifyOrReturnValue(stepMode != SaturationStepMode::kUnknownEnumValue, Status::InvalidCommand);
-    VerifyOrReturnValue(stepSize != 0, Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.stepMode != SaturationStepMode::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.stepSize != 0, Status::InvalidCommand);
 
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
     VerifyOrReturnValue(colorSaturationTransitionState != nullptr, Status::UnsupportedEndpoint);
 
-    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
+    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
@@ -1846,18 +1835,18 @@ Status ColorControlServer::stepSaturationCommand(EndpointId endpoint, const Comm
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
     uint8_t currentSaturation = static_cast<uint8_t>(colorSaturationTransitionState->currentValue);
 
-    if (stepMode == SaturationStepMode::kUp)
+    if (commandData.stepMode == SaturationStepMode::kUp)
     {
-        colorSaturationTransitionState->finalValue = addSaturation(currentSaturation, stepSize);
+        colorSaturationTransitionState->finalValue = addSaturation(currentSaturation, commandData.stepSize);
     }
-    else if (stepMode == SaturationStepMode::kDown)
+    else if (commandData.stepMode == SaturationStepMode::kDown)
     {
-        colorSaturationTransitionState->finalValue = subtractSaturation(currentSaturation, stepSize);
+        colorSaturationTransitionState->finalValue = subtractSaturation(currentSaturation, commandData.stepSize);
     }
-    colorSaturationTransitionState->stepsRemaining = std::max<uint8_t>(transitionTime, 1);
+    colorSaturationTransitionState->stepsRemaining = std::max<uint8_t>(commandData.transitionTime, 1);
     colorSaturationTransitionState->stepsTotal     = colorSaturationTransitionState->stepsRemaining;
-    colorSaturationTransitionState->timeRemaining  = transitionTime;
-    colorSaturationTransitionState->transitionTime = transitionTime;
+    colorSaturationTransitionState->timeRemaining  = commandData.transitionTime;
+    colorSaturationTransitionState->transitionTime = commandData.transitionTime;
     colorSaturationTransitionState->endpoint       = endpoint;
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
@@ -1865,7 +1854,7 @@ Status ColorControlServer::stepSaturationCommand(EndpointId endpoint, const Comm
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), commandData.transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
     return Status::Success;
 }
 
@@ -1880,23 +1869,15 @@ Status ColorControlServer::stepSaturationCommand(EndpointId endpoint, const Comm
 Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands::ColorLoopSet::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("colorLoop", "ColorControl");
-    auto & updateFlags     = commandData.updateFlags;
-    auto & action          = commandData.action;
-    auto & direction       = commandData.direction;
-    auto & time            = commandData.time;
-    auto & startHue        = commandData.startHue;
-    auto & optionsMask     = commandData.optionsMask;
-    auto & optionsOverride = commandData.optionsOverride;
-
     // Validate the action and direction parameters of the command
-    VerifyOrReturnValue(action != ColorLoopActionEnum::kUnknownEnumValue, Status::InvalidCommand);
-    VerifyOrReturnValue(direction != ColorLoopDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.action != ColorLoopActionEnum::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.direction != ColorLoopDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
     uint16_t epIndex                                  = getEndpointIndex(endpoint);
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionStateByIndex(epIndex);
     VerifyOrReturnValue(colorHueTransitionState != nullptr, Status::UnsupportedEndpoint);
 
-    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
+    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     uint8_t isColorLoopActive = 0;
     // In case of get failure, isColorLoopActive will remain at the init value 0 (not active)
@@ -1905,19 +1886,20 @@ Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands:
         ChipLogError(Zcl, "Failed to retrieve ColorLoopActive value");
     }
 
-    uint8_t deactiveColorLoop = updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction) && (action == ColorLoopAction::kDeactivate);
+    uint8_t deactiveColorLoop =
+        commandData.updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction) && (commandData.action == ColorLoopAction::kDeactivate);
 
-    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateDirection))
+    if (commandData.updateFlags.Has(ColorLoopUpdateFlags::kUpdateDirection))
     {
-        Attributes::ColorLoopDirection::Set(endpoint, to_underlying(direction));
+        Attributes::ColorLoopDirection::Set(endpoint, to_underlying(commandData.direction));
 
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
         {
-            colorHueTransitionState->up                 = (direction == ColorLoopDirectionEnum::kIncrement);
+            colorHueTransitionState->up                 = (commandData.direction == ColorLoopDirectionEnum::kIncrement);
             colorHueTransitionState->initialEnhancedHue = colorHueTransitionState->currentEnhancedHue;
 
-            if (direction == ColorLoopDirectionEnum::kIncrement)
+            if (commandData.direction == ColorLoopDirectionEnum::kIncrement)
             {
                 colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState->initialEnhancedHue - 1);
             }
@@ -1929,14 +1911,14 @@ Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands:
         }
     }
 
-    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateTime))
+    if (commandData.updateFlags.Has(ColorLoopUpdateFlags::kUpdateTime))
     {
-        Attributes::ColorLoopTime::Set(endpoint, time);
+        Attributes::ColorLoopTime::Set(endpoint, commandData.time);
 
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
         {
-            colorHueTransitionState->stepsTotal         = static_cast<uint16_t>(time * TRANSITION_STEPS_PER_1S);
+            colorHueTransitionState->stepsTotal         = static_cast<uint16_t>(commandData.time * TRANSITION_STEPS_PER_1S);
             colorHueTransitionState->initialEnhancedHue = colorHueTransitionState->currentEnhancedHue;
 
             if (colorHueTransitionState->up)
@@ -1951,14 +1933,14 @@ Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands:
         }
     }
 
-    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateStartHue))
+    if (commandData.updateFlags.Has(ColorLoopUpdateFlags::kUpdateStartHue))
     {
-        Attributes::ColorLoopStartEnhancedHue::Set(endpoint, startHue);
+        Attributes::ColorLoopStartEnhancedHue::Set(endpoint, commandData.startHue);
     }
 
-    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction))
+    if (commandData.updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction))
     {
-        if (action == ColorLoopAction::kDeactivate)
+        if (commandData.action == ColorLoopAction::kDeactivate)
         {
             if (isColorLoopActive)
             {
@@ -1977,11 +1959,11 @@ Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands:
                 // Do Nothing since it's not on
             }
         }
-        else if (action == ColorLoopAction::kActivateFromColorLoopStartEnhancedHue)
+        else if (commandData.action == ColorLoopAction::kActivateFromColorLoopStartEnhancedHue)
         {
             startColorLoop(endpoint, true);
         }
-        else if (action == ColorLoopAction::kActivateFromEnhancedCurrentHue)
+        else if (commandData.action == ColorLoopAction::kActivateFromEnhancedCurrentHue)
         {
             startColorLoop(endpoint, false);
         }
