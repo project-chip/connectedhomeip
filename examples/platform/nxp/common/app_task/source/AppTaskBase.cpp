@@ -74,8 +74,8 @@
 #endif
 
 #if CONFIG_LOW_POWER
-#include "PWR_Interface.h"
 #include "LowPower.h"
+#include "PWR_Interface.h"
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
