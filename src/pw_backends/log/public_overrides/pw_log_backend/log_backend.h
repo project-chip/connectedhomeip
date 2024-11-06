@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors.
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,12 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *        This header interfaces with the Pigweed logging facade by overriding
- *        the backend header.
- */
 #pragma once
 
-#include "pw_log_chip/log_chip.h"
+#include "pw_log_matter/log_matter.h"
