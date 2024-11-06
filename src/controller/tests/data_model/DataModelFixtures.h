@@ -121,7 +121,7 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
                                                         chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
-    void ReportAttributeChanged(const AttributePathParams & path) override {}
+    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override {}
 
     EndpointId FirstEndpoint() override;
     EndpointId NextEndpoint(EndpointId before) override;

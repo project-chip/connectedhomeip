@@ -261,7 +261,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     return CHIP_NO_ERROR;
 }
 
-void CodegenDataModelProvider::ReportAttributeChanged(const AttributePathParams & path)
+void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
 {
     ContextAttributesChangeListener change_listener(CurrentContext());
     if (path.mClusterId != kInvalidClusterId)

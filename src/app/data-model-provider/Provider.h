@@ -105,15 +105,24 @@ public:
     virtual std::optional<ActionReturnStatus> Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                      CommandHandler * handler) = 0;
 
-    /// Report attribute changed
+    /// Workaround function to report attribute change.
     ///
-    /// When this is invoked, the caller is expected to increase the cluster data version and the attribute path
-    /// should be marked as dirty by the data model provider listener so that the reporter can report the attribute
-    /// changes to the subscriber.
+    /// When this is invoked, the caller is expected to increment the cluster data version, and the attribute path
+    /// should be marked as `dirty` by the data model provider listener so that the reporter can norify the subscriber
+    /// of attribute changes.
+    /// This function should be invoked when attribute managed by attribute access interface is modified but not
+    /// through a WriteAttribute calling.
+    /// For example, if the LastNetworkingStatus attribute changes because the NetworkCommissioning driver detects a
+    /// network connection status change and calls SetLastNetworkingStatusValue(). The data model provider can recognize
+    /// this change by invoking this function at the point of change.
     ///
-    /// It should be invoked when attribute managed by access override is changed but the change is not caused by
-    /// WriteAttribute(Such as LastNetworkingStatus in NetworkCommissioning cluster).
-    virtual void ReportAttributeChanged(const AttributePathParams & path) = 0;
+    /// This is a workaround function as we cannot notify the attribute change to the data model provider. The provider
+    /// should own its data and versions.
+    ///
+    /// TODO: We should remove this function when the AttributeAccessInterface/CommandHandlerInterface is able to report
+    /// the attribute changes.
+    [[deprecated("Workaround until all code can use a context object instead")]]
+    virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
 
 private:
     InteractionModelContext mContext = { nullptr };

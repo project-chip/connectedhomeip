@@ -30,7 +30,7 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    InteractionModelEngine::GetInstance()->GetDataModelProvider()->ReportAttributeChanged(
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->Temporary_ReportAttributeChanged(
         AttributePathParams(endpoint, clusterId, attributeId));
 }
 
@@ -40,7 +40,7 @@ void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    InteractionModelEngine::GetInstance()->GetDataModelProvider()->ReportAttributeChanged(
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->Temporary_ReportAttributeChanged(
         AttributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId));
 }
 
@@ -50,5 +50,5 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    InteractionModelEngine::GetInstance()->GetDataModelProvider()->ReportAttributeChanged(AttributePathParams(endpoint));
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->Temporary_ReportAttributeChanged(AttributePathParams(endpoint));
 }
