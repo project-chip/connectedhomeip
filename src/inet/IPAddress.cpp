@@ -59,6 +59,9 @@ IPAddress::IPAddress(const ip6_addr_t & ipv6Addr)
 {
     static_assert(sizeof(ipv6Addr.addr) == sizeof(Addr), "ip6_addr_t size mismatch");
     memcpy(Addr, &ipv6Addr.addr, sizeof(ipv6Addr.addr));
+#if LWIP_IPV6_SCOPES
+    Zone = ipv6Addr.zone;
+#endif
 }
 
 #if INET_CONFIG_ENABLE_IPV4 || LWIP_IPV4
@@ -193,6 +196,9 @@ ip6_addr_t IPAddress::ToIPv6() const
     ip6_addr_t ipAddr = {};
     static_assert(sizeof(ipAddr.addr) == sizeof(Addr), "ip6_addr_t size mismatch");
     memcpy(&ipAddr.addr, Addr, sizeof(ipAddr.addr));
+#if LWIP_IPV6_SCOPES
+    ipAddr.zone = Zone;
+#endif
     return ipAddr;
 }
 

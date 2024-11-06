@@ -201,6 +201,9 @@ public:
      *  address in network byte order.
      */
     uint32_t Addr[4];
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_IPV6_SCOPES
+    uint8_t Zone;
+#endif
 
     /**
      * @brief   Test whether address is IPv6 compatible.
