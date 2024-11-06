@@ -331,6 +331,12 @@ def _add_target_to_cmd(cmd, flag, path, runner):
     help="Keep going on errors. Will report all failed tests at the end.",
 )
 @click.option(
+    "--fail-log-dir",
+    default=None,
+    help="Save failure logs into the specified directory instead of logging (as logging can be noisy/slow)",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+)
+@click.option(
     "--runner",
     default="none",
     type=click.Choice(list(__RUNNERS__.keys()), case_sensitive=False),
@@ -344,6 +350,7 @@ def python_tests(
     no_show_timings,
     runner,
     keep_going,
+    fail_log_dir,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -478,8 +485,21 @@ def python_tests(
 
                 if result.returncode != 0:
                     logging.error("Test failed: %s", script)
-                    logging.info("STDOUT:\n%s", result.stdout.decode("utf8"))
-                    logging.warning("STDERR:\n%s", result.stderr.decode("utf8"))
+                    if fail_log_dir:
+                        out_name = os.path.join(fail_log_dir, f"{base_name}.out.log")
+                        err_name = os.path.join(fail_log_dir, f"{base_name}.err.log")
+
+                        logging.error("STDOUT IN %s", out_name)
+                        logging.error("STDERR IN %s", err_name)
+
+                        with open(out_name, "wb") as f:
+                            f.write(result.stdout)
+                        with open(err_name, "wb") as f:
+                            f.write(result.stdout)
+
+                    else:
+                        logging.info("STDOUT:\n%s", result.stdout.decode("utf8"))
+                        logging.warning("STDERR:\n%s", result.stderr.decode("utf8"))
                     if not keep_going:
                         sys.exit(1)
                     failed_tests.append(script)
