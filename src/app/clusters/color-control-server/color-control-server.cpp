@@ -2329,18 +2329,13 @@ Status ColorControlServer::moveToColorCommand(EndpointId endpoint, const Command
  */
 Status ColorControlServer::moveColorCommand(EndpointId endpoint, const Commands::MoveColor::DecodableType & commandData)
 {
-    auto & rateX           = commandData.rateX;
-    auto & rateY           = commandData.rateY;
-    auto & optionsMask     = commandData.optionsMask;
-    auto & optionsOverride = commandData.optionsOverride;
-
     uint16_t epIndex                                = getEndpointIndex(endpoint);
     Color16uTransitionState * colorXTransitionState = getXTransitionStateByIndex(epIndex);
     Color16uTransitionState * colorYTransitionState = getYTransitionStateByIndex(epIndex);
     VerifyOrReturnValue(colorXTransitionState != nullptr, Status::UnsupportedEndpoint);
     VerifyOrReturnValue(colorYTransitionState != nullptr, Status::UnsupportedEndpoint);
 
-    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
+    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     uint16_t transitionTimeX, transitionTimeY;
     uint16_t unsignedRate;
@@ -2348,7 +2343,7 @@ Status ColorControlServer::moveColorCommand(EndpointId endpoint, const Commands:
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
 
-    if (rateX == 0 && rateY == 0)
+    if (commandData.rateX == 0 && commandData.rateY == 0)
     {
         // any current transition has been stopped. We are done.
         return Status::Success;
@@ -2360,15 +2355,15 @@ Status ColorControlServer::moveColorCommand(EndpointId endpoint, const Commands:
     // now, kick off the state machine.
     Attributes::CurrentX::Get(endpoint, &(colorXTransitionState->initialValue));
     colorXTransitionState->currentValue = colorXTransitionState->initialValue;
-    if (rateX > 0)
+    if (commandData.rateX > 0)
     {
         colorXTransitionState->finalValue = MAX_CIE_XY_VALUE;
-        unsignedRate                      = static_cast<uint16_t>(rateX);
+        unsignedRate                      = static_cast<uint16_t>(commandData.rateX);
     }
     else
     {
         colorXTransitionState->finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                      = static_cast<uint16_t>(rateX * -1);
+        unsignedRate                      = static_cast<uint16_t>(commandData.rateX * -1);
     }
     transitionTimeX                       = computeTransitionTimeFromStateAndRate(colorXTransitionState, unsignedRate);
     colorXTransitionState->stepsRemaining = transitionTimeX;
@@ -2381,15 +2376,15 @@ Status ColorControlServer::moveColorCommand(EndpointId endpoint, const Commands:
 
     Attributes::CurrentY::Get(endpoint, &(colorYTransitionState->initialValue));
     colorYTransitionState->currentValue = colorYTransitionState->initialValue;
-    if (rateY > 0)
+    if (commandData.rateY > 0)
     {
         colorYTransitionState->finalValue = MAX_CIE_XY_VALUE;
-        unsignedRate                      = static_cast<uint16_t>(rateY);
+        unsignedRate                      = static_cast<uint16_t>(commandData.rateY);
     }
     else
     {
         colorYTransitionState->finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                      = static_cast<uint16_t>(rateY * -1);
+        unsignedRate                      = static_cast<uint16_t>(commandData.rateY * -1);
     }
     transitionTimeY                       = computeTransitionTimeFromStateAndRate(colorYTransitionState, unsignedRate);
     colorYTransitionState->stepsRemaining = transitionTimeY;
@@ -2417,13 +2412,7 @@ Status ColorControlServer::moveColorCommand(EndpointId endpoint, const Commands:
  */
 Status ColorControlServer::stepColorCommand(EndpointId endpoint, const Commands::StepColor::DecodableType & commandData)
 {
-    auto stepX           = commandData.stepX;
-    auto stepY           = commandData.stepY;
-    auto transitionTime  = commandData.transitionTime;
-    auto optionsMask     = commandData.optionsMask;
-    auto optionsOverride = commandData.optionsOverride;
-
-    VerifyOrReturnValue(stepX != 0 || stepY != 0, Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.stepX != 0 || commandData.stepY != 0, Status::InvalidCommand);
 
     uint16_t epIndex                                = getEndpointIndex(endpoint);
     Color16uTransitionState * colorXTransitionState = getXTransitionStateByIndex(epIndex);
@@ -2431,15 +2420,15 @@ Status ColorControlServer::stepColorCommand(EndpointId endpoint, const Commands:
 
     VerifyOrReturnValue(colorXTransitionState != nullptr, Status::UnsupportedEndpoint);
     VerifyOrReturnValue(colorYTransitionState != nullptr, Status::UnsupportedEndpoint);
-    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
+    VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     uint16_t currentColorX = 0;
     uint16_t currentColorY = 0;
     Attributes::CurrentX::Get(endpoint, &currentColorX);
     Attributes::CurrentY::Get(endpoint, &currentColorY);
 
-    uint16_t colorX = findNewColorValueFromStep(currentColorX, stepX);
-    uint16_t colorY = findNewColorValueFromStep(currentColorY, stepY);
+    uint16_t colorX = findNewColorValueFromStep(currentColorX, commandData.stepX);
+    uint16_t colorY = findNewColorValueFromStep(currentColorY, commandData.stepY);
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
@@ -2451,10 +2440,10 @@ Status ColorControlServer::stepColorCommand(EndpointId endpoint, const Commands:
     colorXTransitionState->initialValue   = currentColorX;
     colorXTransitionState->currentValue   = currentColorX;
     colorXTransitionState->finalValue     = colorX;
-    colorXTransitionState->stepsRemaining = std::max<uint16_t>(transitionTime, 1);
+    colorXTransitionState->stepsRemaining = std::max<uint16_t>(commandData.transitionTime, 1);
     colorXTransitionState->stepsTotal     = colorXTransitionState->stepsRemaining;
-    colorXTransitionState->timeRemaining  = transitionTime;
-    colorXTransitionState->transitionTime = transitionTime;
+    colorXTransitionState->timeRemaining  = commandData.transitionTime;
+    colorXTransitionState->transitionTime = commandData.transitionTime;
     colorXTransitionState->endpoint       = endpoint;
     colorXTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
     colorXTransitionState->highLimit      = MAX_CIE_XY_VALUE;
@@ -2464,16 +2453,16 @@ Status ColorControlServer::stepColorCommand(EndpointId endpoint, const Commands:
     colorYTransitionState->finalValue     = colorY;
     colorYTransitionState->stepsRemaining = colorXTransitionState->stepsRemaining;
     colorYTransitionState->stepsTotal     = colorXTransitionState->stepsRemaining;
-    colorYTransitionState->timeRemaining  = transitionTime;
-    colorYTransitionState->transitionTime = transitionTime;
+    colorYTransitionState->timeRemaining  = commandData.transitionTime;
+    colorYTransitionState->transitionTime = commandData.transitionTime;
     colorYTransitionState->endpoint       = endpoint;
     colorYTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
     colorYTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
-    SetQuietReportRemainingTime(endpoint, transitionTime, true /* isNewTransition */);
+    SetQuietReportRemainingTime(endpoint, commandData.transitionTime, true /* isNewTransition */);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureXYEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
+    scheduleTimerCallbackMs(configureXYEventControl(endpoint), commandData.transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
     return Status::Success;
 }
 
