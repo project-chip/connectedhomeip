@@ -48,7 +48,9 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/SystemTimer.h>
 
+#ifndef CONFIG_IDF_TARGET_ESP32P4
 #include "esp_bt.h"
+#endif
 #include "esp_log.h"
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
@@ -1020,6 +1022,11 @@ CHIP_ERROR BLEManagerImpl::DeinitBLE()
 
     return MapBLEError(err);
 }
+
+#ifdef CONFIG_IDF_TARGET_ESP32P4
+// Stub function to avoid link error
+extern "C" void ble_transport_ll_deinit(void) {}
+#endif
 
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {

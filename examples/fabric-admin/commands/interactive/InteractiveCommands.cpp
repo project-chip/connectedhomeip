@@ -117,7 +117,7 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
 #if defined(PW_RPC_ENABLED)
 void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
 {
-    if (StartRpcClient() == CHIP_NO_ERROR)
+    if (admin::StartRpcClient() == CHIP_NO_ERROR)
     {
         // print to console
         fprintf(stderr, "Connected to Fabric-Bridge\n");
@@ -199,8 +199,8 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     }
 
 #if defined(PW_RPC_ENABLED)
-    SetRpcRemoteServerPort(mFabricBridgeServerPort.Value());
-    InitRpcServer(mLocalServerPort.Value());
+    admin::SetRpcRemoteServerPort(mFabricBridgeServerPort.Value());
+    admin::InitRpcServer(mLocalServerPort.Value());
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
     DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredConnect, 0);
 #endif

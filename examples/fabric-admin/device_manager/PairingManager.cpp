@@ -35,6 +35,8 @@
 using namespace ::chip;
 using namespace ::chip::Controller;
 
+namespace admin {
+
 namespace {
 
 CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
@@ -310,10 +312,10 @@ void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
     }
 
-    if (mCommissioningDelegate)
+    if (mPairingDelegate)
     {
-        mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
-        SetCommissioningDelegate(nullptr);
+        mPairingDelegate->OnCommissioningComplete(nodeId, err);
+        SetPairingDelegate(nullptr);
     }
 }
 
@@ -548,7 +550,13 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     if (err == CHIP_NO_ERROR)
     {
         // print to console
-        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 "has been successfully removed.\n", ChipLogValueX64(nodeId));
+        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 " has been successfully removed.\n", ChipLogValueX64(nodeId));
+
+        if (self->mPairingDelegate)
+        {
+            self->mPairingDelegate->OnDeviceRemoved(nodeId, err);
+            self->SetPairingDelegate(nullptr);
+        }
 
 #if defined(PW_RPC_ENABLED)
         FabricIndex fabricIndex = self->CurrentCommissioner().GetFabricIndex();
@@ -655,3 +663,5 @@ CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
         }
     });
 }
+
+} // namespace admin

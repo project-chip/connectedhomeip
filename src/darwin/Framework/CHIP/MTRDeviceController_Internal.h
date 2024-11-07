@@ -30,7 +30,6 @@
 #import "MTRBaseDevice.h"
 #import "MTRDeviceClusterData.h"
 #import "MTRDeviceController.h"
-#import "MTRDeviceControllerDataStore.h"
 #import "MTRDeviceControllerDelegate.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 
@@ -64,11 +63,6 @@ NS_ASSUME_NONNULL_BEGIN
  * running, else nil.
  */
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
-
-/**
- * The per-controller data store this controller was initialized with, if any.
- */
-@property (nonatomic, readonly, nullable) MTRDeviceControllerDataStore * controllerDataStore;
 
 /**
  * OTA delegate and its queue, if this controller supports OTA.  Either both

@@ -53,14 +53,10 @@
 
 #include <atomic>
 #include <dns_sd.h>
-#include <optional>
 #include <string>
 
 #import <os/lock.h>
 
-// TODO: These strings and their consumers in this file should probably go away,
-// since none of them really apply to all controllers.
-static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
 static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
 static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
 
@@ -93,8 +89,6 @@ using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRDeviceController {
     os_unfair_lock _underlyingDeviceMapLock;
-
-    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
 
     // For now, we just ensure that access to _suspended is atomic, but don't
     // guarantee atomicity of the the entire suspend/resume operation.  The
@@ -476,25 +470,6 @@ using namespace chip::Tracing::DarwinFramework;
     return YES;
 }
 
-- (BOOL)checkIsRunning
-{
-    return [self checkIsRunning:nil];
-}
-
-- (BOOL)checkIsRunning:(NSError * __autoreleasing *)error
-{
-    if ([self isRunning]) {
-        return YES;
-    }
-
-    MTR_LOG_ERROR("%@: %@ Error: %s", NSStringFromClass(self.class), self, [kErrorNotRunning UTF8String]);
-    if (error) {
-        *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-    }
-
-    return NO;
-}
-
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {
     // TODO: Figure out how to get callsites to have an MTRDeviceController_Concrete.
@@ -504,8 +479,8 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (nullable NSNumber *)compressedFabricID
 {
-    auto storedValue = _storedCompressedFabricID.load();
-    return storedValue.has_value() ? @(storedValue.value()) : nil;
+    MTR_ABSTRACT_METHOD();
+    return nil;
 }
 
 #ifdef DEBUG
