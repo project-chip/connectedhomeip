@@ -1261,12 +1261,12 @@ EmberEventControl * ColorControlServer::configureHSVEventControl(EndpointId endp
 }
 
 /**
- * @brief executes move to saturation command
+ * @brief Executes move to saturation command
  *
- * @param endpoint target endpoint where to execute move
- * @param saturation target saturation
- * @param transitionTime transition time in 10th of seconds
- * @return Status::Success when successful,
+ * @param endpoint Target endpoint where to execute move
+ * @param saturation Target saturation
+ * @param transitionTime Transition time in 10th of seconds
+ * @return Status::Success When successful,
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state.
  */
 Status ColorControlServer::moveToSaturation(EndpointId endpoint, uint8_t saturation, uint16_t transitionTime)
@@ -1300,15 +1300,15 @@ Status ColorControlServer::moveToSaturation(EndpointId endpoint, uint8_t saturat
 }
 
 /**
- * @brief executes move to hue and saturatioan command
+ * @brief Executes move to hue and saturatioan command.
  *
- * @param[in] endpoint endpointId of the recipient Color control cluster
- * @param[in] hue target hue
- * @param[in] saturation target saturation
- * @param[in] transitionTime transition time in 10th of seconds
+ * @param[in] endpoint EndpointId of the recipient Color control cluster.
+ * @param[in] hue Target hue.
+ * @param[in] saturation Target saturation.
+ * @param[in] transitionTime Transition time in 10th of seconds.
  * @param[in] isEnhanced If True, function was called by EnhancedMoveHue command and rate is a uint16 value. If False function
- * was called by MoveHue command and rate is a uint8 value
- * @return Status::Success when successful,
+ * was called by MoveHue command and rate is a uint8 value.
+ * @return Status::Success When successful,
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state,
  */
 Status ColorControlServer::moveToHueAndSaturation(EndpointId endpoint, uint16_t hue, uint8_t saturation, uint16_t transitionTime,
@@ -1389,15 +1389,15 @@ Status ColorControlServer::moveToHueAndSaturation(EndpointId endpoint, uint16_t 
 }
 
 /**
- * @brief Executes move Hue Command
+ * @brief Executes move Hue Command.
  *
- * @param[in] endpoint endpointId of the recipient Color control cluster
+ * @param[in] endpoint EndpointId of the recipient Color control cluster.
  * @param[in] moveMode
  * @param[in] rate
  * @param[in] optionsMask
  * @param[in] optionsOverride
  * @param[in] isEnhanced If True, function was called by EnhancedMoveHue command and rate is a uint16 value. If False function
- * was called by MoveHue command and rate is a uint8 value
+ * was called by MoveHue command and rate is a uint8 value.
  * @return Status::Success when successful,
  *         Status::InvalidCommand when Rate is 0 or an unknown moveMode is provided
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state,
@@ -1485,16 +1485,16 @@ Status ColorControlServer::moveHueCommand(EndpointId endpoint, HueMoveMode moveM
 }
 
 /**
- * @brief Executes move to hue command
+ * @brief Executes move to hue command.
  *
- * @param[in] endpointId of the recipient Color control cluster
+ * @param[in] endpoint EndpointId of the recipient Color control cluster.
  * @param[in] hue
  * @param[in] moveDirection
  * @param[in] transitionTime
  * @param[in] optionsMask
  * @param[in] optionsOverride
  * @param[in] isEnhanced If True, function was called by EnhancedMoveHue command and rate is a uint16 value. If False function
- * was called by MoveHue command and rate is a uint8 value
+ * was called by MoveHue command and rate is a uint8 value.
  * @return Status::Success when successful,
  *         Status::InvalidCommand when Rate is 0 or an unknown moveDirection is provided
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state,
@@ -1604,15 +1604,15 @@ Status ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, D
 }
 
 /**
- * @brief executes move to hue and saturatioan command
- * @param[in] endpointId of the recipient Color control cluster
+ * @brief Executes move to hue and saturatioan command.
+ * @param[in] endpoint EndpointId of the recipient Color control cluster.
  * @param[in] hue
  * @param[in] saturation
  * @param[in] transitionTime
  * @param[in] optionsMask
  * @param[in] optionsOverride
  * @param[in] isEnhanced If True, function was called by EnhancedMoveHue command and rate is a uint16 value. If False function
- * was called by MoveHue command and rate is a uint8 value
+ * was called by MoveHue command and rate is a uint8 value.
  * @return Status::Success when successful,
  *         Status::ConstraintError when the other parameters are outside their defined value range.
 
@@ -1636,7 +1636,7 @@ Status ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, ui
 }
 
 /**
- * @brief Executes step hue command
+ * @brief Executes step hue command.
  *
  * @param[in] endpoint
  * @param[in] stepMode
@@ -1645,7 +1645,7 @@ Status ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, ui
  * @param[in] optionsMask
  * @param[in] optionsOverride
  * @param[in] isEnhanced If True, function was called by EnhancedMoveHue command and rate is a uint16 value. If False function
- * was called by MoveHue command and rate is a uint8 value
+ * was called by MoveHue command and rate is a uint8 value.
  * @return Status::Success when successful,
  *         Status::InvalidCommand when StepSize is 0 or an unknown HueStepMode is provided
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state.
@@ -1724,9 +1724,9 @@ Status ColorControlServer::stepHueCommand(EndpointId endpoint, HueStepMode stepM
 }
 
 /**
- * @brief executes moveSaturation command
- * @param endpoint endpointId of the recipient Color control cluster
- * @param commandData Struct containing the parameters of the command
+ * @brief Executes moveSaturation command.
+ * @param endpoint EndpointId of the recipient Color control cluster.
+ * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
  *         Status::InvalidCommand when a rate of 0 for a non-stop move or an unknown SaturationMoveMode is provided
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state.
@@ -1785,9 +1785,9 @@ Status ColorControlServer::moveSaturationCommand(EndpointId endpoint, const Comm
 }
 
 /**
- * @brief executes move to saturation command
- * @param endpoint endpointId of the recipient Color control cluster
- * @param commandData Struct containing the parameters of the command
+ * @brief Executes move to saturation command.
+ * @param endpoint EndpointId of the recipient Color control cluster.
+ * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state (verified in
  * moveToSaturation function) Status::ConstraintError when a command parameters is outside its defined value range.
@@ -1808,9 +1808,9 @@ Status ColorControlServer::moveToSaturationCommand(EndpointId endpoint,
 }
 
 /**
- * @brief executes step saturation command
- * @param endpoint endpointId of the recipient Color control cluster
- * @param commandData Struct containing the parameters of the command
+ * @brief Executes step saturation command.
+ * @param endpoint EndpointId of the recipient Color control cluster.
+ * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
  *         Status::InvalidCommand when a step size of 0 or an unknown SaturationStepMode is provided
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state.
@@ -1859,12 +1859,12 @@ Status ColorControlServer::stepSaturationCommand(EndpointId endpoint, const Comm
 }
 
 /**
- * @brief executes ColorLoop command
- * @param endpoint endpointId of the recipient Color control cluster
- * @param commandData Struct containing the parameters of the command
+ * @brief Executes ColorLoop command.
+ * @param endpoint EndpointId of the recipient Color control cluster.
+ * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
  *         Status::InvalidCommand when an unknown action or direction is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state,
+ *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state.
  */
 Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands::ColorLoopSet::DecodableType & commandData)
 {
@@ -1976,7 +1976,7 @@ Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands:
 }
 
 /**
- * @brief updates Hue and saturation after timer is finished
+ * @brief Updates Hue and saturation after timer is finished.
  *
  * @param endpoint
  */

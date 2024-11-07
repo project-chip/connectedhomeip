@@ -148,7 +148,7 @@ public:
                              chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride);
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
-    // The Commands DecodableType to pass the command arguments are not used in the following HSV command handlers
+    // The Command's DecodableType are not used to pass arguments in the following HSV handlers,
     // as they handle both standard and Enhanced HSV commands.
     // The command arguments are decoupled in the command callback.
     chip::Protocols::InteractionModel::Status
