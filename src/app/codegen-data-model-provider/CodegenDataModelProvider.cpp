@@ -811,7 +811,8 @@ void CodegenDataModelProvider::IncrementClustersVersionForEndpoint(EndpointId en
 
         // double check this path is valid (wildcard endpoints would try to expand all endpoint IDs)
         // we do not rely here that emberAfDataVersionStorage would return null (e.g. our tests do not return null)
-        if (FindServerCluster(clusterPath) == nullptr) {
+        if (FindServerCluster(clusterPath) == nullptr)
+        {
             return;
         }
 
