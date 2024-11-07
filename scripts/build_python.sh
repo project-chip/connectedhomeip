@@ -35,7 +35,7 @@ echo_bold_white() {
 }
 
 check_one_of() {
-    local value=$1
+    local value="$1"
     shift
     for v in "$@"; do
         if [ "$value" = "$v" ]; then
