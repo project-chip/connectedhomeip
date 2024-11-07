@@ -39,7 +39,6 @@ extern void xPortSysTickHandler(void);
 /* RSI Driver include file */
 #include "rsi_driver.h"
 /* RSI WLAN Config include file */
-#include "WifiInterfaceAbstraction.h"
 #include "rsi_bootup_config.h"
 #include "rsi_common_apis.h"
 #include "rsi_data_types.h"
@@ -50,6 +49,8 @@ extern void xPortSysTickHandler(void);
 #include "rsi_wlan.h"
 #include "rsi_wlan_apis.h"
 #include "rsi_wlan_config.h"
+
+#define WFX_RSI_NUM_TIMERS (2) /* Number of RSI timers to alloc	*/
 
 #ifndef _use_the_rsi_defined_functions
 

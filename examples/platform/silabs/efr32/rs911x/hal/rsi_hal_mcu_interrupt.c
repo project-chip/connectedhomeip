@@ -35,7 +35,6 @@
 #include "event_groups.h"
 #include "task.h"
 
-#include "WifiInterfaceAbstraction.h"
 #include "wfx_host_events.h"
 
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)

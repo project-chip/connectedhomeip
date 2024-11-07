@@ -34,6 +34,8 @@
 using namespace chip;
 using namespace chip::DeviceLayer;
 
+using WifiStateFlags = chip::BitFlags<WifiState>;
+
 namespace {
 
 constexpr uint8_t kWlanMinRetryIntervalsInSec = 1;
@@ -88,8 +90,8 @@ void RetryConnectionTimerHandler(void * arg)
  ***********************************************************************/
 sl_status_t wfx_wifi_start(void)
 {
-    VerifyOrReturnError(!(wfx_rsi.dev_state & WFX_RSI_ST_STARTED), SL_STATUS_OK);
-    wfx_rsi.dev_state |= WFX_RSI_ST_STARTED;
+    VerifyOrReturnError(!(wfx_rsi.dev_state.Has(WifiState::kStationStarted)), SL_STATUS_OK);
+    wfx_rsi.dev_state.Set(WifiState::kStationStarted);
 
     // Creating a Wi-Fi driver thread
     sWlanThread = osThreadNew(sl_matter_wifi_task, NULL, &kWlanTaskAttr);
@@ -109,7 +111,7 @@ sl_status_t wfx_wifi_start(void)
  ***********************************************************************/
 void wfx_enable_sta_mode(void)
 {
-    wfx_rsi.dev_state |= WFX_RSI_ST_STA_MODE;
+    wfx_rsi.dev_state.Set(WifiState::kStationMode);
 }
 
 /*********************************************************************
@@ -121,9 +123,7 @@ void wfx_enable_sta_mode(void)
  ***********************************************************************/
 bool wfx_is_sta_mode_enabled(void)
 {
-    bool mode;
-    mode = !!(wfx_rsi.dev_state & WFX_RSI_ST_STA_MODE);
-    return mode;
+    return wfx_rsi.dev_state.Has(WifiState::kStationMode);
 }
 
 /*********************************************************************
@@ -157,7 +157,7 @@ void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
 {
     VerifyOrReturn(cfg != nullptr);
     wfx_rsi.sec = *cfg;
-    wfx_rsi.dev_state |= WFX_RSI_ST_STA_PROVISIONED;
+    wfx_rsi.dev_state.Set(WifiState::kStationProvisioned);
 }
 
 /*********************************************************************
@@ -171,7 +171,7 @@ void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
 {
     VerifyOrReturnError(wifiConfig != nullptr, false);
-    VerifyOrReturnError(wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED, false);
+    VerifyOrReturnError(wfx_rsi.dev_state.Has(WifiState::kStationProvisioned), false);
     *wifiConfig = wfx_rsi.sec;
     return true;
 }
@@ -186,7 +186,7 @@ bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
 void wfx_clear_wifi_provision(void)
 {
     memset(&wfx_rsi.sec, 0, sizeof(wfx_rsi.sec));
-    wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_PROVISIONED;
+    wfx_rsi.dev_state.Clear(WifiState::kStationProvisioned);
     ChipLogProgress(DeviceLayer, "Clear WiFi Provision");
 }
 
@@ -199,13 +199,13 @@ void wfx_clear_wifi_provision(void)
  ****************************************************************************/
 sl_status_t wfx_connect_to_ap(void)
 {
-    VerifyOrReturnError(wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED, SL_STATUS_INVALID_CONFIGURATION);
+    VerifyOrReturnError(wfx_rsi.dev_state.Has(WifiState::kStationProvisioned), SL_STATUS_INVALID_CONFIGURATION);
     VerifyOrReturnError(wfx_rsi.sec.ssid_length, SL_STATUS_INVALID_CREDENTIALS);
     VerifyOrReturnError(wfx_rsi.sec.ssid_length <= WFX_MAX_SSID_LENGTH, SL_STATUS_HAS_OVERFLOWED);
     ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
-    WfxEvent_t event;
-    event.eventType = WFX_EVT_STA_START_JOIN;
-    sl_matter_wifi_post_event(&event);
+
+    WifiEvent event = WifiEvent::kStationStartJoin;
+    sl_matter_wifi_post_event(event);
     return SL_STATUS_OK;
 }
 
@@ -266,8 +266,7 @@ void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
  ***********************************************************************/
 bool wfx_is_sta_connected(void)
 {
-    bool status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) > 0;
-    return status;
+    return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
 /*********************************************************************
@@ -280,7 +279,7 @@ bool wfx_is_sta_connected(void)
  ***********************************************************************/
 wifi_mode_t wfx_get_wifi_mode(void)
 {
-    if (wfx_rsi.dev_state & WFX_RSI_ST_DEV_READY)
+    if (wfx_rsi.dev_state.Has(WifiState::kStationInit))
         return WIFI_MODE_STA;
     return WIFI_MODE_NULL;
 }
@@ -297,7 +296,7 @@ sl_status_t sl_matter_wifi_disconnect(void)
 {
     sl_status_t status;
     status = sl_wifi_platform_disconnect();
-    wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTED;
+    wfx_rsi.dev_state.Clear(WifiState::kStationConnected);
     return status;
 }
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
@@ -312,7 +311,7 @@ sl_status_t sl_matter_wifi_disconnect(void)
 bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
 {
     VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
-    return ((wfx_rsi.dev_state & WFX_RSI_ST_STA_DHCP_DONE) > 0);
+    return wfx_rsi.dev_state.Has(WifiState::kStationDhcpDone);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
@@ -327,8 +326,8 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
 bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
 {
     VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
-    // TODO: WFX_RSI_ST_STA_CONNECTED does not guarantee SLAAC IPv6 LLA, maybe use a different FLAG
-    return ((wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) > 0);
+    // TODO: WifiState::kStationConnected does not guarantee SLAAC IPv6 LLA, maybe use a different FLAG
+    return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
 /*********************************************************************
@@ -341,7 +340,7 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
  ***********************************************************************/
 bool wfx_hw_ready(void)
 {
-    return (wfx_rsi.dev_state & WFX_RSI_ST_DEV_READY) ? true : false;
+    return wfx_rsi.dev_state.Has(WifiState::kStationInit);
 }
 
 /*********************************************************************
@@ -404,9 +403,8 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
     VerifyOrReturnError(wfx_rsi.scan_ssid != nullptr, false);
     chip::Platform::CopyString(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length, ssid);
 
-    WfxEvent_t event;
-    event.eventType = WFX_EVT_SCAN;
-    sl_matter_wifi_post_event(&event);
+    WifiEvent event = WifiEvent::kScan;
+    sl_matter_wifi_post_event(event);
 
     return true;
 }
@@ -486,7 +484,7 @@ void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
  *    notification of disconnection
  * @param[in] status:
  * @return None
- ********************************************************************************************/
+ *************************************************************************************/
 void wfx_disconnected_notify(int32_t status)
 {
     sl_wfx_disconnect_ind_t evt;
@@ -504,7 +502,7 @@ void wfx_disconnected_notify(int32_t status)
  *      notification of ipv6
  * @param[in]  got_ip:
  * @return None
- ********************************************************************************************/
+ *************************************************************************************/
 void wfx_ipv6_notify(int got_ip)
 {
     sl_wfx_generic_message_t eventData;
@@ -521,7 +519,7 @@ void wfx_ipv6_notify(int got_ip)
  *      notification of ip change
  * @param[in]  got_ip:
  * @return None
- ********************************************************************************************/
+ *************************************************************************************/
 void wfx_ip_changed_notify(int got_ip)
 {
     sl_wfx_generic_message_t eventData;
@@ -540,7 +538,7 @@ void wfx_ip_changed_notify(int got_ip)
  *      with AP continously after a certain time interval.
  * @param[in]  retryAttempt
  * @return None
- ********************************************************************************************/
+ *************************************************************************************/
 void wfx_retry_connection(uint16_t retryAttempt)
 {
     // During commissioning, we retry to join the network MAX_JOIN_RETRIES_COUNT

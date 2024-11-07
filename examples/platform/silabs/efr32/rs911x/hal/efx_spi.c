@@ -41,7 +41,6 @@
 #include "sl_status.h"
 #include "spidrv.h"
 
-#include "WifiInterfaceAbstraction.h"
 #include "silabs_utils.h"
 #include "spi_multiplex.h"
 #include "wfx_host_events.h"

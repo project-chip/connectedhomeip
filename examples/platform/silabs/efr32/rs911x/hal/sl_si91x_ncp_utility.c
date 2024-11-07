@@ -44,7 +44,6 @@
 #include "sl_device_init_hfxo.h"
 #include "sl_status.h"
 
-#include "WifiInterfaceAbstraction.h"
 #include "silabs_utils.h"
 #include "sl_si91x_ncp_utility.h"
 #include "wfx_host_events.h"
