@@ -148,31 +148,38 @@ public:
                         const chip::app::Clusters::ColorControl::Commands::StopMoveStep::DecodableType & commandData);
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
-    bool moveHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                        MoveModeEnum moveMode, uint16_t rate,
-                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
-                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
-    bool moveToHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, uint16_t hue,
-                          DirectionEnum moveDirection, uint16_t transitionTime,
-                          chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
-                          chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
-    bool moveToHueAndSaturationCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                       uint16_t hue, uint8_t saturation, uint16_t transitionTime,
-                                       chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
-                                       chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride,
-                                       bool isEnhanced);
-    bool stepHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                        StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTime,
-                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
-                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
-    bool moveSaturationCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                               const chip::app::Clusters::ColorControl::Commands::MoveSaturation::DecodableType & commandData);
-    bool moveToSaturationCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                 const chip::app::Clusters::ColorControl::Commands::MoveToSaturation::DecodableType & commandData);
-    bool stepSaturationCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                               const chip::app::Clusters::ColorControl::Commands::StepSaturation::DecodableType & commandData);
-    bool colorLoopCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          const chip::app::Clusters::ColorControl::Commands::ColorLoopSet::DecodableType & commandData);
+    // The Command's DecodableType are not used to pass arguments in the following HSV handlers,
+    // as they handle both standard and Enhanced HSV commands.
+    // The command arguments are decoupled in the command callback.
+    chip::Protocols::InteractionModel::Status
+    moveHueCommand(const chip::EndpointId endpoint, MoveModeEnum moveMode, uint16_t rate,
+                   chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                   chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
+    chip::Protocols::InteractionModel::Status
+    moveToHueCommand(const chip::EndpointId endpoint, uint16_t hue, DirectionEnum moveDirection, uint16_t transitionTime,
+                     chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                     chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
+    chip::Protocols::InteractionModel::Status
+    moveToHueAndSaturationCommand(const chip::EndpointId endpoint, uint16_t hue, uint8_t saturation, uint16_t transitionTime,
+                                  chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                                  chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
+    chip::Protocols::InteractionModel::Status
+    stepHueCommand(const chip::EndpointId endpoint, StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTime,
+                   chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                   chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
+
+    chip::Protocols::InteractionModel::Status
+    moveSaturationCommand(const chip::EndpointId endpoint,
+                          const chip::app::Clusters::ColorControl::Commands::MoveSaturation::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status
+    moveToSaturationCommand(const chip::EndpointId endpoint,
+                            const chip::app::Clusters::ColorControl::Commands::MoveToSaturation::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status
+    stepSaturationCommand(const chip::EndpointId endpoint,
+                          const chip::app::Clusters::ColorControl::Commands::StepSaturation::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status
+    colorLoopCommand(const chip::EndpointId endpoint,
+                     const chip::app::Clusters::ColorControl::Commands::ColorLoopSet::DecodableType & commandData);
     void updateHueSatCommand(chip::EndpointId endpoint);
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
@@ -234,10 +241,10 @@ private:
     uint16_t getEndpointIndex(chip::EndpointId);
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
-    chip::Protocols::InteractionModel::Status moveToSaturation(uint8_t saturation, uint16_t transitionTime,
-                                                               chip::EndpointId endpoint);
-    chip::Protocols::InteractionModel::Status moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTime,
-                                                                     bool isEnhanced, chip::EndpointId endpoint);
+    chip::Protocols::InteractionModel::Status moveToSaturation(chip::EndpointId endpoint, uint8_t saturation,
+                                                               uint16_t transitionTime);
+    chip::Protocols::InteractionModel::Status moveToHueAndSaturation(chip::EndpointId endpoint, uint16_t hue, uint8_t saturation,
+                                                                     uint16_t transitionTime, bool isEnhanced);
     ColorHueTransitionState * getColorHueTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getSaturationTransitionState(chip::EndpointId endpoint);
     ColorHueTransitionState * getColorHueTransitionStateByIndex(uint16_t index);
