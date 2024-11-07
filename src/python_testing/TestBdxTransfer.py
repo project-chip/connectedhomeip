@@ -16,12 +16,24 @@
 #
 
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: False
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --end_user_support_log ${END_USER_SUPPORT_LOG}
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --string-arg "end_user_support_log:${END_USER_SUPPORT_LOG}"
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --end_user_support_log ${END_USER_SUPPORT_LOG}
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --string-arg "end_user_support_log:${END_USER_SUPPORT_LOG}"
+#     factory-reset: true
+#     quiet: false
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -30,7 +42,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.bdx import BdxTransfer
 from chip.ChipDeviceCtrl import ChipDeviceController
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -87,7 +99,7 @@ class TestBdxTransfer(MatterBaseTest):
 
         self.step(6)
         data_file = open(self.user_params["end_user_support_log"], "rb")
-        asserts.assert_equal(bytearray(data), data_file.read(), "Transferred data doesn't match")
+        asserts.assert_equal(data, data_file.read(), "Transferred data doesn't match")
 
         self.step(7)
         if command_send_future in done:
