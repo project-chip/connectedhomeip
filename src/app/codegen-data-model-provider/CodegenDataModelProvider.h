@@ -180,9 +180,11 @@ public:
     void MarkDirty(const AttributePathParams & path) override;
 
 private:
+    // Flag tracking initialization for the purposes of attaching/deteaching to AttributeAccessInterface
+    // entries.
+    bool mInitialized = false;
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
-    bool mInitialized                 = false;
     uint16_t mEndpointIterationHint   = 0;
     unsigned mClusterIterationHint    = 0;
     unsigned mAttributeIterationHint  = 0;
