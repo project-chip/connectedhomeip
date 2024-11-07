@@ -449,10 +449,9 @@ static inline EVP_MD_CTX * to_inner_hash_evp_md_ctx(HashSHA256OpaqueContext * co
     return *SafePointerCast<EVP_MD_CTX **>(context);
 }
 
-Hash_SHA256_stream::Hash_SHA256_stream()
+Hash_SHA256_stream::Hash_SHA256_stream() : mInitialized(false)
 {
     set_inner_hash_evp_md_ctx(&mContext, nullptr);
-    mInitialized = false;
 }
 
 Hash_SHA256_stream::~Hash_SHA256_stream()
@@ -537,12 +536,12 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
 void Hash_SHA256_stream::Clear()
 {
     EVP_MD_CTX * mdctx = to_inner_hash_evp_md_ctx(&mContext);
-    if (mdctx != nullptr)
-    {
-        EVP_MD_CTX_free(mdctx);
-        set_inner_hash_evp_md_ctx(&mContext, nullptr);
-        mInitialized = false;
-    }
+
+    // EVP_MD_CTX_free does nothing if a nullptr is passed to it
+    EVP_MD_CTX_free(mdctx);
+    set_inner_hash_evp_md_ctx(&mContext, nullptr);
+
+    mInitialized = false;
     OPENSSL_cleanse(this, sizeof(*this));
 }
 
