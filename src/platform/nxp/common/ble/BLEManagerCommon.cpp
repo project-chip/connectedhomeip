@@ -1190,7 +1190,7 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
 
     if (pConnectionEvent->eventType == gConnEvtConnected_c)
     {
-#if CHIP_DEVICE_K32W1
+#if NXP_DEVICE_K32W1_MCXW7X
 #if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
         /* Disallow must be called here for K32W1, otherwise an assert will be reached.
          * Disclaimer: this is a workaround until a better cross platform solution is found. */
