@@ -54,6 +54,7 @@ docs/html
 
 # Python venv
 .venv
+cirque_venv
 
 # Documentation
 docs/_build
