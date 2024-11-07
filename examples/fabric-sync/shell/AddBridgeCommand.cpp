@@ -54,6 +54,15 @@ void AddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
                         ChipLogValueX64(mBridgeNodeId));
 
         admin::DeviceMgr().UpdateLastUsedNodeId(mBridgeNodeId);
+        admin::DeviceMgr().SubscribeRemoteFabricBridge();
+
+        // After successful commissioning of the Commissionee, initiate Reverse Commissioning
+        // via the Commissioner Control Cluster. However, we must first verify that the
+        // remote Fabric-Bridge supports Fabric Synchronization.
+        //
+        // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
+        // if the remote Fabric-Bridge lacks Fabric Synchronization support.
+        DeviceLayer::SystemLayer().ScheduleLambda([]() { admin::DeviceMgr().ReadSupportedDeviceCategories(); });
     }
     else
     {

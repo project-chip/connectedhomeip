@@ -17,7 +17,9 @@
  */
 
 #include <AppMain.h>
+#include <admin/FabricAdmin.h>
 #include <admin/PairingManager.h>
+#include <bridge/include/Bridge.h>
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "ShellCommands.h"
@@ -82,12 +84,21 @@ void ApplicationInit()
 
     // Redirect logs to the custom logging callback
     Logging::SetLogRedirectCallback(LoggingCallback);
+
+    CHIP_ERROR err = bridge::BridgeInit(&admin::FabricAdmin::Instance());
+    VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified, "Fabric-Sync: Failed to initialize bridge, error: %s", ErrorStr(err));
 }
 
 void ApplicationShutdown()
 {
     ChipLogDetail(NotSpecified, "Fabric-Sync: ApplicationShutdown()");
     CloseLogFile();
+
+    CHIP_ERROR err = bridge::BridgeShutdown();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Fabric-Sync: Failed to shutdown bridge, error: %s", ErrorStr(err));
+    }
 }
 
 int main(int argc, char * argv[])
