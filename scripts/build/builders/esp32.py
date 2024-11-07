@@ -155,7 +155,6 @@ class Esp32Builder(Builder):
                  enable_rpcs: bool = False,
                  enable_ipv4: bool = True,
                  enable_insights_trace: bool = False,
-                 data_model_interface: Optional[str] = None,
                  ):
         super(Esp32Builder, self).__init__(root, runner)
         self.board = board
@@ -163,7 +162,6 @@ class Esp32Builder(Builder):
         self.enable_rpcs = enable_rpcs
         self.enable_ipv4 = enable_ipv4
         self.enable_insights_trace = enable_insights_trace
-        self.data_model_interface = data_model_interface
 
         if not app.IsCompatible(board):
             raise Exception(
@@ -217,9 +215,6 @@ class Esp32Builder(Builder):
         if self.options.pregen_dir:
             cmake_flags.append(
                 f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
-
-        if self.data_model_interface:
-            cmake_flags.append(f'-DCHIP_DATA_MODEL_INTERFACE={self.data_model_interface}')
 
         cmake_args = ['-C', self.ExamplePath, '-B',
                       shlex.quote(self.output_dir)] + cmake_flags

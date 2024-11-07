@@ -24,6 +24,7 @@ details.
         -   [Activating python virtual env](#activating-python-virtual-env)
         -   [Interacting with CHIP-REPL and the example app](#interacting-with-chip-repl-and-the-example-app)
         -   [Using chip-repl to Fake a charging session](#using-chip-repl-to-fake-a-charging-session)
+    -   [Water Heater App: Interaction using the chip-tool and TestEventTriggers](#water-heater-app-interaction-using-the-chip-tool-and-testeventtriggers)
 
 <hr>
 
@@ -272,7 +273,7 @@ data (e.g. fabric info).
 -   Step 3: (In chip-repl) Commissioning OnNetwork
 
 ```python
-    devCtrl.CommissionOnNetwork(1234,20202021)   # Commission with NodeID 1234
+    await devCtrl.CommissionOnNetwork(1234,20202021)   # Commission with NodeID 1234
 Established secure session with Device
 Commissioning complete
 Out[2]: <chip.native.PyChipError object at 0x7f2432b16140>

@@ -17,8 +17,9 @@
  */
 #pragma once
 
-/*
+/**
  * Run Fixture's class function as a test.
+ *
  * It is used to execute test cases that need to use private members of a particular class.
  * Unlike the pigweed macro `FRIEND_TEST`, this approach allows you to define the entire
  * test_fixture class as a friend, rather than having to define each testcase as a friend.
@@ -54,3 +55,16 @@
         test_name();                                                                                                               \
     }                                                                                                                              \
     void test_fixture::test_name()
+
+/**
+ * Run Fixture's class function as a test.
+ *
+ * This macro does not define the body of the test function. It can be used to
+ * run a single test case which needs to be run against different fixtures.
+ *
+ */
+#define TEST_F_FROM_FIXTURE_NO_BODY(test_fixture, test_name)                                                                       \
+    TEST_F(test_fixture, test_name)                                                                                                \
+    {                                                                                                                              \
+        test_name();                                                                                                               \
+    }

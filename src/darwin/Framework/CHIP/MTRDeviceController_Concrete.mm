@@ -106,8 +106,6 @@ using namespace chip::Tracing::DarwinFramework;
 @property (nonatomic, readonly, nullable) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (nonatomic, readonly, nullable) NSMutableArray<MTRServerEndpoint *> * serverEndpoints;
 
-@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
-
 @property (nonatomic, readonly) MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration;
 
 // Whether we should be advertising our operational identity when we are not suspended.
@@ -1614,17 +1612,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         sessionMgr->MarkSessionsAsDefunct(
             self->_cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
-    };
-
-    [self syncRunOnWorkQueue:block error:nil];
-}
-
-- (void)invalidateCASESessionEstablishmentForNode:(NSNumber *)nodeID;
-{
-    auto block = ^{
-        auto caseSessionMgr = self->_cppCommissioner->CASESessionMgr();
-        VerifyOrDie(caseSessionMgr != nullptr);
-        caseSessionMgr->ReleaseSession(self->_cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue));
     };
 
     [self syncRunOnWorkQueue:block error:nil];

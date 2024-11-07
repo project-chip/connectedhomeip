@@ -24,6 +24,7 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerContextKey 
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey MTR_NEWLY_AVAILABLE;
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey MTR_NEWLY_AVAILABLE;
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey MTR_NEWLY_AVAILABLE;
 
 MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>

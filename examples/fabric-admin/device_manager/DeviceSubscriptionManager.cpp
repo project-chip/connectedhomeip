@@ -32,6 +32,8 @@
 using namespace ::chip;
 using namespace ::chip::app;
 
+namespace admin {
+
 DeviceSubscriptionManager & DeviceSubscriptionManager::Instance()
 {
     static DeviceSubscriptionManager instance;
@@ -78,3 +80,5 @@ void DeviceSubscriptionManager::DeviceSubscriptionTerminated(ScopedNodeId scoped
     VerifyOrDie(it != mDeviceSubscriptionMap.end());
     mDeviceSubscriptionMap.erase(scopedNodeId);
 }
+
+} // namespace admin

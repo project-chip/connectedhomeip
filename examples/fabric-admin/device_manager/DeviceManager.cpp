@@ -27,6 +27,8 @@
 
 using namespace chip;
 
+namespace admin {
+
 namespace {
 
 constexpr EndpointId kAggregatorEndpointId = 1;
@@ -69,7 +71,11 @@ void DeviceManager::UpdateLastUsedNodeId(NodeId nodeId)
 void DeviceManager::SetRemoteBridgeNodeId(chip::NodeId nodeId)
 {
     mRemoteBridgeNodeId = nodeId;
-    mCommissionerControl.Init(PairingManager::Instance().CurrentCommissioner(), mRemoteBridgeNodeId, kAggregatorEndpointId);
+
+    if (mRemoteBridgeNodeId != kUndefinedNodeId)
+    {
+        mCommissionerControl.Init(PairingManager::Instance().CurrentCommissioner(), mRemoteBridgeNodeId, kAggregatorEndpointId);
+    }
 }
 
 void DeviceManager::AddSyncedDevice(const Device & device)
@@ -465,3 +471,5 @@ void DeviceManager::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
     RemoveSyncedDevice(deviceId);
     ChipLogProgress(NotSpecified, "Synced device with NodeId:" ChipLogFormatX64 " has been removed.", ChipLogValueX64(deviceId));
 }
+
+} // namespace admin

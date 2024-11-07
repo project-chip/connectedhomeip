@@ -120,7 +120,7 @@ enum
  *
  * @return @p true if the specified TLV type is valid; otherwise @p false.
  */
-inline bool IsValidTLVType(TLVElementType type)
+constexpr bool IsValidTLVType(TLVElementType type)
 {
     return type <= TLVElementType::EndOfContainer;
 }
@@ -130,7 +130,7 @@ inline bool IsValidTLVType(TLVElementType type)
  *
  * @return @p true if the specified TLV type implies the presence of an associated value field; otherwise @p false.
  */
-inline bool TLVTypeHasValue(TLVElementType type)
+constexpr bool TLVTypeHasValue(TLVElementType type)
 {
     return (type <= TLVElementType::UInt64 ||
             (type >= TLVElementType::FloatingPointNumber32 && type <= TLVElementType::ByteString_8ByteLength));
@@ -141,7 +141,7 @@ inline bool TLVTypeHasValue(TLVElementType type)
  *
  * @return @p true if the specified TLV type implies the presence of an associated length field; otherwise @p false.
  */
-inline bool TLVTypeHasLength(TLVElementType type)
+constexpr bool TLVTypeHasLength(TLVElementType type)
 {
     return type >= TLVElementType::UTF8String_1ByteLength && type <= TLVElementType::ByteString_8ByteLength;
 }
@@ -186,13 +186,13 @@ inline bool TLVTypeIsUTF8String(TLVElementType type)
  *
  * @return @p true if the specified TLV type is a byte string; otherwise @p false.
  */
-inline bool TLVTypeIsByteString(TLVElementType type)
+constexpr bool TLVTypeIsByteString(TLVElementType type)
 {
     return type >= TLVElementType::ByteString_1ByteLength && type <= TLVElementType::ByteString_8ByteLength;
 }
 
 // TODO: move to private namespace
-inline TLVFieldSize GetTLVFieldSize(TLVElementType type)
+constexpr TLVFieldSize GetTLVFieldSize(TLVElementType type)
 {
     if (TLVTypeHasValue(type))
         return static_cast<TLVFieldSize>(static_cast<uint8_t>(type) & kTLVTypeSizeMask);
@@ -200,12 +200,18 @@ inline TLVFieldSize GetTLVFieldSize(TLVElementType type)
 }
 
 // TODO: move to private namespace
-inline uint8_t TLVFieldSizeToBytes(TLVFieldSize fieldSize)
+constexpr uint8_t TLVFieldSizeToBytes(TLVFieldSize fieldSize)
 {
     // We would like to assert fieldSize < 7, but that gives us fatal
     // -Wtautological-constant-out-of-range-compare warnings...
     return static_cast<uint8_t>((fieldSize != kTLVFieldSize_0Byte) ? (1 << fieldSize) : 0);
 }
+
+static_assert(TLVFieldSizeToBytes(kTLVFieldSize_0Byte) == 0);
+static_assert(TLVFieldSizeToBytes(kTLVFieldSize_1Byte) == 1);
+static_assert(TLVFieldSizeToBytes(kTLVFieldSize_2Byte) == 2);
+static_assert(TLVFieldSizeToBytes(kTLVFieldSize_4Byte) == 4);
+static_assert(TLVFieldSizeToBytes(kTLVFieldSize_8Byte) == 8);
 
 } // namespace TLV
 } // namespace chip

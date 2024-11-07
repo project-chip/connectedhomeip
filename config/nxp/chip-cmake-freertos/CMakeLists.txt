@@ -50,12 +50,6 @@ matter_add_gn_arg_bool("nxp_enable_secure_whole_factory_data" ${CONFIG_CHIP_ENAB
 matter_add_gn_arg_bool("nxp_enable_matter_cli" CONFIG_CHIP_LIB_SHELL)
 matter_add_gn_arg_bool("chip_enable_pairing_autostart" CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART)
 
-if (CONFIG_USE_CHIP_DATA_MODEL_INTERFACE)
-    set(DATA_MODEL_INTERFACE "enabled")
-else()
-    set(DATA_MODEL_INTERFACE "disabled")
-endif()
-
 if(CONFIG_BOOTLOADER_MCUBOOT)
     matter_add_gn_arg_bool("no_mcuboot" false)
 endif(CONFIG_BOOTLOADER_MCUBOOT)
@@ -73,7 +67,6 @@ else()
         PROJECT_CONFIG ${CONFIG_CHIP_PROJECT_CONFIG}
         PROJECT_CONFIG_INC_DIR ${CONFIG_CHIP_PROJECT_CONFIG_INCLUDE_DIRS}
         DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-        DATA_MODEL_INTERFACE ${DATA_MODEL_INTERFACE}
     )
 endif()
 

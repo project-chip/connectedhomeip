@@ -30,6 +30,8 @@
 
 using namespace ::chip;
 
+namespace admin {
+
 void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 {
     if (mBridgeNodeId != deviceId)
@@ -81,11 +83,11 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
     if (DeviceMgr().IsFabricSyncReady())
     {
         // print to console
-        fprintf(stderr, "Remote Fabric Bridge has already been configured.");
+        fprintf(stderr, "Remote Fabric Bridge has already been configured.\n");
         return CHIP_NO_ERROR;
     }
 
-    PairingManager::Instance().SetCommissioningDelegate(this);
+    PairingManager::Instance().SetPairingDelegate(this);
 
     mBridgeNodeId = remoteId;
 
@@ -124,7 +126,7 @@ CHIP_ERROR FabricSyncRemoveBridgeCommand::RunCommand()
     if (bridgeNodeId == kUndefinedNodeId)
     {
         // print to console
-        fprintf(stderr, "Remote Fabric Bridge is not configured yet, nothing to remove.");
+        fprintf(stderr, "Remote Fabric Bridge is not configured yet, nothing to remove.\n");
         return CHIP_NO_ERROR;
     }
 
@@ -174,11 +176,11 @@ CHIP_ERROR FabricSyncAddLocalBridgeCommand::RunCommand(NodeId deviceId)
     if (DeviceMgr().IsLocalBridgeReady())
     {
         // print to console
-        fprintf(stderr, "Local Fabric Bridge has already been configured.");
+        fprintf(stderr, "Local Fabric Bridge has already been configured.\n");
         return CHIP_NO_ERROR;
     }
 
-    PairingManager::Instance().SetCommissioningDelegate(this);
+    PairingManager::Instance().SetPairingDelegate(this);
     mLocalBridgeNodeId = deviceId;
 
     if (mSetupPINCode.HasValue())
@@ -225,7 +227,7 @@ CHIP_ERROR FabricSyncRemoveLocalBridgeCommand::RunCommand()
     if (bridgeNodeId == kUndefinedNodeId)
     {
         // print to console
-        fprintf(stderr, "Local Fabric Bridge is not configured yet, nothing to remove.");
+        fprintf(stderr, "Local Fabric Bridge is not configured yet, nothing to remove.\n");
         return CHIP_NO_ERROR;
     }
 
@@ -250,7 +252,7 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
         {
             NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
 
-            PairingManager::Instance().SetCommissioningDelegate(this);
+            PairingManager::Instance().SetPairingDelegate(this);
             mAssignedNodeId = nodeId;
 
             usleep(kCommissionPrepareTimeMs * 1000);
@@ -290,18 +292,20 @@ void FabricSyncDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERRO
     }
 }
 
-CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
+CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteEndpointId)
 {
     if (!DeviceMgr().IsFabricSyncReady())
     {
         // print to console
-        fprintf(stderr, "Remote Fabric Bridge is not configured yet.");
+        fprintf(stderr, "Remote Fabric Bridge is not configured yet.\n");
         return CHIP_NO_ERROR;
     }
 
     PairingManager::Instance().SetOpenCommissioningWindowDelegate(this);
 
-    DeviceMgr().OpenRemoteDeviceCommissioningWindow(remoteId);
+    DeviceMgr().OpenRemoteDeviceCommissioningWindow(remoteEndpointId);
 
     return CHIP_NO_ERROR;
 }
+
+} // namespace admin

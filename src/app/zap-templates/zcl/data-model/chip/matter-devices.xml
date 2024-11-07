@@ -293,7 +293,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -394,7 +393,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -492,7 +490,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -609,7 +606,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -742,7 +738,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -836,7 +831,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>

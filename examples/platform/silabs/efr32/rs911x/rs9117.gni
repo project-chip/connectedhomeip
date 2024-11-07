@@ -1,3 +1,17 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
@@ -7,14 +21,14 @@ rs911x_src_plat = [
   "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_interrupt.c",
   "${examples_plat_dir}/rs911x/hal/sl_si91x_ncp_utility.c",
   "${examples_plat_dir}/rs911x/hal/efx32_ncp_host.c",
-  "${silabs_common_plat_dir}/wifi/wfx_notify.cpp",
-  "${silabs_common_plat_dir}/wifi/wfx_rsi_host.cpp",
+  "${silabs_common_plat_dir}/wifi/WifiInterfaceAbstraction.cpp",
 ]
 
 rs9117_inc_plat = [
   "${examples_plat_dir}/rs911x",
   "${examples_plat_dir}/rs911x/hal",
   "${wifi_sdk_root}/components/si91x/ble/inc",
+  "${silabs_common_plat_dir}/wifi",
 ]
 
 rs911x_cflags = [ "-Wno-empty-body" ]

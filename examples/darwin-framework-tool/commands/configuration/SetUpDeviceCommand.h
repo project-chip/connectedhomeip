@@ -50,6 +50,9 @@ protected:
         __auto_type queue = dispatch_queue_create("com.chip.devicedelegate", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         [device addDelegate:delegate queue:queue];
 
+        // Make sure the device is registered as the latest MTRDevice.
+        DeviceWithNodeId(mNodeId);
+
         mDelegate = delegate;
         SetCommandExitStatus(CHIP_NO_ERROR);
         return CHIP_NO_ERROR;
