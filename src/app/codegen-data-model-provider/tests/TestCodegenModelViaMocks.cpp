@@ -2650,9 +2650,8 @@ TEST(TestCodegenModelViaMocks, TestMarkDirty)
         model.ChangeListener().DirtyList().clear();
         model.MarkDirty(kPath);
 
-        // exactly one cluster increased
-        // we do not validate cluster versions here, so versions increase
-        EXPECT_EQ(startVersion + 1, chip::Test::GetVersion());
+        // Cluster is not valid, so no version change
+        EXPECT_EQ(startVersion, chip::Test::GetVersion());
 
         // mark dirty does go through
         EXPECT_EQ(model.ChangeListener().DirtyList().size(), 1u);
@@ -2697,6 +2696,51 @@ TEST(TestCodegenModelViaMocks, TestMarkDirty)
         // Each cluster should call the increase once
         constexpr unsigned kNumTotalClusters = 9; // see gTestNodeConfig
         EXPECT_EQ(startVersion + kNumTotalClusters, chip::Test::GetVersion());
+
+        EXPECT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], kPath);
+    }
+
+    // Mark a specific cluster on all endpoints
+    {
+        const DataVersion startVersion = chip::Test::GetVersion();
+        const AttributePathParams kPath(kInvalidEndpointId, MockClusterId(1));
+        model.ChangeListener().DirtyList().clear();
+        model.MarkDirty(kPath);
+
+        // Each cluster should call the increase once
+        constexpr unsigned kNumClusterId1 = 3; // Appears on al endpoints
+        EXPECT_EQ(startVersion + kNumClusterId1, chip::Test::GetVersion());
+
+        EXPECT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], kPath);
+    }
+
+    // Mark a specific cluster on all endpoints
+    {
+        const DataVersion startVersion = chip::Test::GetVersion();
+        const AttributePathParams kPath(kInvalidEndpointId, MockClusterId(3));
+        model.ChangeListener().DirtyList().clear();
+        model.MarkDirty(kPath);
+
+        // Each cluster should call the increase once
+        constexpr unsigned kNumClusterId3 = 2; // Appears mock endpoints 2 and 3
+        EXPECT_EQ(startVersion + kNumClusterId3, chip::Test::GetVersion());
+
+        EXPECT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], kPath);
+    }
+
+    // Mark a specific cluster on all endpoints
+    {
+        const DataVersion startVersion = chip::Test::GetVersion();
+        const AttributePathParams kPath(kInvalidEndpointId, MockClusterId(4));
+        model.ChangeListener().DirtyList().clear();
+        model.MarkDirty(kPath);
+
+        // Each cluster should call the increase once
+        constexpr unsigned kNumClusterId4 = 1; // Appears mock endpoints 3 only
+        EXPECT_EQ(startVersion + kNumClusterId4, chip::Test::GetVersion());
 
         EXPECT_EQ(model.ChangeListener().DirtyList().size(), 1u);
         EXPECT_EQ(model.ChangeListener().DirtyList()[0], kPath);
