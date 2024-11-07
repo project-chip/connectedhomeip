@@ -270,6 +270,6 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrStorageWithoutSourceLocation)
         // ErrorStr with given storage.
         ErrorStrStorage storage;
         CheckCoreErrorStrWithoutSourceLocationHelper(ErrorStr(err, /*withSourceLocation=*/false, storage), err);
-        
+
     }
 }

@@ -62,7 +62,7 @@ DLL_EXPORT const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation)
  * @param[in] storage                  ErrorStrStorage to write into
  * location in the output string. Only used if CHIP_CONFIG_ERROR_SOURCE &&
  * !CHIP_CONFIG_SHORT_ERROR_STR. Defaults to true.
- * 
+ *
  * @return A pointer to a NULL-terminated C string describing the
  *         provided error.
  */
