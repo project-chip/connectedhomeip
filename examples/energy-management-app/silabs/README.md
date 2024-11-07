@@ -108,14 +108,14 @@ creating real products based on the Silicon Labs platform.
     To build the Water Heater example you can change the args to gn gen (see
     BUILD.gn for arg options)
 
-          $ gn gen out/debug --args='chip_enable_example_evse_device=false chip_enable_example_water_heater_device=true'
+          $ gn gen out/debug --args='sl_enable_example_evse_device=false sl_enable_example_water_heater_device=true'
           $ ninja -C out/debug
 
     To change Device Energy Management feature support (e.g. Power forecast or
     State forecast reporting), you can change the args to gn gen (see BUILD.gn
     for arg options)
 
-          $ gn gen out/debug --args='chip_dem_support_state_forecast_reporting=true chip_dem_support_power_forecast_reporting=false'
+          $ gn gen out/debug --args='sl_dem_support_state_forecast_reporting=true sl_dem_support_power_forecast_reporting=false'
           $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
@@ -126,10 +126,6 @@ creating real products based on the Silicon Labs platform.
 *   Build the example as Intermittently Connected Device (ICD)
 
           $ ./scripts/examples/gn_silabs_example.sh ./examples/energy-management-app/silabs/ ./out/energy-management-app_ICD BRD4187C --icd
-
-    or use gn as previously mentioned but adding the following arguments:
-
-          $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
 
 *   Build the example with pigweed RPC
 
