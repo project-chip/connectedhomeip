@@ -754,7 +754,8 @@ void ProcessEvent(WfxEvent_t inEvent)
             memset(&ap, 0, sizeof(ap));
             ap.ssid_length =
                 strnlen(reinterpret_cast<char *>(scan->ssid), std::min<size_t>(sizeof(scan->ssid), WFX_MAX_SSID_LENGTH));
-            chip::Platform::CopyString(ap.ssid, ap.ssid_length, reinterpret_cast<char *>(scan->ssid));
+            // ap.ssid is of size WFX_MAX_SSID_LENGTH+1, we are safe with the ap.ssid_length calculated above
+            chip::Platform::CopyString(ap.ssid, ap.ssid_length + 1, reinterpret_cast<char *>(scan->ssid)); // +1 for null termination
 
             // check if the scanned ssid is the one we are looking for
             if (wfx_rsi.scan_ssid_length != 0 && strncmp(wfx_rsi.scan_ssid, ap.ssid, WFX_MAX_SSID_LENGTH) != CMP_SUCCESS)

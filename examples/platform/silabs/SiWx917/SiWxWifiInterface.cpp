@@ -328,9 +328,8 @@ sl_status_t InitiateScan()
     sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
 
     ssid.length = wfx_rsi.sec.ssid_length;
-
-    // TODO: workaround because the string management with the null termination is flawed
-    chip::Platform::CopyString((char *) &ssid.value[0], ssid.length + 1, wfx_rsi.sec.ssid);
+    ssid.length = std::min<size_t>(wfx_rsi.sec.ssid_length, sizeof(ssid_arg.value) - 1);
+    chip::Platform::CopyString((char *) &ssid.value[0], ssid.length + 1, wfx_rsi.sec.ssid); // +1 for null termination
     sl_wifi_set_scan_callback(ScanCallback, NULL);
 
     osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
@@ -609,11 +608,12 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
 
         cur_scan_result.ssid_length = strnlen((char *) scan_result->scan_info[idx].ssid,
                                               std::min<size_t>(sizeof(scan_result->scan_info[idx].ssid), WFX_MAX_SSID_LENGTH));
-        chip::Platform::CopyString(cur_scan_result.ssid, cur_scan_result.ssid_length, (char *) scan_result->scan_info[idx].ssid);
+        // cur_scan_result.ssid is of size WFX_MAX_SSID_LENGTH+1, we are safe with the cur_scan_result.ssid_length calculated above
+        chip::Platform::CopyString(cur_scan_result.ssid, cur_scan_result.ssid_length + 1, (char *) scan_result->scan_info[idx].ssid); // +1 for null termination
 
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
         if (wfx_rsi.scan_ssid != nullptr &&
-            (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, std::min(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
+            (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, std::min(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) !=
              CMP_SUCCESS))
         {
             continue;
