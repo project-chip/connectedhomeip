@@ -83,10 +83,12 @@ struct AttributeEntry
     static const AttributeEntry kInvalid;
 };
 
+// Bitmask values for different Command qualities.
 enum class CommandQualityFlags : uint32_t
 {
     kFabricScoped = 0x0001,
     kTimed        = 0x0002, // `T` quality on commands
+    kLargeMessage = 0x0004, // `L` quality on commands
 };
 
 struct CommandInfo
