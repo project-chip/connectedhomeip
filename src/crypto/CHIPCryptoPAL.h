@@ -942,6 +942,9 @@ public:
 
 private:
     HashSHA256OpaqueContext mContext;
+#if CHIP_CRYPTO_BORINGSSL || CHIP_CRYPTO_OPENSSL
+    bool mInitialized = false;
+#endif
 };
 
 class HKDF_sha
