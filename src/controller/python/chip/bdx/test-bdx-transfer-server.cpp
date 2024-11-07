@@ -20,7 +20,9 @@
 namespace chip {
 namespace bdx {
 
-TestBdxTransferServer::TestBdxTransferServer(BdxTransfer::Delegate * bdxTransferDelegate) : mBdxTransferDelegate(bdxTransferDelegate) {}
+TestBdxTransferServer::TestBdxTransferServer(BdxTransfer::Delegate * bdxTransferDelegate) :
+    mBdxTransferDelegate(bdxTransferDelegate)
+{}
 
 TestBdxTransferServer::~TestBdxTransferServer()
 {
@@ -31,7 +33,7 @@ CHIP_ERROR TestBdxTransferServer::Init(System::Layer * systemLayer, Messaging::E
 {
     VerifyOrReturnError(systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mSystemLayer = systemLayer;
+    mSystemLayer     = systemLayer;
     mExchangeManager = exchangeManager;
     // This removes the BdxTransferServer registered as part of CHIPDeviceControllerFactory.
     mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendInit);
@@ -58,7 +60,8 @@ void TestBdxTransferServer::StopExpectingATransfer()
     }
 }
 
-void TestBdxTransferServer::Release(BdxTransfer * bdxTransfer) {
+void TestBdxTransferServer::Release(BdxTransfer * bdxTransfer)
+{
     mTransferPool.ReleaseObject(bdxTransfer);
 }
 
@@ -68,10 +71,10 @@ CHIP_ERROR TestBdxTransferServer::OnUnsolicitedMessageReceived(const PayloadHead
     VerifyOrReturnValue(mExpectedTransfers != 0, CHIP_ERROR_HANDLER_NOT_SET);
 
     BdxTransfer * transfer = mTransferPool.CreateObject(mSystemLayer);
-    if (transfer == nullptr) {
-      ChipLogError(BDX, "Failed to allocate BDX transfer. The pool (size %d) is exhausted.",
-                   static_cast<int>(kTransferPoolSize));
-      return CHIP_ERROR_NO_MEMORY;
+    if (transfer == nullptr)
+    {
+        ChipLogError(BDX, "Failed to allocate BDX transfer. The pool (size %d) is exhausted.", static_cast<int>(kTransferPoolSize));
+        return CHIP_ERROR_NO_MEMORY;
     }
     transfer->SetDelegate(mBdxTransferDelegate);
     delegate = transfer;

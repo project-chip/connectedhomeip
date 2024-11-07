@@ -45,10 +45,10 @@ namespace chip {
 namespace python {
 
 // The Python callbacks to call when certain events happen.
-using OnTransferObtainedCallback       = void (*)(PyObject context, void * bdxTransfer,
-                                                  bdx::TransferControlFlags transferControlFlags, uint16_t maxBlockSize,
-                                                  uint64_t startOffset, uint64_t length, const uint8_t * fileDesignator,
-                                                  uint16_t fileDesignatorLength, const uint8_t * metadata, size_t metadataLength);
+using OnTransferObtainedCallback = void (*)(PyObject context, void * bdxTransfer, bdx::TransferControlFlags transferControlFlags,
+                                            uint16_t maxBlockSize, uint64_t startOffset, uint64_t length,
+                                            const uint8_t * fileDesignator, uint16_t fileDesignatorLength, const uint8_t * metadata,
+                                            size_t metadataLength);
 using OnFailedToObtainTransferCallback = void (*)(PyObject context, PyChipError result);
 using OnDataReceivedCallback           = void (*)(PyObject context, const uint8_t * dataBuffer, size_t bufferLength);
 using OnTransferCompletedCallback      = void (*)(PyObject context, PyChipError result);
@@ -63,7 +63,7 @@ OnTransferCompletedCallback gOnTransferCompletedCallback           = nullptr;
 struct TransferInfo
 {
     // The transfer object. Owned by the transfer server.
-    bdx::BdxTransfer * Transfer         = nullptr;
+    bdx::BdxTransfer * Transfer = nullptr;
     // The contexts for different python callbacks. Owned by the python side.
     PyObject OnTransferObtainedContext  = nullptr;
     PyObject OnDataReceivedContext      = nullptr;
@@ -138,9 +138,8 @@ public:
         {
             transferInfo->Transfer = transfer;
             gOnTransferObtainedCallback(transferInfo->OnTransferObtainedContext, transfer, init_data.TransferCtlFlags,
-                                        init_data.MaxBlockSize, init_data.StartOffset, init_data.Length,
-                                        init_data.FileDesignator, init_data.FileDesLength, init_data.Metadata,
-                                        init_data.MetadataLength);
+                                        init_data.MaxBlockSize, init_data.StartOffset, init_data.Length, init_data.FileDesignator,
+                                        init_data.FileDesLength, init_data.Metadata, init_data.MetadataLength);
         }
     }
 
