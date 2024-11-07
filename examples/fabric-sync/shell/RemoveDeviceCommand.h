@@ -23,18 +23,15 @@
 
 namespace commands {
 
-class AddBridgeCommand : public Command, public admin::PairingDelegate
+class RemoveDeviceCommand : public Command, public admin::PairingDelegate
 {
 public:
-    AddBridgeCommand(chip::NodeId nodeId, uint32_t setupPINCode, const char * remoteAddr, uint16_t remotePort);
-    void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) override;
+    RemoveDeviceCommand(chip::NodeId nodeId);
+    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
     CHIP_ERROR RunCommand() override;
 
 private:
-    chip::NodeId mBridgeNodeId;
-    uint32_t mSetupPINCode;
-    const char * mRemoteAddr;
-    uint16_t mRemotePort;
+    chip::NodeId mNodeId = chip::kUndefinedNodeId;
 };
 
 } // namespace commands

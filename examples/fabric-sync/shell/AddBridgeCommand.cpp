@@ -73,7 +73,7 @@ CHIP_ERROR AddBridgeCommand::RunCommand()
         return CHIP_NO_ERROR;
     }
 
-    admin::PairingManager::Instance().SetCommissioningDelegate(this);
+    admin::PairingManager::Instance().SetPairingDelegate(this);
 
     return admin::DeviceMgr().PairRemoteFabricBridge(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
 }
