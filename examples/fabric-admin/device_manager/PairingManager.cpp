@@ -312,10 +312,10 @@ void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
     }
 
-    if (mCommissioningDelegate)
+    if (mPairingDelegate)
     {
-        mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
-        SetCommissioningDelegate(nullptr);
+        mPairingDelegate->OnCommissioningComplete(nodeId, err);
+        SetPairingDelegate(nullptr);
     }
 }
 
@@ -555,6 +555,7 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
         if (self->mPairingDelegate)
         {
             self->mPairingDelegate->OnDeviceRemoved(nodeId, err);
+            self->SetPairingDelegate(nullptr);
         }
 
 #if defined(PW_RPC_ENABLED)
