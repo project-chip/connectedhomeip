@@ -2563,12 +2563,12 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransit
 }
 
 /**
- * @brief executes move to color temp logic
+ * @brief Executes move to color temp logic.
  *
  * @param aEndpoint
  * @param colorTemperature
  * @param transitionTime
- * @return Status::Success if successful, Status::UnsupportedEndpoint if the endpoint doesn't support color temperature
+ * @return Status::Success if successful, Status::UnsupportedEndpoint if the endpoint doesn't support color temperature.
  */
 Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime)
 {
@@ -2764,12 +2764,12 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
 }
 
 /**
- * @brief executes move color temp command
- * @param endpoint endpointId of the recipient Color control cluster
- * @param commandData Struct containing the parameters of the command
+ * @brief Executes move color temp command.
+ * @param endpoint EndpointId of the recipient Color control cluster.
+ * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
  *         Status::InvalidCommand when a rate of 0 for a non-stop move or an unknown HueMoveMode is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state,
+ *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state.
  */
 Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
                                                 const Commands::MoveColorTemperature::DecodableType & commandData)
@@ -2861,9 +2861,9 @@ Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
 }
 
 /**
- * @brief executes move to color temp command
- * @param endpoint endpointId of the recipient Color control cluster
- * @param commandData Struct containing the parameters of the command
+ * @brief Executes move to color temp command.
+ * @param endpoint EndpointId of the recipient Color control cluster.
+ * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color XY transition state (verified in
  * moveToColorTemp function).
@@ -2881,12 +2881,12 @@ Status ColorControlServer::moveToColorTempCommand(EndpointId endpoint,
 }
 
 /**
- * @brief executes step color temp command
- * @param endpoint endpointId of the recipient Color control cluster
+ * @brief Executes step color temp command.
+ * @param endpoint EndpointId of the recipient Color control cluster.
  * @param commandData Struct containing the parameters of the command
  * @return Status::Success when successful,
  *         Status::InvalidCommand when stepSize is 0 or an unknown stepMode is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state,
+ *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state.
  */
 Status ColorControlServer::stepColorTempCommand(EndpointId endpoint,
                                                 const Commands::StepColorTemperature::DecodableType & commandData)
