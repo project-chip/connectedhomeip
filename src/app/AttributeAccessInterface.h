@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "data-model-provider/ProviderChangeListener.h"
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/AttributeReportBuilder.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
