@@ -50,9 +50,8 @@ struct ErrorFormatter
 
 struct ErrorStrStorage
 {
-    uint16_t Size() { return sizeof(buff); }
-
     char buff[CHIP_CONFIG_ERROR_STR_SIZE];
+    constexpr static uint16_t kBufferSize = sizeof(buff);
 };
 
 extern const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation = true);
