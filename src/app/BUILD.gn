@@ -288,6 +288,27 @@ source_set("events") {
   ]
 }
 
+static_library("attribute-value-encode-decode") {
+  sources = [
+    "AttributeEncodeState.h",
+    "AttributeValueDecoder.h",
+    "AttributeValueEncoder.cpp",
+    "AttributeValueEncoder.h",
+    "AttributeReportBuilder.cpp",
+    "AttributeReportBuilder.h",
+  ]
+
+  deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/util:af-types",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 static_library("attribute-access") {
   sources = [
     "AttributeAccessInterface.h",
@@ -295,8 +316,6 @@ static_library("attribute-access") {
     "AttributeAccessInterfaceRegistry.cpp",
     "AttributeAccessInterfaceRegistry.h",
     "AttributeEncodeState.h",
-    "AttributeReportBuilder.cpp",
-    "AttributeReportBuilder.h",
     "AttributeValueDecoder.h",
     "AttributeValueEncoder.cpp",
     "AttributeValueEncoder.h",
@@ -312,6 +331,8 @@ static_library("attribute-access") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
+
+  public_deps = [ ":attribute-value-encode-decode" ]
 }
 
 source_set("required-privileges") {

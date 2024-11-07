@@ -160,6 +160,7 @@ source_set("ecosystem-information-test-srcs") {
     "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.h",
   ]
   public_deps = [
+    "${chip_root}/src/app:attribute-access",
     "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
