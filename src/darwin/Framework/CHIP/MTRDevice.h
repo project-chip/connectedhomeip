@@ -16,6 +16,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRAttributeValueWaiter.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
 
@@ -337,6 +338,26 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
     MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+/**
+ * Sets up the provided completion to be called when any of the following
+ * happens:
+ *
+ * 1) A set of attributes reaches certain values: completion called with nil.
+ * 2) The provided timeout expires: completion called with MTRErrorCodeTimeout error.
+ * 3) The wait is canceled: completion called with MTRErrorCodeCancelled error.
+ *
+ * If the MTRAttributeValueWaiter is destroyed before the
+ * completion is called, that is treated the same as canceling the waiter.
+ *
+ * The attributes and values to wait for are represented as a dictionary which
+ * has the attribute paths as keys and the expected data-values as values.
+ */
+- (MTRAttributeValueWaiter *)waitForAttributeValues:(NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)values
+                                            timeout:(NSTimeInterval)timeout
+                                              queue:(dispatch_queue_t)queue
+                                         completion:(void (^)(NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
 @end
 
 MTR_EXTERN NSString * const MTRPreviousDataKey MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
