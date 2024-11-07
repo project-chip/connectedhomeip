@@ -131,6 +131,8 @@ class CAHierarchy:
     Utilities to manage a CA hierarchy on disk.
     """
 
+    default_ca_duration = datetime.timedelta(days=365.25*20)
+
     def __init__(self, base: Path, name: str) -> None:
         self.name = name
         self.directory = base
@@ -176,8 +178,7 @@ class CAHierarchy:
                 .serial_number(x509.random_serial_number())
                 .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
                 .not_valid_after(
-                    datetime.datetime.now(datetime.timezone.utc)
-                    + datetime.timedelta(days=1)
+                    datetime.datetime.now(datetime.timezone.utc) + self.default_ca_duration
                 )
                 .add_extension(
                     x509.BasicConstraints(ca=True, path_length=None), critical=True
@@ -245,7 +246,10 @@ class CAHierarchy:
         return (key_path, cert_path)
 
     def _sign_cert(
-        self, dns: str, public_key: CertificatePublicKeyTypes
+        self,
+        dns: str,
+        public_key: CertificatePublicKeyTypes,
+        duration: datetime.timedelta
     ) -> x509.Certificate:
         """
         Generate and sign a certificate.
@@ -270,8 +274,7 @@ class CAHierarchy:
             .serial_number(x509.random_serial_number())
             .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
             .not_valid_after(
-                datetime.datetime.now(datetime.timezone.utc)
-                + datetime.timedelta(hours=1)
+                datetime.datetime.now(datetime.timezone.utc) + duration
             )
             .add_extension(
                 x509.SubjectAlternativeName(
@@ -320,7 +323,7 @@ class CAHierarchy:
             .sign(self.root_key, hashes.SHA256())
         )
 
-    def gen_cert(self, dns: str, csr: str, override=False) -> tuple[Path, Path, bool]:
+    def gen_cert(self, dns: str, csr: str, override=False, duration: datetime.timedelta = datetime.timedelta(hours=1)) -> tuple[Path, Path, bool]:
         """
         Generate a certificate signed by this CA hierarchy using the provided CSR.
         Returns the path to the key, cert, and whether it was reused or not.
@@ -337,7 +340,7 @@ class CAHierarchy:
                 return (key_path, cert_path, True)
 
         # Sign certificate
-        cert = self._sign_cert(dns, csr.public_key())
+        cert = self._sign_cert(dns, csr.public_key(), duration)
 
         # Save that information to disk
         (key_path, cert_bundle_path) = self._save_cert(
@@ -348,7 +351,7 @@ class CAHierarchy:
 
         return (key_path, cert_bundle_path, False)
 
-    def gen_keypair(self, dns: str, override=False) -> tuple[Path, Path, bool]:
+    def gen_keypair(self, dns: str, override=False, duration: datetime.timedelta = datetime.timedelta(hours=1)) -> tuple[Path, Path, bool]:
         """
         Generate a private key as well as the associated certificate signed by this CA
         hierarchy. Returns the path to the key, cert, and whether it was reused or not.
@@ -366,7 +369,7 @@ class CAHierarchy:
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 
         # Sign certificate
-        cert = self._sign_cert(dns, key.public_key())
+        cert = self._sign_cert(dns, key.public_key(), duration)
 
         # Save that information to disk
         (key_path, cert_bundle_path) = self._save_cert(dns, cert, key, bundle_root=True)
