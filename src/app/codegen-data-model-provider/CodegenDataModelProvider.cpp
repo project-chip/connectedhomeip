@@ -805,9 +805,9 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 void CodegenDataModelProvider::IncrementClustersVersionForEndpoint(EndpointId endpointId, ClusterId clusterIdMayBeWildcard)
 {
 
-    if (clusterIdMayBeWildcard == kInvalidClusterId)
+    if (clusterIdMayBeWildcard != kInvalidClusterId)
     {
-        // wildcard
+        // exact cluster ID, not a wildcard
         DataVersion * versionPtr = emberAfDataVersionStorage(ConcreteClusterPath(endpointId, clusterIdMayBeWildcard));
         if (versionPtr != nullptr)
         {

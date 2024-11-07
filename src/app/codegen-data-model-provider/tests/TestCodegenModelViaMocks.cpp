@@ -2637,3 +2637,68 @@ TEST(TestCodegenModelViaMocks, DeviceTypeIteration)
     entry = model.FirstDeviceType(kMockEndpoint3);
     ASSERT_FALSE(entry.has_value());
 }
+
+TEST(TestCodegenModelViaMocks, TestMarkDirty)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // Mark a single INVALID path dirty
+    {
+        const DataVersion startVersion = chip::Test::GetVersion();
+        const AttributePathParams kPath(kEndpointIdThatIsMissing, kAttributeIdReadOnly);
+        model.ChangeListener().DirtyList().clear();
+        model.MarkDirty(kPath);
+
+        // exactly one cluster increased
+        // we do not validate cluster versions here, so versions increase
+        EXPECT_EQ(startVersion + 1, chip::Test::GetVersion());
+
+        // mark dirty does go through
+        EXPECT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], kPath);
+    }
+
+    // mark an exact path dirty (with wildcard attribute id)
+    {
+        const DataVersion startVersion = chip::Test::GetVersion();
+        const AttributePathParams kPath(kMockEndpoint1, MockClusterId(1));
+        model.ChangeListener().DirtyList().clear();
+        model.MarkDirty(kPath);
+
+        // exactly one cluster increased
+        EXPECT_EQ(startVersion + 1, chip::Test::GetVersion());
+
+        EXPECT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], kPath);
+    }
+
+    // mark an exact path dirty (with a specific attribute id)
+    {
+        const DataVersion startVersion = chip::Test::GetVersion();
+        const AttributePathParams kPath(kMockEndpoint1, MockClusterId(1), ClusterRevision::Id);
+        model.ChangeListener().DirtyList().clear();
+        model.MarkDirty(kPath);
+
+        // exactly one cluster increased
+        EXPECT_EQ(startVersion + 1, chip::Test::GetVersion());
+
+        EXPECT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], kPath);
+    }
+
+    // Mark all clusters on an endpoint as invalid
+    {
+        const DataVersion startVersion = chip::Test::GetVersion();
+        const AttributePathParams kPath(kInvalidEndpointId, kInvalidClusterId);
+        model.ChangeListener().DirtyList().clear();
+        model.MarkDirty(kPath);
+
+        // Each cluster should call the increase once
+        constexpr unsigned kNumTotalClusters = 9; // see gTestNodeConfig
+        EXPECT_EQ(startVersion + kNumTotalClusters, chip::Test::GetVersion());
+
+        EXPECT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], kPath);
+    }
+}
