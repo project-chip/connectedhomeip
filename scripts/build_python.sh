@@ -34,16 +34,27 @@ echo_bold_white() {
     echo -e "\033[1;37m$*\033[0m"
 }
 
+check_one_of() {
+    local value=$1
+    shift
+    for v in "$@"; do
+        if [ "$value" = "$v" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 
 declare enable_ble=true
 declare chip_detail_logging=false
 declare chip_mdns
-declare case_retry_delta
 declare install_virtual_env
 declare clean_virtual_env=yes
-declare install_pytest_requirements=yes
+declare install_wheels=no
+declare install_pytest_requirements=unknown
 declare install_jupyterlab=no
 
 help() {
@@ -60,16 +71,16 @@ Input Options:
                                                             By default it is minimal.
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
-  -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
-                                                            <path> represents where the virtual environment is to be created.
-  -c, --clean_virtual_env  <yes|no>                         When installing a virtual environment, create/clean it first.
-                                                            Defaults to yes.
-  --include_pytest_deps  <yes|no>                           Install requirements.txt for running scripts/tests and
-                                                            src/python_testing scripts.
-                                                            Defaults to yes.
-  -j, --jupyter-lab                                         Install jupyterlab requirements.
-  --extra_packages PACKAGES                                 Install extra Python packages from PyPI
-  -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
+  -e, --create-virtual-env  <path>                          Create Python virtual environment in the specified path
+  -c, --clean-virtual-env   <yes|no>                        Clean the virtual environment if it exists; defaults to yes
+  -i, --install-wheels                                      Install generated wheels; this option is enabled by default
+                                                            if the --create-virtual-env is specified
+  --install-pytest-deps     <yes|no>                        Install requirements.txt for running scripts/tests and
+                                                            src/python_testing scripts; defaults to yes if the
+                                                            --install-wheels is used, otherwise no
+  -j, --install-jupyter-lab                                 Install jupyterlab requirements
+  --extra-packages PACKAGES                                 Install extra Python packages from PyPI
+  -z, --pregen-dir DIRECTORY                                Directory where generated zap files have been pre-generated.
 "
 }
 
@@ -82,19 +93,19 @@ while (($#)); do
             exit 1
             ;;
         --enable_ble | -b)
+            check_one_of "$2" "true" "false" || {
+                echo "error: Option --enable_ble should have a true/false value, not '$2'"
+                exit 1
+            }
             enable_ble=$2
-            if [[ "$enable_ble" != "true" && "$enable_ble" != "false" ]]; then
-                echo "chip_detail_logging should have a true/false value, not '$enable_ble'"
-                exit
-            fi
             shift
             ;;
         --chip_detail_logging | -d)
+            check_one_of "$2" "true" "false" || {
+                echo "error: Option --chip_detail_logging should have a true/false value, not '$2'"
+                exit 1
+            }
             chip_detail_logging=$2
-            if [[ "$chip_detail_logging" != "true" && "$chip_detail_logging" != "false" ]]; then
-                echo "chip_detail_logging should have a true/false value, not '$chip_detail_logging'"
-                exit
-            fi
             shift
             ;;
         --chip_mdns | -m)
@@ -105,45 +116,56 @@ while (($#)); do
             chip_case_retry_delta=$2
             shift
             ;;
-        --install_virtual_env | -i)
+        --install-virtual-env | -e)
             install_virtual_env=$2
             shift
             ;;
-        --clean_virtual_env | -c)
+        --clean-virtual-env | -c)
+            check_one_of "$2" "yes" "no" || {
+                echo "error: Option --clean-virtual-env should have a yes/no value, not '$2'"
+                exit 1
+            }
             clean_virtual_env=$2
-            if [[ "$clean_virtual_env" != "yes" && "$clean_virtual_env" != "no" ]]; then
-                echo "clean_virtual_env should have a yes/no value, not '$clean_virtual_env'"
-                exit
-            fi
             shift
             ;;
-        --include_pytest_deps)
+        --install-wheels | -i)
+            install_wheels=yes
+            ;;
+        --install-pytest-deps)
+            check_one_of "$2" "yes" "no" || {
+                echo "error: Option --install-pytest-deps should have a yes/no value, not '$2'"
+                exit 1
+            }
             install_pytest_requirements=$2
-            if [[ "$install_pytest_requirements" != "yes" && "$install_pytest_requirements" != "no" ]]; then
-                echo "install_pytest_requirements should have a yes/no value, not '$install_pytest_requirements'"
-                exit
-            fi
             shift
             ;;
-        --extra_packages)
+        --install-jupyter-lab | -j)
+            install_jupyterlab=yes
+            ;;
+        --extra-packages)
             extra_packages=$2
             shift
             ;;
-        --pregen_dir | -z)
+        --pregen-dir | -z)
             pregen_dir=$2
             shift
             ;;
-        --jupyter-lab | -j)
-            install_jupyterlab=yes
-            ;;
         -*)
             help
-            echo "Unknown Option \"$1\""
+            echo "error: Unknown option '$1'"
             exit 1
             ;;
     esac
     shift
 done
+
+# Set default values for --install-wheels and --install-pytest-deps
+if [ -n "$install_virtual_env" ]; then
+    install_wheels=yes
+fi
+if [ "$install_pytest_requirements" = "unknown" ]; then
+    install_pytest_requirements=$install_wheels
+fi
 
 # Print input values
 echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\", enable_ble=\"$enable_ble\""
@@ -170,7 +192,7 @@ export SYSTEM_VERSION_COMPAT=0
 [[ -n "$chip_case_retry_delta" ]] && chip_case_retry_arg="chip_case_retry_delta=$chip_case_retry_delta" || chip_case_retry_arg=""
 [[ -n "$pregen_dir" ]] && pregen_dir_arg="chip_code_pre_generated_directory=\"$pregen_dir\"" || pregen_dir_arg=""
 
-# Make all possible human redable tracing available.
+# Make all possible human readable tracing available.
 tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
 
 gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_crypto=\"boringssl\""
@@ -206,20 +228,30 @@ if [ -n "$install_virtual_env" ]; then
     fi
 
     source "$ENVIRONMENT_ROOT"/bin/activate
-    "$ENVIRONMENT_ROOT"/bin/python -m ensurepip --upgrade
-    "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade "${WHEEL[@]}"
+    python -m ensurepip --upgrade
+fi
 
-    if [ "$install_pytest_requirements" = "yes" ]; then
-        echo_blue "Installing python test dependencies ..."
-        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/tests/requirements.txt"
-        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
-    fi
+if [ "$install_wheels" = "yes" ]; then
+    # Uninstall the existing wheels and install the new ones to make sure we
+    # have the latest versions even if the wheel version was not bumped.
+    echo_blue "Uninstalling stale CHIP python packages ..."
+    pip uninstall --yes "${WHEEL[@]}"
+    echo_blue "Installing CHIP python packages ..."
+    pip install "${WHEEL[@]}"
+fi
 
-    if [ "$install_jupyterlab" = "yes" ]; then
-        echo_blue "Installing JupyterLab kernels and lsp..."
-        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/jupyterlab_requirements.txt"
-    fi
+if [ "$install_pytest_requirements" = "yes" ]; then
+    echo_blue "Installing python test dependencies ..."
+    pip install -r "$CHIP_ROOT/scripts/tests/requirements.txt"
+    pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
+fi
 
+if [ "$install_jupyterlab" = "yes" ]; then
+    echo_blue "Installing JupyterLab kernels and LSP ..."
+    pip install -r "$CHIP_ROOT/scripts/jupyterlab_requirements.txt"
+fi
+
+if [ -n "$ENVIRONMENT_ROOT" ]; then
     echo ""
     echo_green "Compilation completed and WHL package installed in: "
     echo_blue "  $ENVIRONMENT_ROOT"
