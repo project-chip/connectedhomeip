@@ -291,11 +291,11 @@ source_set("events") {
 static_library("attribute-value-encode-decode") {
   sources = [
     "AttributeEncodeState.h",
+    "AttributeReportBuilder.cpp",
+    "AttributeReportBuilder.h",
     "AttributeValueDecoder.h",
     "AttributeValueEncoder.cpp",
     "AttributeValueEncoder.h",
-    "AttributeReportBuilder.cpp",
-    "AttributeReportBuilder.h",
   ]
 
   deps = [

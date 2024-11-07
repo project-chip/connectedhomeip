@@ -34,6 +34,13 @@ struct InteractionModelContext
     EventsGenerator * eventsGenerator;
     ProviderChangeListener * dataModelChangeListener;
     ActionContext * actionContext;
+
+    void Reset()
+    {
+        eventsGenerator         = nullptr;
+        dataModelChangeListener = nullptr;
+        actionContext           = nullptr;
+    }
 };
 
 } // namespace DataModel

@@ -53,7 +53,12 @@ public:
         mContext = context;
         return CHIP_NO_ERROR;
     }
-    virtual CHIP_ERROR Shutdown() = 0;
+
+    virtual CHIP_ERROR Shutdown()
+    {
+        mContext.Reset();
+        return CHIP_NO_ERROR;
+    }
 
     // During the transition phase, we expect a large subset of code to require access to
     // event emitting, path marking and other operations
