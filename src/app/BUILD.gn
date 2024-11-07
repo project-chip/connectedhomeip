@@ -307,6 +307,7 @@ static_library("attribute-access") {
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

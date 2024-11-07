@@ -93,7 +93,9 @@ private:
 /// Given that this relies on global data at link time, there generally can be
 /// only one CodegenDataModelProvider per application (you can create more instances,
 /// however they would share the exact same underlying data and storage).
-class CodegenDataModelProvider : public chip::app::DataModel::Provider
+///
+/// The `ProviderChangeListener` will both update cluster revisions AND increment cluster data versions.
+class CodegenDataModelProvider : public DataModel::Provider, public DataModel::ProviderChangeListener
 {
 private:
     /// Ember commands are stored as a `CommandId *` pointer that is either null (i.e. no commands)
@@ -132,14 +134,12 @@ public:
         mAcceptedCommandsIterator.Reset();
         mGeneratedCommandsIterator.Reset();
         mPreviouslyFoundCluster = std::nullopt;
+        mInitialized            = false;
     }
 
     /// Generic model implementations
-    CHIP_ERROR Shutdown() override
-    {
-        Reset();
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Shutdown() override;
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -172,9 +172,17 @@ public:
     ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
     ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
 
+    // ProviderChangeListener support
+
+    /// CodegenDataModelProvider will both increment cluster versions AND call the underlying
+    /// CurrentContext()->dataModelChangeListener->MarkDirty
+    ///
+    void MarkDirty(const AttributePathParams & path) override;
+
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
+    bool mInitialized                 = false;
     uint16_t mEndpointIterationHint   = 0;
     unsigned mClusterIterationHint    = 0;
     unsigned mAttributeIterationHint  = 0;
@@ -213,6 +221,12 @@ private:
     CommandId FindCommand(const ConcreteCommandPath & path, detail::EnumeratorCommandFinder & handlerFinder,
                           detail::EnumeratorCommandFinder::Operation operation,
                           CodegenDataModelProvider::EmberCommandListIterator & emberIterator, CommandListGetter commandListGetter);
+
+    /// Increments the cluster data version for the specified endpoint
+    ///
+    /// @param endpointId - the endpoint to consider. MUST NOT be a wildcard
+    /// @param clusterIdMayBeWildcard - the cluster id. Wildcard means increment all cluster versions.
+    void IncrementClustersVersionForEndpoint(EndpointId endpointId, ClusterId clusterIdMayBeWildcard);
 };
 
 } // namespace app

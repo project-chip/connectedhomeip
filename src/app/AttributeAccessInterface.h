@@ -18,9 +18,11 @@
 
 #pragma once
 
+#include "data-model-provider/ProviderChangeListener.h"
 #include <app/AttributeReportBuilder.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/data-model-provider/Provider.h>
 #include <lib/core/CHIPError.h>
 
 /**
@@ -47,6 +49,36 @@ public:
         mEndpointId(aEndpointId), mClusterId(aClusterId)
     {}
     virtual ~AttributeAccessInterface() {}
+
+    /**
+     * Allows a provider to register itself as using this attribute access interface.
+     *
+     * The intent is to be able to hook into:
+     *   - interactions with other clusters (ability to read/write/invoke)
+     *   - Access to `CurrentContext()` to generate event and (RARELY) use an ExchangeContext
+     *      - NOTE: usage of dataModelChangeListerner would only trigger path dirty sets
+     *              however the DAtaModel::Provider manages cluster versions. As a result,
+     *              the `ChangeListener` passed in should be used instead to both modify
+     *              cluster version and trigger path dirtying
+     *   - nofify of data model changes (which will update data model dirty paths)
+     *
+     * @param [in] provider - use it for read/write/invoke and for GetCurrentContext
+     * @param [in] attributeChangeListener - use this to `MarkDirty` a specific parth that
+     *        this AttributeAccessInterfaces manages. The paths SHOULD match mEndpointID/mClusterId
+     *        for this AttributeAccessInterface
+     *
+     * Lifetime of provider and attributeChangeListener is valid until DetachProvider is called
+     * with the same provider value.
+     */
+    virtual void AttachToProvider(DataModel::Provider * provider, DataModel::ProviderChangeListener * attributeChangeListener) {}
+
+    /**
+     * Notify that the given Provider that was previously attached is not valid anymore.
+     *
+     * Note that the `attributeChangeListener` is also invalidated, however that is not passed in as
+     * the provider is considered sufficiently unique.
+     */
+    virtual void DetachProvider(DataModel::Provider * provider);
 
     /**
      * Callback for reading attributes.

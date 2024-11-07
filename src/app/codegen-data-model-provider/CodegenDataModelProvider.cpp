@@ -18,6 +18,8 @@
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/AttributePathExpandIterator.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteClusterPath.h>
@@ -769,6 +771,98 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
 
     mDeviceTypeIterationHint = idx;
     return DeviceTypeEntryFromEmber(deviceTypes[idx]);
+}
+
+CHIP_ERROR CodegenDataModelProvider::Shutdown()
+{
+    if (mInitialized)
+    {
+        for (auto it = AttributeAccessInterfaceRegistry::Instance().begin();
+             it != AttributeAccessInterfaceRegistry::Instance().end(); ++it)
+        {
+            it->DetachProvider(this);
+        }
+    }
+    Reset();
+    return DataModel::Provider::Shutdown();
+}
+
+CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
+{
+    ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+
+    mInitialized = true;
+
+    for (auto it = AttributeAccessInterfaceRegistry::Instance().begin(); it != AttributeAccessInterfaceRegistry::Instance().end();
+         ++it)
+    {
+        it->AttachToProvider(this, this);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void CodegenDataModelProvider::IncrementClustersVersionForEndpoint(EndpointId endpointId, ClusterId clusterIdMayBeWildcard)
+{
+
+    if (clusterIdMayBeWildcard == kInvalidClusterId)
+    {
+        // wildcard
+        DataVersion * versionPtr = emberAfDataVersionStorage(ConcreteClusterPath(endpointId, clusterIdMayBeWildcard));
+        if (versionPtr != nullptr)
+        {
+            (*versionPtr)++;
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        }
+        else
+        {
+            // nothing we can do here ... no version
+            ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI, static_cast<int>(endpointId),
+                         ChipLogValueMEI(clusterIdMayBeWildcard));
+#endif
+        }
+        return;
+    }
+
+    // wildcard path, so go through all clusters and increment the version once
+    for (DataModel::ClusterEntry cluster = FirstCluster(endpointId); cluster.IsValid(); cluster = NextCluster(cluster.path))
+    {
+        DataVersion * versionPtr = emberAfDataVersionStorage(cluster.path);
+        if (versionPtr != nullptr)
+        {
+            (*versionPtr)++;
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        }
+        else
+        {
+            // nothing we can do here ... no version
+            ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI,
+                         static_cast<int>(cluster.path.mEndpointId), ChipLogValueMEI(cluster.path.mClusterId));
+#endif
+        }
+    }
+}
+
+void CodegenDataModelProvider::MarkDirty(const AttributePathParams & path)
+{
+    // FIRST step: increase cluster version for every path that is marked dirty
+    SingleLinkedListNode<app::AttributePathParams> singleItemList;
+    singleItemList.mValue = path;
+
+    if (path.HasWildcardEndpointId())
+    {
+        for (EndpointId endpointId = FirstEndpoint(); endpointId != kInvalidEndpointId; endpointId = NextEndpoint(endpointId))
+        {
+            IncrementClustersVersionForEndpoint(endpointId, path.mClusterId);
+        }
+    }
+    else
+    {
+        IncrementClustersVersionForEndpoint(path.mEndpointId, path.mClusterId);
+    }
+
+    // SECOND step: trigger data model dirty marking (this should trigger any reporting that is needed)
+    CurrentContext().dataModelChangeListener->MarkDirty(path);
 }
 
 } // namespace app
