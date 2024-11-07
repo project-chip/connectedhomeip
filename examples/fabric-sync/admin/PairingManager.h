@@ -36,18 +36,12 @@ public:
     virtual ~CommissioningWindowDelegate()                                                                      = default;
 };
 
-class CommissioningDelegate
-{
-public:
-    virtual void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) = 0;
-    virtual ~CommissioningDelegate()                                            = default;
-};
-
 class PairingDelegate
 {
 public:
-    virtual void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) = 0;
-    virtual ~PairingDelegate()                                          = default;
+    virtual void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) {}
+    virtual void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) {}
+    virtual ~PairingDelegate() = default;
 };
 
 /**
@@ -84,7 +78,6 @@ public:
     CHIP_ERROR Init(chip::Controller::DeviceCommissioner * commissioner);
 
     void SetOpenCommissioningWindowDelegate(CommissioningWindowDelegate * delegate) { mCommissioningWindowDelegate = delegate; }
-    void SetCommissioningDelegate(CommissioningDelegate * delegate) { mCommissioningDelegate = delegate; }
     void SetPairingDelegate(PairingDelegate * delegate) { mPairingDelegate = delegate; }
     PairingDelegate * GetPairingDelegate() { return mPairingDelegate; }
 
@@ -177,7 +170,6 @@ private:
     chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
 
     CommissioningWindowDelegate * mCommissioningWindowDelegate = nullptr;
-    CommissioningDelegate * mCommissioningDelegate             = nullptr;
     PairingDelegate * mPairingDelegate                         = nullptr;
 
     chip::NodeId mNodeId = chip::kUndefinedNodeId;

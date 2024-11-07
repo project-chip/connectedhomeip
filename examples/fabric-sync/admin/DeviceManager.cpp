@@ -79,6 +79,37 @@ CHIP_ERROR DeviceManager::PairRemoteFabricBridge(NodeId nodeId, uint32_t setupPI
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceManager::PairRemoteDevice(NodeId nodeId, const char * payload)
+{
+    CHIP_ERROR err = PairingManager::Instance().PairDeviceWithCode(nodeId, payload);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to pair device: Node ID " ChipLogFormatX64 " with error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(nodeId), err.Format());
+        return err;
+    }
+
+    ChipLogProgress(NotSpecified, "Successfully paired device: Node ID " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceManager::PairRemoteDevice(NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp,
+                                           uint16_t deviceRemotePort)
+{
+    CHIP_ERROR err = PairingManager::Instance().PairDevice(nodeId, setupPINCode, deviceRemoteIp, deviceRemotePort);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to pair device: Node ID " ChipLogFormatX64 " with error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(nodeId), err.Format());
+        return err;
+    }
+
+    ChipLogProgress(NotSpecified, "Successfully paired device: Node ID " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceManager::UnpairRemoteFabricBridge()
 {
     if (mRemoteBridgeNodeId == kUndefinedNodeId)
@@ -96,6 +127,19 @@ CHIP_ERROR DeviceManager::UnpairRemoteFabricBridge()
 
     ChipLogProgress(NotSpecified, "Successfully unpaired remote fabric bridge: Node ID " ChipLogFormatX64,
                     ChipLogValueX64(mRemoteBridgeNodeId));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceManager::UnpairRemoteDevice(NodeId nodeId)
+{
+    CHIP_ERROR err = PairingManager::Instance().UnpairDevice(nodeId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to unpair remote device " ChipLogFormatX64, ChipLogValueX64(nodeId));
+        return err;
+    }
+
+    ChipLogProgress(NotSpecified, "Successfully unpaired remote device: Node ID " ChipLogFormatX64, ChipLogValueX64(nodeId));
     return CHIP_NO_ERROR;
 }
 
