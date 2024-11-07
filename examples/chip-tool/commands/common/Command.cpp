@@ -55,7 +55,7 @@ bool Command::InitArguments(int argc, char ** argv)
         {
             optionalArgsCount++;
         }
-	else if (argvExtraArgsCount == 0)
+        else if (argvExtraArgsCount == 0)
         {
             mandatoryArgsCount++;
         }
