@@ -46,7 +46,7 @@ matter_add_gn_arg_bool("nxp_use_factory_data" ${CONFIG_CHIP_FACTORY_DATA})
 matter_add_gn_arg_bool("nxp_enable_secure_dac_private_key_storage" ${CONFIG_CHIP_SECURE_DAC_PRIVATE_KEY_STORAGE})
 matter_add_gn_arg_bool("nxp_enable_secure_whole_factory_data" ${CONFIG_CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA})
 matter_add_gn_arg_bool("nxp_enable_matter_cli" CONFIG_CHIP_LIB_SHELL)
-matter_add_gn_arg_bool("chip_enable_pairing_autostart" CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART)
+matter_add_gn_arg_bool("nxp_enable_pairing_autostart" CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART)
 
 if(CONFIG_CHIP_NVM_COMPONENT_NVS)
     matter_add_gn_arg_string("nxp_nvm_component" "nvs")
