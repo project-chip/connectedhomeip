@@ -21,7 +21,7 @@ This tool uses the python environment used by the python_testing efforts, which
 can be built using the below command.
 
 ```
-scripts/build_python.sh -m platform -i out/python_env
+scripts/build_python.sh -m platform -e out/python_env
 ```
 
 Once the python environment is build it can be activated using this command:

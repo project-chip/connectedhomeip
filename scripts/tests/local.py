@@ -150,7 +150,7 @@ def _do_build_python():
     """
     logging.info("Building python packages in out/venv ...")
     subprocess.run(
-        ["./scripts/build_python.sh", "--install_virtual_env", "out/venv"], check=True
+        ["./scripts/build_python.sh", "--install-virtual-env", "out/venv"], check=True
     )
 
 

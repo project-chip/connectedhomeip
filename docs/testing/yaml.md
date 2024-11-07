@@ -333,8 +333,8 @@ subsequent setups as it is faster.
 Next build the python wheels and create a venv (called `py` here, but any name
 may be used)
 
-```
-./scripts/build_python.sh -i out/python_env
+```shell
+./scripts/build_python.sh --install-virtual-env out/python_env
 source py/bin/activate
 ```
 

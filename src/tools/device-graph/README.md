@@ -9,7 +9,7 @@ can be built using the below command. Notice that graphviz is required as an
 extra package in order for the tool to generate the graph file.
 
 ```
-scripts/build_python.sh -m platform -i out/python_env --extra_packages graphviz
+scripts/build_python.sh -m platform -e out/python_env --extra-packages graphviz
 ```
 
 Once the python environment is build it can be activated using this command:

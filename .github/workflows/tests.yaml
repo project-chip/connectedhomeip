@@ -215,7 +215,7 @@ jobs:
                     "
             - name: Build Apps
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install-virtual-env out/venv'
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
@@ -484,7 +484,7 @@ jobs:
               #       This may result in invalid errors, however for most purposes of our testing, we are unlikely to
               #       hit such cases so we remain very strict on testing here.
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install-virtual-env out/venv'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
                       --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
@@ -588,7 +588,7 @@ jobs:
 
             - name: Build Python REPL and example apps
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install-virtual-env out/venv'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
                       --target darwin-x64-all-clusters-${BUILD_VARIANT}-test \

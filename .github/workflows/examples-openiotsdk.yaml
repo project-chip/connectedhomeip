@@ -58,7 +58,7 @@ jobs:
 
             - name: Build and install Python controller
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install-virtual-env out/venv'
                   scripts/run_in_python_env.sh out/venv 'pip install -r scripts/setup/requirements.openiotsdk.txt'
 
             - name: Build shell example

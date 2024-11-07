@@ -245,7 +245,7 @@ data (e.g. fabric info).
 ### Building chip-repl:
 
 ```bash
-    $ ./build_python.sh -i <path_to_out_folder>
+    $ ./build_python.sh --install-virtual-env <path_to_out_folder>
 ```
 
 ### Activating python virtual env
