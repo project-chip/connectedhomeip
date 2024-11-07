@@ -84,6 +84,7 @@ public:
 
 protected:
     CHIP_ERROR InitCommonParts(void);
+    void PrintFirmwareInfo(void);
 
     void DispatchEvent(AppEvent * event);
     void GetEvent(AppEvent * aEvent);
