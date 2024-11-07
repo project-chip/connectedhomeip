@@ -197,13 +197,15 @@ public:
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-    bool moveColorTempCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                              const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::DecodableType & commandData);
-    bool
-    moveToColorTempCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    chip::Protocols::InteractionModel::Status
+    moveColorTempCommand(const chip::EndpointId endpoint,
+                         const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status
+    moveToColorTempCommand(const chip::EndpointId endpoint,
                            const chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::DecodableType & commandData);
-    bool stepColorTempCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                              const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status
+    stepColorTempCommand(const chip::EndpointId endpoint,
+                         const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
     void levelControlColorTempChangeCommand(chip::EndpointId endpoint);
     void startUpColorTempCommand(chip::EndpointId endpoint);
     void updateTempCommand(chip::EndpointId endpoint);
