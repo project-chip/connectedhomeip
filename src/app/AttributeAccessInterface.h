@@ -78,7 +78,7 @@ public:
      * Note that the `attributeChangeListener` is also invalidated, however that is not passed in as
      * the provider is considered sufficiently unique.
      */
-    virtual void DetachProvider(DataModel::Provider * provider);
+    virtual void DetachProvider(DataModel::Provider * provider) {}
 
     /**
      * Callback for reading attributes.

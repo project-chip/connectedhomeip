@@ -315,10 +315,6 @@ static_library("attribute-access") {
     "AttributeAccessInterfaceCache.h",
     "AttributeAccessInterfaceRegistry.cpp",
     "AttributeAccessInterfaceRegistry.h",
-    "AttributeEncodeState.h",
-    "AttributeValueDecoder.h",
-    "AttributeValueEncoder.cpp",
-    "AttributeValueEncoder.h",
   ]
 
   deps = [
