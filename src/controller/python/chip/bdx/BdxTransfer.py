@@ -34,7 +34,7 @@ class InitMessage:
 
 
 class BdxTransfer:
-    def __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data: bytes=None):
+    def __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data: bytes = None):
         self.init_message = init_message
         self._bdx_transfer = bdx_transfer
         self._data = bytearray(data) if data else None
