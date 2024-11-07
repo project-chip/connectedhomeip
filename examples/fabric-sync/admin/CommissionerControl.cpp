@@ -21,7 +21,7 @@ CHIP_ERROR CommissionerControl::RequestCommissioningApproval(uint64_t requestId,
 {
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(NotSpecified, "yujuan: Sending RequestCommissioningApproval to node " ChipLogFormatX64,
+    ChipLogProgress(NotSpecified, "Sending RequestCommissioningApproval to node " ChipLogFormatX64,
                     ChipLogValueX64(mDestinationId));
 
     mRequestCommissioningApproval.requestID = requestId;
@@ -43,7 +43,7 @@ CHIP_ERROR CommissionerControl::CommissionNode(uint64_t requestId, uint16_t resp
 {
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(NotSpecified, "yujuan: Sending CommissionNode to node " ChipLogFormatX64, ChipLogValueX64(mDestinationId));
+    ChipLogProgress(NotSpecified, "Sending CommissionNode to node " ChipLogFormatX64, ChipLogValueX64(mDestinationId));
 
     mCommissionNode.requestID              = requestId;
     mCommissionNode.responseTimeoutSeconds = responseTimeoutSeconds;

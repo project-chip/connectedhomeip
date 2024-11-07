@@ -34,12 +34,20 @@ source_set("fabric-admin-lib") {
     "CommissionerControl.h",
     "DeviceManager.cpp",
     "DeviceManager.h",
+    "DeviceSubscription.cpp",
+    "DeviceSubscription.h",
+    "DeviceSubscriptionManager.cpp",
+    "DeviceSubscriptionManager.h",
+    "DeviceSynchronization.cpp",
+    "DeviceSynchronization.h",
     "FabricAdmin.cpp",
     "FabricAdmin.h",
     "FabricSyncGetter.cpp",
     "FabricSyncGetter.h",
     "PairingManager.cpp",
     "PairingManager.h",
+    "UniqueIdGetter.cpp",
+    "UniqueIdGetter.h",
   ]
 
   deps = [

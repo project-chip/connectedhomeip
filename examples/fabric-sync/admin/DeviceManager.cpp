@@ -305,7 +305,7 @@ void DeviceManager::RequestCommissioningApproval()
 
 void DeviceManager::HandleCommissioningRequestResult(TLV::TLVReader & data)
 {
-    ChipLogProgress(NotSpecified, "yujuan: CommissioningRequestResult event received.");
+    ChipLogProgress(NotSpecified, "CommissioningRequestResult event received.");
 
     app::Clusters::CommissionerControl::Events::CommissioningRequestResult::DecodableType value;
     CHIP_ERROR error = app::DataModel::Decode(data, value);
