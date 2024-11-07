@@ -170,7 +170,8 @@ static const CHIP_ERROR kTestElements[] =
 };
 // clang-format on
 
-void CheckCoreErrorStrHelper(const char * errStr, CHIP_ERROR err) {
+void CheckCoreErrorStrHelper(const char * errStr, CHIP_ERROR err)
+{
     char expectedText[9];
 
     // Assert that the error string contains the error number in hex.
@@ -223,24 +224,25 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrStorage)
     }
 }
 
-void CheckCoreErrorStrWithoutSourceLocationHelper(const char * errStr, CHIP_ERROR err) {
+void CheckCoreErrorStrWithoutSourceLocationHelper(const char * errStr, CHIP_ERROR err)
+{
     char expectedText[9];
 
-        // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
-        EXPECT_TRUE((strstr(errStr, expectedText) != nullptr));
+    // Assert that the error string contains the error number in hex.
+    snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
+    EXPECT_TRUE((strstr(errStr, expectedText) != nullptr));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-        // Assert that the error string contains a description, which is signaled
-        // by a presence of a colon proceeding the description.
-        EXPECT_TRUE((strchr(errStr, ':') != nullptr));
+    // Assert that the error string contains a description, which is signaled
+    // by a presence of a colon proceeding the description.
+    EXPECT_TRUE((strchr(errStr, ':') != nullptr));
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
 #if CHIP_CONFIG_ERROR_SOURCE
-        char const * const file = err.GetFile();
-        ASSERT_NE(file, nullptr);
-        // File should not be included in the error.
-        EXPECT_EQ(strstr(errStr, file), nullptr);
+    char const * const file = err.GetFile();
+    ASSERT_NE(file, nullptr);
+    // File should not be included in the error.
+    EXPECT_EQ(strstr(errStr, file), nullptr);
 #endif // CHIP_CONFIG_ERROR_SOURCE
 }
 
@@ -270,6 +272,5 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrStorageWithoutSourceLocation)
         // ErrorStr with given storage.
         ErrorStrStorage storage;
         CheckCoreErrorStrWithoutSourceLocationHelper(ErrorStr(err, /*withSourceLocation=*/false, storage), err);
-
     }
 }
