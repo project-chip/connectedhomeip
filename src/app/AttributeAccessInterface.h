@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/AttributeReportBuilder.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <lib/core/CHIPError.h>
 
 /**
