@@ -3627,6 +3627,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 }
 
                 [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
+
+                [self _attributeValue:attributeDataValue reportedForPath:attributePath];
             }
 
 #ifdef DEBUG

@@ -35101,5 +35101,20 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     return false;
 }
 
+bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
+{
+    if ((aCluster == Clusters::CameraAvStreamManagement::Id) &&
+        (aCommand == Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CameraAvStreamManagement::Id) &&
+        (aCommand == Clusters::CameraAvStreamManagement::Commands::CaptureSnapshotResponse::Id))
+    {
+        return true;
+    }
+    return false;
+}
+
 } // namespace app
 } // namespace chip

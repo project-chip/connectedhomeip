@@ -87,7 +87,7 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
         return CHIP_NO_ERROR;
     }
 
-    PairingManager::Instance().SetCommissioningDelegate(this);
+    PairingManager::Instance().SetPairingDelegate(this);
 
     mBridgeNodeId = remoteId;
 
@@ -180,7 +180,7 @@ CHIP_ERROR FabricSyncAddLocalBridgeCommand::RunCommand(NodeId deviceId)
         return CHIP_NO_ERROR;
     }
 
-    PairingManager::Instance().SetCommissioningDelegate(this);
+    PairingManager::Instance().SetPairingDelegate(this);
     mLocalBridgeNodeId = deviceId;
 
     if (mSetupPINCode.HasValue())
@@ -252,7 +252,7 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
         {
             NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
 
-            PairingManager::Instance().SetCommissioningDelegate(this);
+            PairingManager::Instance().SetPairingDelegate(this);
             mAssignedNodeId = nodeId;
 
             usleep(kCommissionPrepareTimeMs * 1000);

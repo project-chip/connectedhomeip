@@ -143,9 +143,9 @@ public:
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
     chip::Protocols::InteractionModel::Status stopAllColorTransitions(chip::EndpointId endpoint);
-    bool stopMoveStepCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                             chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
-                             chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride);
+    chip::Protocols::InteractionModel::Status
+    stopMoveStepCommand(const chip::EndpointId endpoint,
+                        const chip::app::Clusters::ColorControl::Commands::StopMoveStep::DecodableType & commandData);
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
     bool moveHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -177,12 +177,15 @@ public:
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
-    bool moveToColorCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                            const chip::app::Clusters::ColorControl::Commands::MoveToColor::DecodableType & commandData);
-    bool moveColorCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          const chip::app::Clusters::ColorControl::Commands::MoveColor::DecodableType & commandData);
-    bool stepColorCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          const chip::app::Clusters::ColorControl::Commands::StepColor::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status
+    moveToColorCommand(const chip::EndpointId endpoint,
+                       const chip::app::Clusters::ColorControl::Commands::MoveToColor::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status
+    moveColorCommand(const chip::EndpointId endpoint,
+                     const chip::app::Clusters::ColorControl::Commands::MoveColor::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status
+    stepColorCommand(const chip::EndpointId endpoint,
+                     const chip::app::Clusters::ColorControl::Commands::StepColor::DecodableType & commandData);
     void updateXYCommand(chip::EndpointId endpoint);
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
@@ -255,8 +258,8 @@ private:
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
-    chip::Protocols::InteractionModel::Status moveToColor(uint16_t colorX, uint16_t colorY, uint16_t transitionTime,
-                                                          chip::EndpointId endpoint);
+    chip::Protocols::InteractionModel::Status moveToColor(chip::EndpointId endpoint, uint16_t colorX, uint16_t colorY,
+                                                          uint16_t transitionTime);
     Color16uTransitionState * getXTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getYTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getXTransitionStateByIndex(uint16_t index);
