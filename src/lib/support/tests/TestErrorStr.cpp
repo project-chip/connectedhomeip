@@ -121,6 +121,13 @@ TEST(TestErrorStr, CheckNoError)
     EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_NO_ERROR)), CHIP_NO_ERROR_STRING);
 }
 
+TEST(TestErrorStr, CheckErrorWithProvidedStorage)
+{
+    ErrorStrStorage storage;
+    EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_NO_ERROR, true, storage)), CHIP_NO_ERROR_STRING);
+    EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_ERROR_INTERNAL, true, storage)), "Error 0x000000AC");
+}
+
 TEST(TestErrorStr, CheckFormatErr)
 {
 #if CHIP_CONFIG_SHORT_ERROR_STR

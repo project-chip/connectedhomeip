@@ -29,7 +29,7 @@ namespace chip {
 /**
  * Static buffer to store the formatted error string.
  */
-static char sErrorStr[CHIP_CONFIG_ERROR_STR_SIZE];
+static ErrorStrStorage sErrorStr;
 
 /**
  * Linked-list of error formatter functions.
@@ -38,7 +38,7 @@ static ErrorFormatter * sErrorFormatterList = nullptr;
 
 /**
  * This routine returns a human-readable NULL-terminated C string
- * describing the provided error.
+ * describing the provided error. This uses the global static storage.
  *
  * @param[in] err                      The error for format and describe.
  * @param[in] withSourceLocation       Whether or not to include the source
@@ -50,8 +50,7 @@ static ErrorFormatter * sErrorFormatterList = nullptr;
  */
 DLL_EXPORT const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation)
 {
-    ErrorStr(err, withSourceLocation, sErrorStr, sizeof(sErrorStr));
-    return sErrorStr;
+    return ErrorStr(err, withSourceLocation, sErrorStr);
 }
 
 /**
@@ -60,15 +59,17 @@ DLL_EXPORT const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation)
  *
  * @param[in] err                      The error for format and describe.
  * @param[in] withSourceLocation       Whether or not to include the source
- * @param[in] buf                      Provided buf to write into
- * @param[in] bufSize                  Size of the buf
+ * @param[in] storage                  ErrorStrStorage to write into
  * location in the output string. Only used if CHIP_CONFIG_ERROR_SOURCE &&
  * !CHIP_CONFIG_SHORT_ERROR_STR. Defaults to true.
+ * 
+ * @return A pointer to a NULL-terminated C string describing the
+ *         provided error.
  */
-DLL_EXPORT void ErrorStr(CHIP_ERROR err, bool withSourceLocation, char * buf, uint16_t bufSize)
+DLL_EXPORT const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation, ErrorStrStorage & storage)
 {
-    char * formattedError   = buf;
-    uint16_t formattedSpace = sizeof(buf);
+    char * formattedError   = storage.buff;
+    uint16_t formattedSpace = storage.Size();
 
 #if CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
 
@@ -87,7 +88,7 @@ DLL_EXPORT void ErrorStr(CHIP_ERROR err, bool withSourceLocation, char * buf, ui
     if (err == CHIP_NO_ERROR)
     {
         (void) snprintf(formattedError, formattedSpace, CHIP_NO_ERROR_STRING);
-        return;
+        return storage.buff;
     }
 
     // Search the registered error formatter for one that will format the given
@@ -96,13 +97,13 @@ DLL_EXPORT void ErrorStr(CHIP_ERROR err, bool withSourceLocation, char * buf, ui
     {
         if (errFormatter->FormatError(formattedError, formattedSpace, err))
         {
-            return;
+            return storage.buff;
         }
     }
 
     // Use a default formatting if no formatter found.
     FormatError(formattedError, formattedSpace, nullptr, err, nullptr);
-    return;
+    return storage.buff;
 }
 
 /**

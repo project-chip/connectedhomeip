@@ -48,8 +48,15 @@ struct ErrorFormatter
     ErrorFormatter * Next;
 };
 
+struct ErrorStrStorage
+{
+    uint16_t Size() { return sizeof(buff); }
+
+    char buff[CHIP_CONFIG_ERROR_STR_SIZE];
+};
+
 extern const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation = true);
-extern void ErrorStr(CHIP_ERROR err, bool withSourceLocation, char * buf, uint16_t bufSize);
+extern const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation, ErrorStrStorage & storage);
 extern void RegisterErrorFormatter(ErrorFormatter * errFormatter);
 extern void DeregisterErrorFormatter(ErrorFormatter * errFormatter);
 extern void FormatError(char * buf, uint16_t bufSize, const char * subsys, CHIP_ERROR err, const char * desc);
