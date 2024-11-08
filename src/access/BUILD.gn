@@ -80,9 +80,7 @@ static_library("access") {
 }
 
 source_set("provider-impl") {
-  sources = [
-    "ProviderDeviceTypeResolver.h"
-  ]
+  sources = [ "ProviderDeviceTypeResolver.h" ]
 
   public_deps = [
     ":access",
