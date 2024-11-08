@@ -40,6 +40,18 @@ void LEDWidget::Init(void)
     mStrip      = led_strip_new_rmt_ws2812(&strip_config);
     mHue        = 0;
     mSaturation = 0;
+#elif CONFIG_LED_TYPE_SPI
+    led_strip_config_t strip_config = {
+        .strip_gpio_num = CONFIG_LED_GPIO,
+        .max_leds       = 1, // at least one LED on board
+    };
+
+    led_strip_spi_config_t spi_config = {
+        .spi_bus = SPI2_HOST,
+    };
+    spi_config.flags.with_dma = true;
+    led_strip_new_spi_device(&strip_config, &spi_config, &mStrip);
+    led_strip_clear(mStrip);
 #else
     mGPIONum                       = (gpio_num_t) CONFIG_LED_GPIO;
     ledc_timer_config_t ledc_timer = {
@@ -128,6 +140,9 @@ void LEDWidget::DoSet(void)
         mStrip->set_pixel(mStrip, 0, rgb.r, rgb.g, rgb.b);
         mStrip->refresh(mStrip, 100);
     }
+#elif CONFIG_LED_TYPE_SPI
+    led_strip_set_pixel_hsv(mStrip, 0, 0, 0, brightness);
+    led_strip_refresh(mStrip);
 #else
     if (mGPIONum < GPIO_NUM_MAX)
     {

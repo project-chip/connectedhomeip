@@ -30,9 +30,9 @@
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"
+#include "led_strip.h"
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM || CONFIG_DEVICE_TYPE_ESP32_C6_DEVKITC
 #include "driver/rmt.h"
-#include "led_strip.h"
 #define RMT_TX_DEFAULT_GPIO GPIO_NUM_8
 #define RMT_TX_DEFAULT_CHANNEL RMT_CHANNEL_0
 static led_strip_t * strip = NULL;
@@ -64,6 +64,18 @@ void LEDWidget::Init(gpio_num_t gpioNum)
         mHue                            = 0;
         mSaturation                     = 0;
     }
+#elif CONFIG_DEVICE_TYPE_ESP32_C61_DEVKITC
+    led_strip_config_t strip_config = {
+        .strip_gpio_num = CONFIG_STATUS_LED_GPIO_NUM,
+        .max_leds       = 1, // at least one LED on board
+    };
+
+    led_strip_spi_config_t spi_config = {
+        .spi_bus = SPI2_HOST,
+    };
+    spi_config.flags.with_dma = true;
+    led_strip_new_spi_device(&strip_config, &spi_config, &mStrip);
+    led_strip_clear(mStrip);
 #else
     if (gpioNum < GPIO_NUM_MAX)
     {
@@ -106,6 +118,9 @@ void LEDWidget::SetBrightness(uint8_t brightness)
         strip->set_pixel(strip, 0, red, green, blue);
         strip->refresh(strip, 100);
     }
+#elif CONFIG_DEVICE_TYPE_ESP32_C61_DEVKITC
+    led_strip_set_pixel_hsv(mStrip, 0, 0, 0, brightness);
+    led_strip_refresh(mStrip);
 #else
     if (mGPIONum < GPIO_NUM_MAX)
     {
@@ -195,6 +210,10 @@ void LEDWidget::DoSet(bool state)
         strip->set_pixel(strip, 0, red, green, blue);
         strip->refresh(strip, 100);
     }
+#elif CONFIG_DEVICE_TYPE_ESP32_C61_DEVKITC
+    uint8_t brightness = state ? mDefaultOnBrightness : 0;
+    led_strip_set_pixel_hsv(mStrip, 0, 0, 0, brightness);
+    led_strip_refresh(mStrip);
 #else
     if (mGPIONum < GPIO_NUM_MAX)
     {
