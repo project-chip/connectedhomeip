@@ -474,14 +474,19 @@ std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & 
     return std::nullopt; // handler status is set by the dispatch
 }
 
-EndpointId CustomDataModel::FirstEndpoint()
+DataModel::EndpointEntry CustomDataModel::FirstEndpoint()
 {
     return CodegenDataModelProviderInstance()->FirstEndpoint();
 }
 
-EndpointId CustomDataModel::NextEndpoint(EndpointId before)
+DataModel::EndpointEntry CustomDataModel::NextEndpoint(EndpointId before)
 {
     return CodegenDataModelProviderInstance()->NextEndpoint(before);
+}
+
+std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint)
+{
+    return CodegenDataModelProviderInstance()->GetEndpointInfo(endpoint);
 }
 
 std::optional<DataModel::DeviceTypeEntry> CustomDataModel::FirstDeviceType(EndpointId endpoint)
@@ -491,6 +496,11 @@ std::optional<DataModel::DeviceTypeEntry> CustomDataModel::FirstDeviceType(Endpo
 
 std::optional<DataModel::DeviceTypeEntry> CustomDataModel::NextDeviceType(EndpointId endpoint,
                                                                           const DataModel::DeviceTypeEntry & previous)
+{
+    return std::nullopt;
+}
+
+std::optional<DataModel::Provider::SemanticTag> CustomDataModel::GetSemanticTagAtIndex(EndpointId endpoint, size_t index)
 {
     return std::nullopt;
 }

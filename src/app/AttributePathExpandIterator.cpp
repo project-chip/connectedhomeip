@@ -141,8 +141,8 @@ std::optional<ClusterId> AttributePathExpandIterator::NextEndpointId()
     {
         if (mpAttributePath->mValue.HasWildcardEndpointId())
         {
-            EndpointId id = mDataModelProvider->FirstEndpoint();
-            return (id != kInvalidEndpointId) ? std::make_optional(id) : std::nullopt;
+            EndpointEntry ep = mDataModelProvider->FirstEndpoint();
+            return (ep.id != kInvalidEndpointId) ? std::make_optional(ep.id) : std::nullopt;
         }
 
         return mpAttributePath->mValue.mEndpointId;
@@ -150,8 +150,8 @@ std::optional<ClusterId> AttributePathExpandIterator::NextEndpointId()
 
     VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
 
-    EndpointId id = mDataModelProvider->NextEndpoint(mOutputPath.mEndpointId);
-    return (id != kInvalidEndpointId) ? std::make_optional(id) : std::nullopt;
+    EndpointEntry ep = mDataModelProvider->NextEndpoint(mOutputPath.mEndpointId);
+    return (ep.id != kInvalidEndpointId) ? std::make_optional(ep.id) : std::nullopt;
 }
 
 void AttributePathExpandIterator::ResetCurrentCluster()

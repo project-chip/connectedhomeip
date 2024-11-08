@@ -20,25 +20,58 @@
 #include <optional>
 
 #include <access/Privilege.h>
+#include <app/data-model/List.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 
 namespace chip {
 namespace app {
 namespace DataModel {
+
+enum class EndpointCompositionPattern : uint8_t
+{
+    kTreePattern = 0x1,
+    kFullFamilyPattern = 0x2,
+};
+
+struct EndpointInfo
+{
+    EndpointId parentId;
+    EndpointCompositionPattern compositionPattern;
+
+    EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kTreePattern) {}
+};
+
+struct EndpointEntry
+{
+    EndpointId id;
+    EndpointInfo info;
+
+    bool IsValid() const { return id != kInvalidEndpointId; }
+    static const EndpointEntry kInvalid;
+};
 
 enum class ClusterQualityFlags : uint32_t
 {
     kDiagnosticsData = 0x0001, // `K` quality, may be filtered out in subscriptions
 };
 
+enum class ClusterMask : uint8_t
+{
+    kServer = 0x1,
+    kClient = 0x2,
+};
+
 struct ClusterInfo
 {
     DataVersion dataVersion; // current cluster data version,
     BitFlags<ClusterQualityFlags> flags;
+    BitMask<ClusterMask> mask;
 
     /// Constructor that marks data version as mandatory
     /// for this structure.
@@ -140,13 +173,17 @@ class ProviderMetadataTree
 public:
     virtual ~ProviderMetadataTree() = default;
 
-    virtual EndpointId FirstEndpoint()                 = 0;
-    virtual EndpointId NextEndpoint(EndpointId before) = 0;
+    virtual EndpointEntry FirstEndpoint()                              = 0;
+    virtual EndpointEntry NextEndpoint(EndpointId before)              = 0;
+    virtual std::optional<EndpointInfo> GetEndpointInfo(EndpointId id) = 0;
     virtual bool EndpointExists(EndpointId id);
 
     // This iteration describes device types registered on an endpoint
     virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;
     virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
+
+    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+    virtual std::optional<SemanticTag> GetSemanticTagAtIndex(EndpointId endpoint, size_t index) = 0;
 
     // This iteration will list all clusters on a given endpoint
     virtual ClusterEntry FirstCluster(EndpointId endpoint)                              = 0;

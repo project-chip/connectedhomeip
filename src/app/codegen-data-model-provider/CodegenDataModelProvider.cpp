@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/util/att-storage.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -128,9 +129,16 @@ std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteC
 
     DataModel::ClusterInfo info(*versionPtr);
 
+    if (cluster.mask & CLUSTER_MASK_SERVER)
+    {
+        info.mask.Set(DataModel::ClusterMask::kServer);
+    }
+    if (cluster.mask & CLUSTER_MASK_CLIENT)
+    {
+        info.mask.Set(DataModel::ClusterMask::kClient);
+    }
     // TODO: set entry flags:
     //   info->flags.Set(ClusterQualityFlags::kDiagnosticsData)
-
     return info;
 }
 
@@ -396,7 +404,26 @@ bool CodegenDataModelProvider::EndpointExists(EndpointId endpoint)
     return (emberAfIndexFromEndpoint(endpoint) != kEmberInvalidEndpointIndex);
 }
 
-EndpointId CodegenDataModelProvider::FirstEndpoint()
+std::optional<DataModel::EndpointInfo> CodegenDataModelProvider::GetEndpointInfo(EndpointId endpoint)
+{
+    uint16_t endpoint_idx = emberAfIndexFromEndpoint(endpoint);
+    if (endpoint_idx != kEmberInvalidEndpointIndex && emberAfEndpointIndexIsEnabled(endpoint_idx))
+    {
+        DataModel::EndpointInfo info(emberAfParentEndpointFromIndex(endpoint_idx));
+        if (IsFlatCompositionForEndpoint(endpoint))
+        {
+            info.compositionPattern = DataModel::EndpointCompositionPattern::kFullFamilyPattern;
+        }
+        else if (IsTreeCompositionForEndpoint(endpoint))
+        {
+            info.compositionPattern = DataModel::EndpointCompositionPattern::kTreePattern;
+        }
+        return std::make_optional(info);
+    }
+    return std::nullopt;
+}
+
+DataModel::EndpointEntry CodegenDataModelProvider::FirstEndpoint()
 {
     // find the first enabled index
     const uint16_t lastEndpointIndex = emberAfEndpointCount();
@@ -404,13 +431,20 @@ EndpointId CodegenDataModelProvider::FirstEndpoint()
     {
         if (emberAfEndpointIndexIsEnabled(endpoint_idx))
         {
-            mEndpointIterationHint = endpoint_idx;
-            return emberAfEndpointFromIndex(endpoint_idx);
+            mEndpointIterationHint                 = endpoint_idx;
+            DataModel::EndpointEntry endpointEntry = DataModel::EndpointEntry::kInvalid;
+            endpointEntry.id                       = emberAfEndpointFromIndex(endpoint_idx);
+            auto endpointInfo                      = GetEndpointInfo(endpointEntry.id);
+            if (endpointInfo.has_value())
+            {
+                endpointEntry.info = endpointInfo.value();
+            }
+            return endpointEntry;
         }
     }
 
     // No enabled endpoint found. Give up
-    return kInvalidEndpointId;
+    return DataModel::EndpointEntry::kInvalid;
 }
 
 std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointId id) const
@@ -433,14 +467,14 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
     return std::make_optional<unsigned>(idx);
 }
 
-EndpointId CodegenDataModelProvider::NextEndpoint(EndpointId before)
+DataModel::EndpointEntry CodegenDataModelProvider::NextEndpoint(EndpointId before)
 {
     const uint16_t lastEndpointIndex = emberAfEndpointCount();
 
     std::optional<unsigned> before_idx = TryFindEndpointIndex(before);
     if (!before_idx.has_value())
     {
-        return kInvalidEndpointId;
+        return DataModel::EndpointEntry::kInvalid;
     }
 
     // find the first enabled index
@@ -448,13 +482,20 @@ EndpointId CodegenDataModelProvider::NextEndpoint(EndpointId before)
     {
         if (emberAfEndpointIndexIsEnabled(endpoint_idx))
         {
-            mEndpointIterationHint = endpoint_idx;
-            return emberAfEndpointFromIndex(endpoint_idx);
+            mEndpointIterationHint                 = endpoint_idx;
+            DataModel::EndpointEntry endpointEntry = DataModel::EndpointEntry::kInvalid;
+            endpointEntry.id                       = emberAfEndpointFromIndex(endpoint_idx);
+            auto endpointInfo                      = GetEndpointInfo(endpointEntry.id);
+            if (endpointInfo.has_value())
+            {
+                endpointEntry.info = endpointInfo.value();
+            }
+            return endpointEntry;
         }
     }
 
     // No enabled enpoint after "before" was found, give up
-    return kInvalidEndpointId;
+    return DataModel::EndpointEntry::kInvalid;
 }
 
 DataModel::ClusterEntry CodegenDataModelProvider::FirstCluster(EndpointId endpointId)
@@ -769,6 +810,16 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
 
     mDeviceTypeIterationHint = idx;
     return DeviceTypeEntryFromEmber(deviceTypes[idx]);
+}
+
+std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetSemanticTagAtIndex(EndpointId endpoint, size_t index)
+{
+    Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
+    if (GetSemanticTagForEndpointAtIndex(endpoint, index, tag) == CHIP_NO_ERROR)
+    {
+        return std::make_optional(tag);
+    }
+    return std::nullopt;
 }
 
 } // namespace app
