@@ -17,8 +17,8 @@
 
 #include <app/server/Server.h>
 
-#include <access/examples/ExampleAccessControlDelegate.h>
 #include <access/ProviderDeviceTypeResolver.h>
+#include <access/examples/ExampleAccessControlDelegate.h>
 
 #include <app/AppConfig.h>
 #include <app/EventManagement.h>
