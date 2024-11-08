@@ -54,7 +54,11 @@ data_model_XMLS = [
 """
 
 # Function to find and collect all .xml and .json files
-def find_files():
+#
+# Data model files that the module uses are currently all XML and JSON files.
+#    - XMLs are generally data definitions
+#    - json are currently only cluster_ids.json
+def get_data_model_file_names():
     file_list = []
     for directory in directories:
         for root, _, files in os.walk(directory):
