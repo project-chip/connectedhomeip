@@ -55,7 +55,7 @@ public:
     CHIP_ERROR Init(const WiFiPAFListenParameters & param);
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
     bool CanSendToPeer(const Transport::PeerAddress & address) override;
-    void OnWiFiPAFMessageReceived(System::PacketBufferHandle && buffer) override;
+    void OnWiFiPAFMessageReceived(WiFiPAF::WiFiPAFSession & RxInfo, System::PacketBufferHandle && buffer) override;
     void SetWiFiPAFLayerTransportToSelf() { mWiFiPAFLayer->mWiFiPAFTransport = this; }
     bool IsWiFiPAFLayerTransportSetToSelf() { return mWiFiPAFLayer->mWiFiPAFTransport == this; }
 

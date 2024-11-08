@@ -178,15 +178,15 @@ public:
     CHIP_ERROR GetAndLogWiFiStatsCounters();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     struct WiFiPAFAdvertiseParam;
-
-    CHIP_ERROR SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
+    CHIP_ERROR WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
+    CHIP_ERROR WiFiPAFCancelPublish(uint32_t PublishId);
     typedef void (*OnConnectionCompleteFunct)(void * appState);
     typedef void (*OnConnectionErrorFunct)(void * appState, CHIP_ERROR err);
-    CHIP_ERROR WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
-                              OnConnectionErrorFunct onError);
-    CHIP_ERROR WiFiPAFCancelConnect();
-    CHIP_ERROR WiFiPAFCancelIncompleteConnect();
-    CHIP_ERROR WiFiPAFSend(System::PacketBufferHandle && msgBuf);
+    CHIP_ERROR WiFiPAFSubscribe(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
+                                OnConnectionErrorFunct onError);
+    CHIP_ERROR WiFiPAFCancelSubscribe(uint32_t SubscribeId);
+    CHIP_ERROR WiFiPAFCancelIncompleteSubscribe();
+    CHIP_ERROR WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, System::PacketBufferHandle && msgBuf);
     WiFiPAF::WiFiPAFLayer * GetWiFiPAF();
     void WiFiPafSetApFreq(const uint16_t freq);
 #endif
@@ -441,30 +441,36 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-inline CHIP_ERROR ConnectivityManager::SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args)
+inline CHIP_ERROR ConnectivityManager::WiFiPAFPublish(WiFiPAFAdvertiseParam & args)
 {
-    return static_cast<ImplClass *>(this)->_SetWiFiPAFAdvertisingEnabled(args);
+    return static_cast<ImplClass *>(this)->_WiFiPAFPublish(args);
 }
 
-inline CHIP_ERROR ConnectivityManager::WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState,
-                                                      OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
+inline CHIP_ERROR ConnectivityManager::WiFiPAFCancelPublish(uint32_t PublishId)
 {
-    return static_cast<ImplClass *>(this)->_WiFiPAFConnect(connDiscriminator, appState, onSuccess, onError);
+    return static_cast<ImplClass *>(this)->_WiFiPAFCancelPublish(PublishId);
 }
 
-inline CHIP_ERROR ConnectivityManager::WiFiPAFCancelConnect()
+inline CHIP_ERROR ConnectivityManager::WiFiPAFSubscribe(const SetupDiscriminator & connDiscriminator, void * appState,
+                                                        OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
 {
-    return static_cast<ImplClass *>(this)->_WiFiPAFCancelConnect();
+    return static_cast<ImplClass *>(this)->_WiFiPAFSubscribe(connDiscriminator, appState, onSuccess, onError);
 }
 
-inline CHIP_ERROR ConnectivityManager::WiFiPAFCancelIncompleteConnect()
+inline CHIP_ERROR ConnectivityManager::WiFiPAFCancelSubscribe(uint32_t SubscribeId)
 {
-    return static_cast<ImplClass *>(this)->_WiFiPAFCancelIncompleteConnect();
+    return static_cast<ImplClass *>(this)->_WiFiPAFCancelSubscribe(SubscribeId);
 }
 
-inline CHIP_ERROR ConnectivityManager::WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf)
+inline CHIP_ERROR ConnectivityManager::WiFiPAFCancelIncompleteSubscribe()
 {
-    return static_cast<ImplClass *>(this)->_WiFiPAFSend(std::move(msgBuf));
+    return static_cast<ImplClass *>(this)->_WiFiPAFCancelIncompleteSubscribe();
+}
+
+inline CHIP_ERROR ConnectivityManager::WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo,
+                                                   chip::System::PacketBufferHandle && msgBuf)
+{
+    return static_cast<ImplClass *>(this)->_WiFiPAFSend(TxInfo, std::move(msgBuf));
 }
 #endif
 
