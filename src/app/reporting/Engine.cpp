@@ -90,7 +90,6 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
     if (status.IsSuccess())
     {
-        // Odd ifdef is to only do this if the `Read-Check` does not do it already.
         // TODO: this callback being only executed on success is awkward. The Write callback is always done
         //       for both read and write.
         //
