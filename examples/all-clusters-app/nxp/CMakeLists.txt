@@ -28,25 +28,27 @@ get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-cluster
 get_filename_component(ALL_CLUSTERS_NXP_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/nxp/common REALPATH)
 get_filename_component(EXAMPLE_PLATFORM_NXP_COMMON_DIR ${CHIP_ROOT}/examples/platform/nxp/common REALPATH)
 
+# Add the CHIP stack & NXP port libs as an external module
 list(APPEND EXTRA_MCUX_MODULES ${CHIP_ROOT}/config/nxp/chip-cmake-freertos)
 
+# Add application prj.conf & Kconfig
 set(CONF_FILE ${CONF_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/prj.conf)
 
 set(KCONFIG_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig)
 
+# Load the MCUX SDK package
 find_package(McuxSDK 3.0.0)
 
 # Get compiler flags and includes and pass them to CHIP target
 list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS McuxSDK)
 
-include(${CHIP_ROOT}/third_party/nxp/nxp_matter_support/cmake/nxp_sdk_reconfig.cmake)
+# Include the nxp_sdk_reconfigure.cmake to customize the SDK for Matter application
+include(${CHIP_ROOT}/third_party/nxp/nxp_matter_support/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/nxp_sdk_reconfig.cmake)
 
+# Define application project name
 project(chip-nxp-all-clusters-app-example)
 
-target_compile_definitions(app PRIVATE
-    vApplicationMallocFailedHook=vApplicationMallocFailedHookBTBLE
-    EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\")
-
+# Add application definitions, include paths and source files
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
 target_include_directories(app

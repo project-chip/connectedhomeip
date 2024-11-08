@@ -94,7 +94,17 @@ if(NOT CONFIG_CHIP_BUILD_APP_WITH_GN)
     )
 endif()
 
-# **************************************************************************************
+if(CONFIG_CHIP_DEVICE_USE_ZEPHYR_BLE)
+    target_compile_definitions(chip INTERFACE
+        EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"
+    )
+    # Include Matter BT/BLE hooks
+    target_include_directories(chip INTERFACE
+        ${CHIP_ROOT}/third_party/nxp/nxp_matter_support/gn_build/rt_sdk/sdk_hook
+    )
+endif()
+
+#**************************************************************************************
 # Pre-build instructions
 # **************************************************************************************
 nxp_pre_build_process()

@@ -16,7 +16,6 @@
 
 rsource "../cmake/Kconfig.matter.common"
 rsource "../cmake/Kconfig.matter.nxp"
-rsource "Kconfig.features"
 rsource "../../../third_party/nxp/nxp_matter_support/cmake/Kconfig"
 
 if CHIP
@@ -108,6 +107,57 @@ config CHIP_USE_GENERATED_CONFIG
 	help
 		Use the generated macro configs for CHIP configuration.
 
+config BT
+	bool "Enable BLE"
+	default y
+	help
+		Enable BLE support.
+
+config CHIP_DEVICE_USE_ZEPHYR_BLE
+	bool "Use Zephyr BLE implementation"
+	depends on BT
+	default y if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
+	help
+		Use Zephyr implementation for BLE manager.
+
+config CHIP_WIFI
+	bool "Enable NXP Wi-Fi support"
+	help
+		Enable Matter-over-Wi-Fi.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
+	int "Define the minimum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 500
+	help
+		Specifies the minimum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
+	int "Define the maximum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 3600000 # 1 hour
+	help
+		Specifies the maximum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
+	int "Define the maximum amount of connection recovery occurrences"
+	depends on CHIP_WIFI
+	default 0
+	help
+		Specifies the maximum number of connection recovery attempts.
+		If set to 0, no limitation is applied and attempts
+		to recover the connection are performed indefinitely.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
+	int "Define the connection recovery jitter in milliseconds"
+	depends on CHIP_WIFI
+	default 2000
+	help
+		Specifies the maximum connection recovery jitter interval (in milliseconds).
+		Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+		a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+		within range [-JITTER; +JITTER].
+
 # Thread network features
 
 if NET_L2_OPENTHREAD
@@ -118,7 +168,7 @@ config CHIP_IPV4
 	bool "IPv4 support for Matter"
 	help
 		If disabled, it allows to build NXP SDK application
-	  	with IPv4 support independently of the Matter stack still
-	  	running over IPv6.
+		with IPv4 support independently of the Matter stack still
+		running over IPv6.
 
 endif # CHIP
