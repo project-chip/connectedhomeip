@@ -82,7 +82,7 @@ def get_data_model_file_names():
 # Main function to generate the data_model_xmls.gni file
 def generate_gni_file():
     # Step 1: Find all files and create the sorted file list
-    file_list = find_files()
+    file_list = get_data_model_file_names()  # Fixed: Changed to get_data_model_file_names()
 
     # Step 2: Render the template with the file list
     environment = jinja2.Environment(trim_blocks=True, lstrip_blocks=True)
@@ -97,5 +97,5 @@ def generate_gni_file():
     print(f"{output_file} has been generated successfully.")
 
 # Run the function to generate the .gni file
-if __name__ = "__main__":
+if __name__ == "__main__":  # Fixed: Changed = to ==
     generate_gni_file()
