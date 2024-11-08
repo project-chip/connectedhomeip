@@ -97,6 +97,34 @@ target_sources(app
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp
 )
 
+if (CONFIG_CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA OR CONFIG_CHIP_ENABLE_EL2GO_FACTORY_DATA)
+    target_sources(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataExample.cpp
+    )
+    if (CONFIG_CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA)
+        target_compile_definitions(app PRIVATE
+            ENABLE_SECURE_WHOLE_FACTORY_DATA
+        )
+        target_compile_definitions(app 
+            PUBLIC
+            EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/FactoryDataProviderEncImpl.h\"
+        )
+    else()
+        target_compile_definitions(app 
+            PUBLIC
+            EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/FactoryDataProviderEl2GoImpl.h\"
+        )
+    endif()
+else()
+    target_sources(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
+    )
+    target_compile_definitions(app 
+        PUBLIC
+        EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/FactoryDataProviderImpl.h\"
+    )
+endif()
+
 if (CONFIG_CHIP_LIB_SHELL)
     target_compile_definitions(app PRIVATE
         ENABLE_CHIP_SHELL
@@ -113,22 +141,6 @@ if (CONFIG_CHIP_LIB_SHELL)
     target_include_directories(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/include
         ${CHIP_ROOT}/examples/shell/shell_common/include
-    )
-endif()
-
-if (CONFIG_CHIP_SECURE_DAC_PRIVATE_KEY_STORAGE OR CONFIG_CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA)
-    target_compile_definitions(app PUBLIC
-        EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/FactoryDataProviderImpl.h\"
-    )
-    target_sources(app PRIVATE
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataExample.cpp
-    )
-else()
-    target_compile_definitions(app PUBLIC
-        EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"
-    )
-    target_sources(app PRIVATE
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
     )
 endif()
 
