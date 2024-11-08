@@ -35,7 +35,6 @@
 #include "event_groups.h"
 #include "task.h"
 
-#include "WifiInterfaceAbstraction.h"
 #include "wfx_host_events.h"
 
 #include "rsi_board_configuration.h"

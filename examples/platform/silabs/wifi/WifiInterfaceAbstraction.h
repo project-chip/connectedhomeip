@@ -18,6 +18,7 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 #include <cmsis_os2.h>
+#include <lib/support/BitFlags.h>
 #include <sl_cmsis_os2_common.h>
 #include <wfx_host_events.h>
 
@@ -25,48 +26,40 @@
  * Interface to RSI Sapis
  */
 
-#define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256) /* Stack for the WLAN task	 	*/ // TODO: For rs9116
-#define WFX_RSI_BUF_SZ (1024 * 10)
 #define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP		*/
-#define WFX_RSI_NUM_TIMERS (2)           /* Number of RSI timers to alloc	*/
 
-typedef enum
+enum class WifiEvent : uint8_t
 {
-    WFX_EVT_STA_CONN,
-    WFX_EVT_STA_DISCONN,
-    WFX_EVT_AP_START,
-    WFX_EVT_AP_STOP,
-    WFX_EVT_SCAN, /* This is used as scan result and start */
-    WFX_EVT_STA_START_JOIN,
-    WFX_EVT_STA_DO_DHCP,
-    WFX_EVT_STA_DHCP_DONE,
-    WFX_EVT_DHCP_POLL
-} WfxEventType_e;
+    kStationConnect    = 0,
+    kStationDisconnect = 1,
+    kAPStart           = 2,
+    kAPStop            = 3,
+    kScan              = 4, /* This is used as scan result and start */
+    kStationStartJoin  = 5,
+    kStationDoDhcp     = 6,
+    kStationDhcpDone   = 7,
+    kStationDhcpPoll   = 8
+};
 
-typedef enum
+enum class WifiState : uint16_t
 {
-    WFX_RSI_ST_DEV_READY       = (1 << 0),
-    WFX_RSI_ST_AP_READY        = (1 << 1),
-    WFX_RSI_ST_STA_PROVISIONED = (1 << 2),
-    WFX_RSI_ST_STA_CONNECTING  = (1 << 3),
-    WFX_RSI_ST_STA_CONNECTED   = (1 << 4),
-    WFX_RSI_ST_STA_DHCP_DONE   = (1 << 6), /* Requested to do DHCP after conn	*/
-    WFX_RSI_ST_STA_MODE        = (1 << 7), /* Enable Station Mode			*/
-    WFX_RSI_ST_AP_MODE         = (1 << 8), /* Enable AP Mode			*/
-    WFX_RSI_ST_STA_READY       = (WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE),
-    WFX_RSI_ST_STARTED         = (1 << 9),  /* RSI task started			*/
-    WFX_RSI_ST_SCANSTARTED     = (1 << 10), /* Scan Started				*/
-} WfxStateType_e;
-
-typedef struct WfxEvent_s
-{
-    WfxEventType_e eventType;
-    void * eventData; // event data TODO: confirm needed
-} WfxEvent_t;
+    kStationInit        = (1 << 0),
+    kAPReady            = (1 << 1),
+    kStationProvisioned = (1 << 2),
+    kStationConnecting  = (1 << 3),
+    kStationConnected   = (1 << 4),
+    kStationDhcpDone    = (1 << 6), /* Requested to do DHCP after conn	*/
+    kStationMode        = (1 << 7), /* Enable Station Mode			*/
+    kAPMode             = (1 << 8), /* Enable AP Mode			*/
+    kStationReady       = (kStationConnected | kStationDhcpDone),
+    kStationStarted     = (1 << 9),  /* RSI task started			*/
+    kScanStarted        = (1 << 10), /* Scan Started					*/
+};
+using WifiStateFlags = chip::BitFlags<WifiState>;
 
 typedef struct wfx_rsi_s
 {
-    uint16_t dev_state;
+    WifiStateFlags dev_state;
     uint16_t ap_chan; /* The chan our STA is using	*/
     wfx_wifi_provision_t sec;
 #ifdef SL_WFX_CONFIG_SCAN
@@ -118,7 +111,6 @@ int32_t wfx_rsi_power_save();
 /**
  * @brief Posts an event to the Wi-Fi task
  *
- * @param[in] event Event to process. Must be valid ptr
+ * @param[in] event Event to process.
  */
-// TODO: Can't be a const & since the ncp builds are still using c files
-void sl_matter_wifi_post_event(WfxEvent_t * event);
+void sl_matter_wifi_post_event(WifiEvent event);
