@@ -21,6 +21,7 @@ so that methods requiring data model files work just by installing the python
 package without requiring a full chip SDK checkout.
 """
 import os
+
 import jinja2
 
 # Set chip_root to be dynamically based on the script's location
