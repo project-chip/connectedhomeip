@@ -42,9 +42,6 @@ constexpr uint16_t kMaxDiscriminatorLength = 4095;
 
 } // namespace
 
-// Define the static member
-DeviceManager DeviceManager::sInstance;
-
 void DeviceManager::Init()
 {
     // TODO: (#34113) Init mLastUsedNodeId from chip config file
