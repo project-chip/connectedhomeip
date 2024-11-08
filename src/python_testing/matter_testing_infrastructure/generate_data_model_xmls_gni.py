@@ -28,7 +28,7 @@ directories = [
     os.path.join(chip_root, "data_model/master/device_types/"),
 ]
 
-# Template for generating the GNI file content
+# Template for generating the GNI file content with proper indentation
 GNI_TEMPLATE = """\
 # Copyright (c) 2024 Project CHIP Authors
 #
@@ -47,9 +47,9 @@ GNI_TEMPLATE = """\
 import("//build_overrides/chip.gni")
 
 data_model_XMLS = [
-{% for name in file_list -%}
-"{{ name }}",
-{% endfor -%}
+{% for name in file_list %}
+    "{{ name }}",
+{% endfor %}
 ]
 """
 
@@ -79,6 +79,7 @@ def generate_gni_file():
 
     # Step 3: Write the rendered content to data_model_xmls.gni
     output_file = "src/python_testing/matter_testing_infrastructure/data_model_xmls.gni"
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
     with open(output_file, "wt") as f:
         f.write(output_content)
     print(f"{output_file} has been generated successfully.")
