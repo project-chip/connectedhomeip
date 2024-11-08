@@ -89,4 +89,5 @@ def generate_gni_file():
     print(f"{output_file} has been generated successfully.")
 
 # Run the function to generate the .gni file
-generate_gni_file()
+if __name__ = "__main__":
+    generate_gni_file()
