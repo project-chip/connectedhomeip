@@ -1,0 +1,87 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+import jinja2
+
+# Set chip_root to be dynamically based on the script's location
+chip_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+
+# Directories to search for .xml and .json files relative to chip_root
+directories = [
+    os.path.join(chip_root, "data_model/1.3/clusters/"),
+    os.path.join(chip_root, "data_model/1.3/device_types/"),
+    os.path.join(chip_root, "data_model/1.4/clusters/"),
+    os.path.join(chip_root, "data_model/1.4/device_types/"),
+    os.path.join(chip_root, "data_model/master/clusters/"),
+    os.path.join(chip_root, "data_model/master/device_types/"),
+]
+
+# Template for generating the GNI file content
+GNI_TEMPLATE = """\
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+data_model_XMLS = [
+{% for name in file_list -%}
+"{{ name }}",
+{% endfor -%}
+]
+"""
+
+# Function to find and collect all .xml and .json files
+def find_files():
+    file_list = []
+    for directory in directories:
+        for root, _, files in os.walk(directory):
+            for file in files:
+                if file.endswith(".xml") or file.endswith(".json"):
+                    # Replace absolute path with `${chip_root}` for GNI compatibility
+                    relative_path = os.path.join("${chip_root}", os.path.relpath(root, chip_root), file)
+                    file_list.append(relative_path)
+    # Sort files alphabetically
+    file_list.sort()
+    return file_list
+
+# Main function to generate the data_model_xmls.gni file
+def generate_gni_file():
+    # Step 1: Find all files and create the sorted file list
+    file_list = find_files()
+
+    # Step 2: Render the template with the file list
+    environment = jinja2.Environment(trim_blocks=True, lstrip_blocks=True)
+    template = environment.from_string(GNI_TEMPLATE)
+    output_content = template.render(file_list=file_list)
+
+    # Step 3: Write the rendered content to data_model_xmls.gni
+    output_file = "src/python_testing/matter_testing_infrastructure/data_model_xmls.gni"
+    with open(output_file, "wt") as f:
+        f.write(output_content)
+    print(f"{output_file} has been generated successfully.")
+
+# Run the function to generate the .gni file
+generate_gni_file()

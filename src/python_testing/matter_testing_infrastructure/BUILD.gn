@@ -45,5 +45,6 @@ pw_python_package("chip-testing") {
   tests = [
     "chip/testing/test_metadata.py",
     "chip/testing/test_tasks.py",
+    "generate_data_model_xmls_gni.py",
   ]
 }
