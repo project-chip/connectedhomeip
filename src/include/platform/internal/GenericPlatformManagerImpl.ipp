@@ -152,6 +152,21 @@ void GenericPlatformManagerImpl<ImplClass>::_Shutdown()
     BLEMgr().Shutdown();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ChipLogProgress(DeviceLayer, "WiFi-PAF Layer shutdown");
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer()->Shutdown([](uint32_t id, WiFiPAF::WiFiPAFSession::PAFRole role) {
+        switch (role)
+        {
+        case WiFiPAF::WiFiPAFSession::PAFRole::publisher:
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
+            break;
+        case WiFiPAF::WiFiPAFSession::PAFRole::subscriber:
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
+            break;
+        }
+    });
+#endif
+
     ChipLogProgress(DeviceLayer, "System Layer shutdown");
     SystemLayer().Shutdown();
 }
