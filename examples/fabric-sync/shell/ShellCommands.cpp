@@ -216,7 +216,6 @@ void RegisterCommands()
 
     // Register the root `device` command with the top-level shell.
     Engine::Root().RegisterCommands(&sDeviceComand, 1);
-    return;
 }
 
 } // namespace Shell
