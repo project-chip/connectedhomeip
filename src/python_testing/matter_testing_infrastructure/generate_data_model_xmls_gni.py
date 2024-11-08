@@ -62,6 +62,8 @@ data_model_XMLS = [
 """
 
 # Function to find and collect all .xml and .json files
+
+
 def get_data_model_file_names():
     file_list = []
     for directory in directories:
@@ -76,6 +78,8 @@ def get_data_model_file_names():
     return file_list
 
 # Main function to generate the data_model_xmls.gni file
+
+
 def generate_gni_file():
     # Step 1: Find all files and create the sorted file list
     file_list = get_data_model_file_names()
@@ -88,10 +92,11 @@ def generate_gni_file():
     # Step 3: Dynamically generate the output file path
     # Get the script's directory (where this script is located)
     script_dir = os.path.dirname(os.path.realpath(__file__))  # Directory of the current script
-    
+
     # Step 4: Ensure we are in the correct `src/python_testing/` directory
     base_dir = os.path.abspath(os.path.join(script_dir, "../.."))  # Go up two levels to src/python_testing/
-    output_dir = os.path.join(base_dir, "python_testing", "matter_testing_infrastructure")  # Now append `matter_testing_infrastructure`
+    # Now append `matter_testing_infrastructure`
+    output_dir = os.path.join(base_dir, "python_testing", "matter_testing_infrastructure")
     output_file = os.path.join(output_dir, "data_model_xmls.gni")
 
     # Step 5: Write the rendered content to the output file
@@ -99,6 +104,7 @@ def generate_gni_file():
     with open(output_file, "wt") as f:
         f.write(output_content)
     print(f"{output_file} has been generated successfully.")
+
 
 # Run the function to generate the .gni file
 if __name__ == "__main__":  # Fixed = to ==
