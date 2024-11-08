@@ -1,12 +1,7 @@
 import push_av_server
 
 from multiprocessing import Process
-import chip.clusters as Clusters
-from chip.clusters import ClusterObjects as ClusterObjects
-from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                    async_test_body)
-from mobly import asserts
-from test_plan_support import commission_if_required, if_feature_supported, read_attribute, verify_success
+from matter_testing_support import (MatterBaseTest, TestStep, default_matter_test_main, async_test_body)
 
 
 class TC_PAVS_1_0(MatterBaseTest):
@@ -58,7 +53,7 @@ class TC_PAVS_1_0(MatterBaseTest):
         self.step("3b")
         # Generate nonce
         # send TLSCertificateManagement.TLSClientCSR, receive TLSClientCSRResponse
-        push_av_server.device_hierarchy.gen_cert(name, csr)
+        push_av_server.device_hierarchy.gen_cert("device name", "csr")
         # send ProvisionClientCertificate, receive ProvisionClientCertificateResponse
 
         self.step(4)

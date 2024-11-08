@@ -58,8 +58,8 @@ ffmpeg -hide_banner \
   -reconnect_on_network_error 1 \
   -reconnect_on_http_error 4xx,5xx \
   -reconnect_delay_max 2 \
-  -ca_file $CERT_ROOT_DIR/certs/server/root.pem \
-  -cert_file $CERT_ROOT_DIR/certs/device/dev.pem \
-  -key_file $CERT_ROOT_DIR/certs/device/dev.key \
+  -ca_file "$CERT_ROOT_DIR/certs/server/root.pem" \
+  -cert_file "$CERT_ROOT_DIR/certs/device/dev.pem" \
+  -key_file "$CERT_ROOT_DIR/certs/device/dev.key" \
   -tls_verify 1 \
   "$PUBLISHING_ENDPOINT/cmaf/example/video-720p.cmfv"
