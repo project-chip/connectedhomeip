@@ -34,9 +34,6 @@ namespace admin {
 namespace {
 
 constexpr EndpointId kAggregatorEndpointId = 1;
-constexpr uint16_t kWindowTimeout          = 300;
-constexpr uint16_t kIteration              = 1000;
-constexpr uint16_t kMaxDiscriminatorLength = 4095;
 
 } // namespace
 
