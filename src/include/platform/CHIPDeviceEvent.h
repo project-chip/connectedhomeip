@@ -502,6 +502,9 @@ struct ChipDeviceEvent final
         struct
         {
             chip::System::PacketBuffer * Data;
+            uint32_t id;
+            uint32_t peer_id;
+            uint8_t peer_addr[6];
         } CHIPoWiFiPAFWriteReceived;
 #endif
         struct

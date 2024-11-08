@@ -572,7 +572,17 @@ void DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    DeviceLayer::ConnectivityMgr().WiFiPAFCancelConnect();
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer()->Shutdown([](uint32_t id, WiFiPAF::WiFiPAFSession::PAFRole role) {
+        switch (role)
+        {
+        case WiFiPAF::WiFiPAFSession::PAFRole::publisher:
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
+            break;
+        case WiFiPAF::WiFiPAFSession::PAFRole::subscriber:
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
+            break;
+        }
+    });
 #endif
 
     // Release everything from the commissionee device pool here.
@@ -829,15 +839,21 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     {
         if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != WiFiPAF::State::kConnected)
         {
-            ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices");
+            ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices, nodeId: %lu",
+                            params.GetPeerAddress().GetRemoteId());
             if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
             {
                 ChipLogError(Controller, "Wi-Fi Management should have been started now.");
                 ExitNow(CHIP_ERROR_INTERNAL);
             }
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
-            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), reinterpret_cast<void *>(this),
-                                                          OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
+            auto nodeId                                         = params.GetPeerAddress().GetRemoteId();
+            const SetupDiscriminator & connDiscriminator(params.GetSetupDiscriminator().value());
+            uint16_t discriminator =
+                connDiscriminator.IsShortDiscriminator() ? connDiscriminator.GetShortValue() : connDiscriminator.GetLongValue();
+            DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(nodeId, discriminator);
+            DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(params.GetSetupDiscriminator().value(), reinterpret_cast<void *>(this),
+                                                            OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
         }
     }
