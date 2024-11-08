@@ -175,7 +175,9 @@ CHIP_ERROR BdxTransfer::SendBlock()
 CHIP_ERROR BdxTransfer::OnMessageReceived(chip::Messaging::ExchangeContext * exchangeContext,
                                           const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle && payload)
 {
-    if (payloadHeader.HasMessageType(MessageType::SendInit) || payloadHeader.HasMessageType(MessageType::ReceiveInit))
+    bool has_send_init = payloadHeader.HasMessageType(MessageType::SendInit);
+    bool has_receive_init = payloadHeader.HasMessageType(MessageType::ReceiveInit);
+    if (has_send_init || has_receive_init)
     {
         FabricIndex fabricIndex = exchangeContext->GetSessionHandle()->GetFabricIndex();
         NodeId peerNodeId       = exchangeContext->GetSessionHandle()->GetPeer().GetNodeId();
@@ -184,12 +186,12 @@ CHIP_ERROR BdxTransfer::OnMessageReceived(chip::Messaging::ExchangeContext * exc
 
         TransferControlFlags flags;
         TransferRole role;
-        if (payloadHeader.HasMessageType(MessageType::SendInit))
+        if (has_send_init)
         {
             flags = TransferControlFlags::kSenderDrive;
             role  = TransferRole::kReceiver;
         }
-        else if (payloadHeader.HasMessageType(MessageType::ReceiveInit))
+        else
         {
             flags = TransferControlFlags::kReceiverDrive;
             role  = TransferRole::kSender;

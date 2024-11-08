@@ -131,7 +131,7 @@ public:
 
     void Init(System::Layer * systemLayer) { mSystemLayer = systemLayer; }
 
-    virtual void InitMessageReceived(bdx::BdxTransfer * transfer, bdx::TransferSession::TransferInitData init_data)
+    void InitMessageReceived(bdx::BdxTransfer * transfer, bdx::TransferSession::TransferInitData init_data) override
     {
         TransferInfo * transferInfo = mTransfers->NextUnassociatedTransferInfo();
         if (gOnTransferObtainedCallback && transferInfo)
@@ -143,7 +143,7 @@ public:
         }
     }
 
-    virtual void DataReceived(bdx::BdxTransfer * transfer, const ByteSpan & block)
+    void DataReceived(bdx::BdxTransfer * transfer, const ByteSpan & block) override
     {
         TransferInfo * transferInfo = mTransfers->TransferInfoForTransfer(transfer);
         if (gOnDataReceivedCallback && transferInfo)
@@ -152,7 +152,7 @@ public:
         }
     }
 
-    virtual void TransferCompleted(bdx::BdxTransfer * transfer, CHIP_ERROR result)
+    void TransferCompleted(bdx::BdxTransfer * transfer, CHIP_ERROR result) override
     {
         TransferInfo * transferInfo = mTransfers->TransferInfoForTransfer(transfer);
         if (!transferInfo && result != CHIP_NO_ERROR)
