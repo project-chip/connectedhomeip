@@ -1,7 +1,7 @@
-import push_av_server
-
 from multiprocessing import Process
-from matter_testing_support import (MatterBaseTest, TestStep, default_matter_test_main, async_test_body)
+
+import push_av_server
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_PAVS_1_0(MatterBaseTest):

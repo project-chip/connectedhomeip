@@ -1,41 +1,34 @@
-import logging
-import ssl
-from typing import Optional, Union
-import tempfile
-import os.path
-import datetime
 import argparse
-import pathlib
-from pathlib import Path
-import random
-import string
+import datetime
 import json
+import logging
+import os.path
+import pathlib
+import random
 import socket
-import sys
+import ssl
+import string
 import subprocess
-
-from zeroconf import ServiceInfo, Zeroconf
+import sys
+import tempfile
+from pathlib import Path
+from typing import Optional, Union
 
 import uvicorn
 from cryptography import x509
-from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives.asymmetric.types import (
-    CertificatePublicKeyTypes,
-    CertificateIssuerPrivateKeyTypes,
-)
-
-
-from fastapi import FastAPI, Request, HTTPException, Response
-from fastapi.responses import HTMLResponse, FileResponse
+from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes, CertificatePublicKeyTypes
+from cryptography.x509.oid import NameOID
+from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-
 # Monkey patch uvicorn to make the underlying transport available to us.
 # That will let us access the ssl context and get the client certificate information.
 from uvicorn.protocols.http.h11_impl import H11Protocol
+from zeroconf import ServiceInfo, Zeroconf
 
 http_tools_protocol_old__should_upgrade = H11Protocol._should_upgrade
 
