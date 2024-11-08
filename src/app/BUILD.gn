@@ -186,7 +186,6 @@ static_library("interaction-model") {
     "WriteClient.h",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
-    "reporting/Read.h",
     "reporting/ReportScheduler.h",
     "reporting/ReportSchedulerImpl.cpp",
     "reporting/ReportSchedulerImpl.h",
@@ -199,8 +198,6 @@ static_library("interaction-model") {
     #
     #       This breaks having `.h` and `.cpp` based off the same compilation unit and
     #       should ideally be cleaned up.
-    "reporting/Read.cpp",
-    "reporting/Read.h",
     "reporting/reporting.h",
   ]
 
