@@ -123,10 +123,10 @@ config CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 	help
 	  Allows to load the factory data provisioned in flash.
 
-config CHIP_SECURE_DAC_PRIVATE_KEY_STORAGE
-	bool "Secure DAC private key storage"
+config CHIP_ENABLE_EL2GO_FACTORY_DATA
+	bool "Secure DAC private key storage using El2Go provisioning"
 	help
-		Enable DAC private key secure storage.
+		Enable DAC private key storage using El2Go provisioning.
 
 config CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA
 	bool "Secure whole factory data"
