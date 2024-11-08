@@ -23,16 +23,32 @@
 
 #pragma once
 
+#include <lib/core/NodeId.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace WiFiPAF {
 
+struct WiFiPAFSession
+{
+    enum PAFRole
+    {
+        publisher,
+        subscriber
+    };
+    PAFRole role;
+    uint32_t id;
+    uint32_t peer_id;
+    uint8_t peer_addr[6];
+    NodeId nodeId;
+    uint16_t discriminator;
+};
+
 class WiFiPAFLayerDelegate
 {
 public:
-    virtual ~WiFiPAFLayerDelegate()                                          = default;
-    virtual void OnWiFiPAFMessageReceived(System::PacketBufferHandle && msg) = 0;
+    virtual ~WiFiPAFLayerDelegate()                                                                   = default;
+    virtual void OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) = 0;
 };
 
 } // namespace WiFiPAF

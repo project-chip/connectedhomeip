@@ -21,6 +21,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>
 #include <system/SystemPacketBuffer.h>
+#include <vector>
 
 namespace chip {
 namespace WiFiPAF {
@@ -43,10 +44,21 @@ public:
 
     WiFiPAFLayer() = default;
     static WiFiPAFLayer * GetWiFiPAFLayer();
-
-    void OnWiFiPAFMessageReceived(System::PacketBufferHandle && msg);
+    typedef void (*OnCancelDeviceHandle)(uint32_t id, WiFiPAFSession::PAFRole role);
+    void Shutdown(OnCancelDeviceHandle OnCancelDevice);
+    void OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     State GetWiFiPAFState() { return mAppState; };
     void SetWiFiPAFState(State state);
+
+    void AddPafSession(const NodeId nodeId, const uint16_t discriminator);
+    void AddPafSession(uint32_t id);
+    void RmPafSession(uint32_t id);
+    WiFiPAFSession * GetPAFInfo(NodeId nodeId);
+    WiFiPAFSession * GetPAFInfo(uint32_t id);
+    WiFiPAFSession * GetPAFInfo(uint16_t discriminator);
+
+private:
+    std::vector<WiFiPAFSession> PafInfoVect;
 };
 
 } /* namespace WiFiPAF */

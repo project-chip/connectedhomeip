@@ -549,7 +549,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
             args.enable        = LinuxDeviceOptions::GetInstance().mWiFiPAF;
             args.freq_list_len = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, args.freq_list);
-            DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+            DeviceLayer::ConnectivityMgr().WiFiPAFPublish(args);
         }
     }
 #endif

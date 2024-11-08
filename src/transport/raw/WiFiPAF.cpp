@@ -60,7 +60,7 @@ CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
         {
             ChipLogError(Inet, "Wi-Fi Management taking too long to start - device configuration will be reset.");
         }
-        ChipLogProgress(NotSpecified, "Wi-Fi Management is started");
+        ChipLogProgress(Inet, "Wi-Fi Management is started");
     }
     return CHIP_NO_ERROR;
 }
@@ -69,7 +69,17 @@ CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, Syst
 {
     VerifyOrReturnError(address.GetTransportType() == Type::kWiFiPAF, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != chip::WiFiPAF::State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-    DeviceLayer::ConnectivityMgr().WiFiPAFSend(std::move(msgBuf));
+
+    chip::WiFiPAF::WiFiPAFSession * pTxInfo = mWiFiPAFLayer->GetPAFInfo(address.GetRemoteId());
+    if (pTxInfo == nullptr)
+    {
+        /*
+            The session does not exist
+        */
+        ChipLogError(Inet, "WiFi-PAF: No valid session whose nodeId: %lu", address.GetRemoteId());
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    DeviceLayer::ConnectivityMgr().WiFiPAFSend(*pTxInfo, std::move(msgBuf));
 
     return CHIP_NO_ERROR;
 }
@@ -84,9 +94,34 @@ bool WiFiPAFBase::CanSendToPeer(const Transport::PeerAddress & address)
     return false;
 }
 
-void WiFiPAFBase::OnWiFiPAFMessageReceived(System::PacketBufferHandle && buffer)
+void WiFiPAFBase::OnWiFiPAFMessageReceived(chip::WiFiPAF::WiFiPAFSession & RxInfo, System::PacketBufferHandle && buffer)
 {
-    HandleMessageReceived(Transport::PeerAddress(Transport::Type::kWiFiPAF), std::move(buffer));
+    auto pPafInfo = mWiFiPAFLayer->GetPAFInfo(RxInfo.id);
+    if (pPafInfo == nullptr)
+    {
+        /*
+            The session does not exist
+        */
+        ChipLogError(Inet, "WiFi-PAF: No valid session whose Id: %u", RxInfo.id);
+        return;
+    }
+
+    if ((pPafInfo->id != RxInfo.id) || (pPafInfo->peer_id != RxInfo.peer_id) ||
+        memcmp(pPafInfo->peer_addr, RxInfo.peer_addr, sizeof(uint8_t) * 6))
+    {
+        /*
+            The packet is from the wrong sender
+        */
+        ChipLogError(Inet, "WiFi-PAF: packet from unexpected node:");
+        ChipLogError(Inet, "session: [id: %u, peer_id: %u, [%02x:%02x:%02x:%02x:%02x:%02x]", pPafInfo->id, pPafInfo->peer_id,
+                     pPafInfo->peer_addr[0], pPafInfo->peer_addr[1], pPafInfo->peer_addr[2], pPafInfo->peer_addr[3],
+                     pPafInfo->peer_addr[4], pPafInfo->peer_addr[5]);
+        ChipLogError(Inet, "pkt: [id: %u, peer_id: %u, [%02x:%02x:%02x:%02x:%02x:%02x]", RxInfo.id, RxInfo.peer_id,
+                     RxInfo.peer_addr[0], RxInfo.peer_addr[1], RxInfo.peer_addr[2], RxInfo.peer_addr[3], RxInfo.peer_addr[4],
+                     RxInfo.peer_addr[5]);
+        return;
+    }
+    HandleMessageReceived(Transport::PeerAddress(Transport::Type::kWiFiPAF, pPafInfo->nodeId), std::move(buffer));
 }
 
 CHIP_ERROR WiFiPAFBase::SendAfterConnect(System::PacketBufferHandle && msg)

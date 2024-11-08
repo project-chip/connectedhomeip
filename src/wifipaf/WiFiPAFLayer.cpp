@@ -24,14 +24,32 @@
  */
 
 #include "WiFiPAFLayer.h"
+#include <cassert>
 namespace chip {
 namespace WiFiPAF {
 
-void WiFiPAFLayer::OnWiFiPAFMessageReceived(System::PacketBufferHandle && msg)
+void WiFiPAFLayer::Shutdown(OnCancelDeviceHandle OnCancelDevice)
+{
+    ChipLogProgress(Inet, "WiFiPAF: Closing all WiFiPAF sessions (%lu)", PafInfoVect.size());
+    for (WiFiPAFSession & PafInfoElm : PafInfoVect)
+    {
+        if (PafInfoElm.id == UINT32_MAX)
+        {
+            // Unused session
+            continue;
+        }
+        ChipLogProgress(Inet, "WiFiPAF: Canceling id: %u", PafInfoElm.id);
+        OnCancelDevice(PafInfoElm.id, PafInfoElm.role);
+    }
+    PafInfoVect.clear();
+    return;
+}
+
+void WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)
 {
     if (mWiFiPAFTransport != nullptr)
     {
-        mWiFiPAFTransport->OnWiFiPAFMessageReceived(std::move(msg));
+        mWiFiPAFTransport->OnWiFiPAFMessageReceived(RxInfo, std::move(msg));
     }
 }
 
@@ -44,6 +62,96 @@ static WiFiPAFLayer sInstance;
 WiFiPAFLayer * WiFiPAFLayer::GetWiFiPAFLayer()
 {
     return &sInstance;
+}
+
+void WiFiPAFLayer::AddPafSession(const NodeId nodeId, const uint16_t discriminator)
+{
+    for (auto PafInfoElm : PafInfoVect)
+    {
+        if (PafInfoElm.nodeId == nodeId)
+        {
+            assert(PafInfoElm.discriminator == discriminator);
+            // Already exist
+            return;
+        }
+    }
+    WiFiPAFSession PafInfo{ .id = UINT32_MAX, .nodeId = nodeId, .discriminator = discriminator };
+    PafInfoVect.push_back(PafInfo);
+    ChipLogProgress(Inet, "WiFiPAF: Add session with nodeId: %lu, disc: %x, total %lu sessions", nodeId, discriminator,
+                    PafInfoVect.size());
+}
+
+void WiFiPAFLayer::AddPafSession(uint32_t id)
+{
+    for (auto PafInfoElm : PafInfoVect)
+    {
+        if (PafInfoElm.id == id)
+        {
+            // Already exist
+            return;
+        }
+    }
+    WiFiPAFSession PafInfo{ .id = id };
+    PafInfoVect.push_back(PafInfo);
+    ChipLogProgress(Inet, "WiFiPAF: Add session with id: %u, total %lu sessions", id, PafInfoVect.size());
+}
+/*
+void WiFiPAFLayer::AddPafSession()
+{
+    WiFiPAFSession PafInfo {
+        .id = UINT32_MAX
+    };
+    PafInfoVect.push_back(PafInfo);
+}
+*/
+
+void WiFiPAFLayer::RmPafSession(uint32_t id)
+{
+    for (std::vector<WiFiPAFSession>::iterator it = PafInfoVect.begin(); it != PafInfoVect.end(); it++)
+    {
+        if (it->id == id)
+        {
+            PafInfoVect.erase(it);
+            return;
+        }
+    }
+}
+
+WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(NodeId nodeId)
+{
+    for (WiFiPAFSession & PafInfoElm : PafInfoVect)
+    {
+        if (PafInfoElm.nodeId == nodeId)
+        {
+            return &PafInfoElm;
+        }
+    }
+    return nullptr;
+}
+
+WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(uint32_t id)
+{
+    for (WiFiPAFSession & PafInfoElm : PafInfoVect)
+    {
+        if (PafInfoElm.id == id)
+        {
+            return &PafInfoElm;
+        }
+    }
+    return nullptr;
+}
+
+WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(uint16_t discriminator)
+{
+    for (WiFiPAFSession & PafInfoElm : PafInfoVect)
+    {
+        if (PafInfoElm.discriminator == discriminator)
+        {
+            // Available session
+            return &PafInfoElm;
+        }
+    }
+    return nullptr;
 }
 
 } /* namespace WiFiPAF */
