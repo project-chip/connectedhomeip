@@ -50,7 +50,7 @@ private:
     chip::EndpointId mEndpointId;
 };
 
-class DeviceManager : public PairingDelegate
+class DeviceManager
 {
 public:
     DeviceManager() = default;
@@ -77,7 +77,7 @@ public:
 
     void AddSyncedDevice(const Device & device);
 
-    void RemoveSyncedDevice(chip::NodeId nodeId);
+    void RemoveSyncedDevice(chip::ScopedNodeId scopedNodeId);
 
     /**
      * @brief Determines whether a given nodeId corresponds to the "current bridge device," either local or remote.
@@ -176,8 +176,6 @@ public:
 
 private:
     friend DeviceManager & DeviceMgr();
-
-    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
 
     void RequestCommissioningApproval();
 

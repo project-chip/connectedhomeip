@@ -23,14 +23,11 @@
 #include <sys/types.h>
 
 #include <commands/common/CHIPCommand.h>
+#include <device_manager/DeviceManager.h>
 #include <device_manager/DeviceSynchronization.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
-
-#if defined(PW_RPC_ENABLED)
-#include <rpc/RpcClient.h>
-#endif
 
 using namespace ::chip;
 using namespace ::chip::Controller;
@@ -547,6 +544,8 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     PairingManager * self = reinterpret_cast<PairingManager *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnCurrentFabricRemove: context is null"));
 
+    ChipLogProgress(NotSpecified, "PairingManager::OnCurrentFabricRemove");
+
     if (err == CHIP_NO_ERROR)
     {
         // print to console
@@ -558,12 +557,10 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
             self->SetPairingDelegate(nullptr);
         }
 
-#if defined(PW_RPC_ENABLED)
         FabricIndex fabricIndex = self->CurrentCommissioner().GetFabricIndex();
         app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(fabricIndex, nodeId);
         ScopedNodeId scopedNodeId(nodeId, fabricIndex);
-        RemoveSynchronizedDevice(scopedNodeId);
-#endif
+        DeviceMgr().RemoveSyncedDevice(scopedNodeId);
     }
     else
     {

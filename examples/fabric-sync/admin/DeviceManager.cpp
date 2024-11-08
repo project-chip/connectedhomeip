@@ -143,16 +143,4 @@ CHIP_ERROR DeviceManager::UnpairRemoteDevice(NodeId nodeId)
     return CHIP_NO_ERROR;
 }
 
-void DeviceManager::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
-{
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to remove synced device:(" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
-                     ChipLogValueX64(deviceId), err.Format());
-        return;
-    }
-
-    ChipLogProgress(NotSpecified, "Synced device with NodeId:" ChipLogFormatX64 " has been removed.", ChipLogValueX64(deviceId));
-}
-
 } // namespace admin

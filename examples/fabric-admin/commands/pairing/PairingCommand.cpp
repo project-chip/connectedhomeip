@@ -23,6 +23,7 @@
 #include <commands/interactive/InteractiveCommands.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <device_manager/DeviceManager.h>
 #include <device_manager/DeviceSynchronization.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -32,10 +33,6 @@
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
 #include <string>
-
-#if defined(PW_RPC_ENABLED)
-#include <rpc/RpcClient.h>
-#endif
 
 using namespace ::chip;
 using namespace ::chip::Controller;
@@ -534,16 +531,16 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(NotSpecified, "OnCurrentFabricRemove: context is null"));
 
+    ChipLogProgress(NotSpecified, "PairingCommand::OnCurrentFabricRemove");
+
     if (err == CHIP_NO_ERROR)
     {
         // print to console
         fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
 
-#if defined(PW_RPC_ENABLED)
         app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(command->CurrentCommissioner().GetFabricIndex(), nodeId);
         ScopedNodeId scopedNodeId(nodeId, command->CurrentCommissioner().GetFabricIndex());
-        admin::RemoveSynchronizedDevice(scopedNodeId);
-#endif
+        admin::DeviceMgr().RemoveSyncedDevice(scopedNodeId);
     }
     else
     {
