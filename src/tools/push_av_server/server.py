@@ -28,7 +28,7 @@ from cryptography.hazmat.primitives.asymmetric.types import (
 
 
 from fastapi import FastAPI, Request, HTTPException, Response
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -399,22 +399,42 @@ def root():
 
 
 @app.get("/ui/streams", response_class=HTMLResponse)
-def ui_streams(request: Request):
+def ui_streams_list(request: Request):
     s = list_streams()
     return templates.TemplateResponse(
         request=request, name="streams_list.html", context={"streams": s["streams"]}
     )
 
 
+@app.get("/ui/streams/{stream_id}/{file_path:path}")
+def ui_streams_details(request: Request, stream_id: int, file_path: str):
+    context = {}
+    context['streams'] = list_streams()['streams']
+    context['stream_id'] = stream_id
+    context['file_path'] = file_path
+
+    if file_path.endswith('.crt'):
+        context['type'] = 'cert'
+        p = wd.path("streams", str(stream_id), file_path)
+        with open(p, "r") as f:
+            context['cert'] = json.load(f)
+    else:
+        context['type'] = 'media'
+        context['probe'] = ffprobe_check(stream_id, file_path)
+        context['pretty_probe'] = json.dumps(context['probe'], sort_keys=True, indent=4)
+
+    return templates.TemplateResponse(request=request, name="streams_details.html", context=context)
+
+
 @app.get("/ui/certificates", response_class=HTMLResponse)
-def ui_certificates(request: Request):
+def ui_certificates_list(request: Request):
     return templates.TemplateResponse(
         request=request, name="certificates_list.html", context={"certs": list_certs()}
     )
 
 
 @app.get("/ui/certificates/{hierarchy}/{name}", response_class=HTMLResponse)
-def ui_certificates(request: Request, hierarchy: str, name: str):
+def ui_certificates_details(request: Request, hierarchy: str, name: str):
     context = certificate_details(hierarchy, name)
     context["certs"] = list_certs()
 
@@ -474,6 +494,11 @@ async def segment_upload(file_path: str, stream_id: int, req: Request):
             f.write(chunk)
 
     return Response(status_code=202)
+
+
+@app.get("/streams/{stream_id}/{file_path:path}")
+async def segment_download(file_path: str, stream_id: int):
+    return FileResponse(wd.path("streams", str(stream_id), file_path))
 
 
 @app.get("/streams/probe/{stream_id}/{file_path:path}")
@@ -619,7 +644,7 @@ def run(host: Optional[str], port: Optional[int], working_directory: Optional[st
             if dns != "localhost":
                 zeroconf.unregister_service(svc_info)
 
-        directory.print_tree()
+        # directory.print_tree()
 
 
 # TODO UI

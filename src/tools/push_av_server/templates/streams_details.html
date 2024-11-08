@@ -27,6 +27,16 @@
             {% endfor %}
         </ul>
         <div class="center">
+            {% if type == 'cert' %}
+            <pre><code>{{cert}}</code></pre>
+            {% else %}
+            <div>
+                <video controls src="/streams/{{stream_id}}/{{file_path}}"></video>
+            </div>
+            <div>
+                <pre><code>{{pretty_probe}}</code></pre>
+            </div>
+            {% endif %}
         </div>
 </body>
 
