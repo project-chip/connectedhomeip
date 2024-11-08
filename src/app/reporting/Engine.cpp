@@ -24,7 +24,6 @@
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
-#include <app/reporting/Read.h>
 #include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
 #include <lib/core/DataModelTypes.h>
@@ -51,6 +50,87 @@ Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eve
     }
 
     return Status::Success;
+}
+
+DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel,
+                                                  const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
+                                                  AttributeReportIBs::Builder & reportBuilder,
+                                                  const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
+{
+    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
+                  path.mAttributeId);
+    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
+                                                          DataModelCallbacks::OperationOrder::Pre, path);
+
+    DataModel::ReadAttributeRequest readRequest;
+
+    if (isFabricFiltered)
+    {
+        readRequest.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
+    }
+    readRequest.subjectDescriptor = &subjectDescriptor;
+    readRequest.path              = path;
+
+    DataVersion version = 0;
+    if (std::optional<DataModel::ClusterInfo> clusterInfo = dataModel->GetClusterInfo(path); clusterInfo.has_value())
+    {
+        version = clusterInfo->dataVersion;
+    }
+    else
+    {
+        ChipLogError(DataManagement, "Read request on unknown cluster - no data version available");
+    }
+
+    TLV::TLVWriter checkpoint;
+    reportBuilder.Checkpoint(checkpoint);
+
+    AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
+
+    DataModel::ActionReturnStatus status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
+
+    if (status.IsSuccess())
+    {
+        // TODO: this callback being only executed on success is awkward. The Write callback is always done
+        //       for both read and write.
+        //
+        //       For now this preserves existing/previous code logic, however we should consider to ALWAYS
+        //       call this.
+        DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
+                                                              DataModelCallbacks::OperationOrder::Post, path);
+        return status;
+    }
+
+    // Encoder state is relevant for errors in case they are retryable.
+    //
+    // Generally only out of space encoding errors would be retryable, however we save the state
+    // for all errors in case this is information that is useful (retry or error position).
+    if (encoderState != nullptr)
+    {
+        *encoderState = attributeValueEncoder.GetState();
+    }
+
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+    // Out of space errors may be chunked data, reporting those cases would be very confusing
+    // as they are not fully errors. Report only others (which presumably are not recoverable
+    // and will be sent to the client as well).
+    if (!status.IsOutOfSpaceEncodingResponse())
+    {
+        DataModel::ActionReturnStatus::StringStorage storage;
+        ChipLogError(DataManagement, "Failed to read attribute: %s", status.c_str(storage));
+    }
+#endif
+    return status;
+}
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
+{
+    std::optional<DataModel::ClusterInfo> info = dataModel->GetClusterInfo(path);
+    if (!info.has_value())
+    {
+        return false;
+    }
+
+    return (info->dataVersion == dataVersion);
 }
 
 } // namespace
@@ -95,9 +175,9 @@ bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFil
         {
             existPathMatch = true;
 
-            if (!Impl::IsClusterDataVersionEqualTo(mpImEngine->GetDataModelProvider(),
-                                                   ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
-                                                   filter->mValue.mDataVersion.Value()))
+            if (!IsClusterDataVersionEqualTo(mpImEngine->GetDataModelProvider(),
+                                             ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
+                                             filter->mValue.mDataVersion.Value()))
             {
                 existVersionMismatch = true;
             }
@@ -209,8 +289,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
             DataModel::ActionReturnStatus status =
-                Impl::RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(),
-                                          apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
+                RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(),
+                                    apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
             if (status.IsError())
             {
                 // Operation error set, since this will affect early return or override on status encoding
