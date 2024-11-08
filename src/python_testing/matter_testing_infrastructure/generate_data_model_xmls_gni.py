@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Generates a gni file containing all data_model files (generally XML and JSON files) 
+that are typically used by matter_testing_infrastructure.
+
+These files are to be bundled with whl packages of the matter_testing_infrastructure
+so that methods requiring data model files work just by installing the python
+package without requiring a full chip SDK checkout.
+"""
 import os
 import jinja2
 
