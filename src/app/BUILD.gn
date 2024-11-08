@@ -186,7 +186,6 @@ static_library("interaction-model") {
     "WriteClient.h",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
-    "reporting/Read.h",
     "reporting/ReportScheduler.h",
     "reporting/ReportSchedulerImpl.cpp",
     "reporting/ReportSchedulerImpl.h",
