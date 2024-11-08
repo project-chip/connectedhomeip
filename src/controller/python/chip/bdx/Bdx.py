@@ -149,7 +149,7 @@ def AcceptSendTransfer(transfer: c_void_p, dataReceivedClosure, transferComplete
 def AcceptReceiveTransfer(transfer: c_void_p, data: bytes, transferComplete: Future):
     handle = chip.native.GetLibraryHandle()
     return builtins.chipStack.Call(
-        lambda: handle.pychip_Bdx_AcceptReceiveTransfer(transfer, ctypes.c_char_p(data), len(data), transferComplete)
+        lambda: handle.pychip_Bdx_AcceptReceiveTransfer(transfer, c_char_p(data), len(data), transferComplete)
     )
 
 
