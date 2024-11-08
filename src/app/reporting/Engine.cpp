@@ -109,16 +109,16 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
         *encoderState = attributeValueEncoder.GetState();
     }
 
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
     // Out of space errors may be chunked data, reporting those cases would be very confusing
     // as they are not fully errors. Report only others (which presumably are not recoverable
     // and will be sent to the client as well).
     if (!status.IsOutOfSpaceEncodingResponse())
     {
         DataModel::ActionReturnStatus::StringStorage storage;
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
         ChipLogError(DataManagement, "Failed to read attribute: %s", status.c_str(storage));
-#endif
     }
+#endif
     return status;
 }
 
