@@ -259,8 +259,8 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
     ChipLogProgress(Controller, "Starting commissioning discovery over WiFiPAF");
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mWaitingForDiscovery[kWiFiPAFTransport] = true;
-    CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFConnect(payload.discriminator, (void *) this, OnWiFiPAFSubscribeComplete,
-                                                                   OnWiFiPAFSubscribeError);
+    CHIP_ERROR err                          = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(payload.discriminator, (void *) this,
+                                                                                              OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
@@ -276,7 +276,7 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverWiFiPAF()
 {
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteConnect();
+    DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
 #endif
     return CHIP_NO_ERROR;
 }

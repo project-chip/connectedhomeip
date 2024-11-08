@@ -141,15 +141,16 @@ public:
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    CHIP_ERROR _WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
-                               OnConnectionErrorFunct onError);
-    CHIP_ERROR _WiFiPAFCancelConnect();
-    CHIP_ERROR _WiFiPAFCancelIncompleteConnect();
+    CHIP_ERROR _WiFiPAFSubscribe(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
+                                 OnConnectionErrorFunct onError);
+    CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
+    CHIP_ERROR _WiFiPAFCancelIncompleteSubscribe();
     void OnDiscoveryResult(GVariant * obj);
     void OnReplied(GVariant * obj);
     void OnNanReceive(GVariant * obj);
+    void OnNanPublishTerminated(guint public_id, gchar * reason);
     void OnNanSubscribeTerminated(guint subscribe_id, gchar * reason);
-    CHIP_ERROR _WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf);
+    CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
     WiFiPAF::WiFiPAFLayer * _GetWiFiPAF();
     void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
 #endif
@@ -232,47 +233,13 @@ private:
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    struct wpa_dbus_discov_info
-    {
-        uint32_t subscribe_id;
-        uint32_t peer_publish_id;
-        uint8_t peer_addr[6];
-        bool fsd;
-        bool fsd_gas;
-        uint32_t srv_proto_type;
-        uint32_t ssi_len;
-    };
-    struct wpa_dbus_reply_info
-    {
-        uint32_t publish_id;
-        uint32_t peer_subscribe_id;
-        uint8_t peer_addr[6];
-        uint32_t srv_proto_type;
-        uint32_t ssi_len;
-    };
-
-    uint32_t mpresubscribe_id;
-    struct wpa_dbus_discov_info mpaf_info;
-    struct wpa_dbus_reply_info mpaf_reply_info;
-    struct wpa_dbus_nantxrx_info
-    {
-        uint32_t id;
-        uint32_t peer_id;
-        uint8_t peer_addr[6];
-        uint32_t ssi_len;
-    };
-    struct wpa_dbus_nantxrx_info mpaf_rx_info;
-    struct wpa_dbus_nantxrx_info mpaf_tx_info;
-
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
     WiFiPAF::WiFiPAFLayer * pmWiFiPAF;
     void * mAppState;
     uint16_t mApFreq;
-    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
-    CHIP_ERROR _WiFiPAFUpdatePublish();
-    CHIP_ERROR _WiFiPAFCancelPublish();
+    CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
 #endif
 
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
