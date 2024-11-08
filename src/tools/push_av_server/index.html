@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <title>Push AV Ref Server</title>
     <script>
@@ -10,7 +11,7 @@
 
             for (const header of headers) {
                 content += `<th>${header}</th>`
-            } 
+            }
 
             content += '</tr></thead><tbody>'
 
@@ -23,7 +24,7 @@
             }
 
             content += "</tbody></table>"
-            
+
             return content
         }
 
@@ -32,7 +33,7 @@
             const certsServerTag = document.getElementById("certs-server")
             const certsDeviceTag = document.getElementById("certs-device")
 
-            fetch('/stream')
+            fetch('/streams')
                 .then((r) => r.json())
                 .then((streams) => {
                     console.log('streams', streams)
@@ -45,14 +46,14 @@
                         </tr>
                     `
 
-                    for (const {id, files} of streams.streams) {
+                    for (const { id, files } of streams.streams) {
                         for (const file of files) {
                             content += `<tr><td>${id}</td><td>${file}</td></tr>`
                         }
                     }
 
                     content += "</table>"
-                    
+
                     streamsTag.innerHTML = content
                 })
 
@@ -71,8 +72,9 @@
                 })
         })
     </script>
-  </head>
-  <body>
+</head>
+
+<body>
     <h1>AV Push Server</h1>
     <h2>Streams</h2>
     <div id="streams"><!-- js generated --></div>
@@ -83,5 +85,6 @@
         <h3>Device certificates</h3>
         <div id="certs-device"><!-- js generated --></div>
     </div>
-  </body>
+</body>
+
 </html>

@@ -29,6 +29,8 @@ from cryptography.hazmat.primitives.asymmetric.types import (
 
 from fastapi import FastAPI, Request, HTTPException, Response
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
 # Monkey patch uvicorn to make the underlying transport available to us.
@@ -380,11 +382,15 @@ class CAHierarchy:
 
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 # Couldn't find how to do DI with state created in __main__ without using
 # global variables, so using those.
 wd: WorkingDirectory = None
 device_hierarchy: CAHierarchy = None
 
+
+# UI website
 
 @app.get("/", response_class=HTMLResponse)
 def root():
@@ -392,12 +398,36 @@ def root():
         return f.read()
 
 
+@app.get("/ui/streams", response_class=HTMLResponse)
+def ui_streams(request: Request):
+    s = list_streams()
+    return templates.TemplateResponse(
+        request=request, name="streams_list.html", context={"streams": s["streams"]}
+    )
+
+
+@app.get("/ui/certificates", response_class=HTMLResponse)
+def ui_certificates(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="certificates_list.html", context={"certs": list_certs()}
+    )
+
+
+@app.get("/ui/certificates/{hierarchy}/{name}", response_class=HTMLResponse)
+def ui_certificates(request: Request, hierarchy: str, name: str):
+    context = certificate_details(hierarchy, name)
+    context["certs"] = list_certs()
+
+    return templates.TemplateResponse(request=request, name="certificates_details.html", context=context)
+
+# APIs
+
+
 @app.post("/streams", status_code=201)
 def create_stream():
     # Find the last registered stream
     dirs = [d for d in pathlib.Path(wd.path("streams")).iterdir() if d.is_dir()]
     last_stream = int(dirs[-1].name) if len(dirs) > 0 else 0
-    print(f"last_stream={last_stream}")
     stream_id = last_stream + 1
 
     wd.mkdir("streams", str(stream_id))
@@ -447,7 +477,7 @@ async def segment_upload(file_path: str, stream_id: int, req: Request):
 
 
 @app.get("/streams/probe/{stream_id}/{file_path:path}")
-def ffprobe_check(file_path: str, stream_id: int):
+def ffprobe_check(stream_id: int, file_path: str):
 
     p = wd.path("streams", str(stream_id), file_path)
 
@@ -479,6 +509,43 @@ def list_certs():
     device = [f.name for f in pathlib.Path(wd.path("certs", "device")).iterdir()]
 
     return {"server": server, "device": device}
+
+
+@app.get("/certs/{hierarchy}/{name}", status_code=200)
+def certificate_details(hierarchy: str, name: str):
+    data = pathlib.Path(wd.path("certs", hierarchy, name)).read_bytes()
+    type = "key" if name.endswith(".key") else "cert"
+
+    key = None
+    cert = None
+    if type == "key":
+        key = serialization.load_pem_private_key(data, None)
+        key = {
+            "key_size": key.key_size,
+            "private_key": key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption(),
+            ),
+            "public_key": key.public_key().public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.PKCS1,
+            ),
+        }
+    else:
+        cert = x509.load_pem_x509_certificate(data)
+        cert = {
+            "public_cert": cert.public_bytes(serialization.Encoding.PEM),
+            "serial_number": hex(cert.serial_number),
+            "not_valid_before": cert.not_valid_before_utc,
+            "not_valid_after": cert.not_valid_after_utc,
+            # public_key? fingerprint?
+            "issuer": cert.issuer.rfc4514_string(),
+            "subject": cert.subject.rfc4514_string(),
+            "extensions": [str(ext) for ext in cert.extensions]
+        }
+
+    return {"type": type, "key": key, "cert": cert}
 
 
 @app.post("/certs/{name}/keypair")

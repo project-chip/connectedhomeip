@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Push AV Server</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <table>
+        <tr>
+            <th>Stream ID</th>
+            <th>File</th>
+        </tr>
+
+        {% for stream in streams %}
+        {% for file in stream['files'] %}
+        <tr>
+            <td>{{stream['id']}}</td>
+            <td>{{file}}</td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+
+    </table>
+</body>
+
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Push AV Server</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="top-level">
+        <a href="/ui/streams">Streams</a>
+        <a href="/ui/certificates">Certificates</a>
+    </nav>
+    <div class="left-bar">
+        <h2>Certificates</h2>
+        <h3>Server</h3>
+        <ul>
+            {% for cert_name in certs['server'] %}
+            <li><a href="/ui/certificates/server/{{cert_name}}">{{cert_name}}</a></li>
+            {% endfor %}
+        </ul>
+        <h3>Clients</h3>
+        <ul>
+            {% for cert_name in certs['device'] %}
+            <li><a href="/ui/certificates/device/{{cert_name}}">{{cert_name}}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="center">
+        <div>Type: {{type}}</div>
+        {% if type == "cert" %}
+        <div>Serial Number: {{cert['serial_number']}}</div>
+        <div>Not Valid Before: {{cert['not_valid_before']}}</div>
+        <div>Not Valid After: {{cert['not_valid_after']}}</div>
+        <div>Issuer: {{cert['issuer']}}</div>
+        <div>Subject: {{cert['subject']}}</div>
+        <div>Extensions</div>
+        {% for ext in cert['extensions'] %}
+        <div>{{ext}}</div>
+        {% endfor %}
+        Public cert:
+        <pre><code>{{cert['public_cert']}}</code></pre>
+        {% else %}
+        <div>Key size: {{key['key_size']}}</div>
+        Public key:
+        <pre><code>{{key['public_key']}}</code></pre>
+        Private key:
+        <pre><code>{{key['private_key']}}</code></pre>
+        {% endif %}
+    </div>
+</body>
+
+</html>
