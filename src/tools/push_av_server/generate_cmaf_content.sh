@@ -3,8 +3,8 @@
 
 PUBLISHING_ENDPOINT=${PUBLISHING_ENDPOINT:-https://localhost:1234/stream/1}
 
-# TODO Handle dynamic value for those three variables
-HTTP_OPTS=ca_file=~/.pavstest/certs/server/root.pem,cert_file=~/.pavstest/certs/device/dev.pem,key_file=~/.pavstest/certs/device/dev.key
+# TODO Handle dynamic value for the certificates
+CERT_ROOT_DIR=~/.pavstest
 
 ffmpeg -hide_banner \
   -re -f lavfi -i "
@@ -58,5 +58,8 @@ ffmpeg -hide_banner \
   -reconnect_on_network_error 1 \
   -reconnect_on_http_error 4xx,5xx \
   -reconnect_delay_max 2 \
-  -http_opts $HTTP_OPTS \
+  -ca_file $CERT_ROOT_DIR/certs/server/root.pem \
+  -cert_file $CERT_ROOT_DIR/certs/device/dev.pem \
+  -key_file $CERT_ROOT_DIR/certs/device/dev.key \
+  -tls_verify 1 \
   "$PUBLISHING_ENDPOINT/cmaf/example/video-720p.cmfv"
