@@ -62,10 +62,6 @@ data_model_XMLS = [
 """
 
 # Function to find and collect all .xml and .json files
-#
-# Data model files that the module uses are currently all XML and JSON files.
-#    - XMLs are generally data definitions
-#    - json are currently only cluster_ids.json
 def get_data_model_file_names():
     file_list = []
     for directory in directories:
@@ -82,20 +78,28 @@ def get_data_model_file_names():
 # Main function to generate the data_model_xmls.gni file
 def generate_gni_file():
     # Step 1: Find all files and create the sorted file list
-    file_list = get_data_model_file_names()  # Fixed: Changed to get_data_model_file_names()
+    file_list = get_data_model_file_names()
 
     # Step 2: Render the template with the file list
     environment = jinja2.Environment(trim_blocks=True, lstrip_blocks=True)
     template = environment.from_string(GNI_TEMPLATE)
     output_content = template.render(file_list=file_list)
 
-    # Step 3: Write the rendered content to data_model_xmls.gni
-    output_file = "src/python_testing/matter_testing_infrastructure/data_model_xmls.gni"
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    # Step 3: Dynamically generate the output file path
+    # Get the script's directory (where this script is located)
+    script_dir = os.path.dirname(os.path.realpath(__file__))  # Directory of the current script
+    
+    # Step 4: Ensure we are in the correct `src/python_testing/` directory
+    base_dir = os.path.abspath(os.path.join(script_dir, "../.."))  # Go up two levels to src/python_testing/
+    output_dir = os.path.join(base_dir, "python_testing", "matter_testing_infrastructure")  # Now append `matter_testing_infrastructure`
+    output_file = os.path.join(output_dir, "data_model_xmls.gni")
+
+    # Step 5: Write the rendered content to the output file
+    os.makedirs(output_dir, exist_ok=True)  # Ensure the output directory exists
     with open(output_file, "wt") as f:
         f.write(output_content)
     print(f"{output_file} has been generated successfully.")
 
 # Run the function to generate the .gni file
-if __name__ == "__main__":  # Fixed: Changed = to ==
+if __name__ == "__main__":  # Fixed = to ==
     generate_gni_file()
