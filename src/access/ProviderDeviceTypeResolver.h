@@ -25,7 +25,7 @@ namespace Access {
 class DynamicProviderDeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
 {
 public:
-    using ModelGetter = app::DataModel::Provider *(*)();
+    using ModelGetter = app::DataModel::Provider * (*) ();
 
     DynamicProviderDeviceTypeResolver(ModelGetter model) : mModelGetter(model) {}
 
