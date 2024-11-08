@@ -89,7 +89,7 @@ config("nxp_platform_config") {
 static_library("nxp_platform") {
   deps = []
   defines = [
-    "CHIP_DEVICE_K32W1=1",
+    "NXP_DEVICE_K32W1_MCXW7X=1",
     "NXP_USE_MML=1",
   ]
 
