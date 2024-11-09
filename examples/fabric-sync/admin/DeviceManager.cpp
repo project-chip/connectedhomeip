@@ -75,7 +75,6 @@ CHIP_ERROR DeviceManager::PairRemoteFabricBridge(NodeId nodeId, uint32_t setupPI
         return err;
     }
 
-    ChipLogProgress(NotSpecified, "Successfully paired remote fabric bridge: Node ID " ChipLogFormatX64, ChipLogValueX64(nodeId));
     return CHIP_NO_ERROR;
 }
 
@@ -90,7 +89,6 @@ CHIP_ERROR DeviceManager::PairRemoteDevice(NodeId nodeId, const char * payload)
         return err;
     }
 
-    ChipLogProgress(NotSpecified, "Successfully paired device: Node ID " ChipLogFormatX64, ChipLogValueX64(nodeId));
     return CHIP_NO_ERROR;
 }
 
@@ -106,7 +104,6 @@ CHIP_ERROR DeviceManager::PairRemoteDevice(NodeId nodeId, uint32_t setupPINCode,
         return err;
     }
 
-    ChipLogProgress(NotSpecified, "Successfully paired device: Node ID " ChipLogFormatX64, ChipLogValueX64(nodeId));
     return CHIP_NO_ERROR;
 }
 
@@ -125,8 +122,6 @@ CHIP_ERROR DeviceManager::UnpairRemoteFabricBridge()
         return err;
     }
 
-    ChipLogProgress(NotSpecified, "Successfully unpaired remote fabric bridge: Node ID " ChipLogFormatX64,
-                    ChipLogValueX64(mRemoteBridgeNodeId));
     return CHIP_NO_ERROR;
 }
 
@@ -139,7 +134,6 @@ CHIP_ERROR DeviceManager::UnpairRemoteDevice(NodeId nodeId)
         return err;
     }
 
-    ChipLogProgress(NotSpecified, "Successfully unpaired remote device: Node ID " ChipLogFormatX64, ChipLogValueX64(nodeId));
     return CHIP_NO_ERROR;
 }
 
