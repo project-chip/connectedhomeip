@@ -51,6 +51,8 @@ extern void xPortSysTickHandler(void);
 #include "rsi_wlan_config.h"
 
 #define WFX_RSI_NUM_TIMERS (2) /* Number of RSI timers to alloc	*/
+#define CONVERT_SEC_TO_MSEC (1000)
+#define CONVERT_USEC_TO_MSEC (1 / 1000)
 
 #ifndef _use_the_rsi_defined_functions
 
@@ -135,7 +137,7 @@ found:
         return RSI_ERROR_INSUFFICIENT_BUFFER;
     }
 
-    (void) xTimerStart(tp->handle, TIMER_TICKS_TO_WAIT_0);
+    (void) xTimerStart(tp->handle, pdMS_TO_TICKS(0));
 
     return RSI_ERROR_NONE;
 }

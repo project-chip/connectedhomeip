@@ -34,7 +34,7 @@
 using namespace chip;
 using namespace chip::DeviceLayer;
 
-using WifiStateFlags = chip::BitFlags<WifiState>;
+#define CONVERT_SEC_TO_MS(TimeInS) (TimeInS * 1000)
 
 namespace {
 
@@ -209,6 +209,7 @@ sl_status_t wfx_connect_to_ap(void)
     return SL_STATUS_OK;
 }
 
+// TODO: Figure out why this function need to be extern C
 #if SL_ICD_ENABLED
 #if SLI_SI917
 /*********************************************************************
@@ -221,7 +222,8 @@ sl_status_t wfx_connect_to_ap(void)
  * @return  SL_STATUS_OK if successful,
  *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
-sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state)
+extern "C" sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,
+                                      sl_si91x_performance_profile_t sl_si91x_wifi_state)
 {
     return (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) ? SL_STATUS_FAIL : SL_STATUS_OK);
 }
@@ -234,7 +236,7 @@ sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
  * @return  SL_STATUS_OK if successful,
  *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
-sl_status_t wfx_power_save(void)
+extern "C" sl_status_t wfx_power_save(void)
 {
     return (wfx_rsi_power_save() ? SL_STATUS_FAIL : SL_STATUS_OK);
 }
@@ -330,6 +332,7 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
     return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
+// TODO: Figure out why this function needs to be extern C
 /*********************************************************************
  * @fn  bool wfx_hw_ready(void)
  * @brief
@@ -338,7 +341,7 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
  * @return  returns ture if successful,
  *          false otherwise
  ***********************************************************************/
-bool wfx_hw_ready(void)
+extern "C" bool wfx_hw_ready(void)
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationInit);
 }

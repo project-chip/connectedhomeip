@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "WiseconnectInterfaceAbstraction.h"
 #include <app/icd/server/ICDServerConfig.h>
 
 #ifdef __cplusplus
