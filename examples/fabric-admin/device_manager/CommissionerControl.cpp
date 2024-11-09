@@ -66,7 +66,7 @@ void CommissionerControl::OnResponse(app::CommandSender * client, const app::Con
 
     if (data != nullptr)
     {
-        DeviceMgr().HandleCommandResponse(path, *data);
+        DeviceManager::Instance().HandleCommandResponse(path, *data);
     }
 }
 

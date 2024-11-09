@@ -34,12 +34,6 @@ using namespace ::chip::app;
 
 namespace admin {
 
-DeviceSubscriptionManager & DeviceSubscriptionManager::Instance()
-{
-    static DeviceSubscriptionManager instance;
-    return instance;
-}
-
 CHIP_ERROR DeviceSubscriptionManager::StartSubscription(Controller::DeviceController & controller, ScopedNodeId scopedNodeId)
 {
     assertChipStackLockedByCurrentThread();

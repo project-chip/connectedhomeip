@@ -112,9 +112,9 @@ public:
                         ChipLogValueX64(scopedNodeId.GetNodeId()), commissioningTimeoutSec, iterations, discriminator);
 
         // Open the device commissioning window using raw binary data for salt and verifier
-        DeviceMgr().OpenDeviceCommissioningWindow(scopedNodeId, iterations, commissioningTimeoutSec, discriminator,
-                                                  ByteSpan(request.salt.bytes, request.salt.size),
-                                                  ByteSpan(request.verifier.bytes, request.verifier.size));
+        DeviceManager::Instance().OpenDeviceCommissioningWindow(scopedNodeId, iterations, commissioningTimeoutSec, discriminator,
+                                                                ByteSpan(request.salt.bytes, request.salt.size),
+                                                                ByteSpan(request.verifier.bytes, request.verifier.size));
 
         response.success = true;
 
@@ -146,13 +146,13 @@ public:
 
         if (error == CHIP_NO_ERROR)
         {
-            NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
+            NodeId nodeId = DeviceManager::Instance().GetNextAvailableNodeId();
 
             // After responding with RequestCommissioningApproval to the node where the client initiated the
             // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
             usleep(kCommissionPrepareTimeMs * 1000);
 
-            DeviceMgr().PairRemoteDevice(nodeId, code.c_str());
+            DeviceManager::Instance().PairRemoteDevice(nodeId, code.c_str());
         }
         else
         {

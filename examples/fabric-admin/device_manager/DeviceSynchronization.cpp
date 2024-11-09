@@ -143,7 +143,7 @@ void DeviceSynchronizer::OnReportEnd()
 void DeviceSynchronizer::OnDone(app::ReadClient * apReadClient)
 {
 #if defined(PW_RPC_ENABLED)
-    if (mState == State::ReceivedResponse && !DeviceMgr().IsCurrentBridgeDevice(mNodeId))
+    if (mState == State::ReceivedResponse && !DeviceManager::Instance().IsCurrentBridgeDevice(mNodeId))
     {
         GetUniqueId();
         if (mState == State::GettingUid)
@@ -230,15 +230,15 @@ void DeviceSynchronizer::GetUniqueId()
     VerifyOrReturn(!mCurrentDeviceData.has_unique_id, ChipLogDetail(NotSpecified, "We already have UniqueId"));
 #endif
 
-    auto * device = DeviceMgr().FindDeviceByNode(mNodeId);
+    auto * device = DeviceManager::Instance().FindDeviceByNode(mNodeId);
     // If there is no associated remote Fabric Sync Aggregator there is no other place for us to try
     // getting the UniqueId from and can return leaving the state in ReceivedResponse.
     VerifyOrReturn(device, ChipLogDetail(NotSpecified, "No remote Fabric Sync Aggregator to get UniqueId from"));
 
     // Because device is not-null we expect IsFabricSyncReady to be true. IsFabricSyncReady indicates we have a
     // connection to the remote Fabric Sync Aggregator.
-    VerifyOrDie(DeviceMgr().IsFabricSyncReady());
-    auto remoteBridgeNodeId               = DeviceMgr().GetRemoteBridgeNodeId();
+    VerifyOrDie(DeviceManager::Instance().IsFabricSyncReady());
+    auto remoteBridgeNodeId               = DeviceManager::Instance().GetRemoteBridgeNodeId();
     EndpointId remoteEndpointIdOfInterest = device->GetEndpointId();
 
     ChipLogDetail(NotSpecified, "Attempting to get UniqueId from remote Fabric Sync Aggregator");
