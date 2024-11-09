@@ -200,8 +200,6 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 extern "C" {
 #endif
 
-bool wfx_hw_ready(void);
-
 #ifdef RS911X_WIFI // for RS9116, 917 NCP and 917 SoC
 /* RSI Power Save */
 #if SL_ICD_ENABLED
@@ -212,6 +210,8 @@ sl_status_t wfx_power_save();
 #endif /* (SLI_SI91X_MCU_INTERFACE | EXP_BOARD) */
 #endif /* SL_ICD_ENABLED */
 #endif /* RS911X_WIFI */
+
+bool wfx_hw_ready(void);
 
 #ifdef WF200_WIFI
 void sl_wfx_host_gpio_init(void);

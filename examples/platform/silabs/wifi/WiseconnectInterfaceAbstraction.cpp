@@ -166,40 +166,6 @@ sl_status_t wfx_connect_to_ap(void)
     return SL_STATUS_OK;
 }
 
-// TODO: Figure out why this function need to be extern C
-#if SL_ICD_ENABLED
-#if SLI_SI917
-/*********************************************************************
- * @fn  sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t
- sl_si91x_wifi_state)
- * @brief
- *      Implements the power save in sleepy application
- * @param[in]  sl_si91x_ble_state : State to set for the BLE
-               sl_si91x_wifi_state : State to set for the WiFi
- * @return  SL_STATUS_OK if successful,
- *          SL_STATUS_FAIL otherwise
- ***********************************************************************/
-extern "C" sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,
-                                      sl_si91x_performance_profile_t sl_si91x_wifi_state)
-{
-    return (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) ? SL_STATUS_FAIL : SL_STATUS_OK);
-}
-#else  // For RS9116
-/*********************************************************************
- * @fn  sl_status_t wfx_power_save(void)
- * @brief
- *      Implements the power save in sleepy application
- * @param[in]  None
- * @return  SL_STATUS_OK if successful,
- *          SL_STATUS_FAIL otherwise
- ***********************************************************************/
-extern "C" sl_status_t wfx_power_save(void)
-{
-    return (wfx_rsi_power_save() ? SL_STATUS_FAIL : SL_STATUS_OK);
-}
-#endif /* SLI_SI917 */
-#endif /* SL_ICD_ENABLED */
-
 /*********************************************************************
  * @fn  void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
  * @brief
@@ -289,7 +255,6 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
     return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
-// TODO: Figure out why this function needs to be extern C
 /*********************************************************************
  * @fn  bool wfx_hw_ready(void)
  * @brief
@@ -298,7 +263,7 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
  * @return  returns ture if successful,
  *          false otherwise
  ***********************************************************************/
-extern "C" bool wfx_hw_ready(void)
+extern "C" bool wfx_hw_ready(void) // TODO : Figure out why the extern C is necessary
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationInit);
 }

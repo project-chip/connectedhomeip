@@ -972,3 +972,18 @@ int32_t wfx_rsi_send_data(void * p, uint16_t len)
 
     return status;
 }
+
+#if SL_ICD_ENABLED
+/*********************************************************************
+ * @fn  sl_status_t wfx_power_save(void)
+ * @brief
+ *      Implements the power save in sleepy application
+ * @param[in]  None
+ * @return  SL_STATUS_OK if successful,
+ *          SL_STATUS_FAIL otherwise
+ ***********************************************************************/
+extern "C" sl_status_t wfx_power_save(void) // TODO : Figure out why the extern C is necessary
+{
+    return (wfx_rsi_power_save() ? SL_STATUS_FAIL : SL_STATUS_OK);
+}
+#endif /* SL_ICD_ENABLED */

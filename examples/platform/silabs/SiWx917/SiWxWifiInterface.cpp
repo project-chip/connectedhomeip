@@ -46,7 +46,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 extern "C" {
-#include "sl_net.h"
 #include "sl_si91x_driver.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_types.h"
@@ -933,3 +932,22 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     wfx_ip_changed_notify(IP_STATUS_SUCCESS);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+
+#if SL_ICD_ENABLED
+/*********************************************************************
+ * @fn  sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t
+ sl_si91x_wifi_state)
+ * @brief
+ *      Implements the power save in sleepy application
+ * @param[in]  sl_si91x_ble_state : State to set for the BLE
+               sl_si91x_wifi_state : State to set for the WiFi
+ * @return  SL_STATUS_OK if successful,
+ *          SL_STATUS_FAIL otherwise
+ ***********************************************************************/
+extern "C" sl_status_t
+wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,
+               sl_si91x_performance_profile_t sl_si91x_wifi_state) // TODO : Figure out why the extern C is necessary
+{
+    return (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) ? SL_STATUS_FAIL : SL_STATUS_OK);
+}
+#endif

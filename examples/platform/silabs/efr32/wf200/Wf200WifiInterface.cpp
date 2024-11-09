@@ -1198,7 +1198,7 @@ wifi_mode_t wfx_get_wifi_mode(void)
  * @return returns true if sucessful,
  *         false otherwise
  ******************************************************************************/
-bool wfx_hw_ready(void)
+extern "C" bool wfx_hw_ready(void) // TODO : Figure out why the extern C is necessary
 {
     return (wifiContext.state & SL_WFX_STARTED) ? true : false;
 }
