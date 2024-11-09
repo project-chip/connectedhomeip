@@ -42,6 +42,10 @@
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
+namespace FuzzChip {
+class TestPASESession;
+}
+
 namespace chip {
 
 extern const char kSpake2pI2RSessionInfo[];
@@ -174,6 +178,7 @@ private:
         kInvalidKeyConfirmation = 0x00,
         kUnexpected             = 0xff,
     };
+    friend class FuzzChip::TestPASESession;
 
     CHIP_ERROR Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
