@@ -151,7 +151,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     Status status = Status::Failure;
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+    BridgedDevice * device = BridgedDeviceManager::Instance().GetDevice(endpointId);
 
     // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
     if (device != nullptr &&
@@ -214,7 +214,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
         return;
     }
 
-    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+    BridgedDevice * device = BridgedDeviceManager::Instance().GetDevice(endpointId);
     if (device == nullptr || !device->IsIcd())
     {
         handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Failure);
@@ -262,7 +262,7 @@ void ApplicationInit()
     AttemptRpcClientConnect(&DeviceLayer::SystemLayer(), nullptr);
 #endif
 
-    bridge::BridgeDeviceMgr().Init();
+    bridge::BridgedDeviceManager::Instance().Init();
     VerifyOrDie(bridge::gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
 
     VerifyOrDieWithMsg(bridge::CommissionerControlInit() == CHIP_NO_ERROR, NotSpecified,
