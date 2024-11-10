@@ -5599,12 +5599,12 @@ enum class VideoCodecEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kPrivacy         = 0x1,
-    kAudio           = 0x2,
-    kSpeaker         = 0x4,
-    kImageControl    = 0x8,
-    kVideo           = 0x10,
-    kSnapshot        = 0x20,
+    kAudio           = 0x1,
+    kVideo           = 0x2,
+    kSnapshot        = 0x4,
+    kPrivacy         = 0x8,
+    kSpeaker         = 0x10,
+    kImageControl    = 0x20,
     kWatermark       = 0x40,
     kOnScreenDisplay = 0x80,
     kLocalStorage    = 0x100,

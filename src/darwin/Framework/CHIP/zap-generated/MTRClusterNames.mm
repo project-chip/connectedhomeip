@@ -7831,18 +7831,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"NightVisionIllum";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAWBEnabledID:
-            result = @"AWBEnabled";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAutoShutterSpeedEnabledID:
-            result = @"AutoShutterSpeedEnabled";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAutoISOEnabledID:
-            result = @"AutoISOEnabled";
-            break;
-
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeViewportID:
             result = @"Viewport";
             break;
@@ -7909,10 +7897,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeStatusLightBrightnessID:
             result = @"StatusLightBrightness";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeDepthSensorStatusID:
-            result = @"DepthSensorStatus";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeGeneratedCommandListID:
@@ -10830,22 +10814,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotID:
             result = @"CaptureSnapshot";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetViewportID:
-            result = @"SetViewport";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageRotationID:
-            result = @"SetImageRotation";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageFlipHorizontalID:
-            result = @"SetImageFlipHorizontal";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageFlipVerticalID:
-            result = @"SetImageFlipVertical";
             break;
 
         default:
