@@ -450,6 +450,8 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     PairingManager * self = reinterpret_cast<PairingManager *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnCurrentFabricRemove: context is null"));
 
+    ChipLogProgress(NotSpecified, "PairingManager::OnCurrentFabricRemove");
+
     if (err == CHIP_NO_ERROR)
     {
         // print to console

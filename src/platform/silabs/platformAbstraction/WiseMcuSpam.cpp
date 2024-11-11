@@ -17,11 +17,13 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <sl_si91x_button_pin_config.h>
+#include <sl_si91x_common_flash_intf.h>
 
 #include <FreeRTOS.h>
 #include <task.h>
 
 #include <app/icd/server/ICDServerConfig.h>
+#include <lib/support/CodeUtils.h>
 
 #include <lib/support/CodeUtils.h>
 #if SILABS_LOG_ENABLED
@@ -150,8 +152,7 @@ void SilabsPlatform::StartScheduler()
     vTaskStartScheduler();
 }
 
-extern "C" {
-void sl_button_on_change(uint8_t btn, uint8_t btnAction)
+extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
 #if SL_ICD_ENABLED
     // This is to make sure we get a one-press and one-release event for the button
@@ -185,11 +186,27 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
     }
     Silabs::GetPlatform().mButtonCallback(btn, btnAction);
 }
-}
 
 uint8_t SilabsPlatform::GetButtonState(uint8_t button)
 {
     return (button < SL_SI91x_BUTTON_COUNT) ? sButtonStates[button] : 0;
+}
+
+CHIP_ERROR SilabsPlatform::FlashInit()
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SilabsPlatform::FlashErasePage(uint32_t addr)
+{
+    rsi_flash_erase_sector((uint32_t *) addr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SilabsPlatform::FlashWritePage(uint32_t addr, const uint8_t * data, size_t size)
+{
+    rsi_flash_write((uint32_t *) addr, (unsigned char *) data, size);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Silabs

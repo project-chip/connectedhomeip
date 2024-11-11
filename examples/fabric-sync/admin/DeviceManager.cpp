@@ -75,7 +75,6 @@ CHIP_ERROR DeviceManager::PairRemoteFabricBridge(NodeId nodeId, uint32_t setupPI
         return err;
     }
 
-    ChipLogProgress(NotSpecified, "Successfully paired remote fabric bridge: Node ID " ChipLogFormatX64, ChipLogValueX64(nodeId));
     return CHIP_NO_ERROR;
 }
 
@@ -90,7 +89,6 @@ CHIP_ERROR DeviceManager::PairRemoteDevice(NodeId nodeId, const char * payload)
         return err;
     }
 
-    ChipLogProgress(NotSpecified, "Successfully paired device: Node ID " ChipLogFormatX64, ChipLogValueX64(nodeId));
     return CHIP_NO_ERROR;
 }
 
@@ -106,7 +104,6 @@ CHIP_ERROR DeviceManager::PairRemoteDevice(NodeId nodeId, uint32_t setupPINCode,
         return err;
     }
 
-    ChipLogProgress(NotSpecified, "Successfully paired device: Node ID " ChipLogFormatX64, ChipLogValueX64(nodeId));
     return CHIP_NO_ERROR;
 }
 
@@ -125,8 +122,6 @@ CHIP_ERROR DeviceManager::UnpairRemoteFabricBridge()
         return err;
     }
 
-    ChipLogProgress(NotSpecified, "Successfully unpaired remote fabric bridge: Node ID " ChipLogFormatX64,
-                    ChipLogValueX64(mRemoteBridgeNodeId));
     return CHIP_NO_ERROR;
 }
 
@@ -139,20 +134,7 @@ CHIP_ERROR DeviceManager::UnpairRemoteDevice(NodeId nodeId)
         return err;
     }
 
-    ChipLogProgress(NotSpecified, "Successfully unpaired remote device: Node ID " ChipLogFormatX64, ChipLogValueX64(nodeId));
     return CHIP_NO_ERROR;
-}
-
-void DeviceManager::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
-{
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to remove synced device:(" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
-                     ChipLogValueX64(deviceId), err.Format());
-        return;
-    }
-
-    ChipLogProgress(NotSpecified, "Synced device with NodeId:" ChipLogFormatX64 " has been removed.", ChipLogValueX64(deviceId));
 }
 
 } // namespace admin

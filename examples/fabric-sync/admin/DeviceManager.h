@@ -25,7 +25,7 @@
 
 namespace admin {
 
-class DeviceManager : public PairingDelegate
+class DeviceManager
 {
 public:
     DeviceManager() = default;
@@ -118,8 +118,6 @@ public:
 
 private:
     friend DeviceManager & DeviceMgr();
-
-    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
 
     static DeviceManager sInstance;
 

@@ -17,6 +17,7 @@
 
 #include <app/server/Server.h>
 
+#include <access/ProviderDeviceTypeResolver.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
 
 #include <app/AppConfig.h>
@@ -82,23 +83,9 @@ using chip::Transport::TcpListenParameters;
 
 namespace {
 
-class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
-{
-public:
-    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
-    {
-        chip::app::DataModel::Provider * model = chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
-
-        for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type))
-        {
-            if (type->deviceTypeId == deviceType)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-} sDeviceTypeResolver;
+chip::Access::DynamicProviderDeviceTypeResolver sDeviceTypeResolver([] {
+    return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+});
 
 } // namespace
 
