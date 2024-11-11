@@ -107,7 +107,7 @@ void WiFiPAFBase::OnWiFiPAFMessageReceived(chip::WiFiPAF::WiFiPAFSession & RxInf
     }
 
     if ((pPafInfo->id != RxInfo.id) || (pPafInfo->peer_id != RxInfo.peer_id) ||
-        memcmp(pPafInfo->peer_addr, RxInfo.peer_addr, sizeof(uint8_t) * 6))
+        (memcmp(pPafInfo->peer_addr, RxInfo.peer_addr, sizeof(uint8_t) * 6) != 0))
     {
         /*
             The packet is from the wrong sender

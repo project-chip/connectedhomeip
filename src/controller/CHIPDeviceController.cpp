@@ -848,7 +848,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             }
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
             auto nodeId                                         = params.GetPeerAddress().GetRemoteId();
-            const SetupDiscriminator & connDiscriminator(params.GetSetupDiscriminator().value());
+            const SetupDiscriminator connDiscriminator(params.GetSetupDiscriminator().value());
             uint16_t discriminator =
                 connDiscriminator.IsShortDiscriminator() ? connDiscriminator.GetShortValue() : connDiscriminator.GetLongValue();
             DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(nodeId, discriminator);
