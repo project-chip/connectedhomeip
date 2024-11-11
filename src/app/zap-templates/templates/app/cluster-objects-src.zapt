@@ -267,14 +267,14 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
       {{#zcl_commands}}
           {{#if isLargeMessage}}
           if ((aCluster == Clusters::{{asUpperCamelCase parent.name}}::Id) &&
-		       (aCommand == Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id))
-		  {
+              (aCommand == Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id))
+          {
               return true;
-		  }
+          }
           {{/if}}
       {{/zcl_commands}}
     {{/zcl_clusters}}
-	return false;
+    return false;
 }
 
 } // namespace app
