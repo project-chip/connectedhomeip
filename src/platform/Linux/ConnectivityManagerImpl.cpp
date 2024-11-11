@@ -896,6 +896,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     g_variant_builder_add(&builder, "{sv}", "freq_list", freq_array_variant);
     g_variant_builder_add(&builder, "{sv}", "fsd", g_variant_new_boolean(fsd));
     args = g_variant_builder_end(&builder);
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     wpa_supplicant_1_interface_call_nanpublish_sync(mWpaSupplicant.iface, args, &publish_id, nullptr, &err.GetReceiver());
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: %u ! ", publish_id);

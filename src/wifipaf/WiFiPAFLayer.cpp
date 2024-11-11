@@ -42,7 +42,6 @@ void WiFiPAFLayer::Shutdown(OnCancelDeviceHandle OnCancelDevice)
         OnCancelDevice(PafInfoElm.id, PafInfoElm.role);
     }
     PafInfoVect.clear();
-    return;
 }
 
 void WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)
