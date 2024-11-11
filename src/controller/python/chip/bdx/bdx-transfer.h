@@ -64,6 +64,7 @@ public:
 
     void SetDelegate(Delegate * delegate);
 
+    // Responder virtual method overrides.
     void HandleTransferSessionOutput(TransferSession::OutputEvent & event) override;
     void OnExchangeClosing(Messaging::ExchangeContext * exchangeContext) override;
     CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * exchangeContext, const chip::PayloadHeader & payloadHeader,

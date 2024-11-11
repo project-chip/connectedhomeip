@@ -24,6 +24,7 @@ from . import Bdx
 
 @dataclass
 class InitMessage:
+    # The transfer control flag constants SENDER_DRIVE, RECEIVER_DRIVE, and ASYNC are defined in Constants.py.
     TransferControlFlags: int
     MaxBlockSize: int
     StartOffset: int
@@ -36,6 +37,7 @@ class BdxTransfer:
     def __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data: bytes = None):
         self.init_message = init_message
         self._bdx_transfer = bdx_transfer
+        # _data is a bytearray when receiving data, so the data to send is converted to one as well for consistency.
         self._data = bytearray(data) if data else None
 
     async def accept(self):

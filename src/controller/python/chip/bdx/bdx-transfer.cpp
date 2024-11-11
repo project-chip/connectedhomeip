@@ -96,6 +96,10 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
             mDelegate->DataReceived(this, data);
             mTransfer.PrepareBlockAck();
         }
+        else
+        {
+            ChipLogError(BDX, "Block received without a delegate!");
+        }
         break;
     case TransferSession::OutputEventType::kMsgToSend:
         SendMessage(event);
@@ -130,7 +134,10 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
 
 void BdxTransfer::EndSession(CHIP_ERROR result)
 {
-    mDelegate->TransferCompleted(this, result);
+    if (mDelegate)
+    {
+        mDelegate->TransferCompleted(this, result);
+    }
     ResetTransfer();
     if (mExchangeCtx)
     {

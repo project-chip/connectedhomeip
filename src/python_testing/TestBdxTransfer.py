@@ -39,7 +39,7 @@
 import asyncio
 
 import chip.clusters as Clusters
-from chip.bdx import BdxTransfer
+from chip.bdx import BdxProtocol, BdxTransfer
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -85,7 +85,7 @@ class TestBdxTransfer(MatterBaseTest):
         self.step(4)
         asserts.assert_true(bdx_future in done, "BDX transfer didn't start")
         bdx_transfer: BdxTransfer.BdxTransfer = bdx_future.result()
-        asserts.assert_equal(bdx_transfer.init_message.TransferControlFlags, 0x10, "Invalid transfer control flags")
+        asserts.assert_equal(bdx_transfer.init_message.TransferControlFlags, BdxProtocol.SENDER_DRIVE, "Invalid transfer control flags")
         asserts.assert_equal(bdx_transfer.init_message.MaxBlockSize, 1024, "Invalid max block size")
         asserts.assert_equal(bdx_transfer.init_message.StartOffset, 0, "Invalid start offset")
         asserts.assert_equal(bdx_transfer.init_message.FileDesignator,
@@ -100,10 +100,11 @@ class TestBdxTransfer(MatterBaseTest):
         asserts.assert_equal(data, data_file.read(), "Transferred data doesn't match")
 
         self.step(7)
+        command_response: Clusters.DiagnosticLogs.Commands.RetrieveLogsResponse
         if command_send_future in done:
             command_response = command_send_future.result()
         else:
-            command_response: Clusters.DiagnosticLogs.Commands.RetrieveLogsResponse = await command_send_future
+            command_response = await command_send_future
         asserts.assert_equal(command_response.status, Clusters.DiagnosticLogs.Enums.StatusEnum.kSuccess, "Invalid command response")
 
 
