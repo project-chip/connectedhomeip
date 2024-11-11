@@ -131,8 +131,10 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
     {
     case FanControl::Attributes::PercentSetting::Id: {
         ChipLogProgress(NotSpecified, "ChefFanControlManager::HandleFanControlAttributeChange  PercentSetting");
-        DataModel::Nullable<Percent> percentSetting =
-            NumericAttributeTraits<DataModel::Nullable<Percent>>::StorageToWorking(*value);
+        DataModel::Nullable<Percent> percentSetting;
+        if (!NumericAttributeTraits<Percent>::IsNullValue(*value)) {
+            percentSetting.SetNonNull(NumericAttributeTraits<Percent>::StorageToWorking(*value));
+        }
 
         // The cluster code in fan-control-server.cpp is the only one allowed to set PercentSetting to null.
         // This happens as a consequence of setting the FanMode to kAuto. In auto mode, percentCurrent should continue to report the
