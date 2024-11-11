@@ -2155,7 +2155,7 @@ limitations under the License.
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
-     <deviceType>
+    <deviceType>
         <name>MA-oven</name>
         <domain>CHIP</domain>
         <typeName>Oven</typeName>
@@ -2251,7 +2251,7 @@ limitations under the License.
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
-        <deviceType>
+    <deviceType>
         <name>MA-laundry-dryer</name>
         <domain>CHIP</domain>
         <typeName>Laundry Dryer</typeName>
@@ -2444,7 +2444,6 @@ limitations under the License.
             <include cluster="Thread Border Router Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
-
     <deviceType>
         <name>MA-all-clusters-app</name>
         <domain>CHIP</domain>
@@ -2663,7 +2662,7 @@ limitations under the License.
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
-        <deviceType>
+    <deviceType>
         <name>Energy EVSE</name>
         <domain>CHIP</domain>
         <typeName>EVSE</typeName>
