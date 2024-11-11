@@ -29,6 +29,7 @@
 #include <commands/fabric-sync/FabricSyncCommand.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <device_manager/DeviceManager.h>
+#include <device_manager/DeviceSynchronization.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <system/SystemClock.h>
 
@@ -113,16 +114,7 @@ public:
         if (err == CHIP_NO_ERROR)
         {
             DeviceManager::Instance().SetRemoteBridgeNodeId(deviceId);
-
-            // We need to register the remote bridge device as a bridged device on the local bridge. This ensures that the ecosystem
-            // triggering the fabric sync process is notified of the successful reverse commissioning.
-            chip_rpc_SynchronizedDevice deviceData = chip_rpc_SynchronizedDevice_init_default;
-            deviceData.has_id                      = true;
-            deviceData.id.node_id                  = deviceId;
-            deviceData.id.fabric_index             = PairingManager::Instance().CurrentCommissioner().GetFabricIndex();
-            deviceData.has_is_icd                  = true;
-            deviceData.is_icd                      = false;
-            AddSynchronizedDevice(deviceData);
+            DeviceSynchronizer::Instance().setReverseCommissioningFlag(true);
         }
         else
         {
