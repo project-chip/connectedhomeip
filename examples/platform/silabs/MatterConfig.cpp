@@ -42,7 +42,7 @@
 
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
 #include "SiWxPlatformInterface.h"
-#include "WifiInterfaceAbstraction.h"
+#include "WiseconnectInterfaceAbstraction.h"
 #endif // SLI_SI91X_MCU_INTERFACE
 
 #include <crypto/CHIPCryptoPAL.h>
