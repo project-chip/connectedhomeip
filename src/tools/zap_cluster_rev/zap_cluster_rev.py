@@ -2,7 +2,6 @@
 
 import argparse
 import json
-import sys
 from dataclasses import dataclass
 
 from chip.testing.spec_parsing import build_xml_clusters
