@@ -5,7 +5,7 @@ import json
 import sys
 from dataclasses import dataclass
 
-from chip.testing.spec_parsing import CommandType, build_xml_clusters, build_xml_device_types
+from chip.testing.spec_parsing import build_xml_clusters
 
 
 @dataclass
