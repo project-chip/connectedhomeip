@@ -209,6 +209,8 @@ void DeviceSynchronizer::StartDeviceSynchronization(Controller::DeviceController
 
     mNodeId = nodeId;
 
+    ChipLogProgress(NotSpecified, "Start device synchronization for NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+
 #if defined(PW_RPC_ENABLED)
     mCurrentDeviceData                 = chip_rpc_SynchronizedDevice_init_default;
     mCurrentDeviceData.has_id          = true;
