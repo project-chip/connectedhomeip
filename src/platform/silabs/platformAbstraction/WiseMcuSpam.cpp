@@ -152,8 +152,7 @@ void SilabsPlatform::StartScheduler()
     vTaskStartScheduler();
 }
 
-extern "C" {
-void sl_button_on_change(uint8_t btn, uint8_t btnAction)
+extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
 #if SL_ICD_ENABLED
     // This is to make sure we get a one-press and one-release event for the button
@@ -186,7 +185,6 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
         sButtonStates[btn] = btnAction;
     }
     Silabs::GetPlatform().mButtonCallback(btn, btnAction);
-}
 }
 
 uint8_t SilabsPlatform::GetButtonState(uint8_t button)

@@ -40,7 +40,6 @@
 #include "AppConfig.h"
 #include "sl_wfx_host.h"
 #include "sl_wfx_task.h"
-#include "wfx_host_events.h"
 
 #include "sl_spidrv_instances.h"
 #include "spidrv.h"

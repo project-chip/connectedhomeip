@@ -25,15 +25,17 @@
 // BLE include file to refer BLE APIs
 #include "ble_config.h"
 #include "cmsis_os2.h"
-#include "wfx_host_events.h"
+#include <stdbool.h>
+#include <string.h>
+
+extern "C" {
 #include <rsi_ble.h>
 #include <rsi_ble_apis.h>
 #include <rsi_ble_common_config.h>
 #include <rsi_bt_common.h>
 #include <rsi_bt_common_apis.h>
 #include <rsi_common_apis.h>
-#include <stdbool.h>
-#include <string.h>
+}
 
 #define ATT_REC_IN_HOST (0)
 #define WFX_QUEUE_SIZE 10

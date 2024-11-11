@@ -263,7 +263,7 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
  * @return  returns ture if successful,
  *          false otherwise
  ***********************************************************************/
-extern "C" bool wfx_hw_ready(void) // TODO : Figure out why the extern C is necessary
+bool wfx_hw_ready(void)
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationInit);
 }

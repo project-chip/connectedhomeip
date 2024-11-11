@@ -34,8 +34,6 @@ extern void SysTick_Handler(void);
 extern void xPortSysTickHandler(void);
 #endif /* SysTick */
 #endif /* RSI_WITH_OS */
-#include "wfx_host_events.h"
-
 /* RSI Driver include file */
 #include "rsi_driver.h"
 /* RSI WLAN Config include file */
