@@ -284,7 +284,8 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-admin apps/fab
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-data-model-no-unique-id-app apps/chip-lighting-data-model-no-unique-id-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/matter-network-manager-app apps/matter-network-manager-app
 
-# Create symbolic link to apps
+# Create symbolic links for now since this allows users to use existing configurations
+# for running just `app-name` instead of `apps/app-name`
 RUN ln -s apps/* .
 
 
