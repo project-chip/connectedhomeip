@@ -108,5 +108,5 @@ def generate_gni_file():
 
 
 # Run the function to generate the .gni file
-if __name__ == "__main__":  # Fixed = to ==
+if __name__ == "__main__":
     generate_gni_file()
