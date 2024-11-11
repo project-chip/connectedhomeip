@@ -16,31 +16,124 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements reporting engine for CHIP
- *      Data Model profile.
- *
- */
-
-#include "app/data-model-provider/ActionReturnStatus.h"
+#include <app/AppConfig.h>
+#include <app/ConcreteEventPath.h>
+#include <app/InteractionModelEngine.h>
+#include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
+#include <app/reporting/Engine.h>
+#include <app/reporting/reporting.h>
+#include <app/util/MatterCallbacks.h>
+#include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
-#include <app/AppConfig.h>
-#include <app/InteractionModelEngine.h>
-#include <app/RequiredPrivilege.h>
-#include <app/reporting/Engine.h>
-#include <app/reporting/Read.h>
-#include <app/util/MatterCallbacks.h>
-#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip::Access;
 
 namespace chip {
 namespace app {
 namespace reporting {
+namespace {
+
+using Protocols::InteractionModel::Status;
+
+Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
+{
+    if (!model->GetClusterInfo(eventPath).has_value())
+    {
+        return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
+    }
+
+    return Status::Success;
+}
+
+DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel,
+                                                  const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
+                                                  AttributeReportIBs::Builder & reportBuilder,
+                                                  const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
+{
+    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
+                  path.mAttributeId);
+    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
+                                                          DataModelCallbacks::OperationOrder::Pre, path);
+
+    DataModel::ReadAttributeRequest readRequest;
+
+    if (isFabricFiltered)
+    {
+        readRequest.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
+    }
+    readRequest.subjectDescriptor = &subjectDescriptor;
+    readRequest.path              = path;
+
+    DataVersion version = 0;
+    if (std::optional<DataModel::ClusterInfo> clusterInfo = dataModel->GetClusterInfo(path); clusterInfo.has_value())
+    {
+        version = clusterInfo->dataVersion;
+    }
+    else
+    {
+        ChipLogError(DataManagement, "Read request on unknown cluster - no data version available");
+    }
+
+    TLV::TLVWriter checkpoint;
+    reportBuilder.Checkpoint(checkpoint);
+
+    AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
+
+    DataModel::ActionReturnStatus status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
+
+    if (status.IsSuccess())
+    {
+        // TODO: this callback being only executed on success is awkward. The Write callback is always done
+        //       for both read and write.
+        //
+        //       For now this preserves existing/previous code logic, however we should consider to ALWAYS
+        //       call this.
+        DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
+                                                              DataModelCallbacks::OperationOrder::Post, path);
+        return status;
+    }
+
+    // Encoder state is relevant for errors in case they are retryable.
+    //
+    // Generally only out of space encoding errors would be retryable, however we save the state
+    // for all errors in case this is information that is useful (retry or error position).
+    if (encoderState != nullptr)
+    {
+        *encoderState = attributeValueEncoder.GetState();
+    }
+
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+    // Out of space errors may be chunked data, reporting those cases would be very confusing
+    // as they are not fully errors. Report only others (which presumably are not recoverable
+    // and will be sent to the client as well).
+    if (!status.IsOutOfSpaceEncodingResponse())
+    {
+        DataModel::ActionReturnStatus::StringStorage storage;
+        ChipLogError(DataManagement, "Failed to read attribute: %s", status.c_str(storage));
+    }
+#endif
+    return status;
+}
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
+{
+    std::optional<DataModel::ClusterInfo> info = dataModel->GetClusterInfo(path);
+    if (!info.has_value())
+    {
+        return false;
+    }
+
+    return (info->dataVersion == dataVersion);
+}
+
+} // namespace
 
 Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
 
@@ -71,8 +164,10 @@ bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFil
         if (aPath.mEndpointId == filter->mValue.mEndpointId && aPath.mClusterId == filter->mValue.mClusterId)
         {
             existPathMatch = true;
-            if (!IsClusterDataVersionEqual(ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
-                                           filter->mValue.mDataVersion.Value()))
+
+            if (!IsClusterDataVersionEqualTo(mpImEngine->GetDataModelProvider(),
+                                             ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
+                                             filter->mValue.mDataVersion.Value()))
             {
                 existVersionMismatch = true;
             }
@@ -184,8 +279,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
             DataModel::ActionReturnStatus status =
-                Impl::RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(),
-                                          apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
+                RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(),
+                                    apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
             if (status.IsError())
             {
                 // Operation error set, since this will affect early return or override on status encoding
@@ -326,7 +421,8 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         }
 
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
-        Status status = CheckEventSupportStatus(path);
+        Status status = EventPathValid(mpImEngine->GetDataModelProvider(), path);
+
         if (status != Status::Success)
         {
             TLV::TLVWriter checkpoint = aWriter;
@@ -829,7 +925,7 @@ bool Engine::MergeDirtyPathsUnderSameEndpoint()
 
 CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttributePath)
 {
-    ReturnErrorCodeIf(MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
+    VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
 
     if (mGlobalDirtySet.Exhausted() && !MergeDirtyPathsUnderSameCluster() && !MergeDirtyPathsUnderSameEndpoint())
     {
@@ -839,7 +935,7 @@ CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttribute
         object->mGeneration = GetDirtySetGeneration();
     }
 
-    ReturnErrorCodeIf(MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
+    VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
     ChipLogDetail(DataManagement, "Cannot merge the new path into any existing path, create one.");
 
     auto object = mGlobalDirtySet.CreateObject();
@@ -855,7 +951,7 @@ CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttribute
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
+CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
 {
     BumpDirtySetGeneration();
 
@@ -1010,12 +1106,20 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
     Run();
 }
 
-}; // namespace reporting
+void Engine::MarkDirty(const AttributePathParams & path)
+{
+    CHIP_ERROR err = SetDirty(path);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to set path dirty: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+} // namespace reporting
 } // namespace app
 } // namespace chip
 
-// TODO: MatterReportingAttributeChangeCallback should just live in libCHIP,
-// instead of being in ember-compatibility-functions.  It does not depend on any
+// TODO: MatterReportingAttributeChangeCallback should just live in libCHIP, It does not depend on any
 // app-specific generated bits.
 void __attribute__((weak))
 MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)

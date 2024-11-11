@@ -343,7 +343,7 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    // Nothing to do
+    CloseConnection(conId);
 }
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
@@ -449,7 +449,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advData[index++] = ShortUUID_CHIPoBLEService[0];                                            // AD value
     advData[index++] = ShortUUID_CHIPoBLEService[1];
 
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
     // Check for extended advertisement interval and redact VID/PID if past the initial period.
     if (mFlags.Has(Flags::kExtAdvertisingEnabled))
     {
@@ -553,7 +553,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
     else
     {
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
         if (!mFlags.Has(Flags::kExtAdvertisingEnabled))
         {
             interval_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
@@ -670,6 +670,21 @@ void BLEManagerImpl::HandleConnectEvent(volatile sl_bt_msg_t * evt)
     ChipLogProgress(DeviceLayer, "Connect Event for handle : %d", connHandle);
 
     AddConnection(connHandle, bondingHandle);
+
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+}
+
+void BLEManagerImpl::HandleConnectParams(volatile sl_bt_msg_t * evt)
+{
+    sl_bt_evt_connection_parameters_t * con_param_evt = (sl_bt_evt_connection_parameters_t *) &(evt->data);
+
+    if (con_param_evt->timeout < BLE_CONFIG_TIMEOUT)
+    {
+        ChipLogProgress(DeviceLayer, "Request to increase the connection timeout from %d to %d", con_param_evt->timeout,
+                        BLE_CONFIG_TIMEOUT);
+        sl_bt_connection_set_parameters(con_param_evt->connection, BLE_CONFIG_MIN_INTERVAL, BLE_CONFIG_MAX_INTERVAL,
+                                        BLE_CONFIG_LATENCY, BLE_CONFIG_TIMEOUT, BLE_CONFIG_MIN_CE_LENGTH, BLE_CONFIG_MAX_CE_LENGTH);
+    }
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
@@ -993,12 +1008,12 @@ void BLEManagerImpl::BleAdvTimeoutHandler(void * arg)
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
         BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
         BLEMgrImpl().mFlags.Clear(Flags::kExtAdvertisingEnabled);
         BLEMgrImpl().StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS);
 #endif
     }
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
     else
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start extended advertisement");
@@ -1061,11 +1076,20 @@ extern "C" void sl_bt_on_event(sl_bt_msg_t * evt)
     }
     break;
     case sl_bt_evt_connection_parameters_id: {
-        // ChipLogProgress(DeviceLayer, "Connection parameter ID received");
+        ChipLogProgress(DeviceLayer, "Connection parameter ID received - i:%d, l:%d, t:%d, sm:%d",
+                        evt->data.evt_connection_parameters.interval, evt->data.evt_connection_parameters.latency,
+                        evt->data.evt_connection_parameters.timeout, evt->data.evt_connection_parameters.security_mode);
+        chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectParams(evt);
     }
     break;
     case sl_bt_evt_connection_phy_status_id: {
-        // ChipLogProgress(DeviceLayer, "PHY update procedure is completed");
+        ChipLogProgress(DeviceLayer, "Connection phy status ID received - phy:%d", evt->data.evt_connection_phy_status.phy);
+    }
+    break;
+    case sl_bt_evt_connection_data_length_id: {
+        ChipLogProgress(DeviceLayer, "Connection data length ID received - txL:%d, txT:%d, rxL:%d, rxL:%d",
+                        evt->data.evt_connection_data_length.tx_data_len, evt->data.evt_connection_data_length.tx_time_us,
+                        evt->data.evt_connection_data_length.rx_data_len, evt->data.evt_connection_data_length.rx_time_us);
     }
     break;
     case sl_bt_evt_connection_closed_id: {

@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-"""The metadata_parser package."""
-
 import setuptools  # type: ignore
 
 setuptools.setup()  # Package definition in setup.cfg

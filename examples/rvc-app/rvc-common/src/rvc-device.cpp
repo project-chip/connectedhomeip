@@ -168,7 +168,7 @@ bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText)
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() == to_underlying(OperationalState::OperationalStateEnum::kRunning))
     {
-        CopyCharSpanToMutableCharSpan("cannot set the Selected Areas while the device is running"_span, statusText);
+        CopyCharSpanToMutableCharSpanWithTruncation("cannot set the Selected Areas while the device is running"_span, statusText);
         return false;
     }
     return true;
@@ -179,14 +179,14 @@ bool RvcDevice::SaHandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipSta
     if (mServiceAreaInstance.GetCurrentArea() != skippedArea)
     {
         // This device only supports skipping the current location.
-        CopyCharSpanToMutableCharSpan("the skipped area does not match the current area"_span, skipStatusText);
+        CopyCharSpanToMutableCharSpanWithTruncation("the skipped area does not match the current area"_span, skipStatusText);
         return false;
     }
 
     if (mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(OperationalState::OperationalStateEnum::kRunning))
     {
         // This device only accepts the skip are command while in the running state
-        CopyCharSpanToMutableCharSpan("skip area is only accepted when the device is running"_span, skipStatusText);
+        CopyCharSpanToMutableCharSpanWithTruncation("skip area is only accepted when the device is running"_span, skipStatusText);
         return false;
     }
 

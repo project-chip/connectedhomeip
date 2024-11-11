@@ -36,6 +36,8 @@ enum class ICDTestEventTriggerEvent : uint64_t
     kInvalidateHalfCounterValues     = 0x0046'0000'00000003,
     kInvalidateAllCounterValues      = 0x0046'0000'00000004,
     kForceMaximumCheckInBackOffState = 0x0046'0000'00000005,
+    kDSLSForceSitMode                = 0x0046'0000'00000006,
+    kDSLSWithdrawSitMode             = 0x0046'0000'00000007,
 };
 } // namespace
 
@@ -78,9 +80,6 @@ void ICDManager::Init()
         VerifyOrDieWithMsg(ICDConfigurationData::GetInstance().GetMinLitActiveModeThreshold() <=
                                ICDConfigurationData::GetInstance().GetActiveModeThreshold(),
                            AppServer, "The minimum ActiveModeThreshold value for a LIT ICD is 5 seconds.");
-        // Disabling check until LIT support is compelte
-        // VerifyOrDieWithMsg((GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
-        //                    "LIT support is required for slow polling intervals superior to 15 seconds");
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
@@ -118,13 +117,13 @@ void ICDManager::Shutdown()
 bool ICDManager::SupportsFeature(Feature feature)
 {
     // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
-#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
     uint32_t featureMap = 0;
     bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == Status::Success);
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 #else
     return ((mFeatureMap & to_underlying(feature)) != 0);
-#endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
 }
 
 uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
@@ -146,7 +145,7 @@ uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 void ICDManager::SendCheckInMsgs()
 {
-#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
     VerifyOrDie(mStorage != nullptr);
     VerifyOrDie(mFabricTable != nullptr);
 
@@ -214,7 +213,7 @@ void ICDManager::SendCheckInMsgs()
             }
         }
     }
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
 }
 
 bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsgsBeSentFunction> & shouldCheckInMsgsBeSentFunction)
@@ -367,19 +366,28 @@ void ICDManager::UpdateICDMode()
     // Device can only switch to the LIT operating mode if LIT support is present
     if (SupportsFeature(Feature::kLongIdleTimeSupport))
     {
-        VerifyOrDie(mStorage != nullptr);
-        VerifyOrDie(mFabricTable != nullptr);
-        // We can only get to LIT Mode, if at least one client is registered with the ICD device
-        for (const auto & fabricInfo : *mFabricTable)
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+        // Ensure SIT mode is not requested
+        if (SupportsFeature(Feature::kDynamicSitLitSupport) && !mSITModeRequested)
         {
-            // We only need 1 valid entry to ensure LIT compliance
-            ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), 1 /*Table entry limit*/, mSymmetricKeystore);
-            if (!table.IsEmpty())
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
+
+            VerifyOrDie(mStorage != nullptr);
+            VerifyOrDie(mFabricTable != nullptr);
+            // We can only get to LIT Mode, if at least one client is registered with the ICD device
+            for (const auto & fabricInfo : *mFabricTable)
             {
-                tempMode = ICDConfigurationData::ICDMode::LIT;
-                break;
+                // We only need 1 valid entry to ensure LIT compliance
+                ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), 1 /*Table entry limit*/, mSymmetricKeystore);
+                if (!table.IsEmpty())
+                {
+                    tempMode = ICDConfigurationData::ICDMode::LIT;
+                    break;
+                }
             }
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
         }
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
@@ -388,7 +396,7 @@ void ICDManager::UpdateICDMode()
         ICDConfigurationData::GetInstance().SetICDMode(tempMode);
 
         // Can't use attribute accessors/Attributes::OperatingMode::Set in unit tests
-#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
         Attributes::OperatingMode::Set(kRootEndpointId, static_cast<OperatingModeEnum>(tempMode));
 #endif
 
@@ -622,6 +630,24 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
     }
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+void ICDManager::OnSITModeRequest()
+{
+    mSITModeRequested = true;
+    this->UpdateICDMode();
+    // Update the poll interval also to comply with SIT requirements
+    UpdateOperationState(OperationalState::ActiveMode);
+}
+
+void ICDManager::OnSITModeRequestWithdrawal()
+{
+    mSITModeRequested = false;
+    this->UpdateICDMode();
+    // Update the poll interval also to comply with LIT requirements
+    UpdateOperationState(OperationalState::ActiveMode);
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
+
 void ICDManager::OnNetworkActivity()
 {
     this->UpdateOperationState(OperationalState::ActiveMode);
@@ -685,6 +711,14 @@ CHIP_ERROR ICDManager::HandleEventTrigger(uint64_t eventTrigger)
         err = mICDCheckInBackOffStrategy->ForceMaximumCheckInBackoff();
         break;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    case ICDTestEventTriggerEvent::kDSLSForceSitMode:
+        OnSITModeRequest();
+        break;
+    case ICDTestEventTriggerEvent::kDSLSWithdrawSitMode:
+        OnSITModeRequestWithdrawal();
+        break;
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
     default:
         err = CHIP_ERROR_INVALID_ARGUMENT;
         break;

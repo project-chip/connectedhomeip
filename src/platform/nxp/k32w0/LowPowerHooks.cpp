@@ -20,7 +20,7 @@
  *          Provides a glue layer between Matter and NXP-SDK Low Power
  */
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>

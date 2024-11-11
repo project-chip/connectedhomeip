@@ -22,13 +22,6 @@
 #include <controller/CommissioningWindowOpener.h>
 #include <lib/support/CHIPMem.h>
 
-class CommissioningWindowDelegate
-{
-public:
-    virtual void OnCommissioningWindowOpened(chip::NodeId deviceId, CHIP_ERROR err, chip::SetupPayload payload) = 0;
-    virtual ~CommissioningWindowDelegate()                                                                      = default;
-};
-
 class OpenCommissioningWindowCommand : public CHIPCommand
 {
 public:
@@ -57,9 +50,6 @@ public:
                     "params if absent");
     }
 
-    void RegisterDelegate(CommissioningWindowDelegate * delegate) { mDelegate = delegate; }
-    void UnregisterDelegate() { mDelegate = nullptr; }
-
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
 
@@ -71,7 +61,6 @@ private:
     NodeId mNodeId;
     chip::EndpointId mEndpointId;
     chip::Controller::CommissioningWindowOpener::CommissioningWindowOption mCommissioningWindowOption;
-    CommissioningWindowDelegate * mDelegate = nullptr;
     uint16_t mCommissioningWindowTimeout;
     uint32_t mIteration;
     uint16_t mDiscriminator;

@@ -22,6 +22,8 @@ using namespace ::chip;
 using namespace ::chip::app;
 using chip::app::ReadClient;
 
+namespace admin {
+
 namespace {
 
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
@@ -53,8 +55,8 @@ UniqueIdGetter::UniqueIdGetter() :
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this)
 {}
 
-CHIP_ERROR UniqueIdGetter::GetUniqueId(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller,
-                                       chip::NodeId nodeId, chip::EndpointId endpointId)
+CHIP_ERROR UniqueIdGetter::GetUniqueId(OnDoneCallback onDoneCallback, Controller::DeviceController & controller, NodeId nodeId,
+                                       EndpointId endpointId)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrDie(!mCurrentlyGettingUid);
@@ -95,11 +97,6 @@ void UniqueIdGetter::OnAttributeData(const ConcreteDataAttributePath & path, TLV
     }
 }
 
-void UniqueIdGetter::OnReportEnd()
-{
-    // We will call mOnDoneCallback in OnDone.
-}
-
 void UniqueIdGetter::OnError(CHIP_ERROR error)
 {
     ChipLogProgress(NotSpecified, "Error Getting UID: %" CHIP_ERROR_FORMAT, error.Format());
@@ -131,7 +128,7 @@ void UniqueIdGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr,
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to issue subscription to AdministratorCommissioning data");
+        ChipLogError(NotSpecified, "Failed to read unique ID from the bridged device.");
         OnDone(nullptr);
         return;
     }
@@ -140,7 +137,9 @@ void UniqueIdGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr,
 void UniqueIdGetter::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     VerifyOrDie(mCurrentlyGettingUid);
-    ChipLogError(NotSpecified, "DeviceSubscription failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    ChipLogError(NotSpecified, "UniqueIdGetter failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
 
     OnDone(nullptr);
 }
+
+} // namespace admin

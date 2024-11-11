@@ -26,16 +26,15 @@ import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 assert(chip_device_platform == "nxp")
 assert(nxp_platform == "mcxw71_k32w1")
 
-assert(chip_with_low_power == 0 ||
-           (chip_with_low_power == 1 && chip_with_ot_cli == 0),
+assert(!nxp_use_low_power || (nxp_use_low_power && !nxp_enable_ot_cli),
        "Please disable low power if openthread CLI is needed!")
 
 source_set("nxp_factory_data") {
   sources = [
-    "../common/legacy/FactoryDataDriver.cpp",
-    "../common/legacy/FactoryDataProvider.cpp",
-    "FactoryDataDriverImpl.cpp",
-    "FactoryDataProviderImpl.cpp",
+    "../common/factory_data/legacy/FactoryDataDriver.cpp",
+    "../common/factory_data/legacy/FactoryDataDriverImpl.cpp",
+    "../common/factory_data/legacy/FactoryDataProvider.cpp",
+    "../common/factory_data/legacy/FactoryDataProviderImpl.cpp",
   ]
 
   public = [
@@ -43,7 +42,7 @@ source_set("nxp_factory_data") {
     "${chip_root}/src/credentials/CertificationDeclaration.h",
   ]
 
-  defines = [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/mcxw71_k32w1/FactoryDataProviderImpl.h\"" ]
+  defines = [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h\"" ]
 
   deps = [
     ":nxp_platform",
@@ -52,23 +51,22 @@ source_set("nxp_factory_data") {
 }
 
 source_set("nxp_ota") {
-  public = [ "../common/legacy/OTAImageProcessorImpl.h" ]
+  public = [ "../common/ota/OTAImageProcessorImpl.h" ]
 
   sources = [
-    "../common/legacy/OTAImageProcessorImpl.cpp",
-    "../common/legacy/OTAImageProcessorImpl.h",
-    "../common/legacy/OTATlvProcessor.cpp",
-    "../common/legacy/OTATlvProcessor.h",
-    "OTAFirmwareProcessor.cpp",
-    "OTAFirmwareProcessor.h",
-    "OTAHooks.cpp",
+    "../common/ota/OTAFirmwareProcessor.cpp",
+    "../common/ota/OTAFirmwareProcessor.h",
+    "../common/ota/OTAHooks.cpp",
+    "../common/ota/OTAImageProcessorImpl.cpp",
+    "../common/ota/OTAImageProcessorImpl.h",
+    "../common/ota/OTATlvProcessor.cpp",
+    "../common/ota/OTATlvProcessor.h",
   ]
 
-  if (chip_with_factory_data == 1 &&
-      chip_enable_ota_factory_data_processor == 1) {
+  if (nxp_use_factory_data && nxp_enable_ota_factory_data_processor) {
     sources += [
-      "../common/legacy/OTAFactoryDataProcessor.cpp",
-      "../common/legacy/OTAFactoryDataProcessor.h",
+      "../common/ota/OTAFactoryDataProcessor.cpp",
+      "../common/ota/OTAFactoryDataProcessor.h",
     ]
   }
 
@@ -78,15 +76,30 @@ source_set("nxp_ota") {
   ]
 }
 
+config("nxp_platform_config") {
+  include_dirs = [
+    ".",
+    "../common/ble",
+    "../common/crypto",
+    "../common/factory_data/legacy",
+    "../common/ota",
+  ]
+}
+
 static_library("nxp_platform") {
   deps = []
-  defines = [ "CHIP_DEVICE_K32W1=1" ]
+  defines = [
+    "NXP_DEVICE_K32W1_MCXW7X=1",
+    "NXP_USE_MML=1",
+  ]
 
   sources = [
     "../../SingletonConfigurationManager.cpp",
-    "../common/legacy/BLEManagerCommon.cpp",
-    "../common/legacy/BLEManagerCommon.h",
-    "BLEManagerImpl.cpp",
+    "../common/DiagnosticDataProviderImpl.cpp",
+    "../common/DiagnosticDataProviderImpl.h",
+    "../common/ble/BLEManagerCommon.cpp",
+    "../common/ble/BLEManagerCommon.h",
+    "../common/ble/BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
@@ -94,15 +107,12 @@ static_library("nxp_platform") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DiagnosticDataProviderImpl.cpp",
-    "DiagnosticDataProviderImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
-    "ble_function_mux.c",
   ]
 
-  if (chip_key_storage == "fwk_nvm") {
+  if (nxp_nvm_component == "fwk_nvm") {
     defines += [ "CHIP_PLAT_NVM_SUPPORT=1" ]
 
     sources += [
@@ -113,7 +123,7 @@ static_library("nxp_platform") {
       "ram_storage.c",
       "ram_storage.h",
     ]
-  } else if (chip_key_storage == "littlefs") {
+  } else if (nxp_nvm_component == "littlefs") {
     defines += [
       "CHIP_PLAT_NVM_SUPPORT=3",
       "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"platform/nxp/common/KeyValueStoreManagerImpl.h\"",
@@ -125,7 +135,7 @@ static_library("nxp_platform") {
       "../common/NXPConfig.h",
       "../common/NXPConfigKS.cpp",
     ]
-  } else if (chip_key_storage == "nvs") {
+  } else if (nxp_nvm_component == "nvs") {
     defines += [
       "gAppNvsExternalFlash_c=0",
       "gAppNvsInternalFlash_c=1",
@@ -140,7 +150,7 @@ static_library("nxp_platform") {
     ]
   }
 
-  if (chip_use_plain_dac_key) {
+  if (nxp_use_plain_dac_key) {
     defines += [ "CHIP_USE_PLAIN_DAC_KEY=1" ]
   } else {
     defines += [ "CHIP_USE_PLAIN_DAC_KEY=0" ]
@@ -151,24 +161,25 @@ static_library("nxp_platform") {
     "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
     "${chip_root}/src/credentials/examples/ExamplePAI.h",
+    "${chip_root}/src/platform/nxp/common/crypto/PersistentStorageOpKeystoreS200.h",
     "${chip_root}/src/platform/nxp/mcxw71_k32w1/BLEManagerImpl.h",
     "${chip_root}/src/platform/nxp/mcxw71_k32w1/SMU2Manager.h",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  if (chip_with_low_power != 0) {
+  if (nxp_use_low_power) {
     sources += [ "LowPowerHooks.cpp" ]
   }
 
   if (chip_crypto == "platform") {
     sources += [
-      "CHIPCryptoPalK32W1.cpp",
-      "K32W1PersistentStorageOpKeystore.cpp",
-      "K32W1PersistentStorageOpKeystore.h",
+      "../common/crypto/CHIPCryptoPalS200.cpp",
+      "../common/crypto/PersistentStorageOpKeystoreS200.cpp",
+      "../common/crypto/PersistentStorageOpKeystoreS200.h",
     ]
 
-    if (chip_with_ot_cli == 1) {
+    if (nxp_enable_ot_cli) {
       defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
     }
   }
@@ -192,7 +203,7 @@ static_library("nxp_platform") {
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
 
-    if (use_smu2_dynamic) {
+    if (nxp_use_smu2_dynamic) {
       sources += [
         "SMU2Manager.cpp",
         "SMU2Manager.h",
@@ -208,4 +219,6 @@ static_library("nxp_platform") {
     "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/src/platform/logging:headers",
   ]
+
+  public_configs = [ ":nxp_platform_config" ]
 }

@@ -27,14 +27,17 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/silabs/MigrationManager.h>
 #include <platform/silabs/SilabsConfig.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <silabs_creds.h>
+#ifndef NDEBUG
+#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
+#include <sl_matter_test_event_trigger_config.h>
+#endif // defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
+#endif // NDEBUG
 #ifdef OTA_ENCRYPTION_ENABLE
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif // OTA_ENCRYPTION_ENABLE
-#ifdef SLI_SI91X_MCU_INTERFACE
-#include <sl_si91x_common_flash_intf.h>
-#else
-#include <em_msc.h>
+#ifndef SLI_SI91X_MCU_INTERFACE
 #include <psa/crypto.h>
 #endif
 
@@ -64,22 +67,12 @@ size_t sCredentialsOffset     = 0;
 
 CHIP_ERROR ErasePage(uint32_t addr)
 {
-#ifdef SLI_SI91X_MCU_INTERFACE
-    rsi_flash_erase_sector((uint32_t *) addr);
-#else
-    MSC_ErasePage((uint32_t *) addr);
-#endif
-    return CHIP_NO_ERROR;
+    return chip::DeviceLayer::Silabs::GetPlatform().FlashErasePage(addr);
 }
 
 CHIP_ERROR WritePage(uint32_t addr, const uint8_t * data, size_t size)
 {
-#ifdef SLI_SI91X_MCU_INTERFACE
-    rsi_flash_write((uint32_t *) addr, (unsigned char *) data, size);
-#else
-    MSC_WriteWord((uint32_t *) addr, data, size);
-#endif
-    return CHIP_NO_ERROR;
+    return chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, data, size);
 }
 
 size_t RoundNearest(size_t n, size_t multiple)
@@ -161,8 +154,8 @@ CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
     {
 #ifndef SLI_SI91X_MCU_INTERFACE
         base_addr = (flash_addr + flash_size - FLASH_PAGE_SIZE);
-        MSC_Init();
 #endif // SLI_SI91X_MCU_INTERFACE
+        chip::DeviceLayer::Silabs::GetPlatform().FlashInit();
 #ifdef SL_PROVISION_GENERATOR
         setNvm3End(base_addr);
 #endif
@@ -353,14 +346,14 @@ CHIP_ERROR Storage::GetManufacturingDate(uint8_t * value, size_t max, size_t & s
     return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_ManufacturingDate, (char *) value, max, size);
 }
 
-CHIP_ERROR Storage::SetUniqueId(const uint8_t * value, size_t size)
+CHIP_ERROR Storage::SetPersistentUniqueId(const uint8_t * value, size_t size)
 {
-    return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_UniqueId, value, size);
+    return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_PersistentUniqueId, value, size);
 }
 
-CHIP_ERROR Storage::GetUniqueId(uint8_t * value, size_t max, size_t & size)
+CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & size)
 {
-    return SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_UniqueId, value, max, size);
+    return SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_PersistentUniqueId, value, max, size);
 }
 
 //

@@ -16,6 +16,7 @@ commissioning and different cluster control.
 -   [Testing the example](#testing-the-example)
 -   [Matter Shell](#testing-the-all-clusters-application-with-matter-cli-enabled)
 -   [OTA Software Update](#ota-software-update)
+-   [Thread Border Router overview](#thread-border-router-overview)
 
 <hr>
 
@@ -124,14 +125,19 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x
 
 #### Building with Matter over Wifi + OpenThread Border Router configuration on RW612
 
-This configuration requires enabling the Matter CLI in order to control the
-Thread network on the Border Router.
+This configuration supports the Thread Border Router management cluster to
+provision the Thread credentials. Enabling the Matter CLI in order to control
+the Thread network on the Border Router is optional but recommended for other
+features like the Thread credential sharing.
+
+Note that the Thread Border Router management cluster is only supported on the
+thermostat application for now.
 
 -   Build Matter with Border Router configuration with BLE commissioning
     (ble-wifi) :
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true chip_enable_openthread=true chip_enable_matter_cli=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true chip_enable_openthread=true nxp_enable_matter_cli=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ ninja -C out/debug
 ```
 
@@ -143,8 +149,15 @@ out/debug/chip-rw61x-all-cluster-example.
 Optional GN options that can be added when building an application:
 
 -   To enable the
+    [secondary network commissioning interface](../../../../../docs/platforms/nxp/nxp_otbr_guide.md#using-the-secondary-network-commissioning-interface),
+    the arguments `chip_enable_secondary_nwk_if=true` and
+    `chip_device_config_thread_network_endpoint_id=2` must be added to the _gn
+    gen_ command. Note that this is only supported when building the Matter over
+    Wifi + OpenThread Border Router configuration. Note that is only supported
+    on the on the thermostat application for now.
+-   To enable the
     [matter CLI](README.md#testing-the-all-clusters-application-with-matter-cli-enabled),
-    the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
+    the argument `nxp_enable_matter_cli=true` must be added to the _gn gen_
     command.
 -   By default, the `NXP RD-RW612-BGA` board revision will be chosen. To switch
     to `NXP FRDM-RW612` board revision, the argument `board_version=\"frdm\"`
@@ -152,18 +165,18 @@ Optional GN options that can be added when building an application:
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
-    specific flash area the argument `chip_with_factory_data=1` must be added to
-    the _gn gen_ command. (for more information see
-    [Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
+    specific flash area the argument `nxp_use_factory_data=true` must be added
+    to the _gn gen_ command. (for more information see
+    [Guide for writing manufacturing data on NXP devices](../../../../../docs/platforms/nxp/nxp_manufacturing_flow.md).
 -   To build the application with the OTA Requestor enabled, the arguments
     `chip_enable_ota_requestor=true no_mcuboot=false` must be added to the _gn
     gen_ command. (More information about the OTA Requestor feature in
-    [OTA Requestor README](../../../../../docs/guides/nxp/nxp_rw61x_ota_software_update.md)
+    [OTA Requestor README](../../../../../docs/platforms/nxp/nxp_RTs_ota_software_update.md)
 
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md)
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/platforms/nxp/nxp_manufacturing_flow.md)
 
 Other comments:
 
@@ -174,13 +187,13 @@ software key before flashing them to the device flash.
 Using DAC private key secure usage: Experimental feature, contain some
 limitation: potential concurrent access issue during sign with dac key operation
 due to the lack of protection between multiple access to `ELS` crypto module.
-The argument `chip_enable_secure_dac_private_key_storage=1` must be added to the
-_gn gen_ command to enable secure private DAC key usage with S50.
-`chip_with_factory_data=1` must have been added to the _gn gen_ command
+The argument `nxp_enable_secure_dac_private_key_storage=true` must be added to
+the _gn gen_ command to enable secure private DAC key usage with S50.
+`nxp_use_factory_data=true` must have been added to the _gn gen_ command
 
 DAC private key generation: The argument `chip_convert_dac_private_key=1` must
 be added to the _gn gen_ command to enable DAC private plain key conversion to
-blob with S50. `chip_enable_secure_dac_private_key_storage=1` must have been
+blob with S50. `nxp_enable_secure_dac_private_key_storage=1` must have been
 added to the _gn gen_ command
 
 `ELS` contain concurrent access risks. They must be fixed before enabling it by
@@ -239,7 +252,7 @@ Right click on the Project -> Debug -> As->SEGGER JLink probes -> OK -> Select e
 CHIP Tool is a Matter controller which can be used to commission a Matter device
 into the network. For more information regarding how to use the CHIP Tool
 controller, please refer to the
-[CHIP Tool guide](../../../../../docs/guides/chip_tool_guide.md).
+[CHIP Tool guide](../../../../../docs/development_controllers/chip-tool/chip_tool_guide.md).
 
 To know how to commission a device over BLE, follow the instructions from
 [chip-tool's README.md 'Commission a device over
@@ -265,9 +278,11 @@ The "ble-thread" pairing method can be used in order to commission the device.
 
 #### Matter over wifi with openthread border router configuration :
 
-In order to create or join a Thread network on the Matter Border Router, the
-`otcli` commands from the matter CLI can be used. For more information about
-using the matter shell, follow instructions from
+In order to create or join a Thread network on the Matter Border Router, the TBR
+management cluster or the `otcli` commands from the matter CLI can be used. For
+more information about using the TBR management cluster follow instructions from
+['Using the TBR management cluster'](../../../../../docs/platforms/nxp/nxp_otbr_guide.md#using-the-thread-border-router-management-cluster).
+For more information about using the matter shell, follow instructions from
 ['Testing the all-clusters application with Matter CLI'](#testing-the-all-clusters-application-with-matter-cli-enabled).
 
 In this configuration, the device can be commissioned over Wi-Fi with the
@@ -392,4 +407,14 @@ Done
 Over-The-Air software updates are supported with the RW61x all-clusters example.
 The process to follow in order to perform a software update is described in the
 dedicated guide
-['Matter Over-The-Air Software Update with NXP RW61x example applications'](../../../../../docs/guides/nxp/nxp_rw61x_ota_software_update.md).
+['Matter Over-The-Air Software Update with NXP RW61x example applications'](../../../../../docs/platforms/nxp/nxp_RTs_ota_software_update.md).
+
+<a name="thread-border-router-overview"></a>
+
+## Thread Border Router overview
+
+To enable Thread Border Router support see the [build](README.md#building)
+section.
+
+The complete Border Router guide is located
+[here](../../../../../docs/platforms/nxp/nxp_otbr_guide.md).

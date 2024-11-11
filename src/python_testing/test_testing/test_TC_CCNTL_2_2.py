@@ -30,11 +30,11 @@ from chip.interaction_model import InteractionModelError, Status
 from MockTestRunner import AsyncMock, MockTestRunner
 
 try:
-    from matter_testing_support import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
+    from chip.testing.matter_testing import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from matter_testing_support import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
+    from chip.testing.matter_testing import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
 
 invoke_call_count = 0
 event_call_count = 0
@@ -94,14 +94,14 @@ def dynamic_event_return(*args, **argv):
         header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id,
                                        EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(
-            requestId=0x1234567887654321, clientNodeId=112233, statusCode=0)
+            requestID=0x1234567887654321, clientNodeID=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
         return [result]
     elif event_call_count == 4:  # returned event with new request
         header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id,
                                        EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(
-            requestId=0x1234567812345678, clientNodeId=112233, statusCode=0)
+            requestID=0x1234567812345678, clientNodeID=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
         return [result]
     else:

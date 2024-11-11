@@ -24,6 +24,8 @@
 #include <memory>
 #include <optional>
 
+namespace admin {
+
 /**
  * @brief Class used to get UniqueID from Bridged Device Basic Information Cluster
  *
@@ -51,7 +53,6 @@ public:
     ///////////////////////////////////////////////////////////////
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
                          const chip::app::StatusIB & status) override;
-    void OnReportEnd() override;
     void OnError(CHIP_ERROR error) override;
     void OnDone(chip::app::ReadClient * apReadClient) override;
 
@@ -74,3 +75,5 @@ private:
     char mUniqueId[33];
     chip::EndpointId mEndpointId;
 };
+
+} // namespace admin

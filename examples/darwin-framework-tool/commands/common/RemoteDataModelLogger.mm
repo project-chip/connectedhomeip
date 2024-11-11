@@ -27,6 +27,8 @@
 
 #include <string>
 
+constexpr char kAttributePathKey[] = "attributePath";
+constexpr char kCommandPathKey[] = "commandPath";
 constexpr char kClusterIdKey[] = "clusterId";
 constexpr char kEndpointIdKey[] = "endpointId";
 constexpr char kAttributeIdKey[] = "attributeId";
@@ -142,8 +144,45 @@ CHIP_ERROR LogAttributeAsJSON(NSNumber * endpointId, NSNumber * clusterId, NSNum
 
     Json::Value jsonValue;
     VerifyOrDie(CHIP_NO_ERROR == AsJsonValue(result, jsonValue));
-    value[kValueKey] = jsonValue;
 
+    // When using the *-by-id commands, the return format is always encapsulated
+    // within an array. If the attribute itself is an empty array, the result will
+    // appear as follows:
+    //
+    //[
+    //  {
+    //    attributePath = "<MTRAttributePath endpoint 0 cluster 0x41 (65, UserLabel) 0x0 (0, LabelList)>";
+    //    data =     {
+    //        type = Array;
+    //        value =         (
+    //        );
+    //    };
+    //  }
+    //]
+    bool hasData = false;
+    if (jsonValue.isArray() && !jsonValue.empty()) {
+        for (Json::ArrayIndex i = 0; i < jsonValue.size(); i++) {
+            if (jsonValue[i].isObject()) {
+                if (jsonValue[i].isMember(kAttributePathKey)) {
+                    jsonValue[i].removeMember(kAttributePathKey);
+                }
+
+                if (!jsonValue[i].empty()) {
+                    hasData = true;
+                }
+            } else {
+                hasData = true;
+            }
+        }
+    } else {
+        hasData = true;
+    }
+
+    if (!hasData) {
+        return CHIP_NO_ERROR;
+    }
+
+    value[kValueKey] = jsonValue;
     auto valueStr = JsonToString(value);
     return gDelegate->LogJSON(valueStr.c_str());
 }
@@ -159,8 +198,31 @@ CHIP_ERROR LogCommandAsJSON(NSNumber * endpointId, NSNumber * clusterId, NSNumbe
 
     Json::Value jsonValue;
     VerifyOrDie(CHIP_NO_ERROR == AsJsonValue(result, jsonValue));
-    value[kValueKey] = jsonValue;
 
+    bool hasData = false;
+    if (jsonValue.isArray()) {
+        for (Json::ArrayIndex i = 0; i < jsonValue.size(); i++) {
+            if (jsonValue[i].isObject()) {
+                if (jsonValue[i].isMember(kCommandPathKey)) {
+                    jsonValue[i].removeMember(kCommandPathKey);
+                }
+
+                if (!jsonValue[i].empty()) {
+                    hasData = true;
+                }
+            } else {
+                hasData = true;
+            }
+        }
+    } else {
+        hasData = true;
+    }
+
+    if (!hasData) {
+        return CHIP_NO_ERROR;
+    }
+
+    value[kValueKey] = jsonValue;
     auto valueStr = JsonToString(value);
     return gDelegate->LogJSON(valueStr.c_str());
 }
