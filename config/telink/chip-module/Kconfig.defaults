@@ -448,4 +448,17 @@ config PWM_SHELL
 config OPENTHREAD_SHELL
     default n
 
+# Thread analyzer
+config THREAD_ANALYZER
+    default n
+    select THREAD_ANALYZER_AUTO
+
+config THREAD_ANALYZER_AUTO_INTERVAL
+    default 5
+    depends on THREAD_ANALYZER_AUTO
+
+config THREAD_ANALYZER_LOG_LEVEL
+    default 3 # info
+    depends on THREAD_ANALYZER
+
 endif
