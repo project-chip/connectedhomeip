@@ -73,7 +73,7 @@ extern "C" {
 #if defined(_SILICON_LABS_32B_SERIES_3)
 // To remove any ambiguities regarding the Flash aliases, use the below macro to ignore the 8 MSB.
 #define FLASH_GENERIC_MASK 0x00FFFFFF
-#define GENERIC_ADDRESS(addr) ((addr) & FLASH_GENERIC_MASK)
+#define GENERIC_ADDRESS(addr) ((addr) &FLASH_GENERIC_MASK)
 
 // Transforms any address into an address using the same alias as FLASH_BASE from the CMSIS.
 #define CMSIS_CONVERTED_ADDRESS(addr) (GENERIC_ADDRESS(addr) | FLASH_BASE)
