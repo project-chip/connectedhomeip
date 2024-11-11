@@ -16,7 +16,10 @@
  ******************************************************************************/
 #pragma once
 
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 #include "rsi_ble_apis.h"
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "rsi_bt_common_apis.h"
@@ -24,7 +27,10 @@ extern "C" {
 #else
 #include <rsi_data_types.h>
 #endif
+
+#ifdef __cplusplus
 }
+#endif
 
 #if SL_MATTER_GN_BUILD == 0
 #include "sl_matter_wifi_config.h"
