@@ -7,6 +7,9 @@ orphan: true
 This tool parses ZAP files and updates outdated cluster revisions according to
 the specification.
 
+**WARNING**: This tool only updates the revision number. Please ensure any new
+attributes, events or commands are implemented accordingly.
+
 # Prerequisites
 
 This tool uses the python environment, which can be built and activated using:

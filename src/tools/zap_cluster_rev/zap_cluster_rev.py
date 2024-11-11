@@ -64,6 +64,7 @@ def main():
     parser.add_argument("filenames", nargs="+", help="A sequence of ZAP filenames.")
     args = parser.parse_args()
 
+    print("**WARNING**: This tool only updates the revision number. Please ensure any new attributes, events or commands are implemented accordingly.")
     outdated_count = 0
     for zap_filename in args.filenames:
         print("Checking for outdated cluster revisions on: %s" % zap_filename)
