@@ -86,6 +86,11 @@ public:
     void RemoveSyncedDevice(chip::ScopedNodeId scopedNodeId);
 
     /**
+     * @brief Initializes the CommissionerControl for fabric sync setup process.
+     */
+    void InitCommissionerControl();
+
+    /**
      * @brief Determines whether a given nodeId corresponds to the "current bridge device," either local or remote.
      *
      * @param nodeId            The ID of the node being checked.
@@ -192,8 +197,6 @@ private:
     void SendCommissionNodeRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
 
     void HandleReverseOpenCommissioningWindow(chip::TLV::TLVReader & data);
-
-    static DeviceManager sInstance;
 
     chip::NodeId mLastUsedNodeId = 0;
 

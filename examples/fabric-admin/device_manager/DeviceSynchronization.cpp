@@ -142,13 +142,16 @@ void DeviceSynchronizer::OnReportEnd()
 
 void DeviceSynchronizer::OnDone(app::ReadClient * apReadClient)
 {
+    ChipLogProgress(NotSpecified, "Synchronization complete for NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+
 #if defined(PW_RPC_ENABLED)
     if (mState == State::ReceivedResponse && !DeviceManager::Instance().IsCurrentBridgeDevice(mNodeId))
     {
         GetUniqueId();
         if (mState == State::GettingUid)
         {
-            // GetUniqueId was successful and we rely on callback to call SynchronizationCompleteAddDevice.
+            ChipLogProgress(NotSpecified,
+                            "GetUniqueId was successful and we rely on callback to call SynchronizationCompleteAddDevice.");
             return;
         }
         SynchronizationCompleteAddDevice();
@@ -272,6 +275,7 @@ void DeviceSynchronizer::GetUniqueId()
 void DeviceSynchronizer::SynchronizationCompleteAddDevice()
 {
     VerifyOrDie(mState == State::ReceivedResponse || mState == State::GettingUid);
+    ChipLogProgress(NotSpecified, "Synchronization complete and add device");
 
 #if defined(PW_RPC_ENABLED)
     AddSynchronizedDevice(mCurrentDeviceData);

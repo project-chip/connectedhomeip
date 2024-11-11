@@ -57,6 +57,7 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
 
         DeviceManager::Instance().UpdateLastUsedNodeId(mBridgeNodeId);
         DeviceManager::Instance().SubscribeRemoteFabricBridge();
+        DeviceManager::Instance().InitCommissionerControl();
 
         if (DeviceManager::Instance().IsLocalBridgeReady())
         {
