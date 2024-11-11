@@ -188,4 +188,6 @@ ALLOW: Dict[str, Set[str]] = {
     'src/controller/CHIPDeviceController.cpp': {'string'},
     'src/qrcodetool/setup_payload_commands.cpp': {'string'},
     'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
+
+    'src/wifipaf/WiFiPAFLayer.h': {'vector'},
 }
