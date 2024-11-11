@@ -19,9 +19,16 @@
 
 #include "lwip/err.h"
 #include "lwip/netif.h"
+
+#ifdef WF200_WIFI
+#include "sl_wfx_api.h"
+#include "sl_wfx_constants.h"
+#endif // WF200_WIFI
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /***************************************************************************
  * @fn  err_t sta_ethernetif_init(struct netif *netif)
  * @brief
@@ -47,6 +54,7 @@ void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer);
 #else
 void wfx_host_received_sta_frame_cb(uint8_t * buf, int len);
 #endif /* WF200_WIFI */
+
 #ifdef __cplusplus
 }
 #endif

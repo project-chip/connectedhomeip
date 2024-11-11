@@ -50,6 +50,7 @@ extern "C" {
 #endif
 
 #include "WifiInterfaceAbstraction.h"
+#include "WiseconnectInterfaceAbstraction.h"
 #include "dhcp_client.h"
 #include "ethernetif.h"
 #include "lwip/nd6.h"
@@ -60,8 +61,20 @@ extern "C" {
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+using WifiStateFlags = chip::BitFlags<WifiState>;
+
 #define WFX_QUEUE_SIZE 10
 #define WFX_RSI_BUF_SZ (1024 * 10)
+#define RSI_RESPONSE_MAX_SIZE (28)
+#define RSI_RESPONSE_HOLD_BUFF_SIZE (128)
+#define RSI_DRIVER_STATUS (0)
+#define OPER_MODE_0 (0)
+#define COEX_MODE_0 (0)
+#define RESP_BUFF_SIZE (6)
+#define AP_CHANNEL_NO_0 (0)
+#define SCAN_BITMAP_OPTN_1 (1)
+
+WfxRsi_t wfx_rsi;
 
 static osThreadId_t sDrvThread;
 constexpr uint32_t kDrvTaskSize = 1792;
@@ -750,7 +763,7 @@ void ProcessEvent(WifiEvent event)
             chip::Platform::CopyString(ap.ssid, ap.ssid_length, reinterpret_cast<char *>(scan->ssid));
 
             // check if the scanned ssid is the one we are looking for
-            if (wfx_rsi.scan_ssid_length != 0 && strncmp(wfx_rsi.scan_ssid, ap.ssid, WFX_MAX_SSID_LENGTH) != CMP_SUCCESS)
+            if (wfx_rsi.scan_ssid_length != 0 && strncmp(wfx_rsi.scan_ssid, ap.ssid, WFX_MAX_SSID_LENGTH) != 0)
             {
                 continue; // we found the targeted ssid.
             }
@@ -861,10 +874,10 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &HEX_VALUE_FF;
-    wfx_rsi.ip4_addr[1] = (ip >> 8) & HEX_VALUE_FF;
-    wfx_rsi.ip4_addr[2] = (ip >> 16) & HEX_VALUE_FF;
-    wfx_rsi.ip4_addr[3] = (ip >> 24) & HEX_VALUE_FF;
+    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
+    wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
+    wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
     ChipLogProgress(DeviceLayer, "DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
                     wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
@@ -960,4 +973,17 @@ int32_t wfx_rsi_send_data(void * p, uint16_t len)
     return status;
 }
 
-WfxRsi_t wfx_rsi;
+#if SL_ICD_ENABLED
+/*********************************************************************
+ * @fn  sl_status_t wfx_power_save(void)
+ * @brief
+ *      Implements the power save in sleepy application
+ * @param[in]  None
+ * @return  SL_STATUS_OK if successful,
+ *          SL_STATUS_FAIL otherwise
+ ***********************************************************************/
+sl_status_t wfx_power_save(void) // TODO : Figure out why the extern C is necessary
+{
+    return (wfx_rsi_power_save() ? SL_STATUS_FAIL : SL_STATUS_OK);
+}
+#endif /* SL_ICD_ENABLED */

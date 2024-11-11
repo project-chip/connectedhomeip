@@ -115,6 +115,7 @@ config("wifi-interface-config") {
 source_set("wifi-interface") {
   sources = [
     "${silabs_common_plat_dir}/wifi/WifiInterfaceAbstraction.cpp",
+    "${silabs_common_plat_dir}/wifi/WiseconnectInterfaceAbstraction.cpp",
     "SiWxWifiInterface.cpp",
 
     # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed

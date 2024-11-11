@@ -64,6 +64,7 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #ifdef SL_WIFI
+#include "WifiInterfaceAbstraction.h"
 #include "wfx_host_events.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>

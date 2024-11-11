@@ -15,13 +15,17 @@
  *    limitations under the License.
  */
 
+// TODO: Delete this file after moving the wifi abstraction files to the src directory.
+//       Nothing should be added to this file anymore.
+//       File is kept due to the current header inclusion structure.
+
 #ifndef _WFX_MSGS_H_
 #define _WFX_MSGS_H_
-/*
- * Taken from sl_wfx firmware - so I can re-use.
- * I need to do a better job than to use this stuff
- * in the CPP files of Matter
- */
+
+#ifdef WF200_WIFI
+#include "sl_wfx_api.h"
+#include "sl_wfx_constants.h"
+#else
 typedef struct
 {
     uint8_t octet[6]; ///< Table to store a MAC address
@@ -62,29 +66,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_startup_ind_body_s
     uint32_t
         status; ///< Initialization status. A value of zero indicates the boot is completed successfully  (see enum sl_wfx_status_t)
     uint16_t hardware_id; ///<=RO misc_read_reg7 register value
-#if 0                     /* Not used in RS911x for now - use stuff here for the port */
-  uint8_t  opn[SL_WFX_OPN_SIZE];                           ///<=OTP part_OPN
-  uint8_t  uid[SL_WFX_UID_SIZE];                           ///<=OTP UID
-  uint16_t num_inp_ch_bufs;                                ///<Number of buffers available for request messages.
-  uint16_t size_inp_ch_buf;                                ///<TX Buffer size in bytes=request message max size.
-  uint8_t  num_links_aP;                                   ///<number of STA that are supported in AP mode
-  uint8_t  num_interfaces;                                 ///<number of interfaces (WIFI link : STA or AP) that can be created by the user
-  uint8_t  mac_addr[2][SL_WFX_MAC_ADDR_SIZE];              ///<MAC addresses derived from OTP
-  uint8_t  api_version_minor;
-  uint8_t  api_version_major;
-  sl_wfx_capabilities_t capabilities;                      ///<List some FW options
-  uint8_t  firmware_build;
-  uint8_t  firmware_minor;
-  uint8_t  firmware_major;
-  uint8_t  firmware_type;                                  ///<See enum sl_wfx_fw_type_t
-  uint8_t  disabled_channel_list[SL_WFX_DISABLED_CHANNEL_LIST_SIZE]; ///<=OTP Disabled channel list info
-  sl_wfx_otp_regul_sel_mode_info_t regul_sel_mode_info;    ///<OTP region selection mode info
-  sl_wfx_otp_phy_info_t otp_phy_info;                      ///<info on OTP backoff tables used to enforce the different DFS regulations.
-  uint32_t supported_rate_mask;                            ///<A bit mask that indicates which rates are supported by the Physical layer. See enum api_rate_index.
-  uint8_t  firmware_label[SL_WFX_FIRMWARE_LABEL_SIZE];     ///<Null terminated text string describing the loaded FW.
-#else
     uint8_t mac_addr[6];
-#endif
 } sl_wfx_startup_ind_body_t;
 
 typedef struct __attribute__((__packed__)) sl_wfx_startup_ind_s
@@ -178,5 +160,6 @@ typedef struct __attribute__((__packed__)) sl_wfx_disconnect_ind_s
     /** Indication message body. */
     sl_wfx_disconnect_ind_body_t body;
 } sl_wfx_disconnect_ind_t;
+#endif
 
 #endif /* _WFX_MSGS_H_ */

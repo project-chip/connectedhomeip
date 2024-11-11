@@ -29,6 +29,7 @@
 
 #include "FreeRTOS.h"
 #include "WifiInterfaceAbstraction.h"
+#include "WiseconnectInterfaceAbstraction.h"
 #include "ble_config.h"
 #include "dhcp_client.h"
 #include "event_groups.h"
@@ -45,7 +46,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 extern "C" {
-#include "sl_net.h"
 #include "sl_si91x_driver.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_types.h"
@@ -53,7 +53,6 @@ extern "C" {
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_types.h"
-#include "wfx_host_events.h"
 #if SL_MBEDTLS_USE_TINYCRYPT
 #include "sl_si91x_constants.h"
 #include "sl_si91x_trng.h"
@@ -440,6 +439,38 @@ sl_status_t JoinWifiNetwork(void)
 
 } // namespace
 
+/**
+ * @brief Wifi initialization called from app main
+ *
+ * @return sl_status_t Returns underlying Wi-Fi initialization error
+ */
+sl_status_t sl_matter_wifi_platform_init(void)
+{
+    sl_status_t status = SL_STATUS_OK;
+
+    status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
+    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
+
+    // Create Sempaphore for scan completion
+    sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+
+    // Create Semaphore for scan in-progress protection
+    sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+
+    // Create the message queue
+    sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiEvent), nullptr);
+    VerifyOrReturnError(sWifiEventQueue != nullptr, SL_STATUS_ALLOCATION_FAILED);
+
+    // Create timer for DHCP polling
+    // TODO: Use LWIP timer instead of creating a new one here
+    sDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
+    VerifyOrReturnError(sDHCPTimer != nullptr, SL_STATUS_ALLOCATION_FAILED);
+
+    return status;
+}
+
 /******************************************************************
  * @fn   int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t *ap)
  * @brief
@@ -614,7 +645,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
         if (wfx_rsi.scan_ssid != nullptr &&
             (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, std::min(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
-             CMP_SUCCESS))
+             0))
         {
             continue;
         }
@@ -838,38 +869,6 @@ void ProcessEvent(WifiEvent event)
     }
 }
 
-/**
- * @brief Wifi initialization called from app main
- *
- * @return sl_status_t Returns underlying Wi-Fi initialization error
- */
-sl_status_t sl_matter_wifi_platform_init(void)
-{
-    sl_status_t status = SL_STATUS_OK;
-
-    status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
-    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
-
-    // Create Sempaphore for scan completion
-    sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    // Create Semaphore for scan in-progress protection
-    sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    // Create the message queue
-    sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiEvent), nullptr);
-    VerifyOrReturnError(sWifiEventQueue != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    // Create timer for DHCP polling
-    // TODO: Use LWIP timer instead of creating a new one here
-    sDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
-    VerifyOrReturnError(sDHCPTimer != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    return status;
-}
-
 /*********************************************************************************
  * @fn  void sl_matter_wifi_task(void *arg)
  * @brief
@@ -922,10 +921,10 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &HEX_VALUE_FF;
-    wfx_rsi.ip4_addr[1] = (ip >> 8) & HEX_VALUE_FF;
-    wfx_rsi.ip4_addr[2] = (ip >> 16) & HEX_VALUE_FF;
-    wfx_rsi.ip4_addr[3] = (ip >> 24) & HEX_VALUE_FF;
+    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
+    wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
+    wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
     ChipLogDetail(DeviceLayer, "DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
                   wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
@@ -933,3 +932,21 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     wfx_ip_changed_notify(IP_STATUS_SUCCESS);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+
+#if SL_ICD_ENABLED
+/*********************************************************************
+ * @fn  sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t
+ sl_si91x_wifi_state)
+ * @brief
+ *      Implements the power save in sleepy application
+ * @param[in]  sl_si91x_ble_state : State to set for the BLE
+               sl_si91x_wifi_state : State to set for the WiFi
+ * @return  SL_STATUS_OK if successful,
+ *          SL_STATUS_FAIL otherwise
+ ***********************************************************************/
+sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,
+                           sl_si91x_performance_profile_t sl_si91x_wifi_state) // TODO : Figure out why the extern C is necessary
+{
+    return (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) ? SL_STATUS_FAIL : SL_STATUS_OK);
+}
+#endif

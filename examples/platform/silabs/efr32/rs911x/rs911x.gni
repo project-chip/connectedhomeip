@@ -23,6 +23,7 @@ rs911x_src_plat = [
   "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_timer.c",
   "${examples_plat_dir}/rs911x/hal/efx_spi.c",
   "${silabs_common_plat_dir}/wifi/WifiInterfaceAbstraction.cpp",
+  "${silabs_common_plat_dir}/wifi/WiseconnectInterfaceAbstraction.cpp",
 ]
 
 #

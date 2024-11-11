@@ -35,8 +35,6 @@
 #include "event_groups.h"
 #include "task.h"
 
-#include "wfx_host_events.h"
-
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "sl_board_configuration.h"
 

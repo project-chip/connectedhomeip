@@ -218,8 +218,7 @@ void SilabsPlatform::StartScheduler()
 }
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-extern "C" {
-void sl_button_on_change(const sl_button_t * handle)
+extern "C" void sl_button_on_change(const sl_button_t * handle)
 {
     if (Silabs::GetPlatform().mButtonCallback == nullptr)
     {
@@ -234,7 +233,6 @@ void sl_button_on_change(const sl_button_t * handle)
             break;
         }
     }
-}
 }
 
 uint8_t SilabsPlatform::GetButtonState(uint8_t button)

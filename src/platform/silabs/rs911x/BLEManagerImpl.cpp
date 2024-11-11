@@ -26,30 +26,25 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <platform/internal/BLEManager.h>
-
+#include "wfx_sl_ble_init.h"
 #include <ble/Ble.h>
+#include <crypto/RandUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/internal/BLEManager.h>
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-#include <crypto/RandUtils.h>
-#ifdef __cplusplus
 extern "C" {
-#endif
-#include "wfx_sl_ble_init.h"
 #if !(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include <rsi_driver.h>
 #endif
 #include <rsi_utils.h>
-#ifdef __cplusplus
 }
-#endif
 
 #define BLE_MIN_CONNECTION_INTERVAL_MS 24
 #define BLE_MAX_CONNECTION_INTERVAL_MS 40

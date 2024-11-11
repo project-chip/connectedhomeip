@@ -27,6 +27,22 @@
  */
 
 #define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP		*/
+#define MAX_JOIN_RETRIES_COUNT (5)
+
+enum class WifiState : uint16_t
+{
+    kStationInit        = (1 << 0),
+    kAPReady            = (1 << 1),
+    kStationProvisioned = (1 << 2),
+    kStationConnecting  = (1 << 3),
+    kStationConnected   = (1 << 4),
+    kStationDhcpDone    = (1 << 6), /* Requested to do DHCP after conn */
+    kStationMode        = (1 << 7), /* Enable Station Mode */
+    kAPMode             = (1 << 8), /* Enable AP Mode */
+    kStationReady       = (kStationConnected | kStationDhcpDone),
+    kStationStarted     = (1 << 9),  /* RSI task started */
+    kScanStarted        = (1 << 10), /* Scan Started */
+};
 
 enum class WifiEvent : uint8_t
 {
@@ -41,25 +57,9 @@ enum class WifiEvent : uint8_t
     kStationDhcpPoll   = 8
 };
 
-enum class WifiState : uint16_t
-{
-    kStationInit        = (1 << 0),
-    kAPReady            = (1 << 1),
-    kStationProvisioned = (1 << 2),
-    kStationConnecting  = (1 << 3),
-    kStationConnected   = (1 << 4),
-    kStationDhcpDone    = (1 << 6), /* Requested to do DHCP after conn	*/
-    kStationMode        = (1 << 7), /* Enable Station Mode			*/
-    kAPMode             = (1 << 8), /* Enable AP Mode			*/
-    kStationReady       = (kStationConnected | kStationDhcpDone),
-    kStationStarted     = (1 << 9),  /* RSI task started			*/
-    kScanStarted        = (1 << 10), /* Scan Started					*/
-};
-using WifiStateFlags = chip::BitFlags<WifiState>;
-
 typedef struct wfx_rsi_s
 {
-    WifiStateFlags dev_state;
+    chip::BitFlags<WifiState> dev_state;
     uint16_t ap_chan; /* The chan our STA is using	*/
     wfx_wifi_provision_t sec;
 #ifdef SL_WFX_CONFIG_SCAN
@@ -90,13 +90,6 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t sl_wifi_platform_disconnect();
 
-// TODO : this needs to be extern otherwise we get a linking error. We need to figure out why in the header clean up
-// NCP files are including this while being c files
-#ifdef __cplusplus
-extern "C" {
-#endif
-sl_status_t sl_matter_wifi_platform_init(void);
-
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI917
 int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
@@ -104,9 +97,6 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
 int32_t wfx_rsi_power_save();
 #endif /* SLI_SI917 */
 #endif /* SL_ICD_ENABLED */
-#ifdef __cplusplus
-}
-#endif
 
 /**
  * @brief Posts an event to the Wi-Fi task
