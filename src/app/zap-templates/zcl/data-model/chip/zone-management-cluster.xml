@@ -96,7 +96,7 @@ Git: 1.4-282-gad46b0990
     <client init="false" tick="false">true</client>
     <features>
       <feature bit="0" code="TWODCART" name="TwoDimensionalCartesianZone" summary="Support Two Dimensional Cartesian Zones">
-        <optionalConform choice="a" more="true" min="1"/>
+        <optionalConform/>
       </feature>
       <feature bit="1" code="PERZONESENS" name="PerZoneSensitivity" summary="Supports a sensitivity value per Zone">
         <optionalConform/>
