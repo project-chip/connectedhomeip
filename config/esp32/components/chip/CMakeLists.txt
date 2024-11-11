@@ -512,7 +512,7 @@ endif()
 idf_component_get_property(lwip_lib lwip COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${lwip_lib}>)
 
-if ("${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}" VERSION_GREATER_EQUAL "5.3")
+if ("${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}" VERSION_GREATER_EQUAL "5.3" OR CONFIG_ESP32_WIFI_ENABLED)
     idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)
 endif()
