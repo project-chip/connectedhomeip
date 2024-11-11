@@ -2597,6 +2597,7 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2744,7 +2745,7 @@ endpoint 3 {
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue default = 6000;
+    ram      attribute measuredValue default = 4000;
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 90;
     callback attribute generatedCommandList;
