@@ -207,7 +207,7 @@ BOOL MTRInvokeResponseIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * r
 
     // Now we know data is a dictionary (in fact a data-value).  The only thing
     // we promise about it is that it has type MTRStructureValueType.
-    if (data[MTRTypeKey] != MTRStructureValueType) {
+    if (![MTRStructureValueType isEqual:data[MTRTypeKey]]) {
         MTR_LOG_ERROR("Invoke response data is not of structure type: %@", data);
         return NO;
     }
