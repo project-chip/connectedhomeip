@@ -111,7 +111,7 @@ public:
     /// should be marked as `dirty` by the data model provider listener so that the reporter can notify the subscriber
     /// of attribute changes.
     /// This function should be invoked when attribute managed by attribute access interface is modified but not
-    /// through a WriteAttribute calling.
+    /// through am actual Write interaction.
     /// For example, if the LastNetworkingStatus attribute changes because the NetworkCommissioning driver detects a
     /// network connection status change and calls SetLastNetworkingStatusValue(). The data model provider can recognize
     /// this change by invoking this function at the point of change.
