@@ -162,7 +162,7 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
     /* We allocate a pbuf chain of pbufs from the Lwip buffer pool
      * and copy the data to the pbuf chain
      */
-    if ((p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL)) != STRUCT_PBUF)
+    if ((p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL)) != NULL)
     {
         for (q = p, bufferoffset = 0; q != NULL; q = q->next)
         {
@@ -268,7 +268,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     /* send the generated frame over Wifi network */
     while ((result != SL_STATUS_OK) && (i++ < 10))
     {
-        result = sl_wfx_send_ethernet_frame(tx_buffer, framelength, SL_WFX_STA_INTERFACE, PRIORITY_0);
+        result = sl_wfx_send_ethernet_frame(tx_buffer, framelength, SL_WFX_STA_INTERFACE, 0 /* priority */);
     }
     sl_wfx_host_free_buffer(tx_buffer, SL_WFX_TX_FRAME_BUFFER);
 
