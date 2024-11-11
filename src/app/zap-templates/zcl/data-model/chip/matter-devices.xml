@@ -2679,7 +2679,7 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-device-energy-management</name>
+        <name>Device Energy Management</name>
         <domain>CHIP</domain>
         <typeName>Device Energy Management</typeName>
         <class>Utility</class>

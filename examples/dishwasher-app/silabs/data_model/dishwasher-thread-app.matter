@@ -2733,6 +2733,7 @@ endpoint 2 {
   }
 }
 endpoint 3 {
+  device type device_energy_management = 1293, version 1;
 
 
   server cluster Descriptor {
