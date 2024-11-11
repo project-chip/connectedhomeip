@@ -26,6 +26,7 @@
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
+#include <access/ProviderDeviceTypeResolver.h>
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app/InteractionModelEngine.h>
@@ -42,18 +43,12 @@ using namespace chip::Access;
 
 namespace {
 
-class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver {
+class DeviceTypeResolver : public chip::Access::DynamicProviderDeviceTypeResolver {
 public:
-    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override
+    DeviceTypeResolver()
+        : chip::Access::DynamicProviderDeviceTypeResolver(
+            [] { return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(); })
     {
-        app::DataModel::Provider * model = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
-
-        for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type)) {
-            if (type->deviceTypeId == deviceType) {
-                return true;
-            }
-        }
-        return false;
     }
 };
 

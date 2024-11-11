@@ -52,6 +52,8 @@ static_library("server") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/access",
+    "${chip_root}/src/access:provider-impl",
     "${chip_root}/src/app",
     "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/icd/server:icd-server-config",
