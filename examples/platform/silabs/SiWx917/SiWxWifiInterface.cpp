@@ -327,7 +327,6 @@ sl_status_t InitiateScan()
     // TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
     sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
 
-    ssid.length = wfx_rsi.sec.ssid_length;
     ssid.length = std::min<size_t>(wfx_rsi.sec.ssid_length, sizeof(ssid.value) - 1);
     chip::Platform::CopyString((char *) &ssid.value[0], ssid.length + 1, wfx_rsi.sec.ssid); // +1 for null termination
     sl_wifi_set_scan_callback(ScanCallback, NULL);
