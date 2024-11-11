@@ -48,6 +48,7 @@
 
 namespace chip {
 namespace app {
+
 namespace {
 
 using namespace chip::app::Compatibility::Internal;
