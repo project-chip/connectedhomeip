@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-from chip.testing.spec_parsing import CommandType, build_xml_clusters, build_xml_device_types
-from dataclasses import dataclass
-import sys
-import json
 import argparse
+import json
+import sys
+from dataclasses import dataclass
+
+from chip.testing.spec_parsing import CommandType, build_xml_clusters, build_xml_device_types
 
 
 @dataclass
