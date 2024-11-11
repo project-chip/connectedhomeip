@@ -108,7 +108,7 @@ public:
     /// Workaround function to report attribute change.
     ///
     /// When this is invoked, the caller is expected to increment the cluster data version, and the attribute path
-    /// should be marked as `dirty` by the data model provider listener so that the reporter can norify the subscriber
+    /// should be marked as `dirty` by the data model provider listener so that the reporter can notify the subscriber
     /// of attribute changes.
     /// This function should be invoked when attribute managed by attribute access interface is modified but not
     /// through a WriteAttribute calling.
