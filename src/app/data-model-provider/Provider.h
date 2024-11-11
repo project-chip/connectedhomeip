@@ -121,8 +121,7 @@ public:
     ///
     /// TODO: We should remove this function when the AttributeAccessInterface/CommandHandlerInterface is able to report
     /// the attribute changes.
-    [[deprecated("Workaround until all code can use a context object instead")]] virtual void
-    Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
+    virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
 
 private:
     InteractionModelContext mContext = { nullptr };

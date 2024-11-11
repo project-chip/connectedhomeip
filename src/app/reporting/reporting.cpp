@@ -24,12 +24,6 @@
 using namespace chip;
 using namespace chip::app;
 
-#if defined(__GNUC__) || defined(__clang__)
-// Disable the deprecated warning only for this file
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     // Attribute writes have asserted this already, but this assert should catch
@@ -58,6 +52,3 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
 
     InteractionModelEngine::GetInstance()->GetDataModelProvider()->Temporary_ReportAttributeChanged(AttributePathParams(endpoint));
 }
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic pop
-#endif
