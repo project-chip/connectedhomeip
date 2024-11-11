@@ -270,6 +270,7 @@ void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributeP
     }
     else
     {
+        // If cluster Id is invalid, mark the endpoint dirty using the path. This can happen when enabling/disabling the endpoint.
         change_listener.MarkDirty(path);
     }
 }
