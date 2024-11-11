@@ -944,9 +944,8 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
  * @return  SL_STATUS_OK if successful,
  *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
-extern "C" sl_status_t
-wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,
-               sl_si91x_performance_profile_t sl_si91x_wifi_state) // TODO : Figure out why the extern C is necessary
+sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,
+                           sl_si91x_performance_profile_t sl_si91x_wifi_state) // TODO : Figure out why the extern C is necessary
 {
     return (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) ? SL_STATUS_FAIL : SL_STATUS_OK);
 }

@@ -17,6 +17,7 @@
 
 #pragma once
 
+// TODO: remove this include when the abstraction is fully implemented
 #include "WiseconnectInterfaceAbstraction.h"
 #include <app/icd/server/ICDServerConfig.h>
 

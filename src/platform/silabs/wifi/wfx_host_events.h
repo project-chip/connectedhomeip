@@ -192,17 +192,6 @@ int32_t wfx_rsi_send_data(void * p, uint16_t len);
 
 bool wfx_hw_ready(void);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#if (SLI_SI91X_MCU_INTERFACE)
-#if SL_ICD_ENABLED
-// TODO : This should be moved outside of the Wifi interface functions
-void sl_button_on_change(uint8_t btn, uint8_t btnAction);
-#endif /* SL_ICD_ENABLED */
-#endif /* SLI_SI91X_MCU_INTERFACE */
-
 #ifdef RS911X_WIFI // for RS9116, 917 NCP and 917 SoC
 /* RSI Power Save */
 #if SL_ICD_ENABLED
@@ -213,6 +202,17 @@ sl_status_t wfx_power_save();
 #endif /* (SLI_SI91X_MCU_INTERFACE | EXP_BOARD) */
 #endif /* SL_ICD_ENABLED */
 #endif /* RS911X_WIFI */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if (SLI_SI91X_MCU_INTERFACE)
+#if SL_ICD_ENABLED
+// TODO : This should be moved outside of the Wifi interface functions
+void sl_button_on_change(uint8_t btn, uint8_t btnAction);
+#endif /* SL_ICD_ENABLED */
+#endif /* SLI_SI91X_MCU_INTERFACE */
 
 #ifdef WF200_WIFI
 void sl_wfx_host_gpio_init(void);
