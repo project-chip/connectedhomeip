@@ -5583,6 +5583,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         @{
             @"input" : @[
                 @{
+                    @"commandPath" : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    @"data" : @ {
+                        @"type" : @"Structure",
+                        @"value" : @[], // Empty structure, valid
+                    },
+                },
+            ],
+            // Same as the previous test, but not using the SDK string constants
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
                     MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
                     MTRDataKey : @ {
                         MTRTypeKey : MTRStructureValueType,
