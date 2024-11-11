@@ -79,10 +79,10 @@ MTR_DIRECT_MEMBERS
 - (void)cancel
 {
     [self.device _forgetAttributeWaiter:self];
-    [self _cancelWithoutRemovingFromDevice];
+    [self _notifyCancellation];
 }
 
-- (void)_cancelWithoutRemovingFromDevice
+- (void)_notifyCancellation
 {
     [self _notifyWithError:[MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]];
 }

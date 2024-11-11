@@ -769,9 +769,7 @@ MTR_DIRECT_MEMBERS
         return attributeWaiter;
     }
 
-    // Otherwise, wait for one of our termination conditions.  It's important to
-    // not take the lock earlier, because the _notifyWithError call above would
-    // also try to take the lock.
+    // Otherwise, wait for one of our termination conditions.
     {
         std::lock_guard lock(_lock);
         if (!self.attributeValueWaiters) {
@@ -819,7 +817,7 @@ MTR_DIRECT_MEMBERS
     auto * attributeValueWaiters = self.attributeValueWaiters;
     self.attributeValueWaiters = nil;
     for (MTRAttributeValueWaiter * attributeValueWaiter in attributeValueWaiters) {
-        [attributeValueWaiter _cancelWithoutRemovingFromDevice];
+        [attributeValueWaiter _notifyCancellation];
     }
 }
 

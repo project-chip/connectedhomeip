@@ -50,9 +50,9 @@ MTR_DIRECT_MEMBERS
 - (void)_startTimerWithTimeout:(NSTimeInterval)timeout;
 
 // Cancels the waiter without trying to remove it from the MTRDevice's
-// collection of waiters.  This is exposed so that MTRDevice can do it when
-// invalidating.
-- (void)_cancelWithoutRemovingFromDevice;
+// collection of waiters (unlike "cancel", which does that removal).  This is
+// exposed so that MTRDevice can do it when invalidating.
+- (void)_notifyCancellation;
 
 @end
 
