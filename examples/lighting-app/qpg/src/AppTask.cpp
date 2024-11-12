@@ -43,7 +43,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/TypeTraits.h>
 
-#include <app/DeferredAttributePersistenceProvider.h>
+#include <app/util/persistence/DeferredAttributePersistenceProvider.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
