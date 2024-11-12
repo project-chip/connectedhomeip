@@ -1163,16 +1163,16 @@ public:
      * @param my_identity_len   The prover identity length.
      * @param peer_identity     The peer identity. May be NULL if identities are not established.
      * @param peer_identity_len The peer identity length.
-     * @param w0in              The input w0 (an output from the PBKDF).
-     * @param w0in_len          The input w0 length.
-     * @param w1in              The input w1 (an output from the PBKDF).
-     * @param w1in_len          The input w1 length.
+     * @param w0sin             The input w0s (an output from the PBKDF).
+     * @param w0sin_len         The input w0s length.
+     * @param w1sin             The input w1s (an output from the PBKDF).
+     * @param w1sin_len         The input w1s length.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                                   size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
-                                   size_t w1in_len);
+                                   size_t peer_identity_len, const uint8_t * w0sin, size_t w0sin_len, const uint8_t * w1sin,
+                                   size_t w1sin_len);
 
     /**
      * @brief Compute the first round of the protocol.
@@ -1347,26 +1347,26 @@ public:
     /*
      *   @synopsis Compute w0sin mod p
      *
-     *   @param w0out       Output field element (modulo p)
+     *   @param w0out       Output field element w0
      *   @param w0_len      Output field element length
-     *   @param w1sin       Input field element
-     *   @param w1sin_len   Input field element length
+     *   @param w0sin       Input field element
+     *   @param w0sin_len   Input field element length
      *
      *   @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len) = 0;
 
     /*
-     *   @synopsis Compute w1in*G
+     *   @synopsis Compute w1in*G where w1in is w1sin mod p
      *
      *   @param Lout        Output point in 0x04 || X || Y format.
      *   @param L_len       Output point length
-     *   @param w1in        Input field element
-     *   @param w1in_len    Input field element size
+     *   @param w1sin       Input field element
+     *   @param w1sin_len   Input field element size
      *
      *   @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) = 0;
+    virtual CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1sin, size_t w1sin_len) = 0;
 
     void * M;
     void * N;
@@ -1521,7 +1521,7 @@ public:
     CHIP_ERROR PointIsValid(void * R) override;
 
     CHIP_ERROR ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len) override;
-    CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) override;
+    CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1sin, size_t w1sin_len) override;
 
 protected:
     CHIP_ERROR InitImpl() override;
@@ -1561,12 +1561,12 @@ public:
     CHIP_ERROR Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin);
 
     /**
-     * @brief Compute the initiator values (w0, w1) used for PAKE input.
+     * @brief Compute the initiator values (w0s, w1s) used for PAKE input.
      *
      * @param pbkdf2IterCount Iteration count for PBKDF2 function
      * @param salt            Salt to be used for Spake2+ operation
      * @param setupPin        Provided setup PIN (passcode)
-     * @param ws              The output pair (w0, w1) stored sequentially
+     * @param ws              The output pair (w0s, w1s) stored sequentially
      * @param ws_len          The output length
      *
      * @return CHIP_ERROR     The result from running PBKDF2
