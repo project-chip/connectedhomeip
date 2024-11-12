@@ -367,12 +367,22 @@ template("efr32_sdk") {
         "${wifi_sdk_root}/components/protocol/wifi/si91x",
       ]
     }
+
+    if (use_rs9116) {
+      _include_dirs += [
+        "${chip_root}/src/platform/silabs/wifi/rs911x/platform",
+        "${chip_root}/src/platform/silabs/wifi/rs911x",
+      ]
+    }
+
     if (use_rs9116 || use_SiWx917) {
       _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
     }
+
     if (use_wf200 || use_rs9116 || use_SiWx917) {
       _include_dirs += [ "${chip_root}/src/platform/silabs/wifi" ]
     }
+
     if (silabs_family != "mgm24") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/radio/rail_lib/hal",
