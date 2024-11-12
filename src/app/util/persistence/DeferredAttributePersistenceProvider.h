@@ -15,7 +15,7 @@
  */
 #pragma once
 
-#include <app/AttributePersistenceProvider.h>
+#include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <system/SystemClock.h>
@@ -55,8 +55,7 @@ public:
     DeferredAttributePersistenceProvider(AttributePersistenceProvider & persister,
                                          const Span<DeferredAttribute> & deferredAttributes,
                                          System::Clock::Milliseconds32 writeDelay) :
-        mPersister(persister),
-        mDeferredAttributes(deferredAttributes), mWriteDelay(writeDelay)
+        mPersister(persister), mDeferredAttributes(deferredAttributes), mWriteDelay(writeDelay)
     {}
 
     /*
