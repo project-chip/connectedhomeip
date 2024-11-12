@@ -23,17 +23,20 @@ if (use_SiWx917) {
   shell_dependency_path = "${chip_root}/examples/platform/silabs/SiWx917"
 }
 
-config("shell-config") {
-  include_dirs = [ "." ]
+config("icd-shell-config") {
+  include_dirs = [ "./icd/" ]
 }
 
 source_set("icd") {
   sources = [
-    "ICDShellCommands.cpp",
-    "ICDShellCommands.h",
+    "./icd/ICDShellCommands.cpp",
+    "./icd/ICDShellCommands.h",
   ]
 
-  public_configs = [ ":shell-config" ]
+  public_configs = [ ":icd-shell-config" ]
 
-  deps = [ "${shell_dependency_path}:matter-shell" ]
+  deps = [
+    "${chip_root}/src/app/icd/server:notifier",
+    "${shell_dependency_path}:matter-shell",
+  ]
 }

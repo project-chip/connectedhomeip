@@ -119,6 +119,7 @@ ALLOW: Dict[str, Set[str]] = {
     # Only uses <chrono> for zero-cost types.
     'src/system/SystemClock.h': {'chrono'},
     'src/platform/mbed/MbedEventTimeout.h': {'chrono'},
+    'src/lib/core/StringBuilderAdapters.h': {'chrono'},
 
     'src/app/app-platform/ContentApp.h': {'list', 'string'},
     'src/app/app-platform/ContentAppPlatform.cpp': {'string'},
@@ -187,4 +188,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/controller/CHIPDeviceController.cpp': {'string'},
     'src/qrcodetool/setup_payload_commands.cpp': {'string'},
     'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
+
+    # nrfconnect test runner
+    'src/test_driver/nrfconnect/main/runner.cpp': {'vector'},
 }

@@ -33,7 +33,6 @@
 #include "nvs_flash.h"
 #include "platform/PlatformManager.h"
 #include "shell_extension/launch.h"
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/endpoint-config-api.h>
 #include <binding-handler.h>
 #include <common/CHIPDeviceManager.h>
@@ -42,6 +41,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 
@@ -128,7 +128,6 @@ static void InitServer(intptr_t context)
     app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 
-// #include <laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <examples/all-clusters-app/all-clusters-common/include/laundry-washer-controls-delegate-impl.h>
 #include <src/app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 
@@ -210,7 +209,6 @@ extern "C" void app_main()
     {
         ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %" CHIP_ERROR_FORMAT, error.Format());
     }
-    ESPOpenThreadInit();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

@@ -76,6 +76,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=${chip_build_controller_dynamic_server}",
     "CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP=${chip_enable_busy_handling_for_operational_session_setup}",
     "CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING=${chip_data_model_extra_logging}",
+    "CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED=${chip_terms_and_conditions_required}",
   ]
 
   visibility = [ ":app_config" ]
@@ -106,17 +107,22 @@ source_set("paths") {
     "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
   ]
 }
 
 source_set("global-attributes") {
-  sources = [ "GlobalAttributes.h" ]
+  sources = [
+    "GlobalAttributes.cpp",
+    "GlobalAttributes.h",
+  ]
 
   # This also depends on zap-generated code which is currently impossible to split out
   # as a dependency
   public_deps = [
     ":app_config",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/lib/support",
   ]
 }
@@ -147,6 +153,10 @@ source_set("constants") {
 
 source_set("test-event-trigger") {
   sources = [ "TestEventTriggerDelegate.h" ]
+}
+
+source_set("event-reporter") {
+  sources = [ "EventReporter.h" ]
 }
 
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
@@ -201,22 +211,23 @@ static_library("interaction-model") {
     "reporting/reporting.h",
   ]
 
-  deps = [ "${chip_root}/src/app:events" ]
-
-  # Temporary dependency: codegen data provider instance should be provided
-  # by the application
-  deps += [ "${chip_root}/src/app/codegen-data-model-provider:instance-header" ]
+  deps = [
+    ":path-expansion",
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/app:global-attributes",
+  ]
 
   public_deps = [
     ":app_config",
     ":command-handler-impl",
     ":constants",
+    ":event-reporter",
     ":paths",
     ":subscription-info-provider",
+    "${chip_root}/src/access",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
-    "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/app/util:callbacks",
@@ -227,6 +238,10 @@ static_library("interaction-model") {
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
   ]
+
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd/server:manager" ]
+  }
 
   public_configs = [ "${chip_root}/src:includes" ]
 
@@ -256,7 +271,6 @@ static_library("interaction-model") {
     # We likely should formalize and change this with a proper DataModel::Provider that
     # is consistent instead
     sources += [
-      "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
       "${chip_root}/src/app/util/ember-io-storage.cpp",
       "dynamic_server/DynamicDispatcher.cpp",
     ]
@@ -344,13 +358,29 @@ source_set("status-response") {
     ":constants",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
+  ]
+}
+
+source_set("command-handler") {
+  sources = [
+    "CommandHandler.cpp",
+    "CommandHandler.h",
+  ]
+
+  public_deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
   ]
 }
 
 source_set("command-handler-interface") {
   sources = [
-    "CommandHandler.cpp",
-    "CommandHandler.h",
     "CommandHandlerExchangeInterface.h",
     "CommandHandlerInterface.h",
     "CommandHandlerInterfaceRegistry.cpp",
@@ -358,9 +388,11 @@ source_set("command-handler-interface") {
   ]
 
   public_deps = [
+    ":command-handler",
     ":paths",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
@@ -381,11 +413,68 @@ source_set("command-handler-impl") {
     ":status-response",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
+  ]
+}
+
+source_set("storage-wrapper") {
+  sources = [
+    "StorageDelegateWrapper.cpp",
+    "StorageDelegateWrapper.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("path-expansion") {
+  sources = [
+    "AttributePathExpandIterator.cpp",
+    "AttributePathExpandIterator.h",
+  ]
+
+  public_deps = [
+    ":global-attributes",
+    ":paths",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("attribute-persistence") {
+  sources = [
+    "DefaultSafeAttributePersistenceProvider.h",
+    "SafeAttributePersistenceProvider.cpp",
+    "SafeAttributePersistenceProvider.h",
+  ]
+
+  public_deps = [
+    ":paths",
+    ":storage-wrapper",
+    "${chip_root}/src/app/data-model:nullable",
+    "${chip_root}/src/app/util:types",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:span",
+  ]
+}
+
+source_set("generic-test-event-trigger-handler") {
+  sources = [
+    "GenericEventManagementTestEventTriggerHandler.cpp",
+    "GenericEventManagementTestEventTriggerHandler.h",
+  ]
+
+  public_deps = [
+    ":test-event-trigger",
+    "${chip_root}/src/platform",
   ]
 }
 
@@ -395,28 +484,17 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "AttributePathExpandIterator.cpp",
-    "AttributePathExpandIterator.h",
-    "AttributePathExpandIterator.h",
-    "AttributePersistenceProvider.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
-    "DefaultAttributePersistenceProvider.cpp",
-    "DefaultAttributePersistenceProvider.h",
-    "DeferredAttributePersistenceProvider.cpp",
-    "DeferredAttributePersistenceProvider.h",
     "EventLogging.h",
     "EventManagement.cpp",
     "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
-    "GenericEventManagementTestEventTriggerHandler.cpp",
-    "GenericEventManagementTestEventTriggerHandler.h",
     "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
-    "SafeAttributePersistenceProvider.h",
     "TimerDelegates.cpp",
     "TimerDelegates.h",
     "WriteHandler.cpp",
@@ -433,8 +511,10 @@ static_library("app") {
     ":app_config",
     ":attribute-access",
     ":constants",
+    ":event-reporter",
     ":global-attributes",
     ":interaction-model",
+    ":path-expansion",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",

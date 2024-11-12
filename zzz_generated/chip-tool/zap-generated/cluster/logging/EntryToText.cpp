@@ -179,6 +179,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "DoorLock";
     case chip::app::Clusters::WindowCovering::Id:
         return "WindowCovering";
+    case chip::app::Clusters::ClosureControl::Id:
+        return "ClosureControl";
     case chip::app::Clusters::ServiceArea::Id:
         return "ServiceArea";
     case chip::app::Clusters::PumpConfigurationAndControl::Id:
@@ -263,16 +265,22 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ZoneManagement";
     case chip::app::Clusters::CameraAvStreamManagement::Id:
         return "CameraAvStreamManagement";
+    case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id:
+        return "CameraAvSettingsUserLevelManagement";
     case chip::app::Clusters::WebRTCTransportProvider::Id:
         return "WebRTCTransportProvider";
     case chip::app::Clusters::WebRTCTransportRequestor::Id:
         return "WebRTCTransportRequestor";
+    case chip::app::Clusters::PushAvStreamTransport::Id:
+        return "PushAvStreamTransport";
     case chip::app::Clusters::Chime::Id:
         return "Chime";
     case chip::app::Clusters::EcosystemInformation::Id:
         return "EcosystemInformation";
     case chip::app::Clusters::CommissionerControl::Id:
         return "CommissionerControl";
+    case chip::app::Clusters::TlsCertificateManagement::Id:
+        return "TlsCertificateManagement";
     case chip::app::Clusters::UnitTesting::Id:
         return "UnitTesting";
     case chip::app::Clusters::FaultInjection::Id:
@@ -2715,6 +2723,43 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ClosureControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureControl::Attributes::CountdownTime::Id:
+            return "CountdownTime";
+        case chip::app::Clusters::ClosureControl::Attributes::MainState::Id:
+            return "MainState";
+        case chip::app::Clusters::ClosureControl::Attributes::CurrentErrorList::Id:
+            return "CurrentErrorList";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallState::Id:
+            return "OverallState";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallTarget::Id:
+            return "OverallTarget";
+        case chip::app::Clusters::ClosureControl::Attributes::RestingProcedure::Id:
+            return "RestingProcedure";
+        case chip::app::Clusters::ClosureControl::Attributes::TriggerCondition::Id:
+            return "TriggerCondition";
+        case chip::app::Clusters::ClosureControl::Attributes::TriggerPosition::Id:
+            return "TriggerPosition";
+        case chip::app::Clusters::ClosureControl::Attributes::WaitingDelay::Id:
+            return "WaitingDelay";
+        case chip::app::Clusters::ClosureControl::Attributes::KickoffTimer::Id:
+            return "KickoffTimer";
+        case chip::app::Clusters::ClosureControl::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ClosureControl::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ClosureControl::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ClosureControl::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ClosureControl::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ServiceArea::Id: {
         switch (id)
         {
@@ -4148,8 +4193,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedZoneSources";
         case chip::app::Clusters::ZoneManagement::Attributes::Zones::Id:
             return "Zones";
-        case chip::app::Clusters::ZoneManagement::Attributes::TimeControl::Id:
-            return "TimeControl";
+        case chip::app::Clusters::ZoneManagement::Attributes::Triggers::Id:
+            return "Triggers";
         case chip::app::Clusters::ZoneManagement::Attributes::Sensitivity::Id:
             return "Sensitivity";
         case chip::app::Clusters::ZoneManagement::Attributes::GeneratedCommandList::Id:
@@ -4197,10 +4242,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentFrameRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::HDRModeEnabled::Id:
             return "HDRModeEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentVideoCodecs::Id:
-            return "CurrentVideoCodecs";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentSnapshotConfig::Id:
-            return "CurrentSnapshotConfig";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::FabricsUsingCamera::Id:
             return "FabricsUsingCamera";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedVideoStreams::Id:
@@ -4269,6 +4310,41 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MPTZPosition::Id:
+            return "MPTZPosition";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MaxPresets::Id:
+            return "MaxPresets";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MPTZPresets::Id:
+            return "MPTZPresets";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::Id:
+            return "DPTZRelativeMove";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::Id:
+            return "ZoomMax";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::TiltMin::Id:
+            return "TiltMin";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::TiltMax::Id:
+            return "TiltMax";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::PanMin::Id:
+            return "PanMin";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::PanMax::Id:
+            return "PanMax";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WebRTCTransportProvider::Id: {
         switch (id)
         {
@@ -4302,6 +4378,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::WebRTCTransportRequestor::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::WebRTCTransportRequestor::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::PushAvStreamTransport::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::SupportedContainerFormats::Id:
+            return "SupportedContainerFormats";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::SupportedIngestMethods::Id:
+            return "SupportedIngestMethods";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::CurrentConnections::Id:
+            return "CurrentConnections";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -4365,6 +4464,31 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::CommissionerControl::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::CommissionerControl::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsCertificateManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::MaxRootCertificates::Id:
+            return "MaxRootCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::CurrentRootCertificates::Id:
+            return "CurrentRootCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::MaxClientCertificates::Id:
+            return "MaxClientCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::CurrentClientCertificates::Id:
+            return "CurrentClientCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -4907,6 +5031,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RemoveFabric";
         case chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
             return "AddTrustedRootCertificate";
+        case chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id:
+            return "SetVidVerificationStatement";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Id:
+            return "SignVidVerificationRequest";
         default:
             return "Unknown";
         }
@@ -5343,6 +5471,23 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ClosureControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureControl::Commands::Stop::Id:
+            return "Stop";
+        case chip::app::Clusters::ClosureControl::Commands::MoveTo::Id:
+            return "MoveTo";
+        case chip::app::Clusters::ClosureControl::Commands::Calibrate::Id:
+            return "Calibrate";
+        case chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::Id:
+            return "ConfigureFallback";
+        case chip::app::Clusters::ClosureControl::Commands::CancelFallback::Id:
+            return "CancelFallback";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ServiceArea::Id: {
         switch (id)
         {
@@ -5686,6 +5831,27 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::Id:
+            return "MPTZSetPosition";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::Id:
+            return "MPTZRelativeMove";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::Id:
+            return "MPTZMoveToPreset";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::Id:
+            return "MPTZSavePreset";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::Id:
+            return "MPTZRemovePreset";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Id:
+            return "DPTZSetViewport";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::Id:
+            return "DPTZRelativeMove";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WebRTCTransportProvider::Id: {
         switch (id)
         {
@@ -5695,8 +5861,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ProvideOffer";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id:
             return "ProvideAnswer";
-        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id:
-            return "ProvideICECandidate";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id:
+            return "ProvideICECandidates";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
             return "EndSession";
         default:
@@ -5710,10 +5876,29 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Offer";
         case chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::Id:
             return "Answer";
-        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id:
-            return "ICECandidate";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id:
+            return "ICECandidates";
         case chip::app::Clusters::WebRTCTransportRequestor::Commands::End::Id:
             return "End";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::PushAvStreamTransport::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Id:
+            return "AllocatePushTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::DeallocatePushTransport::Id:
+            return "DeallocatePushTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::ModifyPushTransport::Id:
+            return "ModifyPushTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::SetTransportStatus::Id:
+            return "SetTransportStatus";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id:
+            return "ManuallyTriggerTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
+            return "FindTransport";
         default:
             return "Unknown";
         }
@@ -5734,6 +5919,31 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RequestCommissioningApproval";
         case chip::app::Clusters::CommissionerControl::Commands::CommissionNode::Id:
             return "CommissionNode";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsCertificateManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::Id:
+            return "ProvisionRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id:
+            return "FindRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id:
+            return "LookupRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
+            return "RemoveRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
+            return "TLSClientCSR";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
+            return "ProvisionClientCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
+            return "FindClientCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id:
+            return "LookupClientCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Id:
+            return "RemoveClientCertificate";
         default:
             return "Unknown";
         }
@@ -5935,6 +6145,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "CSRResponse";
         case chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::Id:
             return "NOCResponse";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::Id:
+            return "SignVidVerificationResponse";
         default:
             return "Unknown";
         }
@@ -6287,11 +6499,43 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::PushAvStreamTransport::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransportResponse::Id:
+            return "AllocatePushTransportResponse";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::FindTransportResponse::Id:
+            return "FindTransportResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommissionerControl::Id: {
         switch (id)
         {
         case chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::Id:
             return "ReverseOpenCommissioningWindow";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsCertificateManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::Id:
+            return "ProvisionRootCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::Id:
+            return "FindRootCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::Id:
+            return "LookupRootCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id:
+            return "TLSClientCSRResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::Id:
+            return "ProvisionClientCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
+            return "FindClientCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id:
+            return "LookupClientCertificateResponse";
         default:
             return "Unknown";
         }
@@ -6459,10 +6703,44 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Color Temperature Light";
     case 0x0000010D:
         return "Extended Color Light";
+    case 0x0000010F:
+        return "Mounted On/Off Control";
+    case 0x00000110:
+        return "Mounted Dimmable Load Control";
+    case 0x00000142:
+        return "Camera";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:
         return "Window Covering Controller";
+    case 0x00000230:
+        return "ClosureBase";
+    case 0x00000231:
+        return "Window";
+    case 0x00000232:
+        return "Shutter";
+    case 0x00000233:
+        return "Shade";
+    case 0x00000234:
+        return "Curtain";
+    case 0x00000235:
+        return "Blind";
+    case 0x00000236:
+        return "Screen";
+    case 0x00000237:
+        return "Awning";
+    case 0x00000238:
+        return "Pergola";
+    case 0x00000239:
+        return "Door";
+    case 0x0000023A:
+        return "GarageDoor";
+    case 0x0000023B:
+        return "Gate";
+    case 0x0000023C:
+        return "Barrier";
+    case 0x0000023D:
+        return "Cabinet";
     case 0x00000300:
         return "Heating/Cooling Unit";
     case 0x00000301:
@@ -6481,6 +6759,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Humidity Sensor";
     case 0x00000309:
         return "Heat Pump";
+    case 0x0000030A:
+        return "Thermostat Controller";
     case 0x0000050C:
         return "EVSE";
     case 0x0000050D:

@@ -55,14 +55,8 @@ constexpr int kListenBacklogSize = 2;
 
 TCPBase::~TCPBase()
 {
-    if (mListenSocket != nullptr)
-    {
-        // endpoint is only non null if it is initialized and listening
-        mListenSocket->Free();
-        mListenSocket = nullptr;
-    }
-
-    CloseActiveConnections();
+    // Call Close to free the listening socket and close all active connections.
+    Close();
 }
 
 void TCPBase::CloseActiveConnections()
@@ -82,25 +76,27 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
 
     VerifyOrExit(mState == TCPState::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = params.GetEndPointManager()->NewEndPoint(&mListenSocket);
-#else
-    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
-    SuccessOrExit(err);
-
-    err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(),
-                              params.GetInterfaceId().IsPresent());
-    SuccessOrExit(err);
-
-    mListenSocket->mAppState            = reinterpret_cast<void *>(this);
-    mListenSocket->OnConnectionReceived = HandleIncomingConnection;
-    mListenSocket->OnAcceptError        = HandleAcceptError;
-
     mEndpointType = params.GetAddressType();
 
-    err = mListenSocket->Listen(kListenBacklogSize);
+    // Primary socket endpoint created to help get EndPointManager handle for creating multiple
+    // connection endpoints at runtime.
+    err = params.GetEndPointManager()->NewEndPoint(&mListenSocket);
     SuccessOrExit(err);
+
+    if (params.IsServerListenEnabled())
+    {
+        err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(),
+                                  params.GetInterfaceId().IsPresent());
+        SuccessOrExit(err);
+
+        mListenSocket->mAppState            = reinterpret_cast<void *>(this);
+        mListenSocket->OnConnectionReceived = HandleIncomingConnection;
+        mListenSocket->OnAcceptError        = HandleAcceptError;
+
+        err = mListenSocket->Listen(kListenBacklogSize);
+        SuccessOrExit(err);
+        ChipLogProgress(Inet, "TCP server listening on port %d for incoming connections", params.GetListenPort());
+    }
 
     mState = TCPState::kInitialized;
 
@@ -125,6 +121,9 @@ void TCPBase::Close()
         mListenSocket->Free();
         mListenSocket = nullptr;
     }
+
+    CloseActiveConnections();
+
     mState = TCPState::kNotReady;
 }
 
@@ -343,7 +342,15 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             // We have not yet received the complete message.
             return CHIP_NO_ERROR;
         }
+
         state->mReceived.Consume(kPacketSizeBytes);
+
+        if (messageSize == 0)
+        {
+            // No payload but considered a valid message. Return success to keep the connection alive.
+            return CHIP_NO_ERROR;
+        }
+
         ReturnErrorOnFailure(ProcessSingleMessage(peerAddress, state, messageSize));
     }
 

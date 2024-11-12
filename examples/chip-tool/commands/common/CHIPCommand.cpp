@@ -22,6 +22,7 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
@@ -137,6 +138,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.opCertStore              = &mOpCertStore;
     factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
     factoryInitParams.sessionKeystore          = &sSessionKeystore;
+    factoryInitParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance(&mDefaultStorage);
 
     // Init group data provider that will be used for all group keys and IPKs for the
     // chip-tool-configured fabrics. This is OK to do once since the fabric tables
@@ -467,6 +469,11 @@ void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
 CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, chip::FabricId fabricId)
 {
     std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    VerifyOrReturnError(chip::CanCastTo<uint16_t>(CHIP_UDC_PORT + fabricId), CHIP_ERROR_INVALID_ARGUMENT);
+    uint16_t udcListenPort = static_cast<uint16_t>(CHIP_UDC_PORT + fabricId);
+    commissioner->SetUdcListenPort(udcListenPort);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     chip::Controller::SetupParams commissionerParams;
 
     ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sTrustStore, sRevocationDelegate));

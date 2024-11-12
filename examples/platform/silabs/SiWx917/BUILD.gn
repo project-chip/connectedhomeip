@@ -18,32 +18,20 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/examples/platform/silabs/args.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/platform/silabs/wifi_args.gni")
+import("${chip_root}/src/platform/silabs/wifi/args.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 import("${silabs_sdk_build_root}/SiWx917_sdk.gni")
+
+import("${matter_support_root}/provision/args.gni")  # Seperate import since the
+                                                     # matter_support_root is
+                                                     # defined in the
+                                                     # ef32_sdk.gni
 
 declare_args() {
   enable_heap_monitoring = false
 
   # OTA timeout in seconds
   ota_periodic_query_timeout_sec = 86400
-
-  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
-  sl_wfx_config_softap = false
-  sl_wfx_config_scan = true
-
-  # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_transition = true
-
-  #default WiFi SSID
-  chip_default_wifi_ssid = ""
-
-  #default Wifi Password
-  chip_default_wifi_psk = ""
-
-  # The EnableKey in hex string format used by TestEventTrigger command in
-  # GeneralDiagnostics cluster. The length of the string should be 16 bytes.
-  sl_test_event_trigger_enable_key = "00112233445566778899AABBCCDDEEFF"
 }
 
 # Sanity check
@@ -66,29 +54,6 @@ config("chip_examples_project_config") {
   ]
 }
 
-config("test-event-trigger-config") {
-  defines = [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLED" ]
-
-  if (is_debug) {
-    defines += [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${sl_test_event_trigger_enable_key}\"" ]
-  }
-}
-
-source_set("test-event-trigger") {
-  sources = [
-    "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.cpp",
-    "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.h",
-  ]
-
-  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
-  public_configs = [ ":test-event-trigger-config" ]
-  public_deps = [
-    "${chip_root}/src/app:test-event-trigger",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
-}
-
 source_set("matter-shell") {
   defines = [ "ENABLE_CHIP_SHELL" ]
 
@@ -102,41 +67,6 @@ source_set("matter-shell") {
     "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib/shell:shell",
     "${chip_root}/src/lib/shell:shell_core",
-  ]
-}
-
-config("wifi-interface-config") {
-  include_dirs = [
-    "${silabs_plat_dir}/wifi",
-    "${silabs_common_plat_dir}/wifi",
-  ]
-}
-
-source_set("wifi-interface") {
-  sources = [
-    "${silabs_common_plat_dir}/wifi/WifiInterfaceAbstraction.cpp",
-    "${silabs_common_plat_dir}/wifi/WiseconnectInterfaceAbstraction.cpp",
-    "SiWxWifiInterface.cpp",
-
-    # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
-    "${sdk_support_root}/components/service/network_manager/src/sl_net_for_lwip.c",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/icd/server:icd-server-config",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/platform:platform",
-    "${chip_root}/src/platform/silabs/SiWx917:SiWx917",
-    "${lwip_root}:lwip",
-  ]
-
-  public_configs = [
-    ":siwx917-common-config",
-    "${silabs_sdk_build_root}:silabs_config",
-    ":chip_examples_project_config",
-    ":wifi-interface-config",
-    ":silabs-wifi-config",
   ]
 }
 
@@ -164,46 +94,10 @@ config("siwx917-common-config") {
   ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
-config("silabs-wifi-config") {
-  defines = []
-  include_dirs = []
-
-  if (chip_default_wifi_ssid != "") {
-    defines += [
-      "SL_ONNETWORK_PAIRING=1",
-      "SL_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
-    ]
-  }
-  if (chip_default_wifi_psk != "") {
-    assert(chip_default_wifi_ssid != "",
-           "ssid can't be null if psk is provided")
-    defines += [ "SL_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
-  }
-
-  if (sl_wfx_config_softap) {
-    defines += [ "SL_WFX_CONFIG_SOFTAP" ]
-  }
-
-  if (sl_wfx_config_scan) {
-    defines += [ "SL_WFX_CONFIG_SCAN" ]
-  }
-
-  if (chip_enable_wifi_ipv4) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
-  }
-
-  if (rs91x_wpa3_transition) {
-    defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
-  }
-}
-
 source_set("siwx917-common") {
   deps = [ "${silabs_common_plat_dir}/provision:storage" ]
   defines = []
-  public_deps = [
-    ":wifi-interface",
-    "${lwip_root}:lwip",
-  ]
+  public_deps = []
 
   public_configs = [
     ":siwx917-common-config",
@@ -250,10 +144,6 @@ source_set("siwx917-common") {
     sources += [ "${silabs_common_plat_dir}/MemMonitoring.cpp" ]
   }
 
-  if (chip_enable_wifi) {
-    public_configs += [ ":silabs-wifi-config" ]
-  }
-
   if (chip_build_libshell) {
     deps += [ ":matter-shell" ]
 
@@ -277,12 +167,13 @@ source_set("siwx917-common") {
 
   public_deps += [
     "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
 
   if (sl_enable_test_event_trigger) {
-    public_deps += [ ":test-event-trigger" ]
+    public_deps += [ "${silabs_common_plat_dir}/test-event-trigger:sources" ]
   }
 
   if (sl_enable_si70xx_sensor) {

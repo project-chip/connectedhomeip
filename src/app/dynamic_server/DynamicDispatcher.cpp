@@ -29,7 +29,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
 #include <app/data-model/Decode.h>
-#include <app/util/att-storage.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
 #include <cstddef>
@@ -194,6 +194,14 @@ uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
     return 0;
 }
 
+uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, bool server)
+{
+    const EmberAfClusterMask cluster_mask = server ? MATTER_CLUSTER_FLAG_SERVER : MATTER_CLUSTER_FLAG_CLIENT;
+
+    return static_cast<uint8_t>(std::count_if(type->cluster, type->cluster + type->clusterCount,
+                                              [=](const EmberAfCluster & cluster) { return (cluster.mask & cluster_mask) != 0; }));
+}
+
 Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, ClusterId cluster, uint16_t attributeIndex)
 {
     return NullOptional;
@@ -201,7 +209,7 @@ Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, Cl
 
 uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
-    if (endpoint == kSupportedEndpoint && clusterId == OtaSoftwareUpdateProvider::Id && (mask & CLUSTER_MASK_SERVER))
+    if (endpoint == kSupportedEndpoint && clusterId == OtaSoftwareUpdateProvider::Id && (mask & MATTER_CLUSTER_FLAG_SERVER))
     {
         return 0;
     }
@@ -225,7 +233,7 @@ const EmberAfCluster otaProviderCluster{
     .attributes           = nullptr,
     .attributeCount       = 0,
     .clusterSize          = 0,
-    .mask                 = CLUSTER_MASK_SERVER,
+    .mask                 = MATTER_CLUSTER_FLAG_SERVER,
     .functions            = nullptr,
     .acceptedCommandList  = acceptedCommands,
     .generatedCommandList = generatedCommands,
@@ -274,11 +282,38 @@ Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttrib
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
+namespace chip {
+namespace app {
+
+EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
+{
+    return EndpointComposition::kFullFamily;
+}
+
+} // namespace app
+} // namespace chip
+
+EndpointId emberAfParentEndpointFromIndex(uint16_t index)
+{
+    return kInvalidEndpointId;
+}
+
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
+                                            Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag)
+{
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
                              AttributesChangedListener * listener)
 {
     gMockDataVersion++;
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
+}
+
+void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+{
+    listener->MarkDirty(AttributePathParams(endpoint));
 }
 
 DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClusterPath)

@@ -53,8 +53,8 @@
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
+#include <bridged-actions-stub.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -87,6 +87,7 @@ Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupporte
 Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
+Clusters::Actions::ActionsDelegateImpl sActionsDelegateImpl;
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
 constexpr const uint8_t kNamespaceCommon   = 7;
@@ -124,6 +125,7 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = { {
                                                                                  .tag         = kTagSwitchesUp } };
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp4TagList[] = { { .namespaceID = kNamespaceSwitches,
                                                                                  .tag         = kTagSwitchesDown } };
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -256,7 +258,7 @@ void ApplicationInit()
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
-    Clusters::WaterHeaterManagement::WhmApplicationInit();
+    Clusters::WaterHeaterManagement::WhmApplicationInit(chip::EndpointId(1));
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
@@ -338,6 +340,12 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
     auto & delegate = ThermostatDelegate::GetInstance();
 
     SetDefaultDelegate(endpoint, &delegate);
+}
+
+void emberAfActionsClusterInitCallback(EndpointId endpoint)
+{
+    VerifyOrReturn(endpoint == 1);
+    Clusters::Actions::ActionsServer::Instance().SetDefaultDelegate(endpoint, &sActionsDelegateImpl);
 }
 
 Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,

@@ -67,10 +67,10 @@ CHIP_ERROR LayerImplSelect::Init()
     mHandleSelectThread = PTHREAD_NULL;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
     ReturnErrorOnFailure(mWakeEvent.Open(*this));
-#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
@@ -116,9 +116,9 @@ void LayerImplSelect::Shutdown()
     mTimerPool.ReleaseAll();
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     mWakeEvent.Close(*this);
-#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
 }
@@ -127,6 +127,8 @@ void LayerImplSelect::Signal()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LIBEV
     ChipLogError(DeviceLayer, "Signal() should not be called in CHIP_SYSTEM_CONFIG_USE_LIBEV builds (might be ok in tests)");
+#elif CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    ChipLogError(DeviceLayer, "Signal() should not be called in CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK builds");
 #else
     /*
      * Wake up the I/O thread by writing a single byte to the wake pipe.
@@ -151,7 +153,7 @@ void LayerImplSelect::Signal()
 
         ChipLogError(chipSystemLayer, "System wake event notify failed: %" CHIP_ERROR_FORMAT, status.Format());
     }
-#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
@@ -188,6 +190,9 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
         dispatch_resume(timerSource);
         return CHIP_NO_ERROR;
     }
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    return CHIP_ERROR_INTERNAL;
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #elif CHIP_SYSTEM_CONFIG_USE_LIBEV
     VerifyOrDie(mLibEvLoopP != nullptr);
     ev_timer_init(&timer->mLibEvTimer, &LayerImplSelect::HandleLibEvTimer, 1, 0);
@@ -205,15 +210,18 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
     ev_timer_start(mLibEvLoopP, &timer->mLibEvTimer);
     return CHIP_NO_ERROR;
 #endif
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
-    // Note: dispatch based implementation needs this as fallback, but not LIBEV (and dead code is not allowed with -Werror)
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    // Note: The dispatch-based implementation (using sockets but not Network.framework) requires this as a fallback
+    // for testing purposes. However, it is not needed for LIBEV or when using Network.framework (which lacks a testing
+    // configuration).  Since dead code is also not allowed with -Werror, we need to ifdef this code out
+    // in those configurations.
     if (mTimerList.Add(timer) == timer)
     {
         // The new timer is the earliest, so the time until the next event has probably changed.
         Signal();
     }
     return CHIP_NO_ERROR;
-#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 CHIP_ERROR LayerImplSelect::ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
@@ -290,8 +298,8 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
     mTimerPool.Release(timer);
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
-    // LIBEV has no I/O wakeup thread, so must not call Signal()
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    // Neither LIBEV nor CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK builds include an I/O wakeup thread, so must not call Signal().
     Signal();
 #endif
 }
@@ -311,6 +319,9 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
         });
         return CHIP_NO_ERROR;
     }
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    return CHIP_ERROR_INTERNAL;
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #elif CHIP_SYSTEM_CONFIG_USE_LIBEV
     // schedule as timer with no delay, but do NOT cancel previous timers with same onComplete/appState!
     TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
@@ -324,8 +335,11 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
     ev_timer_start(mLibEvLoopP, &timer->mLibEvTimer);
     return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
-    // Note: dispatch based implementation needs this as fallback, but not LIBEV (and dead code is not allowed with -Werror)
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    // Note: The dispatch-based implementation (using sockets but not Network.framework) requires this as a fallback
+    // for testing purposes. However, it is not needed for LIBEV or when using Network.framework (which lacks a testing
+    // configuration). Since dead code is also not allowed with -Werror, we need to ifdef this code out
+    // in those configurations.
     // Ideally we would not use a timer here at all, but if we try to just
     // ScheduleLambda the lambda needs to capture the following:
     // 1) onComplete
@@ -360,7 +374,7 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
         Signal();
     }
     return CHIP_NO_ERROR;
-#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)

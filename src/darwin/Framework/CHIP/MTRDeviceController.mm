@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -150,6 +149,11 @@ using namespace chip::Tracing::DarwinFramework;
         *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
     }
     return nil;
+}
+
+- (void)dealloc
+{
+    MTR_LOG("%@ dealloc", self);
 }
 
 - (NSString *)description
@@ -371,15 +375,37 @@ using namespace chip::Tracing::DarwinFramework;
     return [[MTRDevice alloc] initForSubclassesWithNodeID:nodeID controller:self];
 }
 
-- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
+- (MTRDevice * _Nullable)_deviceForNodeID:(NSNumber *)nodeID createIfNeeded:(BOOL)createIfNeeded
 {
     std::lock_guard lock(*self.deviceMapLock);
     MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
-    if (!deviceToReturn) {
+    if (!deviceToReturn && createIfNeeded) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
+        [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+            if ([delegate respondsToSelector:@selector(devicesChangedForController:)]) {
+                [delegate devicesChangedForController:self];
+            }
+        } logString:__PRETTY_FUNCTION__];
     }
 
     return deviceToReturn;
+}
+
+- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
+{
+    return [self _deviceForNodeID:nodeID createIfNeeded:YES];
+}
+
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID
+{
+    MTRDevice * deviceToRemove;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        deviceToRemove = [_nodeIDToDeviceMap objectForKey:nodeID];
+    }
+    if (deviceToRemove != nil) {
+        [self removeDevice:deviceToRemove];
+    }
 }
 
 - (void)removeDevice:(MTRDevice *)device
@@ -393,6 +419,27 @@ using namespace chip::Tracing::DarwinFramework;
     } else {
         MTR_LOG_ERROR("%@ Error: Cannot remove device %p with nodeID %llu", self, device, nodeID.unsignedLongLongValue);
     }
+}
+
+- (NSArray<MTRDevice *> *)devices
+{
+    std::lock_guard lock(*self.deviceMapLock);
+    NSMutableArray * devicesToReturn = [NSMutableArray array];
+
+    for (MTRDevice * device in _nodeIDToDeviceMap.objectEnumerator) {
+        [devicesToReturn addObject:device];
+    }
+
+    return devicesToReturn;
+}
+
+- (void)deviceDeallocated
+{
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(devicesChangedForController:)]) {
+            [delegate devicesChangedForController:self];
+        }
+    } logString:__PRETTY_FUNCTION__];
 }
 
 - (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
@@ -491,6 +538,12 @@ using namespace chip::Tracing::DarwinFramework;
     chip::app::DnssdServer::Instance().SetInterfaceId(interfaceId);
 }
 #endif // DEBUG
+
+- (NSArray<NSNumber *> *)nodesWithStoredData
+{
+    MTR_ABSTRACT_METHOD();
+    return @[];
+}
 
 #pragma mark - MTRDeviceControllerDelegate management
 
@@ -651,11 +704,13 @@ using namespace chip::Tracing::DarwinFramework;
     } logString:__PRETTY_FUNCTION__];
 }
 
-- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info
+- (void)controller:(MTRDeviceController *)controller readCommissioneeInfo:(MTRCommissioneeInfo *)info
 {
     [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
-            [delegate controller:controller readCommissioningInfo:info];
+        if ([delegate respondsToSelector:@selector(controller:readCommissioneeInfo:)]) {
+            [delegate controller:controller readCommissioneeInfo:info];
+        } else if ([delegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
+            [delegate controller:controller readCommissioningInfo:info.productIdentity];
         }
     } logString:__PRETTY_FUNCTION__];
 }

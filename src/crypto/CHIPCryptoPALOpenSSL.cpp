@@ -449,7 +449,7 @@ static inline EVP_MD_CTX * to_inner_hash_evp_md_ctx(HashSHA256OpaqueContext * co
     return *SafePointerCast<EVP_MD_CTX **>(context);
 }
 
-Hash_SHA256_stream::Hash_SHA256_stream() : mInitialized(false)
+Hash_SHA256_stream::Hash_SHA256_stream()
 {
     set_inner_hash_evp_md_ctx(&mContext, nullptr);
 }
@@ -470,14 +470,29 @@ CHIP_ERROR Hash_SHA256_stream::Begin()
     const int result = EVP_DigestInit_ex(mdctx, _digestForType(DigestType::SHA256), nullptr);
 
     VerifyOrReturnError(result == 1, CHIP_ERROR_INTERNAL);
-    mInitialized = true;
 
     return CHIP_NO_ERROR;
 }
 
+bool Hash_SHA256_stream::IsInitialized()
+{
+    EVP_MD_CTX * mdctx = to_inner_hash_evp_md_ctx(&mContext);
+    VerifyOrReturnValue(mdctx != nullptr, false);
+
+// Verify that the EVP_MD_CTX is initialized to SHA256 (ensures that EVP_DigestInit_ex was successfully called).
+// The legacy API EVP_MD_CTX_md() to check SHA256 initialization is deprecated in OpenSSL 3.0
+// and was replaced by EVP_MD_CTX_get0_md().
+// OpenSSL 1.1.1, which BoringSSL also uses at the time of this comment, does not support the newer replacement API.
+#if CHIP_CRYPTO_BORINGSSL || (defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x30000000L)
+    return EVP_MD_CTX_md(mdctx) == _digestForType(DigestType::SHA256);
+#else
+    return EVP_MD_CTX_get0_md(mdctx) == _digestForType(DigestType::SHA256);
+#endif
+}
+
 CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_UNINITIALIZED, Clear());
 
     EVP_MD_CTX * mdctx = to_inner_hash_evp_md_ctx(&mContext);
     VerifyOrReturnError(mdctx != nullptr, CHIP_ERROR_INTERNAL);
@@ -492,7 +507,7 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
 {
 
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_UNINITIALIZED, Clear());
 
     EVP_MD_CTX * mdctx = to_inner_hash_evp_md_ctx(&mContext);
 
@@ -519,7 +534,7 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
     unsigned int size;
 
     VerifyOrReturnError(out_buffer.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_UNINITIALIZED, Clear());
 
     EVP_MD_CTX * mdctx = to_inner_hash_evp_md_ctx(&mContext);
 
@@ -541,7 +556,6 @@ void Hash_SHA256_stream::Clear()
     EVP_MD_CTX_free(mdctx);
     set_inner_hash_evp_md_ctx(&mContext, nullptr);
 
-    mInitialized = false;
     OPENSSL_cleanse(this, sizeof(*this));
 }
 

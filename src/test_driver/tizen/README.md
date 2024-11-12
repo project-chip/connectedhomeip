@@ -12,7 +12,7 @@ image from hub.docker.com or build it locally using the provided Dockerfile in
 
 ```sh
 # Pull the image from hub.docker.com
-docker pull ghcr.io/project-chip/chip-build-tizen-qemu:50
+docker pull ghcr.io/project-chip/chip-build-tizen-qemu:119
 ```
 
 ## Building and Running Tests on QEMU
@@ -21,7 +21,7 @@ All steps described below should be done inside the docker container.
 
 ```sh
 docker run -it --rm --name chip-tizen-qemu \
-    ghcr.io/project-chip/chip-build-tizen-qemu:50 /bin/bash
+    ghcr.io/project-chip/chip-build-tizen-qemu:119 /bin/bash
 ```
 
 ### Clone the connectedhomeip repository

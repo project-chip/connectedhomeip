@@ -24,8 +24,24 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -110,13 +126,14 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         super().teardown_class()
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism.", is_commissioning=True),
-                 TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
-                 TestStep(3, "Reverse Commission TH_FSAs onto DUT_FSA fabric."),
-                 TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
-                 TestStep("3b", "TH_FSA sends CommissionNode"),
-                 TestStep("3c", "DUT_FSA commissions TH_FSA")]
-        return steps
+        return [
+            TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism.", is_commissioning=True),
+            TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
+            TestStep(3, "Reverse Commission TH_FSAs onto DUT_FSA fabric."),
+            TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
+            TestStep("3b", "TH_FSA sends CommissionNode"),
+            TestStep("3c", "DUT_FSA commissions TH_FSA"),
+        ]
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.

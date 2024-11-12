@@ -144,6 +144,8 @@ Status NXPWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDeb
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
+    VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
+
     // Use empty ssid for representing invalid network
     mStagingNetwork.ssidLen = 0;
 

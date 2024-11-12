@@ -133,6 +133,8 @@ MTR_DIRECT_MEMBERS
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
     MTR_LOG("MTRDevice dealloc: %p", self);
 
+    [_deviceController deviceDeallocated];
+
     // Locking because _cancelAllAttributeValueWaiters has os_unfair_lock_assert_owner(&_lock)
     std::lock_guard lock(_lock);
     [self _cancelAllAttributeValueWaiters];
@@ -201,10 +203,10 @@ MTR_DIRECT_MEMBERS
     MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
 
     // Call hook to allow subclasses to act on delegate addition.
-    [self _delegateAdded];
+    [self _delegateAdded:delegate];
 }
 
-- (void)_delegateAdded
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -233,6 +235,16 @@ MTR_DIRECT_MEMBERS
         [_delegates minusSet:delegatesToRemove];
         MTR_LOG("%@ removeDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
     }
+
+    // Call hook to allow subclasses to act on delegate addition.
+    [self _delegateRemoved:delegate];
+}
+
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    // Nothing to do for now. At the moment this is a hook for subclasses.
 }
 
 - (void)invalidate
@@ -241,6 +253,12 @@ MTR_DIRECT_MEMBERS
 
     [_delegates removeAllObjects];
     [self _cancelAllAttributeValueWaiters];
+}
+
+- (BOOL)delegateExists
+{
+    std::lock_guard lock(_lock);
+    return [self _delegateExists];
 }
 
 - (BOOL)_delegateExists
@@ -361,6 +379,32 @@ MTR_DIRECT_MEMBERS
 {
     MTR_ABSTRACT_METHOD();
     return [NSArray array];
+}
+
+- (NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)descriptorClusters
+{
+    @autoreleasepool {
+        // For now, we have a temp array that we should make sure dies as soon
+        // as possible.
+        //
+        // TODO: We should have a version of readAttributePaths that returns a
+        // dictionary in the format we want here.
+        auto path = [MTRAttributeRequestPath requestPathWithEndpointID:nil
+                                                             clusterID:@(MTRClusterIDTypeDescriptorID)
+                                                           attributeID:nil];
+        auto * data = [self readAttributePaths:@[ path ]];
+
+        auto * retval = [NSMutableDictionary dictionaryWithCapacity:data.count];
+        for (NSDictionary * item in data) {
+            // We double-check that the things in our dictionaries are the right
+            // thing, because XPC has no way to check that for us.
+            if (MTR_SAFE_CAST(item[MTRAttributePathKey], MTRAttributePath) && MTR_SAFE_CAST(item[MTRDataKey], NSDictionary)) {
+                retval[item[MTRAttributePathKey]] = item[MTRDataKey];
+            }
+        }
+
+        return retval;
+    }
 }
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
@@ -495,6 +539,16 @@ MTR_DIRECT_MEMBERS
            serverSideProcessingTimeout:serverSideProcessingTimeout
                                  queue:queue
                             completion:responseHandler];
+}
+
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
+                 queue:(dispatch_queue_t)queue
+            completion:(MTRDeviceResponseHandler)completion
+{
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
@@ -753,7 +807,6 @@ MTR_DIRECT_MEMBERS
 
     NSArray<MTRDeviceResponseValueDictionary> * currentValues = [self readAttributePaths:requestPaths];
 
-    std::lock_guard lock(_lock);
     auto * attributeWaiter = [[MTRAttributeValueWaiter alloc] initWithDevice:self values:values queue:queue completion:completion];
 
     for (MTRDeviceResponseValueDictionary currentValue in currentValues) {
@@ -764,37 +817,23 @@ MTR_DIRECT_MEMBERS
 
     if (attributeWaiter.allValuesSatisfied) {
         MTR_LOG("%@ waitForAttributeValues no need to wait, values already match: %@", self, values);
+        // We haven't added this waiter to self.attributeValueWaiters yet, so
+        // no need to remove it before notifying.
         [attributeWaiter _notifyWithError:nil];
         return attributeWaiter;
     }
 
-    // Otherwise, wait for the values to arrive or our timeout.
-    if (!self.attributeValueWaiters) {
-        self.attributeValueWaiters = [NSHashTable weakObjectsHashTable];
+    // Otherwise, wait for one of our termination conditions.
+    {
+        std::lock_guard lock(_lock);
+        if (!self.attributeValueWaiters) {
+            self.attributeValueWaiters = [NSHashTable weakObjectsHashTable];
+        }
+        [self.attributeValueWaiters addObject:attributeWaiter];
     }
-    [self.attributeValueWaiters addObject:attributeWaiter];
 
     MTR_LOG("%@ waitForAttributeValues will wait up to %f seconds for %@", self, timeout, values);
-    dispatch_source_t timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
-    attributeWaiter.expirationTimer = timerSource;
-
-    // Set a timer to go off after timeout, and not repeat.
-    dispatch_source_set_timer(timerSource, dispatch_time(DISPATCH_TIME_NOW, static_cast<uint64_t>(timeout * static_cast<double>(NSEC_PER_SEC))), DISPATCH_TIME_FOREVER,
-        // Allow .5 seconds of leeway; should be plenty, in practice.
-        static_cast<uint64_t>(0.5 * static_cast<double>(NSEC_PER_SEC)));
-
-    mtr_weakify(attributeWaiter);
-    mtr_weakify(self);
-    dispatch_source_set_event_handler(timerSource, ^{
-        dispatch_source_cancel(timerSource);
-        mtr_strongify(self);
-        mtr_strongify(attributeWaiter);
-        if (self != nil && attributeWaiter != nil) {
-            [self _attributeWaitTimedOut:attributeWaiter];
-        }
-    });
-
-    dispatch_resume(timerSource);
+    [attributeWaiter _startTimerWithTimeout:timeout];
     return attributeWaiter;
 }
 
@@ -814,35 +853,15 @@ MTR_DIRECT_MEMBERS
     }
 
     for (MTRAttributeValueWaiter * attributeValueWaiter in satisfiedWaiters) {
-        [self _notifyAttributeValueWaiter:attributeValueWaiter withError:nil];
+        [self.attributeValueWaiters removeObject:attributeValueWaiter];
+        [attributeValueWaiter _notifyWithError:nil];
     }
 }
 
-- (void)_attributeWaitTimedOut:(MTRAttributeValueWaiter *)attributeValueWaiter
+- (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter
 {
     std::lock_guard lock(_lock);
-    [self _notifyAttributeValueWaiter:attributeValueWaiter withError:[MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT]];
-}
-
-- (void)_attributeWaitCanceled:(MTRAttributeValueWaiter *)attributeValueWaiter
-{
-    std::lock_guard lock(_lock);
-    [self _doAttributeWaitCanceled:attributeValueWaiter];
-}
-
-- (void)_doAttributeWaitCanceled:(MTRAttributeValueWaiter *)attributeValueWaiter
-{
-    os_unfair_lock_assert_owner(&_lock);
-
-    [self _notifyAttributeValueWaiter:attributeValueWaiter withError:[MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]];
-}
-
-- (void)_notifyAttributeValueWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter withError:(NSError * _Nullable)error
-{
-    os_unfair_lock_assert_owner(&_lock);
-
     [self.attributeValueWaiters removeObject:attributeValueWaiter];
-    [attributeValueWaiter _notifyWithError:error];
 }
 
 - (void)_cancelAllAttributeValueWaiters
@@ -852,7 +871,7 @@ MTR_DIRECT_MEMBERS
     auto * attributeValueWaiters = self.attributeValueWaiters;
     self.attributeValueWaiters = nil;
     for (MTRAttributeValueWaiter * attributeValueWaiter in attributeValueWaiters) {
-        [self _doAttributeWaitCanceled:attributeValueWaiter];
+        [attributeValueWaiter _notifyCancellation];
     }
 }
 

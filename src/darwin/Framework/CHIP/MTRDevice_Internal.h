@@ -146,10 +146,15 @@ MTR_DIRECT_MEMBERS
 // Returns YES if any non-null delegates were found
 - (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^ _Nullable)(MTRDeviceDelegateInfo * delegateInfo))block;
 
+// For subclasses to call while holding lock
 - (BOOL)_delegateExists;
 
+// For device controller or other objects to call
+- (BOOL)delegateExists;
+
 // Must be called by subclasses or MTRDevice implementation only.
-- (void)_delegateAdded;
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate;
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate;
 
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
@@ -176,7 +181,7 @@ MTR_DIRECT_MEMBERS
 // expected value for the relevant attribute.
 - (void)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path;
 
-- (void)_attributeWaitCanceled:(MTRAttributeValueWaiter *)attributeValueWaiter;
+- (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter;
 
 @end
 

@@ -38,7 +38,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build-bouffalolab:90
+      image: ghcr.io/project-chip/chip-build-bouffalolab:119
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
@@ -58,7 +58,7 @@ jobs:
         run: |
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py \
-              --target bouffalolab-bl602dk-light-mfd-littlefs-rpc-115200 \
+              --target bouffalolab-bl602dk-light-wifi-littlefs-mfd-rpc \
               build \
               --copy-artifacts-to out/artifacts \
             "
@@ -66,7 +66,7 @@ jobs:
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl602 bl602+mfd+littlefs+rpc lighting-app \
-              out/artifacts/bouffalolab-bl602dk-light-mfd-littlefs-rpc-115200/chip-bl602-lighting-example.out \
+              out/artifacts/bouffalolab-bl602dk-light-wifi-littlefs-mfd-rpc/chip-bl602-lighting-example.out \
               /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
@@ -77,7 +77,7 @@ jobs:
             "./scripts/build/build_examples.py \
               --target bouffalolab-bl706dk-light-ethernet-easyflash \
               --target bouffalolab-bl706dk-light-wifi-littlefs \
-              --target bouffalolab-bl706dk-light-mfd-rpc-littlefs-115200 \
+              --target bouffalolab-bl706dk-light-thread-littlefs-mfd-rpc \
               build \
               --copy-artifacts-to out/artifacts \
             "
@@ -93,7 +93,7 @@ jobs:
               /tmp/bloat_reports/
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl702 bl706+mfd+rpc+littlefs lighting-app \
-              out/artifacts/bouffalolab-bl706dk-light-mfd-rpc-littlefs-115200/chip-bl702-lighting-example.out \
+              out/artifacts/bouffalolab-bl706dk-light-thread-littlefs-mfd-rpc/chip-bl702-lighting-example.out \
               /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
@@ -103,7 +103,7 @@ jobs:
         run: |
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py \
-              --target bouffalolab-bl704ldk-light-mfd-littlefs \
+              --target bouffalolab-bl704ldk-light-thread-littlefs-mfd \
               build \
               --copy-artifacts-to out/artifacts \
             "
@@ -111,7 +111,25 @@ jobs:
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl702l bl702l+mfd+littlefs lighting-app \
-              out/artifacts/bouffalolab-bl704ldk-light-mfd-littlefs/chip-bl702l-lighting-example.out \
+              out/artifacts/bouffalolab-bl704ldk-light-thread-littlefs-mfd/chip-bl702l-lighting-example.out \
+              /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
+
+      - name: Build example BL702L Contact Sensor
+        timeout-minutes: 30
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py \
+              --target bouffalolab-bl704ldk-contact-sensor-thread-mtd-littlefs-mfd \
+              build \
+              --copy-artifacts-to out/artifacts \
+            "
+      - name: Prepare some bloat report from the previous builds
+        run: |
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702l bl702l+mfd+littlefs contact-sensor-app \
+              out/artifacts/bouffalolab-bl704ldk-contact-sensor-thread-mtd-littlefs-mfd/chip-bl702l-contact-sensor-example.out \
               /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out

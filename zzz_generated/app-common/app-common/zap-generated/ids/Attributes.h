@@ -4289,6 +4289,72 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace WindowCovering
 
+namespace ClosureControl {
+namespace Attributes {
+
+namespace CountdownTime {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace CountdownTime
+
+namespace MainState {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MainState
+
+namespace CurrentErrorList {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CurrentErrorList
+
+namespace OverallState {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OverallState
+
+namespace OverallTarget {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace OverallTarget
+
+namespace RestingProcedure {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace RestingProcedure
+
+namespace TriggerCondition {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace TriggerCondition
+
+namespace TriggerPosition {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace TriggerPosition
+
+namespace WaitingDelay {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace WaitingDelay
+
+namespace KickoffTimer {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace KickoffTimer
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ClosureControl
+
 namespace ServiceArea {
 namespace Attributes {
 
@@ -6832,9 +6898,9 @@ namespace Zones {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace Zones
 
-namespace TimeControl {
+namespace Triggers {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace TimeControl
+} // namespace Triggers
 
 namespace Sensitivity {
 static constexpr AttributeId Id = 0x00000003;
@@ -6922,120 +6988,112 @@ namespace HDRModeEnabled {
 static constexpr AttributeId Id = 0x0000000D;
 } // namespace HDRModeEnabled
 
-namespace CurrentVideoCodecs {
-static constexpr AttributeId Id = 0x0000000E;
-} // namespace CurrentVideoCodecs
-
-namespace CurrentSnapshotConfig {
-static constexpr AttributeId Id = 0x0000000F;
-} // namespace CurrentSnapshotConfig
-
 namespace FabricsUsingCamera {
-static constexpr AttributeId Id = 0x00000010;
+static constexpr AttributeId Id = 0x0000000E;
 } // namespace FabricsUsingCamera
 
 namespace AllocatedVideoStreams {
-static constexpr AttributeId Id = 0x00000011;
+static constexpr AttributeId Id = 0x0000000F;
 } // namespace AllocatedVideoStreams
 
 namespace AllocatedAudioStreams {
-static constexpr AttributeId Id = 0x00000012;
+static constexpr AttributeId Id = 0x00000010;
 } // namespace AllocatedAudioStreams
 
 namespace AllocatedSnapshotStreams {
-static constexpr AttributeId Id = 0x00000013;
+static constexpr AttributeId Id = 0x00000011;
 } // namespace AllocatedSnapshotStreams
 
 namespace RankedVideoStreamPrioritiesList {
-static constexpr AttributeId Id = 0x00000014;
+static constexpr AttributeId Id = 0x00000012;
 } // namespace RankedVideoStreamPrioritiesList
 
 namespace SoftRecordingPrivacyModeEnabled {
-static constexpr AttributeId Id = 0x00000015;
+static constexpr AttributeId Id = 0x00000013;
 } // namespace SoftRecordingPrivacyModeEnabled
 
 namespace SoftLivestreamPrivacyModeEnabled {
-static constexpr AttributeId Id = 0x00000016;
+static constexpr AttributeId Id = 0x00000014;
 } // namespace SoftLivestreamPrivacyModeEnabled
 
 namespace HardPrivacyModeOn {
-static constexpr AttributeId Id = 0x00000017;
+static constexpr AttributeId Id = 0x00000015;
 } // namespace HardPrivacyModeOn
 
 namespace NightVision {
-static constexpr AttributeId Id = 0x00000018;
+static constexpr AttributeId Id = 0x00000016;
 } // namespace NightVision
 
 namespace NightVisionIllum {
-static constexpr AttributeId Id = 0x00000019;
+static constexpr AttributeId Id = 0x00000017;
 } // namespace NightVisionIllum
 
 namespace Viewport {
-static constexpr AttributeId Id = 0x0000001A;
+static constexpr AttributeId Id = 0x00000018;
 } // namespace Viewport
 
 namespace SpeakerMuted {
-static constexpr AttributeId Id = 0x0000001B;
+static constexpr AttributeId Id = 0x00000019;
 } // namespace SpeakerMuted
 
 namespace SpeakerVolumeLevel {
-static constexpr AttributeId Id = 0x0000001C;
+static constexpr AttributeId Id = 0x0000001A;
 } // namespace SpeakerVolumeLevel
 
 namespace SpeakerMaxLevel {
-static constexpr AttributeId Id = 0x0000001D;
+static constexpr AttributeId Id = 0x0000001B;
 } // namespace SpeakerMaxLevel
 
 namespace SpeakerMinLevel {
-static constexpr AttributeId Id = 0x0000001E;
+static constexpr AttributeId Id = 0x0000001C;
 } // namespace SpeakerMinLevel
 
 namespace MicrophoneMuted {
-static constexpr AttributeId Id = 0x0000001F;
+static constexpr AttributeId Id = 0x0000001D;
 } // namespace MicrophoneMuted
 
 namespace MicrophoneVolumeLevel {
-static constexpr AttributeId Id = 0x00000020;
+static constexpr AttributeId Id = 0x0000001E;
 } // namespace MicrophoneVolumeLevel
 
 namespace MicrophoneMaxLevel {
-static constexpr AttributeId Id = 0x00000021;
+static constexpr AttributeId Id = 0x0000001F;
 } // namespace MicrophoneMaxLevel
 
 namespace MicrophoneMinLevel {
-static constexpr AttributeId Id = 0x00000022;
+static constexpr AttributeId Id = 0x00000020;
 } // namespace MicrophoneMinLevel
 
 namespace MicrophoneAGCEnabled {
-static constexpr AttributeId Id = 0x00000023;
+static constexpr AttributeId Id = 0x00000021;
 } // namespace MicrophoneAGCEnabled
 
 namespace ImageRotation {
-static constexpr AttributeId Id = 0x00000024;
+static constexpr AttributeId Id = 0x00000022;
 } // namespace ImageRotation
 
 namespace ImageFlipHorizontal {
-static constexpr AttributeId Id = 0x00000025;
+static constexpr AttributeId Id = 0x00000023;
 } // namespace ImageFlipHorizontal
 
 namespace ImageFlipVertical {
-static constexpr AttributeId Id = 0x00000026;
+static constexpr AttributeId Id = 0x00000024;
 } // namespace ImageFlipVertical
 
 namespace LocalVideoRecordingEnabled {
-static constexpr AttributeId Id = 0x00000027;
+static constexpr AttributeId Id = 0x00000025;
 } // namespace LocalVideoRecordingEnabled
 
 namespace LocalSnapshotRecordingEnabled {
-static constexpr AttributeId Id = 0x00000028;
+static constexpr AttributeId Id = 0x00000026;
 } // namespace LocalSnapshotRecordingEnabled
 
 namespace StatusLightEnabled {
-static constexpr AttributeId Id = 0x00000029;
+static constexpr AttributeId Id = 0x00000027;
 } // namespace StatusLightEnabled
 
 namespace StatusLightBrightness {
-static constexpr AttributeId Id = 0x0000002A;
+static constexpr AttributeId Id = 0x00000028;
 } // namespace StatusLightBrightness
 
 namespace GeneratedCommandList {
@@ -7060,6 +7118,68 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace CameraAvStreamManagement
+
+namespace CameraAvSettingsUserLevelManagement {
+namespace Attributes {
+
+namespace MPTZPosition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MPTZPosition
+
+namespace MaxPresets {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MaxPresets
+
+namespace MPTZPresets {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MPTZPresets
+
+namespace DPTZRelativeMove {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace DPTZRelativeMove
+
+namespace ZoomMax {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ZoomMax
+
+namespace TiltMin {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace TiltMin
+
+namespace TiltMax {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace TiltMax
+
+namespace PanMin {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace PanMin
+
+namespace PanMax {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace PanMax
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CameraAvSettingsUserLevelManagement
 
 namespace WebRTCTransportProvider {
 namespace Attributes {
@@ -7120,6 +7240,44 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace WebRTCTransportRequestor
+
+namespace PushAvStreamTransport {
+namespace Attributes {
+
+namespace SupportedContainerFormats {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedContainerFormats
+
+namespace SupportedIngestMethods {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedIngestMethods
+
+namespace CurrentConnections {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CurrentConnections
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace PushAvStreamTransport
 
 namespace Chime {
 namespace Attributes {
@@ -7222,6 +7380,48 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace CommissionerControl
+
+namespace TlsCertificateManagement {
+namespace Attributes {
+
+namespace MaxRootCertificates {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MaxRootCertificates
+
+namespace CurrentRootCertificates {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentRootCertificates
+
+namespace MaxClientCertificates {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxClientCertificates
+
+namespace CurrentClientCertificates {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace CurrentClientCertificates
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TlsCertificateManagement
 
 namespace UnitTesting {
 namespace Attributes {

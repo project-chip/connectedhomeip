@@ -130,35 +130,19 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = sKeysStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS keys storage with id: %d. Error: %s", kNvmId_KvsKeys, ErrorStr(err));
-    }
+    ReturnErrorOnFailure(err);
 
     err = sValuesStorage.Init(Internal::RamStorage::kRamBufferInitialSize, true);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS values storage with id: %d. Error: %s", kNvmId_KvsValues, ErrorStr(err));
-    }
+    ReturnErrorOnFailure(err);
 
     err = sSubscriptionStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS subscription storage with id: %d. Error: %s", kNvmId_KvsSubscription,
-                        ErrorStr(err));
-    }
+    ReturnErrorOnFailure(err);
 
     err = sGroupsStorage.Init(Internal::RamStorage::kRamBufferInitialSize, true);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS groups storage with id: %d. Error: %s", kNvmId_KvsGroups, ErrorStr(err));
-    }
+    ReturnErrorOnFailure(err);
 
     err = sAclStorage.Init(Internal::RamStorage::kRamBufferInitialSize, true);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS acl storage with id: %d. Error: %s", kNvmId_KvsAcl, ErrorStr(err));
-    }
+    ReturnErrorOnFailure(err);
 
 #if CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
     ChipLogProgress(DeviceLayer, "Moving some keys to dedicated storage");
@@ -187,10 +171,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         ChipLogProgress(DeviceLayer, "KVS val: get [%s][%i][%s]", key, pdmInternalId, GetValStorage(key)->GetName());
         err              = GetValStorage(key)->Read(pdmInternalId, 0, (uint8_t *) value, &valueSize);
         *read_bytes_size = valueSize;
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "KVS key [%s] not found in persistent storage.", key);
     }
 
 exit:
@@ -230,15 +210,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
             ChipLogProgress(DeviceLayer, "KVS key: set [%s][%i][%s]", key, pdmInternalId, GetKeyStorage(key)->GetName());
 
             err = GetKeyStorage(key)->Write(pdmInternalId, (uint8_t *) key, strlen(key) + 1);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogProgress(DeviceLayer, "KVS key: error when setting [%s][%i]", key, pdmInternalId);
-            }
         }
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "KVS val: error when setting [%s][%i]", key, pdmInternalId);
     }
 
 exit:
@@ -271,14 +243,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
             ChipLogProgress(DeviceLayer, "KVS val: del [%s][%i][%s]", key, pdmInternalId, GetValStorage(key)->GetName());
 
             err = GetValStorage(key)->Delete(pdmInternalId, -1);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogProgress(DeviceLayer, "KVS val: error when deleting [%s][%i]", key, pdmInternalId);
-            }
-        }
-        else
-        {
-            ChipLogProgress(DeviceLayer, "KVS key: error when deleting [%s][%i]", key, pdmInternalId);
         }
     }
 exit:

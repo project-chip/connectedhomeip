@@ -132,7 +132,6 @@ class BLEManagerImpl final : public BLEManager,
 #endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 {
 public:
-    uint8_t scanResponseBuffer[MAX_SCAN_RSP_DATA_LEN];
     BLEManagerImpl() {}
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
@@ -146,6 +145,7 @@ public:
 
 private:
     chip::Optional<chip::ByteSpan> mScanResponse;
+    uint8_t scanResponseBuffer[MAX_SCAN_RSP_DATA_LEN];
 
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -227,6 +227,7 @@ private:
         kUseCustomDeviceName      = 0x0400, /**< The application has configured a custom BLE device name. */
         kAdvertisingRefreshNeeded = 0x0800, /**< The advertising configuration/state in ESP BLE layer needs to be updated. */
         kExtAdvertisingEnabled    = 0x1000, /**< The application has enabled Extended BLE announcement. */
+        kBleDeinitAndMemReleased  = 0x2000, /**< The ble is deinitialized and memory is reclaimed. */
     };
 
     enum

@@ -15,7 +15,7 @@
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
-from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
+from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabThreadType
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
@@ -79,8 +79,7 @@ def BuildHostFakeTarget():
         "-clang").ExceptIfRe('-libfuzzer')
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
         "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
-    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(chip-tool|all-clusters)')
+    target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
 
@@ -148,6 +147,8 @@ def BuildHostTarget():
         TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
         TargetPart('energy-management', app=HostApp.ENERGY_MANAGEMENT),
         TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
+        TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
+        TargetPart('camera', app=HostApp.CAMERA),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -185,8 +186,7 @@ def BuildHostTarget():
         "-clang").ExceptIfRe('-libfuzzer')
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
         "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
-    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(chip-tool|all-clusters|tests)')
+    target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
     target.AppendModifier('test', extra_tests=True)
@@ -197,6 +197,7 @@ def BuildHostTarget():
     target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
+    target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
 
     return target
 
@@ -255,6 +256,7 @@ def BuildEfr32Target():
         TargetPart('brd4338a', board=Efr32Board.BRD4338A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd2605a', board=Efr32Board.BRD2605A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd4343a', board=Efr32Board.BRD4343A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd4342a', board=Efr32Board.BRD4342A, enable_wifi=True, enable_917_soc=True),
     ])
 
     # apps
@@ -302,8 +304,8 @@ def BuildNrfNativeTarget():
     target = BuildTarget('nrf', NrfConnectBuilder)
 
     target.AppendFixedTargets([
-        TargetPart('native-posix-64-tests',
-                   board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS),
+        TargetPart('native-sim-tests',
+                   board=NrfBoard.NATIVE_SIM, app=NrfApp.UNIT_TESTS),
     ])
 
     return target
@@ -691,40 +693,47 @@ def BuildBouffalolabTarget():
     # Boards
     target.AppendFixedTargets([
         TargetPart('BL602DK',
-                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
+                   board=BouffalolabBoard.BL602DK, module_type="BL602"),
+        TargetPart('BL616DK', board=BouffalolabBoard.BL616DK, module_type="BL616"),
         TargetPart('BL704LDK', board=BouffalolabBoard.BL704LDK, module_type="BL704L"),
         TargetPart('BL706DK',
                    board=BouffalolabBoard.BL706DK, module_type="BL706C-22"),
         TargetPart('BL602-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
+                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602", enable_resetCnt=True),
         TargetPart('BL706-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22", enable_resetCnt=True),
         TargetPart('BL602-IoT-Matter-V1',
                    board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
         TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
                    module_type="BL706C-22"),
     ])
 
-    # Apps
     target.AppendFixedTargets([
         TargetPart('light', app=BouffalolabApp.LIGHT),
+        TargetPart('contact-sensor', app=BouffalolabApp.CONTACT, enable_pds=True).OnlyIfRe('-(bl704l)'),
     ])
 
-    target.AppendModifier('ethernet', enable_ethernet=True)
-    target.AppendModifier('wifi', enable_wifi=True)
-    target.AppendModifier('thread', enable_thread=True)
-    target.AppendModifier('easyflash', enable_easyflash=True)
-    target.AppendModifier('littlefs', enable_littlefs=True)
+    target.AppendFixedTargets([
+        TargetPart('ethernet', enable_ethernet=True),
+        TargetPart('wifi', enable_wifi=True),
+        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
+        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
+        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD),
+    ])
+
+    target.AppendFixedTargets([
+        TargetPart('easyflash', enable_easyflash=True),
+        TargetPart('littlefs', enable_littlefs=True),
+    ])
+
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('mfd', enable_mfd=True)
     target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
-    target.AppendModifier('rpc', enable_rpcs=True)
-    target.AppendModifier('cdc', enable_cdc=True)
-    target.AppendModifier('mot', use_matter_openthread=True)
-    target.AppendModifier('resetCnt', enable_resetCnt=True)
+    target.AppendModifier('rpc', enable_rpcs=True, baudrate=115200).OnlyIfRe('-(bl602dk|bl704ldk|bl706dk)')
+    target.AppendModifier('cdc', enable_cdc=True).OnlyIfRe('-(bl706dk)')
+    target.AppendModifier('mot', use_matter_openthread=True).OnlyIfRe('-(thread)')
     target.AppendModifier('memmonitor', enable_heap_monitoring=True)
-    target.AppendModifier('115200', baudrate=115200)
-    target.AppendModifier('fp', enable_frame_ptr=True)
+    target.AppendModifier('coredump', enable_debug_coredump=True)
 
     return target
 
@@ -768,8 +777,10 @@ def BuildTelinkTarget():
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
-        TargetPart('tlsr9258a', board=TelinkBoard.TLSR9258A),
-        TargetPart('tlsr9258a_retention', board=TelinkBoard.TLSR9258A_RETENTION),
+        TargetPart('tl3218x', board=TelinkBoard.TL3218X),
+        TargetPart('tl3218x_retention', board=TelinkBoard.TL3218X_RETENTION),
+        TargetPart('tl7218x', board=TelinkBoard.TL7218X),
+        TargetPart('tl7218x_retention', board=TelinkBoard.TL7218X_RETENTION),
     ])
 
     target.AppendFixedTargets([
@@ -801,6 +812,7 @@ def BuildTelinkTarget():
     target.AppendModifier('mars', mars_board_config=True)
     target.AppendModifier('usb', usb_board_config=True)
     target.AppendModifier('compress-lzma', compress_lzma_config=True)
+    target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
 
     return target
 

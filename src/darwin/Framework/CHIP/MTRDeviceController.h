@@ -22,6 +22,7 @@
 #import <Matter/MTROperationalCertificateIssuer.h>
 
 @class MTRBaseDevice;
+@class MTRDevice;
 @class MTRServerEndpoint; // Defined in MTRServerEndpoint.h, which imports MTRAccessGrant.h, which imports MTRBaseClusters.h, which imports this file, so we can't import it.
 
 @class MTRDeviceControllerAbstractParameters;
@@ -83,6 +84,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     NSNumber * controllerNodeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
+ * Returns the list of MTRDevice instances that this controller has loaded
+ * into memory. Returns an empty array if no devices are in memory.
+ */
+@property (readonly, nonatomic) NSArray<MTRDevice *> * devices MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
  * Set up a commissioning session for a device, using the provided setup payload
  * to discover it and connect to it.
  *
@@ -98,12 +105,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Then a PASE session will be established with the device, unless an error
  * occurs.  MTRDeviceControllerDelegate will be notified as follows:
  *
- * * Discovery fails: onStatusUpdate with MTRCommissioningStatusFailed.
+ * * Discovery fails: controller:statusUpdate: with MTRCommissioningStatusFailed.
  *
- * * Discovery succeeds but commissioning session setup fails: onPairingComplete
- *   with an error.
+ * * Commissioning session setup fails:
+ *   controller:commissioningSessionEstablishmentDone: with non-nil error.
  *
- * * Commissioning session setup succeeds: onPairingComplete with no error.
+ * * Commissioning session setup succeeds:
+ *   controller:commissioningSessionEstablishmentDone: with nil error.
  *
  * Once a commissioning session is set up, getDeviceBeingCommissioned
  * can be used to get an MTRBaseDevice and discover what sort of network
@@ -132,11 +140,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Then a PASE session will be established with the device, unless an error
  * occurs.  MTRDeviceControllerDelegate will be notified as follows:
  *
- * * Invalid connection information: onStatusUpdate with MTRCommissioningStatusFailed.
+ * * Invalid connection information: controller:statusUpdate: with MTRCommissioningStatusFailed.
  *
- * * Commissioning session setup fails: onPairingComplete with an error.
+ * * Commissioning session setup fails:
+ *   controller:commissioningSessionEstablishmentDone: with non-nil error.
  *
- * * Commissioning session setup succeeds: onPairingComplete with no error.
+ * * Commissioning session setup succeeds:
+ *   controller:commissioningSessionEstablishmentDone: with nil error.
  *
  * Once a commissioning session is set up, getDeviceBeingCommissioned
  * can be used to get an MTRBaseDevice and discover what sort of network
@@ -267,6 +277,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
+ * Forget any information we have about the device with the given node ID.  That
+ * includes clearing any information we have stored about it.
+ */
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
  * Compute a PASE verifier for the desired setup passcode.
  *
  * @param[in] setupPasscode   The desired passcode to use.
@@ -299,6 +315,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * there does not need to be a resume call to match every suspend call.
  */
 - (void)resume MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
+/**
+ * Returns the list of node IDs for which this controller has stored
+ * information.  Returns empty list if the controller does not have any
+ * information stored.
+ */
+@property (readonly, nonatomic) NSArray<NSNumber *> * nodesWithStoredData MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Shut down the controller. Calls to shutdown after the first one are NO-OPs.

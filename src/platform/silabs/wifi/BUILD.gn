@@ -1,0 +1,165 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/lwip.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/silabs/efr32_sdk.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
+
+declare_args() {
+  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
+  sl_wfx_config_softap = false
+
+  # Argument to force enable WPA3 security on rs91x
+  rs91x_wpa3_transition = true
+
+  #default WiFi SSID
+  chip_default_wifi_ssid = ""
+
+  #default Wifi Password
+  chip_default_wifi_psk = ""
+
+  # Argument to enable LwIP debug logs
+  sl_enable_wifi_debug = false
+}
+
+if (chip_enable_wifi && !wifi_soc) {
+  assert(use_rs9116 || use_wf200 || use_SiWx917)
+  import("${chip_root}/src/platform/silabs/wifi/args.gni")
+
+  if (use_rs9116) {
+    import("${silabs_platform_dir}/wifi/rs911x/rs911x.gni")
+  } else if (use_SiWx917) {
+    import("${silabs_platform_dir}/wifi/SiWx/ncp/rs9117.gni")
+  }
+  if (use_wf200) {
+    import("${silabs_platform_dir}/wifi/wf200/wf200.gni")
+  }
+}
+
+config("wifi-platform-config") {
+  defines = []
+  include_dirs = []
+
+  if (sl_enable_wifi_debug) {
+    defines += [ "WIFI_DEBUG_ENABLED=1" ]
+  } else {
+    defines += [ "WIFI_DEBUG_ENABLED=0" ]
+  }
+
+  if (use_rs9116) {
+    # All the stuff from wiseconnect
+    include_dirs += rs911x_inc_plat
+  } else if (use_SiWx917) {
+    # All the stuff from wiseconnect
+    include_dirs += rs9117_inc_plat
+  }
+
+  if (chip_default_wifi_ssid != "") {
+    defines += [
+      "SL_ONNETWORK_PAIRING=1",
+      "SL_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
+    ]
+  }
+
+  if (chip_default_wifi_psk != "") {
+    assert(chip_default_wifi_ssid != "",
+           "ssid can't be null if psk is provided")
+    defines += [ "SL_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
+  }
+
+  if (sl_wfx_config_softap) {
+    defines += [ "SL_WFX_CONFIG_SOFTAP" ]
+  }
+
+  if (chip_enable_wifi_ipv4) {
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
+  }
+
+  if (rs91x_wpa3_transition) {
+    # TODO: Change this macro once WF200 support is provided
+    defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
+  }
+
+  # TODO: This defines needs to be here for the spi_multiplex.h configuration header.
+  # We need to find a better way to handle this.
+  if (!disable_lcd) {
+    defines += [ "DISPLAY_ENABLED" ]
+  }
+}
+
+source_set("wifi-platform") {
+  sources = [
+    "${silabs_platform_dir}/wifi/WifiInterface.cpp",
+    "${silabs_platform_dir}/wifi/WifiInterface.h",
+    "${silabs_platform_dir}/wifi/wfx_msgs.h",
+  ]
+
+  public_configs = [ ":wifi-platform-config" ]
+
+  public_deps = [
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/support",
+  ]
+
+  if (use_rs9116) {
+    sources += rs911x_src_plat
+
+    # All the stuff from wiseconnect
+    sources += rs911x_src_sapi
+  } else if (use_SiWx917) {
+    sources += rs911x_src_plat
+
+    # All the stuff from wiseconnect
+    sources += rs9117_src_sapi
+  } else if (use_wf200) {
+    sources += wf200_plat_src
+  }
+
+  if (wifi_soc) {
+    sources += [
+      "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
+      "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.cpp",
+      "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.h",
+
+      # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
+      "${matter_support_root}/sdk-copies/components/service/network_manager/src/sl_net_for_lwip.c",
+    ]
+
+    public_deps += [ "${lwip_root}:lwip" ]
+  }
+
+  if (use_wf200 || use_rs9116) {
+    sources += [
+      "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.cpp",
+      "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.h",
+      "${silabs_platform_dir}/wifi/lwip-support/ethernetif.cpp",
+      "${silabs_platform_dir}/wifi/lwip-support/ethernetif.h",
+      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.cpp",
+      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.h",
+    ]
+  }
+
+  # TODO: Once the WifiInterface refactor is done and becomes a class, we will inject an interface instead of having them in same source_set
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd/server:configuration-data" ]
+
+    sources += [
+      "${silabs_platform_dir}/wifi/icd/WifiSleepManager.cpp",
+      "${silabs_platform_dir}/wifi/icd/WifiSleepManager.h",
+    ]
+  }
+}

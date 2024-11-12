@@ -546,6 +546,160 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
+/** Provides an interface for providing OTA software updates */
+cluster OtaSoftwareUpdateProvider = 41 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum ApplyUpdateActionEnum : enum8 {
+    kProceed = 0;
+    kAwaitNextAction = 1;
+    kDiscontinue = 2;
+  }
+
+  enum DownloadProtocolEnum : enum8 {
+    kBDXSynchronous = 0;
+    kBDXAsynchronous = 1;
+    kHTTPS = 2;
+    kVendorSpecific = 3;
+  }
+
+  enum StatusEnum : enum8 {
+    kUpdateAvailable = 0;
+    kBusy = 1;
+    kNotAvailable = 2;
+    kDownloadProtocolNotSupported = 3;
+  }
+
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct QueryImageRequest {
+    vendor_id vendorID = 0;
+    int16u productID = 1;
+    int32u softwareVersion = 2;
+    DownloadProtocolEnum protocolsSupported[] = 3;
+    optional int16u hardwareVersion = 4;
+    optional char_string<2> location = 5;
+    optional boolean requestorCanConsent = 6;
+    optional octet_string<512> metadataForProvider = 7;
+  }
+
+  response struct QueryImageResponse = 1 {
+    StatusEnum status = 0;
+    optional int32u delayedActionTime = 1;
+    optional char_string<256> imageURI = 2;
+    optional int32u softwareVersion = 3;
+    optional char_string<64> softwareVersionString = 4;
+    optional octet_string<32> updateToken = 5;
+    optional boolean userConsentNeeded = 6;
+    optional octet_string<512> metadataForRequestor = 7;
+  }
+
+  request struct ApplyUpdateRequestRequest {
+    octet_string<32> updateToken = 0;
+    int32u newVersion = 1;
+  }
+
+  response struct ApplyUpdateResponse = 3 {
+    ApplyUpdateActionEnum action = 0;
+    int32u delayedActionTime = 1;
+  }
+
+  request struct NotifyUpdateAppliedRequest {
+    octet_string<32> updateToken = 0;
+    int32u softwareVersion = 1;
+  }
+
+  /** Determine availability of a new Software Image */
+  command QueryImage(QueryImageRequest): QueryImageResponse = 0;
+  /** Determine next action to take for a downloaded Software Image */
+  command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
+  /** Notify OTA Provider that an update was applied */
+  command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
+}
+
+/** Provides an interface for downloading and applying OTA software updates */
+cluster OtaSoftwareUpdateRequestor = 42 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum AnnouncementReasonEnum : enum8 {
+    kSimpleAnnouncement = 0;
+    kUpdateAvailable = 1;
+    kUrgentUpdateAvailable = 2;
+  }
+
+  enum ChangeReasonEnum : enum8 {
+    kUnknown = 0;
+    kSuccess = 1;
+    kFailure = 2;
+    kTimeOut = 3;
+    kDelayByProvider = 4;
+  }
+
+  enum UpdateStateEnum : enum8 {
+    kUnknown = 0;
+    kIdle = 1;
+    kQuerying = 2;
+    kDelayedOnQuery = 3;
+    kDownloading = 4;
+    kApplying = 5;
+    kDelayedOnApply = 6;
+    kRollingBack = 7;
+    kDelayedOnUserConsent = 8;
+  }
+
+  fabric_scoped struct ProviderLocation {
+    node_id providerNodeID = 1;
+    endpoint_no endpoint = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  info event StateTransition = 0 {
+    UpdateStateEnum previousState = 0;
+    UpdateStateEnum newState = 1;
+    ChangeReasonEnum reason = 2;
+    nullable int32u targetSoftwareVersion = 3;
+  }
+
+  critical event VersionApplied = 1 {
+    int32u softwareVersion = 0;
+    int16u productID = 1;
+  }
+
+  info event DownloadError = 2 {
+    int32u softwareVersion = 0;
+    int64u bytesDownloaded = 1;
+    nullable int8u progressPercent = 2;
+    nullable int64s platformCode = 3;
+  }
+
+  attribute access(write: administer) ProviderLocation defaultOTAProviders[] = 0;
+  readonly attribute boolean updatePossible = 1;
+  readonly attribute UpdateStateEnum updateState = 2;
+  readonly attribute nullable int8u updateStateProgress = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AnnounceOTAProviderRequest {
+    node_id providerNodeID = 0;
+    vendor_id vendorID = 1;
+    AnnouncementReasonEnum announcementReason = 2;
+    optional octet_string<512> metadataForNode = 3;
+    endpoint_no endpoint = 4;
+  }
+
+  /** Announce the presence of an OTA Provider */
+  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+}
+
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
       may have differing common languages, units of measurements, and numerical formatting
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
@@ -931,7 +1085,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
+  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1292,7 +1446,7 @@ cluster GeneralDiagnostics = 51 {
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** Request a variable length payload response. */
-  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+  command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -1373,12 +1527,14 @@ cluster OperationalCredentials = 62 {
     fabric_id fabricID = 3;
     node_id nodeID = 4;
     char_string<32> label = 5;
+    optional octet_string<85> vidVerificationStatement = 6;
     fabric_idx fabricIndex = 254;
   }
 
   fabric_scoped struct NOCStruct {
-    fabric_sensitive octet_string noc = 1;
-    nullable fabric_sensitive octet_string icac = 2;
+    octet_string noc = 1;
+    nullable octet_string icac = 2;
+    optional octet_string vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1453,6 +1609,23 @@ cluster OperationalCredentials = 62 {
     octet_string rootCACertificate = 0;
   }
 
+  request struct SetVidVerificationStatementRequest {
+    optional vendor_id vendorID = 0;
+    optional octet_string vidVerificationStatement = 1;
+    optional octet_string vvsc = 2;
+  }
+
+  request struct SignVidVerificationRequestRequest {
+    fabric_idx fabricIndex = 0;
+    octet_string<32> clientChallenge = 1;
+  }
+
+  response struct SignVidVerificationResponse = 14 {
+    fabric_idx fabricIndex = 0;
+    int8u fabricBindingVersion = 1;
+    octet_string signature = 2;
+  }
+
   /** Sender is requesting attestation information from the receiver. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
   /** Sender is requesting a device attestation certificate from the receiver. */
@@ -1469,6 +1642,10 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  fabric command access(invoke: administer) SetVidVerificationStatement(SetVidVerificationStatementRequest): DefaultSuccess = 12;
+  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  command access(invoke: administer) SignVidVerificationRequest(SignVidVerificationRequestRequest): SignVidVerificationResponse = 13;
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
@@ -2401,6 +2578,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
+  binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -2416,7 +2594,6 @@ endpoint 0 {
 
   server cluster AccessControl {
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
@@ -2448,7 +2625,24 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster OtaSoftwareUpdateRequestor {
+    emits event StateTransition;
+    emits event VersionApplied;
+    emits event DownloadError;
+    callback attribute defaultOTAProviders;
+    ram      attribute updatePossible default = true;
+    ram      attribute updateState default = 0;
+    ram      attribute updateStateProgress;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command AnnounceOTAProvider;
   }
 
   server cluster LocalizationConfiguration {
@@ -2478,21 +2672,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster PowerSource {
-    ram      attribute status;
-    ram      attribute order;
-    ram      attribute description;
-    ram      attribute wiredCurrentType;
-    ram      attribute wiredNominalVoltage;
-    ram      attribute wiredMaximumCurrent;
-    callback attribute endpointList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
-  }
-
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
@@ -2503,7 +2682,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2605,8 +2784,10 @@ endpoint 0 {
   }
 }
 endpoint 1 {
+  device type ma_powersource = 17, version 1;
   device type ma_electricalsensor = 1296, version 1;
   device type energy_evse = 1292, version 1;
+  device type device_energy_management = 1293, version 1;
 
 
   server cluster Identify {
@@ -2616,7 +2797,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2632,6 +2813,21 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+
+  server cluster PowerSource {
+    ram      attribute status;
+    ram      attribute order;
+    ram      attribute description;
+    ram      attribute wiredCurrentType;
+    ram      attribute wiredNominalVoltage;
+    ram      attribute wiredMaximumCurrent;
+    callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster ElectricalPowerMeasurement {
@@ -2675,23 +2871,6 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster WaterHeaterManagement {
-    callback attribute heaterTypes;
-    callback attribute heatDemand;
-    callback attribute tankVolume;
-    callback attribute estimatedHeatRequired;
-    callback attribute tankPercentage;
-    callback attribute boostState;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-
-    handle command Boost;
-    handle command CancelBoost;
   }
 
   server cluster DeviceEnergyManagement {
@@ -2751,7 +2930,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command GetTargetsResponse;
     handle command Disable;
@@ -2778,10 +2957,135 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
+  }
+
+  server cluster DeviceEnergyManagementMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 2;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
+  }
+}
+endpoint 2 {
+  device type ma_electricalsensor = 1296, version 1;
+  device type device_energy_management = 1293, version 1;
+  device type ma_waterheater = 1295, version 1;
+
+
+  server cluster Identify {
+    ram      attribute identifyTime default = 0x0;
+    ram      attribute identifyType default = 0x00;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 5;
+
+    handle command Identify;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster ElectricalPowerMeasurement {
+    callback attribute powerMode;
+    callback attribute numberOfMeasurementTypes;
+    callback attribute accuracy;
+    callback attribute ranges;
+    callback attribute voltage;
+    callback attribute activeCurrent;
+    callback attribute reactiveCurrent;
+    callback attribute apparentCurrent;
+    callback attribute activePower;
+    callback attribute reactivePower;
+    callback attribute apparentPower;
+    callback attribute RMSVoltage;
+    callback attribute RMSCurrent;
+    callback attribute RMSPower;
+    callback attribute frequency;
+    callback attribute harmonicCurrents;
+    callback attribute harmonicPhases;
+    callback attribute powerFactor;
+    callback attribute neutralCurrent;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ElectricalEnergyMeasurement {
+    callback attribute accuracy;
+    callback attribute cumulativeEnergyImported;
+    callback attribute cumulativeEnergyExported;
+    callback attribute periodicEnergyImported;
+    callback attribute periodicEnergyExported;
+    callback attribute cumulativeEnergyReset;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster WaterHeaterManagement {
+    callback attribute heaterTypes;
+    callback attribute heatDemand;
+    callback attribute tankVolume;
+    callback attribute estimatedHeatRequired;
+    callback attribute tankPercentage;
+    callback attribute boostState;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command Boost;
+    handle command CancelBoost;
+  }
+
+  server cluster DeviceEnergyManagement {
+    callback attribute ESAType;
+    callback attribute ESACanGenerate;
+    callback attribute ESAState;
+    callback attribute absMinPower;
+    callback attribute absMaxPower;
+    callback attribute powerAdjustmentCapability;
+    callback attribute forecast;
+    callback attribute optOutState;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster PowerTopology {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster WaterHeaterMode {
@@ -2804,7 +3108,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;

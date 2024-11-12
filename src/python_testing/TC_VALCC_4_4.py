@@ -27,6 +27,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -36,8 +37,8 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
-                                         utc_time_in_matter_epoch)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.timeoperations import utc_time_in_matter_epoch
 from mobly import asserts
 
 
@@ -80,7 +81,7 @@ class TC_VALCC_4_4(MatterBaseTest):
     @async_test_body
     async def test_TC_VALCC_4_4(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint(default=1)
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes

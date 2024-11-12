@@ -18,10 +18,12 @@
 
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDevice_Internal.h"
 #import "MTRDevice_XPC.h"
 #import "MTRDevice_XPC_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
 
@@ -60,18 +62,32 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
                                                : (NSDictionary *) controllerState, updateControllerConfiguration
                                                : (NSDictionary *) controllerState)
 
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(deleteNodeID
+                                               : (NSNumber *) nodeID, deleteNodeID
+                                               : (NSNumber *) nodeID)
+
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
+    NSArray<NSNumber *> *,
+    @[], // Default return value
+    getNodesWithStoredDataWithReply)
+
 - (void)_updateRegistrationInfo
 {
+    std::lock_guard lock(*self.deviceMapLock);
+
     NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
 
     NSMutableDictionary * controllerContext = [NSMutableDictionary dictionary];
     NSMutableArray * nodeIDs = [NSMutableArray array];
 
     for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
-        NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
-        MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
+        MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
+        if ([device delegateExists]) {
+            NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
+            MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
 
-        [nodeIDs addObject:nodeDictionary];
+            [nodeIDs addObject:nodeDictionary];
+        }
     }
     MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDsKey, nodeIDs, registrationInfo)
     MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
@@ -93,6 +109,13 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 {
     [super removeDevice:device];
     [self _updateRegistrationInfo];
+}
+
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID
+{
+    MTR_LOG("%@: Forgetting device with node ID: %@", self, nodeID);
+    [self deleteNodeID:nodeID];
+    [super forgetDeviceWithNodeID:nodeID];
 }
 
 #pragma mark - XPC
@@ -121,13 +144,28 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
         [MTRCommandPath class],
-        [MTRAttributePath class],
     ]];
 
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
             argumentIndex:0
                   ofReply:YES];
+
+    // invokeCommands has the same reply types as invokeCommandWithEndpointID.
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:invokeCommands:completion:)
+            argumentIndex:0
+                  ofReply:YES];
+
+    // invokeCommands gets handed MTRCommandWithRequiredResponse (which includes
+    // MTRCommandPath, which is already in allowedClasses).
+    [allowedClasses addObjectsFromArray:@[
+        [MTRCommandWithRequiredResponse class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:invokeCommands:completion:)
+            argumentIndex:2
+                  ofReply:NO];
 
     // readAttributePaths: gets handed an array of MTRAttributeRequestPath.
     allowedClasses = [MTRDeviceController_XPC _allowedClasses];
@@ -355,8 +393,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
     [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
 
-    [self _updateRegistrationInfo];
-
     return deviceToReturn;
 }
 
@@ -487,7 +523,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
             continue;
         }
 
-        auto * device = static_cast<MTRDevice_XPC *>([self deviceForNodeID:nodeID]);
+        auto * device = static_cast<MTRDevice_XPC *>([self _deviceForNodeID:nodeID createIfNeeded:NO]);
         [device device:nodeID internalStateUpdated:deviceInternalState];
     }
 }

@@ -105,7 +105,7 @@ limitations under the License.
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x09" name="TCUpdateDeadline" define="TC_UPDATE_DEADLINE" type="int32u" writable="false" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="0x09" name="TCUpdateDeadline" define="TC_UPDATE_DEADLINE" type="int32u" writable="false" optional="true" isNullable="true" apiMaturity="provisional">
       <access op="read" privilege="administer"/>
       <otherwiseConform>
         <provisionalConform/>

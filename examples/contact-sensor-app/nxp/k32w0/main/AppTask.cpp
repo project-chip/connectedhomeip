@@ -18,18 +18,18 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 
 #include <DeviceInfoProviderImpl.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -298,6 +298,7 @@ void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     auto & infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
     infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
@@ -779,23 +780,23 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     }
 #endif
 
-#if CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
     if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
     {
-        if (!NFCMgr().IsTagEmulationStarted())
+        if (!NFCOnboardingPayloadMgr().IsTagEmulationStarted())
         {
             K32W_LOG("NFC Tag emulation is already stopped!");
         }
         else
         {
-            NFCMgr().StopTagEmulation();
+            NFCOnboardingPayloadMgr().StopTagEmulation();
             K32W_LOG("Stopped NFC Tag Emulation!");
         }
     }
     else if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange &&
              event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
     {
-        if (NFCMgr().IsTagEmulationStarted())
+        if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
         {
             K32W_LOG("NFC Tag emulation is already started!");
         }
