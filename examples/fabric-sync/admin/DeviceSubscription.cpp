@@ -109,7 +109,7 @@ void DeviceSubscription::OnReportEnd()
             bridge::FabricBridge::Instance().AdminCommissioningAttributeChanged(mCurrentAdministratorCommissioningAttributes);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified, "forward Administrator Commissioning Attribute to fabric bridge %" CHIP_ERROR_FORMAT,
+            ChipLogError(NotSpecified, "Cannot forward Administrator Commissioning Attribute to fabric bridge %" CHIP_ERROR_FORMAT,
                          err.Format());
         }
         mChangeDetected = false;
