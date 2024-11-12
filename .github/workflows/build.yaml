@@ -205,14 +205,14 @@ jobs:
                       esac
 
                       rm -rf ./out/sanitizers
-                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
+                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --add-export-compile-commands=*
                       BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                   done
             - name: Generate tests with sanitizers (for tidy)
               if: github.event.pull_request.number != null
               run: |
                   rm -rf ./out/sanitizers
-                  BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="is_clang=true is_asan=true" --export-compile-commands
+                  BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="is_clang=true is_asan=true" --add-export-compile-commands=*
             - name: Ensure codegen is done for sanitize
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
@@ -439,7 +439,7 @@ jobs:
                   # We want to build various standalone example apps (similar to what examples-linux-standalone.yaml
                   # does), so use target_os="all" to get those picked up as part of the "unified" build.  But then
                   # to save CI resources we want to exclude the "host clang" build, which uses the pigweed clang.
-                  scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false' --export-compile-commands
+                  scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false' --add-export-compile-commands=*
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
                   scripts/tests/gn_tests.sh
             - name: Ensure codegen is done for default

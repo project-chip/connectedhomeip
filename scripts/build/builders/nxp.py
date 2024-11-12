@@ -421,7 +421,7 @@ class NxpBuilder(GnBuilder):
 
             elif self.build_system == NxpBuildSystem.GN:
                 # add empty space at the end to avoid concatenation issue when there is no --args
-                cmd += 'gn gen --check --fail-on-unused-args --export-compile-commands --root=%s ' % self.root
+                cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root=%s ' % self.root
 
                 extra_args = []
 
