@@ -25,7 +25,7 @@ import("${qpg_sdk_build_root}/qpg_sdk.gni")
 # declares chip_build_libshell = false
 import("${chip_root}/src/lib/lib.gni")
 
-# declares chip_enable_pw_rpc = false
+# declares chip_enable_pw_rpexamples/lighting-app/qpg/src/c = false
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
@@ -66,6 +66,7 @@ qpg_executable("lighting_app") {
     "${chip_root}/examples/lighting-app/lighting-common:color-format",
     "${chip_root}/examples/lighting-app/qpg/zap/",
     "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/app/util/persistence:deferred",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
