@@ -17,11 +17,13 @@
  */
 
 #include "BridgeSubscription.h"
-#include <device_manager/DeviceManager.h>
+#include "DeviceManager.h"
 
 using namespace ::chip;
 using namespace ::chip::app;
 using chip::app::ReadClient;
+
+namespace admin {
 
 namespace {
 
@@ -78,7 +80,7 @@ void BridgeSubscription::OnAttributeData(const ConcreteDataAttributePath & path,
         return;
     }
 
-    DeviceMgr().HandleAttributeData(path, *data);
+    DeviceManager::Instance().HandleAttributeData(path, *data);
 }
 
 void BridgeSubscription::OnEventData(const app::EventHeader & eventHeader, TLV::TLVReader * data, const app::StatusIB * status)
@@ -99,7 +101,7 @@ void BridgeSubscription::OnEventData(const app::EventHeader & eventHeader, TLV::
         return;
     }
 
-    DeviceMgr().HandleEventData(eventHeader, *data);
+    DeviceManager::Instance().HandleEventData(eventHeader, *data);
 }
 
 void BridgeSubscription::OnError(CHIP_ERROR error)
@@ -157,3 +159,5 @@ void BridgeSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, 
     ChipLogError(NotSpecified, "BridgeSubscription failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     OnDone(nullptr);
 }
+
+} // namespace admin

@@ -19,9 +19,9 @@
 #import <dns_sd.h>
 #import <os/lock.h>
 
+#import "MTRDefines_Internal.h"
 #import "MTRDeviceClusterData.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
-#import "MTRDeviceDataValueDictionary.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
@@ -2706,8 +2706,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
             // Given the base device read is happening on the 5th device, at the completion
             // time of the first [pool size] subscriptions, the BaseDevice's request to
-            // read can't have completed, as it should be gated on its call to the
-            // MTRDeviceController's getSessionForNode: call.
+            // read can't have completed, as it should be gated on its call to
+            // MTRDeviceController_Concrete's getSessionForNode:.
             if (subscriptionDequeueCount <= (orderedDeviceIDs.count - subscriptionPoolSize)) {
                 XCTAssertFalse(baseDeviceReadCompleted);
             }

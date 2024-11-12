@@ -17,23 +17,96 @@
  */
 
 #include <AppMain.h>
+#include <admin/PairingManager.h>
+
+#if defined(ENABLE_CHIP_SHELL)
+#include "ShellCommands.h"
+#endif
 
 using namespace chip;
+
+namespace {
+
+constexpr char kFabricSyncLogFilePath[] = "/tmp/fabric_sync.log";
+
+// File pointer for the log file
+FILE * sLogFile = nullptr;
+
+void OpenLogFile(const char * filePath)
+{
+    sLogFile = fopen(filePath, "a");
+    if (sLogFile == nullptr)
+    {
+        perror("Failed to open log file");
+    }
+}
+
+void CloseLogFile()
+{
+    if (sLogFile != nullptr)
+    {
+        fclose(sLogFile);
+        sLogFile = nullptr;
+    }
+}
+
+void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
+{
+    if (sLogFile == nullptr)
+    {
+        return;
+    }
+
+    uint64_t timeMs       = System::SystemClock().GetMonotonicMilliseconds64().count();
+    uint64_t seconds      = timeMs / 1000;
+    uint64_t milliseconds = timeMs % 1000;
+
+    flockfile(sLogFile);
+
+    fprintf(sLogFile, "[%llu.%06llu] CHIP:%s: ", static_cast<unsigned long long>(seconds),
+            static_cast<unsigned long long>(milliseconds), module);
+    vfprintf(sLogFile, msg, args);
+    fprintf(sLogFile, "\n");
+    fflush(sLogFile);
+
+    funlockfile(sLogFile);
+}
+
+} // namespace
 
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Fabric-Sync: ApplicationInit()");
+
+    OpenLogFile(kFabricSyncLogFilePath);
+
+    // Redirect logs to the custom logging callback
+    Logging::SetLogRedirectCallback(LoggingCallback);
 }
 
 void ApplicationShutdown()
 {
     ChipLogDetail(NotSpecified, "Fabric-Sync: ApplicationShutdown()");
+    CloseLogFile();
 }
 
 int main(int argc, char * argv[])
 {
 
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+
+#if defined(ENABLE_CHIP_SHELL)
+    Shell::RegisterCommands();
+#endif
+
+    CHIP_ERROR err = admin::PairingManager::Instance().Init(GetDeviceCommissioner());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "Failed to init PairingManager: %s ", ErrorStr(err));
+
+        // End the program with non zero error code to indicate a error.
+        return 1;
+    }
 
     ChipLinuxAppMainLoop();
 

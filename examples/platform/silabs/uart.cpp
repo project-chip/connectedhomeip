@@ -16,7 +16,9 @@
  *    limitations under the License.
  */
 #include "AppConfig.h"
-#include "matter_shell.h"
+#ifdef ENABLE_CHIP_SHELL
+#include "MatterShell.h" // nogncheck
+#endif
 #include <cmsis_os2.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <sl_cmsis_os2_common.h>
@@ -362,7 +364,7 @@ void USART_IRQHandler(void)
 {
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcess();
-#elif !defined(PW_RPC_ENABLED) && !defined(SL_WIFI)
+#elif !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
     otSysEventSignalPending();
 #endif
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
@@ -409,7 +411,7 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
 
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcess();
-#elif !defined(PW_RPC_ENABLED)
+#elif !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
     otSysEventSignalPending();
 #endif
 }

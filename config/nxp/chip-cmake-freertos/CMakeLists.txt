@@ -44,17 +44,11 @@ endif()
 # ==============================================================================
 matter_add_gn_arg_string("nxp_nvm_component" ${CONFIG_CHIP_NVM_COMPONENT})
 matter_add_gn_arg_string("nxp_platform" ${CONFIG_CHIP_NXP_PLATFORM})
-matter_add_gn_arg("chip_with_factory_data" ${CONFIG_CHIP_FACTORY_DATA})
-matter_add_gn_arg("chip_enable_secure_dac_private_key_storage" ${CONFIG_CHIP_SECURE_DAC_PRIVATE_KEY_STORAGE})
-matter_add_gn_arg("chip_enable_secure_whole_factory_data" ${CONFIG_CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA})
-matter_add_gn_arg_bool("chip_enable_matter_cli" CONFIG_CHIP_LIB_SHELL)
+matter_add_gn_arg_bool("nxp_use_factory_data" ${CONFIG_CHIP_FACTORY_DATA})
+matter_add_gn_arg_bool("nxp_enable_secure_dac_private_key_storage" ${CONFIG_CHIP_SECURE_DAC_PRIVATE_KEY_STORAGE})
+matter_add_gn_arg_bool("nxp_enable_secure_whole_factory_data" ${CONFIG_CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA})
+matter_add_gn_arg_bool("nxp_enable_matter_cli" CONFIG_CHIP_LIB_SHELL)
 matter_add_gn_arg_bool("chip_enable_pairing_autostart" CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART)
-
-if (CONFIG_USE_CHIP_DATA_MODEL_INTERFACE)
-    set(DATA_MODEL_INTERFACE "enabled")
-else()
-    set(DATA_MODEL_INTERFACE "disabled")
-endif()
 
 if(CONFIG_BOOTLOADER_MCUBOOT)
     matter_add_gn_arg_bool("no_mcuboot" false)
@@ -73,7 +67,6 @@ else()
         PROJECT_CONFIG ${CONFIG_CHIP_PROJECT_CONFIG}
         PROJECT_CONFIG_INC_DIR ${CONFIG_CHIP_PROJECT_CONFIG_INCLUDE_DIRS}
         DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-        DATA_MODEL_INTERFACE ${DATA_MODEL_INTERFACE}
     )
 endif()
 

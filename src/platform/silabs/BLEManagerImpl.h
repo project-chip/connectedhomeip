@@ -27,13 +27,7 @@
 #include "FreeRTOS.h"
 #include "timers.h"
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
 #include "wfx_sl_ble_init.h"
-#ifdef __cplusplus
-}
-#endif // __cplusplus
 #else
 #include "gatt_db.h"
 #include "sl_bgapi.h"
@@ -68,6 +62,7 @@ public:
     int32_t SendBLEAdvertisementCommand(void);
 #else
     void HandleConnectEvent(volatile sl_bt_msg_t * evt);
+    void HandleConnectParams(volatile sl_bt_msg_t * evt);
     void HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt);
     void HandleWriteEvent(volatile sl_bt_msg_t * evt);
     void UpdateMtu(volatile sl_bt_msg_t * evt);

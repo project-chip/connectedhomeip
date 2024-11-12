@@ -219,7 +219,7 @@ if (current_os == "zephyr" || current_os == "mbed") {
     } else if (lwip_platform == "cc32xx") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
     } else if (lwip_platform == "silabs") {
-      public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
+      public_deps += [ "${silabs_sdk_build_root}:silabs_sdk" ]
 
       sources += [
         "${lwip_platform}/lwipopts-rs911x.h",

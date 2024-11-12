@@ -18,8 +18,8 @@
 #import <Foundation/Foundation.h>
 #import <Matter/Matter.h>
 
+#import "MTRDefines_Internal.h"
 #import "MTRDeviceClusterData.h"
-#import "MTRDeviceDataValueDictionary.h"
 #import "MTRDevice_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN

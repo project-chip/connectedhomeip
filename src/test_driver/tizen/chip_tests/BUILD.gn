@@ -24,12 +24,15 @@ tizen_qemu_run("chip-tests") {
   virtio_net = true
 
   # Share tests directory.
-  share = "${root_out_dir}/tests"
+  share = "${root_out_dir}"
+
+  # Runner script file name.
+  runner = "runner-${target_name}.sh"
 
   # Copy runner script to shared directory.
   copy("${target_name}:runner") {
     sources = [ "runner.sh" ]
-    outputs = [ share + "/runner.sh" ]
+    outputs = [ share + "/" + runner ]
   }
 
   # Build CHIP unit tests.

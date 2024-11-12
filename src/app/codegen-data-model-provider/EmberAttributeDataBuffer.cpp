@@ -17,6 +17,7 @@
 #include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
 
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/odd-sized-integers.h>
@@ -51,74 +52,47 @@ constexpr uint32_t MaxLength(EmberAttributeDataBuffer::PascalStringType s)
     return std::numeric_limits<uint16_t>::max() - 1;
 }
 
-struct UnsignedDecodeInfo
+constexpr unsigned GetByteCountOfIntegerType(EmberAfAttributeType type)
 {
-    unsigned byteCount;
-    uint64_t maxValue;
+    // This TERRIBLE bit fiddling, however it is small in flash
+    // and we assert statically the actual values we care about
 
-    constexpr UnsignedDecodeInfo(unsigned bytes) : byteCount(bytes), maxValue(NumericLimits::MaxUnsignedValue(bytes)) {}
-};
+    // ZCL_INT8U_ATTRIBUTE_TYPE             = 0x20, // Unsigned 8-bit integer
+    // ZCL_INT16U_ATTRIBUTE_TYPE            = 0x21, // Unsigned 16-bit integer
+    // ZCL_INT24U_ATTRIBUTE_TYPE            = 0x22, // Unsigned 24-bit integer
+    // ZCL_INT32U_ATTRIBUTE_TYPE            = 0x23, // Unsigned 32-bit integer
+    // ZCL_INT40U_ATTRIBUTE_TYPE            = 0x24, // Unsigned 40-bit integer
+    // ZCL_INT48U_ATTRIBUTE_TYPE            = 0x25, // Unsigned 48-bit integer
+    // ZCL_INT56U_ATTRIBUTE_TYPE            = 0x26, // Unsigned 56-bit integer
+    // ZCL_INT64U_ATTRIBUTE_TYPE            = 0x27, // Unsigned 64-bit integer
+    //
+    // ZCL_INT8S_ATTRIBUTE_TYPE             = 0x28, // Signed 8-bit integer
+    // ZCL_INT16S_ATTRIBUTE_TYPE            = 0x29, // Signed 16-bit integer
+    // ZCL_INT24S_ATTRIBUTE_TYPE            = 0x2A, // Signed 24-bit integer
+    // ZCL_INT32S_ATTRIBUTE_TYPE            = 0x2B, // Signed 32-bit integer
+    // ZCL_INT40S_ATTRIBUTE_TYPE            = 0x2C, // Signed 40-bit integer
+    // ZCL_INT48S_ATTRIBUTE_TYPE            = 0x2D, // Signed 48-bit integer
+    // ZCL_INT56S_ATTRIBUTE_TYPE            = 0x2E, // Signed 56-bit integer
+    // ZCL_INT64S_ATTRIBUTE_TYPE            = 0x2F, // Signed 64-bit integer
 
-constexpr UnsignedDecodeInfo GetUnsignedDecodeInfo(EmberAfAttributeType type)
-{
-
-    switch (type)
-    {
-    case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
-        return UnsignedDecodeInfo(1);
-    case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
-        return UnsignedDecodeInfo(2);
-    case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-        return UnsignedDecodeInfo(3);
-    case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
-        return UnsignedDecodeInfo(4);
-    case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
-        return UnsignedDecodeInfo(5);
-    case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
-        return UnsignedDecodeInfo(6);
-    case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
-        return UnsignedDecodeInfo(7);
-    case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
-        return UnsignedDecodeInfo(8);
-    }
-    chipDie();
+    return (static_cast<unsigned>(type) % 8) + 1;
 }
-
-struct SignedDecodeInfo
-{
-    unsigned byteCount;
-    int64_t minValue;
-    int64_t maxValue;
-
-    constexpr SignedDecodeInfo(unsigned bytes) :
-        byteCount(bytes), minValue(NumericLimits::MinSignedValue(bytes)), maxValue(NumericLimits::MaxSignedValue(bytes))
-    {}
-};
-
-constexpr SignedDecodeInfo GetSignedDecodeInfo(EmberAfAttributeType type)
-{
-
-    switch (type)
-    {
-    case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
-        return SignedDecodeInfo(1);
-    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
-        return SignedDecodeInfo(2);
-    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
-        return SignedDecodeInfo(3);
-    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
-        return SignedDecodeInfo(4);
-    case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
-        return SignedDecodeInfo(5);
-    case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
-        return SignedDecodeInfo(6);
-    case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
-        return SignedDecodeInfo(7);
-    case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
-        return SignedDecodeInfo(8);
-    }
-    chipDie();
-}
+static_assert(GetByteCountOfIntegerType(ZCL_INT8U_ATTRIBUTE_TYPE) == 1);
+static_assert(GetByteCountOfIntegerType(ZCL_INT8S_ATTRIBUTE_TYPE) == 1);
+static_assert(GetByteCountOfIntegerType(ZCL_INT16U_ATTRIBUTE_TYPE) == 2);
+static_assert(GetByteCountOfIntegerType(ZCL_INT16S_ATTRIBUTE_TYPE) == 2);
+static_assert(GetByteCountOfIntegerType(ZCL_INT24U_ATTRIBUTE_TYPE) == 3);
+static_assert(GetByteCountOfIntegerType(ZCL_INT24S_ATTRIBUTE_TYPE) == 3);
+static_assert(GetByteCountOfIntegerType(ZCL_INT32U_ATTRIBUTE_TYPE) == 4);
+static_assert(GetByteCountOfIntegerType(ZCL_INT32S_ATTRIBUTE_TYPE) == 4);
+static_assert(GetByteCountOfIntegerType(ZCL_INT40U_ATTRIBUTE_TYPE) == 5);
+static_assert(GetByteCountOfIntegerType(ZCL_INT40S_ATTRIBUTE_TYPE) == 5);
+static_assert(GetByteCountOfIntegerType(ZCL_INT48U_ATTRIBUTE_TYPE) == 6);
+static_assert(GetByteCountOfIntegerType(ZCL_INT48S_ATTRIBUTE_TYPE) == 6);
+static_assert(GetByteCountOfIntegerType(ZCL_INT56U_ATTRIBUTE_TYPE) == 7);
+static_assert(GetByteCountOfIntegerType(ZCL_INT56S_ATTRIBUTE_TYPE) == 7);
+static_assert(GetByteCountOfIntegerType(ZCL_INT64U_ATTRIBUTE_TYPE) == 8);
+static_assert(GetByteCountOfIntegerType(ZCL_INT64S_ATTRIBUTE_TYPE) == 8);
 
 /// Encodes the string of type stringType pointed to by `reader` into the TLV `writer`.
 /// Then encoded string will be at tag `tag` and of type `tlvType`
@@ -173,7 +147,8 @@ CHIP_ERROR EncodeString(EmberAttributeDataBuffer::PascalStringType stringType, T
 
 CHIP_ERROR EmberAttributeDataBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer)
 {
-    UnsignedDecodeInfo info = GetUnsignedDecodeInfo(mAttributeType);
+    const unsigned byteCount = GetByteCountOfIntegerType(mAttributeType);
+    const uint64_t maxValue  = NumericLimits::MaxUnsignedValue(byteCount);
 
     // Any size of integer can be read by TLV getting 64-bit integers
     uint64_t value;
@@ -181,7 +156,7 @@ CHIP_ERROR EmberAttributeDataBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader 
     if (reader.GetType() == TLV::kTLVType_Null)
     {
         // we know mIsNullable due to the check at the top of ::Decode
-        value = NumericLimits::UnsignedMaxValueToNullValue(info.maxValue);
+        value = NumericLimits::UnsignedMaxValueToNullValue(maxValue);
     }
     else
     {
@@ -189,20 +164,22 @@ CHIP_ERROR EmberAttributeDataBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader 
 
         bool valid =
             // Value is in [0, max] RANGE
-            (value <= info.maxValue)
+            (value <= maxValue)
             // Nullable values reserve a specific value to mean NULL
-            && !(mIsNullable && (value == NumericLimits::UnsignedMaxValueToNullValue(info.maxValue)));
+            && !(mIsNullable && (value == NumericLimits::UnsignedMaxValueToNullValue(maxValue)));
 
         VerifyOrReturnError(valid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
-    writer.EndianPut(value, info.byteCount);
+    writer.EndianPut(value, byteCount);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EmberAttributeDataBuffer::DecodeSignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer)
 {
-    SignedDecodeInfo info = GetSignedDecodeInfo(mAttributeType);
+    const unsigned byteCount = GetByteCountOfIntegerType(mAttributeType);
+    const int64_t minValue   = NumericLimits::MinSignedValue(byteCount);
+    const int64_t maxValue   = NumericLimits::MaxSignedValue(byteCount);
 
     // Any size of integer can be read by TLV getting 64-bit integers
     int64_t value;
@@ -210,7 +187,7 @@ CHIP_ERROR EmberAttributeDataBuffer::DecodeSignedInteger(chip::TLV::TLVReader & 
     if (reader.GetType() == TLV::kTLVType_Null)
     {
         // we know mIsNullable due to the check at the top of ::Decode
-        value = NumericLimits::SignedMinValueToNullValue(info.minValue);
+        value = NumericLimits::SignedMinValueToNullValue(minValue);
     }
     else
     {
@@ -218,13 +195,13 @@ CHIP_ERROR EmberAttributeDataBuffer::DecodeSignedInteger(chip::TLV::TLVReader & 
 
         bool valid =
             // Value is in [min, max] RANGE
-            ((value >= info.minValue) && (value <= info.maxValue))
+            ((value >= minValue) && (value <= maxValue))
             // Nullable values reserve a specific value to mean NULL
-            && !(mIsNullable && (value == NumericLimits::SignedMinValueToNullValue(info.minValue)));
+            && !(mIsNullable && (value == NumericLimits::SignedMinValueToNullValue(minValue)));
 
         VerifyOrReturnError(valid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
-    writer.EndianPutSigned(value, info.byteCount);
+    writer.EndianPutSigned(value, byteCount);
     return CHIP_NO_ERROR;
 }
 
@@ -384,30 +361,12 @@ CHIP_ERROR EmberAttributeDataBuffer::EncodeInteger(chip::TLV::TLVWriter & writer
 
     uint8_t raw_bytes[8];
 
-    bool isSigned = (mAttributeType == ZCL_INT8S_ATTRIBUTE_TYPE) //
-        || (mAttributeType == ZCL_INT16S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT24S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT32S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT40S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT48S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT56S_ATTRIBUTE_TYPE)         //
-        || (mAttributeType == ZCL_INT64S_ATTRIBUTE_TYPE);
+    const bool isSigned      = IsSignedAttributeType(mAttributeType);
+    const unsigned byteCount = GetByteCountOfIntegerType(mAttributeType);
 
-    unsigned byteCount;
-    uint64_t nullValue;
-
-    if (isSigned)
-    {
-        const SignedDecodeInfo info = GetSignedDecodeInfo(mAttributeType);
-        byteCount                   = info.byteCount;
-        nullValue                   = static_cast<uint64_t>(info.minValue); // just a bit cast for easy compare
-    }
-    else
-    {
-        const UnsignedDecodeInfo info = GetUnsignedDecodeInfo(mAttributeType);
-        byteCount                     = info.byteCount;
-        nullValue                     = info.maxValue;
-    }
+    const uint64_t nullValueAsU64 = isSigned
+        ? static_cast<uint64_t>(NumericLimits::SignedMinValueToNullValue(NumericLimits::MinSignedValue(byteCount)))
+        : NumericLimits::UnsignedMaxValueToNullValue(NumericLimits::MaxUnsignedValue(byteCount));
 
     VerifyOrDie(sizeof(raw_bytes) >= byteCount);
     if (!reader.ReadBytes(raw_bytes, byteCount).IsSuccess())
@@ -445,36 +404,21 @@ CHIP_ERROR EmberAttributeDataBuffer::EncodeInteger(chip::TLV::TLVWriter & writer
         value.uint_value = (value.uint_value & ~0xFFULL) | raw_bytes[i];
     }
 
-    if (mIsNullable && (value.uint_value == nullValue))
+    // We place the null value as either int_value or uint_value into a union that is
+    // bit-formatted as both int64 and uint64. When we define the nullValue,
+    // it is bitcast into u64 hence this comparison. This is ugly, however this
+    // code prioritizes code size over readability here.
+    if (mIsNullable && (value.uint_value == nullValueAsU64))
     {
-        // MaxValue is used for NULL setting
         return writer.PutNull(tag);
     }
 
-    switch (mAttributeType)
+    if (isSigned)
     {
-    case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
-        return writer.Put(tag, static_cast<uint8_t>(value.uint_value));
-    case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
-        return writer.Put(tag, static_cast<uint16_t>(value.uint_value));
-    case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-    case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
-        return writer.Put(tag, static_cast<uint32_t>(value.uint_value));
-    case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
-    case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
-    case ZCL_INT56U_ATTRIBUTE_TYPE: // Signed 56-bit integer
-    case ZCL_INT64U_ATTRIBUTE_TYPE: // Signed 64-bit integer
-        return writer.Put(tag, static_cast<uint64_t>(value.uint_value));
-    case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
-        return writer.Put(tag, static_cast<int8_t>(value.int_value));
-    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
-        return writer.Put(tag, static_cast<int16_t>(value.int_value));
-    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
-    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
-        return writer.Put(tag, static_cast<int32_t>(value.int_value));
-    default:
-        return writer.Put(tag, static_cast<int64_t>(value.int_value));
+        return writer.Put(tag, value.int_value);
     }
+
+    return writer.Put(tag, value.uint_value);
 }
 
 CHIP_ERROR EmberAttributeDataBuffer::Encode(chip::TLV::TLVWriter & writer, TLV::Tag tag) const
@@ -497,10 +441,11 @@ CHIP_ERROR EmberAttributeDataBuffer::Encode(chip::TLV::TLVWriter & writer, TLV::
         case 1:
             return writer.PutBoolean(tag, value != 0);
         case 0xFF:
+            VerifyOrReturnError(mIsNullable, CHIP_ERROR_INVALID_ARGUMENT);
             return writer.PutNull(tag);
         default:
             // Unknown types
-            return CHIP_ERROR_INCORRECT_STATE;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
     case ZCL_INT8U_ATTRIBUTE_TYPE:  // Unsigned 8-bit integer
@@ -531,7 +476,7 @@ CHIP_ERROR EmberAttributeDataBuffer::Encode(chip::TLV::TLVWriter & writer, TLV::
         {
             return endianReader.StatusCode();
         }
-        if (NumericAttributeTraits<float>::IsNullValue(value.value))
+        if (mIsNullable && NumericAttributeTraits<float>::IsNullValue(value.value))
         {
             return writer.PutNull(tag);
         }
@@ -548,7 +493,7 @@ CHIP_ERROR EmberAttributeDataBuffer::Encode(chip::TLV::TLVWriter & writer, TLV::
         {
             return endianReader.StatusCode();
         }
-        if (NumericAttributeTraits<double>::IsNullValue(value.value))
+        if (mIsNullable && NumericAttributeTraits<double>::IsNullValue(value.value))
         {
             return writer.PutNull(tag);
         }
