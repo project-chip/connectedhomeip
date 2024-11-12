@@ -270,17 +270,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint) {}
 
-#ifdef MATTER_DM_PLUGIN_AUDIO_OUTPUT_SERVER
-#include "audio-output/AudioOutputManager.h"
-static AudioOutputManager audioOutputManager;
-
-void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: AudioOutput::SetDefaultDelegate");
-    AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
-}
-#endif
-
 #ifdef MATTER_DM_PLUGIN_CHANNEL_SERVER
 #include "channel/ChannelManager.h"
 static ChannelManager channelManager;

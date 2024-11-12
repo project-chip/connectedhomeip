@@ -35,6 +35,7 @@
 #include <string>
 
 static CHIPToolPersistentStorageDelegate * storage = nil;
+static MTRDevice * sLastUsedDevice = nil;
 static DeviceDelegate * sDeviceDelegate = nil;
 static dispatch_queue_t sDeviceDelegateDispatchQueue = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
@@ -306,17 +307,13 @@ MTRDevice * CHIPCommandBridge::DeviceWithNodeId(chip::NodeId nodeId)
     VerifyOrReturnValue(nil != device, nil);
 
     // The device delegate is initialized only once, when the first MTRDevice is created.
-    // As a result, subsequent commands using --use-mtr-device don’t need to specify the
-    // `--pretend-thread-enabled 1` argument again. Any further attempts to set it to `0` will also be ignored.
     if (sDeviceDelegate == nil) {
         sDeviceDelegate = [[DeviceDelegate alloc] init];
         sDeviceDelegateDispatchQueue = dispatch_queue_create("com.chip.devicedelegate", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        if (mPretendThreadEnabled.ValueOr(false)) {
-            [sDeviceDelegate setPretendThreadEnabled:YES];
-        }
     }
     [device addDelegate:sDeviceDelegate queue:sDeviceDelegateDispatchQueue];
 
+    sLastUsedDevice = device;
     return device;
 }
 
@@ -361,6 +358,21 @@ void CHIPCommandBridge::ShutdownCommissioner()
     mCurrentController = nil;
 
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+}
+
+void CHIPCommandBridge::SuspendOrResumeCommissioners()
+{
+    for (auto & pair : mControllers) {
+        __auto_type * commissioner = pair.second;
+        if (commissioner.running) {
+            commissioner.suspended ? [commissioner resume] : [commissioner suspend];
+        }
+    }
+}
+
+MTRDevice * CHIPCommandBridge::GetLastUsedDevice()
+{
+    return sLastUsedDevice;
 }
 
 CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration)

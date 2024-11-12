@@ -19,7 +19,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
@@ -34,13 +33,11 @@ using namespace chip::app::Clusters::FanControl::Attributes;
 using Protocols::InteractionModel::Status;
 
 namespace {
-class FanControlManager : public AttributeAccessInterface, public Delegate
+class FanControlManager : public FanControlAttributeAccessInterface, public Delegate
 {
 public:
     // Register for the FanControl cluster on all endpoints.
-    FanControlManager(EndpointId aEndpointId) :
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), FanControl::Id), Delegate(aEndpointId)
-    {}
+    FanControlManager(EndpointId aEndpointId) : FanControlAttributeAccessInterface(aEndpointId), Delegate(aEndpointId) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;

@@ -2146,30 +2146,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRCameraAVStreamManagementClusterSetViewportParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRCameraAVStreamManagementClusterSetImageRotationParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRCameraAVStreamManagementClusterSetImageFlipHorizontalParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRCameraAVStreamManagementClusterSetImageFlipVerticalParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
 @interface MTRWebRTCTransportProviderClusterSolicitOfferParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

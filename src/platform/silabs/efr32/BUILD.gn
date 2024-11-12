@@ -161,10 +161,9 @@ static_library("efr32") {
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
       "${silabs_platform_dir}/wifi/wfx_host_events.h",
       "wifi/wfx_msgs.h",
-      "wifi/wifi_config.h",
     ]
 
-    if (use_wf200 || use_rs9116 || use_SiWx917) {
+    if (use_wf200 || use_rs9116) {
       sources += [
         "${silabs_platform_dir}/wifi/dhcp_client.cpp",
         "wifi/ethernetif.cpp",

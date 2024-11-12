@@ -22,6 +22,8 @@
 #include <lib/core/ScopedNodeId.h>
 #include <platform/CHIPDeviceLayer.h>
 
+namespace bridge {
+
 /**
  * Sets the RPC server port to which the RPC client will connect.
  *
@@ -70,3 +72,5 @@ CHIP_ERROR
 CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params, chip::VendorId vendorId, uint16_t productId);
 
 CHIP_ERROR KeepActive(chip::ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs);
+
+} // namespace bridge

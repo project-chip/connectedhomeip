@@ -1,0 +1,75 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("$dir_pw_build/facade.gni")
+
+config("public_include_path") {
+  include_dirs = [ "public" ]
+  visibility = [ ":*" ]
+}
+
+config("backend_config") {
+  include_dirs = [ "public_overrides" ]
+  visibility = [ ":*" ]
+}
+
+pw_facade("handler") {
+  backend = "${chip_root}/src/pw_backends/log:log.impl"
+  public_configs = [ ":public_include_path" ]
+  public_deps = [
+    "$dir_pw_preprocessor",
+    "${chip_root}/src/lib/support:text_only_logging",
+  ]
+  public = [
+    "public/pw_log_matter/log_matter.h",
+    "public_overrides/pw_log_backend/log_backend.h",
+  ]
+}
+
+pw_source_set("log") {
+  public_configs = [
+    ":backend_config",
+    ":public_include_path",
+  ]
+  public = [ "public/pw_log_matter/log_matter.h" ]
+  public_deps = [
+    ":handler.facade",
+    "${chip_root}/src/lib/support:text_only_logging",
+  ]
+}
+
+# A basic handler backend using pw_sys_io.
+pw_source_set("log.impl") {
+  # Turn off GN check since this target intentionally leaves out deps to avoid
+  # circular dependencies.
+  check_includes = false
+
+  configs = [
+    "$dir_pw_string:public_include_path",
+    "$dir_pw_result:public_include_path",
+  ]
+
+  deps = [
+    ":handler.facade",
+    "$dir_pw_log:config",
+    "$dir_pw_preprocessor",
+    "$dir_pw_string:builder",
+    "${chip_root}/src/lib/support",
+  ]
+  sources = []
+}

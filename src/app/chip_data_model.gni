@@ -213,11 +213,6 @@ template("chip_data_model") {
         "${_app_root}/util/ember-io-storage.cpp",
         "${_app_root}/util/util.cpp",
       ]
-
-      if (chip_use_data_model_interface != "enabled") {
-        # This applies to "check" or "disabled" (i.e. use ember-only or use ember for double-checking)
-        sources += [ "${_app_root}/util/ember-compatibility-functions.cpp" ]
-      }
     }
 
     if (defined(invoker.zap_file)) {

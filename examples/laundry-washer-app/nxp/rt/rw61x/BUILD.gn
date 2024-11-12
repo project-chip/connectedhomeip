@@ -57,8 +57,8 @@ rt_sdk("sdk") {
   defines = []
 
   # To be moved, temporary mbedtls config fix to build app with factory data
-  if (chip_enable_secure_dac_private_key_storage ||
-      chip_enable_secure_whole_factory_data) {
+  if (nxp_enable_secure_dac_private_key_storage ||
+      nxp_enable_secure_whole_factory_data) {
     defines += [
       "MBEDTLS_NIST_KW_C",
       "MBEDTLS_PSA_CRYPTO_CLIENT",
@@ -142,10 +142,10 @@ rt_executable("laundry-washer") {
     "../../common/main/main.cpp",
   ]
 
-  if (chip_enable_secure_dac_private_key_storage ||
-      chip_enable_secure_whole_factory_data) {
+  if (nxp_enable_secure_dac_private_key_storage ||
+      nxp_enable_secure_whole_factory_data) {
     sources += [ "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp" ]
-    if (chip_enable_secure_whole_factory_data) {
+    if (nxp_enable_secure_whole_factory_data) {
       defines += [ "ENABLE_SECURE_WHOLE_FACTORY_DATA" ]
     }
   } else {
@@ -189,7 +189,7 @@ rt_executable("laundry-washer") {
     "../../common/main/operational-state-delegate-impl.cpp",
   ]
 
-  if (chip_enable_matter_cli) {
+  if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
     deps += [
       "${chip_root}/examples/shell/shell_common:shell_common",
