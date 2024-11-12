@@ -224,12 +224,6 @@ public:
 
     Protocols::InteractionModel::Status SetNightVisionIllum(TriStateAutoEnum aNightVisionIllum);
 
-    Protocols::InteractionModel::Status SetAWBEnabled(bool aAWBEnabled);
-
-    Protocols::InteractionModel::Status SetAutoShutterSpeedEnabled(bool aAutoShutterSpeedEnabled);
-
-    Protocols::InteractionModel::Status SetAutoISOEnabled(bool aAutoISOEnabled);
-
     Protocols::InteractionModel::Status SetViewport(const ViewportStruct & aViewport);
 
     Protocols::InteractionModel::Status SetSpeakerMuted(bool aSpeakerMuted);
@@ -262,8 +256,6 @@ public:
 
     Protocols::InteractionModel::Status SetStatusLightBrightness(ThreeLevelAutoEnum aStatusLightBrightness);
 
-    Protocols::InteractionModel::Status SetDepthSensorStatus(TriStateAutoEnum aDepthSensorStatus);
-
     EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
 private:
@@ -293,9 +285,6 @@ private:
     bool mHardPrivacyModeOn                = false;
     TriStateAutoEnum mNightVision;
     TriStateAutoEnum mNightVisionIllum;
-    bool mAWBEnabled              = false;
-    bool mAutoShutterSpeedEnabled = false;
-    bool mAutoISOEnabled          = false;
     ViewPortStruct mViewport;
     bool mSpeakerMuted = false;
     uint8_t mSpeakerVolumeLevel;
@@ -313,7 +302,6 @@ private:
     bool mLocalSnapshotRecordingEnabled = false;
     bool mStatusLightEnabled            = false;
     ThreeLevelAutoEnum mStatusLightBrightness;
-    TriStateAutoEnum mDepthSensorStatus;
 
     Structs::VideoSensorParamsStruct::Type mVideoSensorParams;
     CHIP_ERROR SetVideoSensorParams(const Structs::VideoSensorParamsStruct::Type & videoSensorParams)
@@ -371,13 +359,6 @@ private:
 
     void HandleCaptureSnapshot(HandlerContext & ctx, const Commands::VideoStreamModify::DecodableType & req);
 
-    /**
-     * @brief Handle Command: AddMoreTime.
-     * @param ctx Returns the Interaction Model status code which was user determined in the business logic.
-     * If the cook time value is out of range, returns the Interaction Model status code of CONSTRAINT_ERROR.
-     * If the operational state is in 'Error', returns the Interaction Model status code of INVALID_IN_STATE.
-     */
-    void HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTime::DecodableType & req);
 };
 
 } // namespace CameraAVStreamMgmt
