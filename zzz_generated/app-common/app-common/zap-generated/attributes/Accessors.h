@@ -5683,24 +5683,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
                                         MarkAttributeDirty markDirty);
 } // namespace NightVisionIllum
 
-namespace AWBEnabled {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
-} // namespace AWBEnabled
-
-namespace AutoShutterSpeedEnabled {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
-} // namespace AutoShutterSpeedEnabled
-
-namespace AutoISOEnabled {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
-} // namespace AutoISOEnabled
-
 namespace SpeakerMuted {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
 Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
@@ -5798,14 +5780,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::ThreeLevelAutoEnum value,
                                         MarkAttributeDirty markDirty);
 } // namespace StatusLightBrightness
-
-namespace DepthSensorStatus {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum * value); // TriStateAutoEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace DepthSensorStatus
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32

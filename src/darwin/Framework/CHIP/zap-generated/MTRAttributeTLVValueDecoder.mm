@@ -17478,39 +17478,6 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
-    case Attributes::AWBEnabled::Id: {
-        using TypeInfo = Attributes::AWBEnabled::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithBool:cppValue];
-        return value;
-    }
-    case Attributes::AutoShutterSpeedEnabled::Id: {
-        using TypeInfo = Attributes::AutoShutterSpeedEnabled::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithBool:cppValue];
-        return value;
-    }
-    case Attributes::AutoISOEnabled::Id: {
-        using TypeInfo = Attributes::AutoISOEnabled::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithBool:cppValue];
-        return value;
-    }
     case Attributes::Viewport::Id: {
         using TypeInfo = Attributes::Viewport::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -17693,17 +17660,6 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     }
     case Attributes::StatusLightBrightness::Id: {
         using TypeInfo = Attributes::StatusLightBrightness::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
-        return value;
-    }
-    case Attributes::DepthSensorStatus::Id: {
-        using TypeInfo = Attributes::DepthSensorStatus::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

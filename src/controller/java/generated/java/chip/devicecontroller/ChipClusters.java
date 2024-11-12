@@ -59750,27 +59750,23 @@ public class ChipClusters {
     private static final long HARD_PRIVACY_MODE_ON_ATTRIBUTE_ID = 23L;
     private static final long NIGHT_VISION_ATTRIBUTE_ID = 24L;
     private static final long NIGHT_VISION_ILLUM_ATTRIBUTE_ID = 25L;
-    private static final long AWB_ENABLED_ATTRIBUTE_ID = 26L;
-    private static final long AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID = 27L;
-    private static final long AUTO_ISO_ENABLED_ATTRIBUTE_ID = 28L;
-    private static final long VIEWPORT_ATTRIBUTE_ID = 29L;
-    private static final long SPEAKER_MUTED_ATTRIBUTE_ID = 30L;
-    private static final long SPEAKER_VOLUME_LEVEL_ATTRIBUTE_ID = 31L;
-    private static final long SPEAKER_MAX_LEVEL_ATTRIBUTE_ID = 32L;
-    private static final long SPEAKER_MIN_LEVEL_ATTRIBUTE_ID = 33L;
-    private static final long MICROPHONE_MUTED_ATTRIBUTE_ID = 34L;
-    private static final long MICROPHONE_VOLUME_LEVEL_ATTRIBUTE_ID = 35L;
-    private static final long MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID = 36L;
-    private static final long MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID = 37L;
-    private static final long MICROPHONE_AGC_ENABLED_ATTRIBUTE_ID = 38L;
-    private static final long IMAGE_ROTATION_ATTRIBUTE_ID = 39L;
-    private static final long IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID = 40L;
-    private static final long IMAGE_FLIP_VERTICAL_ATTRIBUTE_ID = 41L;
-    private static final long LOCAL_VIDEO_RECORDING_ENABLED_ATTRIBUTE_ID = 42L;
-    private static final long LOCAL_SNAPSHOT_RECORDING_ENABLED_ATTRIBUTE_ID = 43L;
-    private static final long STATUS_LIGHT_ENABLED_ATTRIBUTE_ID = 44L;
-    private static final long STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID = 45L;
-    private static final long DEPTH_SENSOR_STATUS_ATTRIBUTE_ID = 46L;
+    private static final long VIEWPORT_ATTRIBUTE_ID = 26L;
+    private static final long SPEAKER_MUTED_ATTRIBUTE_ID = 27L;
+    private static final long SPEAKER_VOLUME_LEVEL_ATTRIBUTE_ID = 28L;
+    private static final long SPEAKER_MAX_LEVEL_ATTRIBUTE_ID = 29L;
+    private static final long SPEAKER_MIN_LEVEL_ATTRIBUTE_ID = 30L;
+    private static final long MICROPHONE_MUTED_ATTRIBUTE_ID = 31L;
+    private static final long MICROPHONE_VOLUME_LEVEL_ATTRIBUTE_ID = 32L;
+    private static final long MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID = 33L;
+    private static final long MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID = 34L;
+    private static final long MICROPHONE_AGC_ENABLED_ATTRIBUTE_ID = 35L;
+    private static final long IMAGE_ROTATION_ATTRIBUTE_ID = 36L;
+    private static final long IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID = 37L;
+    private static final long IMAGE_FLIP_VERTICAL_ATTRIBUTE_ID = 38L;
+    private static final long LOCAL_VIDEO_RECORDING_ENABLED_ATTRIBUTE_ID = 39L;
+    private static final long LOCAL_SNAPSHOT_RECORDING_ENABLED_ATTRIBUTE_ID = 40L;
+    private static final long STATUS_LIGHT_ENABLED_ATTRIBUTE_ID = 41L;
+    private static final long STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID = 42L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -60089,86 +60085,6 @@ public class ChipClusters {
       final long requestedResolutionFieldID = 1L;
       BaseTLVType requestedResolutiontlvValue = requestedResolution.encodeTlv();
       elements.add(new StructElement(requestedResolutionFieldID, requestedResolutiontlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void setViewport(DefaultClusterCallback callback, ChipStructs.CameraAvStreamManagementClusterViewportStruct viewport) {
-      setViewport(callback, viewport, 0);
-    }
-
-    public void setViewport(DefaultClusterCallback callback, ChipStructs.CameraAvStreamManagementClusterViewportStruct viewport, int timedInvokeTimeoutMs) {
-      final long commandId = 13L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long viewportFieldID = 0L;
-      BaseTLVType viewporttlvValue = viewport.encodeTlv();
-      elements.add(new StructElement(viewportFieldID, viewporttlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void setImageRotation(DefaultClusterCallback callback, Integer angle) {
-      setImageRotation(callback, angle, 0);
-    }
-
-    public void setImageRotation(DefaultClusterCallback callback, Integer angle, int timedInvokeTimeoutMs) {
-      final long commandId = 14L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long angleFieldID = 0L;
-      BaseTLVType angletlvValue = new UIntType(angle);
-      elements.add(new StructElement(angleFieldID, angletlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void setImageFlipHorizontal(DefaultClusterCallback callback, Boolean enabled) {
-      setImageFlipHorizontal(callback, enabled, 0);
-    }
-
-    public void setImageFlipHorizontal(DefaultClusterCallback callback, Boolean enabled, int timedInvokeTimeoutMs) {
-      final long commandId = 15L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long enabledFieldID = 0L;
-      BaseTLVType enabledtlvValue = new BooleanType(enabled);
-      elements.add(new StructElement(enabledFieldID, enabledtlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void setImageFlipVertical(DefaultClusterCallback callback, Boolean enabled) {
-      setImageFlipVertical(callback, enabled, 0);
-    }
-
-    public void setImageFlipVertical(DefaultClusterCallback callback, Boolean enabled, int timedInvokeTimeoutMs) {
-      final long commandId = 16L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long enabledFieldID = 0L;
-      BaseTLVType enabledtlvValue = new BooleanType(enabled);
-      elements.add(new StructElement(enabledFieldID, enabledtlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -60992,111 +60908,6 @@ public class ChipClusters {
         }, NIGHT_VISION_ILLUM_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readAWBEnabledAttribute(
-        BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AWB_ENABLED_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AWB_ENABLED_ATTRIBUTE_ID, true);
-    }
-
-    public void writeAWBEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
-      writeAWBEnabledAttribute(callback, value, 0);
-    }
-
-    public void writeAWBEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new BooleanType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), AWB_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeAWBEnabledAttribute(
-        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AWB_ENABLED_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AWB_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAutoShutterSpeedEnabledAttribute(
-        BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID, true);
-    }
-
-    public void writeAutoShutterSpeedEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
-      writeAutoShutterSpeedEnabledAttribute(callback, value, 0);
-    }
-
-    public void writeAutoShutterSpeedEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new BooleanType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeAutoShutterSpeedEnabledAttribute(
-        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAutoISOEnabledAttribute(
-        BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AUTO_ISO_ENABLED_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AUTO_ISO_ENABLED_ATTRIBUTE_ID, true);
-    }
-
-    public void writeAutoISOEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
-      writeAutoISOEnabledAttribute(callback, value, 0);
-    }
-
-    public void writeAutoISOEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new BooleanType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), AUTO_ISO_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeAutoISOEnabledAttribute(
-        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AUTO_ISO_ENABLED_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AUTO_ISO_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readViewportAttribute(
         ViewportAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VIEWPORT_ATTRIBUTE_ID);
@@ -61108,6 +60919,15 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, VIEWPORT_ATTRIBUTE_ID, true);
+    }
+
+    public void writeViewportAttribute(DefaultClusterCallback callback, ChipStructs.CameraAvStreamManagementClusterViewportStruct value) {
+      writeViewportAttribute(callback, value, 0);
+    }
+
+    public void writeViewportAttribute(DefaultClusterCallback callback, ChipStructs.CameraAvStreamManagementClusterViewportStruct value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value.encodeTlv();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), VIEWPORT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeViewportAttribute(
@@ -61206,15 +61026,6 @@ public class ChipClusters {
         }, SPEAKER_MAX_LEVEL_ATTRIBUTE_ID, true);
     }
 
-    public void writeSpeakerMaxLevelAttribute(DefaultClusterCallback callback, Integer value) {
-      writeSpeakerMaxLevelAttribute(callback, value, 0);
-    }
-
-    public void writeSpeakerMaxLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), SPEAKER_MAX_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeSpeakerMaxLevelAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SPEAKER_MAX_LEVEL_ATTRIBUTE_ID);
@@ -61239,15 +61050,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SPEAKER_MIN_LEVEL_ATTRIBUTE_ID, true);
-    }
-
-    public void writeSpeakerMinLevelAttribute(DefaultClusterCallback callback, Integer value) {
-      writeSpeakerMinLevelAttribute(callback, value, 0);
-    }
-
-    public void writeSpeakerMinLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), SPEAKER_MIN_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeSpeakerMinLevelAttribute(
@@ -61346,15 +61148,6 @@ public class ChipClusters {
         }, MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID, true);
     }
 
-    public void writeMicrophoneMaxLevelAttribute(DefaultClusterCallback callback, Integer value) {
-      writeMicrophoneMaxLevelAttribute(callback, value, 0);
-    }
-
-    public void writeMicrophoneMaxLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeMicrophoneMaxLevelAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID);
@@ -61379,15 +61172,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID, true);
-    }
-
-    public void writeMicrophoneMinLevelAttribute(DefaultClusterCallback callback, Integer value) {
-      writeMicrophoneMinLevelAttribute(callback, value, 0);
-    }
-
-    public void writeMicrophoneMinLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeMicrophoneMinLevelAttribute(
@@ -61451,6 +61235,15 @@ public class ChipClusters {
         }, IMAGE_ROTATION_ATTRIBUTE_ID, true);
     }
 
+    public void writeImageRotationAttribute(DefaultClusterCallback callback, Integer value) {
+      writeImageRotationAttribute(callback, value, 0);
+    }
+
+    public void writeImageRotationAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), IMAGE_ROTATION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
     public void subscribeImageRotationAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IMAGE_ROTATION_ATTRIBUTE_ID);
@@ -61477,6 +61270,15 @@ public class ChipClusters {
         }, IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID, true);
     }
 
+    public void writeImageFlipHorizontalAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeImageFlipHorizontalAttribute(callback, value, 0);
+    }
+
+    public void writeImageFlipHorizontalAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
     public void subscribeImageFlipHorizontalAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID);
@@ -61501,6 +61303,15 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, IMAGE_FLIP_VERTICAL_ATTRIBUTE_ID, true);
+    }
+
+    public void writeImageFlipVerticalAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeImageFlipVerticalAttribute(callback, value, 0);
+    }
+
+    public void writeImageFlipVerticalAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), IMAGE_FLIP_VERTICAL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeImageFlipVerticalAttribute(
@@ -61654,41 +61465,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDepthSensorStatusAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEPTH_SENSOR_STATUS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DEPTH_SENSOR_STATUS_ATTRIBUTE_ID, true);
-    }
-
-    public void writeDepthSensorStatusAttribute(DefaultClusterCallback callback, Integer value) {
-      writeDepthSensorStatusAttribute(callback, value, 0);
-    }
-
-    public void writeDepthSensorStatusAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), DEPTH_SENSOR_STATUS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeDepthSensorStatusAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEPTH_SENSOR_STATUS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DEPTH_SENSOR_STATUS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

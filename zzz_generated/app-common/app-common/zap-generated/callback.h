@@ -6853,30 +6853,6 @@ bool emberAfCameraAvStreamManagementClusterCaptureSnapshotCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::DecodableType & commandData);
 /**
- * @brief Camera AV Stream Management Cluster SetViewport Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSetViewportCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetViewport::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SetImageRotation Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSetImageRotationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageRotation::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SetImageFlipHorizontal Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSetImageFlipHorizontalCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipHorizontal::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SetImageFlipVertical Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSetImageFlipVerticalCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipVertical::DecodableType & commandData);
-/**
  * @brief WebRTC Transport Provider Cluster SolicitOffer Command callback (from client)
  */
 bool emberAfWebRTCTransportProviderClusterSolicitOfferCallback(
