@@ -325,6 +325,12 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
     Reset();
+
+    if (GetAttributePersistenceProvider() == &gDefaultAttributePersistenceProvider)
+    {
+        gDefaultAttributePersistenceProvider.Shutdown();
+        // We cannot actually reset it as `SetAttributePersistenceProvider` ignores nullptr
+    }
     return CHIP_NO_ERROR;
 }
 

@@ -136,11 +136,7 @@ public:
 
     /// Generic model implementations
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
-    CHIP_ERROR Shutdown() override
-    {
-        Reset();
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Shutdown() override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;

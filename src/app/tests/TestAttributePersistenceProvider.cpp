@@ -16,10 +16,9 @@
  *    limitations under the License.
  */
 
-#include "app/SafeAttributePersistenceProvider.h"
-#include "lib/core/CHIPError.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <pw_unit_test/framework.h>
@@ -32,7 +31,7 @@ const ConcreteAttributePath TestConcretePath = ConcreteAttributePath(1, 1, 1);
 
 namespace {
 
-class TestAttributePersistenceProvider : public ::testing::Test
+class TestSafeAttributePersistenceProvider : public ::testing::Test
 {
 public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -42,7 +41,7 @@ public:
 /**
  * Tests the storage and retrival of data from the KVS as ByteSpan
  */
-TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalByteSpans)
+TEST_F(TestSafeAttributePersistenceProvider, TestStorageAndRetrivalByteSpans)
 {
     TestPersistentStorageDelegate storageDelegate;
     SafeAttributePersistenceProvider persistenceProvider;
@@ -112,7 +111,7 @@ void testHelperStorageAndRetrivalScalarValues(SafeAttributePersistenceProvider &
 /**
  * Tests the storage and retrival of data from the KVS of types  bool, uint8_t, uint16_t, uint32_t, uint64_t.
  */
-TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalScalarValues)
+TEST_F(TestSafeAttributePersistenceProvider, TestStorageAndRetrivalScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
     SafeAttributePersistenceProvider persistenceProvider;
@@ -153,7 +152,7 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalScalarValues)
 /**
  * Tests the storage and retrival of data from the KVS of types  int8_t, int16_t, int32_t, int64_t.
  */
-TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedScalarValues)
+TEST_F(TestSafeAttributePersistenceProvider, TestStorageAndRetrivalSignedScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
     SafeAttributePersistenceProvider persistenceProvider;
@@ -189,7 +188,7 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedScalarValue
 /**
  * Tests the storage and retrival of data from the KVS of DataModel::Nullable types bool, uint8_t, uint16_t, uint32_t, uint64_t.
  */
-TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalNullableScalarValues)
+TEST_F(TestSafeAttributePersistenceProvider, TestStorageAndRetrivalNullableScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
     SafeAttributePersistenceProvider persistenceProvider;
@@ -245,7 +244,7 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalNullableScalarVal
 /**
  * Tests the storage and retrival of data from the KVS of DataModel::Nullable types int8_t, int16_t, int32_t, int64_t.
  */
-TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedNullableScalarValues)
+TEST_F(TestSafeAttributePersistenceProvider, TestStorageAndRetrivalSignedNullableScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
     SafeAttributePersistenceProvider persistenceProvider;
@@ -293,7 +292,7 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedNullableSca
 /**
  * Test that the correct error is given when trying to read a value with a buffer that's too small.
  */
-TEST_F(TestAttributePersistenceProvider, TestBufferTooSmallErrors)
+TEST_F(TestSafeAttributePersistenceProvider, TestBufferTooSmallErrors)
 {
     TestPersistentStorageDelegate storageDelegate;
     SafeAttributePersistenceProvider persistenceProvider;
