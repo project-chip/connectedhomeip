@@ -17,19 +17,23 @@ import("//build_overrides/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
 rs911x_src_plat = [
-  "${chip_root}/examples/platform/silabs/SiWx917/SiWxWifiInterface.cpp",
-  "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_interrupt.c",
-  "${examples_plat_dir}/rs911x/hal/sl_si91x_ncp_utility.c",
-  "${examples_plat_dir}/rs911x/hal/efx32_ncp_host.c",
-  "${silabs_common_plat_dir}/wifi/WifiInterfaceAbstraction.cpp",
-  "${silabs_common_plat_dir}/wifi/WiseconnectInterfaceAbstraction.cpp",
+  "${chip_root}/src/platform/silabs/wifi/SiWx/SiWxWifiInterface.cpp",
+  "${chip_root}/src/platform/silabs/wifi/rs911x/platform/rsi_hal_mcu_interrupt.c",
+  "${chip_root}/src/platform/silabs/wifi/rs911x/platform/sl_si91x_ncp_utility.c",
+  "${chip_root}/src/platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.cpp",
+
+  # TODO: We shouldn't need a file form the WF200 for the SiWx917 NCP builds
+  "${chip_root}/src/platform/silabs/wifi/wf200/platform/spi_multiplex.h",
+
+  # TODO : We should be using the file from the Wiseconnect SDK and not our copy of it.
+  "${chip_root}/src/platform/silabs/wifi/rs911x/platform/efx32_ncp_host.c",
 ]
 
 rs9117_inc_plat = [
-  "${examples_plat_dir}/rs911x",
-  "${examples_plat_dir}/rs911x/hal",
+  "${chip_root}/src/platform/silabs/wifi/rs911x",
+  "${chip_root}/src/platform/silabs/wifi/rs911x/platform",
   "${wifi_sdk_root}/components/si91x/ble/inc",
-  "${silabs_common_plat_dir}/wifi",
+  "${chip_root}/src/platform/silabs/wifi",
 ]
 
 rs911x_cflags = [ "-Wno-empty-body" ]

@@ -28,10 +28,7 @@
 #endif // SL_MATTER_GN_BUILD
 
 #include "FreeRTOS.h"
-#include "WifiInterfaceAbstraction.h"
-#include "WiseconnectInterfaceAbstraction.h"
 #include "ble_config.h"
-#include "dhcp_client.h"
 #include "event_groups.h"
 #include "sl_board_configuration.h"
 #include "sl_status.h"
@@ -44,6 +41,8 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
 
 extern "C" {
 #include "sl_si91x_driver.h"
@@ -921,7 +920,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[0] = (ip) & 0xFF;
     wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
     wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
