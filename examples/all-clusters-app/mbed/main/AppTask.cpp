@@ -73,7 +73,7 @@ int AppTask::Init()
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
-    error = Server::GetInstance().Init(initParams);
+    error                        = Server::GetInstance().Init(initParams);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Server initialization failed: %s", error.AsString());
