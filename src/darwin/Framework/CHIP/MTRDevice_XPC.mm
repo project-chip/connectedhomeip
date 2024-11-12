@@ -141,6 +141,11 @@
     return [[self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID] copy];
 }
 
+- (nullable NSNumber *)networkCommissioningFeature
+{
+    return [[self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures] copy];
+}
+
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
 // required methods for MTRDeviceDelegates

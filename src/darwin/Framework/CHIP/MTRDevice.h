@@ -123,6 +123,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, readonly, nullable, copy) NSNumber * productID MTR_NEWLY_AVAILABLE;
 
 /**
+ * Network commissioning features supported by the device.
+ *
+ * The value if not nil, represents the options available in MTRNetworkCommissioningFeature type.
+ *
+ */
+@property (nonatomic, readonly, nullable, copy) NSNumber * networkCommissioningFeature MTR_NEWLY_AVAILABLE;
+
+/**
  * Set the delegate to receive asynchronous callbacks about the device.
  *
  * The delegate will be called on the provided queue, for attribute reports, event reports, and device state changes.
