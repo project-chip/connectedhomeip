@@ -94,15 +94,6 @@ void WiFiPAFLayer::AddPafSession(uint32_t id)
     PafInfoVect.push_back(PafInfo);
     ChipLogProgress(Inet, "WiFiPAF: Add session with id: %u, total %lu sessions", id, PafInfoVect.size());
 }
-/*
-void WiFiPAFLayer::AddPafSession()
-{
-    WiFiPAFSession PafInfo {
-        .id = UINT32_MAX
-    };
-    PafInfoVect.push_back(PafInfo);
-}
-*/
 
 void WiFiPAFLayer::RmPafSession(uint32_t id)
 {

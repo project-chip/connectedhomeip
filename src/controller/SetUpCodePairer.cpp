@@ -259,8 +259,13 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
     ChipLogProgress(Controller, "Starting commissioning discovery over WiFiPAF");
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mWaitingForDiscovery[kWiFiPAFTransport] = true;
-    CHIP_ERROR err                          = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(payload.discriminator, (void *) this,
-                                                                                              OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
+
+    const SetupDiscriminator connDiscriminator(payload.discriminator);
+    uint16_t discriminator =
+        connDiscriminator.IsShortDiscriminator() ? connDiscriminator.GetShortValue() : connDiscriminator.GetLongValue();
+    DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(mRemoteId, discriminator);
+    CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(payload.discriminator, (void *) this,
+                                                                     OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
