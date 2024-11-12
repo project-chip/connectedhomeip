@@ -492,21 +492,6 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get NightVisionIllumination, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVisionIllum));
         break;
-    case AWBEnabled::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get AWBEnabled, feature is not supported"));
-        ReturnErrorOnFailure(aEncoder.Encode(mAWBEnabled));
-        break;
-    case AutoShutterSpeedEnabled::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get AutoShutterSpeedEnabled, feature is not supported"));
-        ReturnErrorOnFailure(aEncoder.Encode(mAutoShutterSpeedEnabled));
-        break;
-    case AutoISOEnabled::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get AutoISOEnabled, feature is not supported"));
-        ReturnErrorOnFailure(aEncoder.Encode(mAutoISOEnabled));
-        break;
     case Viewport::Id:
         VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get Viewport, feature is not supported"));
@@ -597,12 +582,6 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get StatusLightBrightness, feature is not supported");
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightBrightness));
         break;
-    case DepthSensorStatus::Id:
-        VerifyOrReturnError(HasFeature(Feature::kVideo) && SupportsOptAttr(OptionalAttributes::kSupportsDepthSensorStatus),
-                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get DepthSensorStatus, feature is not supported");
-        ReturnErrorOnFailure(aEncoder.Encode(mDepthSensorStatus));
-        break;
     }
 
     return CHIP_NO_ERROR;
@@ -674,28 +653,13 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         ReturnErrorOnFailure(SetNightVisionIllum(nightVisionIllum));
         return CHIP_NO_ERROR;
     }
-    case AWBEnabled::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set AWBEnabled, feature is not supported"));
-        bool awbEnabled;
-        ReturnErrorOnFailure(aDecoder.Decode(awbEnabled));
-        ReturnErrorOnFailure(SetAWBEnabled(awbEnabled));
-        return CHIP_NO_ERROR;
-    }
-    case AutoShutterSpeedEnabled::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set AutoShutterSpeedEnabled, feature is not supported"));
-        bool autoShutterSpeedEnabled;
-        ReturnErrorOnFailure(aDecoder.Decode(autoShutterSpeedEnabled));
-        ReturnErrorOnFailure(SetAutoShutterSpeedEnabled(autoShutterSpeedEnabled));
-        return CHIP_NO_ERROR;
-    }
-    case AutoISOEnabled::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set AutoISOEnabled, feature is not supported"));
-        bool autoISOEnabled;
-        ReturnErrorOnFailure(aDecoder.Decode(autoISOEnabled));
-        ReturnErrorOnFailure(SetAutoISOEnabled(autoISOEnabled));
+    case Viewport::Id: {
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set RankedVideoStreamPrioritiesList, feature is not supported"));
+       ViewportStruct viewPort;
+        ReturnErrorOnFailure(aDecoder.Decode(viewPort));
+        ReturnErrorOnFailure(SetViewport(viewPort));
         return CHIP_NO_ERROR;
     }
     case SpeakerMuted::Id: {
@@ -714,22 +678,6 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         ReturnErrorOnFailure(SetSpeakerVolumeLevel(speakerVolLevel));
         return CHIP_NO_ERROR;
     }
-    case SpeakerMaxLevel::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set SpeakerMaxLevel, feature is not supported"));
-        uint8_t speakerMaxLevel;
-        ReturnErrorOnFailure(aDecoder.Decode(speakerMaxLevel));
-        ReturnErrorOnFailure(SetSpeakerMaxLevel(speakerMaxLevel));
-        return CHIP_NO_ERROR;
-    }
-    case SpeakerMinLevel::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set SpeakerMinLevel, feature is not supported"));
-        uint8_t speakerMinLevel;
-        ReturnErrorOnFailure(aDecoder.Decode(speakerMinLevel));
-        ReturnErrorOnFailure(SetSpeakerMinLevel(speakerMinLevel));
-        return CHIP_NO_ERROR;
-    }
     case MicrophoneMuted::Id: {
         VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set MicrophoneMuted, feature is not supported"));
@@ -744,22 +692,6 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         uint8_t micVolLevel;
         ReturnErrorOnFailure(aDecoder.Decode(micVolLevel));
         ReturnErrorOnFailure(SetMicrophoneVolumeLevel(micVolLevel));
-        return CHIP_NO_ERROR;
-    }
-    case MicrophoneMaxLevel::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set MicrophoneMaxLevel, feature is not supported"));
-        uint8_t micMaxLevel;
-        ReturnErrorOnFailure(aDecoder.Decode(micMaxLevel));
-        ReturnErrorOnFailure(SetMicrophoneMaxLevel(micMaxLevel));
-        return CHIP_NO_ERROR;
-    }
-    case MicrophoneMinLevel::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set MicrophoneMinLevel, feature is not supported"));
-        uint8_t micMinLevel;
-        ReturnErrorOnFailure(aDecoder.Decode(micMinLevel));
-        ReturnErrorOnFailure(SetMicrophoneMaxLevel(micMinLevel));
         return CHIP_NO_ERROR;
     }
     case MicrophoneAGCEnabled::Id: {
@@ -805,15 +737,6 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         ThreeLevelAutoEnum statusLightBrightness;
         ReturnErrorOnFailure(aDecoder.Decode(statusLightBrightness));
         ReturnErrorOnFailure(SetStatusLightBrightness(statusLightBrightness));
-        return CHIP_NO_ERROR;
-    }
-    case DepthSensorStatus::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kVideo) && SupportsOptAttr(OptionalAttributes::kSupportsDepthSensorStatus),
-                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set DepthSensorStatus, feature is not supported");
-        TriStateAutoEnum depthSensorStatus;
-        ReturnErrorOnFailure(aDecoder.Decode(depthSensorStatus));
-        ReturnErrorOnFailure(SetDepthSensorStatus(depthSensorStatus));
         return CHIP_NO_ERROR;
     }
 
@@ -933,42 +856,6 @@ Status CameraAVStreamMgmtServer::SetNightVisionIllum(TriStateAutoEnum aNightVisi
 
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::NightVisionIllum::Id);
         GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mNightVisionIllum);
-    }
-    return Protocols::InteractionModel::Status::Success;
-}
-
-Status CameraAVStreamMgmtServer::SetAWBEnabled(bool aAWBEnabled)
-{
-    if (mAWBEnabled != aAWBEnabled)
-    {
-        mAWBEnabled = aAWBEnabled;
-
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::AWBEnabled::Id);
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mAWBEnabled);
-    }
-    return Protocols::InteractionModel::Status::Success;
-}
-
-Status CameraAVStreamMgmtServer::SetAutoShutterSpeedEnabled(bool aAutoShutterSpeedEnabled)
-{
-    if (mAutoShutterSpeedEnabled != aAutoShutterSpeedEnabled)
-    {
-        mAutoShutterSpeedEnabled = aAutoShutterSpeedEnabled;
-
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::AutoShutterSpeedEnabled::Id);
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mAutoShutterSpeedEnabled);
-    }
-    return Protocols::InteractionModel::Status::Success;
-}
-
-Status CameraAVStreamMgmtServer::SetAutoISOEnabled(bool aAutoISOEnabled)
-{
-    if (mAutoISOEnabled != aAutoISOEnabled)
-    {
-        mAutoISOEnabled = aAutoISOEnabled;
-
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::AutoISOEnabled::Id);
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mAutoISOEnabled);
     }
     return Protocols::InteractionModel::Status::Success;
 }
@@ -1236,20 +1123,6 @@ Status CameraAVStreamMgmtServer::SetStatusLightBrightness(ThreeLevelAutoEnum aSt
     return Protocols::InteractionModel::Status::Success;
 }
 
-Status CameraAVStreamMgmtServer::SetDepthSensorStatus(TriStateAutoEnum aDepthSensorStatus)
-{
-
-    if (mDepthSensorStatus != aDepthSensorStatus)
-    {
-        mDepthSensorStatus = aDepthSensorStatus;
-
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::DepthSensorStatus::Id);
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mDepthSensorStatus);
-        MatterReportingAttributeChangeCallback(path);
-    }
-    return Protocols::InteractionModel::Status::Success;
-}
-
 void CameraAVStreamMgmtServer::LoadPersistentAttributes()
 {
     // Load HDR Mode Enabled
@@ -1380,6 +1253,11 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
 
+    case Commands::SetStreamPriorities::Id:
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Set Stream Priorities");
+        // TODO
+        return;
+
     case Commands::CaptureSnapshot::Id:
         ChipLogDetail(Zcl, "CameraAVStreamMgmt: Capture Snapshot image");
 
@@ -1395,7 +1273,6 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
 
-#TODO : Add more commands
     }
 }
 

@@ -703,8 +703,6 @@
             "MaxNetworkBandwidth",
             "CurrentFrameRate",
             "HDRModeEnabled",
-            "CurrentVideoCodecs",
-            "CurrentSnapshotConfig",
             "FabricsUsingCamera",
             "AllocatedVideoStreams",
             "AllocatedAudioStreams",
@@ -715,9 +713,6 @@
             "HardPrivacyModeOn",
             "NightVision",
             "NightVisionIllum",
-            "AWBEnabled",
-            "AutoShutterSpeedEnabled",
-            "AutoISOEnabled",
             "SpeakerMuted",
             "SpeakerVolumeLevel",
             "SpeakerMaxLevel",
@@ -734,7 +729,6 @@
             "LocalSnapshotRecordingEnabled",
             "StatusLightEnabled",
             "StatusLightBrightness",
-            "DepthSensorStatus",
             "FeatureMap"
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"]
