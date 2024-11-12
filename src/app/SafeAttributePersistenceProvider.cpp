@@ -48,14 +48,14 @@ CHIP_ERROR SafeAttributePersistenceProvider::KeyReadValue(const StorageKeyName &
 
 CHIP_ERROR SafeAttributePersistenceProvider::SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
 {
-    return KeyWriteValue(
-        DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
+    return KeyWriteValue(DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+                         aValue);
 }
 
 CHIP_ERROR SafeAttributePersistenceProvider::SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue)
 {
-    return KeyReadValue(
-        DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
+    return KeyReadValue(DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+                        aValue);
 }
 
 namespace {

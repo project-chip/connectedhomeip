@@ -135,6 +135,7 @@ public:
     }
 
     /// Generic model implementations
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
     CHIP_ERROR Shutdown() override
     {
         Reset();

@@ -126,6 +126,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.operationalKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.opCertStore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.reportScheduler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(initParams.dataModelProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
@@ -158,8 +159,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // Set up attribute persistence before we try to bring up the data model
     // handler.
     SuccessOrExit(err = mSafeAttributePersister.Init(mDeviceStorage));
-    SuccessOrExit(err = mAttributePersister.Init(&mSafeAttributePersister));
-    SetAttributePersistenceProvider(&mAttributePersister);
     SetSafeAttributePersistenceProvider(&mSafeAttributePersister);
 
     {
@@ -354,6 +353,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
+
+    // CodegenDataModelProvider requires a persistence provider to use, so this must be called late
+    // enough, after SetSafeAttributePersistenceProvider
+    chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler,
                                                                  &mCASESessionManager, mSubscriptionResumptionStorage);
@@ -646,7 +649,7 @@ void Server::Shutdown()
     }
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-    mAttributePersister.Shutdown();
+
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }

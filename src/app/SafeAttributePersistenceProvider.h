@@ -178,6 +178,7 @@ public:
      * Key-based I/O. Prefer using the `Safe` calls above
      */
     CHIP_ERROR KeyReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue);
+
 protected:
     PersistentStorageDelegate * mStorage;
 };

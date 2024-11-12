@@ -391,8 +391,8 @@ source_set("command-handler-impl") {
 
 source_set("attribute-persistence") {
   sources = [
-      "SafeAttributePersistenceProvider.h",
-      "SafeAttributePersistenceProvider.cpp",
+    "SafeAttributePersistenceProvider.cpp",
+    "SafeAttributePersistenceProvider.h",
   ]
 
   public_deps = [

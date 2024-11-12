@@ -38,7 +38,7 @@ public:
     virtual ~DefaultAttributePersistenceProvider() = default;
 
     // Passed-in storage must outlive this object.
-    CHIP_ERROR Init(SafeAttributePersistenceProvider *provider)
+    CHIP_ERROR Init(SafeAttributePersistenceProvider * provider)
     {
         if (provider == nullptr)
         {
@@ -55,7 +55,7 @@ public:
                          MutableByteSpan & aValue) override;
 
 protected:
-    SafeAttributePersistenceProvider *mProvider;
+    SafeAttributePersistenceProvider * mProvider;
 
     CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType, size_t aExpectedSize,
                                  MutableByteSpan & aValue);

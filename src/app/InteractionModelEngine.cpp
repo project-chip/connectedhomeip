@@ -246,6 +246,7 @@ void InteractionModelEngine::Shutdown()
 
     mpCASESessionMgr = nullptr;
 
+    SetDataModelProvider(nullptr);
     //
     // We _should_ be clearing these out, but doing so invites a world
     // of trouble. #21233 tracks fixing the underlying assumptions to make

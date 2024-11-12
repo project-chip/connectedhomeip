@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/Provider.h"
+#include "app/util/persistence/AttributePersistenceProvider.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -24,11 +26,13 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -299,7 +303,30 @@ unsigned FindNextDeviceTypeIndex(Span<const EmberAfDeviceType> types, const Data
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
+// Ember requires a persistence provider
+DefaultAttributePersistenceProvider gDefaultAttributePersistenceProvider;
+
 } // namespace
+
+CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
+{
+    ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+
+    // Ember/codegen requires a persistence provider. Ensure one is set.
+    if (GetSafeAttributePersistenceProvider() == nullptr)
+    {
+        ReturnErrorOnFailure(gDefaultAttributePersistenceProvider.Init(GetSafeAttributePersistenceProvider()));
+        SetAttributePersistenceProvider(&gDefaultAttributePersistenceProvider);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CodegenDataModelProvider::Shutdown()
+{
+    Reset();
+    return CHIP_NO_ERROR;
+}
 
 std::optional<CommandId> CodegenDataModelProvider::EmberCommandListIterator::First(const CommandId * list)
 {
