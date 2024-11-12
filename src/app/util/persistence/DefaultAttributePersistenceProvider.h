@@ -31,11 +31,23 @@ namespace app {
  * of this class, since it can't be constructed automatically without knowing
  * what PersistentStorageDelegate is to be used.
  */
-class DefaultAttributePersistenceProvider : public AttributePersistenceProvider, public SafeAttributePersistenceProvider
+class DefaultAttributePersistenceProvider : public AttributePersistenceProvider
 {
 public:
     DefaultAttributePersistenceProvider()          = default;
     virtual ~DefaultAttributePersistenceProvider() = default;
+
+    // Passed-in storage must outlive this object.
+    CHIP_ERROR Init(SafeAttributePersistenceProvider *provider)
+    {
+        if (provider == nullptr)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        mProvider = provider;
+        return CHIP_NO_ERROR;
+    }
+    void Shutdown() {}
 
     // AttributePersistenceProvider implementation.
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
@@ -43,6 +55,8 @@ public:
                          MutableByteSpan & aValue) override;
 
 protected:
+    SafeAttributePersistenceProvider *mProvider;
+
     CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType, size_t aExpectedSize,
                                  MutableByteSpan & aValue);
 };

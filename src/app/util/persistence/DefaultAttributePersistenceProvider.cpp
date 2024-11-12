@@ -27,7 +27,8 @@ namespace app {
 
 CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
 {
-    return SafeAttributePersistenceProvider::InternalWriteValue(
+    VerifyOrReturnError(mProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mProvider->KeyWriteValue(
         DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
 }
 
@@ -41,7 +42,8 @@ CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttribut
 CHIP_ERROR DefaultAttributePersistenceProvider::InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType,
                                                                   size_t aExpectedSize, MutableByteSpan & aValue)
 {
-    ReturnErrorOnFailure(SafeAttributePersistenceProvider::InternalReadValue(aKey, aValue));
+    VerifyOrReturnError(mProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mProvider->KeyReadValue(aKey, aValue));
     size_t size = aValue.size();
     if (emberAfIsStringAttributeType(aType))
     {
@@ -71,13 +73,6 @@ AttributePersistenceProvider * gAttributeSaver = nullptr;
 
 } // anonymous namespace
 
-/**
- * Gets the global attribute saver.
- *
- * Note: When storing cluster attributes that are managed via AttributeAccessInterface, it is recommended to
- * use SafeAttributePersistenceProvider. See AttributePersistenceProvider and SafeAttributePersistenceProvider
- * class documentation for more information.
- */
 AttributePersistenceProvider * GetAttributePersistenceProvider()
 {
     return gAttributeSaver;
@@ -88,28 +83,6 @@ void SetAttributePersistenceProvider(AttributePersistenceProvider * aProvider)
     if (aProvider != nullptr)
     {
         gAttributeSaver = aProvider;
-    }
-}
-
-namespace {
-
-SafeAttributePersistenceProvider * gSafeAttributeSaver = nullptr;
-
-} // anonymous namespace
-
-/**
- * Gets the global attribute safe saver.
- */
-SafeAttributePersistenceProvider * GetSafeAttributePersistenceProvider()
-{
-    return gSafeAttributeSaver;
-}
-
-void SetSafeAttributePersistenceProvider(SafeAttributePersistenceProvider * aProvider)
-{
-    if (aProvider != nullptr)
-    {
-        gSafeAttributeSaver = aProvider;
     }
 }
 

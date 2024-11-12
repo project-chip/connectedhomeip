@@ -169,11 +169,17 @@ public:
      */
     virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue);
 
+    /**
+     * Key-based I/O. Prefer using the `Safe` calls above
+     */
+    CHIP_ERROR KeyWriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
+
+    /**
+     * Key-based I/O. Prefer using the `Safe` calls above
+     */
+    CHIP_ERROR KeyReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue);
 protected:
     PersistentStorageDelegate * mStorage;
-
-    CHIP_ERROR InternalWriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
-    CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue);
 };
 
 /**

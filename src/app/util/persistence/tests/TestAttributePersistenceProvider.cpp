@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "app/SafeAttributePersistenceProvider.h"
+#include "lib/core/CHIPError.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -43,16 +45,15 @@ public:
 TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalByteSpans)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    SafeAttributePersistenceProvider persistenceProvider;
 
     // Init
-    ChipError err = persistenceProvider.Init(&storageDelegate);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(persistenceProvider.Init(&storageDelegate), CHIP_NO_ERROR);
 
     // Store ByteSpan of size 1
     uint8_t valueArray[1] = { 0x42 };
     ByteSpan value(valueArray);
-    err = persistenceProvider.SafeWriteValue(TestConcretePath, value);
+    CHIP_ERROR err = persistenceProvider.SafeWriteValue(TestConcretePath, value);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     uint8_t getArray[1];
@@ -77,7 +78,7 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalByteSpans)
  * @param testValue The test value to store and retrieve
  */
 template <typename T>
-void testHelperStorageAndRetrivalScalarValues(DefaultAttributePersistenceProvider & persistenceProvider, T testValue)
+void testHelperStorageAndRetrivalScalarValues(SafeAttributePersistenceProvider & persistenceProvider, T testValue)
 {
     CHIP_ERROR err = persistenceProvider.WriteScalarValue(TestConcretePath, testValue);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -95,7 +96,7 @@ void testHelperStorageAndRetrivalScalarValues(DefaultAttributePersistenceProvide
  * @param testValue The test value to store and retrieve
  */
 template <typename T>
-void testHelperStorageAndRetrivalScalarValues(DefaultAttributePersistenceProvider & persistenceProvider,
+void testHelperStorageAndRetrivalScalarValues(SafeAttributePersistenceProvider & persistenceProvider,
                                               DataModel::Nullable<T> testValue)
 {
     CHIP_ERROR err = persistenceProvider.WriteScalarValue(TestConcretePath, testValue);
@@ -114,7 +115,7 @@ void testHelperStorageAndRetrivalScalarValues(DefaultAttributePersistenceProvide
 TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    SafeAttributePersistenceProvider persistenceProvider;
 
     // Init
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
@@ -155,7 +156,7 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalScalarValues)
 TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    SafeAttributePersistenceProvider persistenceProvider;
 
     // Init
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
@@ -191,7 +192,7 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedScalarValue
 TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalNullableScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    SafeAttributePersistenceProvider persistenceProvider;
 
     // Init
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
@@ -247,7 +248,7 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalNullableScalarVal
 TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedNullableScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    SafeAttributePersistenceProvider persistenceProvider;
 
     // Init
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
@@ -295,7 +296,7 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedNullableSca
 TEST_F(TestAttributePersistenceProvider, TestBufferTooSmallErrors)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    SafeAttributePersistenceProvider persistenceProvider;
 
     // Init
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);

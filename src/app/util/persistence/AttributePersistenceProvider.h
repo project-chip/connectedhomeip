@@ -77,6 +77,10 @@ public:
  *
  * Callers have to externally synchronize usage of this function.
  *
+ * Note: When storing cluster attributes that are managed via AttributeAccessInterface, it is recommended to
+ * use SafeAttributePersistenceProvider. See AttributePersistenceProvider and SafeAttributePersistenceProvider
+ * class documentation for more information.
+ *
  * @return The global AttributePersistenceProvider.  This must never be null.
  */
 AttributePersistenceProvider * GetAttributePersistenceProvider();
