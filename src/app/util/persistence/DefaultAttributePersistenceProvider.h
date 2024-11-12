@@ -34,36 +34,15 @@ namespace app {
 class DefaultAttributePersistenceProvider : public AttributePersistenceProvider, public SafeAttributePersistenceProvider
 {
 public:
-    DefaultAttributePersistenceProvider() {}
-
-    // Passed-in storage must outlive this object.
-    CHIP_ERROR Init(PersistentStorageDelegate * storage)
-    {
-        if (storage == nullptr)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        mStorage = storage;
-        return CHIP_NO_ERROR;
-    }
-
-    void Shutdown() {}
+    DefaultAttributePersistenceProvider()          = default;
+    virtual ~DefaultAttributePersistenceProvider() = default;
 
     // AttributePersistenceProvider implementation.
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
                          MutableByteSpan & aValue) override;
 
-    // SafeAttributePersistenceProvider implementation.
-    CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
-    CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) override;
-
 protected:
-    PersistentStorageDelegate * mStorage;
-
-private:
-    CHIP_ERROR InternalWriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
-    CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue);
     CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType, size_t aExpectedSize,
                                  MutableByteSpan & aValue);
 };

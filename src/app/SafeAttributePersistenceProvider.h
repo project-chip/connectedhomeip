@@ -20,10 +20,10 @@
 #include <app/util/attribute-metadata.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 
 #include <cstring>
-#include <inttypes.h>
 
 namespace chip {
 namespace app {
@@ -38,6 +38,19 @@ class SafeAttributePersistenceProvider
 public:
     virtual ~SafeAttributePersistenceProvider() = default;
     SafeAttributePersistenceProvider()          = default;
+
+    // Passed-in storage must outlive this object.
+    CHIP_ERROR Init(PersistentStorageDelegate * storage)
+    {
+        if (storage == nullptr)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        mStorage = storage;
+        return CHIP_NO_ERROR;
+    }
+
+    void Shutdown() {}
 
     // The following API provides helper functions to simplify the access of commonly used types.
     // The API may not be complete.
@@ -141,7 +154,7 @@ public:
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write. The value will be stored as-is.
      */
-    virtual CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) = 0;
+    virtual CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue);
 
     /**
      * Read an attribute value as a raw sequence of bytes from non-volatile memory.
@@ -154,7 +167,13 @@ public:
      * @retval CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if no stored value exists for the attribute
      * @retval CHIP_ERROR_BUFFER_TOO_SMALL aValue.size() is too small to hold the value.
      */
-    virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) = 0;
+    virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue);
+
+protected:
+    PersistentStorageDelegate * mStorage;
+
+    CHIP_ERROR InternalWriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
+    CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue);
 };
 
 /**

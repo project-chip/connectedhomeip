@@ -13,9 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/SafeAttributePersistenceProvider.h"
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 
 #include <app/util/ember-strings.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
@@ -23,34 +25,23 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR DefaultAttributePersistenceProvider::InternalWriteValue(const StorageKeyName & aKey, const ByteSpan & aValue)
+CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
 {
-    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    // TODO: we may want to have a small cache for values that change a lot, so
-    //  we only write them once a bunch of changes happen or on timer or
-    //  shutdown.
-    if (!CanCastTo<uint16_t>(aValue.size()))
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
-    return mStorage->SyncSetKeyValue(aKey.KeyName(), aValue.data(), static_cast<uint16_t>(aValue.size()));
+    return SafeAttributePersistenceProvider::InternalWriteValue(
+        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
 }
 
-CHIP_ERROR DefaultAttributePersistenceProvider::InternalReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue)
+CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
+                                                          const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue)
 {
-    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    uint16_t size = static_cast<uint16_t>(std::min(aValue.size(), static_cast<size_t>(UINT16_MAX)));
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(aKey.KeyName(), aValue.data(), size));
-    aValue.reduce_size(size);
-    return CHIP_NO_ERROR;
+    return InternalReadValue(DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+                             aMetadata->attributeType, aMetadata->size, aValue);
 }
 
 CHIP_ERROR DefaultAttributePersistenceProvider::InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType,
                                                                   size_t aExpectedSize, MutableByteSpan & aValue)
 {
-    ReturnErrorOnFailure(InternalReadValue(aKey, aValue));
+    ReturnErrorOnFailure(SafeAttributePersistenceProvider::InternalReadValue(aKey, aValue));
     size_t size = aValue.size();
     if (emberAfIsStringAttributeType(aType))
     {
@@ -72,31 +63,6 @@ CHIP_ERROR DefaultAttributePersistenceProvider::InternalReadValue(const StorageK
         VerifyOrReturnError(size == aExpectedSize, CHIP_ERROR_INVALID_ARGUMENT);
     }
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
-{
-    return InternalWriteValue(DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-                              aValue);
-}
-
-CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
-                                                          const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue)
-{
-    return InternalReadValue(DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-                             aMetadata->attributeType, aMetadata->size, aValue);
-}
-
-CHIP_ERROR DefaultAttributePersistenceProvider::SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
-{
-    return InternalWriteValue(
-        DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
-}
-
-CHIP_ERROR DefaultAttributePersistenceProvider::SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue)
-{
-    return InternalReadValue(
-        DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
 }
 
 namespace {
