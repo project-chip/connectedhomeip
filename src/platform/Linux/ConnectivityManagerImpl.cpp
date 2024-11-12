@@ -855,7 +855,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS;
     unsigned int freq                             = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
     unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
-    bool fsd                                      = false;
 
     // Add the freq_list:
     GVariant * freq_array_variant =
@@ -894,7 +893,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     g_variant_builder_add(&builder, "{sv}", "freq", g_variant_new_uint16(freq));
     g_variant_builder_add(&builder, "{sv}", "ssi", ssi_array_variant);
     g_variant_builder_add(&builder, "{sv}", "freq_list", freq_array_variant);
-    g_variant_builder_add(&builder, "{sv}", "fsd", g_variant_new_boolean(fsd));
     args = g_variant_builder_end(&builder);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     wpa_supplicant_1_interface_call_nanpublish_sync(mWpaSupplicant.iface, args, &publish_id, nullptr, &err.GetReceiver());
