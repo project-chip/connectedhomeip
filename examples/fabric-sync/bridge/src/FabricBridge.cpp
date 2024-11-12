@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -124,6 +123,12 @@ CHIP_ERROR FabricBridge::AddSynchronizedDevice(const SynchronizedDevice & data)
         app::Clusters::EcosystemInformation::EcosystemInformationServer::Instance().AddEcosystemInformationClusterToEndpoint(
             addedDevice->GetEndpointId());
 
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to add Ecosystem Information Cluster to endpoint %u: %" CHIP_ERROR_FORMAT,
+                     addedDevice->GetEndpointId(), err.Format());
+    }
+
     return err;
 }
 
@@ -175,12 +180,11 @@ CHIP_ERROR FabricBridge::AdminCommissioningAttributeChanged(const AdministratorC
 
     BridgedDevice::AdminCommissioningAttributes adminCommissioningAttributes;
 
-    uint32_t maxWindowStatusValue =
-        static_cast<uint32_t>(app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kUnknownEnumValue);
-    VerifyOrReturnError(data.windowStatus < maxWindowStatusValue, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(data.windowStatus <
+                            app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kUnknownEnumValue,
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
-    adminCommissioningAttributes.commissioningWindowStatus =
-        static_cast<app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum>(data.windowStatus);
+    adminCommissioningAttributes.commissioningWindowStatus = data.windowStatus;
     if (data.openerFabricIndex.has_value())
     {
         VerifyOrReturnError(data.openerFabricIndex >= kMinValidFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);

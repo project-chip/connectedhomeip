@@ -33,6 +33,8 @@ namespace admin {
 
 namespace {
 
+constexpr uint16_t kBasicInformationAttributeBufSize = 128;
+
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     reinterpret_cast<DeviceSynchronizer *>(context)->OnDeviceConnected(exchangeMgr, sessionHandle);
@@ -82,7 +84,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     switch (path.mAttributeId)
     {
     case Clusters::BasicInformation::Attributes::UniqueID::Id: {
-        char uniqueIdBuffer[128]; // Adjust size as needed
+        char uniqueIdBuffer[kBasicInformationAttributeBufSize];
         if (SuccessOrLog(data->GetString(uniqueIdBuffer, sizeof(uniqueIdBuffer)), "UniqueId"))
         {
             mCurrentDeviceData.uniqueId = std::string(uniqueIdBuffer);
@@ -90,7 +92,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     }
     break;
     case Clusters::BasicInformation::Attributes::VendorName::Id: {
-        char vendorNameBuffer[128]; // Adjust size as needed
+        char vendorNameBuffer[kBasicInformationAttributeBufSize];
         if (SuccessOrLog(data->GetString(vendorNameBuffer, sizeof(vendorNameBuffer)), "VendorName"))
         {
             mCurrentDeviceData.vendorName = std::string(vendorNameBuffer);
@@ -98,7 +100,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     }
     break;
     case Clusters::BasicInformation::Attributes::ProductName::Id: {
-        char productNameBuffer[128]; // Adjust size as needed
+        char productNameBuffer[kBasicInformationAttributeBufSize];
         if (SuccessOrLog(data->GetString(productNameBuffer, sizeof(productNameBuffer)), "ProductName"))
         {
             mCurrentDeviceData.productName = std::string(productNameBuffer);
@@ -106,7 +108,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     }
     break;
     case Clusters::BasicInformation::Attributes::NodeLabel::Id: {
-        char nodeLabelBuffer[128]; // Adjust size as needed
+        char nodeLabelBuffer[kBasicInformationAttributeBufSize];
         if (SuccessOrLog(data->GetString(nodeLabelBuffer, sizeof(nodeLabelBuffer)), "NodeLabel"))
         {
             mCurrentDeviceData.nodeLabel = std::string(nodeLabelBuffer);
@@ -114,7 +116,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     }
     break;
     case Clusters::BasicInformation::Attributes::HardwareVersionString::Id: {
-        char hardwareVersionStringBuffer[128]; // Adjust size as needed
+        char hardwareVersionStringBuffer[kBasicInformationAttributeBufSize];
         if (SuccessOrLog(data->GetString(hardwareVersionStringBuffer, sizeof(hardwareVersionStringBuffer)),
                          "HardwareVersionString"))
         {
@@ -123,7 +125,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     }
     break;
     case Clusters::BasicInformation::Attributes::SoftwareVersionString::Id: {
-        char softwareVersionStringBuffer[128]; // Adjust size as needed
+        char softwareVersionStringBuffer[kBasicInformationAttributeBufSize];
         if (SuccessOrLog(data->GetString(softwareVersionStringBuffer, sizeof(softwareVersionStringBuffer)),
                          "SoftwareVersionString"))
         {

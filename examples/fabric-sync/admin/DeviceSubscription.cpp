@@ -61,7 +61,7 @@ void DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path,
         CHIP_ERROR err = data->Get(windowStatus);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(NotSpecified, "Failed to read WindowStatus"));
         VerifyOrReturn(windowStatus != Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kUnknownEnumValue);
-        mCurrentAdministratorCommissioningAttributes.windowStatus = static_cast<uint8_t>(windowStatus);
+        mCurrentAdministratorCommissioningAttributes.windowStatus = windowStatus;
         mChangeDetected                                           = true;
         break;
     }
@@ -236,7 +236,7 @@ CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback, 
     mCurrentAdministratorCommissioningAttributes    = AdministratorCommissioningChanged_init_default;
     mCurrentAdministratorCommissioningAttributes.id = scopedNodeId;
     mCurrentAdministratorCommissioningAttributes.windowStatus =
-        static_cast<uint8_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
+        Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
 
     mOnDoneCallback = onDoneCallback;
     MoveToState(State::Connecting);

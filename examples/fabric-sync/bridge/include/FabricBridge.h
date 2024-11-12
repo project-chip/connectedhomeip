@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -20,6 +19,7 @@
 
 #include "FabricAdminDelegate.h"
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ScopedNodeId.h>
 #include <optional>
@@ -46,10 +46,10 @@ namespace bridge {
 
 #define AdministratorCommissioningChanged_init_default                                                                             \
     {                                                                                                                              \
-        ScopedNodeId_init_default, /* id */                                                                                        \
-            0,                     /* windowStatus */                                                                              \
-            std::nullopt,          /* openerFabricIndex */                                                                         \
-            std::nullopt           /* openerVendorId */                                                                            \
+        ScopedNodeId_init_default,                                                                          /* id */               \
+            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen, /* windowStatus */     \
+            std::nullopt, /* openerFabricIndex */                                                                                  \
+            std::nullopt  /* openerVendorId */                                                                                     \
     }
 
 struct SynchronizedDevice
@@ -72,7 +72,7 @@ struct SynchronizedDevice
 struct AdministratorCommissioningChanged
 {
     chip::ScopedNodeId id;
-    uint8_t windowStatus;
+    chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum windowStatus;
     std::optional<chip::FabricIndex> openerFabricIndex;
     std::optional<chip::VendorId> openerVendorId;
 };
