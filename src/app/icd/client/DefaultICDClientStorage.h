@@ -119,10 +119,10 @@ public:
 
     CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
                                      Protocols::SecureChannel::CounterType & counter) override;
-    
+
     /**
      * Shutdown DefaultICDClientStorage
-     * 
+     *
      */
     void Shutdown();
 
