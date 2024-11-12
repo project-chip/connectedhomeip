@@ -81,7 +81,7 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
             break;
         }
 
-        ssize_t readBytes      = read(fd, readbuf, kChipEventCmdBufSize);
+        ssize_t readBytes = read(fd, readbuf, kChipEventCmdBufSize);
         if (readBytes > 0)
         {
             readbuf[readBytes - 1] = '\0';
