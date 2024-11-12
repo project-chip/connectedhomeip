@@ -54,15 +54,9 @@ config("wifi-platform-config") {
   if (use_rs9116) {
     # All the stuff from wiseconnect
     include_dirs += rs911x_inc_plat
-
-    # add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
-    cflags = rs911x_cflags
   } else if (use_SiWx917) {
     # All the stuff from wiseconnect
     include_dirs += rs9117_inc_plat
-  } else if (use_wf200) {
-    include_dirs += wf200_plat_incs
-  } else {
   }
 
   if (chip_default_wifi_ssid != "") {

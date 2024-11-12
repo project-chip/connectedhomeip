@@ -38,19 +38,6 @@ source_set("logging") {
   ]
 }
 
-# source_set("wifi-interface") {
-
-#   public_deps = [
-#     "${chip_root}/src/app/icd/server:icd-server-config",
-#     "${chip_root}/src/lib/core",
-#     "${chip_root}/src/lib/support",
-#     "${chip_root}/src/platform:platform",
-#     "${chip_root}/src/platform/silabs/SiWx917:SiWx917",
-#     "${lwip_root}:lwip",
-#   ]
-
-# }
-
 static_library("SiWx917") {
   sources = [
     "${silabs_platform_dir}/BLEManagerImpl.h",

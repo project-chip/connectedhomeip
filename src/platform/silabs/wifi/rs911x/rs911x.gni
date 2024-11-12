@@ -68,11 +68,4 @@ rs911x_src_sapi = [
   "${wiseconnect_sdk_root}/sapi/network/socket/rsi_socket_rom.c",
 ]
 
-rs911x_cflags = [ "-Wno-empty-body" ]
-
-rs911x_inc_plat = [
-  "${chip_root}/src/platform/silabs/wifi/rs911x",
-  "${chip_root}/src/platform/silabs/wifi/rs911x/platform",
-  "${wiseconnect_sdk_root}/sapi/include",
-  "${silabs_common_plat_dir}/wifi",
-]
+rs911x_inc_plat = [ "${wiseconnect_sdk_root}/sapi/include" ]

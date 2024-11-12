@@ -29,14 +29,8 @@ rs911x_src_plat = [
   "${chip_root}/src/platform/silabs/wifi/rs911x/platform/efx32_ncp_host.c",
 ]
 
-rs9117_inc_plat = [
-  "${chip_root}/src/platform/silabs/wifi/rs911x",
-  "${chip_root}/src/platform/silabs/wifi/rs911x/platform",
-  "${wifi_sdk_root}/components/si91x/ble/inc",
-  "${chip_root}/src/platform/silabs/wifi",
-]
+rs9117_inc_plat = [ "${wifi_sdk_root}/components/si91x/ble/inc" ]
 
-rs911x_cflags = [ "-Wno-empty-body" ]
 rs9117_src_sapi = [
   # sl_si91x_wireless component
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
