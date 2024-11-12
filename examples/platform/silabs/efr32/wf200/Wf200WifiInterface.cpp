@@ -15,35 +15,31 @@
  *    limitations under the License.
  */
 
-/* Includes */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "AppConfig.h"
+#include "FreeRTOS.h"
+#include "dhcp_client.h"
 #include "em_bus.h"
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "em_usart.h"
+#include "ethernetif.h"
+#include "event_groups.h"
 #include "gpiointerrupt.h"
-
-#include "AppConfig.h"
 #include "sl_wfx_board.h"
+#include "sl_wfx_cmd_api.h"
+#include "sl_wfx_constants.h"
 #include "sl_wfx_host.h"
 #include "sl_wfx_task.h"
-#include "wfx_host_events.h"
-
-#include "FreeRTOS.h"
-#include "event_groups.h"
 #include "task.h"
-
-#include "dhcp_client.h"
-#include "ethernetif.h"
+#include "wfx_host_events.h"
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
@@ -68,9 +64,30 @@ static wfx_wifi_scan_result_t ap_info;
 #define PASSIVE_CHANNEL_TIME 0
 #define NUM_PROBE_REQUEST 2
 
-// wfx_fmac_driver context
-sl_wfx_context_t wifiContext;
-static uint8_t wifi_extra;
+/* Wi-Fi bitmask events - for the task */
+#define SL_WFX_CONNECT (1 << 1)
+#define SL_WFX_DISCONNECT (1 << 2)
+#define SL_WFX_START_AP (1 << 3)
+#define SL_WFX_STOP_AP (1 << 4)
+#define SL_WFX_SCAN_START (1 << 5)
+#define SL_WFX_SCAN_COMPLETE (1 << 6)
+#define SL_WFX_RETRY_CONNECT (1 << 7)
+
+#define WLAN_TASK_STACK_SIZE (1024)
+#define ETH_FRAME (0)
+#define AP_START_SUCCESS (0)
+#define BITS_TO_WAIT (0)
+#define BEACON_1 (0)
+#define CHANNEL_LIST ((const uint8_t *) 0)
+#define CHANNEL_COUNT (0)
+#define IE_DATA ((const uint8_t *) 0)
+#define IE_DATA_LENGTH (0)
+#define BSSID_SCAN ((const uint8_t *) 0)
+#define CHANNEL_0 (0)
+#define PREVENT_ROAMING (1)
+#define DISABLE_PMF_MODE (0)
+#define STA_IP_FAIL (0)
+#define WLAN_TASK_PRIORITY (1)
 
 /*****************************************************************************
  * macros
@@ -90,8 +107,6 @@ uint8_t softap_channel                 = SOFTAP_CHANNEL_DEFAULT;
 /* station network interface structures */
 struct netif * sta_netif;
 wfx_wifi_provision_t wifi_provision;
-sl_wfx_get_counters_cnf_t * counters;
-sl_wfx_get_counters_cnf_t * Tempcounters;
 #define PUT_COUNTER(name) ChipLogDetail(DeviceLayer, "%-24s %lu", #name, (unsigned long) counters->body.count_##name);
 
 bool hasNotifiedIPV6             = false;
@@ -130,6 +145,162 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac);
 #endif
 
 extern uint32_t gOverrunCount;
+
+namespace {
+
+// wfx_fmac_driver context
+sl_wfx_context_t wifiContext;
+uint8_t wifi_extra;
+
+typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_body_s
+{
+    uint32_t status;
+    uint16_t mib_id;
+    uint16_t length;
+    uint32_t rcpi;
+    uint32_t count_plcp_errors;
+    uint32_t count_fcs_errors;
+    uint32_t count_tx_packets;
+    uint32_t count_rx_packets;
+    uint32_t count_rx_packet_errors;
+    uint32_t count_rx_decryption_failures;
+    uint32_t count_rx_mic_failures;
+    uint32_t count_rx_no_key_failures;
+    uint32_t count_tx_multicast_frames;
+    uint32_t count_tx_frames_success;
+    uint32_t count_tx_frame_failures;
+    uint32_t count_tx_frames_retried;
+    uint32_t count_tx_frames_multi_retried;
+    uint32_t count_rx_frame_duplicates;
+    uint32_t count_rts_success;
+    uint32_t count_rts_failures;
+    uint32_t count_ack_failures;
+    uint32_t count_rx_multicast_frames;
+    uint32_t count_rx_frames_success;
+    uint32_t count_rx_cmacicv_errors;
+    uint32_t count_rx_cmac_replays;
+    uint32_t count_rx_mgmt_ccmp_replays;
+    uint32_t count_rx_bipmic_errors;
+    uint32_t count_rx_beacon;
+    uint32_t count_miss_beacon;
+    uint32_t reserved[15];
+} sl_wfx_get_counters_cnf_body_t;
+
+typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_s
+{
+    /** Common message header. */
+    sl_wfx_header_t header;
+    /** Confirmation message body. */
+    sl_wfx_get_counters_cnf_body_t body;
+} sl_wfx_get_counters_cnf_t;
+
+typedef struct __attribute__((__packed__)) sl_wfx_mib_req_body_s
+{
+    uint16_t mib_id; ///< ID of the MIB to be read.
+    uint16_t reserved;
+} sl_wfx_mib_req_body_t;
+
+typedef struct __attribute__((__packed__)) sl_wfx_header_mib_s
+{
+    uint16_t length; ///< Message length in bytes including this uint16_t.
+                     ///< Maximum value is 8188 but maximum Request size is FW dependent and reported in the
+                     ///< ::sl_wfx_startup_ind_body_t::size_inp_ch_buf.
+    uint8_t id;      ///< Contains the message Id indexed by sl_wfx_general_commands_ids_t or sl_wfx_message_ids_t.
+    uint8_t reserved : 1;
+    uint8_t interface : 2;
+    uint8_t seqnum : 3;
+    uint8_t encrypted : 2;
+} sl_wfx_header_mib_t;
+
+typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
+{
+    /** Common message header. */
+    sl_wfx_header_mib_t header;
+    /** Request message body. */
+    sl_wfx_mib_req_body_t body;
+} sl_wfx_mib_req_t;
+
+sl_wfx_get_counters_cnf_t * counters;
+
+/****************************************************************************
+ * @brief
+ *      get the wifi state
+ * @return returns wificonetext state
+ *****************************************************************************/
+sl_wfx_state_t wfx_get_wifi_state(void)
+{
+    return wifiContext.state;
+}
+
+sl_status_t get_all_counters(void)
+{
+    sl_status_t result;
+    uint8_t command_id         = 0x05;
+    uint16_t mib_id            = 0x2035;
+    sl_wfx_mib_req_t * request = nullptr;
+    uint32_t request_length    = SL_WFX_ROUND_UP_EVEN(sizeof(sl_wfx_header_mib_t) + sizeof(sl_wfx_mib_req_body_t));
+
+    result =
+        sl_wfx_allocate_command_buffer((sl_wfx_generic_message_t **) &request, command_id, SL_WFX_CONTROL_BUFFER, request_length);
+
+    VerifyOrReturnError(request != nullptr, SL_STATUS_NULL_POINTER);
+
+    request->body.mib_id      = mib_id;
+    request->header.interface = 0x2;
+    request->header.encrypted = 0x0;
+
+    result = sl_wfx_send_request(command_id, (sl_wfx_generic_message_t *) request, request_length);
+    SL_WFX_ERROR_CHECK(result);
+
+    result = sl_wfx_host_wait_for_confirmation(command_id, SL_WFX_DEFAULT_REQUEST_TIMEOUT_MS, (void **) &counters);
+    SL_WFX_ERROR_CHECK(result);
+
+    ChipLogDetail(DeviceLayer, "%-24s %12s ", "", "Debug Counters Content");
+    ChipLogDetail(DeviceLayer, "%-24s %lu", "rcpi", (unsigned long) counters->body.rcpi);
+    PUT_COUNTER(plcp_errors);
+    PUT_COUNTER(fcs_errors);
+    PUT_COUNTER(tx_packets);
+    PUT_COUNTER(rx_packets);
+    PUT_COUNTER(rx_packet_errors);
+    PUT_COUNTER(rx_decryption_failures);
+    PUT_COUNTER(rx_mic_failures);
+    PUT_COUNTER(rx_no_key_failures);
+    PUT_COUNTER(tx_multicast_frames);
+    PUT_COUNTER(tx_frames_success);
+    PUT_COUNTER(tx_frame_failures);
+    PUT_COUNTER(tx_frames_retried);
+    PUT_COUNTER(tx_frames_multi_retried);
+    PUT_COUNTER(rx_frame_duplicates);
+    PUT_COUNTER(rts_success);
+    PUT_COUNTER(rts_failures);
+    PUT_COUNTER(ack_failures);
+    PUT_COUNTER(rx_multicast_frames);
+    PUT_COUNTER(rx_frames_success);
+    PUT_COUNTER(rx_cmacicv_errors);
+    PUT_COUNTER(rx_cmac_replays);
+    PUT_COUNTER(rx_mgmt_ccmp_replays);
+    PUT_COUNTER(rx_bipmic_errors);
+    PUT_COUNTER(rx_beacon);
+    PUT_COUNTER(miss_beacon);
+
+error_handler:
+
+    if (result == SL_STATUS_TIMEOUT)
+    {
+        if (sl_wfx_context->used_buffers > 0)
+        {
+            sl_wfx_context->used_buffers--;
+        }
+    }
+    if (request != nullptr)
+    {
+        sl_wfx_free_command_buffer((sl_wfx_generic_message_t *) request, command_id, SL_WFX_CONTROL_BUFFER);
+    }
+
+    return result;
+}
+
+} // namespace
 
 /***************************************************************************
  * @brief
@@ -278,7 +449,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
     /* don't save if filter only wants specific ssid */
     if (scan_ssid != nullptr)
     {
-        if (strcmp(scan_ssid, (char *) &scan_result->ssid_def.ssid[0]) != CMP_SUCCESS)
+        if (strcmp(scan_ssid, (char *) &scan_result->ssid_def.ssid[0]) != 0)
             return;
     }
     if ((ap = (struct scan_result_holder *) (chip::Platform::MemoryAlloc(sizeof(*ap)))) == (struct scan_result_holder *) 0)
@@ -779,74 +950,6 @@ int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
     return status;
 }
 
-sl_status_t get_all_counters(void)
-{
-    sl_status_t result;
-    uint8_t command_id         = 0x05;
-    uint16_t mib_id            = 0x2035;
-    sl_wfx_mib_req_t * request = nullptr;
-    uint32_t request_length    = SL_WFX_ROUND_UP_EVEN(sizeof(sl_wfx_header_mib_t) + sizeof(sl_wfx_mib_req_body_t));
-
-    result =
-        sl_wfx_allocate_command_buffer((sl_wfx_generic_message_t **) &request, command_id, SL_WFX_CONTROL_BUFFER, request_length);
-
-    VerifyOrReturnError(request != nullptr, SL_STATUS_NULL_POINTER);
-
-    request->body.mib_id      = mib_id;
-    request->header.interface = 0x2;
-    request->header.encrypted = 0x0;
-
-    result = sl_wfx_send_request(command_id, (sl_wfx_generic_message_t *) request, request_length);
-    SL_WFX_ERROR_CHECK(result);
-
-    result = sl_wfx_host_wait_for_confirmation(command_id, SL_WFX_DEFAULT_REQUEST_TIMEOUT_MS, (void **) &counters);
-    SL_WFX_ERROR_CHECK(result);
-
-    ChipLogDetail(DeviceLayer, "%-24s %12s ", "", "Debug Counters Content");
-    ChipLogDetail(DeviceLayer, "%-24s %lu", "rcpi", (unsigned long) counters->body.rcpi);
-    PUT_COUNTER(plcp_errors);
-    PUT_COUNTER(fcs_errors);
-    PUT_COUNTER(tx_packets);
-    PUT_COUNTER(rx_packets);
-    PUT_COUNTER(rx_packet_errors);
-    PUT_COUNTER(rx_decryption_failures);
-    PUT_COUNTER(rx_mic_failures);
-    PUT_COUNTER(rx_no_key_failures);
-    PUT_COUNTER(tx_multicast_frames);
-    PUT_COUNTER(tx_frames_success);
-    PUT_COUNTER(tx_frame_failures);
-    PUT_COUNTER(tx_frames_retried);
-    PUT_COUNTER(tx_frames_multi_retried);
-    PUT_COUNTER(rx_frame_duplicates);
-    PUT_COUNTER(rts_success);
-    PUT_COUNTER(rts_failures);
-    PUT_COUNTER(ack_failures);
-    PUT_COUNTER(rx_multicast_frames);
-    PUT_COUNTER(rx_frames_success);
-    PUT_COUNTER(rx_cmacicv_errors);
-    PUT_COUNTER(rx_cmac_replays);
-    PUT_COUNTER(rx_mgmt_ccmp_replays);
-    PUT_COUNTER(rx_bipmic_errors);
-    PUT_COUNTER(rx_beacon);
-    PUT_COUNTER(miss_beacon);
-
-error_handler:
-
-    if (result == SL_STATUS_TIMEOUT)
-    {
-        if (sl_wfx_context->used_buffers > 0)
-        {
-            sl_wfx_context->used_buffers--;
-        }
-    }
-    if (request != nullptr)
-    {
-        sl_wfx_free_command_buffer((sl_wfx_generic_message_t *) request, command_id, SL_WFX_CONTROL_BUFFER);
-    }
-
-    return result;
-}
-
 /************************************************************************
  * @brief
  *    reset the count
@@ -879,16 +982,6 @@ sl_status_t wfx_wifi_start(void)
 
 /****************************************************************************
  * @brief
- *      get the wifi state
- * @return returns wificonetext state
- *****************************************************************************/
-sl_wfx_state_t wfx_get_wifi_state(void)
-{
-    return wifiContext.state;
-}
-
-/****************************************************************************
- * @brief
  *      getnetif using interface
  * @param[in]  interface:
  * @return returns selectedNetif
@@ -907,19 +1000,6 @@ struct netif * wfx_GetNetif(sl_wfx_interface_t interface)
     }
 #endif
     return SelectedNetif;
-}
-
-/****************************************************************************
- * @brief
- * get the wifi mac address using interface
- * @param[in] interface:
- * @return  returns wificontext.mac_addr_o if successful,
- *          wificontext.mac_addr_1 otherwise
- *****************************************************************************/
-sl_wfx_mac_address_t wfx_get_wifi_mac_addr(sl_wfx_interface_t interface)
-{
-    // return Mac address used by WFX SL_WFX_STA_INTERFACE or SL_WFX_SOFTAP_INTERFACE,
-    return (interface == SL_WFX_STA_INTERFACE) ? wifiContext.mac_addr_0 : wifiContext.mac_addr_1;
 }
 
 /****************************************************************************
@@ -958,17 +1038,6 @@ bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
 void wfx_clear_wifi_provision(void)
 {
     memset(&wifi_provision, 0, sizeof(wifi_provision));
-}
-
-/****************************************************************************
- * @brief
- *      driver STA provisioned
- * @return returns true if successful,
- *         false otherwise
- *****************************************************************************/
-bool wfx_is_sta_provisioned(void)
-{
-    return (wifi_provision.ssid[0]) ? true : false;
 }
 
 /****************************************************************************
@@ -1147,10 +1216,10 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
      */
     uint8_t ip4_addr[4];
 
-    ip4_addr[0] = (ip) &HEX_VALUE_FF;
-    ip4_addr[1] = (ip >> 8) & HEX_VALUE_FF;
-    ip4_addr[2] = (ip >> 16) & HEX_VALUE_FF;
-    ip4_addr[3] = (ip >> 24) & HEX_VALUE_FF;
+    ip4_addr[0] = (ip) &0xFF;
+    ip4_addr[1] = (ip >> 8) & 0xFF;
+    ip4_addr[2] = (ip >> 16) & 0xFF;
+    ip4_addr[3] = (ip >> 24) & 0xFF;
 
     ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", ip4_addr[0], ip4_addr[1], ip4_addr[2], ip4_addr[3]);
     sta_ip = ip;

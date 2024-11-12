@@ -176,14 +176,14 @@ else
     BUILD_DIR=$OUTDIR/$STM32_BOARD
     echo BUILD_DIR="$BUILD_DIR"
     if [ "$USE_WIFI" == true ]; then
-        gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="stm32_board=\"$STM32_BOARD\" $optArgs" "$BUILD_DIR"
+        gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="stm32_board=\"$STM32_BOARD\" $optArgs" "$BUILD_DIR"
     else
         # thread build
         #
         if [ -z "$optArgs" ]; then
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="stm32_board=\"$STM32_BOARD\" treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --args="stm32_board=\"$STM32_BOARD\" treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
         else
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="stm32_board=\"$STM32_BOARD\" $optArgs treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --args="stm32_board=\"$STM32_BOARD\" $optArgs treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
         fi
     fi
     ninja -v -C "$BUILD_DIR"/

@@ -22,6 +22,7 @@ rs911x_src_plat = [
   "${examples_plat_dir}/rs911x/hal/sl_si91x_ncp_utility.c",
   "${examples_plat_dir}/rs911x/hal/efx32_ncp_host.c",
   "${silabs_common_plat_dir}/wifi/WifiInterfaceAbstraction.cpp",
+  "${silabs_common_plat_dir}/wifi/WiseconnectInterfaceAbstraction.cpp",
 ]
 
 rs9117_inc_plat = [

@@ -38,11 +38,16 @@
 #include <platform/CHIPDeviceLayer.h>
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
+
 static struct netif sta_netif;
 
 #ifdef SL_WFX_CONFIG_SOFTAP
 static struct netif ap_netif;
 #endif
+
+#define LINK_UP (1)
+#define LINK_DOWN (0)
+#define MAC_48_BIT_SET (1)
 
 /****************************************************************************
  * @fn   static void netif_config(struct netif *sta_if, struct netif *ap_if)

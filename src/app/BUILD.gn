@@ -264,6 +264,7 @@ static_library("interaction-model") {
     public_deps += [
       ":global-attributes",
       "${chip_root}/src/access",
+      "${chip_root}/src/access:provider-impl",
       "${chip_root}/src/app/common:attribute-type",
     ]
 

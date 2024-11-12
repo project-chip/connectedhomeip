@@ -340,7 +340,7 @@ else
         optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
     fi
 
-    "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
+    "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
 
     if [ "$USE_SLC" == true ]; then
         # Activation needs to be after SLC generation which is done in gn gen.
