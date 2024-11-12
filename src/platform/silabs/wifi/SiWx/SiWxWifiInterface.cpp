@@ -34,7 +34,6 @@
 #include "sl_status.h"
 #include "sl_wifi_device.h"
 #include "task.h"
-#include "wfx_host_events.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <inet/IPAddress.h>
 #include <lib/support/CHIPMem.h>

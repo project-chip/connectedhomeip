@@ -25,7 +25,7 @@
 #include <mbedtls/platform.h>
 
 #ifdef SL_WIFI
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #endif /* SL_WIFI */
 
 #if PW_RPC_ENABLED

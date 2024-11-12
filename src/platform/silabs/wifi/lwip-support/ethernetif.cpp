@@ -44,7 +44,7 @@ extern "C" {
 #endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #endif // WF200_WIFI
 
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #ifdef WF200_WIFI
 #include "sl_wfx.h"
 #endif

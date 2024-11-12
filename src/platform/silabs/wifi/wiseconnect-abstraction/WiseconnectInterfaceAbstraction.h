@@ -15,12 +15,11 @@
  */
 #pragma once
 
-#include "WifiInterfaceAbstraction.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <cmsis_os2.h>
 #include <lib/support/BitFlags.h>
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #include <sl_cmsis_os2_common.h>
-#include <wfx_host_events.h>
 
 #define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP */
 #define GET_IPV6_SUCCESS (1)

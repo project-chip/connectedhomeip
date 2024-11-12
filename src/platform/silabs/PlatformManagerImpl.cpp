@@ -138,6 +138,7 @@ void PlatformManagerImpl::_Shutdown()
 } // namespace DeviceLayer
 } // namespace chip
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 // This function needs to be global so it can be used from the platform implementation without depending on the platfrom itself.
 // This is a workaround to avoid a circular dependency.
 void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData)
@@ -210,3 +211,4 @@ void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t *
     // TODO: We should add error processing here
     (void) PlatformMgr().PostEvent(&event);
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION

@@ -17,13 +17,12 @@
 
 // SL MATTER WI-FI INTERFACE
 
-#include "WifiInterfaceAbstraction.h"
 #include "silabs_utils.h"
-#include "wfx_host_events.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>

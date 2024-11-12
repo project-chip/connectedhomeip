@@ -35,9 +35,9 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef SL_WIFI
-#include "wfx_host_events.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #endif
 
 #ifdef DISPLAY_ENABLED

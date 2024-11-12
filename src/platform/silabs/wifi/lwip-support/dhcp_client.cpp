@@ -23,7 +23,7 @@
 
 #include "dhcp_client.h"
 #include "lwip/dhcp.h"
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 

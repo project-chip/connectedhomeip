@@ -105,7 +105,6 @@ source_set("wifi-platform") {
   sources = [
     "${silabs_platform_dir}/wifi/WifiInterfaceAbstraction.cpp",
     "${silabs_platform_dir}/wifi/WifiInterfaceAbstraction.h",
-    "${silabs_platform_dir}/wifi/wfx_host_events.h",
     "${silabs_platform_dir}/wifi/wfx_msgs.h",
   ]
 

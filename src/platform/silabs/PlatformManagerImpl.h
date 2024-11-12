@@ -26,7 +26,7 @@
 
 #include <platform/internal/GenericPlatformManagerImpl_CMSISOS.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #endif
 #include <cmsis_os2.h>
 

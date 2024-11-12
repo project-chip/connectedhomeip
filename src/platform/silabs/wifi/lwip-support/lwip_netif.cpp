@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 
 #include "dhcp_client.h"
 #include "ethernetif.h"
