@@ -55,7 +55,8 @@ public:
     DeferredAttributePersistenceProvider(AttributePersistenceProvider & persister,
                                          const Span<DeferredAttribute> & deferredAttributes,
                                          System::Clock::Milliseconds32 writeDelay) :
-        mPersister(persister), mDeferredAttributes(deferredAttributes), mWriteDelay(writeDelay)
+        mPersister(persister),
+        mDeferredAttributes(deferredAttributes), mWriteDelay(writeDelay)
     {}
 
     /*
