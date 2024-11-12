@@ -239,8 +239,11 @@ void PASESession_Bounded(const uint32_t fuzzedSetupPasscode, const vector<uint8_
 
 FUZZ_TEST(FuzzPASE_PW, PASESession_Bounded)
     .WithDomains(
-        InRange(00000000, 99999998),
+        // fuzzedSetupPasscode: Tests the full 27-bit range allowed by the stack (0 to 134,217,727)
+        InRange(00000000, 134217727),
+        // fuzzedSalt
         Arbitrary<vector<uint8_t>>().WithMinSize(kSpake2p_Min_PBKDF_Salt_Length).WithMaxSize(kSpake2p_Max_PBKDF_Salt_Length),
+        // fuzzedPBKDF2Iter
         InRange(kSpake2p_Min_PBKDF_Iterations, kSpake2p_Max_PBKDF_Iterations));
 
 /* -------------------------------------------------------------------------------------------*/
@@ -267,7 +270,13 @@ void PASESession_Unbounded(const uint32_t fuzzedSetupPasscode, const vector<uint
 }
 
 FUZZ_TEST(FuzzPASE_PW, PASESession_Unbounded)
-    .WithDomains(Arbitrary<uint32_t>(), Arbitrary<vector<uint8_t>>(), Arbitrary<uint32_t>());
+    .WithDomains(
+        // fuzzedSetupPasscode
+        Arbitrary<uint32_t>(),
+        // fuzzedSalt
+        Arbitrary<vector<uint8_t>>(),
+        // fuzzedPBKDF2Iter
+        Arbitrary<uint32_t>());
 
 /* -------------------------------------------------------------------------------------------*/
 // In This FuzzTest, the Spake2pVerifier is fuzzed.
@@ -293,9 +302,17 @@ void FuzzSpake2pVerifier(const vector<uint8_t> & aW0, const vector<uint8_t> & aL
                                         fuzzedSpake2pVerifier, fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
 }
 FUZZ_TEST(FuzzPASE_PW, FuzzSpake2pVerifier)
-    .WithDomains(Arbitrary<std::vector<uint8_t>>().WithMaxSize(kP256_FE_Length),
-                 Arbitrary<std::vector<uint8_t>>().WithMaxSize(kP256_Point_Length), Arbitrary<vector<uint8_t>>(),
-                 Arbitrary<uint32_t>(), Arbitrary<uint32_t>());
+    .WithDomains(
+        // aW0
+        Arbitrary<std::vector<uint8_t>>().WithMaxSize(kP256_FE_Length),
+        // aL
+        Arbitrary<std::vector<uint8_t>>().WithMaxSize(kP256_Point_Length),
+        // aSalt
+        Arbitrary<vector<uint8_t>>(),
+        // fuzzedPBKDF2Iter
+        Arbitrary<uint32_t>(),
+        // fuzzedSetupPasscode
+        Arbitrary<uint32_t>());
 
 /* -------------------------------------------------------------------------------------------*/
 // In This FuzzTest, Fuzzed Serialized Verifier is deserialized and Serialized Again, comparing the original with RoundTrip result.
@@ -649,8 +666,8 @@ void HandlePake1(const uint32_t fuzzedSetupPasscode, const vector<uint8_t> & fuz
 // In This FuzzTest, we will construct a PAKE1 Message with a fuzzed TLV length, and send it through a PASESession
 FUZZ_TEST(FuzzPASE_PW, HandlePake1)
     .WithDomains(
-        // Setup Code Range
-        InRange(00000000, 99999998),
+        // Setup Code Range  (covers the full 27-bit range, plus 2 additional bits)
+        InRange(00000000, 134217729),
         // Salt accepted range
         Arbitrary<vector<uint8_t>>().WithMinSize(kSpake2p_Min_PBKDF_Salt_Length).WithMaxSize(kSpake2p_Max_PBKDF_Salt_Length),
         // PBKDF2Iterations count range
@@ -774,8 +791,8 @@ void HandlePake2(const uint32_t fuzzedSetupPasscode, const vector<uint8_t> & fuz
 
 FUZZ_TEST(FuzzPASE_PW, HandlePake2)
     .WithDomains(
-        // Setup Code Range
-        InRange(00000000, 99999998),
+        // Setup Code Range (covers the full 27-bit range, plus 2 additional bits)
+        InRange(00000000, 134217729),
         // Salt accepted range
         Arbitrary<vector<uint8_t>>().WithMinSize(kSpake2p_Min_PBKDF_Salt_Length).WithMaxSize(kSpake2p_Max_PBKDF_Salt_Length),
         // PBKDF2Iterations count range
@@ -907,8 +924,8 @@ void HandlePake3(const uint32_t fuzzedSetupPasscode, const vector<uint8_t> & fuz
 
 FUZZ_TEST(FuzzPASE_PW, HandlePake3)
     .WithDomains(
-        // Setup Code Range
-        InRange(00000000, 99999998),
+        // Setup Code Range (covers the full 27-bit range, plus 2 additional bits)
+        InRange(00000000, 134217729),
         // Salt accepted range
         Arbitrary<vector<uint8_t>>().WithMinSize(kSpake2p_Min_PBKDF_Salt_Length).WithMaxSize(kSpake2p_Max_PBKDF_Salt_Length),
         // PBKDF2Iterations count range
