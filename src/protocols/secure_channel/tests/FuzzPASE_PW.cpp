@@ -17,15 +17,15 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
-namespace FuzzChip {
+namespace chip {
+namespace Testing {
 
-using namespace chip;
 using namespace std;
 
-using namespace chip::Crypto;
+using namespace Crypto;
 using namespace fuzztest;
-using namespace chip::Transport;
-using namespace chip::Messaging;
+using namespace Transport;
+using namespace Messaging;
 using namespace System::Clock::Literals;
 
 // TODO: #35369 Refactor the classes below to Fixtures once Errors related to FuzzTest Fixtures are resolved
@@ -239,8 +239,8 @@ void PASESession_Bounded(const uint32_t fuzzedSetupPasscode, const vector<uint8_
 
 FUZZ_TEST(FuzzPASE_PW, PASESession_Bounded)
     .WithDomains(
-        // fuzzedSetupPasscode: Tests the full 27-bit range allowed by the stack (0 to 134,217,727)
-        InRange(00000000, 134217727),
+        // fuzzedSetupPasscode: Tests the full 27-bit range allowed by the stack (0 to 0x7FFFFFF)
+        InRange(00000000, 0x7FFFFFF),
         // fuzzedSalt
         Arbitrary<vector<uint8_t>>().WithMinSize(kSpake2p_Min_PBKDF_Salt_Length).WithMaxSize(kSpake2p_Max_PBKDF_Salt_Length),
         // fuzzedPBKDF2Iter
@@ -592,9 +592,8 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
     uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
 
     // Compute serializedWS, to be used in BeginProver()
-    EXPECT_EQ(
-        CHIP_NO_ERROR,
-        Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS, sizeof(serializedWS)));
+
+    Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS, sizeof(serializedWS));
 
     EXPECT_EQ(CHIP_NO_ERROR,
               pairingCommissioner.mSpake2p.BeginProver(nullptr, 0, nullptr, 0, &serializedWS[0], kSpake2p_WS_Length,
@@ -635,7 +634,7 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
 
     //  Compute mPASEVerifier (in order for mSpake2p.BeginVerifier() to use it, once it is called by the pairingAccessory through
     //  HandleMsg1_and_SendMsg2)
-    EXPECT_EQ(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode), CHIP_NO_ERROR);
+    pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
 
     /************************Injecting Fuzzed Pake1 Message into PaseSession::OnMessageReceived*************************/
 
@@ -666,12 +665,14 @@ void HandlePake1(const uint32_t fuzzedSetupPasscode, const vector<uint8_t> & fuz
 // In This FuzzTest, we will construct a PAKE1 Message with a fuzzed TLV length, and send it through a PASESession
 FUZZ_TEST(FuzzPASE_PW, HandlePake1)
     .WithDomains(
-        // Setup Code Range  (covers the full 27-bit range, plus 2 additional bits)
-        InRange(00000000, 134217729),
-        // Salt accepted range
-        Arbitrary<vector<uint8_t>>().WithMinSize(kSpake2p_Min_PBKDF_Salt_Length).WithMaxSize(kSpake2p_Max_PBKDF_Salt_Length),
-        // PBKDF2Iterations count range
-        InRange(kSpake2p_Min_PBKDF_Iterations, kSpake2p_Max_PBKDF_Iterations),
+        // Setup Code Range  (covers the full 27-bit range, plus 16 additional values)
+        InRange(00000000, 0x800000F),
+        // Salt length range (extending min and max by 4 bytes)
+        Arbitrary<vector<uint8_t>>()
+            .WithMinSize(kSpake2p_Min_PBKDF_Salt_Length - 4)
+            .WithMaxSize(kSpake2p_Max_PBKDF_Salt_Length + 4),
+        // PBKDF2Iterations count range (extending min and max by 10 iterations)
+        InRange(kSpake2p_Min_PBKDF_Iterations - 10, kSpake2p_Max_PBKDF_Iterations + 10),
         // Fuzzed pA (Original size = kMAX_Point_Length)
         Arbitrary<vector<uint8_t>>());
 
@@ -712,9 +713,7 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
     uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
 
     // Compute serializedWS, to be used in BeginProver()
-    EXPECT_EQ(
-        CHIP_NO_ERROR,
-        Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS, sizeof(serializedWS)));
+    Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS, sizeof(serializedWS));
 
     EXPECT_EQ(CHIP_NO_ERROR,
               pairingCommissioner.mSpake2p.BeginProver(nullptr, 0, nullptr, 0, &serializedWS[0], kSpake2p_WS_Length,
@@ -735,11 +734,10 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
 
     // Below Steps take place in HandleMsg1
     // Compute mPASEVerifier to be able to pass it to BeginVerifier()
-    EXPECT_EQ(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode), CHIP_NO_ERROR);
+    pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
 
-    EXPECT_EQ(CHIP_NO_ERROR,
-              pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0, kP256_FE_Length,
-                                                      pairingAccessory.mPASEVerifier.mL, kP256_Point_Length));
+    pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0, kP256_FE_Length,
+                                            pairingAccessory.mPASEVerifier.mL, kP256_Point_Length);
 
     /*********************** Constructing Fuzzed PAKE2 Message, to later inject it into PASE Session *********************/
 
@@ -791,12 +789,14 @@ void HandlePake2(const uint32_t fuzzedSetupPasscode, const vector<uint8_t> & fuz
 
 FUZZ_TEST(FuzzPASE_PW, HandlePake2)
     .WithDomains(
-        // Setup Code Range (covers the full 27-bit range, plus 2 additional bits)
-        InRange(00000000, 134217729),
-        // Salt accepted range
-        Arbitrary<vector<uint8_t>>().WithMinSize(kSpake2p_Min_PBKDF_Salt_Length).WithMaxSize(kSpake2p_Max_PBKDF_Salt_Length),
-        // PBKDF2Iterations count range
-        InRange(kSpake2p_Min_PBKDF_Iterations, kSpake2p_Max_PBKDF_Iterations),
+        // Setup Code Range (covers the full 27-bit range, plus 16 additional values)
+        InRange(00000000, 0x800000F),
+        // Salt length range (extending min and max by 4 bytes)
+        Arbitrary<vector<uint8_t>>()
+            .WithMinSize(kSpake2p_Min_PBKDF_Salt_Length - 4)
+            .WithMaxSize(kSpake2p_Max_PBKDF_Salt_Length + 4),
+        // PBKDF2Iterations count range (extending min and max by 10 iterations)
+        InRange(kSpake2p_Min_PBKDF_Iterations - 10, kSpake2p_Max_PBKDF_Iterations + 10),
         //  Fuzzed pB (Original size = kMAX_Point_Length),
         Arbitrary<vector<uint8_t>>(),
         //  Fuzzed cB (Original size = kMAX_Hash_Length)
@@ -828,9 +828,8 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
     uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
 
     // Compute serializedWS, to be used in BeginProver()
-    EXPECT_EQ(
-        CHIP_NO_ERROR,
-        Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS, sizeof(serializedWS)));
+
+    Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS, sizeof(serializedWS));
 
     EXPECT_EQ(CHIP_NO_ERROR,
               pairingCommissioner.mSpake2p.BeginProver(nullptr, 0, nullptr, 0, &serializedWS[0], kSpake2p_WS_Length,
@@ -863,11 +862,10 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
 
     // Below Steps take place in HandleMsg1
     //  compute mPASEVerifier to be able to pass it to BeginVerifier()
-    EXPECT_EQ(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode), CHIP_NO_ERROR);
+    pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
 
-    EXPECT_EQ(CHIP_NO_ERROR,
-              pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0, kP256_FE_Length,
-                                                      pairingAccessory.mPASEVerifier.mL, kP256_Point_Length));
+    pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0, kP256_FE_Length,
+                                            pairingAccessory.mPASEVerifier.mL, kP256_Point_Length);
 
     /*************************** Preparing Accessory for Receiving PAKE3 Message ***************************/
 
@@ -924,13 +922,16 @@ void HandlePake3(const uint32_t fuzzedSetupPasscode, const vector<uint8_t> & fuz
 
 FUZZ_TEST(FuzzPASE_PW, HandlePake3)
     .WithDomains(
-        // Setup Code Range (covers the full 27-bit range, plus 2 additional bits)
-        InRange(00000000, 134217729),
-        // Salt accepted range
-        Arbitrary<vector<uint8_t>>().WithMinSize(kSpake2p_Min_PBKDF_Salt_Length).WithMaxSize(kSpake2p_Max_PBKDF_Salt_Length),
-        // PBKDF2Iterations count range
-        InRange(kSpake2p_Min_PBKDF_Iterations, kSpake2p_Max_PBKDF_Iterations),
+        // Setup Code Range (covers the full 27-bit range, plus 16 additional values)
+        InRange(00000000, 0x800000F),
+        // Salt length range (extending min and max by 4 bytes)
+        Arbitrary<vector<uint8_t>>()
+            .WithMinSize(kSpake2p_Min_PBKDF_Salt_Length - 4)
+            .WithMaxSize(kSpake2p_Max_PBKDF_Salt_Length + 4),
+        // PBKDF2Iterations count range (extending min and max by 10 iterations)
+        InRange(kSpake2p_Min_PBKDF_Iterations - 10, kSpake2p_Max_PBKDF_Iterations + 10),
         // Fuzzed cA (Original size = kMAX_Hash_Length)
         Arbitrary<vector<uint8_t>>());
 
-} // namespace FuzzChip
+} // namespace Testing
+} // namespace chip
