@@ -43,8 +43,8 @@ public:
     static FabricAdmin & Instance();
 
     CHIP_ERROR
-    CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params, chip::VendorId vendorId,
-                   uint16_t productId) override;
+    CommissionRemoteBridge(chip::Controller::CommissioningWindowPasscodeParams params, chip::VendorId vendorId,
+                           uint16_t productId) override;
 
     CHIP_ERROR KeepActive(chip::ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs) override;
 

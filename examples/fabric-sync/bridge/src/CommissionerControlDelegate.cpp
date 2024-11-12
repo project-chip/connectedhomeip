@@ -183,14 +183,14 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const Commissioning
 
     VerifyOrReturnError(mNextStep == Step::kStartCommissionNode, CHIP_ERROR_INCORRECT_STATE);
 
-    // Attempt to commission the node using provided commissioning parameters.
-    err = mFabricAdmin->CommissionNode(Controller::CommissioningWindowPasscodeParams()
-                                           .SetSetupPIN(kSetupPinCode)
-                                           .SetTimeout(params.commissioningTimeout)
-                                           .SetDiscriminator(params.discriminator)
-                                           .SetIteration(params.iterations)
-                                           .SetSalt(params.salt),
-                                       mVendorId, mProductId);
+    // Attempt to reverse commission the bridge using provided commissioning parameters.
+    err = mFabricAdmin->CommissionRemoteBridge(Controller::CommissioningWindowPasscodeParams()
+                                                   .SetSetupPIN(kSetupPinCode)
+                                                   .SetTimeout(params.commissioningTimeout)
+                                                   .SetDiscriminator(params.discriminator)
+                                                   .SetIteration(params.iterations)
+                                                   .SetSalt(params.salt),
+                                               mVendorId, mProductId);
 
     if (err != CHIP_NO_ERROR)
     {

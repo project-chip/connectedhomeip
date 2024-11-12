@@ -31,9 +31,9 @@ public:
     virtual ~FabricAdminDelegate() = default;
 
     /**
-     * Commission a node using the specified parameters.
+     * Reverse commission a bridge using the specified parameters.
      *
-     * This function initiates the commissioning process for a node, utilizing
+     * This function initiates the commissioning process for a bridge node, utilizing
      * the provided passcode parameters, vendor ID, and product ID.
      *
      * @param params    Parameters required for commissioning the device using passcode.
@@ -46,8 +46,8 @@ public:
      * - CHIP_NO_ERROR: The RPC command was successfully sent and the commissioning process was initiated.
      * - CHIP_ERROR_INTERNAL: An internal error occurred during the preparation or sending of the command.
      */
-    virtual CHIP_ERROR CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params, chip::VendorId vendorId,
-                                      uint16_t productId) = 0;
+    virtual CHIP_ERROR CommissionRemoteBridge(chip::Controller::CommissioningWindowPasscodeParams params, chip::VendorId vendorId,
+                                              uint16_t productId) = 0;
 
     virtual CHIP_ERROR KeepActive(chip::ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs) = 0;
 };

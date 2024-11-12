@@ -71,6 +71,9 @@ CHIP_ERROR AddDeviceCommand::RunCommand()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    ChipLogProgress(NotSpecified, "Running AddDeviceCommand with Node ID: %lu, PIN Code: %u, Address: %s, Port: %u", mNodeId,
+                    mSetupPINCode, mRemoteAddr, mRemotePort);
+
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
     return admin::DeviceMgr().PairRemoteDevice(mNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);

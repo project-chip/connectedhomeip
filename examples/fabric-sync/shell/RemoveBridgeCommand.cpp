@@ -62,6 +62,8 @@ CHIP_ERROR RemoveBridgeCommand::RunCommand()
 
     mBridgeNodeId = bridgeNodeId;
 
+    ChipLogProgress(NotSpecified, "Running RemoveBridgeCommand");
+
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
     return admin::DeviceMgr().UnpairRemoteFabricBridge();

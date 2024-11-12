@@ -39,7 +39,7 @@ FabricAdmin & FabricAdmin::Instance()
 }
 
 CHIP_ERROR
-FabricAdmin::CommissionNode(Controller::CommissioningWindowPasscodeParams params, VendorId vendorId, uint16_t productId)
+FabricAdmin::CommissionRemoteBridge(Controller::CommissioningWindowPasscodeParams params, VendorId vendorId, uint16_t productId)
 {
     char saltHex[Crypto::kSpake2p_Max_PBKDF_Salt_Length * 2 + 1];
     Encoding::BytesToHex(params.GetSalt().data(), params.GetSalt().size(), saltHex, sizeof(saltHex),
