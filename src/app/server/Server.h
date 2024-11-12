@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "app/SafeAttributePersistenceProvider.h"
 #include <app/AppConfig.h>
 #include <app/icd/server/ICDServerConfig.h>
 
@@ -684,6 +685,7 @@ private:
     app::SubscriptionResumptionStorage * mSubscriptionResumptionStorage;
     Credentials::GroupDataProvider * mGroupsProvider;
     Crypto::SessionKeystore * mSessionKeystore;
+    app::SafeAttributePersistenceProvider mSafeAttributePersister;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
