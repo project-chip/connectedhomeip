@@ -25,9 +25,6 @@
 #include "lwip/dhcp.h"
 #include "wfx_host_events.h"
 
-#include "FreeRTOS.h"
-#include "event_groups.h"
-
 #include <lib/support/logging/CHIPLogging.h>
 
 #define MAX_DHCP_TRIES (4)

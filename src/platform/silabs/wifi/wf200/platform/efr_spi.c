@@ -14,14 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "AppConfig.h"
 #include "FreeRTOS.h"
-#include "semphr.h"
-
 #include "dmadrv.h"
 #include "em_bus.h"
 #include "em_cmu.h"
@@ -29,6 +22,7 @@
 #include "em_ldma.h"
 #include "em_usart.h"
 #include "gpiointerrupt.h"
+#include "semphr.h"
 #include "sl_spidrv_exp_config.h"
 #include "sl_spidrv_instances.h"
 #include "sl_wfx.h"
@@ -38,8 +32,10 @@
 #include "sl_wfx_host_api.h"
 #include "sl_wfx_task.h"
 #include "spidrv.h"
-
-#include "spi_multiplex.h"
+#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
@@ -441,6 +437,8 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 #endif // SL_SPICTRL_MUX
     return SL_STATUS_OK;
 }
+#else
+#error still not working
 #endif // SL_LCDCTRL_MUX
 
 #if SL_UARTCTRL_MUX
