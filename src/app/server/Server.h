@@ -311,7 +311,6 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
             this->icdCheckInBackOffStrategy = &sDefaultICDCheckInBackOffStrategy;
         }
 #endif
-
         return CHIP_NO_ERROR;
     }
 

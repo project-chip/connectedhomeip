@@ -23,6 +23,7 @@
 #include <DeviceInfoProviderImpl.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
 

@@ -17,6 +17,7 @@
  */
 
 #include "AndroidAppServerWrapper.h"
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -50,6 +51,7 @@ CHIP_ERROR ChipAndroidAppInit(AppDelegate * appDelegate)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
     if (appDelegate != nullptr)
     {
         initParams.appDelegate = appDelegate;
