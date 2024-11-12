@@ -18527,39 +18527,6 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementNightVisionIllumCommandParams
         );
         result.put("readNightVisionIllumAttribute", readCameraAvStreamManagementNightVisionIllumAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementAWBEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementAWBEnabledAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readAWBEnabledAttribute(
-              (ChipClusters.BooleanAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readCameraAvStreamManagementAWBEnabledCommandParams
-        );
-        result.put("readAWBEnabledAttribute", readCameraAvStreamManagementAWBEnabledAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementAutoShutterSpeedEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementAutoShutterSpeedEnabledAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readAutoShutterSpeedEnabledAttribute(
-              (ChipClusters.BooleanAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readCameraAvStreamManagementAutoShutterSpeedEnabledCommandParams
-        );
-        result.put("readAutoShutterSpeedEnabledAttribute", readCameraAvStreamManagementAutoShutterSpeedEnabledAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementAutoISOEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementAutoISOEnabledAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readAutoISOEnabledAttribute(
-              (ChipClusters.BooleanAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readCameraAvStreamManagementAutoISOEnabledCommandParams
-        );
-        result.put("readAutoISOEnabledAttribute", readCameraAvStreamManagementAutoISOEnabledAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementSpeakerMutedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementSpeakerMutedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18736,17 +18703,6 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementStatusLightBrightnessCommandParams
         );
         result.put("readStatusLightBrightnessAttribute", readCameraAvStreamManagementStatusLightBrightnessAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementDepthSensorStatusCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementDepthSensorStatusAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readDepthSensorStatusAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readCameraAvStreamManagementDepthSensorStatusCommandParams
-        );
-        result.put("readDepthSensorStatusAttribute", readCameraAvStreamManagementDepthSensorStatusAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

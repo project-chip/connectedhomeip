@@ -18621,21 +18621,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NightVisionIllum", 1, value);
         }
-        case CameraAvStreamManagement::Attributes::AWBEnabled::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AWBEnabled", 1, value);
-        }
-        case CameraAvStreamManagement::Attributes::AutoShutterSpeedEnabled::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AutoShutterSpeedEnabled", 1, value);
-        }
-        case CameraAvStreamManagement::Attributes::AutoISOEnabled::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AutoISOEnabled", 1, value);
-        }
         case CameraAvStreamManagement::Attributes::Viewport::Id: {
             chip::app::Clusters::CameraAvStreamManagement::Structs::ViewportStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -18720,11 +18705,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::Clusters::Globals::ThreeLevelAutoEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StatusLightBrightness", 1, value);
-        }
-        case CameraAvStreamManagement::Attributes::DepthSensorStatus::Id: {
-            chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DepthSensorStatus", 1, value);
         }
         case CameraAvStreamManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
