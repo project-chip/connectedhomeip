@@ -4221,12 +4221,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "NightVision";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::NightVisionIllum::Id:
             return "NightVisionIllum";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AWBEnabled::Id:
-            return "AWBEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AutoShutterSpeedEnabled::Id:
-            return "AutoShutterSpeedEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AutoISOEnabled::Id:
-            return "AutoISOEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::Viewport::Id:
             return "Viewport";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerMuted::Id:
@@ -4261,8 +4255,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "StatusLightEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::StatusLightBrightness::Id:
             return "StatusLightBrightness";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::DepthSensorStatus::Id:
-            return "DepthSensorStatus";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AcceptedCommandList::Id:
@@ -5690,14 +5682,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "SetStreamPriorities";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::Id:
             return "CaptureSnapshot";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetViewport::Id:
-            return "SetViewport";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageRotation::Id:
-            return "SetImageRotation";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipHorizontal::Id:
-            return "SetImageFlipHorizontal";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipVertical::Id:
-            return "SetImageFlipVertical";
         default:
             return "Unknown";
         }

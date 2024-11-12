@@ -6970,89 +6970,73 @@ namespace NightVisionIllum {
 static constexpr AttributeId Id = 0x00000019;
 } // namespace NightVisionIllum
 
-namespace AWBEnabled {
-static constexpr AttributeId Id = 0x0000001A;
-} // namespace AWBEnabled
-
-namespace AutoShutterSpeedEnabled {
-static constexpr AttributeId Id = 0x0000001B;
-} // namespace AutoShutterSpeedEnabled
-
-namespace AutoISOEnabled {
-static constexpr AttributeId Id = 0x0000001C;
-} // namespace AutoISOEnabled
-
 namespace Viewport {
-static constexpr AttributeId Id = 0x0000001D;
+static constexpr AttributeId Id = 0x0000001A;
 } // namespace Viewport
 
 namespace SpeakerMuted {
-static constexpr AttributeId Id = 0x0000001E;
+static constexpr AttributeId Id = 0x0000001B;
 } // namespace SpeakerMuted
 
 namespace SpeakerVolumeLevel {
-static constexpr AttributeId Id = 0x0000001F;
+static constexpr AttributeId Id = 0x0000001C;
 } // namespace SpeakerVolumeLevel
 
 namespace SpeakerMaxLevel {
-static constexpr AttributeId Id = 0x00000020;
+static constexpr AttributeId Id = 0x0000001D;
 } // namespace SpeakerMaxLevel
 
 namespace SpeakerMinLevel {
-static constexpr AttributeId Id = 0x00000021;
+static constexpr AttributeId Id = 0x0000001E;
 } // namespace SpeakerMinLevel
 
 namespace MicrophoneMuted {
-static constexpr AttributeId Id = 0x00000022;
+static constexpr AttributeId Id = 0x0000001F;
 } // namespace MicrophoneMuted
 
 namespace MicrophoneVolumeLevel {
-static constexpr AttributeId Id = 0x00000023;
+static constexpr AttributeId Id = 0x00000020;
 } // namespace MicrophoneVolumeLevel
 
 namespace MicrophoneMaxLevel {
-static constexpr AttributeId Id = 0x00000024;
+static constexpr AttributeId Id = 0x00000021;
 } // namespace MicrophoneMaxLevel
 
 namespace MicrophoneMinLevel {
-static constexpr AttributeId Id = 0x00000025;
+static constexpr AttributeId Id = 0x00000022;
 } // namespace MicrophoneMinLevel
 
 namespace MicrophoneAGCEnabled {
-static constexpr AttributeId Id = 0x00000026;
+static constexpr AttributeId Id = 0x00000023;
 } // namespace MicrophoneAGCEnabled
 
 namespace ImageRotation {
-static constexpr AttributeId Id = 0x00000027;
+static constexpr AttributeId Id = 0x00000024;
 } // namespace ImageRotation
 
 namespace ImageFlipHorizontal {
-static constexpr AttributeId Id = 0x00000028;
+static constexpr AttributeId Id = 0x00000025;
 } // namespace ImageFlipHorizontal
 
 namespace ImageFlipVertical {
-static constexpr AttributeId Id = 0x00000029;
+static constexpr AttributeId Id = 0x00000026;
 } // namespace ImageFlipVertical
 
 namespace LocalVideoRecordingEnabled {
-static constexpr AttributeId Id = 0x0000002A;
+static constexpr AttributeId Id = 0x00000027;
 } // namespace LocalVideoRecordingEnabled
 
 namespace LocalSnapshotRecordingEnabled {
-static constexpr AttributeId Id = 0x0000002B;
+static constexpr AttributeId Id = 0x00000028;
 } // namespace LocalSnapshotRecordingEnabled
 
 namespace StatusLightEnabled {
-static constexpr AttributeId Id = 0x0000002C;
+static constexpr AttributeId Id = 0x00000029;
 } // namespace StatusLightEnabled
 
 namespace StatusLightBrightness {
-static constexpr AttributeId Id = 0x0000002D;
+static constexpr AttributeId Id = 0x0000002A;
 } // namespace StatusLightBrightness
-
-namespace DepthSensorStatus {
-static constexpr AttributeId Id = 0x0000002E;
-} // namespace DepthSensorStatus
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
