@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,21 +15,8 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <lib/core/DataModelTypes.h>
 
-#include "fan-control-delegate.h"
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af-types.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace FanControl {
-
-void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate);
-Delegate * GetDelegate(EndpointId aEndpoint);
-
-} // namespace FanControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+#ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
+#endif
