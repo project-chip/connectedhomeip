@@ -18,8 +18,8 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
-import("${efr32_sdk_build_root}/silabs_board.gni")
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
+import("${silabs_sdk_build_root}/silabs_board.gni")
 
 declare_args() {
   enable_heap_monitoring = false
@@ -111,10 +111,10 @@ source_set("openthread_core_config_efr32_chip_examples") {
   if (chip_enable_openthread) {
     sources = [ "project_include/OpenThreadConfig.h" ]
 
-    public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
+    public_deps = [ "${silabs_sdk_build_root}:silabs_sdk" ]
 
     if (use_silabs_thread_lib) {
-      public_deps += [ "${efr32_sdk_build_root}:openthread_core_config_efr32" ]
+      public_deps += [ "${silabs_sdk_build_root}:openthread_core_config_efr32" ]
     } else {
       public_deps += [ "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32" ]
     }
@@ -207,7 +207,7 @@ source_set("efr32-common") {
   public_deps = []
   public_configs = [
     ":efr32-common-config",
-    "${efr32_sdk_build_root}:silabs_config",
+    "${silabs_sdk_build_root}:silabs_config",
     ":chip_examples_project_config",
   ]
 

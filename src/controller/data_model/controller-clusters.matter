@@ -9566,12 +9566,12 @@ provisional cluster CameraAvStreamManagement = 1361 {
   }
 
   bitmap Feature : bitmap32 {
-    kPrivacy = 0x1;
-    kAudio = 0x2;
-    kSpeaker = 0x4;
-    kImageControl = 0x8;
-    kVideo = 0x10;
-    kSnapshot = 0x20;
+    kAudio = 0x1;
+    kVideo = 0x2;
+    kSnapshot = 0x4;
+    kPrivacy = 0x8;
+    kSpeaker = 0x10;
+    kImageControl = 0x20;
     kWatermark = 0x40;
     kOnScreenDisplay = 0x80;
     kLocalStorage = 0x100;
@@ -9715,27 +9715,23 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional boolean hardPrivacyModeOn = 23;
   attribute access(read: manage, write: manage) optional TriStateAutoEnum nightVision = 24;
   attribute access(read: manage, write: manage) optional TriStateAutoEnum nightVisionIllum = 25;
-  attribute access(read: manage, write: manage) optional boolean AWBEnabled = 26;
-  attribute access(read: manage, write: manage) optional boolean autoShutterSpeedEnabled = 27;
-  attribute access(read: manage, write: manage) optional boolean autoISOEnabled = 28;
-  readonly attribute optional ViewportStruct viewport = 29;
-  attribute access(read: manage, write: manage) optional boolean speakerMuted = 30;
-  attribute access(read: manage, write: manage) optional int8u speakerVolumeLevel = 31;
-  attribute access(read: manage, write: manage) optional int8u speakerMaxLevel = 32;
-  attribute access(read: manage, write: manage) optional int8u speakerMinLevel = 33;
-  attribute access(read: manage, write: manage) optional boolean microphoneMuted = 34;
-  attribute access(read: manage, write: manage) optional int8u microphoneVolumeLevel = 35;
-  attribute access(read: manage, write: manage) optional int8u microphoneMaxLevel = 36;
-  attribute access(read: manage, write: manage) optional int8u microphoneMinLevel = 37;
-  attribute access(read: manage, write: manage) optional boolean microphoneAGCEnabled = 38;
-  readonly attribute optional int16u imageRotation = 39;
-  readonly attribute optional boolean imageFlipHorizontal = 40;
-  readonly attribute optional boolean imageFlipVertical = 41;
-  attribute access(read: manage, write: manage) optional boolean localVideoRecordingEnabled = 42;
-  attribute access(read: manage, write: manage) optional boolean localSnapshotRecordingEnabled = 43;
-  attribute access(read: manage, write: manage) optional boolean statusLightEnabled = 44;
-  attribute access(read: manage, write: manage) optional ThreeLevelAutoEnum statusLightBrightness = 45;
-  attribute access(read: manage, write: manage) optional TriStateAutoEnum depthSensorStatus = 46;
+  attribute access(read: manage, write: manage) optional ViewportStruct viewport = 26;
+  attribute access(read: manage, write: manage) optional boolean speakerMuted = 27;
+  attribute access(read: manage, write: manage) optional int8u speakerVolumeLevel = 28;
+  readonly attribute access(read: manage) optional int8u speakerMaxLevel = 29;
+  readonly attribute access(read: manage) optional int8u speakerMinLevel = 30;
+  attribute access(read: manage, write: manage) optional boolean microphoneMuted = 31;
+  attribute access(read: manage, write: manage) optional int8u microphoneVolumeLevel = 32;
+  readonly attribute access(read: manage) optional int8u microphoneMaxLevel = 33;
+  readonly attribute access(read: manage) optional int8u microphoneMinLevel = 34;
+  attribute access(read: manage, write: manage) optional boolean microphoneAGCEnabled = 35;
+  attribute access(read: manage, write: manage) optional int16u imageRotation = 36;
+  attribute access(read: manage, write: manage) optional boolean imageFlipHorizontal = 37;
+  attribute access(read: manage, write: manage) optional boolean imageFlipVertical = 38;
+  attribute access(read: manage, write: manage) optional boolean localVideoRecordingEnabled = 39;
+  attribute access(read: manage, write: manage) optional boolean localSnapshotRecordingEnabled = 40;
+  attribute access(read: manage, write: manage) optional boolean statusLightEnabled = 41;
+  attribute access(read: manage, write: manage) optional ThreeLevelAutoEnum statusLightBrightness = 42;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -9822,22 +9818,6 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct resolution = 2;
   }
 
-  request struct SetViewportRequest {
-    ViewportStruct viewport = 0;
-  }
-
-  request struct SetImageRotationRequest {
-    int16u angle = 0;
-  }
-
-  request struct SetImageFlipHorizontalRequest {
-    boolean enabled = 0;
-  }
-
-  request struct SetImageFlipVerticalRequest {
-    boolean enabled = 0;
-  }
-
   /** This command SHALL allocate an audio stream on the camera and return an allocated audio stream identifier. */
   command access(invoke: manage) AudioStreamAllocate(AudioStreamAllocateRequest): AudioStreamAllocateResponse = 0;
   /** This command SHALL deallocate an audio stream on the camera, corresponding to the given audio stream identifier. */
@@ -9855,15 +9835,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   /** This command SHALL set the relative priorities of the various stream types on the camera. */
   command access(invoke: administer) SetStreamPriorities(SetStreamPrioritiesRequest): DefaultSuccess = 10;
   /** This command SHALL return a Snapshot from the camera. */
-  command access(invoke: manage) CaptureSnapshot(CaptureSnapshotRequest): DefaultSuccess = 11;
-  /** This command sets the viewport in all video streams. */
-  command access(invoke: manage) SetViewport(SetViewportRequest): DefaultSuccess = 13;
-  /** The data fields for this command SHALL be as follows: */
-  command access(invoke: manage) SetImageRotation(SetImageRotationRequest): DefaultSuccess = 14;
-  /** The data fields for this command SHALL be as follows: */
-  command access(invoke: manage) SetImageFlipHorizontal(SetImageFlipHorizontalRequest): DefaultSuccess = 15;
-  /** The data fields for this command SHALL be as follows: */
-  command access(invoke: manage) SetImageFlipVertical(SetImageFlipVerticalRequest): DefaultSuccess = 16;
+  command CaptureSnapshot(CaptureSnapshotRequest): DefaultSuccess = 11;
 }
 
 /** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */

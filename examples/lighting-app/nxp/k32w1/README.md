@@ -83,8 +83,8 @@ if changed, the names must be updated in `app.ld`. See
 `SMU2` memory range size.
 
 When compiling the application as an OT Full Thread Device
-(`chip_openthread_ftd=true`), using `use_smu2_static=true` gn arg will cause the
-following symbols to be moved to `SMU2` area:
+(`chip_openthread_ftd=true`), using `nxp_use_smu2_static=true` gn arg will cause
+the following symbols to be moved to `SMU2` area:
 
 | symbol name                         | file                         |
 | ----------------------------------- | ---------------------------- |
@@ -93,19 +93,19 @@ following symbols to be moved to `SMU2` area:
 | `Server::sServer`                   | `Server.cpp`                 |
 | `ThreadStackManagerImpl::sInstance` | `ThreadStackManagerImpl.cpp` |
 
-Additionally, using `use_smu2_dynamic=true` will cause the OpenThread buffers to
-be dynamically allocated from a 13KB `SMU2` range after a successful
+Additionally, using `nxp_use_smu2_dynamic=true` will cause the OpenThread
+buffers to be dynamically allocated from a 13KB `SMU2` range after a successful
 commissioning process.
 
-`use_smu2_static` and `use_smu2_dynamic` are set to `true` in the default
-example.
+`nxp_use_smu2_static` and `nxp_use_smu2_dynamic` are set to `true` in the
+default example.
 
 ### LED PWM
 
 In the default configuration, the onboard RGB LED pins are configured as GPIO
 pins. In order to enable the dimming feature, the pins need to be configured in
 PWM mode and synced with channels of the `TPM` (Timer PWM Module). To enable
-this feature, compile the application with: `chip_config_dimmable_led=true`
+this feature, compile the application with: `nxp_config_dimmable_led=true`
 
 If the feature is enabled, the LED brightness can be controlled using
 `LevelControl` cluster

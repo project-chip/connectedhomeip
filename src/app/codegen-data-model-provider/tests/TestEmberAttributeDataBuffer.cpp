@@ -16,6 +16,8 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <cmath>
+
 #include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
 
 #include <app-common/zap-generated/attribute-type.h>
@@ -104,6 +106,28 @@ private:
 template <typename T>
 bool IsEqual(const T & a, const T & b)
 {
+    return a == b;
+}
+
+template <>
+bool IsEqual<float>(const float & a, const float & b)
+{
+    if (std::isnan(a) && std::isnan(b))
+    {
+        return true;
+    }
+
+    return a == b;
+}
+
+template <>
+bool IsEqual<double>(const double & a, const double & b)
+{
+    if (std::isnan(a) && std::isnan(b))
+    {
+        return true;
+    }
+
     return a == b;
 }
 
@@ -756,7 +780,7 @@ TEST(TestEmberAttributeBuffer, TestDecodeFailures)
     {
         // Bad boolean data
         EncodeTester tester(CreateFakeMeta(ZCL_BOOLEAN_ATTRIBUTE_TYPE, false /* nullable */));
-        EXPECT_EQ(tester.TryDecode<bool>(true, { 123 }), CHIP_ERROR_INCORRECT_STATE);
+        EXPECT_EQ(tester.TryDecode<bool>(true, { 123 }), CHIP_ERROR_INVALID_ARGUMENT);
     }
 }
 
@@ -1097,6 +1121,13 @@ TEST(TestEmberAttributeBuffer, TestDecodeBool)
         EXPECT_TRUE(tester.TryDecode<DataModel::Nullable<bool>>(false, { 0 }).IsSuccess());
         EXPECT_TRUE(tester.TryDecode<DataModel::Nullable<bool>>(DataModel::NullNullable, { 0xFF }).IsSuccess());
     }
+
+    {
+        // Boolean that is NOT nullable
+        EncodeTester tester(CreateFakeMeta(ZCL_BOOLEAN_ATTRIBUTE_TYPE, false /* nullable */));
+        EXPECT_EQ(tester.TryDecode<DataModel::Nullable<bool>>(DataModel::NullNullable, { 0xFF }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryDecode<bool>(true, { 0xFF }), CHIP_ERROR_INVALID_ARGUMENT);
+    }
 }
 
 TEST(TestEmberAttributeBuffer, TestDecodeFloatingPoint)
@@ -1121,6 +1152,12 @@ TEST(TestEmberAttributeBuffer, TestDecodeFloatingPoint)
     }
 
     {
+        EncodeTester tester(CreateFakeMeta(ZCL_SINGLE_ATTRIBUTE_TYPE, false /* nullable */));
+        // non-nullable float
+        EXPECT_TRUE(tester.TryDecode<float>(std::nanf("0"), { 0, 0, 0xC0, 0x7F }).IsSuccess());
+    }
+
+    {
         EncodeTester tester(CreateFakeMeta(ZCL_DOUBLE_ATTRIBUTE_TYPE, false /* nullable */));
         EXPECT_TRUE(tester.TryDecode<double>(123.55, { 0x33, 0x33, 0x33, 0x33, 0x33, 0xE3, 0x5E, 0x40 }).IsSuccess());
     }
@@ -1132,5 +1169,11 @@ TEST(TestEmberAttributeBuffer, TestDecodeFloatingPoint)
             tester.TryDecode<DataModel::Nullable<double>>(123.55, { 0x33, 0x33, 0x33, 0x33, 0x33, 0xE3, 0x5E, 0x40 }).IsSuccess());
         EXPECT_TRUE(
             tester.TryDecode<DataModel::Nullable<double>>(DataModel::NullNullable, { 0, 0, 0, 0, 0, 0, 0xF8, 0x7F }).IsSuccess());
+    }
+
+    {
+        EncodeTester tester(CreateFakeMeta(ZCL_DOUBLE_ATTRIBUTE_TYPE, false /* nullable */));
+        // non-nullable double
+        EXPECT_TRUE(tester.TryDecode<double>(std::nan("0"), { 0, 0, 0, 0, 0, 0, 0xF8, 0x7F }).IsSuccess());
     }
 }

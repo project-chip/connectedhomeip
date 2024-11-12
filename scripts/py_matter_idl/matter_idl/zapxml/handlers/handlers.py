@@ -25,6 +25,10 @@ from .parsing import AttrsToAccessPrivilege, AttrsToAttribute, ParseInt
 LOGGER = logging.getLogger('matter-xml-parser')
 
 
+def _IsConformanceTagName(name: str) -> bool:
+    return name in {'mandatoryConform', 'optionalConform', 'otherwiseConform', 'provisionalConform', 'deprecateConform'}
+
+
 class ClusterNameHandler(BaseHandler):
     """Handles /configurator/cluster/name elements."""
 
@@ -110,6 +114,9 @@ class EventHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
             return DescriptionHandler(self.context, self._event)
+        elif _IsConformanceTagName(name):
+            # we do not parse conformance at this point
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
 
@@ -145,6 +152,9 @@ class AttributeHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
             return AttributeDescriptionHandler(self.context, self._attribute)
+        elif _IsConformanceTagName(name):
+            # we do not parse conformance at this point
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
 
@@ -160,6 +170,18 @@ class AttributeHandler(BaseHandler):
             raise Exception("Name for attribute was not parsed.")
 
         self._cluster.attributes.append(self._attribute)
+
+
+class SkipProvisioalHandler(BaseHandler):
+    def __init__(self, context: Context, attrs):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+
+    def GetNextProcessor(self, name: str, attrs):
+        if _IsConformanceTagName(name):
+            # we do not parse conformance at this point
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
 
 
 class StructHandler(BaseHandler, IdlPostProcessor):
@@ -213,7 +235,7 @@ class StructHandler(BaseHandler, IdlPostProcessor):
                 field.qualities |= FieldQuality.FABRIC_SENSITIVE
 
             self._struct.fields.append(field)
-            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+            return SkipProvisioalHandler(self.context, attrs)
         elif name.lower() == 'cluster':
             self._cluster_codes.add(ParseInt(attrs['code']))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
@@ -459,6 +481,9 @@ class CommandHandler(BaseHandler):
         elif name.lower() == 'description':
             if self._command:
                 return DescriptionHandler(self.context, self._command)
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif _IsConformanceTagName(name):
+            # we do not parse conformance at this point
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)

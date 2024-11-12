@@ -24,6 +24,8 @@
 #include <memory>
 #include <optional>
 
+namespace admin {
+
 /**
  * @brief Class used to subscribe to attributes and events from the remote bridged device.
  *
@@ -75,3 +77,5 @@ private:
     chip::EndpointId mEndpointId;
     bool subscriptionStarted = false;
 };
+
+} // namespace admin

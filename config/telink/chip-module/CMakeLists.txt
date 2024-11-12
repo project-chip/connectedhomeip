@@ -77,12 +77,6 @@ if (CONFIG_CHIP_OPENTHREAD_CONFIG)
     zephyr_set_openthread_config(${CHIP_OPENTHREAD_CONFIG})
 endif()
 
-if (CONFIG_USE_CHIP_DATA_MODEL_INTERFACE)
-    set(DATA_MODEL_INTERFACE "enabled")
-else()
-    set(DATA_MODEL_INTERFACE "disabled")
-endif()
-
 # ==============================================================================
 # Generate configuration for CHIP GN build system
 # ==============================================================================
@@ -93,7 +87,6 @@ matter_common_gn_args(
     LIB_TESTS       CONFIG_CHIP_BUILD_TESTS
     PROJECT_CONFIG  ${CONFIG_CHIP_PROJECT_CONFIG}
     DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-    DATA_MODEL_INTERFACE ${DATA_MODEL_INTERFACE}
 )
 matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
@@ -162,6 +155,10 @@ set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 
 include(${TELINK_COMMON}/common.cmake)
 
+if (CONFIG_CHIP_APP_LOG_LEVEL GREATER_EQUAL 4)
+    include(${TELINK_COMMON}/build_info.cmake)
+endif()
+
 # ==============================================================================
 # Define 'process_binaries' target for collecting final binary to flash
 # ==============================================================================
@@ -192,8 +189,17 @@ endif()
 # ==============================================================================
 
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
+    if (CONFIG_COMPRESS_LZMA)
+        add_custom_command(
+            OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME}
+            COMMAND ${CMAKE_COMMAND} -E true
+            COMMENT "Fake command, ${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME} file created in process_binaries target"
+            DEPENDS ${ZEPHYR_FINAL_EXECUTABLE}
+        )
+    endif()
+
     chip_ota_image(chip-ota-image
-        INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr.signed.bin
+        INPUT_FILES ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME}
         OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
     )
     add_dependencies(chip-ota-image process_binaries)

@@ -33,9 +33,6 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 
-// separated out for code-reuse
-#include <app/ember_coupling/EventPathValidity.mixin.h>
-
 #include <optional>
 #include <variant>
 
@@ -244,6 +241,8 @@ DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath
     entry.info.flags.Set(DataModel::CommandQualityFlags::kFabricScoped,
                          CommandIsFabricScoped(clusterPath.mClusterId, clusterCommandId));
 
+    entry.info.flags.Set(DataModel::CommandQualityFlags::kLargeMessage,
+                         CommandHasLargePayload(clusterPath.mClusterId, clusterCommandId));
     return entry;
 }
 
@@ -770,31 +769,6 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
 
     mDeviceTypeIterationHint = idx;
     return DeviceTypeEntryFromEmber(deviceTypes[idx]);
-}
-
-bool CodegenDataModelProvider::EventPathIncludesAccessibleConcretePath(const EventPathParams & path,
-                                                                       const Access::SubjectDescriptor & descriptor)
-{
-
-    if (!path.HasWildcardEndpointId())
-    {
-        // No need to check whether the endpoint is enabled, because
-        // emberAfFindEndpointType returns null for disabled endpoints.
-        return HasValidEventPathForEndpoint(path.mEndpointId, path, descriptor);
-    }
-
-    for (uint16_t endpointIndex = 0; endpointIndex < emberAfEndpointCount(); ++endpointIndex)
-    {
-        if (!emberAfEndpointIndexIsEnabled(endpointIndex))
-        {
-            continue;
-        }
-        if (HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), path, descriptor))
-        {
-            return true;
-        }
-    }
-    return false;
 }
 
 } // namespace app
