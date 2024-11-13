@@ -128,7 +128,7 @@ public:
         //       nonsense, however adding actual paths into the mock config changes existing
         //       test behaviour.
         //
-        // These specific paths were obtrained by grepping logs for what fake attributes we
+        // These specific paths were obtained by grepping logs for what fake attributes we
         // attempt to get info for within this test.
         const ConcreteAttributePath kFakePaths[] = {
             ConcreteAttributePath(kTestEndpointId, MockClusterId(2), 1),
