@@ -218,7 +218,7 @@ CHIP_ERROR DeviceManager::UnpairRemoteDevice(NodeId nodeId)
 
 void DeviceManager::SubscribeRemoteFabricBridge()
 {
-    ChipLogProgress(NotSpecified, "Start subscription to the remote bridge.")
+    ChipLogProgress(NotSpecified, "Start subscription to the remote bridge.");
 
         CHIP_ERROR error = mBridgeSubscriber.StartSubscription(PairingManager::Instance().CurrentCommissioner(),
                                                                mRemoteBridgeNodeId, kAggregatorEndpointId);
