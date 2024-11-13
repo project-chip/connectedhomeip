@@ -60,8 +60,7 @@ public:
     virtual InteractionModelContext CurrentContext() const { return mContext; }
 
     /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
-    ///   ReadAttribute is REQUIRED to perform:
-    ///     - Validation of readability/writability (also controlled by OperationFlags::kInternal)
+    ///   ReadAttribute is REQUIRED to respond to GlobalAttribute read requests
     ///
     /// Return value notes:
     ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse
