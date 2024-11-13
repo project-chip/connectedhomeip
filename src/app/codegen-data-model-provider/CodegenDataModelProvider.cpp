@@ -313,7 +313,7 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
 
     // Ember/codegen requires a persistence provider. Ensure one is set.
-    if (GetSafeAttributePersistenceProvider() == nullptr)
+    if (GetAttributePersistenceProvider() == nullptr)
     {
         ReturnErrorOnFailure(gDefaultAttributePersistenceProvider.Init(GetSafeAttributePersistenceProvider()));
         SetAttributePersistenceProvider(&gDefaultAttributePersistenceProvider);

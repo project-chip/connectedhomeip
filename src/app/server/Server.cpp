@@ -156,10 +156,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrDie(chip::audit::ExecutePersistentStorageLoadTestAudit(*mDeviceStorage));
 #endif
 
-    // Set up attribute persistence before we try to bring up the data model
-    // handler.
-    SuccessOrExit(err = mSafeAttributePersister.Init(mDeviceStorage));
-    SetSafeAttributePersistenceProvider(&mSafeAttributePersister);
 
     {
         FabricTable::InitParams fabricTableInitParams;
@@ -282,6 +278,17 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
+    // Set up attribute persistence before we try to bring up the data model
+    // handler.
+    SuccessOrExit(err = mSafeAttributePersister.Init(mDeviceStorage));
+    SetSafeAttributePersistenceProvider(&mSafeAttributePersister);
+
+    // Ember requires a persistence provider:
+    //   - InitDataModelHandler uses ember init (so needs a data model provider)
+    //   - CodegenDataModelProvider requires a persistence provider to use, so this must be called late
+    //     enough, after SetSafeAttributePersistenceProvider
+    chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
+
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler();
 
@@ -353,10 +360,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
-
-    // CodegenDataModelProvider requires a persistence provider to use, so this must be called late
-    // enough, after SetSafeAttributePersistenceProvider
-    chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler,
                                                                  &mCASESessionManager, mSubscriptionResumptionStorage);
