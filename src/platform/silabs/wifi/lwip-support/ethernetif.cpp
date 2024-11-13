@@ -21,12 +21,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "em_bus.h"
-#include "em_cmu.h"
-#include "em_gpio.h"
-#include "em_ldma.h"
-#include "em_usart.h"
-
 #ifndef WF200_WIFI
 #include "FreeRTOS.h"
 #include "event_groups.h"
@@ -50,7 +44,7 @@ extern "C" {
 #endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #endif // WF200_WIFI
 
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #ifdef WF200_WIFI
 #include "sl_wfx.h"
 #endif

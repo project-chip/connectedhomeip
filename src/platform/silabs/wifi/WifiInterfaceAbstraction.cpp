@@ -17,14 +17,12 @@
 
 // SL MATTER WI-FI INTERFACE
 
-#include "WifiInterfaceAbstraction.h"
 #include "silabs_utils.h"
-#include "wfx_host_events.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,6 +32,10 @@ using namespace chip;
 using namespace chip::DeviceLayer;
 
 #define CONVERT_SEC_TO_MS(TimeInS) (TimeInS * 1000)
+
+// TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
+//       As such we can't depend on the platform here as well
+extern void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData);
 
 namespace {
 
@@ -83,7 +85,7 @@ void sl_matter_wifi_task_started(void)
     wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &mac);
     memcpy(&evt.body.mac_addr[0], &mac.octet[0], MAC_ADDRESS_FIRST_OCTET);
 
-    PlatformMgrImpl().HandleWFXSystemEvent(WIFI_EVENT, (sl_wfx_generic_message_t *) &evt);
+    HandleWFXSystemEvent(WIFI_EVENT, (sl_wfx_generic_message_t *) &evt);
 }
 
 /***********************************************************************************
@@ -110,7 +112,7 @@ void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
 #endif
     memcpy(&evt.body.mac[0], &ap->octet[0], MAC_ADDRESS_FIRST_OCTET);
 
-    PlatformMgrImpl().HandleWFXSystemEvent(WIFI_EVENT, (sl_wfx_generic_message_t *) &evt);
+    HandleWFXSystemEvent(WIFI_EVENT, (sl_wfx_generic_message_t *) &evt);
 }
 
 /**************************************************************************************
@@ -128,7 +130,7 @@ void wfx_disconnected_notify(int32_t status)
     evt.header.id     = SL_WFX_DISCONNECT_IND_ID;
     evt.header.length = sizeof evt;
     evt.body.reason   = status;
-    PlatformMgrImpl().HandleWFXSystemEvent(WIFI_EVENT, (sl_wfx_generic_message_t *) &evt);
+    HandleWFXSystemEvent(WIFI_EVENT, (sl_wfx_generic_message_t *) &evt);
 }
 
 /**************************************************************************************
@@ -145,7 +147,7 @@ void wfx_ipv6_notify(int got_ip)
     memset(&eventData, 0, sizeof(eventData));
     eventData.header.id     = got_ip ? IP_EVENT_GOT_IP6 : IP_EVENT_STA_LOST_IP;
     eventData.header.length = sizeof(eventData.header);
-    PlatformMgrImpl().HandleWFXSystemEvent(IP_EVENT, &eventData);
+    HandleWFXSystemEvent(IP_EVENT, &eventData);
 }
 
 /**************************************************************************************
@@ -162,7 +164,7 @@ void wfx_ip_changed_notify(int got_ip)
     memset(&eventData, 0, sizeof(eventData));
     eventData.header.id     = got_ip ? IP_EVENT_STA_GOT_IP : IP_EVENT_STA_LOST_IP;
     eventData.header.length = sizeof(eventData.header);
-    PlatformMgrImpl().HandleWFXSystemEvent(IP_EVENT, &eventData);
+    HandleWFXSystemEvent(IP_EVENT, &eventData);
 }
 
 /**************************************************************************************

@@ -27,9 +27,8 @@
 #include "sl_memlcd.h"
 #include <app/icd/server/ICDServerConfig.h>
 #if SL_WIFI && !SLI_SI91X_MCU_INTERFACE
-#include "spi_multiplex.h"
+#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
 #endif // SL_WIFI && !SLI_SI91X_MCU_INTERFACE
-#include <stdio.h>
 #include <string.h>
 
 // Main Logo and App image

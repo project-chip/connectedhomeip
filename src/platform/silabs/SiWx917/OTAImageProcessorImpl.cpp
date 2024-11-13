@@ -20,8 +20,8 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/silabs/OTAImageProcessorImpl.h>
 
-#include "wfx_host_events.h"
 #include <platform/silabs/SilabsConfig.h>
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -27,19 +27,6 @@ declare_args() {
   # OTA timeout in seconds
   ota_periodic_query_timeout_sec = 86400
 
-  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
-  sl_wfx_config_softap = false
-  sl_wfx_config_scan = true
-
-  # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_transition = true
-
-  #default WiFi SSID
-  chip_default_wifi_ssid = ""
-
-  #default Wifi Password
-  chip_default_wifi_psk = ""
-
   # The EnableKey in hex string format used by TestEventTrigger command in
   # GeneralDiagnostics cluster. The length of the string should be 16 bytes.
   sl_test_event_trigger_enable_key = "00112233445566778899AABBCCDDEEFF"
@@ -52,20 +39,6 @@ assert(!(chip_enable_wifi && chip_enable_openthread))
 assert(!(use_rs9116 && chip_enable_openthread))
 assert(!(use_SiWx917 && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
-
-if (chip_enable_wifi) {
-  assert(use_rs9116 || use_wf200 || use_SiWx917)
-  import("${chip_root}/src/platform/silabs/wifi_args.gni")
-
-  if (use_rs9116) {
-    import("rs911x/rs911x.gni")
-  } else if (use_SiWx917) {
-    import("rs911x/rs9117.gni")
-  }
-  if (use_wf200) {
-    import("wf200/wf200.gni")
-  }
-}
 
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
@@ -167,40 +140,6 @@ config("efr32-common-config") {
   ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
-config("silabs-wifi-config") {
-  defines = []
-  include_dirs = []
-
-  if (chip_default_wifi_ssid != "") {
-    defines += [
-      "SL_ONNETWORK_PAIRING=1",
-      "SL_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
-    ]
-  }
-  if (chip_default_wifi_psk != "") {
-    assert(chip_default_wifi_ssid != "",
-           "ssid can't be null if psk is provided")
-    defines += [ "SL_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
-  }
-
-  if (sl_wfx_config_softap) {
-    defines += [ "SL_WFX_CONFIG_SOFTAP" ]
-  }
-
-  if (sl_wfx_config_scan) {
-    defines += [ "SL_WFX_CONFIG_SCAN" ]
-  }
-
-  if (chip_enable_wifi_ipv4) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
-  }
-
-  if (rs91x_wpa3_transition) {
-    # TODO: Change this macro once WF200 support is provided
-    defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
-  }
-}
-
 source_set("efr32-common") {
   deps = [ "${silabs_common_plat_dir}/provision:storage" ]
   defines = []
@@ -263,32 +202,6 @@ source_set("efr32-common") {
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",
     ]
-  }
-
-  if (chip_enable_wifi) {
-    if (use_rs9116) {
-      sources += rs911x_src_plat
-
-      # All the stuff from wiseconnect
-      sources += rs911x_src_sapi
-      include_dirs += rs911x_inc_plat
-
-      #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
-      cflags = rs911x_cflags
-    } else if (use_SiWx917) {
-      sources += rs911x_src_plat
-
-      # All the stuff from wiseconnect
-      sources += rs9117_src_sapi
-      include_dirs += rs9117_inc_plat
-
-      #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
-    } else if (use_wf200) {
-      sources += wf200_plat_src
-      include_dirs += wf200_plat_incs
-    }
-
-    public_configs += [ ":silabs-wifi-config" ]
   }
 
   if (chip_build_libshell) {

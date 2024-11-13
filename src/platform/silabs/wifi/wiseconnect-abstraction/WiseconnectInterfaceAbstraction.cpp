@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-#include "WiseconnectInterfaceAbstraction.h"
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
 
 namespace {
 

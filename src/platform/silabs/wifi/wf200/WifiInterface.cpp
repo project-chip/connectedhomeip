@@ -15,34 +15,36 @@
  *    limitations under the License.
  */
 
-#include "AppConfig.h"
 #include "FreeRTOS.h"
-#include "dhcp_client.h"
 #include "em_bus.h"
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "em_usart.h"
-#include "ethernetif.h"
 #include "event_groups.h"
 #include "gpiointerrupt.h"
-#include "sl_wfx_board.h"
 #include "sl_wfx_cmd_api.h"
 #include "sl_wfx_constants.h"
-#include "sl_wfx_host.h"
-#include "sl_wfx_task.h"
 #include "task.h"
-#include "wfx_host_events.h"
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/lwip-support/dhcp_client.h>
+#include <platform/silabs/wifi/lwip-support/ethernetif.h>
+#include <platform/silabs/wifi/wf200/platform/sl_wfx_board.h>
+#include <platform/silabs/wifi/wf200/platform/sl_wfx_host.h>
+#include <platform/silabs/wifi/wf200/platform/sl_wfx_task.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
+
+// TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
+//       As such we can't depend on the platform here as well
+extern void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData);
 
 /* wfxRsi Task will use as its stack */
 StackType_t wfxEventTaskStack[1024] = { 0 };
@@ -333,7 +335,7 @@ sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
     /******** INDICATION ********/
     case SL_WFX_STARTUP_IND_ID: {
         ChipLogProgress(DeviceLayer, "startup completed.");
-        PlatformMgrImpl().HandleWFXSystemEvent(WIFI_EVENT, event_payload);
+        HandleWFXSystemEvent(WIFI_EVENT, event_payload);
         break;
     }
     case SL_WFX_CONNECT_IND_ID: {

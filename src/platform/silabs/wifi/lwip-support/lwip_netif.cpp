@@ -19,23 +19,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "em_bus.h"
-#include "em_cmu.h"
-#include "em_gpio.h"
-#include "em_ldma.h"
-#include "em_usart.h"
-
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 
 #include "dhcp_client.h"
 #include "ethernetif.h"
 
-#include "FreeRTOS.h"
-#include "event_groups.h"
-#include "task.h"
-
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
+
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 

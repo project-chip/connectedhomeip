@@ -25,7 +25,7 @@
 #include <mbedtls/platform.h>
 
 #ifdef SL_WIFI
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #endif /* SL_WIFI */
 
 #if PW_RPC_ENABLED
@@ -41,8 +41,8 @@
 #endif
 
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
-#include "SiWxPlatformInterface.h"
-#include "WiseconnectInterfaceAbstraction.h"
+#include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
+#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
 #endif // SLI_SI91X_MCU_INTERFACE
 
 #include <crypto/CHIPCryptoPAL.h>
