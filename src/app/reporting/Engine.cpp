@@ -20,6 +20,7 @@
 #include <access/Privilege.h>
 #include <app/AppConfig.h>
 #include <app/ConcreteEventPath.h>
+#include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
@@ -83,8 +84,13 @@ std::optional<CHIP_ERROR> ValidateReadACL(DataModel::Provider * dataModel, const
     if (err == CHIP_NO_ERROR)
     {
         // success, but only if this is actually a valid path
-        VerifyOrReturnError(info.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-        VerifyOrReturnError(info->readPrivilege.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedRead));
+        // Global attributes have no metadata, so allow them through as long as `kView` access is available.
+        if (!IsSupportedGlobalAttributeNotInMetadata(path.mAttributeId))
+        {
+            VerifyOrReturnError(info.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+            VerifyOrReturnError(info->readPrivilege.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedRead));
+        }
+
         return std::nullopt;
     }
     VerifyOrReturnError((err == CHIP_ERROR_ACCESS_DENIED) || (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
