@@ -22,14 +22,15 @@ from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
+from chip.testing.matter_testing import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
+                                         get_wait_seconds_from_set_time, parse_matter_test_args, type_matches,
+                                         utc_time_in_matter_epoch)
+from chip.testing.pics import parse_pics, parse_pics_xml
+from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
+                                                    find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
+                                                    get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 from chip.tlv import uint
-from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
-                                    get_wait_seconds_from_set_time, parse_matter_test_args, type_matches, utc_time_in_matter_epoch)
 from mobly import asserts, signals
-from pics_support import parse_pics, parse_pics_xml
-from taglist_and_topology_test_support import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
-                                               find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
-                                               get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 
 
 def get_raw_type_list():
@@ -545,6 +546,14 @@ class TestMatterTestingSupport(MatterBaseTest):
 
         simple[2][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag1, tag2]
         simple[3][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag1, tag2, tag3]
+        problems = find_tag_list_problems(roots, device_types, simple)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
+        # Tags with mfg tags
+        tag_mfg = Clusters.Descriptor.Structs.SemanticTagStruct(mfgCode=0xFFF1, label="test")
+        tag_label = Clusters.Descriptor.Structs.SemanticTagStruct(tag=1, label="test")
+        simple[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag1, tag_mfg]
+        simple[2][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag1, tag_label]
         problems = find_tag_list_problems(roots, device_types, simple)
         asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
 

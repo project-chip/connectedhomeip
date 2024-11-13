@@ -38,6 +38,8 @@
 
 using namespace ::chip;
 
+namespace admin {
+
 namespace {
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
@@ -98,22 +100,21 @@ public:
                                        chip_rpc_OperationStatus & response) override
     {
         VerifyOrReturnValue(request.has_id, pw::Status::InvalidArgument());
-        // TODO(#35875): OpenDeviceCommissioningWindow uses the same controller every time and doesn't currently accept
-        // FabricIndex. For now we are dropping fabric index from the scoped node id.
-        NodeId nodeId                    = request.id.node_id;
+        ScopedNodeId scopedNodeId(request.id.node_id, request.id.fabric_index);
         uint32_t iterations              = request.iterations;
         uint16_t discriminator           = request.discriminator;
         uint16_t commissioningTimeoutSec = static_cast<uint16_t>(request.commissioning_timeout);
 
         // Log the request details for debugging
         ChipLogProgress(NotSpecified,
-                        "Received OpenCommissioningWindow request: NodeId 0x%lx, Timeout: %u, Iterations: %u, Discriminator: %u",
-                        static_cast<unsigned long>(nodeId), commissioningTimeoutSec, iterations, discriminator);
+                        "Received OpenCommissioningWindow request: NodeId " ChipLogFormatX64
+                        ", Timeout: %u, Iterations: %u, Discriminator: %u",
+                        ChipLogValueX64(scopedNodeId.GetNodeId()), commissioningTimeoutSec, iterations, discriminator);
 
         // Open the device commissioning window using raw binary data for salt and verifier
-        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, iterations, commissioningTimeoutSec, discriminator,
-                                                  ByteSpan(request.salt.bytes, request.salt.size),
-                                                  ByteSpan(request.verifier.bytes, request.verifier.size));
+        DeviceManager::Instance().OpenDeviceCommissioningWindow(scopedNodeId, iterations, commissioningTimeoutSec, discriminator,
+                                                                ByteSpan(request.salt.bytes, request.salt.size),
+                                                                ByteSpan(request.verifier.bytes, request.verifier.size));
 
         response.success = true;
 
@@ -145,13 +146,13 @@ public:
 
         if (error == CHIP_NO_ERROR)
         {
-            NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
+            NodeId nodeId = DeviceManager::Instance().GetNextAvailableNodeId();
 
             // After responding with RequestCommissioningApproval to the node where the client initiated the
             // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
             usleep(kCommissionPrepareTimeMs * 1000);
 
-            DeviceMgr().PairRemoteDevice(nodeId, code.c_str());
+            DeviceManager::Instance().PairRemoteDevice(nodeId, code.c_str());
         }
         else
         {
@@ -255,3 +256,5 @@ void InitRpcServer(uint16_t rpcServerPort)
     std::thread rpc_service(RunRpcService);
     rpc_service.detach();
 }
+
+} // namespace admin

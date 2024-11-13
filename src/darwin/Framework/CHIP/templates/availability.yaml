@@ -9682,8 +9682,12 @@
                   - Presets
                   - MatterScheduleConfiguration
 
-- release: "Future"
-  versions: "future"
+- release: "6C44AB2F-2F6B-4B57-B523-5CD89584986F"
+  versions:
+      iOS: "18.2"
+      macOS: "15.2"
+      watchOS: "11.2"
+      tvOS: "18.2"
   introduced:
       enums:
           ColorControl:
@@ -9742,6 +9746,73 @@
                   - UpdateDirection
                   - UpdateTime
                   - UpdateStartHue
+      device types:
+          - AirQualitySensor
+          - AirPurifier
+          - Aggregator
+          - BasicVideoPlayer
+          - BridgedNode
+          - CastingVideoClient
+          - CastingVideoPlayer
+          - ColorDimmerSwitch
+          - ColorTemperatureLight
+          - ContactSensor
+          - ContentApp
+          - ControlBridge
+          - CookSurface
+          - Cooktop
+          - DeviceEnergyManagement
+          - DimmableLight
+          - DimmablePlugInUnit
+          - DimmerSwitch
+          - Dishwasher
+          - DoorLock
+          - DoorLockController
+          - ElectricalSensor
+          - EVSE
+          - ExtendedColorLight
+          - ExtractorHood
+          - Fan
+          - FlowSensor
+          - GenericSwitch
+          - HeatingCoolingUnit
+          - HumiditySensor
+          - LaundryDryer
+          - LaundryWasher
+          - LightSensor
+          - MicrowaveOven
+          - ModeSelect
+          - NetworkInfrastructureManager
+          - OccupancySensor
+          - OnOffLight
+          - OnOffLightSwitch
+          - OnOffPlugInUnit
+          - OnOffSensor
+          - OTAProvider
+          - OTARequestor
+          - Oven
+          - PressureSensor
+          - PowerSource
+          - Pump
+          - PumpController
+          - RainSensor
+          - Refrigerator
+          - RoboticVacuumCleaner
+          - RoomAirConditioner
+          - RootNode
+          - SecondaryNetworkInterface
+          - SmokeCOAlarm
+          - Speaker
+          - TemperatureControlledCabinet
+          - TemperatureSensor
+          - Thermostat
+          - ThreadBorderRouter
+          - VideoRemoteControl
+          - WaterFreezeDetector
+          - WaterLeakDetector
+          - WaterValve
+          - WindowCovering
+          - WindowCoveringController
   provisional:
       clusters:
           # Targeting 1.4
@@ -9754,8 +9825,11 @@
           - WaterHeaterMode
           - WiFiNetworkManagement
           # Targeting Camera enablement
+          - CameraAVStreamManagement
           - Chime
           - WebRTCTransportProvider
+          - WebRTCTransportRequestor
+          - ZoneManagement
       attributes:
           AccessControl:
               # Targeting 1.4
@@ -10007,3 +10081,12 @@
                   - ColorLoop
                   - XY
                   - ColorTemperature
+
+- release: "Future"
+  versions: "future"
+  provisional:
+      device types:
+          - BatteryStorage
+          - HeatPump
+          - SolarPower
+          - WaterHeater

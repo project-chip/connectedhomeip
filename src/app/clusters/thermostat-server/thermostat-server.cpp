@@ -1040,8 +1040,8 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
             return Status::InvalidValue;
         }
         auto RequestedSystemMode = static_cast<SystemModeEnum>(*value);
-        if (ControlSequenceOfOperation > ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat ||
-            RequestedSystemMode > SystemModeEnum::kFanOnly)
+        if (EnsureKnownEnumValue(ControlSequenceOfOperation) == ControlSequenceOfOperationEnum::kUnknownEnumValue ||
+            EnsureKnownEnumValue(RequestedSystemMode) == SystemModeEnum::kUnknownEnumValue)
         {
             return Status::InvalidValue;
         }

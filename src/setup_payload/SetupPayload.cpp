@@ -23,6 +23,7 @@
 
 #include "SetupPayload.h"
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/TLV.h>
@@ -205,6 +206,34 @@ CHIP_ERROR SetupPayload::removeSerialNumber()
     optionalExtensionData.erase(kSerialNumberTag);
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetupPayload::generateRandomSetupPin(uint32_t & setupPINCode)
+{
+    uint8_t retries          = 0;
+    const uint8_t maxRetries = 10;
+
+    do
+    {
+        ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPINCode), sizeof(setupPINCode)));
+
+        // Passcodes shall be restricted to the values 00000001 to 99999998 in decimal, see 5.1.1.6
+        // TODO: Consider revising this method to ensure uniform distribution of setup PIN codes
+        setupPINCode = (setupPINCode % kSetupPINCodeMaximumValue) + 1;
+
+        // Make sure that the Generated Setup Pin code is not one of the invalid passcodes/pin codes defined in the
+        // specification.
+        if (IsValidSetupPIN(setupPINCode))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        retries++;
+        // We got pretty unlucky with the random number generator, Just try again.
+        // This shouldn't take many retries assuming DRBG_get_bytes is not broken.
+    } while (retries < maxRetries);
+
+    return CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR SetupPayload::addOptionalVendorData(const OptionalQRCodeInfo & info)

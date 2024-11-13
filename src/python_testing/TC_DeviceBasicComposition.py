@@ -19,54 +19,73 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1 run2 run3 run4 run5 run6 run7 run8
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --manual-code 10054912339 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#
-# test-runner-run/run2/app: ${CHIP_LOCK_APP}
-# test-runner-run/run2/factoryreset: True
-# test-runner-run/run2/quiet: True
-# test-runner-run/run2/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run2/script-args: --storage-path admin_storage.json --manual-code 10054912339
-#
-# test-runner-run/run3/app: ${CHIP_LOCK_APP}
-# test-runner-run/run3/factoryreset: True
-# test-runner-run/run3/quiet: True
-# test-runner-run/run3/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run3/script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
-#
-# test-runner-run/run4/app: ${CHIP_LOCK_APP}
-# test-runner-run/run4/factoryreset: True
-# test-runner-run/run4/quiet: True
-# test-runner-run/run4/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run4/script-args: --storage-path admin_storage.json --discriminator 1234 --passcode 20202021
-#
-# test-runner-run/run5/app: ${CHIP_LOCK_APP}
-# test-runner-run/run5/factoryreset: True
-# test-runner-run/run5/quiet: True
-# test-runner-run/run5/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run5/script-args: --storage-path admin_storage.json --manual-code 10054912339 --commissioning-method on-network
-#
-# test-runner-run/run6/app: ${CHIP_LOCK_APP}
-# test-runner-run/run6/factoryreset: True
-# test-runner-run/run6/quiet: True
-# test-runner-run/run6/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run6/script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00 --commissioning-method on-network
-#
-# test-runner-run/run7/app: ${CHIP_LOCK_APP}
-# test-runner-run/run7/factoryreset: True
-# test-runner-run/run7/quiet: True
-# test-runner-run/run7/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run7/script-args: --storage-path admin_storage.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network
-#
-# test-runner-run/run8/app: ${CHIP_LOCK_APP}
-# test-runner-run/run8/factoryreset: False
-# test-runner-run/run8/quiet: True
-# test-runner-run/run8/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run8/script-args: --storage-path admin_storage.json
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json --manual-code 10054912339
+#     factory-reset: true
+#     quiet: true
+#   run3:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
+#     factory-reset: true
+#     quiet: true
+#   run4:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#     factory-reset: true
+#     quiet: true
+#   run5:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run6:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --qr-code MT:-24J0Q1212-10648G00
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run7:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run8:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json
+#     factory-reset: false
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 # Run 1: runs through all tests
@@ -84,19 +103,25 @@ from typing import Any, Callable
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
-from basic_composition_support import BasicCompositionTests
 from chip import ChipUtility
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing.basic_composition import BasicCompositionTests
+from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds, attribute_id_type,
+                                               cluster_id_type, command_id_type)
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
+                                         async_test_body, default_matter_test_main)
+from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
+                                                    find_tag_list_problems, find_tree_roots, flat_list_ok,
+                                                    get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 from chip.tlv import uint
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
-                                    async_test_body, default_matter_test_main)
 from mobly import asserts
-from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
-                                               find_tree_roots, flat_list_ok, get_direct_children_of_root, parts_list_cycles,
-                                               separate_endpoint_types)
+
+
+def get_vendor_id(mei: int) -> int:
+    """Get the vendor ID portion (MEI prefix) of an overall MEI."""
+    return (mei >> 16) & 0xffff
 
 
 def check_int_in_range(min_value: int, max_value: int, allow_null: bool = False) -> Callable:
@@ -469,15 +494,17 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 cmd_prefixes = [a & 0xFFFF_0000 for a in cmd_values]
                 bad_attrs = [a for a in attr_prefixes if a >= bad_prefix_min]
                 bad_cmds = [a for a in cmd_prefixes if a >= bad_prefix_min]
-                for bad in bad_attrs:
-                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad)
+                for bad_attrib_id in bad_attrs:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad_attrib_id)
+                    vendor_id = get_vendor_id(bad_attrib_id)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Attribute with bad prefix {attribute_id} in cluster {cluster_id}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                    ), location=location, problem=f'Attribute 0x{bad_attrib_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}' + (' (Test Vendor)' if attribute_id_type(bad_attrib_id) == AttributeIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
-                for bad in bad_cmds:
-                    location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad)
+                for bad_cmd_id in bad_cmds:
+                    location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad_cmd_id)
+                    vendor_id = get_vendor_id(bad_cmd_id)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Command with bad prefix {attribute_id} in cluster {cluster_id}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                    ), location=location, problem=f'Command 0x{bad_cmd_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}' + (' (Test Vendor)' if command_id_type(bad_cmd_id) == CommandIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
 
         self.print_step(7, "Validate that none of the MEI global attribute IDs contain values outside of the allowed suffix range")
@@ -520,10 +547,11 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             cluster_prefixes = [a & 0xFFFF_0000 for a in endpoint.keys()]
             bad_clusters_ids = [a for a in cluster_prefixes if a >= bad_prefix_min]
-            for bad in bad_clusters_ids:
-                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)
+            for bad_cluster_id in bad_clusters_ids:
+                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad_cluster_id)
+                vendor_id = get_vendor_id(bad_cluster_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f'Bad cluster id prefix {bad}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                                  problem=f'Cluster 0x{bad_cluster_id:08x} with bad prefix 0x{vendor_id:04x}' + (' (Test Vendor)' if cluster_id_type(bad_cluster_id) == ClusterIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                 success = False
 
         self.print_step(9, "Validate that all clusters in the standard range have a known cluster ID")

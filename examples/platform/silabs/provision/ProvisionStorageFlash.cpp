@@ -78,7 +78,7 @@ CHIP_ERROR DecodeTotal(Encoding::Buffer & reader, uint16_t & total)
     ReturnErrorOnFailure(reader.Get(sz));
     total     = (0xffff == sz) ? sizeof(uint16_t) : sz;
     reader.in = reader.begin + total;
-    ReturnErrorCodeIf(reader.in > reader.end, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(reader.in <= reader.end, CHIP_ERROR_INTERNAL);
     return CHIP_NO_ERROR;
 }
 
@@ -118,7 +118,7 @@ CHIP_ERROR Set(uint16_t id, Encoding::Buffer & in)
     {
         // New entry
         size_t temp_total = found.offset;
-        ReturnErrorCodeIf(temp_total + in.Size() > kPageSize, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(temp_total + in.Size() <= kPageSize, CHIP_ERROR_INVALID_ARGUMENT);
         // Copy entry
         ReturnErrorOnFailure(in.Get(page + temp_total, in.Size()));
         // Update total
@@ -138,7 +138,7 @@ CHIP_ERROR Set(uint16_t id, Encoding::Buffer & in)
         {
             // Size change, move to the end
             uint16_t temp_total = total - found.encoded_size;
-            ReturnErrorCodeIf(temp_total + in.Size() > kPageSize, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(temp_total + in.Size() <= kPageSize, CHIP_ERROR_INVALID_ARGUMENT);
             // Remove the entry
             memmove(page + found.offset, page + found.offset + found.encoded_size, temp_total);
             // Add the entry
@@ -470,14 +470,14 @@ CHIP_ERROR Storage::GetManufacturingDate(uint8_t * value, size_t max, size_t & s
     return Flash::Get(Parameters::ID::kManufacturingDate, value, max, size);
 }
 
-CHIP_ERROR Storage::SetUniqueId(const uint8_t * value, size_t size)
+CHIP_ERROR Storage::SetPersistentUniqueId(const uint8_t * value, size_t size)
 {
-    return Flash::Set(Parameters::ID::kUniqueId, value, size);
+    return Flash::Set(Parameters::ID::kPersistentUniqueId, value, size);
 }
 
-CHIP_ERROR Storage::GetUniqueId(uint8_t * value, size_t max, size_t & size)
+CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & size)
 {
-    return Flash::Get(Parameters::ID::kUniqueId, value, max, size);
+    return Flash::Get(Parameters::ID::kPersistentUniqueId, value, max, size);
 }
 
 //

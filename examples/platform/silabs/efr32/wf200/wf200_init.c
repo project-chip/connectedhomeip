@@ -40,7 +40,6 @@
 #include "AppConfig.h"
 #include "sl_wfx_host.h"
 #include "sl_wfx_task.h"
-#include "wfx_host_events.h"
 
 #include "sl_spidrv_instances.h"
 #include "spidrv.h"
@@ -258,7 +257,7 @@ sl_status_t sl_wfx_host_set_wake_up_pin(uint8_t state)
     CORE_DECLARE_IRQ_STATE;
 
     CORE_ENTER_ATOMIC();
-    if (state > PINOUT_CLEAR_STATUS)
+    if (state > 0)
     {
 #ifdef SLEEP_ENABLED
 #ifdef SL_WFX_USE_SDIO
@@ -320,8 +319,7 @@ sl_status_t sl_wfx_host_reset_chip(void)
  *****************************************************************************/
 sl_status_t sl_wfx_host_wait_for_wake_up(void)
 {
-    xSemaphoreTake(wfx_wakeup_sem, pdMS_TO_TICKS(TICKS_TO_WAIT_0));
-    xSemaphoreTake(wfx_wakeup_sem, pdMS_TO_TICKS(TICKS_TO_WAIT_3));
+    xSemaphoreTake(wfx_wakeup_sem, pdMS_TO_TICKS(3));
 
     return SL_STATUS_OK;
 }
@@ -388,7 +386,7 @@ sl_status_t sl_wfx_host_wait_for_confirmation(uint8_t confirmation_id, uint32_t 
     for (uint32_t i = 0; i < timeout; i++)
     {
         /* Wait for an event posted by the function sl_wfx_host_post_event() */
-        if (xQueueReceive(wfx_event_Q, &posted_event_id, TICKS_TO_WAIT_1) == pdTRUE)
+        if (xQueueReceive(wfx_event_Q, &posted_event_id, 1) == pdTRUE)
         {
             /* Once a message is received, check if it is the expected ID */
             if (confirmation_id == posted_event_id)
@@ -418,7 +416,7 @@ sl_status_t sl_wfx_host_lock(void)
 
     sl_status_t status = SL_STATUS_OK;
 
-    if (xSemaphoreTake(wfx_mutex, pdMS_TO_TICKS(TICKS_TO_WAIT_500)) != pdTRUE)
+    if (xSemaphoreTake(wfx_mutex, pdMS_TO_TICKS(500)) != pdTRUE)
     {
         SILABS_LOG("*ERR*Wi-Fi driver mutex timo");
         status = SL_STATUS_TIMEOUT;
