@@ -141,7 +141,7 @@
     return [[self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID] copy];
 }
 
-- (nullable NSNumber *)networkCommissioningFeature
+- (nullable NSNumber *)networkCommissioningFeatures
 {
     return [[self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures] copy];
 }
