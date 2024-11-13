@@ -55,11 +55,10 @@ class DeferredAttributePersistenceProvider : public AttributePersistenceProvider
 public:
     DeferredAttributePersistenceProvider() = default;
 
-    CHIP_ERROR Init(AttributePersistenceProvider & persister,
-                    const Span<DeferredAttribute> & deferredAttributes,
-                    System::Clock::Milliseconds32 writeDelay) {
-        mPersister = &persister,
-        mDeferredAttributes = deferredAttributes;
+    CHIP_ERROR Init(AttributePersistenceProvider & persister, const Span<DeferredAttribute> & deferredAttributes,
+                    System::Clock::Milliseconds32 writeDelay)
+    {
+        mPersister = &persister, mDeferredAttributes = deferredAttributes;
         mWriteDelay = writeDelay;
 
         return CHIP_NO_ERROR;
@@ -80,7 +79,7 @@ public:
 private:
     void FlushAndScheduleNext();
 
-    AttributePersistenceProvider *mPersister;
+    AttributePersistenceProvider * mPersister;
     Span<DeferredAttribute> mDeferredAttributes;
     System::Clock::Milliseconds32 mWriteDelay;
 };
