@@ -16,19 +16,22 @@
  *    limitations under the License.
  */
 
-#include "lib/core/CHIPError.h"
-#include "lib/support/CodeUtils.h"
+#include <access/AccessRestrictionProvider.h>
+#include <access/Privilege.h>
 #include <app/AppConfig.h>
 #include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
 #include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -58,16 +61,30 @@ Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eve
 /// Returns the status of ACL validation.
 ///   if the status is set, the status is FINAL (i.e. permanent failure OR success due to path expansion logic.)
 ///   if the status is not set, the processing can continue
-std::optional<CHIP_ERROR> ValidateReadACL(const Access::SubjectDescriptor & subjectDescriptor,
+std::optional<CHIP_ERROR> ValidateReadACL(DataModel::Provider * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
                                           const ConcreteReadAttributePath & path)
 {
+
     Access::RequestPath requestPath{ .cluster     = path.mClusterId,
                                      .endpoint    = path.mEndpointId,
                                      .requestType = Access::RequestType::kAttributeReadRequest,
                                      .entityId    = path.mAttributeId };
-    CHIP_ERROR err = Access::GetAccessControl().Check(subjectDescriptor, requestPath, RequiredPrivilege::ForReadAttribute(path));
+
+    std::optional<DataModel::AttributeInfo> info = dataModel->GetAttributeInfo(path);
+
+    chip::Access::Privilege requiredPrivilege = chip::Access::Privilege::kView; // default
+    if (info.has_value() && info->readPrivilege.has_value())
+    {
+        // set a default even if we do not know and later report the real error if ACL looks ok
+        requiredPrivilege = *info->readPrivilege;
+    }
+
+    CHIP_ERROR err = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requiredPrivilege);
     if (err == CHIP_NO_ERROR)
     {
+        // success, but only if this is actually a valid path
+        VerifyOrReturnError(info.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+        VerifyOrReturnError(info->readPrivilege.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedRead));
         return std::nullopt;
     }
     VerifyOrReturnError((err == CHIP_ERROR_ACCESS_DENIED) || (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
@@ -114,7 +131,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
-    if (auto access_status = ValidateReadACL(subjectDescriptor, path); access_status.has_value())
+    if (auto access_status = ValidateReadACL(dataModel, subjectDescriptor, path); access_status.has_value())
     {
         status = *access_status;
     }
