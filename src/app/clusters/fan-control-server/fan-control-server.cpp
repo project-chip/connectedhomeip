@@ -30,6 +30,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Scoped.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -86,8 +87,8 @@ namespace {
 bool gWriteFromClusterLogic = false;
 
 // Avoid circular callback calls when adjusting SpeedSetting and PercentSetting together.
-bool gSpeedWriteInProgress   = false;
-bool gPercentWriteInProgress = false;
+ScopedChangeOnly gSpeedWriteInProgress(false);
+ScopedChangeOnly gPercentWriteInProgress(false);
 
 Status SetFanModeToOff(EndpointId endpointId)
 {
@@ -372,22 +373,21 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
     }
     case PercentSetting::Id: {
         DataModel::Nullable<Percent> percentSetting;
-        uint8_t speedMax;
         Status status = PercentSetting::Get(attributePath.mEndpointId, percentSetting);
         VerifyOrReturn(Status::Success == status && !percentSetting.IsNull());
-
+        uint8_t speedMax;
         status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
         VerifyOrReturn(Status::Success == status,
                        ChipLogError(Zcl, "Failed to get SpeedMax with error: 0x%02x", to_underlying(status)));
 
         // Avoid circular callback calls
-        gPercentWriteInProgress = true;
+        ScopedChange PercentWriteInProgress(gPercentWriteInProgress, true);
         // If PercentSetting is set to 0, the server SHALL set the FanMode attribute value to Off.
         if (percentSetting.Value() == 0)
         {
             status = SetFanModeToOff(attributePath.mEndpointId);
-            VerifyOrDo(status == Status::Success,
-                       ChipLogError(Zcl, "Failed to set FanMode to off with error: 0x%02x", to_underlying(status)));
+            VerifyOrReturn(status == Status::Success,
+                           ChipLogError(Zcl, "Failed to set FanMode to off with error: 0x%02x", to_underlying(status)));
         }
 
         if (SupportsMultiSpeed(attributePath.mEndpointId))
@@ -402,29 +402,27 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
             VerifyOrDo(Status::Success == status,
                        ChipLogError(Zcl, "Failed to set SpeedSetting with error: 0x%02x", to_underlying(status)));
         }
-        gPercentWriteInProgress = false;
         break;
     }
     case SpeedSetting::Id: {
         if (SupportsMultiSpeed(attributePath.mEndpointId))
         {
             DataModel::Nullable<uint8_t> speedSetting;
-            uint8_t speedMax;
             Status status = SpeedSetting::Get(attributePath.mEndpointId, speedSetting);
             VerifyOrReturn(Status::Success == status && !speedSetting.IsNull());
-
+            uint8_t speedMax;
             status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
             VerifyOrReturn(Status::Success == status,
                            ChipLogError(Zcl, "Failed to get SpeedMax with error: 0x%02x", to_underlying(status)));
 
             // Avoid circular callback calls
-            gSpeedWriteInProgress = true;
+            ScopedChange SpeedWriteInProgress(gSpeedWriteInProgress, true);
             // If SpeedSetting is set to 0, the server SHALL set the FanMode attribute value to Off.
             if (speedSetting.Value() == 0)
             {
                 status = SetFanModeToOff(attributePath.mEndpointId);
-                VerifyOrDo(Status::Success == status,
-                           ChipLogError(Zcl, "Failed to set FanMode to off with error: 0x%02x", to_underlying(status)));
+                VerifyOrReturn(Status::Success == status,
+                               ChipLogError(Zcl, "Failed to set FanMode to off with error: 0x%02x", to_underlying(status)));
             }
 
             // Adjust PercentSetting from a speed value change for SpeedSetting
@@ -435,7 +433,6 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
             status = PercentSetting::Set(attributePath.mEndpointId, percentSetting);
             VerifyOrDo(Status::Success == status,
                        ChipLogError(Zcl, "Failed to set PercentSetting with error: 0x%02x", to_underlying(status)));
-            gSpeedWriteInProgress = false;
         }
         break;
     }
