@@ -33,19 +33,19 @@ class ServiceAreaClusterMapStruct(val mapID: ULong, val name: String) {
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_MAP_I_D), mapID)
+      put(ContextSpecificTag(TAG_MAP_ID), mapID)
       put(ContextSpecificTag(TAG_NAME), name)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_MAP_I_D = 0
+    private const val TAG_MAP_ID = 0
     private const val TAG_NAME = 1
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterMapStruct {
       tlvReader.enterStructure(tlvTag)
-      val mapID = tlvReader.getULong(ContextSpecificTag(TAG_MAP_I_D))
+      val mapID = tlvReader.getULong(ContextSpecificTag(TAG_MAP_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
 
       tlvReader.exitContainer()

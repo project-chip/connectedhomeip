@@ -20,11 +20,11 @@ import os
 from typing import List, Optional, Set
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
+from matter_idl.generators.filters import upfirst
 from matter_idl.generators.type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                                     ParseDataType, TypeLookupContext)
 from matter_idl.matter_idl_types import (Attribute, Cluster, Command, DataType, Field, FieldQuality, Idl, Struct, StructQuality,
                                          StructTag)
-from stringcase import capitalcase
 
 
 @dataclasses.dataclass
@@ -160,7 +160,7 @@ def DelegatedCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     if global_name:
         return 'Delegated{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
 
-    return 'Delegated{}Cluster{}AttributeCallback'.format(context.cluster.name, capitalcase(attr.definition.name))
+    return 'Delegated{}Cluster{}AttributeCallback'.format(context.cluster.name, upfirst(attr.definition.name))
 
 
 def ChipClustersCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
@@ -173,7 +173,7 @@ def ChipClustersCallbackName(attr: Attribute, context: TypeLookupContext) -> str
     if global_name:
         return 'ChipClusters.{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
 
-    return 'ChipClusters.{}Cluster.{}AttributeCallback'.format(context.cluster.name, capitalcase(attr.definition.name))
+    return 'ChipClusters.{}Cluster.{}AttributeCallback'.format(context.cluster.name, upfirst(attr.definition.name))
 
 
 def CallbackName(attr: Attribute, context: TypeLookupContext) -> str:
@@ -189,11 +189,11 @@ def CallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
-        return 'CHIP{}AttributeCallback'.format(capitalcase(global_name))
+        return 'CHIP{}AttributeCallback'.format(upfirst(global_name))
 
     return 'CHIP{}{}AttributeCallback'.format(
-        capitalcase(context.cluster.name),
-        capitalcase(attr.definition.name)
+        upfirst(context.cluster.name),
+        upfirst(attr.definition.name)
     )
 
 
@@ -223,7 +223,7 @@ def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> st
     if global_name:
         return '{}'.format(GlobalNameToJavaName(global_name))
 
-    return '{}Attribute'.format(capitalcase(attr.definition.name))
+    return '{}Attribute'.format(upfirst(attr.definition.name))
 
 
 def IsFieldGlobalName(field: Field, context: TypeLookupContext) -> bool:

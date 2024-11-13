@@ -17,12 +17,17 @@
  */
 
 #pragma once
+
+#include <app/AppConfig.h>
 #include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegatePointers.h>
 #include <app/MessageDef/WriteResponseMessage.h>
+#include <app/data-model-provider/Provider.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -66,13 +71,16 @@ public:
      *  construction until a call to Close is made to terminate the
      *  instance.
      *
+     *  @param[in] apProvider              A valid pointer to the model used to forward writes towards
      *  @param[in] apWriteHandlerDelegate  A Valid pointer to the WriteHandlerDelegate.
      *
+     *  @retval #CHIP_ERROR_INVALID_ARGUMENT on invalid pointers
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
+     *
      */
-    CHIP_ERROR Init(WriteHandlerDelegate * apWriteHandlerDelegate);
+    CHIP_ERROR Init(DataModel::Provider * apProvider, WriteHandlerDelegate * apWriteHandlerDelegate);
 
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
@@ -115,7 +123,7 @@ public:
     /**
      * Check whether the WriteRequest we are handling is a timed write.
      */
-    bool IsTimedWrite() const { return mIsTimedRequest; }
+    bool IsTimedWrite() const { return mStateFlags.Has(StateBits::kIsTimedRequest); }
 
     bool MatchesExchangeContext(Messaging::ExchangeContext * apExchangeContext) const
     {
@@ -136,7 +144,7 @@ public:
 
 private:
     friend class TestWriteInteraction;
-    enum class State
+    enum class State : uint8_t
     {
         Uninitialized = 0, // The handler has not been initialized
         Initialized,       // The handler has been initialized and is ready
@@ -172,31 +180,28 @@ private:
 
     CHIP_ERROR AddStatusInternal(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus);
 
-private:
     // ExchangeDelegate
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
+    // Write the given data to the given path
+    CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
+                                TLV::TLVReader & aData);
+
+    /// Checks whether the given path corresponds to a list attribute
+    /// Return values:
+    ///    true/false: valid attribute path, known if list or not
+    ///    std::nulloptr - path not available/valid, unknown if attribute is a list or not
+    std::optional<bool> IsListAttributePath(const ConcreteAttributePath & path);
+
     Messaging::ExchangeHolder mExchangeCtx;
     WriteResponseMessage::Builder mWriteResponseBuilder;
-    State mState           = State::Uninitialized;
-    bool mIsTimedRequest   = false;
-    bool mSuppressResponse = false;
-    bool mHasMoreChunks    = false;
     Optional<ConcreteAttributePath> mProcessingAttributePath;
-    bool mProcessingAttributeIsList = false;
-    // We record the Status when AddStatus is called to determine whether all data of a list write is accepted.
-    // This value will be used by DeliverListWriteEnd and DeliverFinalListWriteEnd but it won't be used by group writes based on the
-    // fact that the errors that won't be delivered to AttributeAccessInterface are:
-    //  (1) Attribute not found
-    //  (2) Access control failed
-    //  (3) Write request to a read-only attribute
-    //  (4) Data version mismatch
-    //  (5) Not using timed write.
-    //  Where (1)-(3) will be consistent among the whole list write request, while (4) and (5) are not appliable to group writes.
-    bool mAttributeWriteSuccessful                = false;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
+
+    DataModel::Provider * mDataModelProvider = nullptr;
+    std::optional<ConcreteAttributePath> mLastSuccessfullyWrittenPath;
 
     // This may be a "fake" pointer or a real delegate pointer, depending
     // on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.
@@ -205,6 +210,31 @@ private:
     // set to the global InteractionModelEngine and the size of this
     // member is 1 byte.
     InteractionModelDelegatePointer<WriteHandlerDelegate> mDelegate;
+
+    // bit level enums to save storage for this object. InteractionModelEngine maintains
+    // several of these objects, so every bit of storage multiplies storage usage.
+    enum class StateBits : uint8_t
+    {
+        kIsTimedRequest            = 0x01,
+        kSuppressResponse          = 0x02,
+        kHasMoreChunks             = 0x04,
+        kProcessingAttributeIsList = 0x08,
+        // We record the Status when AddStatus is called to determine whether all data of a list write is accepted.
+        // This value will be used by DeliverListWriteEnd and DeliverFinalListWriteEnd but it won't be used by group writes based on
+        // the fact that the errors that won't be delivered to AttributeAccessInterface are:
+        //  (1) Attribute not found
+        //  (2) Access control failed
+        //  (3) Write request to a read-only attribute
+        //  (4) Data version mismatch
+        //  (5) Not using timed write.
+        //  Where (1)-(3) will be consistent among the whole list write request, while (4) and (5) are not appliable to group
+        //  writes.
+        kAttributeWriteSuccessful = 0x10,
+    };
+
+    BitFlags<StateBits> mStateFlags;
+    State mState = State::Uninitialized;
 };
+
 } // namespace app
 } // namespace chip

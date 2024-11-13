@@ -55,6 +55,7 @@ public:
         kMeshLocalPrefix = 7,
         kSecurityPolicy  = 12,
         kActiveTimestamp = 14,
+        kDelayTimer      = 52,
         kChannelMask     = 53,
     };
 
@@ -422,6 +423,24 @@ CHIP_ERROR OperationalDataset::SetSecurityPolicy(uint32_t aSecurityPolicy)
     ThreadTLV * tlv = MakeRoom(ThreadTLV::kSecurityPolicy, sizeof(*tlv) + sizeof(aSecurityPolicy));
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->Set32(aSecurityPolicy);
+    mLength = static_cast<uint8_t>(mLength + tlv->GetSize());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OperationalDataset::GetDelayTimer(uint32_t & aDelayMillis) const
+{
+    const ThreadTLV * tlv = Locate(ThreadTLV::kDelayTimer);
+    VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_TLV_TAG_NOT_FOUND);
+    VerifyOrReturnError(tlv->GetLength() == sizeof(aDelayMillis), CHIP_ERROR_INVALID_TLV_ELEMENT);
+    tlv->Get32(aDelayMillis);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OperationalDataset::SetDelayTimer(uint32_t aDelayMillis)
+{
+    ThreadTLV * tlv = MakeRoom(ThreadTLV::kDelayTimer, sizeof(*tlv) + sizeof(aDelayMillis));
+    VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
+    tlv->Set32(aDelayMillis);
     mLength = static_cast<uint8_t>(mLength + tlv->GetSize());
     return CHIP_NO_ERROR;
 }

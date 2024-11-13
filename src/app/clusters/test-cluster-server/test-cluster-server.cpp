@@ -1185,5 +1185,5 @@ bool emberAfUnitTestingClusterGlobalEchoRequestCallback(CommandHandler * command
 
 void MatterUnitTestingPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

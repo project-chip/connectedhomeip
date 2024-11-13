@@ -81,33 +81,33 @@ tests:
 
           On the TH(chip-tool) verify the received report data message has only the attributes that the TH has privilege to.
 
-          [1655727546.354466][5286:5291] CHIP:DMG:
-          [1655727546.354512][5286:5291] CHIP:DMG:         SuppressResponse = true,
-          [1655727546.354538][5286:5291] CHIP:DMG:         InteractionModelRevision = 1
-          [1655727546.354580][5286:5291] CHIP:DMG: }
-          [1655727546.355252][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 1545325355
-          [1655727546.355324][5286:5291] CHIP:TOO:   identify time: 0
-          [1655727546.355386][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 1545325355
-          [1655727546.355414][5286:5291] CHIP:TOO:   identify type: 2
-          [1655727546.355470][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 1545325355
-          [1655727546.355524][5286:5291] CHIP:TOO:   FeatureMap: 0
-          [1655727546.355606][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 1545325355
-          [1655727546.355635][5286:5291] CHIP:TOO:   ClusterRevision: 4
-          [1655727546.355788][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 1545325355
-          [1655727546.355845][5286:5291] CHIP:TOO:   GeneratedCommandList: 0 entries
-          [1655727546.356030][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 1545325355
-          [1655727546.356087][5286:5291] CHIP:TOO:   AcceptedCommandList: 2 entries
-          [1655727546.356117][5286:5291] CHIP:TOO:     [1]: 0
-          [1655727546.356143][5286:5291] CHIP:TOO:     [2]: 64
-          [1655727546.356552][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 1545325355
-          [1655727546.356590][5286:5291] CHIP:TOO:   AttributeList: 7 entries
-          [1655727546.356617][5286:5291] CHIP:TOO:     [1]: 0
-          [1655727546.356642][5286:5291] CHIP:TOO:     [2]: 1
-          [1655727546.356667][5286:5291] CHIP:TOO:     [3]: 65528
-          [1655727546.356692][5286:5291] CHIP:TOO:     [4]: 65529
-          [1655727546.356716][5286:5291] CHIP:TOO:     [5]: 65531
-          [1655727546.356741][5286:5291] CHIP:TOO:     [6]: 65532
-          [1655727546.356766][5286:5291] CHIP:TOO:     [7]: 65533
+          [1723642164.392] [329152:329154] [DMG]
+          [1723642164.392] [329152:329154] [DMG] 	SuppressResponse = true,
+          [1723642164.392] [329152:329154] [DMG] 	InteractionModelRevision = 11
+          [1723642164.392] [329152:329154] [DMG] }
+          [1723642164.392] [329152:329154] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 357555707
+          [1723642164.392] [329152:329154] [TOO]   IdentifyTime: 0
+          [1723642164.392] [329152:329154] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 357555707
+          [1723642164.392] [329152:329154] [TOO]   IdentifyType: 2
+          [1723642164.392] [329152:329154] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 357555707
+          [1723642164.392] [329152:329154] [TOO]   FeatureMap: 0
+          [1723642164.392] [329152:329154] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 357555707
+          [1723642164.392] [329152:329154] [TOO]   ClusterRevision: 4
+          [1723642164.393] [329152:329154] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 357555707
+          [1723642164.393] [329152:329154] [TOO]   GeneratedCommandList: 0 entries
+          [1723642164.393] [329152:329154] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 357555707
+          [1723642164.393] [329152:329154] [TOO]   AcceptedCommandList: 2 entries
+          [1723642164.393] [329152:329154] [TOO]     [1]: 0 (Identify)
+          [1723642164.393] [329152:329154] [TOO]     [2]: 64 (TriggerEffect)
+          [1723642164.393] [329152:329154] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 357555707
+          [1723642164.393] [329152:329154] [TOO]   AttributeList: 7 entries
+          [1723642164.393] [329152:329154] [TOO]     [1]: 0 (IdentifyTime)
+          [1723642164.393] [329152:329154] [TOO]     [2]: 1 (IdentifyType)
+          [1723642164.393] [329152:329154] [TOO]     [3]: 65528 (GeneratedCommandList)
+          [1723642164.393] [329152:329154] [TOO]     [4]: 65529 (AcceptedCommandList)
+          [1723642164.393] [329152:329154] [TOO]     [5]: 65531 (AttributeList)
+          [1723642164.393] [329152:329154] [TOO]     [6]: 65532 (FeatureMap)
+          [1723642164.393] [329152:329154] [TOO]     [7]: 65533 (ClusterRevision)
       disabled: true
 
     - label:
@@ -272,7 +272,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 7: TH sends the Read Request Message to the DUT to read all
+          "Step 7: TH sends the Read Requ`est Message to the DUT to read all
           attributes from a cluster at all Endpoints AttributePath = [[Cluster =
           Specific ClusterID]] On receipt of this message, DUT should send a
           report data action with the attribute value from all the Endpoints to
@@ -284,52 +284,52 @@ tests:
 
           On the TH(chip-tool) verify the received report data message has all the right attribute values for above command
 
-          [1653629930.057852][8778:8783] CHIP:DMG: }
-          [1653629930.058739][8778:8783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 2065044836
-          [1653629930.058788][8778:8783] CHIP:TOO:   identify time: 0
-          [1653629930.058889][8778:8783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 2065044836
-          [1653629930.058919][8778:8783] CHIP:TOO:   identify type: 2
-          [1653629930.058980][8778:8783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 2065044836
-          [1653629930.058998][8778:8783] CHIP:TOO:   ClusterRevision: 4
-          [1653629930.059191][8778:8783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 2065044836
-          [1653629930.059220][8778:8783] CHIP:TOO:   GeneratedCommandList: 1 entries
-          [1653629930.059239][8778:8783] CHIP:TOO:     [1]: 0
-          [1653629930.059478][8778:8783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 2065044836
-          [1653629930.059503][8778:8783] CHIP:TOO:   AcceptedCommandList: 3 entries
-          [1653629930.059519][8778:8783] CHIP:TOO:     [1]: 0
-          [1653629930.059532][8778:8783] CHIP:TOO:     [2]: 1
-          [1653629930.059546][8778:8783] CHIP:TOO:     [3]: 64
-          [1653629930.059945][8778:8783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 2065044836
-          [1653629930.059974][8778:8783] CHIP:TOO:   AttributeList: 6 entries
-          [1653629930.059989][8778:8783] CHIP:TOO:     [1]: 0
-          [1653629930.060002][8778:8783] CHIP:TOO:     [2]: 1
-          [1653629930.060015][8778:8783] CHIP:TOO:     [3]: 65528
-          [1653629930.060032][8778:8783] CHIP:TOO:     [4]: 65529
-          [1653629930.060048][8778:8783] CHIP:TOO:     [5]: 65531
-          [1653629930.060064][8778:8783] CHIP:TOO:     [6]: 65533
-          [1653629930.060077][8778:8783] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435651
-          [1653629930.060095][8778:8783] CHIP:TOO:   identify time: 0
-          [1653629930.060151][8778:8783] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435651
-          [1653629930.060167][8778:8783] CHIP:TOO:   identify type: 2
-          [1653629930.060224][8778:8783] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435651
-          [1653629930.060240][8778:8783] CHIP:TOO:   ClusterRevision: 4
-          [1653629930.060411][8778:8783] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435651
-          [1653629930.060433][8778:8783] CHIP:TOO:   GeneratedCommandList: 1 entries
-          [1653629930.060448][8778:8783] CHIP:TOO:     [1]: 0
-          [1653629930.060671][8778:8783] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 3620435651
-          [1653629930.060695][8778:8783] CHIP:TOO:   AcceptedCommandList: 3 entries
-          [1653629930.060710][8778:8783] CHIP:TOO:     [1]: 0
-          [1653629930.060722][8778:8783] CHIP:TOO:     [2]: 1
-          [1653629930.060735][8778:8783] CHIP:TOO:     [3]: 64
-          [1653629930.061086][8778:8783] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 3620435651
-          [1653629930.061114][8778:8783] CHIP:TOO:   AttributeList: 6 entries
-          [1653629930.061129][8778:8783] CHIP:TOO:     [1]: 0
-          [1653629930.061141][8778:8783] CHIP:TOO:     [2]: 1
-          [1653629930.061154][8778:8783] CHIP:TOO:     [3]: 65528
-          [1653629930.061167][8778:8783] CHIP:TOO:     [4]: 65529
-          [1653629930.061184][8778:8783] CHIP:TOO:     [5]: 65531
-          [1653629930.061201][8778:8783] CHIP:TOO:     [6]: 65533
-          [1653629930.061435][8778:8783] CHIP:EM: Sending Standalone Ack for MessageCounter:5968688 on exchange 11683i
+          [1653629930.057] [8778:8783] [DMG] }
+          [1653629930.058] [8778:8783] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 2065044836
+          [1653629930.058] [8778:8783] [TOO]   identify time: 0
+          [1653629930.058] [8778:8783] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 2065044836
+          [1653629930.058] [8778:8783] [TOO]   identify type: 2
+          [1653629930.058] [8778:8783] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 2065044836
+          [1653629930.058] [8778:8783] [TOO]   ClusterRevision: 4
+          [1653629930.059] [8778:8783] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 2065044836
+          [1653629930.059] [8778:8783] [TOO]   GeneratedCommandList: 1 entries
+          [1653629930.059] [8778:8783] [TOO]     [1]: 0 (Identify)
+          [1653629930.059] [8778:8783] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 2065044836
+          [1653629930.059] [8778:8783] [TOO]   AcceptedCommandList: 3 entries
+          [1653629930.059] [8778:8783] [TOO]     [1]: 0 (Identify)
+          [1653629930.059] [8778:8783] [TOO]     [2]: 1 (Unknown)
+          [1653629930.059] [8778:8783] [TOO]     [3]: 64 (TriggerEffect)
+          [1653629930.059] [8778:8783] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 2065044836
+          [1653629930.059] [8778:8783] [TOO]   AttributeList: 6 entries
+          [1653629930.059] [8778:8783] [TOO]     [1]: 0 (IdentifyTime)
+          [1653629930.060] [8778:8783] [TOO]     [2]: 1 (IdentifyType)
+          [1653629930.060] [8778:8783] [TOO]     [3]: 65528 (GeneratedCommandList)
+          [1653629930.060] [8778:8783] [TOO]     [4]: 65529 (AcceptedCommandList)
+          [1653629930.060] [8778:8783] [TOO]     [5]: 65531 (AttributeList)
+          [1653629930.060] [8778:8783] [TOO]     [6]: 65533 (ClusterRevision)
+          [1653629930.060] [8778:8783] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435651
+          [1653629930.060] [8778:8783] [TOO]   identify time: 0
+          [1653629930.060] [8778:8783] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435651
+          [1653629930.060] [8778:8783] [TOO]   identify type: 2
+          [1653629930.060] [8778:8783] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435651
+          [1653629930.060] [8778:8783] [TOO]   ClusterRevision: 4
+          [1653629930.060] [8778:8783] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435651
+          [1653629930.060] [8778:8783] [TOO]   GeneratedCommandList: 1 entries
+          [1653629930.060] [8778:8783] [TOO]     [1]: 0 (Identify)
+          [1653629930.060] [8778:8783] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 3620435651
+          [1653629930.060] [8778:8783] [TOO]   AcceptedCommandList: 3 entries
+          [1653629930.060] [8778:8783] [TOO]     [1]: 0 (Identify)
+          [1653629930.060] [8778:8783] [TOO]     [2]: 1 (Unknown)
+          [1653629930.060] [8778:8783] [TOO]     [3]: 64 (TriggerEffect)
+          [1653629930.061] [8778:8783] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 3620435651
+          [1653629930.061] [8778:8783] [TOO]   AttributeList: 6 entries
+          [1653629930.061] [8778:8783] [TOO]     [1]: 0 (IdentifyTime)
+          [1653629930.061] [8778:8783] [TOO]     [2]: 1 (IdentifyType)
+          [1653629930.061] [8778:8783] [TOO]     [3]: 65528 (GeneratedCommandList)
+          [1653629930.061] [8778:8783] [TOO]     [4]: 65529 (AcceptedCommandList)
+          [1653629930.061] [8778:8783] [TOO]     [5]: 65531 (AttributeList)
+          [1653629930.061] [8778:8783] [TOO]     [6]: 65533 (ClusterRevision)
+          [1653629930.061] [8778:8783] [EM] Sending Standalone Ack for MessageCounter:5968688 on exchange 11683i
       disabled: true
 
     - label:
@@ -825,30 +825,29 @@ tests:
           Verify on TH(chip-tool), DUT is responds right attribute value for below command
 
 
-          [1653633965.092996][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435654
-          [1653633965.093041][9835:9840] CHIP:TOO:   identify time: 0
-          [1653633965.093120][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435654
-          [1653633965.093140][9835:9840] CHIP:TOO:   identify type: 2
-          [1653633965.093202][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435654
-          [1653633965.093221][9835:9840] CHIP:TOO:   ClusterRevision: 4
-          [1653633965.093411][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435654
-          [1653633965.093451][9835:9840] CHIP:TOO:   GeneratedCommandList: 1 entries
-          [1653633965.093474][9835:9840] CHIP:TOO:     [1]: 0
-          [1653633965.093721][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 3620435654
-          [1653633965.093748][9835:9840] CHIP:TOO:   AcceptedCommandList: 3 entries
-          [1653633965.093767][9835:9840] CHIP:TOO:     [1]: 0
-          [1653633965.093784][9835:9840] CHIP:TOO:     [2]: 1
-          [1653633965.093800][9835:9840] CHIP:TOO:     [3]: 64
-          [1653633965.094169][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 3620435654
-          [1653633965.094200][9835:9840] CHIP:TOO:   AttributeList: 6 entries
-          [1653633965.094218][9835:9840] CHIP:TOO:     [1]: 0
-          [1653633965.094235][9835:9840] CHIP:TOO:     [2]: 1
-          [1653633965.094252][9835:9840] CHIP:TOO:     [3]: 65528
-          [1653633965.094269][9835:9840] CHIP:TOO:     [4]: 65529
-          [1653633965.094286][9835:9840] CHIP:TOO:     [5]: 65531
-          [1653633965.094302][9835:9840] CHIP:TOO:     [6]: 65533
-          [1653633965.094449][9835:9840] CHIP:EM: Sending Standalone Ack for MessageCounter:14221655 on exchange 17356i
-
+          [1653633965.092996][9835:9840] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435654
+          [1653633965.093041][9835:9840] [TOO]   identify time: 0
+          [1653633965.093120][9835:9840] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435654
+          [1653633965.093140][9835:9840] [TOO]   identify type: 2
+          [1653633965.093202][9835:9840] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435654
+          [1653633965.093221][9835:9840] [TOO]   ClusterRevision: 4
+          [1653633965.093411][9835:9840] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435654
+          [1653633965.093451][9835:9840] [TOO]   GeneratedCommandList: 1 entries
+          [1653633965.093474][9835:9840] [TOO]     [1]: 0 (Identify)
+          [1653633965.093721][9835:9840] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 3620435654
+          [1653633965.093748][9835:9840] [TOO]   AcceptedCommandList: 3 entries
+          [1653633965.093767][9835:9840] [TOO]     [1]: 0 (Identify)
+          [1653633965.093784][9835:9840] [TOO]     [2]: 1 (Unknown)
+          [1653633965.093800][9835:9840] [TOO]     [3]: 64 (TriggerEffect)
+          [1653633965.094169][9835:9840] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 3620435654
+          [1653633965.094200][9835:9840] [TOO]   AttributeList: 6 entries
+          [1653633965.094218][9835:9840] [TOO]     [1]: 0 (IdentifyTime)
+          [1653633965.094235][9835:9840] [TOO]     [2]: 1 (IdentifyType)
+          [1653633965.094252][9835:9840] [TOO]     [3]: 65528 (GeneratedCommandList)
+          [1653633965.094269][9835:9840] [TOO]     [4]: 65529 (AcceptedCommandList)
+          [1653633965.094286][9835:9840] [TOO]     [5]: 65531 (AttributeList)
+          [1653633965.094302][9835:9840] [TOO]     [6]: 65533 (ClusterRevision)
+          [1653633965.094449][9835:9840] [EM] Sending Standalone Ack for MessageCounter:14221655 on exchange 17356i
 
            ./chip-tool any write-by-id 0x03 0x00 2  1 1
 
@@ -884,29 +883,29 @@ tests:
           ./chip-tool any read-by-id 0x03 0xFFFFFFFF  1 1 --data-version 0xd7cb76c6
 
 
-          [1653634117.935268][9878:9883] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435657
-          [1653634117.935294][9878:9883] CHIP:TOO:   identify time: 0
-          [1653634117.935322][9878:9883] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435657
-          [1653634117.935331][9878:9883] CHIP:TOO:   identify type: 2
-          [1653634117.935357][9878:9883] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435657
-          [1653634117.935366][9878:9883] CHIP:TOO:   ClusterRevision: 4
-          [1653634117.935452][9878:9883] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435657
-          [1653634117.935470][9878:9883] CHIP:TOO:   GeneratedCommandList: 1 entries
-          [1653634117.935480][9878:9883] CHIP:TOO:     [1]: 0
-          [1653634117.935589][9878:9883] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 3620435657
-          [1653634117.935601][9878:9883] CHIP:TOO:   AcceptedCommandList: 3 entries
-          [1653634117.935609][9878:9883] CHIP:TOO:     [1]: 0
-          [1653634117.935616][9878:9883] CHIP:TOO:     [2]: 1
-          [1653634117.935623][9878:9883] CHIP:TOO:     [3]: 64
-          [1653634117.935788][9878:9883] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 3620435657
-          [1653634117.935802][9878:9883] CHIP:TOO:   AttributeList: 6 entries
-          [1653634117.935809][9878:9883] CHIP:TOO:     [1]: 0
-          [1653634117.935817][9878:9883] CHIP:TOO:     [2]: 1
-          [1653634117.935824][9878:9883] CHIP:TOO:     [3]: 65528
-          [1653634117.935831][9878:9883] CHIP:TOO:     [4]: 65529
-          [1653634117.935838][9878:9883] CHIP:TOO:     [5]: 65531
-          [1653634117.935845][9878:9883] CHIP:TOO:     [6]: 65533
-          [1653634117.935910][9878:9883] CHIP:EM: Sending Standalone Ack for MessageCounter:531776 on exchange 45674i
+          [1653634117.935268][9878:9883] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435657
+          [1653634117.935294][9878:9883] [TOO]   identify time: 0
+          [1653634117.935322][9878:9883] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435657
+          [1653634117.935331][9878:9883] [TOO]   identify type: 2
+          [1653634117.935357][9878:9883] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435657
+          [1653634117.935366][9878:9883] [TOO]   ClusterRevision: 4
+          [1653634117.935452][9878:9883] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435657
+          [1653634117.935470][9878:9883] [TOO]   GeneratedCommandList: 1 entries
+          [1653634117.935480][9878:9883] [TOO]     [1]: 0 (Identify)
+          [1653634117.935589][9878:9883] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 3620435657
+          [1653634117.935601][9878:9883] [TOO]   AcceptedCommandList: 3 entries
+          [1653634117.935609][9878:9883] [TOO]     [1]: 0 (Identify)
+          [1653634117.935616][9878:9883] [TOO]     [2]: 1 (Unknown)
+          [1653634117.935623][9878:9883] [TOO]     [3]: 64 (TriggerEffect)
+          [1653634117.935788][9878:9883] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 3620435657
+          [1653634117.935802][9878:9883] [TOO]   AttributeList: 6 entries
+          [1653634117.935809][9878:9883] [TOO]     [1]: 0 (IdentifyTime)
+          [1653634117.935817][9878:9883] [TOO]     [2]: 1 (IdentifyType)
+          [1653634117.935824][9878:9883] [TOO]     [3]: 65528 (GeneratedCommandList)
+          [1653634117.935831][9878:9883] [TOO]     [4]: 65529 (AcceptedCommandList)
+          [1653634117.935838][9878:9883] [TOO]     [5]: 65531 (AttributeList)
+          [1653634117.935845][9878:9883] [TOO]     [6]: 65533 (ClusterRevision)
+          [1653634117.935910][9878:9883] [EM] Sending Standalone Ack for MessageCounter:531776 on exchange 45674i
       disabled: true
 
     - label:
@@ -1000,55 +999,55 @@ tests:
 
           ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 1
 
-          [1653634446.678378][9962:9967] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435660
-          [1653634446.678404][9962:9967] CHIP:TOO:   identify time: 0
-          [1653634446.678437][9962:9967] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435660
-          [1653634446.678447][9962:9967] CHIP:TOO:   identify type: 2
-          [1653634446.678474][9962:9967] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435660
-          [1653634446.678483][9962:9967] CHIP:TOO:   ClusterRevision: 4
-          [1653634446.678570][9962:9967] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435660
-          [1653634446.678584][9962:9967] CHIP:TOO:   GeneratedCommandList: 1 entries
-          [1653634446.678594][9962:9967] CHIP:TOO:     [1]: 0
-          [1653634446.678767][9962:9967] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 3620435660
-          [1653634446.678780][9962:9967] CHIP:TOO:   AcceptedCommandList: 3 entries
-          [1653634446.678789][9962:9967] CHIP:TOO:     [1]: 0
-          [1653634446.678796][9962:9967] CHIP:TOO:     [2]: 1
-          [1653634446.678805][9962:9967] CHIP:TOO:     [3]: 64
-          [1653634446.678998][9962:9967] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 3620435660
-          [1653634446.679017][9962:9967] CHIP:TOO:   AttributeList: 6 entries
-          [1653634446.679024][9962:9967] CHIP:TOO:     [1]: 0
-          [1653634446.679030][9962:9967] CHIP:TOO:     [2]: 1
-          [1653634446.679036][9962:9967] CHIP:TOO:     [3]: 65528
-          [1653634446.679042][9962:9967] CHIP:TOO:     [4]: 65529
-          [1653634446.679048][9962:9967] CHIP:TOO:     [5]: 65531
-          [1653634446.679055][9962:9967] CHIP:TOO:     [6]: 65533
-          [1653634446.679129][9962:9967] CHIP:EM: Sending Standalone Ack for MessageCounter:15830359 on exchange 10739i
+          [1653634446.678378] [9962:9967] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435660
+          [1653634446.678404] [9962:9967] [TOO]   identify time: 0
+          [1653634446.678437] [9962:9967] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435660
+          [1653634446.678447] [9962:9967] [TOO]   identify type: 2
+          [1653634446.678474] [9962:9967] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435660
+          [1653634446.678483] [9962:9967] [TOO]   ClusterRevision: 4
+          [1653634446.678570] [9962:9967] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435660
+          [1653634446.678584] [9962:9967] [TOO]   GeneratedCommandList: 1 entries
+          [1653634446.678594] [9962:9967] [TOO]     [1]: 0 (Identify)
+          [1653634446.678767] [9962:9967] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 3620435660
+          [1653634446.678780] [9962:9967] [TOO]   AcceptedCommandList: 3 entries
+          [1653634446.678789] [9962:9967] [TOO]     [1]: 0 (Identify)
+          [1653634446.678796] [9962:9967] [TOO]     [2]: 1 (Unknown)
+          [1653634446.678805] [9962:9967] [TOO]     [3]: 64 (TriggerEffect)
+          [1653634446.678998] [9962:9967] [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 3620435660
+          [1653634446.679017] [9962:9967] [TOO]   AttributeList: 6 entries
+          [1653634446.679024] [9962:9967] [TOO]     [1]: 0 (IdentifyTime)
+          [1653634446.679030] [9962:9967] [TOO]     [2]: 1 (IdentifyType)
+          [1653634446.679036] [9962:9967] [TOO]     [3]: 65528 (GeneratedCommandList)
+          [1653634446.679042] [9962:9967] [TOO]     [4]: 65529 (AcceptedCommandList)
+          [1653634446.679048] [9962:9967] [TOO]     [5]: 65531 (AttributeList)
+          [1653634446.679055] [9962:9967] [TOO]     [6]: 65533 (ClusterRevision)
+          [1653634446.679129] [9962:9967] [EM] Sending Standalone Ack for MessageCounter:15830359 on exchange 10739i
 
 
            ./chip-tool levelcontrol read-by-id  0xFFFFFFFF 1 1 --data-version 0xd7cb76cc (Here given data version received for identify cluster)
 
-          [1653634568.902390][9990:9995] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_FFFB DataVersion: 199562416
-          [1653634568.902417][9990:9995] CHIP:TOO:   AttributeList: 19 entries
-          [1653634568.902428][9990:9995] CHIP:TOO:     [1]: 0
-          [1653634568.902436][9990:9995] CHIP:TOO:     [2]: 1
-          [1653634568.902444][9990:9995] CHIP:TOO:     [3]: 2
-          [1653634568.902451][9990:9995] CHIP:TOO:     [4]: 3
-          [1653634568.902458][9990:9995] CHIP:TOO:     [5]: 4
-          [1653634568.902466][9990:9995] CHIP:TOO:     [6]: 5
-          [1653634568.902475][9990:9995] CHIP:TOO:     [7]: 6
-          [1653634568.902483][9990:9995] CHIP:TOO:     [8]: 15
-          [1653634568.902490][9990:9995] CHIP:TOO:     [9]: 16
-          [1653634568.902498][9990:9995] CHIP:TOO:     [10]: 17
-          [1653634568.902506][9990:9995] CHIP:TOO:     [11]: 18
-          [1653634568.902513][9990:9995] CHIP:TOO:     [12]: 19
-          [1653634568.902520][9990:9995] CHIP:TOO:     [13]: 20
-          [1653634568.902528][9990:9995] CHIP:TOO:     [14]: 16384
-          [1653634568.902535][9990:9995] CHIP:TOO:     [15]: 65528
-          [1653634568.902542][9990:9995] CHIP:TOO:     [16]: 65529
-          [1653634568.902550][9990:9995] CHIP:TOO:     [17]: 65531
-          [1653634568.902557][9990:9995] CHIP:TOO:     [18]: 65532
-          [1653634568.902565][9990:9995] CHIP:TOO:     [19]: 65533
-          [1653634568.902621][9990:9995] CHIP:EM: Sending Standalone Ack for MessageCounter:3712616 on exchange 9501
+          [1653634568.902390] [9990:9995] [TOO] Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_FFFB DataVersion: 199562416
+          [1653634568.902417] [9990:9995] [TOO]   AttributeList: 19 entries
+          [1653634568.902428] [9990:9995] [TOO]     [1]: 0 (CurrentLevel)
+          [1653634568.902436] [9990:9995] [TOO]     [2]: 1 (RemainingTime)
+          [1653634568.902444] [9990:9995] [TOO]     [3]: 2 (MinLevel)
+          [1653634568.902451] [9990:9995] [TOO]     [4]: 3 (MaxLevel)
+          [1653634568.902458] [9990:9995] [TOO]     [5]: 4 (CurrentFrequency)
+          [1653634568.902466] [9990:9995] [TOO]     [6]: 5 (MinFrequency)
+          [1653634568.902475] [9990:9995] [TOO]     [7]: 6 (MaxFrequency)
+          [1653634568.902483] [9990:9995] [TOO]     [8]: 15 (Options)
+          [1653634568.902490] [9990:9995] [TOO]     [9]: 16 (OnOffTransitionTime)
+          [1653634568.902498] [9990:9995] [TOO]     [10]: 17 (OnLevel)
+          [1653634568.902506] [9990:9995] [TOO]     [11]: 18 (OnTransitionTime)
+          [1653634568.902513] [9990:9995] [TOO]     [12]: 19 (OffTransitionTime)
+          [1653634568.902520] [9990:9995] [TOO]     [13]: 20 (DefaultMoveRate)
+          [1653634568.902528] [9990:9995] [TOO]     [14]: 16384 (StartUpCurrentLevel)
+          [1653634568.902535] [9990:9995] [TOO]     [15]: 65528 (GeneratedCommandList)
+          [1653634568.902542] [9990:9995] [TOO]     [16]: 65529 (AcceptedCommandList)
+          [1653634568.902550] [9990:9995] [TOO]     [17]: 65531 (AttributeList)
+          [1653634568.902557] [9990:9995] [TOO]     [18]: 65532 (FeatureMap)
+          [1653634568.902565] [9990:9995] [TOO]     [19]: 65533 (ClusterRevision)
+          [1653634568.902621] [9990:9995] [EM] Sending Standalone Ack for MessageCounter:3712616 on exchange 9501
       disabled: true
 
     - label:
@@ -1166,53 +1165,52 @@ tests:
 
            Verify that there are no errors sent back for attributes the TH has no access to.
 
-          [1659422360.478947][2049:2054] CHIP:DMG: }
-          [1659422360.479556][2049:2054] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 3949809681
-          [1659422360.479619][2049:2054] CHIP:TOO:   ACL: 1 entries
-          [1659422360.479679][2049:2054] CHIP:TOO:     [1]: {
-          [1659422360.479706][2049:2054] CHIP:TOO:       Privilege: 5
-          [1659422360.479729][2049:2054] CHIP:TOO:       AuthMode: 2
-          [1659422360.479768][2049:2054] CHIP:TOO:       Subjects: 2 entries
-          [1659422360.479819][2049:2054] CHIP:TOO:         [1]: 1
-          [1659422360.479847][2049:2054] CHIP:TOO:         [2]: 112233
-          [1659422360.479876][2049:2054] CHIP:TOO:       Targets: 1 entries
-          [1659422360.479925][2049:2054] CHIP:TOO:         [1]: {
-          [1659422360.479969][2049:2054] CHIP:TOO:           Cluster: 31
-          [1659422360.479993][2049:2054] CHIP:TOO:           Endpoint: 0
-          [1659422360.480016][2049:2054] CHIP:TOO:           DeviceType: null
-          [1659422360.480038][2049:2054] CHIP:TOO:          }
-          [1659422360.480062][2049:2054] CHIP:TOO:       FabricIndex: 1
-          [1659422360.480085][2049:2054] CHIP:TOO:      }
-          [1659422360.480165][2049:2054] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 3949809681
-          [1659422360.480197][2049:2054] CHIP:TOO:   Extension: 0 entries
-          [1659422360.480225][2049:2054] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0002 DataVersion: 3949809681
-          [1659422360.480251][2049:2054] CHIP:TOO:   SubjectsPerAccessControlEntry: 4
-          [1659422360.480311][2049:2054] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0003 DataVersion: 3949809681
-          [1659422360.480337][2049:2054] CHIP:TOO:   TargetsPerAccessControlEntry: 3
-          [1659422360.480395][2049:2054] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0004 DataVersion: 3949809681
-          [1659422360.480421][2049:2054] CHIP:TOO:   AccessControlEntriesPerFabric: 3
-          [1659422360.480479][2049:2054] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFC DataVersion: 3949809681
-          [1659422360.480505][2049:2054] CHIP:TOO:   FeatureMap: 0
-          [1659422360.480563][2049:2054] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFD DataVersion: 3949809681
-          [1659422360.480588][2049:2054] CHIP:TOO:   ClusterRevision: 1
-          [1659422360.480690][2049:2054] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFF8 DataVersion: 3949809681
-          [1659422360.480721][2049:2054] CHIP:TOO:   GeneratedCommandList: 0 entries
-          [1659422360.480789][2049:2054] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFF9 DataVersion: 3949809681
-          [1659422360.480818][2049:2054] CHIP:TOO:   AcceptedCommandList: 0 entries
-          [1659422360.481269][2049:2054] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFB DataVersion: 3949809681
-          [1659422360.481307][2049:2054] CHIP:TOO:   AttributeList: 10 entries
-          [1659422360.481334][2049:2054] CHIP:TOO:     [1]: 0
-          [1659422360.481359][2049:2054] CHIP:TOO:     [2]: 1
-          [1659422360.481383][2049:2054] CHIP:TOO:     [3]: 2
-          [1659422360.481408][2049:2054] CHIP:TOO:     [4]: 3
-          [1659422360.481432][2049:2054] CHIP:TOO:     [5]: 4
-          [1659422360.481457][2049:2054] CHIP:TOO:     [6]: 65528
-          [1659422360.481482][2049:2054] CHIP:TOO:     [7]: 65529
-          [1659422360.481506][2049:2054] CHIP:TOO:     [8]: 65531
-          [1659422360.481531][2049:2054] CHIP:TOO:     [9]: 65532
-          [1659422360.481556][2049:2054] CHIP:TOO:     [10]: 65533
-          [1659422360.481706][2049:2054] CHIP:EM: Sending Standalone Ack for MessageCounter:183166533 on exchange 17693i
-
+          [1659422360.478947][2049:2054] [DMG] }
+          [1659422360.479556][2049:2054] [TOO] Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 3949809681
+          [1659422360.479619][2049:2054] [TOO]   ACL: 1 entries
+          [1659422360.479679][2049:2054] [TOO]     [1]: {
+          [1659422360.479706][2049:2054] [TOO]       Privilege: 5
+          [1659422360.479729][2049:2054] [TOO]       AuthMode: 2
+          [1659422360.479768][2049:2054] [TOO]       Subjects: 2 entries
+          [1659422360.479819][2049:2054] [TOO]         [1]: 1
+          [1659422360.479847][2049:2054] [TOO]         [2]: 112233
+          [1659422360.479876][2049:2054] [TOO]       Targets: 1 entries
+          [1659422360.479925][2049:2054] [TOO]         [1]: {
+          [1659422360.479969][2049:2054] [TOO]           Cluster: 31
+          [1659422360.479993][2049:2054] [TOO]           Endpoint: 0
+          [1659422360.480016][2049:2054] [TOO]           DeviceType: null
+          [1659422360.480038][2049:2054] [TOO]          }
+          [1659422360.480062][2049:2054] [TOO]       FabricIndex: 1
+          [1659422360.480085][2049:2054] [TOO]      }
+          [1659422360.480165][2049:2054] [TOO] Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 3949809681
+          [1659422360.480197][2049:2054] [TOO]   Extension: 0 entries
+          [1659422360.480225][2049:2054] [TOO] Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0002 DataVersion: 3949809681
+          [1659422360.480251][2049:2054] [TOO]   SubjectsPerAccessControlEntry: 4
+          [1659422360.480311][2049:2054] [TOO] Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0003 DataVersion: 3949809681
+          [1659422360.480337][2049:2054] [TOO]   TargetsPerAccessControlEntry: 3
+          [1659422360.480395][2049:2054] [TOO] Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0004 DataVersion: 3949809681
+          [1659422360.480421][2049:2054] [TOO]   AccessControlEntriesPerFabric: 3
+          [1659422360.480479][2049:2054] [TOO] Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFC DataVersion: 3949809681
+          [1659422360.480505][2049:2054] [TOO]   FeatureMap: 0
+          [1659422360.480563][2049:2054] [TOO] Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFD DataVersion: 3949809681
+          [1659422360.480588][2049:2054] [TOO]   ClusterRevision: 1
+          [1659422360.480690][2049:2054] [TOO] Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFF8 DataVersion: 3949809681
+          [1659422360.480721][2049:2054] [TOO]   GeneratedCommandList: 0 entries
+          [1659422360.480789][2049:2054] [TOO] Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFF9 DataVersion: 3949809681
+          [1659422360.480818][2049:2054] [TOO]   AcceptedCommandList: 0 entries
+          [1659422360.481269][2049:2054] [TOO] Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFB DataVersion: 3949809681
+          [1659422360.481307][2049:2054] [TOO]   AttributeList: 10 entries
+          [1659422360.481334][2049:2054] [TOO]     [1]: 0 (NOCs)
+          [1659422360.481359][2049:2054] [TOO]     [2]: 1 (Fabrics)
+          [1659422360.481383][2049:2054] [TOO]     [3]: 2 (SupportedFabrics)
+          [1659422360.481408][2049:2054] [TOO]     [4]: 3 (CommissionedFabrics)
+          [1659422360.481432][2049:2054] [TOO]     [5]: 4 (TrustedRootCertificates)
+          [1659422360.481457][2049:2054] [TOO]     [6]: 65528 (GeneratedCommandList)
+          [1659422360.481482][2049:2054] [TOO]     [7]: 65529 (AcceptedCommandList)
+          [1659422360.481506][2049:2054] [TOO]     [8]: 65531 (AttributeList)
+          [1659422360.481531][2049:2054] [TOO]     [9]: 65532 (FeatureMap)
+          [1659422360.481556][2049:2054] [TOO]     [10]: 65533 (ClusterRevision)
+          [1659422360.481706][2049:2054] [EM] Sending Standalone Ack for MessageCounter:183166533 on exchange 17693i
 
 
           With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to  send below mentioned command to Grant access to all clusters again.

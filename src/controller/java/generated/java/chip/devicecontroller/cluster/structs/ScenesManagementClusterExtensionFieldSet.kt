@@ -37,7 +37,7 @@ class ScenesManagementClusterExtensionFieldSet(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_CLUSTER_I_D), clusterID)
+      put(ContextSpecificTag(TAG_CLUSTER_ID), clusterID)
       startArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
       for (item in attributeValueList.iterator()) {
         item.toTlv(AnonymousTag, this)
@@ -48,12 +48,12 @@ class ScenesManagementClusterExtensionFieldSet(
   }
 
   companion object {
-    private const val TAG_CLUSTER_I_D = 0
+    private const val TAG_CLUSTER_ID = 0
     private const val TAG_ATTRIBUTE_VALUE_LIST = 1
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesManagementClusterExtensionFieldSet {
       tlvReader.enterStructure(tlvTag)
-      val clusterID = tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER_I_D))
+      val clusterID = tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER_ID))
       val attributeValueList =
         buildList<ScenesManagementClusterAttributeValuePairStruct> {
           tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))

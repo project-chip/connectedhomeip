@@ -20,6 +20,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 
@@ -36,20 +37,72 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
-constexpr uint16_t kClusterRevision = 1;
+constexpr uint16_t kClusterRevision = 2;
+
+/***************************************************************************
+ *
+ * The Delegate implementation
+ *
+ ***************************************************************************/
+
+CHIP_ERROR Delegate::GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot, Optional<bool> emergencyBoost,
+                                               Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
+                                               Optional<Percent> targetReheat)
+{
+    Events::BoostStarted::Type event;
+    EventNumber eventNumber;
+
+    event.boostInfo.duration          = durationSecs;
+    event.boostInfo.oneShot           = oneShot;
+    event.boostInfo.emergencyBoost    = emergencyBoost;
+    event.boostInfo.temporarySetpoint = temporarySetpoint;
+    event.boostInfo.targetPercentage  = targetPercentage;
+    event.boostInfo.targetReheat      = targetReheat;
+
+    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(AppServer, "Unable to generate BoostStarted event: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    return err;
+}
+
+CHIP_ERROR Delegate::GenerateBoostEndedEvent()
+{
+    Events::BoostEnded::Type event;
+    EventNumber eventNumber;
+    ChipLogError(AppServer, "Delegate::GenerateBoostEndedEvent");
+
+    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(AppServer, "Unable to generate BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    return err;
+}
+
+/***************************************************************************
+ *
+ * The Instance implementation
+ *
+ ***************************************************************************/
 
 CHIP_ERROR Instance::Init()
 {
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
 }
 
 void Instance::Shutdown()
 {
-    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 bool Instance::HasFeature(Feature aFeature) const
@@ -117,12 +170,12 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
 void Instance::HandleBoost(HandlerContext & ctx, const Commands::Boost::DecodableType & commandData)
 {
-    uint32_t duration                   = commandData.duration;
-    Optional<bool> oneShot              = commandData.oneShot;
-    Optional<bool> emergencyBoost       = commandData.emergencyBoost;
-    Optional<int16_t> temporarySetpoint = commandData.temporarySetpoint;
-    Optional<Percent> targetPercentage  = commandData.targetPercentage;
-    Optional<Percent> targetReheat      = commandData.targetReheat;
+    uint32_t duration                   = commandData.boostInfo.duration;
+    Optional<bool> oneShot              = commandData.boostInfo.oneShot;
+    Optional<bool> emergencyBoost       = commandData.boostInfo.emergencyBoost;
+    Optional<int16_t> temporarySetpoint = commandData.boostInfo.temporarySetpoint;
+    Optional<Percent> targetPercentage  = commandData.boostInfo.targetPercentage;
+    Optional<Percent> targetReheat      = commandData.boostInfo.targetReheat;
 
     //  Notify the appliance if the appliance hardware cannot be adjusted, then return Failure
     if (HasFeature(WaterHeaterManagement::Feature::kTankPercent))

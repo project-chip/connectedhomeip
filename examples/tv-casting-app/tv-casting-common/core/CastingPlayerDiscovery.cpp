@@ -25,7 +25,6 @@ namespace core {
 using namespace chip::System;
 using namespace chip::Controller;
 using namespace chip::Dnssd;
-using namespace std;
 
 CastingPlayerDiscovery * CastingPlayerDiscovery::_castingPlayerDiscovery = nullptr;
 
@@ -63,8 +62,8 @@ CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint32_t deviceTypeFilter)
 
 CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
 {
-    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StopDiscovery() mCastingPlayers: %lu, mCastingPlayersInternal: %lu",
-                    mCastingPlayers.size(), mCastingPlayersInternal.size());
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StopDiscovery() mCastingPlayers: %u, mCastingPlayersInternal: %u",
+                    static_cast<unsigned int>(mCastingPlayers.size()), static_cast<unsigned int>(mCastingPlayersInternal.size()));
     VerifyOrReturnError(mState == DISCOVERY_RUNNING, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mCommissionableNodeController.StopDiscovery());
 
@@ -80,8 +79,8 @@ CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
 
 void CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal()
 {
-    ChipLogProgress(Discovery, "CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal() mCastingPlayersInternal: %lu",
-                    mCastingPlayersInternal.size());
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal() mCastingPlayersInternal: %u",
+                    static_cast<unsigned int>(mCastingPlayersInternal.size()));
     // Only clear the CastingPlayers in mCastingPlayersInternal with ConnectionState == CASTING_PLAYER_NOT_CONNECTED
     for (auto it = mCastingPlayersInternal.begin(); it != mCastingPlayersInternal.end();)
     {

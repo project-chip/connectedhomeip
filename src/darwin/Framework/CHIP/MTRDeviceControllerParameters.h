@@ -31,6 +31,13 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRDeviceControllerAbstractParameters : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Whether the controller should start out suspended.
+ *
+ * Defaults to NO.
+ */
+@property (nonatomic, assign) BOOL startSuspended;
 @end
 
 /**
@@ -142,6 +149,33 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
                  operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
                 intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
                         rootCertificate:(MTRCertificateDERBytes)rootCertificate;
+
+/**
+ * The root certificate we were initialized with.
+ */
+@property (nonatomic, copy, readonly) MTRCertificateDERBytes rootCertificate MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
+@end
+
+MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
+@interface MTRXPCDeviceControllerParameters : MTRDeviceControllerAbstractParameters
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * A controller created from this way will connect to a remote instance of an MTRDeviceController loaded in an XPC Service
+ *
+ * @param xpcConnectionBlock The XPC Connection block that will return an NSXPCConnection to the intended listener.
+ *
+ * @param uniqueIdentifier The unique id to assign to the controller.
+ *
+ */
+- (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
+                         uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+
+@property (atomic, readonly, retain) NSUUID * uniqueIdentifier MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+@property (readonly, strong, nonatomic) NSXPCConnection * (^xpcConnectionBlock)(void) MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 @end
 

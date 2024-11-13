@@ -131,7 +131,7 @@ class DiagnosticLogsCluster(
     val TAG_LOG_CONTENT: Int = 1
     var logContent_decoded: ByteArray? = null
 
-    val TAG_U_T_C_TIME_STAMP: Int = 2
+    val TAG_UTC_TIME_STAMP: Int = 2
     var UTCTimeStamp_decoded: ULong? = null
 
     val TAG_TIME_SINCE_BOOT: Int = 3
@@ -148,7 +148,7 @@ class DiagnosticLogsCluster(
         logContent_decoded = tlvReader.getByteArray(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_U_T_C_TIME_STAMP)) {
+      if (tag == ContextSpecificTag(TAG_UTC_TIME_STAMP)) {
         UTCTimeStamp_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

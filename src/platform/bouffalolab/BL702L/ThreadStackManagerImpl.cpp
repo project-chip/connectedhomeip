@@ -32,17 +32,12 @@
 #include <openthread_port.h>
 #include <utils_list.h>
 
-extern "C" {
-#include <ot_utils_ext.h>
-}
-
 namespace chip {
 namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
 
 ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
-extern "C" void (*ot_otrNotifyEvent_ptr)(ot_system_event_t sevent);
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 {
@@ -106,6 +101,31 @@ extern "C" void otSysEventSignalPending(void)
 extern "C" otInstance * otrGetInstance()
 {
     return ThreadStackMgrImpl().OTInstance();
+}
+
+extern "C" uint32_t otrEnterCrit(void)
+{
+    if (xPortIsInsideInterrupt())
+    {
+        return taskENTER_CRITICAL_FROM_ISR();
+    }
+    else
+    {
+        taskENTER_CRITICAL();
+        return 0;
+    }
+}
+
+extern "C" void otrExitCrit(uint32_t tag)
+{
+    if (xPortIsInsideInterrupt())
+    {
+        taskEXIT_CRITICAL_FROM_ISR(tag);
+    }
+    else
+    {
+        taskEXIT_CRITICAL();
+    }
 }
 
 extern "C" ot_system_event_t otrGetNotifyEvent(void)

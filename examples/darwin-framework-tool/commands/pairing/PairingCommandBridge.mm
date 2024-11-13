@@ -19,6 +19,7 @@
 #import <Matter/Matter.h>
 
 #include "../common/CHIPCommandBridge.h"
+#include "../common/CertificateIssuer.h"
 #include "DeviceControllerDelegateBridge.h"
 #include "PairingCommandBridge.h"
 #include <lib/support/logging/CHIPLogging.h>
@@ -48,40 +49,48 @@ extern NSMutableArray * gDiscoveredDevices;
 
 void PairingCommandBridge::SetUpDeviceControllerDelegate()
 {
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
     CHIPToolDeviceControllerDelegate * deviceControllerDelegate = [[CHIPToolDeviceControllerDelegate alloc] init];
-    MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
-    MTRDeviceController * commissioner = CurrentCommissioner();
-
-    [deviceControllerDelegate setDeviceID:mNodeId];
-    switch (mNetworkType) {
-    case PairingNetworkType::None:
-    case PairingNetworkType::Ethernet:
-        break;
-    case PairingNetworkType::WiFi:
-        [params setWifiSSID:[NSData dataWithBytes:mSSID.data() length:mSSID.size()]];
-        [params setWifiCredentials:[NSData dataWithBytes:mPassword.data() length:mPassword.size()]];
-        break;
-    case PairingNetworkType::Thread:
-        [params setThreadOperationalDataset:[NSData dataWithBytes:mOperationalDataset.data() length:mOperationalDataset.size()]];
-        break;
-    }
-
-    if (mUseDeviceAttestationDelegate.ValueOr(false)) {
-        params.deviceAttestationDelegate = [[NoOpAttestationDelegate alloc] init];
-        if (mDeviceAttestationFailsafeTime.HasValue()) {
-            params.failSafeTimeout = @(mDeviceAttestationFailsafeTime.Value());
-        }
-    }
-
-    if (mCountryCode.HasValue()) {
-        params.countryCode = [NSString stringWithUTF8String:mCountryCode.Value()];
-    }
-
     [deviceControllerDelegate setCommandBridge:this];
-    [deviceControllerDelegate setParams:params];
-    [deviceControllerDelegate setCommissioner:commissioner];
+    [deviceControllerDelegate setDeviceID:mNodeId];
 
+    // With per-controller storage, the certificate issuer creates the operational certificate.
+    // When using shared storage, this step is a no-op.
+    auto * certificateIssuer = [CertificateIssuer sharedInstance];
+    certificateIssuer.nextNodeID = @(mNodeId);
+    certificateIssuer.fabricID = CurrentCommissionerFabricId();
+
+    if (mCommissioningType != CommissioningType::None) {
+        MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
+        switch (mCommissioningType) {
+        case CommissioningType::None:
+        case CommissioningType::WithoutNetwork:
+            break;
+        case CommissioningType::WithWiFi:
+            [params setWifiSSID:[NSData dataWithBytes:mSSID.data() length:mSSID.size()]];
+            [params setWifiCredentials:[NSData dataWithBytes:mPassword.data() length:mPassword.size()]];
+            break;
+        case CommissioningType::WithThread:
+            [params setThreadOperationalDataset:[NSData dataWithBytes:mOperationalDataset.data() length:mOperationalDataset.size()]];
+            break;
+        }
+
+        if (mUseDeviceAttestationDelegate.ValueOr(false)) {
+            params.deviceAttestationDelegate = [[NoOpAttestationDelegate alloc] init];
+            if (mDeviceAttestationFailsafeTime.HasValue()) {
+                params.failSafeTimeout = @(mDeviceAttestationFailsafeTime.Value());
+            }
+        }
+
+        if (mCountryCode.HasValue()) {
+            params.countryCode = [NSString stringWithUTF8String:mCountryCode.Value()];
+        }
+
+        [deviceControllerDelegate setParams:params];
+    }
+
+    MTRDeviceController * commissioner = CurrentCommissioner();
+    [deviceControllerDelegate setCommissioner:commissioner];
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     [commissioner setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
 }
 
@@ -89,7 +98,7 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
 {
     NSError * error;
     switch (mPairingMode) {
-    case PairingMode::None:
+    case PairingMode::Unpair:
         Unpair();
         break;
     case PairingMode::Code:
@@ -154,9 +163,8 @@ void PairingCommandBridge::PairWithPayload(NSError * __autoreleasing * error)
 
 void PairingCommandBridge::Unpair()
 {
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip-tool.command", DISPATCH_QUEUE_SERIAL);
-    MTRDeviceController * commissioner = CurrentCommissioner();
-    auto * device = [MTRBaseDevice deviceWithNodeID:@(mNodeId) controller:commissioner];
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip-tool.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    auto * device = BaseDeviceWithNodeId(mNodeId);
 
     ChipLogProgress(chipTool, "Attempting to unpair device %llu", mNodeId);
     MTRBaseClusterOperationalCredentials * opCredsCluster =

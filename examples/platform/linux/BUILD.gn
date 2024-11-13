@@ -15,9 +15,14 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
+
+if (current_os != "nuttx") {
+  import("//build_overrides/jsoncpp.gni")
+}
 
 declare_args() {
   chip_enable_smoke_co_trigger = false
@@ -101,6 +106,10 @@ source_set("app-main") {
     "${chip_root}/src/app/server",
   ]
 
+  if (current_os != "nuttx") {
+    public_deps += [ jsoncpp_root ]
+  }
+
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]
   }
@@ -124,6 +133,9 @@ source_set("app-main") {
       "${chip_root}/examples/common/tracing:commandline",
       "${chip_root}/src/tracing",
     ]
+  }
+  if (chip_enable_icd_server) {
+    deps += [ "${chip_root}/src/app/icd/server:manager" ]
   }
 
   defines += [

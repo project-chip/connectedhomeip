@@ -36,7 +36,9 @@
 #include "spidrv.h"
 #include "task.h"
 
+#ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
+#endif // SL_BOARD_NAME
 
 #include "sl_device_init_clocks.h"
 #include "sl_device_init_hfxo.h"
@@ -44,8 +46,6 @@
 
 #include "silabs_utils.h"
 #include "sl_si91x_ncp_utility.h"
-#include "wfx_host_events.h"
-#include "wfx_rsi.h"
 
 #if SL_MX25CTRL_MUX
 sl_status_t sl_wfx_host_spiflash_cs_assert(void);
@@ -219,7 +219,7 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 #endif // SL_SPICTRL_MUX
         return SL_STATUS_FAIL;
     }
-    GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+    GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = 0;
 #if SL_MX25CTRL_MUX
     sl_wfx_host_spiflash_cs_deassert();
 #endif // SL_MX25CTRL_MUX

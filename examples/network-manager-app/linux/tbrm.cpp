@@ -94,21 +94,41 @@ class FakeBorderRouterDelegate final : public ThreadBorderRouterManagement::Dele
 
         mActivateDatasetCallback = callback;
         mActivateDatasetSequence = sequenceNum;
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(3000), CompleteDatasetActivation, this);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(1000), ActivateActiveDataset, this);
     }
 
     CHIP_ERROR CommitActiveDataset() override { return CHIP_NO_ERROR; }
     CHIP_ERROR RevertActiveDataset() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override
+    {
+        ReturnErrorOnFailure(mPendingDataset.Init(pendingDataset.AsByteSpan()));
+        uint32_t delayTimerMillis;
+        ReturnErrorOnFailure(mPendingDataset.GetDelayTimer(delayTimerMillis));
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(delayTimerMillis), ActivatePendingDataset, this);
+        return CHIP_NO_ERROR;
+    }
 
 private:
-    static void CompleteDatasetActivation(System::Layer *, void * context)
+    static void ActivateActiveDataset(System::Layer *, void * context)
     {
         auto * self                    = static_cast<FakeBorderRouterDelegate *>(context);
         auto * callback                = self->mActivateDatasetCallback;
         auto sequenceNum               = self->mActivateDatasetSequence;
         self->mActivateDatasetCallback = nullptr;
         callback->OnActivateDatasetComplete(sequenceNum, CHIP_NO_ERROR);
+    }
+
+    static void ActivatePendingDataset(System::Layer *, void * context)
+    {
+        auto * self = static_cast<FakeBorderRouterDelegate *>(context);
+        self->mActiveDataset.Init(self->mPendingDataset.AsByteSpan());
+        self->mPendingDataset.Clear();
+        // This could just call MatterReportingAttributeChangeCallback directly
+        self->mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        self->mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
     }
 
     AttributeChangeCallback * mAttributeChangeCallback;

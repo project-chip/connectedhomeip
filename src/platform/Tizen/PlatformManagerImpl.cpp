@@ -56,9 +56,7 @@ namespace {
 
 struct GLibMatterContextInvokeData
 {
-    CHIP_ERROR (*mFunc)(void *);
-    void * mFuncUserData;
-    CHIP_ERROR mFuncResult;
+    LambdaBridge bridge;
     // Sync primitives to wait for the function to be executed
     std::mutex mDoneMutex;
     std::condition_variable mDoneCond;
@@ -144,18 +142,17 @@ void PlatformManagerImpl::_Shutdown()
     mGLibMainLoop = nullptr;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData)
+void PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bridge)
 {
-    GLibMatterContextInvokeData invokeData{ func, userData };
+    GLibMatterContextInvokeData invokeData{ std::move(bridge) };
 
     g_main_context_invoke_full(
         g_main_loop_get_context(mGLibMainLoop), G_PRIORITY_HIGH_IDLE,
         [](void * userData_) {
             auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
             VerifyOrExit(g_main_context_get_thread_default() != nullptr,
-                         ChipLogError(DeviceLayer, "GLib thread default main context is not set");
-                         data->mFuncResult = CHIP_ERROR_INCORRECT_STATE);
-            data->mFuncResult = data->mFunc(data->mFuncUserData);
+                         ChipLogError(DeviceLayer, "GLib thread default main context is not set"));
+            data->bridge();
         exit:
             data->mDoneMutex.lock();
             data->mDone = true;
@@ -167,8 +164,6 @@ CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(
 
     std::unique_lock<std::mutex> lock(invokeData.mDoneMutex);
     invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
-
-    return invokeData.mFuncResult;
 }
 
 } // namespace DeviceLayer

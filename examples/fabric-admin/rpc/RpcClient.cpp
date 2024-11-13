@@ -22,18 +22,13 @@
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
-#include <string>
-#include <thread>
 
+#include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
-#include "pw_assert/check.h"
-#include "pw_hdlc/decoder.h"
-#include "pw_hdlc/default_addresses.h"
-#include "pw_hdlc/rpc_channel.h"
-#include "pw_rpc/client.h"
-#include "pw_stream/socket_stream.h"
 
 using namespace chip;
+
+namespace admin {
 
 namespace {
 
@@ -64,7 +59,7 @@ CHIP_ERROR WaitForResponse(CallType & call)
     }
     else
     {
-        fprintf(stderr, "RPC Response timed out!");
+        fprintf(stderr, "RPC Response timed out!\n");
         return CHIP_ERROR_TIMEOUT;
     }
 }
@@ -105,52 +100,42 @@ void OnRemoveDeviceResponseCompleted(const pw_protobuf_Empty & response, pw::Sta
     }
 }
 
+void RpcCompletedWithEmptyResponse(const pw_protobuf_Empty & response, pw::Status status)
+{
+    std::lock_guard<std::mutex> lock(responseMutex);
+    responseReceived = true;
+    responseError    = status.ok() ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    responseCv.notify_one();
+
+    if (status.ok())
+    {
+        ChipLogProgress(NotSpecified, "RPC call succeeded!");
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "RPC call failed with status: %d", status.code());
+    }
+}
+
 } // namespace
 
-CHIP_ERROR InitRpcClient(uint16_t rpcServerPort)
+void SetRpcRemoteServerPort(uint16_t port)
 {
-    rpc::client::SetRpcServerPort(rpcServerPort);
+    rpc::client::SetRpcServerPort(port);
+}
+
+CHIP_ERROR StartRpcClient()
+{
     return rpc::client::StartPacketProcessing();
 }
 
-CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
+CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data)
 {
     ChipLogProgress(NotSpecified, "AddSynchronizedDevice");
 
-    chip_rpc_SynchronizedDevice device = chip_rpc_SynchronizedDevice_init_default;
-    device.node_id                     = nodeId;
-
-    // TODO: fill this with real data. For now we just add things for testing
-    strcpy(device.vendor_name, "Test Vendor");
-    device.has_vendor_name = true;
-
-    device.vendor_id     = 123;
-    device.has_vendor_id = true;
-
-    strcpy(device.product_name, "Test Product");
-    device.has_product_name = true;
-
-    device.product_id     = 234;
-    device.has_product_id = true;
-
-    strcpy(device.node_label, "Device Label");
-    device.has_node_label = true;
-
-    device.hardware_version     = 11;
-    device.has_hardware_version = true;
-
-    strcpy(device.hardware_version_string, "Hardware");
-    device.has_hardware_version_string = true;
-
-    device.software_version     = 22;
-    device.has_software_version = true;
-
-    strcpy(device.software_version_string, "Test 1.4.22");
-    device.has_software_version_string = true;
-
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
-    auto call = fabricBridgeClient.AddSynchronizedDevice(device, OnAddDeviceResponseCompleted);
+    auto call = fabricBridgeClient.AddSynchronizedDevice(data, OnAddDeviceResponseCompleted);
 
     if (!call.active())
     {
@@ -161,12 +146,14 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
     return WaitForResponse(call);
 }
 
-CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
+CHIP_ERROR RemoveSynchronizedDevice(ScopedNodeId scopedNodeId)
 {
     ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice");
 
     chip_rpc_SynchronizedDevice device = chip_rpc_SynchronizedDevice_init_default;
-    device.node_id                     = nodeId;
+    device.has_id                      = true;
+    device.id.node_id                  = scopedNodeId.GetNodeId();
+    device.id.fabric_index             = scopedNodeId.GetFabricIndex();
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
@@ -180,3 +167,67 @@ CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
 
     return WaitForResponse(call);
 }
+
+CHIP_ERROR ActiveChanged(ScopedNodeId scopedNodeId, uint32_t promisedActiveDurationMs)
+{
+    ChipLogProgress(NotSpecified, "ActiveChanged");
+
+    chip_rpc_KeepActiveChanged parameters;
+    parameters.has_id                      = true;
+    parameters.id.node_id                  = scopedNodeId.GetNodeId();
+    parameters.id.fabric_index             = scopedNodeId.GetFabricIndex();
+    parameters.promised_active_duration_ms = promisedActiveDurationMs;
+
+    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
+    // function and the call will complete.
+    auto call = fabricBridgeClient.ActiveChanged(parameters, RpcCompletedWithEmptyResponse);
+
+    if (!call.active())
+    {
+        // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return WaitForResponse(call);
+}
+
+CHIP_ERROR AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & data)
+{
+    ChipLogProgress(NotSpecified, "AdminCommissioningAttributeChanged");
+
+    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
+    // function and the call will complete.
+    auto call = fabricBridgeClient.AdminCommissioningAttributeChanged(data, RpcCompletedWithEmptyResponse);
+
+    if (!call.active())
+    {
+        // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return WaitForResponse(call);
+}
+
+CHIP_ERROR DeviceReachableChanged(const chip_rpc_ReachabilityChanged & data)
+{
+    ChipLogProgress(NotSpecified, "DeviceReachableChanged");
+    // TODO(#35333): When there is some sort of device manager in fabric-admin that handles all the devices we
+    // are currently connected to (and not just device on the remote bridge), we should notify that manager
+    // so that it can properly handle any sort of reconnection logic. This can either be done here when
+    // `data.reachability == false`, or more control can be given wherever DeviceReachableChanged is currently
+    // called
+
+    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
+    // function and the call will complete.
+    auto call = fabricBridgeClient.DeviceReachableChanged(data, RpcCompletedWithEmptyResponse);
+
+    if (!call.active())
+    {
+        // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return WaitForResponse(call);
+}
+
+} // namespace admin

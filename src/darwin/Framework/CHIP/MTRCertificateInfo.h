@@ -55,15 +55,20 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Matter root certificates are self-signed, i.e. the issuer and the subject are
  * the same.
  */
-@property (readonly) MTRDistinguishedNameInfo * issuer;
+@property (readonly, retain) MTRDistinguishedNameInfo * issuer;
 
 /**
  * The Distinguished Name of the entity represented by the certificate.
  */
-@property (readonly) MTRDistinguishedNameInfo * subject;
+@property (readonly, retain) MTRDistinguishedNameInfo * subject;
 
-@property (readonly) NSDate * notBefore;
-@property (readonly) NSDate * notAfter;
+@property (readonly, retain) NSDate * notBefore;
+@property (readonly, retain) NSDate * notAfter;
+
+/**
+ * Public key data for this certificate
+ */
+@property (nullable, readonly, retain) NSData * publicKeyData MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 @end
 

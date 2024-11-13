@@ -512,7 +512,7 @@ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::Device
 
 PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size)
 {
-    ReturnErrorCodeIf(!sThreadBuf.Alloc(size), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(sThreadBuf.Alloc(size), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     memcpy(sThreadBuf.Get(), threadOperationalDataset, size);
     sCommissioningParameters.SetThreadOperationalDataset(ByteSpan(sThreadBuf.Get(), size));
     return ToPyChipError(CHIP_NO_ERROR);
@@ -520,11 +520,11 @@ PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * thr
 PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials)
 {
     size_t ssidSize = strlen(ssid);
-    ReturnErrorCodeIf(!sSsidBuf.Alloc(ssidSize), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(sSsidBuf.Alloc(ssidSize), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     memcpy(sSsidBuf.Get(), ssid, ssidSize);
 
     size_t credsSize = strlen(credentials);
-    ReturnErrorCodeIf(!sCredsBuf.Alloc(credsSize), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(sCredsBuf.Alloc(credsSize), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     memcpy(sCredsBuf.Get(), credentials, credsSize);
 
     sCommissioningParameters.SetWiFiCredentials(
@@ -544,7 +544,7 @@ PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt
     else
     {
         size_t len = strlen(name);
-        ReturnErrorCodeIf(!sTimeZoneNameBuf.Alloc(len), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+        VerifyOrReturnError(sTimeZoneNameBuf.Alloc(len), ToPyChipError(CHIP_ERROR_NO_MEMORY));
         memcpy(sTimeZoneNameBuf.Get(), name, len);
         sTimeZoneBuf.name.SetValue(CharSpan(sTimeZoneNameBuf.Get(), len));
     }
@@ -564,7 +564,7 @@ PyChipError pychip_DeviceController_SetDSTOffset(int32_t offset, uint64_t validS
 PyChipError pychip_DeviceController_SetDefaultNtp(const char * defaultNTP)
 {
     size_t len = strlen(defaultNTP);
-    ReturnErrorCodeIf(!sDefaultNTPBuf.Alloc(len), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(sDefaultNTPBuf.Alloc(len), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     memcpy(sDefaultNTPBuf.Get(), defaultNTP, len);
     sCommissioningParameters.SetDefaultNTP(chip::app::DataModel::MakeNullable(CharSpan(sDefaultNTPBuf.Get(), len)));
     return ToPyChipError(CHIP_NO_ERROR);
@@ -839,7 +839,11 @@ PyChipError pychip_IsSessionOverTCPConnection(chip::OperationalDeviceProxy * dev
     VerifyOrReturnError(deviceProxy->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
     VerifyOrReturnError(isSessionOverTCP != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     *isSessionOverTCP = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection() != nullptr;
+#else
+    *isSessionOverTCP = false;
+#endif
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
@@ -859,6 +863,7 @@ PyChipError pychip_IsActiveSession(chip::OperationalDeviceProxy * deviceProxy, b
 
 PyChipError pychip_CloseTCPConnectionWithPeer(chip::OperationalDeviceProxy * deviceProxy)
 {
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     VerifyOrReturnError(deviceProxy->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
     VerifyOrReturnError(deviceProxy->GetSecureSession().Value()->AsSecureSession()->AllowsLargePayload(),
                         ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
@@ -867,6 +872,9 @@ PyChipError pychip_CloseTCPConnectionWithPeer(chip::OperationalDeviceProxy * dev
         deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection(), /* shouldAbort = */ false);
 
     return ToPyChipError(CHIP_NO_ERROR);
+#else
+    return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
+#endif
 }
 
 PyChipError pychip_FreeOperationalDeviceProxy(chip::OperationalDeviceProxy * deviceProxy)

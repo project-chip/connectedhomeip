@@ -319,13 +319,9 @@ int ramStorageSavetoFlash(const char * file_name, uint8_t * buffer, uint32_t buf
 
 void ramStorageDump(const ramBufferDescriptor * pBuffer)
 {
-    uint16_t i           = 0;
-    uint16_t j           = 0;
-    uint16_t valueLength = 0;
-    uint16_t readLength;
-    int currentIndex = 0;
+    uint16_t i = 0;
+    uint16_t j = 0;
     const struct settingsBlock * currentBlock;
-    rsError error = RS_ERROR_NOT_FOUND;
 
     (void) OSA_MutexLock((osa_mutex_handle_t) mRamStorageMutexId, osaWaitForever_c);
 

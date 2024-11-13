@@ -16,32 +16,65 @@
  *    limitations under the License.
  */
 
-#include "messaging/ExchangeContext.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/AttributeValueDecoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <credentials/GroupDataProvider.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/logging/TextOnlyLogging.h>
+#include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <optional>
 
 namespace chip {
 namespace app {
 
-using namespace Protocols::InteractionModel;
-using Status                         = Protocols::InteractionModel::Status;
-constexpr uint8_t kListAttributeType = 0x48;
+namespace {
 
-CHIP_ERROR WriteHandler::Init(WriteHandlerDelegate * apWriteHandlerDelegate)
+/// Wraps a EndpointIterator and ensures that `::Release()` is called
+/// for the iterator (assuming it is non-null)
+class AutoReleaseGroupEndpointIterator
+{
+public:
+    explicit AutoReleaseGroupEndpointIterator(Credentials::GroupDataProvider::EndpointIterator * iterator) : mIterator(iterator) {}
+    ~AutoReleaseGroupEndpointIterator()
+    {
+        if (mIterator != nullptr)
+        {
+            mIterator->Release();
+        }
+    }
+
+    bool IsNull() const { return mIterator == nullptr; }
+    bool Next(Credentials::GroupDataProvider::GroupEndpoint & item) { return mIterator->Next(item); }
+
+private:
+    Credentials::GroupDataProvider::EndpointIterator * mIterator;
+};
+
+} // namespace
+
+using namespace Protocols::InteractionModel;
+using Status = Protocols::InteractionModel::Status;
+
+CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDelegate * apWriteHandlerDelegate)
 {
     VerifyOrReturnError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(apWriteHandlerDelegate, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(apProvider, CHIP_ERROR_INVALID_ARGUMENT);
+    mDataModelProvider = apProvider;
 
     mDelegate = apWriteHandlerDelegate;
     MoveToState(State::Initialized);
@@ -62,8 +95,28 @@ void WriteHandler::Close()
     // successful.
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
-    mSuppressResponse = false;
+    mStateFlags.Clear(StateBits::kSuppressResponse);
+    mDataModelProvider = nullptr;
     MoveToState(State::Uninitialized);
+}
+
+std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePath & path)
+{
+    if (mDataModelProvider == nullptr)
+    {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogError(DataManagement, "Null data model while checking attribute properties.");
+#endif
+        return std::nullopt;
+    }
+
+    auto info = mDataModelProvider->GetAttributeInfo(path);
+    if (!info.has_value())
+    {
+        return std::nullopt;
+    }
+
+    return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -106,7 +159,7 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     Status status = HandleWriteRequestMessage(apExchangeContext, std::move(aPayload), aIsTimedWrite);
 
     // The write transaction will be alive only when the message was handled successfully and there are more chunks.
-    if (!(status == Status::Success && mHasMoreChunks))
+    if (!(status == Status::Success && mStateFlags.Has(StateBits::kHasMoreChunks)))
     {
         Close();
     }
@@ -142,7 +195,7 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
     if (status == Status::Success)
     {
         // We have no more chunks, the write response has been sent in HandleWriteRequestMessage, so close directly.
-        if (!mHasMoreChunks)
+        if (!mStateFlags.Has(StateBits::kHasMoreChunks))
         {
             Close();
         }
@@ -184,8 +237,8 @@ CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMes
     VerifyOrExit(mExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
     mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
-                                    mHasMoreChunks ? Messaging::SendMessageFlags::kExpectResponse
-                                                   : Messaging::SendMessageFlags::kNone);
+                                    mStateFlags.Has(StateBits::kHasMoreChunks) ? Messaging::SendMessageFlags::kExpectResponse
+                                                                               : Messaging::SendMessageFlags::kNone);
     SuccessOrExit(err);
 
     MoveToState(State::Sending);
@@ -196,7 +249,7 @@ exit:
 
 void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 {
-    if (auto * attrOverride = GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
+    if (auto * attrOverride = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId))
     {
         attrOverride->OnListWriteBegin(aPath);
     }
@@ -204,7 +257,7 @@ void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 
 void WriteHandler::DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool writeWasSuccessful)
 {
-    if (auto * attrOverride = GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
+    if (auto * attrOverride = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId))
     {
         attrOverride->OnListWriteEnd(aPath, writeWasSuccessful);
     }
@@ -212,7 +265,7 @@ void WriteHandler::DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool
 
 void WriteHandler::DeliverFinalListWriteEnd(bool writeWasSuccessful)
 {
-    if (mProcessingAttributePath.HasValue() && mProcessingAttributeIsList)
+    if (mProcessingAttributePath.HasValue() && mStateFlags.Has(StateBits::kProcessingAttributeIsList))
     {
         DeliverListWriteEnd(mProcessingAttributePath.Value(), writeWasSuccessful);
     }
@@ -221,7 +274,8 @@ void WriteHandler::DeliverFinalListWriteEnd(bool writeWasSuccessful)
 
 CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSuccessful)
 {
-    VerifyOrReturnError(mProcessingAttributePath.HasValue() && mProcessingAttributeIsList, CHIP_NO_ERROR);
+    VerifyOrReturnError(mProcessingAttributePath.HasValue() && mStateFlags.Has(StateBits::kProcessingAttributeIsList),
+                        CHIP_NO_ERROR);
 
     Credentials::GroupDataProvider::GroupEndpoint mapping;
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
@@ -280,7 +334,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mExchangeCtx, CHIP_ERROR_INTERNAL);
     const Access::SubjectDescriptor subjectDescriptor = mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
@@ -303,10 +357,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
 
-        const auto attributeMetadata = GetAttributeMetadata(dataAttributePath);
-        bool currentAttributeIsList  = (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
-
-        if (!dataAttributePath.IsListOperation() && currentAttributeIsList)
+        if (!dataAttributePath.IsListOperation() && IsListAttributePath(dataAttributePath).value_or(false))
         {
             dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         }
@@ -321,18 +372,20 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             continue;
         }
 
-        if (ShouldReportListWriteEnd(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath))
+        if (ShouldReportListWriteEnd(mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList),
+                                     dataAttributePath))
         {
-            DeliverListWriteEnd(mProcessingAttributePath.Value(), mAttributeWriteSuccessful);
+            DeliverListWriteEnd(mProcessingAttributePath.Value(), mStateFlags.Has(StateBits::kAttributeWriteSuccessful));
         }
 
-        if (ShouldReportListWriteBegin(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath))
+        if (ShouldReportListWriteBegin(mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList),
+                                       dataAttributePath))
         {
             DeliverListWriteBegin(dataAttributePath);
-            mAttributeWriteSuccessful = true;
+            mStateFlags.Set(StateBits::kAttributeWriteSuccessful);
         }
 
-        mProcessingAttributeIsList = dataAttributePath.IsListOperation();
+        mStateFlags.Set(StateBits::kProcessingAttributeIsList, dataAttributePath.IsListOperation());
         mProcessingAttributePath.SetValue(dataAttributePath);
 
         DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
@@ -351,7 +404,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             err = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
-        err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, dataReader, this);
+        err = WriteClusterData(subjectDescriptor, dataAttributePath, dataReader);
         if (err != CHIP_NO_ERROR)
         {
             mWriteResponseBuilder.GetWriteResponses().Rollback(backup);
@@ -370,9 +423,9 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
 
     SuccessOrExit(err);
 
-    if (!mHasMoreChunks)
+    if (!mStateFlags.Has(StateBits::kHasMoreChunks))
     {
-        DeliverFinalListWriteEnd(mAttributeWriteSuccessful);
+        DeliverFinalListWriteEnd(mStateFlags.Has(StateBits::kAttributeWriteSuccessful));
     }
 
 exit:
@@ -383,7 +436,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mExchangeCtx, CHIP_ERROR_INTERNAL);
     const Access::SubjectDescriptor subjectDescriptor =
         mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetSubjectDescriptor();
 
@@ -397,10 +450,6 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         AttributePathIB::Parser attributePath;
         ConcreteDataAttributePath dataAttributePath;
         TLV::TLVReader reader = aAttributeDataIBsReader;
-
-        Credentials::GroupDataProvider::GroupEndpoint mapping;
-        Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
-        Credentials::GroupDataProvider::EndpointIterator * iterator;
 
         err = element.Init(reader);
         SuccessOrExit(err);
@@ -423,16 +472,17 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
                       "Received group attribute write for Group=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                       groupId, ChipLogValueMEI(dataAttributePath.mClusterId), ChipLogValueMEI(dataAttributePath.mAttributeId));
 
-        iterator = groupDataProvider->IterateEndpoints(fabric);
-        VerifyOrExit(iterator != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        AutoReleaseGroupEndpointIterator iterator(Credentials::GetGroupDataProvider()->IterateEndpoints(fabric));
+        VerifyOrExit(!iterator.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-        bool shouldReportListWriteEnd =
-            ShouldReportListWriteEnd(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath);
+        bool shouldReportListWriteEnd = ShouldReportListWriteEnd(
+            mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList), dataAttributePath);
         bool shouldReportListWriteBegin = false; // This will be set below.
 
-        const EmberAfAttributeMetadata * attributeMetadata = nullptr;
+        std::optional<bool> isListAttribute = std::nullopt;
 
-        while (iterator->Next(mapping))
+        Credentials::GroupDataProvider::GroupEndpoint mapping;
+        while (iterator.Next(mapping))
         {
             if (groupId != mapping.group_id)
             {
@@ -444,11 +494,11 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             // Try to get the metadata from for the attribute from one of the expanded endpoints (it doesn't really matter which
             // endpoint we pick, as long as it's valid) and update the path info according to it and recheck if we need to report
             // list write begin.
-            if (attributeMetadata == nullptr)
+            if (!isListAttribute.has_value())
             {
-                attributeMetadata = GetAttributeMetadata(dataAttributePath);
-                bool currentAttributeIsList =
-                    (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
+                isListAttribute             = IsListAttributePath(dataAttributePath);
+                bool currentAttributeIsList = isListAttribute.value_or(false);
+
                 if (!dataAttributePath.IsListOperation() && currentAttributeIsList)
                 {
                     dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
@@ -457,7 +507,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
                                                                         dataAttributePath.mEndpointId, dataAttributePath.mListOp,
                                                                         dataAttributePath.mListIndex);
                 shouldReportListWriteBegin =
-                    ShouldReportListWriteBegin(mProcessingAttributePath, mProcessingAttributeIsList, pathForCheckingListWriteBegin);
+                    ShouldReportListWriteBegin(mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList),
+                                               pathForCheckingListWriteBegin);
             }
 
             if (shouldReportListWriteEnd)
@@ -497,12 +548,11 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
             DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
                                                                   DataModelCallbacks::OperationOrder::Pre, dataAttributePath);
-            err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, tmpDataReader, this);
-
+            err = WriteClusterData(subjectDescriptor, dataAttributePath, tmpDataReader);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement,
-                             "WriteSingleClusterData Endpoint=%u Cluster=" ChipLogFormatMEI " Attribute =" ChipLogFormatMEI
+                             "WriteClusterData Endpoint=%u Cluster=" ChipLogFormatMEI " Attribute =" ChipLogFormatMEI
                              " failed: %" CHIP_ERROR_FORMAT,
                              mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                              ChipLogValueMEI(dataAttributePath.mAttributeId), err.Format());
@@ -512,9 +562,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         }
 
         dataAttributePath.mEndpointId = kInvalidEndpointId;
-        mProcessingAttributeIsList    = dataAttributePath.IsListOperation();
+        mStateFlags.Set(StateBits::kProcessingAttributeIsList, dataAttributePath.IsListOperation());
         mProcessingAttributePath.SetValue(dataAttributePath);
-        iterator->Release();
     }
 
     if (CHIP_END_OF_TLV == err)
@@ -549,6 +598,8 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     // our callees hand out Status as well.
     Status status = Status::InvalidAction;
 
+    mLastSuccessfullyWrittenPath = std::nullopt;
+
     reader.Init(std::move(aPayload));
 
     err = writeRequestParser.Init(reader);
@@ -556,25 +607,34 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     writeRequestParser.PrettyPrint();
-#endif
-    err = writeRequestParser.GetSuppressResponse(&mSuppressResponse);
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
+    bool boolValue;
+
+    boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
+    err       = writeRequestParser.GetSuppressResponse(&boolValue);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
 
-    err = writeRequestParser.GetTimedRequest(&mIsTimedRequest);
+    boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
+    err       = writeRequestParser.GetTimedRequest(&boolValue);
     SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 
-    err = writeRequestParser.GetMoreChunkedMessages(&mHasMoreChunks);
+    boolValue = mStateFlags.Has(StateBits::kHasMoreChunks);
+    err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
     if (err == CHIP_ERROR_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kHasMoreChunks, boolValue);
 
-    if (mHasMoreChunks && (mExchangeCtx->IsGroupExchangeContext() || mIsTimedRequest))
+    if (mStateFlags.Has(StateBits::kHasMoreChunks) &&
+        (mExchangeCtx->IsGroupExchangeContext() || mStateFlags.Has(StateBits::kIsTimedRequest)))
     {
         // Sanity check: group exchange context should only have one chunk.
         // Also, timed requests should not have more than one chunk.
@@ -584,7 +644,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     err = writeRequestParser.GetWriteRequests(&AttributeDataIBsParser);
     SuccessOrExit(err);
 
-    if (mIsTimedRequest != aIsTimedWrite)
+    if (mStateFlags.Has(StateBits::kIsTimedRequest) != aIsTimedWrite)
     {
         // The message thinks it should be part of a timed interaction but it's
         // not, or vice versa.
@@ -641,7 +701,7 @@ CHIP_ERROR WriteHandler::AddStatusInternal(const ConcreteDataAttributePath & aPa
 
     if (!aStatus.IsSuccess())
     {
-        mAttributeWriteSuccessful = false;
+        mStateFlags.Clear(StateBits::kAttributeWriteSuccessful);
     }
 
     ReturnErrorOnFailure(writeResponses.GetError());
@@ -689,6 +749,29 @@ void WriteHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
+}
+
+CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
+                                          TLV::TLVReader & aData)
+{
+    // Writes do not have a checked-path. If data model interface is enabled (both checked and only version)
+    // the write is done via the DataModel interface
+    VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    DataModel::WriteAttributeRequest request;
+
+    request.path                = aPath;
+    request.subjectDescriptor   = &aSubject;
+    request.previousSuccessPath = mLastSuccessfullyWrittenPath;
+    request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
+
+    AttributeValueDecoder decoder(aData, aSubject);
+
+    DataModel::ActionReturnStatus status = mDataModelProvider->WriteAttribute(request, decoder);
+
+    mLastSuccessfullyWrittenPath = status.IsSuccess() ? std::make_optional(aPath) : std::nullopt;
+
+    return AddStatusInternal(aPath, StatusIB(status.GetStatusCode()));
 }
 
 } // namespace app

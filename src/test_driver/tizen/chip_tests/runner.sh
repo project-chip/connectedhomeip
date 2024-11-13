@@ -21,6 +21,10 @@ set -e
 # Print CHIP logs on stdout
 dlogutil CHIP &
 
+# Set the correct path for .gcda files
+export GCOV_PREFIX=/mnt/chip
+export GCOV_PREFIX_STRIP=5
+
 FAILED=()
 STATUS=0
 
@@ -43,7 +47,7 @@ while IFS= read -r TEST; do
         echo -e "DONE: \e[31mFAIL\e[0m"
     fi
 
-done < <(find /mnt/chip -type f -executable ! -name runner.sh)
+done < <(find /mnt/chip/tests -type f -executable ! -name runner.sh)
 
 if [ ! "$STATUS" -eq 0 ]; then
     echo

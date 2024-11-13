@@ -24,18 +24,19 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 
 static constexpr unsigned kBridgedDeviceBasicInformationClusterRevision = 4;
-static constexpr unsigned kBridgedDeviceBasicInformationFeatureMap      = 0;
 
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
+
+namespace bridge {
 
 CHIP_ERROR BridgedDeviceBasicInformationImpl::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)
 {
     // Registration is done for the bridged device basic information only
     VerifyOrDie(path.mClusterId == app::Clusters::BridgedDeviceBasicInformation::Id);
 
-    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(path.mEndpointId);
+    BridgedDevice * dev = BridgedDeviceManager::Instance().GetDevice(path.mEndpointId);
     VerifyOrReturnError(dev != nullptr, CHIP_ERROR_NOT_FOUND);
 
     switch (path.mAttributeId)
@@ -49,9 +50,12 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Read(const ConcreteReadAttributePa
     case BasicInformation::Attributes::ClusterRevision::Id:
         encoder.Encode(kBridgedDeviceBasicInformationClusterRevision);
         break;
-    case BasicInformation::Attributes::FeatureMap::Id:
-        encoder.Encode(kBridgedDeviceBasicInformationFeatureMap);
-        break;
+    case BasicInformation::Attributes::FeatureMap::Id: {
+        BitMask<Clusters::BridgedDeviceBasicInformation::Feature> features;
+        features.Set(Clusters::BridgedDeviceBasicInformation::Feature::kBridgedICDSupport, dev->IsIcd());
+        encoder.Encode(features);
+    }
+    break;
     case BasicInformation::Attributes::UniqueID::Id:
         encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().uniqueId.c_str()));
         break;
@@ -89,7 +93,7 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Write(const ConcreteDataAttributeP
 {
     VerifyOrDie(path.mClusterId == app::Clusters::BridgedDeviceBasicInformation::Id);
 
-    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(path.mEndpointId);
+    BridgedDevice * dev = BridgedDeviceManager::Instance().GetDevice(path.mEndpointId);
     VerifyOrReturnError(dev != nullptr, CHIP_ERROR_NOT_FOUND);
 
     if (!dev->IsReachable())
@@ -103,3 +107,5 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Write(const ConcreteDataAttributeP
 
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
+
+} // namespace bridge
