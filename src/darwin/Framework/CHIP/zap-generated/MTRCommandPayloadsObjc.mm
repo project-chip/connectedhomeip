@@ -32619,7 +32619,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _imageCodec = @(0);
 
-        _frameRate = @(0);
+        _maxFrameRate = @(0);
 
         _bitRate = @(0);
 
@@ -32639,7 +32639,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRCameraAVStreamManagementClusterSnapshotStreamAllocateParams alloc] init];
 
     other.imageCodec = self.imageCodec;
-    other.frameRate = self.frameRate;
+    other.maxFrameRate = self.maxFrameRate;
     other.bitRate = self.bitRate;
     other.minResolution = self.minResolution;
     other.maxResolution = self.maxResolution;
@@ -32652,7 +32652,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; frameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; >", NSStringFromClass([self class]), _imageCodec, _frameRate, _bitRate, _minResolution, _maxResolution, _quality];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; maxFrameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; >", NSStringFromClass([self class]), _imageCodec, _maxFrameRate, _bitRate, _minResolution, _maxResolution, _quality];
     return descriptionString;
 }
 
@@ -32668,7 +32668,7 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.imageCodec = static_cast<std::remove_reference_t<decltype(encodableStruct.imageCodec)>>(self.imageCodec.unsignedCharValue);
     }
     {
-        encodableStruct.frameRate = self.frameRate.unsignedShortValue;
+        encodableStruct.maxFrameRate = self.maxFrameRate.unsignedShortValue;
     }
     {
         encodableStruct.bitRate = self.bitRate.unsignedIntValue;

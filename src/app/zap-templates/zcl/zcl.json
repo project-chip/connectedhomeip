@@ -671,7 +671,6 @@
             "MinViewport",
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
-            "CurrentSnapshotConfig",
             "Viewport"
         ]
     },

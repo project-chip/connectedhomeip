@@ -59738,35 +59738,33 @@ public class ChipClusters {
     private static final long MAX_NETWORK_BANDWIDTH_ATTRIBUTE_ID = 11L;
     private static final long CURRENT_FRAME_RATE_ATTRIBUTE_ID = 12L;
     private static final long HDR_MODE_ENABLED_ATTRIBUTE_ID = 13L;
-    private static final long CURRENT_VIDEO_CODECS_ATTRIBUTE_ID = 14L;
-    private static final long CURRENT_SNAPSHOT_CONFIG_ATTRIBUTE_ID = 15L;
-    private static final long FABRICS_USING_CAMERA_ATTRIBUTE_ID = 16L;
-    private static final long ALLOCATED_VIDEO_STREAMS_ATTRIBUTE_ID = 17L;
-    private static final long ALLOCATED_AUDIO_STREAMS_ATTRIBUTE_ID = 18L;
-    private static final long ALLOCATED_SNAPSHOT_STREAMS_ATTRIBUTE_ID = 19L;
-    private static final long RANKED_VIDEO_STREAM_PRIORITIES_LIST_ATTRIBUTE_ID = 20L;
-    private static final long SOFT_RECORDING_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID = 21L;
-    private static final long SOFT_LIVESTREAM_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID = 22L;
-    private static final long HARD_PRIVACY_MODE_ON_ATTRIBUTE_ID = 23L;
-    private static final long NIGHT_VISION_ATTRIBUTE_ID = 24L;
-    private static final long NIGHT_VISION_ILLUM_ATTRIBUTE_ID = 25L;
-    private static final long VIEWPORT_ATTRIBUTE_ID = 26L;
-    private static final long SPEAKER_MUTED_ATTRIBUTE_ID = 27L;
-    private static final long SPEAKER_VOLUME_LEVEL_ATTRIBUTE_ID = 28L;
-    private static final long SPEAKER_MAX_LEVEL_ATTRIBUTE_ID = 29L;
-    private static final long SPEAKER_MIN_LEVEL_ATTRIBUTE_ID = 30L;
-    private static final long MICROPHONE_MUTED_ATTRIBUTE_ID = 31L;
-    private static final long MICROPHONE_VOLUME_LEVEL_ATTRIBUTE_ID = 32L;
-    private static final long MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID = 33L;
-    private static final long MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID = 34L;
-    private static final long MICROPHONE_AGC_ENABLED_ATTRIBUTE_ID = 35L;
-    private static final long IMAGE_ROTATION_ATTRIBUTE_ID = 36L;
-    private static final long IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID = 37L;
-    private static final long IMAGE_FLIP_VERTICAL_ATTRIBUTE_ID = 38L;
-    private static final long LOCAL_VIDEO_RECORDING_ENABLED_ATTRIBUTE_ID = 39L;
-    private static final long LOCAL_SNAPSHOT_RECORDING_ENABLED_ATTRIBUTE_ID = 40L;
-    private static final long STATUS_LIGHT_ENABLED_ATTRIBUTE_ID = 41L;
-    private static final long STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID = 42L;
+    private static final long FABRICS_USING_CAMERA_ATTRIBUTE_ID = 14L;
+    private static final long ALLOCATED_VIDEO_STREAMS_ATTRIBUTE_ID = 15L;
+    private static final long ALLOCATED_AUDIO_STREAMS_ATTRIBUTE_ID = 16L;
+    private static final long ALLOCATED_SNAPSHOT_STREAMS_ATTRIBUTE_ID = 17L;
+    private static final long RANKED_VIDEO_STREAM_PRIORITIES_LIST_ATTRIBUTE_ID = 18L;
+    private static final long SOFT_RECORDING_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID = 19L;
+    private static final long SOFT_LIVESTREAM_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID = 20L;
+    private static final long HARD_PRIVACY_MODE_ON_ATTRIBUTE_ID = 21L;
+    private static final long NIGHT_VISION_ATTRIBUTE_ID = 22L;
+    private static final long NIGHT_VISION_ILLUM_ATTRIBUTE_ID = 23L;
+    private static final long VIEWPORT_ATTRIBUTE_ID = 24L;
+    private static final long SPEAKER_MUTED_ATTRIBUTE_ID = 25L;
+    private static final long SPEAKER_VOLUME_LEVEL_ATTRIBUTE_ID = 26L;
+    private static final long SPEAKER_MAX_LEVEL_ATTRIBUTE_ID = 27L;
+    private static final long SPEAKER_MIN_LEVEL_ATTRIBUTE_ID = 28L;
+    private static final long MICROPHONE_MUTED_ATTRIBUTE_ID = 29L;
+    private static final long MICROPHONE_VOLUME_LEVEL_ATTRIBUTE_ID = 30L;
+    private static final long MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID = 31L;
+    private static final long MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID = 32L;
+    private static final long MICROPHONE_AGC_ENABLED_ATTRIBUTE_ID = 33L;
+    private static final long IMAGE_ROTATION_ATTRIBUTE_ID = 34L;
+    private static final long IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID = 35L;
+    private static final long IMAGE_FLIP_VERTICAL_ATTRIBUTE_ID = 36L;
+    private static final long LOCAL_VIDEO_RECORDING_ENABLED_ATTRIBUTE_ID = 37L;
+    private static final long LOCAL_SNAPSHOT_RECORDING_ENABLED_ATTRIBUTE_ID = 38L;
+    private static final long STATUS_LIGHT_ENABLED_ATTRIBUTE_ID = 39L;
+    private static final long STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID = 40L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -59980,11 +59978,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer frameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality) {
-      snapshotStreamAllocate(callback, imageCodec, frameRate, bitRate, minResolution, maxResolution, quality, 0);
+    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer maxFrameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality) {
+      snapshotStreamAllocate(callback, imageCodec, maxFrameRate, bitRate, minResolution, maxResolution, quality, 0);
     }
 
-    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer frameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality, int timedInvokeTimeoutMs) {
+    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer maxFrameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality, int timedInvokeTimeoutMs) {
       final long commandId = 7L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -59992,9 +59990,9 @@ public class ChipClusters {
       BaseTLVType imageCodectlvValue = new UIntType(imageCodec);
       elements.add(new StructElement(imageCodecFieldID, imageCodectlvValue));
 
-      final long frameRateFieldID = 1L;
-      BaseTLVType frameRatetlvValue = new UIntType(frameRate);
-      elements.add(new StructElement(frameRateFieldID, frameRatetlvValue));
+      final long maxFrameRateFieldID = 1L;
+      BaseTLVType maxFrameRatetlvValue = new UIntType(maxFrameRate);
+      elements.add(new StructElement(maxFrameRateFieldID, maxFrameRatetlvValue));
 
       final long bitRateFieldID = 2L;
       BaseTLVType bitRatetlvValue = new UIntType(bitRate);
@@ -60128,14 +60126,6 @@ public class ChipClusters {
 
     public interface SupportedSnapshotParamsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct> value);
-    }
-
-    public interface CurrentVideoCodecsAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Integer> value);
-    }
-
-    public interface CurrentSnapshotConfigAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct value);
     }
 
     public interface FabricsUsingCameraAttributeCallback extends BaseAttributeCallback {
@@ -60551,58 +60541,6 @@ public class ChipClusters {
         }, HDR_MODE_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readCurrentVideoCodecsAttribute(
-        CurrentVideoCodecsAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_VIDEO_CODECS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CURRENT_VIDEO_CODECS_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeCurrentVideoCodecsAttribute(
-        CurrentVideoCodecsAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_VIDEO_CODECS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CURRENT_VIDEO_CODECS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readCurrentSnapshotConfigAttribute(
-        CurrentSnapshotConfigAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SNAPSHOT_CONFIG_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CURRENT_SNAPSHOT_CONFIG_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeCurrentSnapshotConfigAttribute(
-        CurrentSnapshotConfigAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SNAPSHOT_CONFIG_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CURRENT_SNAPSHOT_CONFIG_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readFabricsUsingCameraAttribute(
         FabricsUsingCameraAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FABRICS_USING_CAMERA_ATTRIBUTE_ID);
@@ -60718,15 +60656,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, RANKED_VIDEO_STREAM_PRIORITIES_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void writeRankedVideoStreamPrioritiesListAttribute(DefaultClusterCallback callback, ArrayList<Integer> value) {
-      writeRankedVideoStreamPrioritiesListAttribute(callback, value, 0);
-    }
-
-    public void writeRankedVideoStreamPrioritiesListAttribute(DefaultClusterCallback callback, ArrayList<Integer> value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> new UIntType(elementvalue));
-      writeAttribute(new WriteAttributesCallbackImpl(callback), RANKED_VIDEO_STREAM_PRIORITIES_LIST_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeRankedVideoStreamPrioritiesListAttribute(

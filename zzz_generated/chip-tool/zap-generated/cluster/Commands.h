@@ -13736,35 +13736,33 @@ private:
 | * MaxNetworkBandwidth                                               | 0x000B |
 | * CurrentFrameRate                                                  | 0x000C |
 | * HDRModeEnabled                                                    | 0x000D |
-| * CurrentVideoCodecs                                                | 0x000E |
-| * CurrentSnapshotConfig                                             | 0x000F |
-| * FabricsUsingCamera                                                | 0x0010 |
-| * AllocatedVideoStreams                                             | 0x0011 |
-| * AllocatedAudioStreams                                             | 0x0012 |
-| * AllocatedSnapshotStreams                                          | 0x0013 |
-| * RankedVideoStreamPrioritiesList                                   | 0x0014 |
-| * SoftRecordingPrivacyModeEnabled                                   | 0x0015 |
-| * SoftLivestreamPrivacyModeEnabled                                  | 0x0016 |
-| * HardPrivacyModeOn                                                 | 0x0017 |
-| * NightVision                                                       | 0x0018 |
-| * NightVisionIllum                                                  | 0x0019 |
-| * Viewport                                                          | 0x001A |
-| * SpeakerMuted                                                      | 0x001B |
-| * SpeakerVolumeLevel                                                | 0x001C |
-| * SpeakerMaxLevel                                                   | 0x001D |
-| * SpeakerMinLevel                                                   | 0x001E |
-| * MicrophoneMuted                                                   | 0x001F |
-| * MicrophoneVolumeLevel                                             | 0x0020 |
-| * MicrophoneMaxLevel                                                | 0x0021 |
-| * MicrophoneMinLevel                                                | 0x0022 |
-| * MicrophoneAGCEnabled                                              | 0x0023 |
-| * ImageRotation                                                     | 0x0024 |
-| * ImageFlipHorizontal                                               | 0x0025 |
-| * ImageFlipVertical                                                 | 0x0026 |
-| * LocalVideoRecordingEnabled                                        | 0x0027 |
-| * LocalSnapshotRecordingEnabled                                     | 0x0028 |
-| * StatusLightEnabled                                                | 0x0029 |
-| * StatusLightBrightness                                             | 0x002A |
+| * FabricsUsingCamera                                                | 0x000E |
+| * AllocatedVideoStreams                                             | 0x000F |
+| * AllocatedAudioStreams                                             | 0x0010 |
+| * AllocatedSnapshotStreams                                          | 0x0011 |
+| * RankedVideoStreamPrioritiesList                                   | 0x0012 |
+| * SoftRecordingPrivacyModeEnabled                                   | 0x0013 |
+| * SoftLivestreamPrivacyModeEnabled                                  | 0x0014 |
+| * HardPrivacyModeOn                                                 | 0x0015 |
+| * NightVision                                                       | 0x0016 |
+| * NightVisionIllum                                                  | 0x0017 |
+| * Viewport                                                          | 0x0018 |
+| * SpeakerMuted                                                      | 0x0019 |
+| * SpeakerVolumeLevel                                                | 0x001A |
+| * SpeakerMaxLevel                                                   | 0x001B |
+| * SpeakerMinLevel                                                   | 0x001C |
+| * MicrophoneMuted                                                   | 0x001D |
+| * MicrophoneVolumeLevel                                             | 0x001E |
+| * MicrophoneMaxLevel                                                | 0x001F |
+| * MicrophoneMinLevel                                                | 0x0020 |
+| * MicrophoneAGCEnabled                                              | 0x0021 |
+| * ImageRotation                                                     | 0x0022 |
+| * ImageFlipHorizontal                                               | 0x0023 |
+| * ImageFlipVertical                                                 | 0x0024 |
+| * LocalVideoRecordingEnabled                                        | 0x0025 |
+| * LocalSnapshotRecordingEnabled                                     | 0x0026 |
+| * StatusLightEnabled                                                | 0x0027 |
+| * StatusLightBrightness                                             | 0x0028 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -14004,7 +14002,7 @@ public:
         mComplex_MaxResolution(&mRequest.maxResolution)
     {
         AddArgument("ImageCodec", 0, UINT8_MAX, &mRequest.imageCodec);
-        AddArgument("FrameRate", 0, UINT16_MAX, &mRequest.frameRate);
+        AddArgument("MaxFrameRate", 0, UINT16_MAX, &mRequest.maxFrameRate);
         AddArgument("BitRate", 0, UINT32_MAX, &mRequest.bitRate);
         AddArgument("MinResolution", &mComplex_MinResolution);
         AddArgument("MaxResolution", &mComplex_MaxResolution);
@@ -26768,8 +26766,6 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "max-network-bandwidth", Attributes::MaxNetworkBandwidth::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "current-frame-rate", Attributes::CurrentFrameRate::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "hdrmode-enabled", Attributes::HDRModeEnabled::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "current-video-codecs", Attributes::CurrentVideoCodecs::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "current-snapshot-config", Attributes::CurrentSnapshotConfig::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig),     //
@@ -26844,12 +26840,6 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "hdrmode-enabled", 0, 1, Attributes::HDRModeEnabled::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum>>>(
-            Id, "current-video-codecs", Attributes::CurrentVideoCodecs::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type>>(
-            Id, "current-snapshot-config", Attributes::CurrentSnapshotConfig::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::FabricIndex>>>(
             Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
@@ -26866,8 +26856,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamTypeEnum>>>(
-            Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id, WriteCommandType::kWrite,
-            credsIssuerConfig), //
+            Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id,
+            WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "soft-recording-privacy-mode-enabled", 0, 1,
                                           Attributes::SoftRecordingPrivacyModeEnabled::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
@@ -26947,8 +26937,6 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "max-network-bandwidth", Attributes::MaxNetworkBandwidth::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "current-frame-rate", Attributes::CurrentFrameRate::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "hdrmode-enabled", Attributes::HDRModeEnabled::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "current-video-codecs", Attributes::CurrentVideoCodecs::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "current-snapshot-config", Attributes::CurrentSnapshotConfig::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig), //

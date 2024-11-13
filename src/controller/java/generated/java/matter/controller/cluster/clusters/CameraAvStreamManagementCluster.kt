@@ -133,29 +133,6 @@ class CameraAvStreamManagementCluster(
     object SubscriptionEstablished : SupportedSnapshotParamsAttributeSubscriptionState()
   }
 
-  class CurrentVideoCodecsAttribute(val value: List<UByte>?)
-
-  sealed class CurrentVideoCodecsAttributeSubscriptionState {
-    data class Success(val value: List<UByte>?) : CurrentVideoCodecsAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : CurrentVideoCodecsAttributeSubscriptionState()
-
-    object SubscriptionEstablished : CurrentVideoCodecsAttributeSubscriptionState()
-  }
-
-  class CurrentSnapshotConfigAttribute(
-    val value: CameraAvStreamManagementClusterSnapshotParamsStruct?
-  )
-
-  sealed class CurrentSnapshotConfigAttributeSubscriptionState {
-    data class Success(val value: CameraAvStreamManagementClusterSnapshotParamsStruct?) :
-      CurrentSnapshotConfigAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : CurrentSnapshotConfigAttributeSubscriptionState()
-
-    object SubscriptionEstablished : CurrentSnapshotConfigAttributeSubscriptionState()
-  }
-
   class FabricsUsingCameraAttribute(val value: List<UByte>)
 
   sealed class FabricsUsingCameraAttributeSubscriptionState {
@@ -511,7 +488,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun snapshotStreamAllocate(
     imageCodec: UByte,
-    frameRate: UShort,
+    maxFrameRate: UShort,
     bitRate: UInt,
     minResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
     maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
@@ -526,8 +503,8 @@ class CameraAvStreamManagementCluster(
     val TAG_IMAGE_CODEC_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_IMAGE_CODEC_REQ), imageCodec)
 
-    val TAG_FRAME_RATE_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_FRAME_RATE_REQ), frameRate)
+    val TAG_MAX_FRAME_RATE_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_MAX_FRAME_RATE_REQ), maxFrameRate)
 
     val TAG_BIT_RATE_REQ: Int = 2
     tlvWriter.put(ContextSpecificTag(TAG_BIT_RATE_REQ), bitRate)
@@ -2039,206 +2016,8 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readCurrentVideoCodecsAttribute(): CurrentVideoCodecsAttribute {
-    val ATTRIBUTE_ID: UInt = 14u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Currentvideocodecs attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UByte>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<UByte> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      } else {
-        null
-      }
-
-    return CurrentVideoCodecsAttribute(decodedValue)
-  }
-
-  suspend fun subscribeCurrentVideoCodecsAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<CurrentVideoCodecsAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 14u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            CurrentVideoCodecsAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Currentvideocodecs attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UByte>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<UByte> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(tlvReader.getUByte(AnonymousTag))
-                }
-                tlvReader.exitContainer()
-              }
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(CurrentVideoCodecsAttributeSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(CurrentVideoCodecsAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readCurrentSnapshotConfigAttribute(): CurrentSnapshotConfigAttribute {
-    val ATTRIBUTE_ID: UInt = 15u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Currentsnapshotconfig attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: CameraAvStreamManagementClusterSnapshotParamsStruct? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        CameraAvStreamManagementClusterSnapshotParamsStruct.fromTlv(AnonymousTag, tlvReader)
-      } else {
-        null
-      }
-
-    return CurrentSnapshotConfigAttribute(decodedValue)
-  }
-
-  suspend fun subscribeCurrentSnapshotConfigAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<CurrentSnapshotConfigAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 15u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            CurrentSnapshotConfigAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Currentsnapshotconfig attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: CameraAvStreamManagementClusterSnapshotParamsStruct? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              CameraAvStreamManagementClusterSnapshotParamsStruct.fromTlv(AnonymousTag, tlvReader)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(CurrentSnapshotConfigAttributeSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(CurrentSnapshotConfigAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
   suspend fun readFabricsUsingCameraAttribute(): FabricsUsingCameraAttribute {
-    val ATTRIBUTE_ID: UInt = 16u
+    val ATTRIBUTE_ID: UInt = 14u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2279,7 +2058,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<FabricsUsingCameraAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 16u
+    val ATTRIBUTE_ID: UInt = 14u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2335,7 +2114,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readAllocatedVideoStreamsAttribute(): AllocatedVideoStreamsAttribute {
-    val ATTRIBUTE_ID: UInt = 17u
+    val ATTRIBUTE_ID: UInt = 15u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2380,7 +2159,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<AllocatedVideoStreamsAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 17u
+    val ATTRIBUTE_ID: UInt = 15u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2445,7 +2224,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readAllocatedAudioStreamsAttribute(): AllocatedAudioStreamsAttribute {
-    val ATTRIBUTE_ID: UInt = 18u
+    val ATTRIBUTE_ID: UInt = 16u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2490,7 +2269,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<AllocatedAudioStreamsAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 18u
+    val ATTRIBUTE_ID: UInt = 16u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2555,7 +2334,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readAllocatedSnapshotStreamsAttribute(): AllocatedSnapshotStreamsAttribute {
-    val ATTRIBUTE_ID: UInt = 19u
+    val ATTRIBUTE_ID: UInt = 17u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2602,7 +2381,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<AllocatedSnapshotStreamsAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 19u
+    val ATTRIBUTE_ID: UInt = 17u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2668,7 +2447,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun readRankedVideoStreamPrioritiesListAttribute():
     RankedVideoStreamPrioritiesListAttribute {
-    val ATTRIBUTE_ID: UInt = 20u
+    val ATTRIBUTE_ID: UInt = 18u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2711,58 +2490,11 @@ class CameraAvStreamManagementCluster(
     return RankedVideoStreamPrioritiesListAttribute(decodedValue)
   }
 
-  suspend fun writeRankedVideoStreamPrioritiesListAttribute(
-    value: List<UByte>,
-    timedWriteTimeout: Duration? = null,
-  ) {
-    val ATTRIBUTE_ID: UInt = 20u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startArray(AnonymousTag)
-    for (item in value.iterator()) {
-      tlvWriter.put(AnonymousTag, item)
-    }
-    tlvWriter.endArray()
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
   suspend fun subscribeRankedVideoStreamPrioritiesListAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<RankedVideoStreamPrioritiesListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 20u
+    val ATTRIBUTE_ID: UInt = 18u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2824,7 +2556,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readSoftRecordingPrivacyModeEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 21u
+    val ATTRIBUTE_ID: UInt = 19u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2865,7 +2597,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 21u
+    val ATTRIBUTE_ID: UInt = 19u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2908,7 +2640,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 21u
+    val ATTRIBUTE_ID: UInt = 19u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2962,7 +2694,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readSoftLivestreamPrivacyModeEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 22u
+    val ATTRIBUTE_ID: UInt = 20u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3003,7 +2735,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 22u
+    val ATTRIBUTE_ID: UInt = 20u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3046,7 +2778,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 22u
+    val ATTRIBUTE_ID: UInt = 20u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3100,7 +2832,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readHardPrivacyModeOnAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 23u
+    val ATTRIBUTE_ID: UInt = 21u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3139,7 +2871,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 23u
+    val ATTRIBUTE_ID: UInt = 21u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3193,7 +2925,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readNightVisionAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 24u
+    val ATTRIBUTE_ID: UInt = 22u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3229,7 +2961,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeNightVisionAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 24u
+    val ATTRIBUTE_ID: UInt = 22u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3272,7 +3004,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 24u
+    val ATTRIBUTE_ID: UInt = 22u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3324,7 +3056,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readNightVisionIllumAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 25u
+    val ATTRIBUTE_ID: UInt = 23u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3360,7 +3092,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeNightVisionIllumAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 25u
+    val ATTRIBUTE_ID: UInt = 23u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3403,7 +3135,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 25u
+    val ATTRIBUTE_ID: UInt = 23u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3457,7 +3189,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readViewportAttribute(): ViewportAttribute {
-    val ATTRIBUTE_ID: UInt = 26u
+    val ATTRIBUTE_ID: UInt = 24u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3496,7 +3228,7 @@ class CameraAvStreamManagementCluster(
     value: CameraAvStreamManagementClusterViewportStruct,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 26u
+    val ATTRIBUTE_ID: UInt = 24u
 
     val tlvWriter = TlvWriter()
     value.toTlv(AnonymousTag, tlvWriter)
@@ -3539,7 +3271,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<ViewportAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 26u
+    val ATTRIBUTE_ID: UInt = 24u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3591,7 +3323,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readSpeakerMutedAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 27u
+    val ATTRIBUTE_ID: UInt = 25u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3627,7 +3359,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeSpeakerMutedAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 27u
+    val ATTRIBUTE_ID: UInt = 25u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3670,7 +3402,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 27u
+    val ATTRIBUTE_ID: UInt = 25u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3722,7 +3454,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readSpeakerVolumeLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 28u
+    val ATTRIBUTE_ID: UInt = 26u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3758,7 +3490,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeSpeakerVolumeLevelAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 28u
+    val ATTRIBUTE_ID: UInt = 26u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3801,7 +3533,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 28u
+    val ATTRIBUTE_ID: UInt = 26u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3855,7 +3587,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readSpeakerMaxLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 29u
+    val ATTRIBUTE_ID: UInt = 27u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3894,7 +3626,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 29u
+    val ATTRIBUTE_ID: UInt = 27u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3948,7 +3680,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readSpeakerMinLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 30u
+    val ATTRIBUTE_ID: UInt = 28u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3987,7 +3719,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 30u
+    val ATTRIBUTE_ID: UInt = 28u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4041,7 +3773,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readMicrophoneMutedAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 31u
+    val ATTRIBUTE_ID: UInt = 29u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4077,7 +3809,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeMicrophoneMutedAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 31u
+    val ATTRIBUTE_ID: UInt = 29u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4120,7 +3852,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 31u
+    val ATTRIBUTE_ID: UInt = 29u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4174,7 +3906,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readMicrophoneVolumeLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 32u
+    val ATTRIBUTE_ID: UInt = 30u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4213,7 +3945,7 @@ class CameraAvStreamManagementCluster(
     value: UByte,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 32u
+    val ATTRIBUTE_ID: UInt = 30u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4256,7 +3988,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 32u
+    val ATTRIBUTE_ID: UInt = 30u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4310,7 +4042,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readMicrophoneMaxLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 33u
+    val ATTRIBUTE_ID: UInt = 31u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4349,7 +4081,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 33u
+    val ATTRIBUTE_ID: UInt = 31u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4403,7 +4135,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readMicrophoneMinLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 34u
+    val ATTRIBUTE_ID: UInt = 32u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4442,7 +4174,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 34u
+    val ATTRIBUTE_ID: UInt = 32u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4496,7 +4228,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readMicrophoneAGCEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 35u
+    val ATTRIBUTE_ID: UInt = 33u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4535,7 +4267,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 35u
+    val ATTRIBUTE_ID: UInt = 33u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4578,7 +4310,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 35u
+    val ATTRIBUTE_ID: UInt = 33u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4632,7 +4364,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readImageRotationAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 36u
+    val ATTRIBUTE_ID: UInt = 34u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4668,7 +4400,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeImageRotationAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 36u
+    val ATTRIBUTE_ID: UInt = 34u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4711,7 +4443,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 36u
+    val ATTRIBUTE_ID: UInt = 34u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4763,7 +4495,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readImageFlipHorizontalAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 37u
+    val ATTRIBUTE_ID: UInt = 35u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4802,7 +4534,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 37u
+    val ATTRIBUTE_ID: UInt = 35u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4845,7 +4577,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 37u
+    val ATTRIBUTE_ID: UInt = 35u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4899,7 +4631,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readImageFlipVerticalAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 38u
+    val ATTRIBUTE_ID: UInt = 36u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4935,7 +4667,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeImageFlipVerticalAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 38u
+    val ATTRIBUTE_ID: UInt = 36u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4978,7 +4710,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 38u
+    val ATTRIBUTE_ID: UInt = 36u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5032,7 +4764,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readLocalVideoRecordingEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 39u
+    val ATTRIBUTE_ID: UInt = 37u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5071,7 +4803,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 39u
+    val ATTRIBUTE_ID: UInt = 37u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5114,7 +4846,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 39u
+    val ATTRIBUTE_ID: UInt = 37u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5168,7 +4900,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readLocalSnapshotRecordingEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 40u
+    val ATTRIBUTE_ID: UInt = 38u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5209,7 +4941,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 40u
+    val ATTRIBUTE_ID: UInt = 38u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5252,7 +4984,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 40u
+    val ATTRIBUTE_ID: UInt = 38u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5306,7 +5038,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readStatusLightEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 41u
+    val ATTRIBUTE_ID: UInt = 39u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5345,7 +5077,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 41u
+    val ATTRIBUTE_ID: UInt = 39u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5388,7 +5120,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 41u
+    val ATTRIBUTE_ID: UInt = 39u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5442,7 +5174,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readStatusLightBrightnessAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 42u
+    val ATTRIBUTE_ID: UInt = 40u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5481,7 +5213,7 @@ class CameraAvStreamManagementCluster(
     value: UByte,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 42u
+    val ATTRIBUTE_ID: UInt = 40u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5524,7 +5256,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 42u
+    val ATTRIBUTE_ID: UInt = 40u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)

@@ -18563,16 +18563,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("HDRModeEnabled", 1, value);
         }
-        case CameraAvStreamManagement::Attributes::CurrentVideoCodecs::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentVideoCodecs", 1, value);
-        }
-        case CameraAvStreamManagement::Attributes::CurrentSnapshotConfig::Id: {
-            chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentSnapshotConfig", 1, value);
-        }
         case CameraAvStreamManagement::Attributes::FabricsUsingCamera::Id: {
             chip::app::DataModel::DecodableList<chip::FabricIndex> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
