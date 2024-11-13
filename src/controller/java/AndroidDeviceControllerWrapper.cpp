@@ -50,6 +50,7 @@ using namespace TLV;
 
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
+    getICDClientStorage()->Shutdown();
     mController->Shutdown();
 
     if (mKeypairBridge != nullptr)
