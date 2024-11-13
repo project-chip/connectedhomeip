@@ -25,22 +25,6 @@ declare_args() {
   # communicated to OperationalSessionSetup API consumers.
   chip_enable_busy_handling_for_operational_session_setup = true
 
-  # Data model interface usage:
-  #   - disabled: does not use data model interface at all
-  #   - check:    runs BOTH datamodel and non-data-model (if possible) functionality and compares results
-  #   - enabled:  runs only the data model interface (does not use the legacy code)
-  if (matter_enable_recommended && current_os == "linux") {
-    chip_use_data_model_interface = "check"
-  } else {
-    chip_use_data_model_interface = "enabled"
-  }
-
-  # Whether we call `chipDie` on DM `check` errors
-  #
-  # If/once the chip_use_data_model_interface flag is removed or does not support
-  # a `check` option, this should alwo be removed
-  chip_data_model_check_die_on_failure = false
-
   # This controls if more logging is supposed to be enabled into the data models.
   # This is an optimization for small-flash size devices as extra logging requires
   # additional flash for messages & code for formatting.

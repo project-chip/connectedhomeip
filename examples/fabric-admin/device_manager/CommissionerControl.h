@@ -21,6 +21,8 @@
 #include <app/CommandSender.h>
 #include <controller/CHIPDeviceController.h>
 
+namespace admin {
+
 /**
  * @class CommissionerControl
  * @brief This class handles sending CHIP commands related to commissioning, including sending
@@ -123,3 +125,5 @@ private:
     chip::app::Clusters::CommissionerControl::Commands::RequestCommissioningApproval::Type mRequestCommissioningApproval;
     chip::app::Clusters::CommissionerControl::Commands::CommissionNode::Type mCommissionNode;
 };
+
+} // namespace admin

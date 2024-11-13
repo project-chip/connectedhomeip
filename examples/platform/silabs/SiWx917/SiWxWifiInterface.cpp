@@ -28,6 +28,8 @@
 #endif // SL_MATTER_GN_BUILD
 
 #include "FreeRTOS.h"
+#include "WifiInterfaceAbstraction.h"
+#include "WiseconnectInterfaceAbstraction.h"
 #include "ble_config.h"
 #include "dhcp_client.h"
 #include "event_groups.h"
@@ -36,7 +38,6 @@
 #include "sl_wifi_device.h"
 #include "task.h"
 #include "wfx_host_events.h"
-#include "wfx_rsi.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <inet/IPAddress.h>
 #include <lib/support/CHIPMem.h>
@@ -45,7 +46,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 extern "C" {
-#include "sl_net.h"
 #include "sl_si91x_driver.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_types.h"
@@ -53,7 +53,6 @@ extern "C" {
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_types.h"
-#include "wfx_host_events.h"
 #if SL_MBEDTLS_USE_TINYCRYPT
 #include "sl_si91x_constants.h"
 #include "sl_si91x_trng.h"
@@ -74,8 +73,11 @@ extern "C" {
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
+#include "SiWxPlatformInterface.h"
+
 #include "rsi_rom_power_save.h"
-#include "sl_si91x_button_pin_config.h"
+#include "sl_gpio_board.h"
+#include "sl_si91x_driver_gpio.h"
 #include "sl_si91x_power_manager.h"
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 
@@ -201,8 +203,8 @@ constexpr uint16_t kWifiScanTimeoutTicks = 10000;
 
 void DHCPTimerEventHandler(void * arg)
 {
-    WfxEvent_t event = { .eventType = WFX_EVT_DHCP_POLL };
-    sl_matter_wifi_post_event(&event);
+    WifiEvent event = WifiEvent::kStationDhcpPoll;
+    sl_matter_wifi_post_event(event);
 }
 
 void CancelDHCPTimer(void)
@@ -280,7 +282,7 @@ sl_status_t sl_wifi_siwx917_init(void)
                         ChipLogError(DeviceLayer, "sl_si91x_trng_program_key failed: 0x%lx", static_cast<uint32_t>(status)));
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
-    wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
+    wfx_rsi.dev_state.Set(WifiState::kStationInit);
     osSemaphoreRelease(sl_rs_ble_init_sem);
     return status;
 }
@@ -401,11 +403,12 @@ sl_status_t SetWifiConfigurations()
 
 sl_status_t JoinWifiNetwork(void)
 {
-    VerifyOrReturnError(!(wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED)), SL_STATUS_IN_PROGRESS);
+    VerifyOrReturnError(!wfx_rsi.dev_state.HasAny(WifiState::kStationConnecting, WifiState::kStationConnected),
+                        SL_STATUS_IN_PROGRESS);
     sl_status_t status = SL_STATUS_OK;
 
     // Start Join Network
-    wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTING;
+    wfx_rsi.dev_state.Set(WifiState::kStationConnecting);
 
     status = SetWifiConfigurations();
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "Failure to set the Wifi Configurations!"));
@@ -414,9 +417,8 @@ sl_status_t JoinWifiNetwork(void)
 
     if (status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS)
     {
-        WfxEvent_t event;
-        event.eventType = WFX_EVT_STA_CONN;
-        sl_matter_wifi_post_event(&event);
+        WifiEvent event = WifiEvent::kStationConnect;
+        sl_matter_wifi_post_event(event);
         return status;
     }
 
@@ -424,18 +426,50 @@ sl_status_t JoinWifiNetwork(void)
     ChipLogError(DeviceLayer, "sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
     VerifyOrReturnError((wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
 
-    wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
+    wfx_rsi.dev_state.Clear(WifiState::kStationConnecting).Clear(WifiState::kStationConnected);
+
     ChipLogProgress(DeviceLayer, "Connection retry attempt %d", wfx_rsi.join_retries);
     wfx_retry_connection(++wfx_rsi.join_retries);
 
-    WfxEvent_t event;
-    event.eventType = WFX_EVT_STA_START_JOIN;
-    sl_matter_wifi_post_event(&event);
+    WifiEvent event = WifiEvent::kStationStartJoin;
+    sl_matter_wifi_post_event(event);
 
     return status;
 }
 
 } // namespace
+
+/**
+ * @brief Wifi initialization called from app main
+ *
+ * @return sl_status_t Returns underlying Wi-Fi initialization error
+ */
+sl_status_t sl_matter_wifi_platform_init(void)
+{
+    sl_status_t status = SL_STATUS_OK;
+
+    status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
+    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
+
+    // Create Sempaphore for scan completion
+    sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+
+    // Create Semaphore for scan in-progress protection
+    sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+
+    // Create the message queue
+    sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiEvent), nullptr);
+    VerifyOrReturnError(sWifiEventQueue != nullptr, SL_STATUS_ALLOCATION_FAILED);
+
+    // Create timer for DHCP polling
+    // TODO: Use LWIP timer instead of creating a new one here
+    sDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
+    VerifyOrReturnError(sDHCPTimer != nullptr, SL_STATUS_ALLOCATION_FAILED);
+
+    return status;
+}
 
 /******************************************************************
  * @fn   int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t *ap)
@@ -522,23 +556,27 @@ int32_t sl_wifi_platform_disconnect(void)
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
-// Required to invoke button press event during sleep as falling edge is not detected
-void sl_si91x_invoke_btn_press_event(void)
+void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
 {
-    // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
-    if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
+    // UULP_GPIO_2 is used to detect the button 0 press
+    VerifyOrReturn(pin_intr == RTE_UULP_GPIO_2_PIN, ChipLogError(DeviceLayer, "invalid pin interrupt: %ld", pin_intr));
+    sl_status_t status      = SL_STATUS_OK;
+    uint8_t pin_intr_status = sl_si91x_gpio_get_uulp_npss_pin(pin_intr);
+    if (pin_intr_status == LOW)
     {
-        sl_button_on_change(SL_BUTTON_BTN0_NUMBER, 1 /* Button Pressed */);
-        btn0_pressed = true;
+        // BTN_0 is pressed
+        // NOTE: the GPIO is masked since the interrupt is invoked before scheduler is started, thus this is required to hand over
+        // control to scheduler, the PIN is unmasked in the power manager flow before going to sleep
+        status = sl_si91x_gpio_driver_mask_uulp_npss_interrupt(BIT(pin_intr));
+        VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
     }
-    if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
-    {
-        btn0_pressed = false;
-    }
+}
 
+void chip::DeviceLayer::Silabs::SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler(void)
+{
 #ifdef ENABLE_CHIP_SHELL
     // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
-    if (RSI_NPSSGPIO_GetPin(RTE_UULP_GPIO_1_PIN))
+    if (sl_si91x_gpio_get_uulp_npss_pin(RTE_UULP_GPIO_1_PIN))
     {
         if (!ps_requirement_added)
         {
@@ -607,7 +645,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
         if (wfx_rsi.scan_ssid != nullptr &&
             (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, std::min(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
-             CMP_SUCCESS))
+             0))
         {
             continue;
         }
@@ -625,7 +663,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
     }
 
     // cleanup and return
-    wfx_rsi.dev_state &= ~WFX_RSI_ST_SCANSTARTED;
+    wfx_rsi.dev_state.Clear(WifiState::kScanStarted);
     wfx_rsi.scan_cb((wfx_wifi_scan_result_t *) 0);
     wfx_rsi.scan_cb = nullptr;
     if (wfx_rsi.scan_ssid)
@@ -655,7 +693,7 @@ void NotifyConnectivity(void)
 
 void HandleDHCPPolling(void)
 {
-    WfxEvent_t event;
+    WifiEvent event;
 
     // TODO: Notify the application that the interface is not set up or Chipdie here because we are in an unkonwn state
     struct netif * sta_netif = &wifi_client_context.netif;
@@ -667,8 +705,8 @@ void HandleDHCPPolling(void)
     {
         wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
         hasNotifiedIPV4 = true;
-        event.eventType = WFX_EVT_STA_DHCP_DONE;
-        sl_matter_wifi_post_event(&event);
+        event           = WifiEvent::kStationDhcpDone;
+        sl_matter_wifi_post_event(event);
         NotifyConnectivity();
     }
     else if (dhcp_state == DHCP_OFF)
@@ -687,27 +725,27 @@ void HandleDHCPPolling(void)
         ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
         wfx_ipv6_notify(GET_IPV6_SUCCESS);
         hasNotifiedIPV6 = true;
-        event.eventType = WFX_EVT_STA_DHCP_DONE;
-        sl_matter_wifi_post_event(&event);
+        event           = WifiEvent::kStationDhcpDone;
+        sl_matter_wifi_post_event(event);
         NotifyConnectivity();
     }
 }
-
-void sl_matter_wifi_post_event(WfxEvent_t * event)
+void sl_matter_wifi_post_event(WifiEvent event)
 {
-    if (osMessageQueuePut(sWifiEventQueue, event, 0, 0) != osOK)
+    sl_status_t status = osMessageQueuePut(sWifiEventQueue, &event, 0, 0);
+
+    if (status != osOK)
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_post_event: failed to post event.")
-        // TODO: Handle error, requeue event depending on queue size or notify relevant task, Chipdie, etc.
+        ChipLogError(DeviceLayer, "sl_matter_wifi_post_event: failed to post event with status: %ld", status);
+        // TODO: Handle error, requeue event depending on queue size or notify relevant task,
+        // Chipdie, etc.
     }
 }
-
 /// ResetDHCPNotificationFlags
 /// @brief Reset the flags that are used to notify the application about DHCP connectivity
-///        and emits a WFX_EVT_STA_DO_DHCP event to trigger DHCP polling checks. Helper function for ProcessEvent.
+///        and emits a WifiEvent::kStationDoDhcp event to trigger DHCP polling checks. Helper function for ProcessEvent.
 void ResetDHCPNotificationFlags(void)
 {
-    WfxEvent_t outEvent;
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
     hasNotifiedIPV4 = false;
@@ -715,27 +753,30 @@ void ResetDHCPNotificationFlags(void)
     hasNotifiedIPV6             = false;
     hasNotifiedWifiConnectivity = false;
 
-    outEvent.eventType = WFX_EVT_STA_DO_DHCP;
-    sl_matter_wifi_post_event(&outEvent);
+    WifiEvent event = WifiEvent::kStationDoDhcp;
+    sl_matter_wifi_post_event(event);
 }
 
-void ProcessEvent(WfxEvent_t inEvent)
+void ProcessEvent(WifiEvent event)
 {
     // Process event
-    switch (inEvent.eventType)
+    switch (event)
     {
-    case WFX_EVT_STA_CONN:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_STA_CONN");
-        wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTED;
+    case WifiEvent::kStationConnect:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationConnect");
+        wfx_rsi.dev_state.Set(WifiState::kStationConnected);
         ResetDHCPNotificationFlags();
-
         break;
 
-    case WFX_EVT_STA_DISCONN:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_STA_DISCONN");
+    case WifiEvent::kStationDisconnect: {
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationDisconnect");
         // TODO: This event is not being posted anywhere, seems to be a dead code or we are missing something
-        wfx_rsi.dev_state &=
-            ~(WFX_RSI_ST_STA_READY | WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE);
+
+        wfx_rsi.dev_state.Clear(WifiState::kStationReady)
+            .Clear(WifiState::kStationConnecting)
+            .Clear(WifiState::kStationConnected)
+            .Clear(WifiState::kStationDhcpDone);
+
         /* TODO: Implement disconnect notify */
         ResetDHCPNotificationFlags();
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -743,22 +784,20 @@ void ProcessEvent(WfxEvent_t inEvent)
         wfx_ip_changed_notify(IP_STATUS_FAIL);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         wfx_ipv6_notify(GET_IPV6_FAIL);
-        break;
+    }
+    break;
 
-    case WFX_EVT_AP_START:
-        // TODO: Currently unimplemented
-        break;
-    case WFX_EVT_AP_STOP:
+    case WifiEvent::kAPStart:
         // TODO: Currently unimplemented
         break;
 
-    case WFX_EVT_SCAN:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_SCAN");
+    case WifiEvent::kScan:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kScan");
 
 #ifdef SL_WFX_CONFIG_SCAN
-        if (!(wfx_rsi.dev_state & WFX_RSI_ST_SCANSTARTED))
+        if (!(wfx_rsi.dev_state.Has(WifiState::kScanStarted)))
         {
-            ChipLogDetail(DeviceLayer, "WFX_EVT_SCAN");
+            ChipLogDetail(DeviceLayer, "WifiEvent::kScan");
             sl_wifi_scan_configuration_t wifi_scan_configuration;
             memset(&wifi_scan_configuration, 0, sizeof(wifi_scan_configuration));
 
@@ -778,7 +817,7 @@ void ProcessEvent(WfxEvent_t inEvent)
                 return;
             }
 
-            if (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED)
+            if (wfx_rsi.dev_state.Has(WifiState::kStationConnected))
             {
                 /* Terminate with end of scan which is no ap sent back */
                 wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
@@ -789,7 +828,7 @@ void ProcessEvent(WfxEvent_t inEvent)
                 wifi_scan_configuration = default_wifi_scan_configuration;
             }
             sl_wifi_set_scan_callback(bg_scan_callback_handler, nullptr);
-            wfx_rsi.dev_state |= WFX_RSI_ST_SCANSTARTED;
+            wfx_rsi.dev_state.Set(WifiState::kScanStarted);
 
             osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
             status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, nullptr, &wifi_scan_configuration);
@@ -800,64 +839,34 @@ void ProcessEvent(WfxEvent_t inEvent)
 
             osSemaphoreRelease(sScanInProgressSemaphore);
         }
-        break;
 #endif /* SL_WFX_CONFIG_SCAN */
-    case WFX_EVT_STA_START_JOIN:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_STA_START_JOIN");
+        break;
 
-        // Trigger Netwrok scan
+    case WifiEvent::kStationStartJoin:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationStartJoin");
+
         InitiateScan();
-
-        // Joining to the network
         JoinWifiNetwork();
         break;
 
-    case WFX_EVT_STA_DO_DHCP:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_STA_DO_DHCP");
+    case WifiEvent::kStationDoDhcp:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationDoDhcp");
         StartDHCPTimer(WFX_RSI_DHCP_POLL_INTERVAL);
         break;
-    case WFX_EVT_STA_DHCP_DONE:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_STA_DHCP_DONE");
+
+    case WifiEvent::kStationDhcpDone:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationDhcpDone");
         CancelDHCPTimer();
         break;
-    case WFX_EVT_DHCP_POLL:
-        ChipLogDetail(DeviceLayer, "WFX_EVT_DHCP_POLL");
+
+    case WifiEvent::kStationDhcpPoll:
+        ChipLogDetail(DeviceLayer, "WifiEvent::kStationDhcpPoll");
         HandleDHCPPolling();
+        break;
+
     default:
         break;
     }
-}
-
-/**
- * @brief Wifi initialization called from app main
- *
- * @return sl_status_t Returns underlying Wi-Fi initialization error
- */
-sl_status_t sl_matter_wifi_platform_init(void)
-{
-    sl_status_t status = SL_STATUS_OK;
-
-    status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
-    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
-
-    // Create Sempaphore for scan completion
-    sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    // Create Semaphore for scan in-progress protection
-    sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    // Create the message queue
-    sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WfxEvent_t), nullptr);
-    VerifyOrReturnError(sWifiEventQueue != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    // Create timer for DHCP polling
-    // TODO: Use LWIP timer instead of creating a new one here
-    sDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
-    VerifyOrReturnError(sDHCPTimer != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    return status;
 }
 
 /*********************************************************************************
@@ -874,7 +883,7 @@ sl_status_t sl_matter_wifi_platform_init(void)
 void sl_matter_wifi_task(void * arg)
 {
     (void) arg;
-    WfxEvent_t wfxEvent;
+    WifiEvent event;
     sl_status_t status = SL_STATUS_OK;
 
     status = sl_wifi_siwx917_init();
@@ -887,9 +896,9 @@ void sl_matter_wifi_task(void * arg)
     ChipLogDetail(DeviceLayer, "sl_matter_wifi_task: starting event loop");
     for (;;)
     {
-        if (osMessageQueueGet(sWifiEventQueue, &wfxEvent, nullptr, osWaitForever) == osOK)
+        if (osMessageQueueGet(sWifiEventQueue, &event, nullptr, osWaitForever) == osOK)
         {
-            ProcessEvent(wfxEvent);
+            ProcessEvent(event);
         }
         else
         {
@@ -912,15 +921,32 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &HEX_VALUE_FF;
-    wfx_rsi.ip4_addr[1] = (ip >> 8) & HEX_VALUE_FF;
-    wfx_rsi.ip4_addr[2] = (ip >> 16) & HEX_VALUE_FF;
-    wfx_rsi.ip4_addr[3] = (ip >> 24) & HEX_VALUE_FF;
+    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
+    wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
+    wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
     ChipLogDetail(DeviceLayer, "DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
                   wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
-    wfx_rsi.dev_state |= WFX_RSI_ST_STA_DHCP_DONE;
+    wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone).Set(WifiState::kStationReady);
     wfx_ip_changed_notify(IP_STATUS_SUCCESS);
-    wfx_rsi.dev_state |= WFX_RSI_ST_STA_READY;
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+
+#if SL_ICD_ENABLED
+/*********************************************************************
+ * @fn  sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t
+ sl_si91x_wifi_state)
+ * @brief
+ *      Implements the power save in sleepy application
+ * @param[in]  sl_si91x_ble_state : State to set for the BLE
+               sl_si91x_wifi_state : State to set for the WiFi
+ * @return  SL_STATUS_OK if successful,
+ *          SL_STATUS_FAIL otherwise
+ ***********************************************************************/
+sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,
+                           sl_si91x_performance_profile_t sl_si91x_wifi_state) // TODO : Figure out why the extern C is necessary
+{
+    return (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) ? SL_STATUS_FAIL : SL_STATUS_OK);
+}
+#endif
