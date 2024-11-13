@@ -30,7 +30,6 @@
 #include "FreeRTOS.h"
 #include "ble_config.h"
 #include "event_groups.h"
-#include "sl_board_configuration.h"
 #include "sl_status.h"
 #include "sl_wifi_device.h"
 #include "task.h"
@@ -68,6 +67,7 @@ extern "C" {
 
 #if (EXP_BOARD)
 #include "rsi_bt_common_apis.h"
+#include <platform/silabs/wifi/rs911x/platform/sl_board_configuration.h>
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
@@ -874,7 +874,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[0] = (ip) & 0xFF;
     wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
     wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
