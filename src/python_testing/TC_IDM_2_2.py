@@ -86,6 +86,14 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 device_attributes |= self.endpoints[endpoint][cluster].keys()
         return device_attributes
 
+    def verify_attribute_list_cluster(self, read_request: dict, endpoint: int, cluster: ClusterObjects.Cluster):
+        cluster_ids = [c.id for c in read_request[endpoint].keys()]
+        asserts.assert_equal(
+            sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]),
+            sorted(cluster_ids),
+            f"ServerList doesn't match the expected server list for endpoint {endpoint}"
+        )
+
     async def check_attribute_read_for_type(self, desired_attribute_type: type) -> bool:
         # Get all clusters from device
         for cluster in self.device_clusters:
@@ -108,6 +116,32 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 if attributes_of_type_on_device:
                     return True
         return False
+
+    async def read_unsupported_attribute(self):
+        found_unsupported = False
+        for endpoint_id, endpoint in self.endpoints.items():
+            print(endpoint_id, next(iter(endpoint)))
+            if found_unsupported:
+                break
+            for cluster_type, cluster in endpoint.items():
+                if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
+                    continue
+
+                all_attrs = set(list(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys()))
+                dut_attrs = set(cluster[cluster_type.Attributes.AttributeList])
+
+                unsupported = [id for id in list(all_attrs - dut_attrs) if global_attribute_ids.attribute_id_type(id)
+                               == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
+
+                if unsupported:
+                    result = await self.read_single_attribute_expect_error(
+                        endpoint=endpoint_id,
+                        cluster=cluster_type,
+                        attribute=ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]], error=Status.UnsupportedAttribute)
+                    asserts.assert_true(isinstance(result.Reason, InteractionModelError),
+                                        msg="Unexpected success reading invalid attribute")
+                    found_unsupported = True
+                    return
 
     @async_test_body
     async def test_TC_IDM_2_2(self):
@@ -243,9 +277,12 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor])
 
         for endpoint in read_request:
-            asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
-            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList,
-                              read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
+            asserts.assert_in(Clusters.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
+            asserts.assert_in(Clusters.Descriptor.Attributes.AttributeList,
+                              read_request[endpoint][Clusters.Descriptor], "AttributeList not in output")
+            # Is this an actual failure? Only cluster in every endpoint returned is Descriptor, but server lists in each endpoint suggest there should be more clusters
+            # Commented for now
+            # self.verify_attribute_list_cluster(read_request, endpoint, Clusters.Descriptor)
 
         # Step 8
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters at one Endpoint
@@ -264,13 +301,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             asserts.assert_equal(sorted(attribute_ids),
                                     sorted(read_request[0][cluster][cluster.Attributes.AttributeList]),
                                     "Expected attribute list does not match actual list for cluster {cluster} on endpoint 0")
-
-        cluster_ids = [c.id for c in read_request[0].keys()]
-        asserts.assert_equal(
-            sorted(read_request[0][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ServerList]),
-            sorted(cluster_ids),
-            "ServerList doesn't match the expected server list for endpoint 0"
-        )
+            self.verify_attribute_list_cluster(read_request, 0, Clusters.Descriptor)
 
         # Step 9
         # TH sends the Read Request Message to the DUT to read an attribute of data type bool.
@@ -380,36 +411,15 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 result = await self.read_single_attribute_expect_error(endpoint=endpoint_id, cluster=ClusterObjects.ALL_CLUSTERS[unsupported[0]], attribute=unsupported_attribute, error=Status.UnsupportedCluster)
                 asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                     msg="Unexpected success reading invalid cluster")
+            else:
+                print("This step is skipped because there are no unsupported clusters")
 
         # Step 21
         # TH sends the Read Request Message to the DUT to read an unsupported attribute
         # DUT responds with the report data action.
         # Verify on the TH that the DUT sends the status code UNSUPPORTED_ATTRIBUTE
         self.print_step(21, "Send the Read Request Message to the DUT to read any attribute to an unsupported attribute")
-        found_unsupported = False
-        for endpoint_id, endpoint in self.endpoints.items():
-
-            if found_unsupported:
-                break
-            for cluster_type, cluster in endpoint.items():
-                if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
-                    continue
-
-                all_attrs = set(list(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys()))
-                dut_attrs = set(cluster[cluster_type.Attributes.AttributeList])
-
-                unsupported = [id for id in list(all_attrs - dut_attrs) if global_attribute_ids.attribute_id_type(id)
-                               == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
-
-                if unsupported:
-                    result = await self.read_single_attribute_expect_error(
-                        endpoint=endpoint_id,
-                        cluster=cluster_type,
-                        attribute=ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]], error=Status.UnsupportedAttribute)
-                    asserts.assert_true(isinstance(result.Reason, InteractionModelError),
-                                        msg="Unexpected success reading invalid attribute")
-                    found_unsupported = True
-                    break
+        await self.read_unsupported_attribute()
 
         # Step 22
         # TH sends the Read Request Message to the DUT to read an attribute
@@ -566,6 +576,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Hardcode this for now
         non_global_cluster = Clusters.Objects.LaundryWasherControls
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, non_global_cluster)])
+        # read_request_2 = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl)])
+
         asserts.assert_equal(read_request, {})
 
         # Step 31
