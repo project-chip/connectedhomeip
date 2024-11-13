@@ -16,14 +16,14 @@
  */
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
-#include <assert.h>
-#include <gtest/gtest.h>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <memory>
-
-#include "platform/PlatformManager.h"
-#include "platform/internal/BLEManager.h"
+#include <platform/PlatformManager.h>
+#include <platform/internal/BLEManager.h>
 
 void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t)
 {

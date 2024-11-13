@@ -192,6 +192,17 @@ MTR_TESTABLE
 /// is lost.
 - (instancetype)initWithContext:(ContextType)context;
 
+/// Creates a work queue with the given context object and a queue width.
+///
+/// The queue will call readyHandler on up to "width" number of work items
+/// concurrently. Once "width" number of work items have started, no other
+/// work items will get a readyHandler call until one of the running work items
+/// has called its completion block with MTRAsyncWorkComplete.
+///
+/// This allows the a MTRAsyncWorkQueue object to manage a pool of
+/// resources that can be use concurrently at any given time.
+- (instancetype)initWithContext:(ContextType)context width:(NSUInteger)width;
+
 /// Enqueues the specified work item, making it eligible for execution.
 ///
 /// Once a work item is enqueued, ownership of it passes to the queue and
@@ -216,6 +227,9 @@ MTR_TESTABLE
 /// @see MTRAsyncWorkDuplicateCheckHandler
 - (BOOL)hasDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID
                  workItemData:(id)opaqueWorkItemData;
+
+// Returns current count of queued items.
+- (NSUInteger)itemCount;
 
 /// Cancels and removes all work items.
 - (void)invalidate;

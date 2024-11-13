@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class ModeSelectClusterModeOptionStruct(
   val label: String,
   val mode: UInt,
-  val semanticTags: List<ModeSelectClusterSemanticTagStruct>
+  val semanticTags: List<ModeSelectClusterSemanticTagStruct>,
 ) {
   override fun toString(): String = buildString {
     append("ModeSelectClusterModeOptionStruct {\n")

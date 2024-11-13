@@ -27,7 +27,7 @@ import matter.tlv.TlvWriter
 class ContentLauncherClusterParameterStruct(
   val type: UInt,
   val value: String,
-  val externalIDList: Optional<List<ContentLauncherClusterAdditionalInfoStruct>>
+  val externalIDList: Optional<List<ContentLauncherClusterAdditionalInfoStruct>>,
 ) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterParameterStruct {\n")
@@ -44,7 +44,7 @@ class ContentLauncherClusterParameterStruct(
       put(ContextSpecificTag(TAG_VALUE), value)
       if (externalIDList.isPresent) {
         val optexternalIDList = externalIDList.get()
-        startArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
+        startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))
         for (item in optexternalIDList.iterator()) {
           item.toTlv(AnonymousTag, this)
         }
@@ -57,17 +57,17 @@ class ContentLauncherClusterParameterStruct(
   companion object {
     private const val TAG_TYPE = 0
     private const val TAG_VALUE = 1
-    private const val TAG_EXTERNAL_I_D_LIST = 2
+    private const val TAG_EXTERNAL_ID_LIST = 2
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterParameterStruct {
       tlvReader.enterStructure(tlvTag)
       val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
       val externalIDList =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))) {
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))) {
           Optional.of(
             buildList<ContentLauncherClusterAdditionalInfoStruct> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
+              tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))
               while (!tlvReader.isEndOfContainer()) {
                 add(ContentLauncherClusterAdditionalInfoStruct.fromTlv(AnonymousTag, tlvReader))
               }

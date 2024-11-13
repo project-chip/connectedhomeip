@@ -42,6 +42,10 @@ using namespace ::chip;
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#if defined(QORVO_QPINCFG_ENABLE)
+#include "qPinCfg.h"
+#endif // QORVO_QPINCFG_ENABLE
+
 #include <inet/EndPointStateOpenThread.h>
 
 #include <DeviceInfoProviderImpl.h>
@@ -58,9 +62,16 @@ using namespace ::chip::DeviceLayer;
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
+#define SWITCH_MULTIPRESS_WINDOW_MS 500
+#define SWITCH_LONGPRESS_WINDOW_MS 3000
+#define SWITCH_BUTTON_PRESSED 1
+#define SWITCH_BUTTON_UNPRESSED 0
+
 #define APP_TASK_STACK_SIZE (2 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
+#define SECONDS_IN_HOUR (3600)                                              // we better keep this 3600
+#define TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS (1 * SECONDS_IN_HOUR) // increment every hour
 
 namespace {
 TaskHandle_t sAppTaskHandle;
@@ -70,6 +81,9 @@ bool sIsThreadProvisioned     = false;
 bool sIsThreadEnabled         = false;
 bool sHaveBLEConnections      = false;
 bool sIsBLEAdvertisingEnabled = false;
+bool sIsMultipressOngoing     = false;
+bool sLongPressDetected       = false;
+uint8_t sSwitchButtonState    = SWITCH_BUTTON_UNPRESSED;
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
@@ -141,11 +155,19 @@ void OnTriggerIdentifyEffect(Identify * identify)
     }
 }
 
-Identify gIdentify = {
+Identify gIdentifyEp1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    Clusters::Identify::IdentifyTypeEnum::kNone,
+    OnTriggerIdentifyEffect,
+};
+
+Identify gIdentifyEp2 = {
+    chip::EndpointId{ 2 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    Clusters::Identify::IdentifyTypeEnum::kNone,
     OnTriggerIdentifyEffect,
 };
 
@@ -224,6 +246,14 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if defined(QORVO_QPINCFG_ENABLE)
+    qResult_t res = Q_OK;
+    res           = qPinCfg_Init(NULL);
+    if (res != Q_OK)
+    {
+        ChipLogError(NotSpecified, "qPinCfg_Init failed: %d", res);
+    }
+#endif // QORVO_QPINCFG_ENABLE
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
     ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -255,6 +285,14 @@ CHIP_ERROR AppTask::Init()
     sIsBLEAdvertisingEnabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
     UpdateLEDs();
 
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS),
+                                                      TotalHoursTimerHandler, this);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+    }
+
     return err;
 }
 
@@ -275,7 +313,9 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
 {
-    ChipLogProgress(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipLogDetail(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
 
     AppEvent button_event              = {};
     button_event.Type                  = AppEvent::kEventType_Button;
@@ -297,13 +337,54 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     case APP_FUNCTION2_SWITCH: {
         if (!btnPressed)
         {
-            ChipLogProgress(NotSpecified, "Switch initial press");
-            SwitchMgr().GenericSwitchInitialPress();
+            ChipLogDetail(NotSpecified, "Switch button released");
+
+            button_event.Handler =
+                sLongPressDetected ? SwitchMgr().GenericSwitchLongReleaseHandler : SwitchMgr().GenericSwitchShortReleaseHandler;
+
+            sIsMultipressOngoing = true;
+            sSwitchButtonState   = SWITCH_BUTTON_UNPRESSED;
+            sLongPressDetected   = false;
+
+            chip::DeviceLayer::SystemLayer().CancelTimer(MultiPressTimeoutHandler, NULL);
+            // we start the MultiPress feature window after releasing the button
+            err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(SWITCH_MULTIPRESS_WINDOW_MS),
+                                                              MultiPressTimeoutHandler, NULL);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+            }
         }
         else
         {
-            ChipLogProgress(NotSpecified, "Switch release press");
-            SwitchMgr().GenericSwitchReleasePress();
+            ChipLogDetail(NotSpecified, "Switch button pressed");
+
+            sSwitchButtonState = SWITCH_BUTTON_PRESSED;
+
+            chip::DeviceLayer::SystemLayer().CancelTimer(LongPressTimeoutHandler, NULL);
+            // we need to check if this is short or long press
+            err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(SWITCH_LONGPRESS_WINDOW_MS),
+                                                              LongPressTimeoutHandler, NULL);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+            }
+
+            // if we have active multipress window we need to send extra event
+            if (sIsMultipressOngoing)
+            {
+                ChipLogDetail(NotSpecified, "Switch MultipressOngoing");
+                button_event.Handler = SwitchMgr().GenericSwitchInitialPressHandler;
+                sAppTask.PostEvent(&button_event);
+                chip::DeviceLayer::SystemLayer().CancelTimer(MultiPressTimeoutHandler, NULL);
+                button_event.Handler = SwitchMgr().GenericSwitchMultipressOngoingHandler;
+            }
+            else
+            {
+                button_event.Handler = SwitchMgr().GenericSwitchInitialPressHandler;
+            }
         }
         break;
     }
@@ -346,6 +427,69 @@ void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
     event.TimerEvent.Context = aAppState;
     event.Handler            = FunctionTimerEventHandler;
     sAppTask.PostEvent(&event);
+}
+
+void AppTask::MultiPressTimeoutHandler(chip::System::Layer * aLayer, void * aAppState)
+{
+    ChipLogDetail(NotSpecified, "MultiPressTimeoutHandler");
+
+    sIsMultipressOngoing = false;
+
+    AppEvent multipress_event = {};
+    multipress_event.Type     = AppEvent::kEventType_Button;
+    multipress_event.Handler  = SwitchMgr().GenericSwitchMultipressCompleteHandler;
+
+    sAppTask.PostEvent(&multipress_event);
+}
+
+void AppTask::LongPressTimeoutHandler(chip::System::Layer * aLayer, void * aAppState)
+{
+    ChipLogDetail(NotSpecified, "LongPressTimeoutHandler");
+
+    // if the button is still pressed after threshold time, this is a LongPress, otherwise jsut ignore it
+    if (sSwitchButtonState == SWITCH_BUTTON_PRESSED)
+    {
+        sLongPressDetected       = true;
+        AppEvent longpress_event = {};
+        longpress_event.Type     = AppEvent::kEventType_Button;
+        longpress_event.Handler  = SwitchMgr().GenericSwitchLongPressHandler;
+
+        sAppTask.PostEvent(&longpress_event);
+    }
+}
+
+void AppTask::TotalHoursTimerHandler(chip::System::Layer * aLayer, void * aAppState)
+{
+    ChipLogDetail(NotSpecified, "HourlyTimer");
+
+    CHIP_ERROR err;
+    uint32_t totalOperationalHours = 0;
+
+    err = ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                      (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS / SECONDS_IN_HOUR));
+    }
+    else if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        totalOperationalHours = 0; // set this explicitly to 0 for safety
+        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                      (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS / SECONDS_IN_HOUR));
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
+    }
+
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS),
+                                                      TotalHoursTimerHandler, nullptr);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+    }
 }
 
 void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
@@ -516,10 +660,14 @@ void AppTask::UpdateLEDs(void)
     // If the system has ble connection(s) uptill the stage above, THEN blink
     // the LEDs at an even rate of 100ms.
     //
-    // Otherwise, blink the LED ON for a very short time.
+    // Otherwise, turn the LED OFF.
     if (sIsThreadProvisioned && sIsThreadEnabled)
     {
         qvIO_LedSet(SYSTEM_STATE_LED, true);
+    }
+    else if (sIsThreadProvisioned && !sIsThreadEnabled)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
     }
     else if (sHaveBLEConnections)
     {
@@ -532,7 +680,7 @@ void AppTask::UpdateLEDs(void)
     else
     {
         // not commissioned yet
-        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
+        qvIO_LedSet(SYSTEM_STATE_LED, false);
     }
 }
 

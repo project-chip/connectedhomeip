@@ -44,6 +44,18 @@
     return self;
 }
 
+- (NSMutableArray *)getServerList
+{
+    NSMutableArray * serverList = [NSMutableArray new];
+    if (_cppEndpoint != nil) {
+        std::vector<chip::ClusterId> cppServerList = _cppEndpoint->GetServerList();
+        for (chip::ClusterId clusterId : cppServerList) {
+            [serverList addObject:@(clusterId)];
+        }
+    }
+    return serverList;
+}
+
 - (NSNumber * _Nonnull)identifier
 {
     return [NSNumber numberWithUnsignedShort:_cppEndpoint->GetId()];
@@ -78,15 +90,67 @@
 - (MCCluster * _Nullable)clusterForType:(MCEndpointClusterType)type
 {
     switch (type) {
-    case MCEndpointClusterTypeContentLauncher:
-        return [[MCContentLauncherCluster alloc] initWithCppCluster:_cppEndpoint->GetCluster<matter::casting::clusters::content_launcher::ContentLauncherCluster>()];
+    case MCEndpointClusterTypeApplicationBasic: {
+        auto cppCluster = _cppEndpoint->GetCluster<matter::casting::clusters::application_basic::ApplicationBasicCluster>();
+        if (cppCluster == nullptr) {
+            ChipLogError(AppServer, "MCEndpoint::clusterForType() MCEndpointClusterTypeApplicationBasic, GetCluster() returned nullptr");
+            return nil;
+        }
+        return [[MCApplicationBasicCluster alloc] initWithCppCluster:cppCluster];
+    }
 
-    case MCEndpointClusterTypeApplicationBasic:
-        return [[MCApplicationBasicCluster alloc] initWithCppCluster:_cppEndpoint->GetCluster<matter::casting::clusters::application_basic::ApplicationBasicCluster>()];
+    case MCEndpointClusterTypeApplicationLauncher: {
+        auto cppCluster = _cppEndpoint->GetCluster<matter::casting::clusters::application_launcher::ApplicationLauncherCluster>();
+        if (cppCluster == nullptr) {
+            ChipLogError(AppServer, "MCEndpoint::clusterForType() MCEndpointClusterTypeApplicationLauncher GetCluster() returned nullptr");
+            return nil;
+        }
+        return [[MCApplicationLauncherCluster alloc] initWithCppCluster:cppCluster];
+    }
 
-    case MCEndpointClusterTypeMediaPlayback:
-        return [[MCMediaPlaybackCluster alloc] initWithCppCluster:_cppEndpoint->GetCluster<matter::casting::clusters::media_playback::MediaPlaybackCluster>()];
+    case MCEndpointClusterTypeContentLauncher: {
+        auto cppCluster = _cppEndpoint->GetCluster<matter::casting::clusters::content_launcher::ContentLauncherCluster>();
+        if (cppCluster == nullptr) {
+            ChipLogError(AppServer, "MCEndpoint::clusterForType() MCEndpointClusterTypeContentLauncher GetCluster() returned nullptr");
+            return nil;
+        }
+        return [[MCContentLauncherCluster alloc] initWithCppCluster:cppCluster];
+    }
 
+    case MCEndpointClusterTypeKeypadInput: {
+        auto cppCluster = _cppEndpoint->GetCluster<matter::casting::clusters::keypad_input::KeypadInputCluster>();
+        if (cppCluster == nullptr) {
+            ChipLogError(AppServer, "MCEndpoint::clusterForType() MCEndpointClusterTypeKeypadInput GetCluster() returned nullptr");
+            return nil;
+        }
+        return [[MCKeypadInputCluster alloc] initWithCppCluster:cppCluster];
+    }
+
+    case MCEndpointClusterTypeMediaPlayback: {
+        auto cppCluster = _cppEndpoint->GetCluster<matter::casting::clusters::media_playback::MediaPlaybackCluster>();
+        if (cppCluster == nullptr) {
+            ChipLogError(AppServer, "MCEndpoint::clusterForType() MCEndpointClusterTypeMediaPlayback GetCluster() returned nullptr");
+            return nil;
+        }
+        return [[MCMediaPlaybackCluster alloc] initWithCppCluster:cppCluster];
+    }
+
+    case MCEndpointClusterTypeOnOff: {
+        auto cppCluster = _cppEndpoint->GetCluster<matter::casting::clusters::on_off::OnOffCluster>();
+        if (cppCluster == nullptr) {
+            ChipLogError(AppServer, "MCEndpoint::clusterForType() MCEndpointClusterTypeOnOff GetCluster() returned nullptr");
+            return nil;
+        }
+        return [[MCOnOffCluster alloc] initWithCppCluster:cppCluster];
+    }
+    case MCEndpointClusterTypeTargetNavigator: {
+        auto cppCluster = _cppEndpoint->GetCluster<matter::casting::clusters::target_navigator::TargetNavigatorCluster>();
+        if (cppCluster == nullptr) {
+            ChipLogError(AppServer, "MCEndpoint::clusterForType() MCEndpointClusterTypeTargetNavigator GetCluster() returned nullptr");
+            return nil;
+        }
+        return [[MCTargetNavigatorCluster alloc] initWithCppCluster:cppCluster];
+    }
     default:
         ChipLogError(AppServer, "MCEndpointClusterType not found");
         break;
@@ -130,4 +194,10 @@
 
     return result;
 }
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MCEndpoint: identifier=%@, vendorId=%@, productId=%@>", [self identifier], [self vendorId], [self productId]];
+}
+
 @end

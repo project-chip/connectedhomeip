@@ -20,8 +20,7 @@
 /**
  *    @file
  *          Provides an implementation of the ThreadStackManager object for
- *          NXP platforms using the NXP SDK and the OpenThread
- *          stack.
+ *          NXP platforms using the NXP SDK and the OpenThread stack.
  *
  */
 
@@ -32,14 +31,16 @@
 #include <platform/ThreadStackManager.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
+#else
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
+#endif
 
 #include <lib/support/CHIPPlatformMemory.h>
 
 #include "openthread-system.h"
 #include "ot_platform_common.h"
-
-extern "C" CHIP_ERROR AppMatterCli_RegisterCommands(void);
 
 /*
  * Empty content for otPlatCliUartProcess, as the openthread CLI
@@ -61,26 +62,43 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if CHIP_DEVICE_CONFIG_INIT_OT_PLAT_ALARM
     /* Initialize the OpenThread Alarm module to make sure that if calling otInstance,
      * it can schedule events
      */
     otPlatAlarmInit();
-
-    /* Make sure to initialize the Matter CLI which will include the ot-cli first.
-     * In fact it is mandatory to enable first the ot-cli before initializing the Matter openthread layer
-     * which would modify some contexts of the openthread instance.
-     */
-    AppMatterCli_RegisterCommands();
+#endif
 
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(NULL);
+#else
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(NULL);
+#endif
     SuccessOrExit(err);
 
 exit:
     return err;
 }
+
+#if CHIP_DEVICE_CONFIG_PROCESS_BLE_IN_THREAD
+void ThreadStackManagerImpl::ProcessThreadActivity()
+{
+    /* reuse thread task for ble processing.
+     * by doing this, we avoid allocating a new stack for short-lived
+     * BLE processing (e.g.: only during Matter commissioning)
+     */
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    auto * bleManager = &chip::DeviceLayer::Internal::BLEMgrImpl();
+    bleManager->DoBleProcessing();
+#endif
+
+    otTaskletsProcess(OTInstance());
+    otSysProcessDrivers(OTInstance());
+}
+#endif
 
 bool ThreadStackManagerImpl::IsInitialized()
 {
@@ -119,4 +137,9 @@ extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 extern "C" void otPlatFree(void * aPtr)
 {
     return CHIPPlatformMemoryFree(aPtr);
+}
+
+extern "C" void * otPlatRealloc(void * p, size_t aSize)
+{
+    return CHIPPlatformMemoryRealloc(p, aSize);
 }

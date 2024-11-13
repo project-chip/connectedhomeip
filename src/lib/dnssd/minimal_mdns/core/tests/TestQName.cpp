@@ -16,8 +16,9 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/core/QName.h>
 
 namespace {
@@ -135,7 +136,7 @@ TEST(TestQName, InvalidReferencing)
 
     {
         // Infinite recursion
-        static const uint8_t kData[] = "\03test\xc0\x00";
+        static const uint8_t kData[] = "\04test\xc0\x00";
         SerializedQNameIterator it   = AsSerializedQName(kData);
 
         EXPECT_TRUE(it.Next());
@@ -145,7 +146,7 @@ TEST(TestQName, InvalidReferencing)
 
     {
         // Infinite recursion by referencing own element (inside the stream)
-        static const uint8_t kData[] = "\03test\xc0\x05";
+        static const uint8_t kData[] = "\04test\xc0\x05";
         SerializedQNameIterator it   = AsSerializedQName(kData);
 
         EXPECT_TRUE(it.Next());
@@ -164,7 +165,7 @@ TEST(TestQName, InvalidReferencing)
 
     {
         // Reference that goes forwad instead of backward
-        static const uint8_t kData[] = "\03test\xc0\x07";
+        static const uint8_t kData[] = "\04test\xc0\x07";
         SerializedQNameIterator it   = AsSerializedQName(kData);
 
         EXPECT_TRUE(it.Next());

@@ -53,30 +53,6 @@ void ActiveResolveAttempts::Complete(const PeerId & peerId)
 #endif
 }
 
-void ActiveResolveAttempts::CompleteCommissioner(const chip::Dnssd::DiscoveredNodeData & data)
-{
-    for (auto & item : mRetryQueue)
-    {
-        if (item.attempt.Matches(data, chip::Dnssd::DiscoveryType::kCommissionerNode))
-        {
-            item.attempt.Clear();
-            return;
-        }
-    }
-}
-
-void ActiveResolveAttempts::CompleteCommissionable(const chip::Dnssd::DiscoveredNodeData & data)
-{
-    for (auto & item : mRetryQueue)
-    {
-        if (item.attempt.Matches(data, chip::Dnssd::DiscoveryType::kCommissionableNode))
-        {
-            item.attempt.Clear();
-            return;
-        }
-    }
-}
-
 bool ActiveResolveAttempts::HasBrowseFor(chip::Dnssd::DiscoveryType type) const
 {
     for (auto & item : mRetryQueue)

@@ -14,10 +14,11 @@ def asBoolean(valueToTest):
 
 
 def isMG24(partnumber):
-    if "EFR32MG24" in partnumber or "MGM240" in partnumber:
-        return True
-    else:
-        return False
+    return ("EFR32MG24" in partnumber or "MGM240" in partnumber)
+
+
+def isMG26(partnumber):
+    return ("EFR32MG26" in partnumber)
 
 
 root_path = sys.argv[1]
@@ -35,10 +36,8 @@ template_path = os.path.join(root_path, "third_party/silabs/slc_gen/")
 slc_arguments = ""
 
 # Add Familly specific component
-if isMG24(silabs_mcu):
+if isMG24(silabs_mcu) or isMG26(silabs_mcu):
     slc_arguments += "uartdrv_eusart:vcom,"
-else:
-    slc_arguments += "uartdrv_usart:vcom,"
 
 # Translate GN arguments in SLC arguments
 if not disable_lcd:
@@ -58,17 +57,28 @@ slc_arguments += silabs_board
 
 print(slc_arguments)
 
-if "GSDK_ROOT" in os.environ:
-    gsdk_root = os.getenv('GSDK_ROOT')
+if "SISDK_ROOT" in os.environ:
+    sisdk_root = os.getenv('SISDK_ROOT')
 else:
     # If no gsdk path is set in the environment, use the standard path to the submodule
-    gsdk_root = os.path.join(root_path, "third_party/silabs/gecko_sdk/")
+    sisdk_root = os.path.join(root_path, "third_party/silabs/simplicity_sdk/")
+
+# SLC needs to run the system python, so we force PATH to have /usr/bin in front
+# This is a workaround for CI builds failing with an odd `jinja2` module error when
+# leaving the default paths enabled
+cmds = f"""
+set -ex
+
+export PATH="/usr/bin:$PATH"
+
+slc configuration --sdk '{sisdk_root}'
+slc signature trust --sdk '{sisdk_root}'
+slc generate '{slcp_file_path}' -d '{output_path}' --with '{slc_arguments}'
+""".strip()
+
 
 # make sure we have a configured and trusted gsdk in slc
-subprocess.run(["slc", "configuration", "--sdk", gsdk_root], check=True)
-subprocess.run(["slc", "signature", "trust", "--sdk", gsdk_root], check=True)
-
-subprocess.run(["slc", "generate", slcp_file_path, "-d", output_path, "--with", slc_arguments], check=True)
+subprocess.run(["bash", "-c", cmds], check=True)
 
 # cleanup of unwanted files
 fileList = glob.glob(os.path.join(output_path, "matter-platform.*"))

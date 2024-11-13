@@ -18,12 +18,12 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -53,8 +53,8 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
 
 Instance::~Instance()
 {
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR Instance::Init()
@@ -88,8 +88,8 @@ CHIP_ERROR Instance::Init()
             Zcl,
             "Microwave Oven Control: feature bits error, if feature supports PowerNumberLimits it must support PowerAsNumber"));
 
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     // If the PowerInWatts feature is supported, get the count of supported watt levels so we can later
     // ensure incoming watt level values are valid.
     if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
@@ -247,11 +247,12 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
     if (startAfterSetting.HasValue())
     {
+        ConcreteCommandPath commandPath(mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id);
+
+        bool commandExists =
+            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetAcceptedCommandInfo(commandPath).has_value();
         VerifyOrExit(
-            ServerClusterCommandExists(
-                ConcreteCommandPath(mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id)) == Status::Success,
-            status = Status::InvalidCommand;
-            ChipLogError(
+            commandExists, status = Status::InvalidCommand; ChipLogError(
                 Zcl,
                 "Microwave Oven Control: Failed to set cooking parameters, Start command of operational state is not supported"));
     }
@@ -296,7 +297,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value is out of range"));
 
         VerifyOrExit(
-            reqPowerSettingNum % powerStepNum == 0, status = Status::InvalidCommand; ChipLogError(
+            (reqPowerSettingNum - minPowerNum) % powerStepNum == 0, status = Status::ConstraintError; ChipLogError(
                 Zcl,
                 "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value must be multiple of PowerStep number"));
 

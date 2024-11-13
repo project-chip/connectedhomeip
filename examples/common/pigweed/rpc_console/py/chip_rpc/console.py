@@ -39,19 +39,21 @@ An example RPC command:
 import argparse
 import sys
 from pathlib import Path
-from typing import Any, Collection
+from typing import Collection
 
 import pw_system.console
 from pw_hdlc import rpc
 
 # Protos
 # isort: off
+from actions_service import actions_service_pb2
 from attributes_service import attributes_service_pb2
 from boolean_state_service import boolean_state_service_pb2
 from button_service import button_service_pb2
 from descriptor_service import descriptor_service_pb2
 from device_service import device_service_pb2
-from echo_service import echo_pb2
+from fabric_admin_service import fabric_admin_service_pb2
+from fabric_bridge_service import fabric_bridge_service_pb2
 from lighting_service import lighting_service_pb2
 from locking_service import locking_service_pb2
 from ot_cli_service import ot_cli_service_pb2
@@ -69,13 +71,6 @@ def _parse_args():
                         type=int,
                         default=115200,
                         help='the baud rate to use')
-    parser.add_argument(
-        '-o',
-        '--output',
-        type=argparse.FileType('wb'),
-        default=sys.stdout.buffer,
-        help=('The file to which to write device output (HDLC channel 1); '
-              'provide - or omit for stdout.'))
     parser.add_argument(
         '-r',
         '--raw_serial',
@@ -96,7 +91,7 @@ def _parse_args():
 
 def show_console(device: str, baudrate: int,
                  token_databases: Collection[Path],
-                 socket_addr: str, output: Any, raw_serial: bool) -> int:
+                 socket_addr: str, raw_serial: bool) -> int:
 
     # TODO: this shows a default console with little customization
     #       Ideally we should at least customize the default messages
@@ -111,7 +106,6 @@ def show_console(device: str, baudrate: int,
         device=device,
         baudrate=baudrate,
         socket_addr=socket_addr,
-        output=output,
         hdlc_encoding=not raw_serial,
         token_databases=token_databases,
         logfile="",
@@ -119,21 +113,19 @@ def show_console(device: str, baudrate: int,
         channel_id=rpc.DEFAULT_CHANNEL_ID,
 
         # Defaults beyond the original console
-        proto_globs=[],
         ticks_per_second=None,
         host_logfile="",
         json_logfile="",
         rpc_logging=False,
-        # the pt-python based console seems to break on python 3.1 with
-        # "set_wakeup_fd only works in main thread of the main interpreter"
-        use_ipython=True,
         compiled_protos=[
+                actions_service_pb2,
                 attributes_service_pb2,
                 boolean_state_service_pb2,
                 button_service_pb2,
                 descriptor_service_pb2,
                 device_service_pb2,
-                echo_pb2,
+                fabric_admin_service_pb2,
+                fabric_bridge_service_pb2,
                 lighting_service_pb2,
                 locking_service_pb2,
                 ot_cli_service_pb2,

@@ -1,12 +1,15 @@
 {{> header}}
 
 #include <commands/clusters/DataModelLogger.h>
+#include <zap-generated/cluster/logging/EntryToText.h>
 
 using namespace chip::app::Clusters;
 
 {{#zcl_structs}}
 {{#if has_more_than_one_cluster}}
 {{> struct_logger_impl namespace="detail"}}
+{{else if has_no_clusters}}
+{{> struct_logger_impl namespace="Globals"}}
 {{/if}}
 {{/zcl_structs}}
 
@@ -73,7 +76,19 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             {
                 {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotOptional=true}} value;
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+{{#if (isEqual name "ServerList")}}
+                return DataModelLogger::LogClusterId("{{name}}", 1, value);
+{{else if (isEqual name "ClientList")}}
+                return DataModelLogger::LogClusterId("{{name}}", 1, value);
+{{else if (isEqual name "AttributeList")}}
+                return DataModelLogger::LogAttributeId("{{name}}", 1, value, {{asUpperCamelCase parent.name}}::Id);
+{{else if (isEqual name "AcceptedCommandList")}}
+                return DataModelLogger::LogAcceptedCommandId("{{name}}", 1, value, {{asUpperCamelCase parent.name}}::Id);
+{{else if (isEqual name "GeneratedCommandList")}}
+                return DataModelLogger::LogGeneratedCommandId("{{name}}", 1, value, {{asUpperCamelCase parent.name}}::Id);
+{{else}}
                 return DataModelLogger::LogValue("{{name}}", 1, value);
+{{/if}}
             }
 {{#last}}
           }

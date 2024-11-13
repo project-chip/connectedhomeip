@@ -27,16 +27,39 @@ namespace matter {
 namespace casting {
 namespace core {
 
+/**
+ * This class is used to manage the JNI callbacks and C++ to Java conversions for the CastingPlayer.
+ */
 class MatterCastingPlayerJNI
 {
 public:
-    MatterCastingPlayerJNI() : mConnectionSuccessHandler([](void *) { return nullptr; }) {}
+    // Member initializer list
+    MatterCastingPlayerJNI() :
+        mConnectionSuccessHandler([](void *) { return nullptr; }),
+        mConnectionFailureHandler(matter::casting::support::convertMatterErrorFromCppToJava),
+        mCommissionerDeclarationHandler(matter::casting::support::convertCommissionerDeclarationFromCppToJava)
+    {}
     support::MatterCallbackJNI<void *> mConnectionSuccessHandler;
-    support::MatterFailureCallbackJNI mConnectionFailureHandler;
+    support::MatterCallbackJNI<CHIP_ERROR> mConnectionFailureHandler;
+    support::MatterCallbackJNI<chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration> mCommissionerDeclarationHandler;
+
+    static MatterCastingPlayerJNI & getInstance() { return sInstance; }
+    auto getConnectCallback() const { return ConnectCallback; }
+    auto getCommissionerDeclarationCallback() const { return CommissionerDeclarationCallback; }
 
 private:
     friend MatterCastingPlayerJNI & MatterCastingPlayerJNIMgr();
     static MatterCastingPlayerJNI sInstance;
+
+    // Handles the connection complete event and calls the ConnectionCallbacks onSuccess or onFailure callback provided by the Java
+    // client. This callback is called by the cpp layer when the connection process has ended, regardless of whether it was
+    // successful or not.
+    static void ConnectCallback(CHIP_ERROR err, CastingPlayer * playerPtr);
+    // Handles the Commissioner Declaration event and calls the ConnectionCallbacks onCommissionerDeclaration callback provided by
+    // the Java client. This callback is called by the cpp layer when the Commissionee receives a CommissionerDeclaration message
+    // from the CastingPlayer/Commissioner.
+    static void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source,
+                                                chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd);
 };
 
 inline class MatterCastingPlayerJNI & MatterCastingPlayerJNIMgr()

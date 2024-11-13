@@ -162,7 +162,7 @@ tests:
               maxValue: 13800
 
     - label:
-          "Step 5a: TH sends EnhancedMoveToHue command to DUT with
+          "Step 3a: TH sends EnhancedMoveToHue command to DUT with
           EnhancedHue=12000, Direction=0x00 (shortest distance) and
           TransitionTime=0 (immediately)."
       PICS: CC.S.F01 && CC.S.C40.Rsp
@@ -190,7 +190,7 @@ tests:
                 value: 100
 
     - label:
-          "Step 5b: TH sends EnhancedStepHue command to DUT with StepMode=0x03
+          "Step 3b: TH sends EnhancedStepHue command to DUT with StepMode=0x03
           (down), StepSize=6000 and TransitionTime=300 (30s)"
       PICS: CC.S.F01 && CC.S.C42.Rsp
       command: "EnhancedStepHue"
@@ -216,7 +216,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "Step 5c: TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 3c: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -234,7 +234,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "Step 2d: TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 3d: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -252,7 +252,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "Step 2e: TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 3e: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -270,7 +270,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "Step 2f: TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 3f: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -279,7 +279,7 @@ tests:
               minValue: 5100
               maxValue: 6900
 
-    - label: "Step 6a: TH reads ColorMode attribute from DUT"
+    - label: "Step 4a: TH reads ColorMode attribute from DUT"
       PICS: CC.S.F01 && CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
@@ -289,7 +289,7 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "Step 6b: TH reads EnhancedColorMode attribute from DUT"
+    - label: "Step 4b: TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F01 && CC.S.A4001
       command: "readAttribute"
       attribute: "EnhancedColorMode"
@@ -298,6 +298,46 @@ tests:
           constraints:
               minValue: 0
               maxValue: 3
+
+    - label:
+          "Step 5a: TH sends EnhancedStepHue command to DUT with StepMode=0x01
+          (up), StepSize=0"
+      PICS: CC.S.F01 && CC.S.C42.Rsp
+      command: "EnhancedStepHue"
+      arguments:
+          values:
+              - name: "StepMode"
+                value: 1
+              - name: "StepSize"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 5b: TH sends EnhancedStepHue command to DUT with StepMode=0x03
+          (down), StepSize=0"
+      PICS: CC.S.F01 && CC.S.C42.Rsp
+      command: "EnhancedStepHue"
+      arguments:
+          values:
+              - name: "StepMode"
+                value: 3
+              - name: "StepSize"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+      response:
+          error: INVALID_COMMAND
 
     - label: "Turn Off light that we turned on"
       PICS: OO.S.C00.Rsp

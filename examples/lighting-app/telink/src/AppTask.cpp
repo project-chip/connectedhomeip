@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 #include <app/server/Server.h>
 
 #include "ColorFormat.h"
+#include "LEDManager.h"
 #include "PWMManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -48,7 +49,7 @@ void AppTask::PowerOnFactoryReset(void)
 {
     LOG_INF("Lighting App Power On Factory Reset");
     AppEvent event;
-    event.Type    = AppEvent::kEventType_Lighting;
+    event.Type    = AppEvent::kEventType_DeviceAction;
     event.Handler = PowerOnFactoryResetEventHandler;
     GetAppTask().PostEvent(&event);
 }
@@ -77,7 +78,7 @@ CHIP_ERROR AppTask::Init(void)
     if (status == Protocols::InteractionModel::Status::Success)
     {
         // Set actual state to stored before reboot
-        SetInitiateAction(storedValue ? ON_ACTION : OFF_ACTION, static_cast<int32_t>(AppEvent::kEventType_Lighting), nullptr);
+        SetInitiateAction(storedValue ? ON_ACTION : OFF_ACTION, static_cast<int32_t>(AppEvent::kEventType_DeviceAction), nullptr);
     }
 
     return CHIP_NO_ERROR;
@@ -88,10 +89,10 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
     Fixture_Action action = INVALID_ACTION;
     int32_t actor         = 0;
 
-    if (aEvent->Type == AppEvent::kEventType_Lighting)
+    if (aEvent->Type == AppEvent::kEventType_DeviceAction)
     {
-        action = static_cast<Fixture_Action>(aEvent->LightingEvent.Action);
-        actor  = aEvent->LightingEvent.Actor;
+        action = static_cast<Fixture_Action>(aEvent->DeviceEvent.Action);
+        actor  = aEvent->DeviceEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
@@ -130,16 +131,24 @@ void AppTask::SetInitiateAction(Fixture_Action aAction, int32_t aActor, uint8_t 
         if (aAction == ON_ACTION)
         {
             sfixture_on = true;
+#ifdef CONFIG_PWM
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (((uint32_t) sLedRgb.r * 1000) / UINT8_MAX));
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (((uint32_t) sLedRgb.g * 1000) / UINT8_MAX));
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, (((uint32_t) sLedRgb.b * 1000) / UINT8_MAX));
+#else
+            LedManager::getInstance().setLed(LedManager::EAppLed_App0, true);
+#endif
         }
         else
         {
             sfixture_on = false;
+#ifdef CONFIG_PWM
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, false);
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, false);
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, false);
+#else
+            LedManager::getInstance().setLed(LedManager::EAppLed_App0, false);
+#endif
         }
     }
     else if (aAction == LEVEL_ACTION)
@@ -217,6 +226,9 @@ void AppTask::PowerOnFactoryResetEventHandler(AppEvent * aEvent)
     PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (bool) (sPowerOnFactoryResetTimerCnt % 2));
     PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (bool) (sPowerOnFactoryResetTimerCnt % 2));
     PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, (bool) (sPowerOnFactoryResetTimerCnt % 2));
+#if !CONFIG_PWM
+    LedManager::getInstance().setLed(LedManager::EAppLed_App0, (bool) (sPowerOnFactoryResetTimerCnt % 2));
+#endif
     k_timer_init(&sPowerOnFactoryResetTimer, PowerOnFactoryResetTimerEvent, nullptr);
     k_timer_start(&sPowerOnFactoryResetTimer, K_MSEC(kPowerOnFactoryResetIndicationTimeMs),
                   K_MSEC(kPowerOnFactoryResetIndicationTimeMs));
@@ -237,3 +249,14 @@ void AppTask::PowerOnFactoryResetTimerEvent(struct k_timer * timer)
     }
 }
 #endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
+
+void AppTask::LinkLeds(LedManager & ledManager)
+{
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+    ledManager.linkLed(LedManager::EAppLed_Status, 0);
+#endif
+
+#if !CONFIG_PWM
+    ledManager.linkLed(LedManager::EAppLed_App0, 1);
+#endif /* !CONFIG_PWM */
+}

@@ -64,6 +64,18 @@ namespace Structs {
 } // namespace Structs
 } // namespace detail
 
+namespace Globals {
+// Global structs
+namespace Structs {
+{{#zcl_structs}}
+{{#if has_no_clusters}}
+{{> cluster_objects_struct header=false}}
+
+{{/if}}
+{{/zcl_structs}}
+} // namespace Structs
+} // namespace Globals
+
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
 {{#zcl_structs}}
@@ -246,6 +258,22 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
       {{/zcl_commands}}
     {{/zcl_clusters}}
     }
+    return false;
+}
+
+bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
+{
+    {{#zcl_clusters}}
+      {{#zcl_commands}}
+          {{#if isLargeMessage}}
+          if ((aCluster == Clusters::{{asUpperCamelCase parent.name}}::Id) &&
+              (aCommand == Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id))
+          {
+              return true;
+          }
+          {{/if}}
+      {{/zcl_commands}}
+    {{/zcl_clusters}}
     return false;
 }
 

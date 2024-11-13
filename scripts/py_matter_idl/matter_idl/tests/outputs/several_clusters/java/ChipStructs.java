@@ -32,9 +32,9 @@ public static class SecondClusterFabricDescriptorStruct {
   public String label;
   public Integer fabricIndex;
   private static final long ROOT_PUBLIC_KEY_ID = 1L;
-  private static final long VENDOR_I_D_ID = 2L;
-  private static final long FABRIC_I_D_ID = 3L;
-  private static final long NODE_I_D_ID = 4L;
+  private static final long VENDOR_ID_ID = 2L;
+  private static final long FABRIC_ID_ID = 3L;
+  private static final long NODE_ID_ID = 4L;
   private static final long LABEL_ID = 5L;
   private static final long FABRIC_INDEX_ID = 254L;
 
@@ -57,9 +57,9 @@ public static class SecondClusterFabricDescriptorStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ROOT_PUBLIC_KEY_ID, new ByteArrayType(rootPublicKey)));
-    values.add(new StructElement(VENDOR_I_D_ID, new UIntType(vendorID)));
-    values.add(new StructElement(FABRIC_I_D_ID, new UIntType(fabricID)));
-    values.add(new StructElement(NODE_I_D_ID, new UIntType(nodeID)));
+    values.add(new StructElement(VENDOR_ID_ID, new UIntType(vendorID)));
+    values.add(new StructElement(FABRIC_ID_ID, new UIntType(fabricID)));
+    values.add(new StructElement(NODE_ID_ID, new UIntType(nodeID)));
     values.add(new StructElement(LABEL_ID, new StringType(label)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
@@ -82,17 +82,17 @@ public static class SecondClusterFabricDescriptorStruct {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           rootPublicKey = castingValue.value(byte[].class);
         }
-      } else if (element.contextTagNum() == VENDOR_I_D_ID) {
+      } else if (element.contextTagNum() == VENDOR_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           vendorID = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == FABRIC_I_D_ID) {
+      } else if (element.contextTagNum() == FABRIC_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           fabricID = castingValue.value(Long.class);
         }
-      } else if (element.contextTagNum() == NODE_I_D_ID) {
+      } else if (element.contextTagNum() == NODE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           nodeID = castingValue.value(Long.class);

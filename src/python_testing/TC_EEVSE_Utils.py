@@ -16,8 +16,10 @@
 
 
 import logging
+import typing
 
 import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
 
@@ -36,6 +38,22 @@ class EEVSEBaseTestHelper:
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
+    def check_value_in_range(self, attribute: str, value: int, lower_value: int, upper_value: int):
+        asserts.assert_greater_equal(value, lower_value,
+                                     f"Unexpected '{attribute}' value - expected {lower_value}, was {value}")
+        asserts.assert_less_equal(value, upper_value,
+                                  f"Unexpected '{attribute}' value - expected {upper_value}, was {value}")
+
+    async def check_evse_attribute_in_range(self, attribute, lower_value: int, upper_value: int, endpoint: int = None, allow_null: bool = False):
+        value = await self.read_evse_attribute_expect_success(endpoint=endpoint, attribute=attribute)
+        if allow_null and value is NullValue:
+            # skip the range check
+            logger.info("value is NULL - OK")
+            return value
+
+        self.check_value_in_range(attribute, value, lower_value, upper_value)
+        return value
+
     async def get_supported_energy_evse_attributes(self, endpoint: int = None):
         return await self.read_evse_attribute_expect_success(endpoint, "AttributeList")
 
@@ -45,7 +63,8 @@ class EEVSEBaseTestHelper:
         result = await self.default_controller.WriteAttribute(self.dut_node_id,
                                                               [(endpoint,
                                                                Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent(user_max_charge))])
-        asserts.assert_equal(result[0].Status, Status.Success, "UserMaximumChargeCurrent write failed")
+        asserts.assert_equal(
+            result[0].Status, Status.Success, "UserMaximumChargeCurrent write failed")
 
     async def send_enable_charge_command(self, endpoint: int = None, charge_until: int = None, timedRequestTimeoutMs: int = 3000,
                                          min_charge: int = 6000, max_charge: int = 32000, expected_status: Status = Status.Success):
@@ -58,7 +77,8 @@ class EEVSEBaseTestHelper:
                 timedRequestTimeoutMs=timedRequestTimeoutMs)
 
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            asserts.assert_equal(e.status, expected_status,
+                                 "Unexpected error returned")
 
     async def send_disable_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000, expected_status: Status = Status.Success):
         try:
@@ -67,7 +87,8 @@ class EEVSEBaseTestHelper:
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            asserts.assert_equal(e.status, expected_status,
+                                 "Unexpected error returned")
 
     async def send_start_diagnostics_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000,
                                              expected_status: Status = Status.Success):
@@ -77,7 +98,46 @@ class EEVSEBaseTestHelper:
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            asserts.assert_equal(e.status, expected_status,
+                                 "Unexpected error returned")
+
+    async def send_clear_targets_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000,
+                                         expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.ClearTargets(),
+                                       endpoint=endpoint,
+                                       timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status,
+                                 "Unexpected error returned")
+
+    async def send_get_targets_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000,
+                                       expected_status: Status = Status.Success):
+        try:
+            get_targets_resp = await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.GetTargets(),
+                                                          endpoint=endpoint,
+                                                          timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status,
+                                 "Unexpected error returned")
+
+        return get_targets_resp
+
+    async def send_set_targets_command(self, endpoint: int = None,
+                                       chargingTargetSchedules: typing.List[
+                                           Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct] = None,
+                                       timedRequestTimeoutMs: int = 3000,
+                                       expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.SetTargets(chargingTargetSchedules),
+                                       endpoint=endpoint,
+                                       timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status,
+                                 "Unexpected error returned")
 
     async def send_test_event_trigger_basic(self):
         await self.send_test_event_triggers(eventTrigger=0x0099000000000000)
@@ -96,6 +156,12 @@ class EEVSEBaseTestHelper:
 
     async def send_test_event_trigger_charge_demand_clear(self):
         await self.send_test_event_triggers(eventTrigger=0x0099000000000005)
+
+    async def send_test_event_trigger_time_of_use_mode(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000006)
+
+    async def send_test_event_trigger_time_of_use_mode_clear(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000021)
 
     async def send_test_event_trigger_evse_ground_fault(self):
         await self.send_test_event_triggers(eventTrigger=0x0099000000000010)

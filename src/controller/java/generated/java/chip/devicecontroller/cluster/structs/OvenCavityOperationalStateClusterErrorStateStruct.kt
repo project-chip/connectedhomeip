@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class OvenCavityOperationalStateClusterErrorStateStruct(
   val errorStateID: UInt,
   val errorStateLabel: Optional<String>,
-  val errorStateDetails: Optional<String>
+  val errorStateDetails: Optional<String>,
 ) {
   override fun toString(): String = buildString {
     append("OvenCavityOperationalStateClusterErrorStateStruct {\n")
@@ -39,7 +39,7 @@ class OvenCavityOperationalStateClusterErrorStateStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_ERROR_STATE_I_D), errorStateID)
+      put(ContextSpecificTag(TAG_ERROR_STATE_ID), errorStateID)
       if (errorStateLabel.isPresent) {
         val opterrorStateLabel = errorStateLabel.get()
         put(ContextSpecificTag(TAG_ERROR_STATE_LABEL), opterrorStateLabel)
@@ -53,16 +53,16 @@ class OvenCavityOperationalStateClusterErrorStateStruct(
   }
 
   companion object {
-    private const val TAG_ERROR_STATE_I_D = 0
+    private const val TAG_ERROR_STATE_ID = 0
     private const val TAG_ERROR_STATE_LABEL = 1
     private const val TAG_ERROR_STATE_DETAILS = 2
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): OvenCavityOperationalStateClusterErrorStateStruct {
       tlvReader.enterStructure(tlvTag)
-      val errorStateID = tlvReader.getUInt(ContextSpecificTag(TAG_ERROR_STATE_I_D))
+      val errorStateID = tlvReader.getUInt(ContextSpecificTag(TAG_ERROR_STATE_ID))
       val errorStateLabel =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_LABEL))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_LABEL)))
@@ -81,7 +81,7 @@ class OvenCavityOperationalStateClusterErrorStateStruct(
       return OvenCavityOperationalStateClusterErrorStateStruct(
         errorStateID,
         errorStateLabel,
-        errorStateDetails
+        errorStateDetails,
       )
     }
   }

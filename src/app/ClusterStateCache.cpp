@@ -626,15 +626,7 @@ CHIP_ERROR ClusterStateCacheT<CanEnableDataCaching>::OnUpdateDataVersionFilterLi
             continue;
         }
 
-        DataVersionFilterIB::Builder & filterIB = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
-        SuccessOrExit(err = aDataVersionFilterIBsBuilder.GetError());
-        ClusterPathIB::Builder & filterPath = filterIB.CreatePath();
-        SuccessOrExit(err = filterIB.GetError());
-        SuccessOrExit(err = filterPath.Endpoint(filter.first.mEndpointId).Cluster(filter.first.mClusterId).EndOfClusterPathIB());
-        SuccessOrExit(err = filterIB.DataVersion(filter.first.mDataVersion.Value()).EndOfDataVersionFilterIB());
-        ChipLogProgress(DataManagement, "Update DataVersionFilter: Endpoint=%u Cluster=" ChipLogFormatMEI " Version=%" PRIu32,
-                        filter.first.mEndpointId, ChipLogValueMEI(filter.first.mClusterId), filter.first.mDataVersion.Value());
-
+        SuccessOrExit(err = aDataVersionFilterIBsBuilder.EncodeDataVersionFilterIB(filter.first));
         aEncodedDataVersionList = true;
     }
 
@@ -646,6 +638,47 @@ exit:
         err = CHIP_NO_ERROR;
     }
     return err;
+}
+
+template <bool CanEnableDataCaching>
+void ClusterStateCacheT<CanEnableDataCaching>::ClearAttributes(EndpointId endpointId)
+{
+    mCache.erase(endpointId);
+}
+
+template <bool CanEnableDataCaching>
+void ClusterStateCacheT<CanEnableDataCaching>::ClearAttributes(const ConcreteClusterPath & cluster)
+{
+    // Can't use GetEndpointState here, since that only handles const things.
+    auto endpointIter = mCache.find(cluster.mEndpointId);
+    if (endpointIter == mCache.end())
+    {
+        return;
+    }
+
+    auto & endpointState = endpointIter->second;
+    endpointState.erase(cluster.mClusterId);
+}
+
+template <bool CanEnableDataCaching>
+void ClusterStateCacheT<CanEnableDataCaching>::ClearAttribute(const ConcreteAttributePath & attribute)
+{
+    // Can't use GetClusterState here, since that only handles const things.
+    auto endpointIter = mCache.find(attribute.mEndpointId);
+    if (endpointIter == mCache.end())
+    {
+        return;
+    }
+
+    auto & endpointState = endpointIter->second;
+    auto clusterIter     = endpointState.find(attribute.mClusterId);
+    if (clusterIter == endpointState.end())
+    {
+        return;
+    }
+
+    auto & clusterState = clusterIter->second;
+    clusterState.mAttributes.erase(attribute.mAttributeId);
 }
 
 template <bool CanEnableDataCaching>

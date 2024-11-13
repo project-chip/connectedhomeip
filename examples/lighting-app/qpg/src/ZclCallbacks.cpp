@@ -160,8 +160,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    uint8_t levelValue;
-    XyColor_t xy;
     bool onOffValue = false;
     app::DataModel::Nullable<uint8_t> currentLevel;
     Protocols::InteractionModel::Status status;
@@ -181,20 +179,11 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
         return;
     }
 
-    levelValue = currentLevel.Value();
-
-    status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        return;
-    }
-    status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        return;
-    }
-    ChipLogProgress(Zcl, "restore level: %u", levelValue);
-    LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, 0, 1, &levelValue);
-    ChipLogProgress(Zcl, "restore XY color: %u|%u", xy.x, xy.y);
-    LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_XY, 0, sizeof(xy), (uint8_t *) &xy);
+    HsvColor_t hsv;
+    status = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
+    assert(status == Protocols::InteractionModel::Status::Success);
+    status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
+    assert(status == Protocols::InteractionModel::Status::Success);
+    ChipLogProgress(Zcl, "restore HSV color: %u|%u", hsv.h, hsv.s);
+    LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_HSV, 0, sizeof(hsv), (uint8_t *) &hsv);
 }

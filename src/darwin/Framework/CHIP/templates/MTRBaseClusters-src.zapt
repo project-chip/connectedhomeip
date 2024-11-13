@@ -116,7 +116,7 @@ MTR{{cluster}}Cluster{{command}}Params
 {{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
 {{#if (or (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
           (and (isSupported (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
-               (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
+               (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
@@ -223,7 +223,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{/if}}
 {{/unless}}
 
-{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
+{{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping name))
            (isSupported (compatClusterNameRemapping name)))}}
 @implementation MTRBaseCluster{{compatClusterNameRemapping name}} (Deprecated)
 
@@ -231,7 +231,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandImpl"}}
-{{#if (and (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)
+{{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" cluster command=command)
            (isSupported cluster command=command))}}
 - (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {
@@ -268,7 +268,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{/zcl_commands}}
 
 {{#zcl_attributes_server removeKeys='isOptional'}}
-{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
+{{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
            (isSupported (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name)))}}
 {{#*inline "attribute"}}Attribute{{compatAttributeNameRemapping parent.name name}}{{/inline}}
 - (void)read{{>attribute}}With

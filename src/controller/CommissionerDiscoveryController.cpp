@@ -155,6 +155,13 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
         return;
     }
 
+    if (state.GetProductId() == 0 && state.GetVendorId() == 0)
+    {
+        // this is an invalid request and should be ignored
+        ChipLogDetail(Controller, "Ignoring the request as it's invalid. product and vendor id cannot be 0");
+        return;
+    }
+
     mReady = false;
     Platform::CopyString(mCurrentInstance, state.GetInstanceName());
     mPendingConsent = true;
@@ -163,8 +170,13 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
                                                          sizeof(rotatingIdString));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "On UDC: could not convert rotating id to hex");
+        ChipLogError(Controller, "On UDC: could not convert rotating id to hex");
         rotatingIdString[0] = '\0';
+    }
+    else
+    {
+        // Store rotating ID string. Don't include null terminator character.
+        mRotatingId = std::string{ rotatingIdString, state.GetRotatingIdLength() * 2 };
     }
 
     ChipLogDetail(Controller,
@@ -219,6 +231,18 @@ void CommissionerDiscoveryController::InternalOk()
         ChipLogError(AppServer, "UX InternalOk: could not find instance=%s", mCurrentInstance);
         return;
     }
+
+    if (mAppInstallationService == nullptr)
+    {
+        ChipLogError(AppServer, "UX InternalOk: no app installation service");
+        return;
+    }
+
+    if (!mAppInstallationService->LookupTargetContentApp(client->GetVendorId(), client->GetProductId()))
+    {
+        ChipLogDetail(AppServer, "UX InternalOk: app not installed.");
+    }
+
     if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kPromptingUser)
     {
         ChipLogError(AppServer, "UX InternalOk: invalid state for ok");
@@ -244,6 +268,7 @@ void CommissionerDiscoveryController::InternalOk()
     CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
 
     uint8_t targetAppCount = client->GetNumTargetAppInfos();
+
     if (targetAppCount > 0)
     {
         ChipLogDetail(AppServer, "UX InternalOk: checking for each target app specified");
@@ -442,6 +467,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
                     cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
                 return;
             }
+
             client->SetCachedCommissionerPasscode(passcode);
             client->SetUDCClientProcessingState(UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
 
@@ -576,13 +602,38 @@ void CommissionerDiscoveryController::Cancel()
         return;
     }
     UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
-    if (client == nullptr || client->GetUDCClientProcessingState() != UDCClientProcessingState::kPromptingUser)
+
+    if (client == nullptr)
     {
-        ChipLogError(AppServer, "UX Cancel: invalid state for cancel");
+        ChipLogError(AppServer, "UX Cancel: client not found");
         return;
     }
+
+    auto state = client->GetUDCClientProcessingState();
+
+    bool isCancelableState =
+        (state == UDCClientProcessingState::kPromptingUser || state == UDCClientProcessingState::kObtainingOnboardingPayload ||
+         state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
+
+    if (!isCancelableState)
+    {
+        ChipLogError(AppServer, "UX Cancel: invalid state for cancel, state: %hhu", static_cast<uint8_t>(state));
+        return;
+    }
+
     client->SetUDCClientProcessingState(UDCClientProcessingState::kUserDeclined);
+
+    if (state == UDCClientProcessingState::kObtainingOnboardingPayload ||
+        state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady)
+    {
+        ChipLogDetail(AppServer, "UX Cancel: user cancelled entering PIN code, sending CDC");
+        CommissionerDeclaration cd;
+        cd.SetCancelPasscode(true);
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+    }
+
     mPendingConsent = false;
+    ResetState();
 }
 
 void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,
@@ -592,10 +643,13 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
     mVendorId  = vendorId;
     mProductId = productId;
     mNodeId    = nodeId;
+
     if (mPostCommissioningListener != nullptr)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
-        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
+        auto rotatingIdSpan = CharSpan{ mRotatingId.data(), mRotatingId.size() };
+        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, rotatingIdSpan, mPasscode, exchangeMgr,
+                                                           sessionHandle);
     }
     else
     {

@@ -45,9 +45,7 @@
 #include "app_thread.h"
 #include "cmsis_os.h"
 #include "dbg_trace.h"
-#include "flash_wb.h"
 #include "stm32_lpm.h"
-
 /* Private typedef -----------------------------------------------------------*/
 /* Private defines -----------------------------------------------------------*/
 /* Private macros ------------------------------------------------------------*/
@@ -96,6 +94,7 @@ int main(void)
      * The OPTVERR flag is wrongly set at power on
      * It shall be cleared before using any HAL_FLASH_xxx() api
      */
+
     __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_OPTVERR);
 
     /**
@@ -126,9 +125,7 @@ int main(void)
     MX_GPIO_Init();
     /* IPCC initialisation */
     MX_IPCC_Init();
-    NM_Init();
     freertos_mbedtls_init();
-
     APPE_Init();
     GetAppTask().InitMatter();
     osKernelStart();

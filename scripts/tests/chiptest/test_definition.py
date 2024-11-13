@@ -159,10 +159,15 @@ class App:
         if self.process:
             self.process.terminate()  # sends SIGTERM
             try:
-                self.process.wait(10)
+                exit_code = self.process.wait(10)
+                if exit_code:
+                    raise Exception('Subprocess failed with exit code: %d' % exit_code)
             except subprocess.TimeoutExpired:
                 logging.debug('Subprocess did not terminate on SIGTERM, killing it now')
                 self.process.kill()
+                # The exit code when using Python subprocess will be the signal used to kill it.
+                # Ideally, we would recover the original exit code, but the process was already
+                # ignoring SIGTERM, indicating something was already wrong.
                 self.process.wait(10)
             self.process = None
             self.outpipe = None
@@ -175,8 +180,10 @@ class TestTarget(Enum):
     OTA = auto()
     BRIDGE = auto()
     LIT_ICD = auto()
+    FABRIC_SYNC = auto()
     MWO = auto()
     RVC = auto()
+    NETWORK_MANAGER = auto()
 
 
 @dataclass
@@ -184,6 +191,7 @@ class ApplicationPaths:
     chip_tool: typing.List[str]
     all_clusters_app: typing.List[str]
     lock_app: typing.List[str]
+    fabric_bridge_app: typing.List[str]
     ota_provider_app: typing.List[str]
     ota_requestor_app: typing.List[str]
     tv_app: typing.List[str]
@@ -193,10 +201,14 @@ class ApplicationPaths:
     chip_repl_yaml_tester_cmd: typing.List[str]
     chip_tool_with_python_cmd: typing.List[str]
     rvc_app: typing.List[str]
+    network_manager_app: typing.List[str]
 
     def items(self):
-        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app,
-                self.tv_app, self.bridge_app, self.lit_icd_app, self.microwave_oven_app, self.chip_repl_yaml_tester_cmd, self.chip_tool_with_python_cmd, self.rvc_app]
+        return [self.chip_tool, self.all_clusters_app, self.lock_app,
+                self.fabric_bridge_app, self.ota_provider_app, self.ota_requestor_app,
+                self.tv_app, self.bridge_app, self.lit_icd_app,
+                self.microwave_oven_app, self.chip_repl_yaml_tester_cmd,
+                self.chip_tool_with_python_cmd, self.rvc_app, self.network_manager_app]
 
 
 @dataclass
@@ -299,6 +311,8 @@ class TestDefinition:
                 target_app = paths.tv_app
             elif self.target == TestTarget.LOCK:
                 target_app = paths.lock_app
+            elif self.target == TestTarget.FABRIC_SYNC:
+                target_app = paths.fabric_bridge_app
             elif self.target == TestTarget.OTA:
                 target_app = paths.ota_requestor_app
             elif self.target == TestTarget.BRIDGE:
@@ -309,6 +323,8 @@ class TestDefinition:
                 target_app = paths.microwave_oven_app
             elif self.target == TestTarget.RVC:
                 target_app = paths.rvc_app
+            elif self.target == TestTarget.NETWORK_MANAGER:
+                target_app = paths.network_manager_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
@@ -373,6 +389,8 @@ class TestDefinition:
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:
                 pairing_cmd = paths.chip_tool_with_python_cmd + ['pairing', 'code', TEST_NODE_ID, setupCode]
+                if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                    pairing_cmd += ['--icd-registration', 'true']
                 test_cmd = paths.chip_tool_with_python_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
                 server_args = ['--server_path', paths.chip_tool[-1]] + \
                     ['--server_arguments', 'interactive server' +

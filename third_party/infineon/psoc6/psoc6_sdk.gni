@@ -21,15 +21,9 @@ import("psoc6_board.gni")
 
 # TODO: Don't hardcode config/toolchain
 # TODO: Convert to GN action?
-if (is_debug) {
-  debug_str = "Debug"
-} else {
-  debug_str = "Release"
-}
 
-mtb_json =
-    read_file("${psoc6_sdk_root}/build/${psoc6_board}/$debug_str/GCC_ARM.json",
-              "json")
+mtb_core_json =
+    read_file("${psoc6_sdk_root}/build/${psoc6_board}/GCC_ARM.json", "json")
 
 # Defines an psoc6 SDK build target.
 #
@@ -73,13 +67,26 @@ template("psoc6_sdk_sources") {
     }
 
     # This is ugly. See note in BUILD.gn for reasoning
-    mtb_json_local = mtb_json  # Can't modify without copying into current scope
+    mtb_json_local =
+        mtb_core_json  # Can't modify without copying into current scope
+
+    # Update the flags and defines for either Release or Debug mode
+    if (is_debug) {
+      mtb_json_local.cflags += [ "-Og" ]
+      mtb_json_local.cxxflags += [ "-Og" ]
+      mtb_json_local.defines += [ "-DDEBUG" ]
+    } else {
+      mtb_json_local.cflags += [ "-Os" ]
+      mtb_json_local.cxxflags += [ "-Os" ]
+      mtb_json_local.defines += [ "-DNDEBUG" ]
+    }
+
     if (chip_enable_ota_requestor == true) {
       mtb_json_local.c_source -= [
-        "./libs/psoc6cm0p/COMPONENT_CM0P_SLEEP/psoc6_01_cm0p_sleep.c",
-        "./libs/psoc6cm0p/COMPONENT_CM0P_SLEEP/psoc6_02_cm0p_sleep.c",
-        "./libs/psoc6cm0p/COMPONENT_CM0P_SLEEP/psoc6_03_cm0p_sleep.c",
-        "./libs/psoc6cm0p/COMPONENT_CM0P_SLEEP/psoc6_04_cm0p_sleep.c",
+        "./libs/cat1cm0p/COMPONENT_CAT1A/COMPONENT_CM0P_SLEEP/psoc6_01_cm0p_sleep.c",
+        "./libs/cat1cm0p/COMPONENT_CAT1A/COMPONENT_CM0P_SLEEP/psoc6_02_cm0p_sleep.c",
+        "./libs/cat1cm0p/COMPONENT_CAT1A/COMPONENT_CM0P_SLEEP/psoc6_03_cm0p_sleep.c",
+        "./libs/cat1cm0p/COMPONENT_CAT1A/COMPONENT_CM0P_SLEEP/psoc6_04_cm0p_sleep.c",
       ]
     }
 

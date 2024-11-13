@@ -24,17 +24,18 @@
  *
  */
 
+#include <pw_unit_test/framework.h>
+
 #include <credentials/CHIPCert.h>
 #include <credentials/examples/LastKnownGoodTimeCertificateValidityPolicyExample.h>
 #include <credentials/examples/StrictCertificateValidityPolicyExample.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/PeerId.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-
-#include <gtest/gtest.h>
 
 #include "CHIPCert_error_test_vectors.h"
 #include "CHIPCert_test_vectors.h"

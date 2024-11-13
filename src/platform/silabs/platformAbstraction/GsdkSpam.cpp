@@ -15,9 +15,18 @@
  *    limitations under the License.
  */
 
+#include <em_device.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
-
+#if defined(_SILICON_LABS_32B_SERIES_2)
+#include "em_msc.h"
 #include "em_rmu.h"
+#elif defined(_SILICON_LABS_32B_SERIES_3)
+#include "sl_hal_emu.h"
+#include "sl_se_manager.h"
+#include "sl_se_manager_types.h"
+#include <sl_se_manager_extmem.h>
+#endif // _SILICON_LABS_32B_SERIES_2
 #include "sl_system_kernel.h"
 
 #ifdef ENABLE_WSTK_LEDS
@@ -61,6 +70,18 @@ extern "C" {
 #include "silabs_utils.h"
 #endif
 
+#if defined(_SILICON_LABS_32B_SERIES_3)
+// To remove any ambiguities regarding the Flash aliases, use the below macro to ignore the 8 MSB.
+#define FLASH_GENERIC_MASK 0x00FFFFFF
+#define GENERIC_ADDRESS(addr) ((addr) &FLASH_GENERIC_MASK)
+
+// Transforms any address into an address using the same alias as FLASH_BASE from the CMSIS.
+#define CMSIS_CONVERTED_ADDRESS(addr) (GENERIC_ADDRESS(addr) | FLASH_BASE)
+namespace {
+sl_se_command_context_t cmd_ctx;
+}
+#endif // _SILICON_LABS_32B_SERIES_3
+
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
@@ -71,16 +92,22 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
+#ifdef _SILICON_LABS_32B_SERIES_2
+    // Read the cause of last reset.
     mRebootCause = RMU_ResetCauseGet();
-    // Clear register so it does accumualate the causes of each reset
+
+    // Clear the register, as the causes cumulate over resets.
     RMU_ResetCauseClear();
+#else
+    // Read the cause of last reset.
+    mRebootCause = sl_hal_emu_get_reset_cause();
+
+    // Clear the register, as the causes cumulate over resets.
+    sl_hal_emu_clear_reset_cause();
+#endif // _SILICON_LABS_32B_SERIES_2
 
 #if SILABS_LOG_OUT_UART && defined(SL_CATALOG_CLI_PRESENT)
     sl_iostream_set_default(sl_iostream_stdio_handle);
-#endif
-
-#if CHIP_ENABLE_OPENTHREAD
-    sl_ot_sys_init();
 #endif
 
 #ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
@@ -93,6 +120,56 @@ CHIP_ERROR SilabsPlatform::Init(void)
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();
+#endif
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SilabsPlatform::FlashInit()
+{
+#if defined(_SILICON_LABS_32B_SERIES_2)
+    MSC_Init();
+#elif defined(_SILICON_LABS_32B_SERIES_3)
+    sl_status_t status;
+    status = sl_se_init();
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
+    status = sl_se_init_command_context(&cmd_ctx);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
+#endif
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SilabsPlatform::FlashErasePage(uint32_t addr)
+{
+#if defined(_SILICON_LABS_32B_SERIES_2)
+    MSC_ErasePage((uint32_t *) addr);
+#elif defined(_SILICON_LABS_32B_SERIES_3)
+    sl_status_t status;
+    uint32_t * data_start = NULL;
+    size_t data_size;
+
+    status = sl_se_data_region_get_location(&cmd_ctx, (void **) &data_start, &data_size);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
+    VerifyOrReturnError(GENERIC_ADDRESS(addr) > GENERIC_ADDRESS((uint32_t) data_start), CHIP_ERROR_INVALID_ADDRESS);
+    status = sl_se_data_region_erase(&cmd_ctx, (void *) addr, 1); // Erase one page
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
+#endif
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SilabsPlatform::FlashWritePage(uint32_t addr, const uint8_t * data, size_t size)
+{
+#if defined(_SILICON_LABS_32B_SERIES_2)
+    MSC_WriteWord((uint32_t *) addr, data, size);
+#elif defined(_SILICON_LABS_32B_SERIES_3)
+    sl_status_t status;
+    uint32_t * data_start = NULL;
+    size_t data_size;
+
+    status = sl_se_data_region_get_location(&cmd_ctx, (void **) &data_start, &data_size);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
+    VerifyOrReturnError(GENERIC_ADDRESS(addr) > GENERIC_ADDRESS((uint32_t) data_start), CHIP_ERROR_INVALID_ADDRESS);
+    status = sl_se_data_region_write(&cmd_ctx, (void *) addr, data, size);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
 #endif
     return CHIP_NO_ERROR;
 }
@@ -141,8 +218,7 @@ void SilabsPlatform::StartScheduler()
 }
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-extern "C" {
-void sl_button_on_change(const sl_button_t * handle)
+extern "C" void sl_button_on_change(const sl_button_t * handle)
 {
     if (Silabs::GetPlatform().mButtonCallback == nullptr)
     {
@@ -158,8 +234,19 @@ void sl_button_on_change(const sl_button_t * handle)
         }
     }
 }
+
+uint8_t SilabsPlatform::GetButtonState(uint8_t button)
+{
+    const sl_button_t * handle = SL_SIMPLE_BUTTON_INSTANCE(button);
+    return nullptr == handle ? 0 : sl_button_get_state(handle);
 }
-#endif
+
+#else
+uint8_t SilabsPlatform::GetButtonState(uint8_t button)
+{
+    return 0;
+}
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 } // namespace Silabs
 } // namespace DeviceLayer

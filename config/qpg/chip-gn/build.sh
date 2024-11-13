@@ -23,6 +23,7 @@ env
 GN_ROOT_TARGET=$(dirname "$0")
 CHIP_ROOT=$GN_ROOT_TARGET/../../../
 OUTDIR=$CHIP_ROOT/out
+GN_ARGS="qpg_target_ic=\"qpg6105\" qpg_flavour=\"_ext_flash\""
 
 mkdir -p "$OUTDIR"
 gn \
@@ -30,9 +31,10 @@ gn \
     --root-target=//config/qpg/chip-gn \
     --dotfile="$GN_ROOT_TARGET/.gn" \
     --script-executable=python3 \
-    --export-compile-commands \
+    --add-export-compile-commands="*" \
     gen \
     --check \
+    --args="$GN_ARGS" \
     --fail-on-unused-args \
     "$OUTDIR"
 ninja -C "$OUTDIR"

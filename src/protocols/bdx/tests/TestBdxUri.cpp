@@ -15,10 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <protocols/bdx/BdxUri.h>
 
 #include <cstring>
-#include <gtest/gtest.h>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <protocols/bdx/BdxUri.h>
 
 using namespace ::chip;
 

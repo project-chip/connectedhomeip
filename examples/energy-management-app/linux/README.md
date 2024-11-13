@@ -1,4 +1,4 @@
-# CHIP Linux Energy Management Example
+# Matter Linux Energy Management Example
 
 An example showing the use of CHIP on the Linux. The document will describe how
 to build and run CHIP Linux Energy Management Example on Raspberry Pi. This doc
@@ -7,16 +7,15 @@ for Raspberry Pi Desktop 20.10 (aarch64)**
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
-[README document](../../../docs/guides/nxp/nxp_imx8m_linux_examples.md) for
+[README document](../../../docs/platforms/nxp/nxp_imx8m_linux_examples.md) for
 details.
 
 <hr>
 
--   [CHIP Linux Energy Management Example](#chip-linux-energy-management-example)
+-   [Matter Linux Energy Management Example](#matter-linux-energy-management-example)
     -   [Building](#building)
     -   [Commandline arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-    -   [Running RPC Console](#running-rpc-console)
     -   [Device Tracing](#device-tracing)
     -   [Python Test Cases](#python-test-cases)
         -   [Running the test cases:](#running-the-test-cases)
@@ -25,6 +24,7 @@ details.
         -   [Activating python virtual env](#activating-python-virtual-env)
         -   [Interacting with CHIP-REPL and the example app](#interacting-with-chip-repl-and-the-example-app)
         -   [Using chip-repl to Fake a charging session](#using-chip-repl-to-fake-a-charging-session)
+    -   [Water Heater App: Interaction using the chip-tool and TestEventTriggers](#water-heater-app-interaction-using-the-chip-tool-and-testeventtriggers)
 
 <hr>
 
@@ -73,6 +73,19 @@ details.
     `interface id`: the number after `hci` when listing BLE interfaces by
     `hciconfig` command, for example, `--ble-device 1` means using `hci1`
     interface. Default: `0`.
+
+-   `--application <evse | water-heater>`
+
+    Emulate either an EVSE or Water Heater example.
+
+-   `--featureSet <feature map for Device Energy Management e.g. 0x7a>`
+
+    Sets the run-time FeatureMap value for the Device Energy Management cluster.
+    This allows the DEM cluster to support `PFR` or `SFR` so that the full range
+    of TC_DEM_2.x test cases can be exercised with this application.
+
+    See the test-runner headers in the respective test script in
+    src/python_testing/TC_DEM_2.x.py which have recommended values to use.
 
 ## Running the Complete Example on Raspberry Pi 4
 
@@ -124,20 +137,6 @@ details.
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
 
-## Running RPC Console
-
--   As part of building the example with RPCs enabled the chip_rpc python
-    interactive console is installed into your venv. The python wheel files are
-    also created in the output folder: out/debug/chip_rpc_console_wheels. To
-    install the wheel files without rebuilding:
-    `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
-
--   To use the chip-rpc console after it has been installed run:
-    `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
-
--   Then you can Get and Set the Energy Management using the RPCs:
-    `rpcs.chip.rpc.EnergyManagement.Get()`
-
 ## Device Tracing
 
 Device tracing is available to analyze the device performance. To turn on
@@ -163,6 +162,14 @@ There are several test scripts provided for EVSE (in
 -   `TC_EEVSE_2_3`: This validates Get/Set/Clear target commands
 -   `TC_EEVSE_2_4`: This validates Faults
 -   `TC_EEVSE_2_5`: This validates EVSE diagnostic command (optional)
+-   `TC_EEVSE_2_6`: This validates EVSE Forecast Adjustment with State Forecast
+    Reporting feature functionality
+-   `TC_EEVSE_2_7`: This validates EVSE Constraints-based Adjustment with Power
+    Forecast Reporting feature functionality
+-   `TC_EEVSE_2_8`: This validates EVSE Constraints-based Adjustment with State
+    Forecast Reporting feature functionality
+-   `TC_EEVSE_2_9`: This validates EVSE Power or State Forecast Reporting
+    feature functionality
 
 These scripts require the use of Test Event Triggers via the GeneralDiagnostics
 cluster on Endpoint 0. This requires an `enableKey` (16 bytes) and a set of
@@ -177,11 +184,44 @@ app you need to add `chip_enable_energy_evse_trigger=true` to the gn args.
 Once the application is built you also need to tell it at runtime what the
 chosen enable key is using the `--enable-key` command line option.
 
-          $ ./chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f
+          $ ./chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f --application evse
 
 ### Running the test cases:
 
 From the top-level of the connectedhomeip repo type:
+
+Start the chip-energy-management-app:
+
+```bash
+rm -f evse.bin; out/debug/chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f --KVS evse.bin --featureSet $featureSet --application evse
+```
+
+where the \$featureSet depends on the test being run:
+
+```
+TC_DEM_2_2.py: 0x01  // PA
+TC_DEM_2_3.py: 0x3b  // STA, PAU, FA, CON + (PFR | SFR)
+TC_DEM_2_4.py: 0x3b  // STA, PAU, FA, CON + (PFR | SFR)
+TC_DEM_2_5.py: 0x3b  // STA, PAU, FA, CON + PFR
+TC_DEM_2_6.py: 0x3d  // STA, PAU, FA, CON + SFR
+TC_DEM_2_7.py: 0x3b  // STA, PAU, FA, CON + PFR
+TC_DEM_2_8.py: 0x3d  // STA, PAU, FA, CON + SFR
+TC_DEM_2_9.py: 0x3f  // STA, PAU, FA, CON + PFR + SFR
+```
+
+where
+
+```
+PA  - DEM.S.F00(PowerAdjustment)
+PFR - DEM.S.F01(PowerForecastReporting)
+SFR - DEM.S.F02(StateForecastReporting)
+STA - DEM.S.F03(StartTimeAdjustment)
+PAU - DEM.S.F04(Pausable)
+FA  - DEM.S.F05(ForecastAdjustment)
+CON  -DEM.S.F06(ConstraintBasedAdjustment)
+```
+
+Then run the test:
 
 ```bash
      $ python src/python_testing/TC_EEVSE_2_2.py --endpoint 1 -m on-network -n 1234 -p 20202021 -d 3840 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
@@ -191,10 +231,17 @@ From the top-level of the connectedhomeip repo type:
     cluster is on endpoint 1. The `--hex-arg enableKey:<key>` value must match
     the `--enable-key <key>` used on chip-energy-management-app args.
 
+The chip-energy-management-app will need to be stopped before running each test
+script as each test commissions the chip-energy-management-app in the first
+step. That is also why the evse.bin is deleted before running
+chip-energy-management-app as this is where the app stores the matter persistent
+data (e.g. fabric info).
+
 ## CHIP-REPL Interaction
 
--   See chip-repl documentation in
-    [Matter_REPL_Intro](../../../docs/guides/repl/Matter_REPL_Intro.ipynb)
+-   See chip-repl documentation in:
+    -   [Working with Python CHIP Controller](../../../docs/development_controllers/chip-repl/python_chip_controller_building.md)
+    -   [Matter_REPL_Intro](../../../docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb)
 
 ### Building chip-repl:
 
@@ -215,7 +262,7 @@ From the top-level of the connectedhomeip repo type:
 -   Step 1: Launch the example app
 
 ```bash
-    $ ./chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f
+    $ ./chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f --application evse
 ```
 
 -   Step 2: Launch CHIP-REPL
@@ -227,7 +274,7 @@ From the top-level of the connectedhomeip repo type:
 -   Step 3: (In chip-repl) Commissioning OnNetwork
 
 ```python
-    devCtrl.CommissionOnNetwork(1234,20202021)   # Commission with NodeID 1234
+    await devCtrl.CommissionOnNetwork(1234,20202021)   # Commission with NodeID 1234
 Established secure session with Device
 Commissioning complete
 Out[2]: <chip.native.PyChipError object at 0x7f2432b16140>
@@ -507,3 +554,62 @@ When we re-read the events:
     state was `kPluggedInCharging` prior to the EV being not detected (normally
     in a graceful shutdown this would be `kPluggedInNoDemand` or
     `kPluggedInDemand`).
+
+## Water Heater App: Interaction using the chip-tool and TestEventTriggers
+
+This section demonstrates how to run the Water Heater application and interact
+with it using the `chip-tool` and `TestEventTriggers`. By default (at the time
+of writing), the WaterHeater app does not configure some of its attributes with
+simulated values (most default to 0). The steps below set the
+[default](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h#L47)
+`TestEventTrigger` which
+`Simulate installation in a 100L tank full of water at 20C, with a target temperature of 60C, in OFF mode`.
+
+Step-by-step:
+
+1. Build the `energy-management-app` for linux:
+
+    ```
+    ./scripts/build/build_examples.py --target linux-x64-energy-management-no-ble build
+    ```
+
+1. Run the Water Heater application:
+
+    ```
+    rm /tmp/chip_* && ./out/linux-x64-energy-management-no-ble/chip-energy-management-app --application water-heater --trace-to json:log --enable-key 000102030405060708090a0b0c0d0e0f
+    ```
+
+1. Commission with chip-tool as node `0x12344321`:
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool pairing code 0x12344321 MT:-24J0AFN00KA0648G00
+    ```
+
+1. Read the `TankVolume` attribute (expect 0 by default):
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool waterheatermanagement read tank-volume 0x12344321 2 | grep TOO
+
+    [1730306361.511] [2089549:2089552] [TOO]   TankVolume: 0
+    ```
+
+1. Set the default TestEventTrigger (`0x0094000000000000`):
+
+-   `0x0094000000000000` corresponds to `kBasicInstallationTestEvent` from
+    `WaterHeadermanagementTestEventTriggerHandler.h`
+-   `hex:00010203...0e0f` is the `--enable-key` passed to the startup of
+    chip-energy-management-app
+-   `0x12344321` is the node-id that the app was commissioned on
+-   final `0` is the endpoint on which the `GeneralDiagnostics` cluster exists
+    to call the `TestEventTrigger` command
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool generaldiagnostics test-event-trigger hex:000102030405060708090a0b0c0d0e0f 0x0094000000000000 0x12344321 0
+    ```
+
+1. Read TankVolume attribute again (now expect 100):
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool waterheatermanagement read tank-volume 0x12344321 2 | grep TOO
+
+    [1730312762.703] [2153606:2153609] [TOO]   TankVolume: 100
+    ```

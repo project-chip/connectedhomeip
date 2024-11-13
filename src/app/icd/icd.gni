@@ -14,22 +14,17 @@
 
 declare_args() {
   # Matter SDK Configuration flag to enable ICD server functionality
-  # TODO - Add Specifics when the design is refined
   chip_enable_icd_server = false
 
   chip_enable_icd_lit = false
-
-  # Matter SDK Configuration flag to enable ICD client functionality
-  # TODO - Add Specifics when the design is refined
-  chip_enable_icd_client = false
 
   # Matter SDK Configuration flag to make the ICD manager emit a report on entering active mode
   chip_icd_report_on_active_mode = false
 
   icd_max_notification_subscribers = 1
 
-  # Set to true to enforce SIT Slow Polling Max value to 15seconds (spec 9.16.1.5)
-  icd_enforce_sit_slow_poll_limit = false
+  # Set to true if device supports dynamic switching from SIT to LIT operating modes (DSLS)
+  chip_enable_icd_dsls = false
 }
 
 # Set the defaults for CIP and UAT features to be consistent with the LIT value.

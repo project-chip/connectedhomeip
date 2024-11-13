@@ -28,31 +28,39 @@
 
 #include "sdkconfig.h"
 
-#if CONFIG_BT_NIMBLE_ENABLED
+#ifdef CONFIG_BT_NIMBLE_ENABLED
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include <ble/Ble.h>
-#endif
+#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include <platform/ESP32/BLEManagerImpl.h>
-#endif
+#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+
 #include <platform/internal/BLEManager.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/SystemTimer.h>
 
+#ifndef CONFIG_IDF_TARGET_ESP32P4
 #include "esp_bt.h"
+#endif
 #include "esp_log.h"
+
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "esp_nimble_hci.h"
 #endif
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include "blecent.h"
-#endif
+#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+
 #include "host/ble_hs.h"
 #include "host/ble_hs_pvcy.h"
 #include "host/ble_uuid.h"
@@ -76,11 +84,10 @@ namespace Internal {
 
 namespace {
 
-TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 static constexpr uint16_t kNewConnectionScanTimeout = 60;
 static constexpr uint16_t kConnectTimeout           = 20;
-#endif
+#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 
 struct ESP32ChipServiceData
 {
@@ -90,27 +97,23 @@ struct ESP32ChipServiceData
 
 const ble_uuid16_t ShortUUID_CHIPoBLEService = { BLE_UUID_TYPE_16, 0xFFF6 };
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 const ble_uuid16_t ShortUUID_CHIPoBLE_CharTx_Desc = { BLE_UUID_TYPE_16, 0x2902 };
-#endif
+#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 
 const ble_uuid128_t UUID128_CHIPoBLEChar_RX = {
     BLE_UUID_TYPE_128, { 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
 };
-const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x11 } };
 
-const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x12 } };
-const ble_uuid128_t UUID_CHIPoBLEChar_TX   = {
+const ble_uuid128_t UUID_CHIPoBLEChar_TX = {
     { BLE_UUID_TYPE_128 }, { 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
 };
 
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 const ble_uuid128_t UUID_CHIPoBLEChar_C3 = {
     { BLE_UUID_TYPE_128 }, { 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64 }
 };
-#endif
+#endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 
 SemaphoreHandle_t semaphoreHandle = NULL;
 
@@ -120,7 +123,7 @@ uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
 
 } // unnamed namespace
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 ChipDeviceScanner & mDeviceScanner = Internal::ChipDeviceScanner::GetInstance();
 #endif
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -159,7 +162,7 @@ const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
     },
 };
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error)
 {
     if (sInstance.mIsCentral)
@@ -207,18 +210,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
 
-    // Create FreeRTOS sw timer for BLE timeouts and interval change.
-    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
-                                       1,                   // == default timer period
-                                       false,               // no timer reload (==one-shot)
-                                       (void *) this,       // init timer id = ble obj context
-                                       BleAdvTimeoutHandler // timer callback handler
-    );
-
-    VerifyOrReturnError(sbleAdvTimeoutTimer != nullptr, CHIP_ERROR_NO_MEMORY);
-
     // Initialize the Chip BleLayer.
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
 #else
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
@@ -230,7 +223,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mC3CharAttrHandle = 0;
 #endif
     mTXCharCCCDAttrHandle = 0;
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral);
     mFlags.Set(Flags::kFastAdvertisingEnabled, !mIsCentral);
 #else
@@ -251,9 +244,7 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
-    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
-    xTimerDelete(sbleAdvTimeoutTimer, portMAX_DELAY);
-    sbleAdvTimeoutTimer = nullptr;
+    CancelBleAdvTimeoutTimer();
 
     BleLayer::Shutdown();
 
@@ -284,7 +275,7 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
+void BLEManagerImpl::BleAdvTimeoutHandler(System::Layer *, void *)
 {
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
@@ -292,13 +283,12 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
         BLEMgrImpl().mFlags.Set(Flags::kFastAdvertisingEnabled, 0);
         BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
 
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
         BLEMgrImpl().mFlags.Clear(Flags::kExtAdvertisingEnabled);
         BLEMgrImpl().StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS);
 #endif
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
     else
     {
         ChipLogProgress(DeviceLayer, "bleAdv Timeout : Start extended advertisement");
@@ -306,9 +296,9 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
         BLEMgrImpl().mFlags.Set(Flags::kExtAdvertisingEnabled);
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
         BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 #endif
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
@@ -368,7 +358,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLESubscribe:
-        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         {
             ChipDeviceEvent connectionEvent;
             connectionEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
@@ -377,16 +367,16 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe:
-        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kCHIPoBLEConnectionError:
@@ -404,14 +394,14 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     default:
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
         HandlePlatformSpecificBLEEvent(event);
 #endif
         break;
     }
 }
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEvent)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -437,20 +427,20 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         break;
 
     case DeviceEventType::kPlatformESP32BLEWriteComplete:
-        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX);
+        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID);
         break;
 
     case DeviceEventType::kPlatformESP32BLESubscribeOpComplete:
         if (apEvent->Platform.BLESubscribeOpComplete.mIsSubscribed)
             HandleSubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
-                                    &chipUUID_CHIPoBLEChar_TX);
+                                    &Ble::CHIP_BLE_CHAR_2_UUID);
         else
             HandleUnsubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
-                                      &chipUUID_CHIPoBLEChar_TX);
+                                      &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kPlatformESP32BLEIndicationReceived:
-        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX,
+        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID,
                                  PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
         break;
 
@@ -496,13 +486,18 @@ static int OnSubscribeCharComplete(uint16_t conn_handle, const struct ble_gatt_e
 }
 #endif
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                   const ChipBleUUID * charId)
 {
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     const struct peer_dsc * dsc;
     uint8_t value[2];
     int rc;
     struct peer * peer = peer_find(conId);
+    if (peer == nullptr)
+    {
+        return BLE_ERROR_GATT_SUBSCRIBE_FAILED;
+    }
 
     dsc = peer_dsc_find_uuid(peer, (ble_uuid_t *) (&ShortUUID_CHIPoBLEService), (ble_uuid_t *) (&UUID_CHIPoBLEChar_TX),
                              (ble_uuid_t *) (&ShortUUID_CHIPoBLE_CharTx_Desc));
@@ -511,7 +506,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     {
         ChipLogError(Ble, "Peer does not have CCCD");
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_SUBSCRIBE_FAILED;
     }
 
     value[0] = 0x02;
@@ -522,21 +517,26 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_SUBSCRIBE_FAILED;
     }
-    return true;
+    return CHIP_NO_ERROR;
 #else
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     const struct peer_dsc * dsc;
     uint8_t value[2];
     int rc;
     struct peer * peer = peer_find(conId);
+    if (peer == nullptr)
+    {
+        return BLE_ERROR_GATT_UNSUBSCRIBE_FAILED;
+    }
 
     dsc = peer_dsc_find_uuid(peer, (ble_uuid_t *) (&ShortUUID_CHIPoBLEService), (ble_uuid_t *) (&UUID_CHIPoBLEChar_TX),
                              (ble_uuid_t *) (&ShortUUID_CHIPoBLE_CharTx_Desc));
@@ -545,7 +545,7 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     {
         ChipLogError(Ble, "Peer does not have CCCD");
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_UNSUBSCRIBE_FAILED;
     }
 
     value[0] = 0x00;
@@ -556,15 +556,15 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_UNSUBSCRIBE_FAILED;
     }
-    return true;
+    return CHIP_NO_ERROR;
 #else
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     CHIP_ERROR err;
 
@@ -577,14 +577,14 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
         ChipLogError(DeviceLayer, "ble_gap_terminate() failed: %s", ErrorStr(err));
     }
 
-#if !CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifndef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     // Force a refresh of the advertising state.
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
     mFlags.Clear(Flags::kAdvertisingConfigured);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 #endif
 
-    return (err == CHIP_NO_ERROR);
+    return err;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -592,8 +592,8 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return ble_att_mtu(conId);
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    chip::System::PacketBufferHandle data)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                          chip::System::PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     struct os_mbuf * om;
@@ -622,15 +622,10 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     }
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
-        return false;
-    }
-    return true;
+    return err;
 }
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 static int OnWriteComplete(uint16_t conn_handle, const struct ble_gatt_error * error, struct ble_gatt_attr * attr, void * arg)
 {
     ChipLogDetail(Ble, "Write complete; status:%d conn_handle:%d attr_handle:%d", error->status, conn_handle, attr->handle);
@@ -647,10 +642,10 @@ static int OnWriteComplete(uint16_t conn_handle, const struct ble_gatt_error * e
 }
 #endif
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      chip::System::PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                            chip::System::PacketBufferHandle pBuf)
 {
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     const struct peer_chr * chr;
     int rc;
     const struct peer * peer = peer_find(conId);
@@ -660,37 +655,33 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBle
     {
         ChipLogError(Ble, "Peer does not have RX characteristic");
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_WRITE_FAILED;
     }
 
-    rc = ble_gattc_write_flat(conId, chr->chr.val_handle, pBuf->Start(), pBuf->DataLength(), OnWriteComplete, this);
+    if (pBuf->DataLength() > UINT16_MAX)
+    {
+        ChipLogError(Ble, "Buffer data Length is too long");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    rc = ble_gattc_write_flat(conId, chr->chr.val_handle, pBuf->Start(), static_cast<uint16_t>(pBuf->DataLength()), OnWriteComplete,
+                              this);
     if (rc != 0)
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_WRITE_FAILED;
     }
-    return true;
+    return CHIP_NO_ERROR;
 #else
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     chip::System::PacketBufferHandle pBuf)
+void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogError(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
-    return false;
+    ChipLogDetail(Ble, "Received notification of closed CHIPoBLE connection (con %u)", conId);
+    CloseConnection(conId);
 }
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogError(DeviceLayer, "BLEManagerImpl::SendReadResponse() not supported");
-    return false;
-}
-
-void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
@@ -723,26 +714,17 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 }
 void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 {
-    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
-
-    if (xTimerStop(sbleAdvTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
+    if (SystemLayer().IsTimerActive(BleAdvTimeoutHandler, nullptr))
     {
-        ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
+        SystemLayer().CancelTimer(BleAdvTimeoutHandler, nullptr);
     }
 }
 void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 {
-    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
+    CancelBleAdvTimeoutTimer();
 
-    if (xTimerIsTimerActive(sbleAdvTimeoutTimer))
-    {
-        CancelBleAdvTimeoutTimer();
-    }
-
-    // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
-    // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), pdMS_TO_TICKS(100)) != pdPASS)
+    CHIP_ERROR err = SystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeoutInMs), BleAdvTimeoutHandler, nullptr);
+    if ((err != CHIP_NO_ERROR))
     {
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
@@ -837,23 +819,21 @@ void BLEManagerImpl::DriveBLEState(void)
                     ExitNow();
                 }
             }
-            // mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
 
             // Transition to the not Advertising state...
-            if (mFlags.Has(Flags::kAdvertising))
+            mFlags.Clear(Flags::kAdvertising);
+            mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+
+            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
+
+            CancelBleAdvTimeoutTimer();
+
+            // Post a CHIPoBLEAdvertisingChange(Stopped) event.
             {
-                mFlags.Clear(Flags::kAdvertising);
-                mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-
-                ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-
-                // Post a CHIPoBLEAdvertisingChange(Stopped) event.
-                {
-                    ChipDeviceEvent advChange;
-                    advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
-                    advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-                    err                                        = PlatformMgr().PostEvent(&advChange);
-                }
+                ChipDeviceEvent advChange;
+                advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+                advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
+                err                                        = PlatformMgr().PostEvent(&advChange);
             }
 
             ExitNow();
@@ -1012,10 +992,10 @@ void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
         // Free up all the space occupied by ble and add it to heap
         esp_err_t err = ESP_OK;
 
-#if CONFIG_IDF_TARGET_ESP32
+#ifdef CONFIG_IDF_TARGET_ESP32
         err = esp_bt_mem_release(ESP_BT_MODE_BTDM);
-#elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32H2 ||          \
-    CONFIG_IDF_TARGET_ESP32C6
+#elif defined(CONFIG_IDF_TARGET_ESP32C2) || defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32S3) ||            \
+    defined(CONFIG_IDF_TARGET_ESP32H2) || defined(CONFIG_IDF_TARGET_ESP32C6)
         err = esp_bt_mem_release(ESP_BT_MODE_BLE);
 #endif
 
@@ -1042,6 +1022,11 @@ CHIP_ERROR BLEManagerImpl::DeinitBLE()
 
     return MapBLEError(err);
 }
+
+#ifdef CONFIG_IDF_TARGET_ESP32P4
+// Stub function to avoid link error
+extern "C" void ble_transport_ll_deinit(void) {}
+#endif
 
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
@@ -1088,7 +1073,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ExitNow();
     }
 
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
     // Check for extended advertisement interval and redact VID/PID if past the initial period.
     if (mFlags.Has(Flags::kExtAdvertisingEnabled))
     {
@@ -1282,7 +1267,7 @@ uint16_t BLEManagerImpl::_NumConnections(void)
     return numCons;
 }
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 void BLEManagerImpl::HandleGAPConnectionFailed(struct ble_gap_event * gapEvent, CHIP_ERROR error)
 {
     ChipLogError(Ble, "BLE GAP connection failed; status:%d", gapEvent->connect.status);
@@ -1371,7 +1356,7 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::HandleGAPConnect(struct ble_gap_event * gapEvent)
 {
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     int rc;
 
     rc = ble_gattc_exchange_mtu(gapEvent->connect.conn_handle, NULL, NULL);
@@ -1397,7 +1382,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
         mNumGAPCons--;
     }
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     peer_delete(gapEvent->disconnect.conn.conn_handle);
 #endif
 
@@ -1534,7 +1519,7 @@ int BLEManagerImpl::ble_svr_gap_event(struct ble_gap_event * event, void * arg)
         ESP_LOGD(TAG, "BLE_GAP_EVENT_MTU = %d channel id = %d", event->mtu.value, event->mtu.channel_id);
         break;
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     case BLE_GAP_EVENT_NOTIFY_RX:
         ESP_LOGD(TAG, "BLE_GAP_EVENT_NOTIFY_RX received %s conn_handle:%d attr_handle:%d attr_len:%d",
                  event->notify_rx.indication ? "indication" : "notification", event->notify_rx.conn_handle,
@@ -1585,7 +1570,7 @@ void BLEManagerImpl::HandleC3CharRead(struct ble_gatt_char_context * param)
                                                                          additionalDataFields);
     SuccessOrExit(err);
 
-    os_mbuf_append(param->ctxt->om, bufferHandle->Start(), bufferHandle->DataLength());
+    os_mbuf_append(param->ctxt->om, bufferHandle->Start(), static_cast<uint16_t>(bufferHandle->DataLength()));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1693,7 +1678,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
     else
     {
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
         if (!mFlags.Has(Flags::kExtAdvertisingEnabled))
         {
             adv_params.itvl_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
@@ -1727,7 +1712,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
                 return err;
             }
         }
-#if CONFIG_BT_NIMBLE_HOST_BASED_PRIVACY
+#ifdef CONFIG_BT_NIMBLE_HOST_BASED_PRIVACY
         else
         {
             err = MapBLEError(ble_hs_pvcy_rpa_config(NIMBLE_HOST_ENABLE_RPA));
@@ -1765,13 +1750,15 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
     sInstance.DriveBLEState();
 }
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 CHIP_ERROR BLEManagerImpl::HandleRXNotify(struct ble_gap_event * ble_event)
 {
-    uint8_t * data                 = OS_MBUF_DATA(ble_event->notify_rx.om, uint8_t *);
-    size_t dataLen                 = OS_MBUF_PKTLEN(ble_event->notify_rx.om);
-    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(data, dataLen);
+    uint16_t dataLen               = OS_MBUF_PKTLEN(ble_event->notify_rx.om);
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(dataLen, 0);
     VerifyOrReturnError(!buf.IsNull(), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(buf->AvailableDataLength() >= dataLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ble_hs_mbuf_to_flat(ble_event->notify_rx.om, buf->Start(), dataLen, NULL);
+    buf->SetDataLength(dataLen);
 
     ChipLogDetail(DeviceLayer, "Indication received, conn = %d", ble_event->notify_rx.conn_handle);
 

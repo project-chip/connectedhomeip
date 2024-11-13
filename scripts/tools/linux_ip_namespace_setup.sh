@@ -124,7 +124,7 @@ function help() {
     echo "sudo <path>/$file_name -r <path>/<application_name>"
     echo ""
     echo "Terminal 2:"
-    echo "<path>/chip-device-ctrl"
+    echo "<path>/chip-repl"
     echo ""
     echo "This script requires sudo for setup and requires access to ebtables-legacy"
     echo "to set up dual ipv4/ipv6 namespaces. Defaults to ipv6 only."

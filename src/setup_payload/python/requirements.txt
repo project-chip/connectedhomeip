@@ -1,2 +1,0 @@
-bitarray==2.6.0
-python_stdnum==1.18

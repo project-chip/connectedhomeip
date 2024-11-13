@@ -22,6 +22,9 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/TypeTraits.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/PlatformManager.h>
 #include <transport/SessionManager.h>
 
 namespace chip {
@@ -78,6 +81,18 @@ void PairingSession::Finish()
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrDie(mSecureSessionHolder);
+        DeviceLayer::ChipDeviceEvent event;
+        event.Type                                   = DeviceLayer::DeviceEventType::kSecureSessionEstablished;
+        event.SecureSessionEstablished.TransportType = to_underlying(address.GetTransportType());
+        event.SecureSessionEstablished.SecureSessionType =
+            to_underlying(mSecureSessionHolder->AsSecureSession()->GetSecureSessionType());
+        event.SecureSessionEstablished.LocalSessionId = mSecureSessionHolder->AsSecureSession()->GetLocalSessionId();
+        event.SecureSessionEstablished.PeerNodeId     = mSecureSessionHolder->GetPeer().GetNodeId();
+        event.SecureSessionEstablished.FabricIndex    = mSecureSessionHolder->GetPeer().GetFabricIndex();
+        if (DeviceLayer::PlatformMgr().PostEvent(&event) != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Failed to post Secure Session established event");
+        }
         // Make sure to null out mDelegate so we don't send it any other
         // notifications.
         auto * delegate = mDelegate;

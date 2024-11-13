@@ -1,6 +1,6 @@
 # Matter EFR32 Pump Example
 
-An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
+An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
@@ -71,22 +71,6 @@ Labs platform.
     -   > For the latest supported hardware please refer to the
         > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
         > in the Silicon Labs Matter Github Repo
-
-    MG12 boards:
-
-    -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
-        868MHz@19dBm
-    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
-    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
-        915MHz@19dBm
-    -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-
-    MG21 boards: Currently not supported due to RAM limitation.
-
-    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
     MG24 boards :
 
@@ -199,13 +183,11 @@ combination with JLinkRTTClient as follows:
 
 -   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
 
-    For MG12 use:
+    For MG24 use:
 
-          $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
-
-    For MG21 use:
-
-          $ JLinkExe -device EFR32MG21AXXXF1024 -if SWD -speed 4000 -autoconnect 1
+          ```
+          $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
+          ```
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
@@ -215,7 +197,7 @@ combination with JLinkRTTClient as follows:
 
 -   It is assumed here that you already have an OpenThread border router
     configured and running. If not see the following guide
-    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
     for more information on how to setup a border router on a raspberryPi.
 
     Take note that the RCP code is available directly through
@@ -260,6 +242,7 @@ combination with JLinkRTTClient as follows:
         -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
             for 30 seconds. The device will then switch to a slower interval advertisement.
             After 15 minutes, the advertisement stops.
+            Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
 
         -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
@@ -325,7 +308,7 @@ tracking code inside the `trackAlloc` and `trackFree` function
 
 For the description of Software Update process with EFR32 example applications
 see
-[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+[EFR32 OTA Software Update](../../../docs/platforms/silabs/silabs_efr32_software_update.md)
 
 ## Group Communication (Multicast)
 

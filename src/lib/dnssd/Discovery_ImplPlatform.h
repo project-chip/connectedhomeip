@@ -55,6 +55,7 @@ public:
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context);
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context);
+    CHIP_ERROR DiscoverOperational(DiscoveryFilter filter, DiscoveryContext & context);
     CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) override;
     CHIP_ERROR StopDiscovery(DiscoveryContext & context) override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;

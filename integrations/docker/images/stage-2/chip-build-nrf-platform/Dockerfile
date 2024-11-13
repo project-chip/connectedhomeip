@@ -7,7 +7,14 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION} as build
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 # Compatible Nordic Connect SDK revision.
-ARG NCS_REVISION=v2.6.0
+ARG NCS_REVISION=v2.7.0
+
+# Requirements to clone SDKs in temporary container
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+    xz-utils \
+    && : # last line
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 WORKDIR /opt/NordicSemiconductor/nRF5_tools
@@ -23,7 +30,7 @@ RUN set -x \
 
 WORKDIR /opt/NordicSemiconductor/nrfconnect
 RUN set -x \
-    && python3 -m pip install -U --no-cache-dir west==1.2.0 \
+    && python3 -m pip install --break-system-packages -U --no-cache-dir west==1.2.0 \
     && west init -m https://github.com/nrfconnect/sdk-nrf --mr "$NCS_REVISION" \
     && west config update.narrow true \
     && west config update.fetch smart \
@@ -50,10 +57,10 @@ COPY --from=build /opt/NordicSemiconductor/nrfconnect/ /opt/NordicSemiconductor/
 RUN set -x \
     # python3-yaml package conflicts with nRF Python requirements
     && (apt-get remove -fy python3-yaml && apt-get autoremove || exit 0) \
-    && python3 -m pip install -U --no-cache-dir cmake==3.25.0 \
-    && python3 -m pip install --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/zephyr/scripts/requirements-base.txt \
-    && python3 -m pip install --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/nrf/scripts/requirements-build.txt \
-    && python3 -m pip install --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/bootloader/mcuboot/scripts/requirements.txt \
+    && python3 -m pip install --break-system-packages -U --no-cache-dir cmake==3.25.0 \
+    && python3 -m pip install --break-system-packages --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/zephyr/scripts/requirements-base.txt \
+    && python3 -m pip install --break-system-packages --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/nrf/scripts/requirements-build.txt \
+    && python3 -m pip install --break-system-packages --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/bootloader/mcuboot/scripts/requirements.txt \
     && : # last line
 
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools

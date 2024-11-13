@@ -26,9 +26,7 @@
 #include "em_usart.h"
 
 #include "wfx_host_events.h"
-#include "wifi_config.h"
 
-#include "AppConfig.h"
 #include "dhcp_client.h"
 #include "ethernetif.h"
 
@@ -36,14 +34,20 @@
 #include "event_groups.h"
 #include "task.h"
 
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
+
 static struct netif sta_netif;
 
 #ifdef SL_WFX_CONFIG_SOFTAP
 static struct netif ap_netif;
 #endif
+
+#define LINK_UP (1)
+#define LINK_DOWN (0)
+#define MAC_48_BIT_SET (1)
 
 /****************************************************************************
  * @fn   static void netif_config(struct netif *sta_if, struct netif *ap_if)
@@ -121,13 +125,13 @@ void wfx_lwip_set_sta_link_down(void)
 }
 
 /***************************************************************************
- * @fn  void wfx_lwip_start(void)
+ * @fn  void sl_matter_lwip_start(void)
  * @brief
  * Initialize the LwIP stack
  * @param[in] None
  * @return None
  *****************************************************************************/
-void wfx_lwip_start(void)
+void sl_matter_lwip_start(void)
 {
     /* Initialize the LwIP stack */
     netif_config(&sta_netif, NULL);

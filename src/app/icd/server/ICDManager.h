@@ -18,7 +18,6 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
-#include <app-common/zap-generated/cluster-enums.h>
 #include <app/AppConfig.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>
@@ -34,9 +33,10 @@
 #include <system/SystemClock.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-#include <app/icd/server/ICDCheckInSender.h>   // nogncheck
-#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
-#endif                                         // CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/icd/server/ICDCheckInBackOffStrategy.h> // nogncheck
+#include <app/icd/server/ICDCheckInSender.h>          // nogncheck
+#include <app/icd/server/ICDMonitoringTable.h>        // nogncheck
+#endif                                                // CHIP_CONFIG_ENABLE_ICD_CIP
 
 namespace chip {
 namespace Crypto {
@@ -47,9 +47,9 @@ using SymmetricKeystore = SessionKeystore;
 namespace chip {
 namespace app {
 
-// Forward declaration of TestICDManager to allow it to be friend with ICDManager
+// Forward declaration of TestICDManager tests to allow it to be friend with ICDManager
 // Used in unit tests
-class TestICDManager;
+class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
 
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
@@ -115,8 +115,52 @@ public:
     ICDManager()  = default;
     ~ICDManager() = default;
 
-    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider);
+    /*
+        Builder function to set all necessary members for the ICDManager class
+    */
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    ICDManager & SetPersistentStorageDelegate(PersistentStorageDelegate * storage)
+    {
+        mStorage = storage;
+        return *this;
+    };
+
+    ICDManager & SetFabricTable(FabricTable * fabricTable)
+    {
+        mFabricTable = fabricTable;
+        return *this;
+    };
+
+    ICDManager & SetSymmetricKeyStore(Crypto::SymmetricKeystore * symmetricKeystore)
+    {
+        mSymmetricKeystore = symmetricKeystore;
+        return *this;
+    };
+
+    ICDManager & SetExchangeManager(Messaging::ExchangeManager * exchangeManager)
+    {
+        mExchangeManager = exchangeManager;
+        return *this;
+    };
+
+    ICDManager & SetSubscriptionsInfoProvider(SubscriptionsInfoProvider * subInfoProvider)
+    {
+        mSubInfoProvider = subInfoProvider;
+        return *this;
+    };
+
+    ICDManager & SetICDCheckInBackOffStrategy(ICDCheckInBackOffStrategy * strategy)
+    {
+        mICDCheckInBackOffStrategy = strategy;
+        return *this;
+    };
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    /**
+     * @brief Validates that the ICDManager has all the necessary members to function and initializes the class
+     */
+    void Init();
     void Shutdown();
 
     /**
@@ -131,6 +175,8 @@ public:
     bool SupportsFeature(Clusters::IcdManagement::Feature feature);
 
     ICDConfigurationData::ICDMode GetICDMode() { return ICDConfigurationData::GetInstance().GetICDMode(); };
+
+    OperationalState GetOperaionalState() { return mOperationalState; };
 
     /**
      * @brief Adds the referenced observer in parameters to the mStateObserverPool
@@ -187,7 +233,7 @@ public:
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool GetIsBootUpResumeSubscriptionExecuted() { return mIsBootUpResumeSubscriptionExecuted; };
 #endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-#endif
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     // Implementation of ICDListener functions.
     // Callers must origin from the chip task context or hold the ChipStack lock.
@@ -195,11 +241,19 @@ public:
     void OnNetworkActivity() override;
     void OnKeepActiveRequest(KeepActiveFlags request) override;
     void OnActiveRequestWithdrawal(KeepActiveFlags request) override;
+
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    void OnSITModeRequest() override;
+    void OnSITModeRequestWithdrawal() override;
+#endif
+
     void OnICDManagementServerEvent(ICDManagementEvents event) override;
     void OnSubscriptionReport() override;
 
 private:
-    friend class TestICDManager;
+    // TODO : Once <gtest/gtest_prod.h> can be included, use FRIEND_TEST for the friend class.
+    friend class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
+
     /**
      * @brief UpdateICDMode evaluates in which mode the ICD can be in; SIT or LIT mode.
      *        If the current operating mode does not match the evaluated operating mode, function updates the ICDMode and triggers
@@ -308,6 +362,10 @@ private:
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
     uint8_t mOpenExchangeContextCount = 0;
 
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    bool mSITModeRequested = false;
+#endif
+
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     uint8_t mCheckInRequestCount = 0;
 
@@ -315,18 +373,19 @@ private:
     bool mIsBootUpResumeSubscriptionExecuted = false;
 #endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-    PersistentStorageDelegate * mStorage           = nullptr;
-    FabricTable * mFabricTable                     = nullptr;
-    Messaging::ExchangeManager * mExchangeManager  = nullptr;
-    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
-    SubscriptionsInfoProvider * mSubInfoProvider   = nullptr;
+    PersistentStorageDelegate * mStorage                   = nullptr;
+    FabricTable * mFabricTable                             = nullptr;
+    Messaging::ExchangeManager * mExchangeManager          = nullptr;
+    Crypto::SymmetricKeystore * mSymmetricKeystore         = nullptr;
+    SubscriptionsInfoProvider * mSubInfoProvider           = nullptr;
+    ICDCheckInBackOffStrategy * mICDCheckInBackOffStrategy = nullptr;
     ObjectPool<ICDCheckInSender, (CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS)> mICDSenderPool;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // feature map that can be changed at runtime for testing purposes
     uint32_t mFeatureMap = 0;
-#endif
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 };
 
 } // namespace app

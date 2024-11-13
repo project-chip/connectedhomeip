@@ -59,7 +59,7 @@ public:
     }
 
     CHIP_ERROR Init(chip::System::Layer * systemLayer, const CASESessionManagerConfig & params);
-    void Shutdown() {}
+    void Shutdown();
 
     /**
      * Find an existing session for the given node ID, or trigger a new session
@@ -142,6 +142,7 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
+    void ReleaseSession(const ScopedNodeId & peerId);
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
     void ReleaseAllSessions();

@@ -21,8 +21,7 @@
 #include <app/server/Dnssd.h>
 #include <lib/dnssd/Advertiser.h>
 
-#include "AppMatterButton.h"
-#include "AppMatterCli.h"
+#include "ButtonRegistration.h"
 
 #include "CHIPDeviceManager.h"
 #include <app/server/Server.h>
@@ -30,6 +29,18 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/nxp/common/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+#ifdef ENABLE_CHIP_SHELL
+#include "AppCLIBase.h"
+#endif
+
+#if CONFIG_ENABLE_FEEDBACK
+#include "UserInterfaceFeedback.h"
+#endif
+
+#if CONFIG_ENABLE_PW_RPC
+#include "AppRpc.h"
+#endif
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -42,12 +53,18 @@
 #ifndef APP_TASK_STACK_SIZE
 #define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE) 6144 / sizeof(portSTACK_TYPE))
 #endif
+
 #ifndef APP_TASK_PRIORITY
 #define APP_TASK_PRIORITY 2
 #endif
-#define APP_EVENT_QUEUE_SIZE 10
 
-static QueueHandle_t sAppEventQueue;
+#ifndef APP_EVENT_QUEUE_SIZE
+#define APP_EVENT_QUEUE_SIZE 10
+#endif
+
+#ifndef APP_QUEUE_TICKS_TO_WAIT
+#define APP_QUEUE_TICKS_TO_WAIT portMAX_DELAY
+#endif
 
 using namespace chip;
 using namespace chip::TLV;
@@ -68,20 +85,23 @@ chip::DeviceLayer::NetworkCommissioning::WiFiDriver * chip::NXP::App::AppTaskFre
 CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::AppMatter_Register()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
     /* Register Matter CLI cmds */
-    err = AppMatterCli_RegisterCommands();
+#ifdef ENABLE_CHIP_SHELL
+    err = chip::NXP::App::GetAppCLI().Init();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Error during CLI init"));
     AppMatter_RegisterCustomCliCommands();
-    AppMatterCli_StartTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Error during AppMatterCli_RegisterCommands");
-        return err;
-    }
+#endif
+
+#if CONFIG_ENABLE_FEEDBACK
+    FeedbackMgr().Init();
+#endif
+
     /* Register Matter buttons */
-    err = AppMatterButton_registerButtons();
+    err = chip::NXP::App::RegisterButtons();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Error during AppMatterButton_registerButtons");
+        ChipLogError(DeviceLayer, "Error during button registration");
         return err;
     }
     return err;
@@ -92,14 +112,30 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
     CHIP_ERROR err = CHIP_NO_ERROR;
     TaskHandle_t taskHandle;
 
-    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
-    if (sAppEventQueue == NULL)
+#if CONFIG_ENABLE_PW_RPC
+    chip::NXP::App::Rpc::Init();
+#endif
+
+    appEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
+    if (appEventQueue == NULL)
     {
         err = CHIP_ERROR_NO_MEMORY;
         ChipLogError(DeviceLayer, "Failed to allocate app event queue");
         assert(err == CHIP_NO_ERROR);
     }
 
+    ticksToWait = APP_QUEUE_TICKS_TO_WAIT;
+
+#if FSL_OSA_MAIN_FUNC_ENABLE
+    /* When OSA is used, this code will be called from within the startup_task
+     * and the scheduler will be started at this point. Just call AppTaskMain to
+     * start the main loop instead of creating a task, since we are already in it.
+     * Task parameters are configured through SDK flags:
+     *  - gMainThreadPriority_c
+     *  - gMainThreadStackSize_c
+     */
+    AppTaskFreeRTOS::AppTaskMain(this);
+#else
     /* AppTaskMain function will loss actual object instance, give it as parameter */
     if (xTaskCreate(&AppTaskFreeRTOS::AppTaskMain, "AppTaskMain", APP_TASK_STACK_SIZE, this, APP_TASK_PRIORITY, &taskHandle) !=
         pdPASS)
@@ -108,6 +144,7 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
         ChipLogError(DeviceLayer, "Failed to start app task");
         assert(err == CHIP_NO_ERROR);
     }
+#endif // FSL_OSA_TASK_ENABLE
 
     return err;
 }
@@ -122,31 +159,43 @@ void chip::NXP::App::AppTaskFreeRTOS::AppTaskMain(void * pvParameter)
 
     sAppTask->PreInitMatterStack();
     err = sAppTask->Init();
+    VerifyOrDieWithMsg(err == CHIP_NO_ERROR, DeviceLayer, "AppTask.Init() failed");
     sAppTask->PostInitMatterStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "AppTask.Init() failed");
-        assert(err == CHIP_NO_ERROR);
-    }
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
+        BaseType_t eventReceived = xQueueReceive(sAppTask->appEventQueue, &event, sAppTask->ticksToWait);
         while (eventReceived == pdTRUE)
         {
             sAppTask->DispatchEvent(event);
-            eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
+            eventReceived = xQueueReceive(sAppTask->appEventQueue, &event, 0);
         }
+#if CONFIG_ENABLE_FEEDBACK
+        FeedbackMgr().DisplayInLoop();
+#endif
     }
 }
 
 void chip::NXP::App::AppTaskFreeRTOS::PostEvent(const AppEvent & event)
 {
-    if (sAppEventQueue != NULL)
+    if (appEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, &event, 0))
+        if (__get_IPSR())
         {
-            ChipLogError(DeviceLayer, "Failed to post event to app task event queue");
+            portBASE_TYPE taskToWake = pdFALSE;
+            if (!xQueueSendToFrontFromISR(appEventQueue, &event, &taskToWake))
+            {
+                ChipLogError(DeviceLayer, "Failed to post event to app task event queue from ISR");
+            }
+
+            portYIELD_FROM_ISR(taskToWake);
+        }
+        else
+        {
+            if (!xQueueSend(appEventQueue, &event, 0))
+            {
+                ChipLogError(DeviceLayer, "Failed to post event to app task event queue");
+            }
         }
     }
 }
@@ -161,80 +210,4 @@ void chip::NXP::App::AppTaskFreeRTOS::DispatchEvent(const AppEvent & event)
     {
         ChipLogProgress(DeviceLayer, "Event received with no handler. Dropping event.");
     }
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::StartCommissioning(intptr_t arg)
-{
-    /* Check the status of the commissioning */
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        ChipLogProgress(DeviceLayer, "Device already commissioned");
-    }
-    else if (chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
-    {
-        ChipLogProgress(DeviceLayer, "Commissioning window already opened");
-    }
-    else
-    {
-        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-    }
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::StopCommissioning(intptr_t arg)
-{
-    /* Check the status of the commissioning */
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        ChipLogProgress(DeviceLayer, "Device already commissioned");
-    }
-    else if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
-    {
-        ChipLogProgress(DeviceLayer, "Commissioning window not opened");
-    }
-    else
-    {
-        chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-    }
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::SwitchCommissioningState(intptr_t arg)
-{
-    /* Check the status of the commissioning */
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        ChipLogProgress(DeviceLayer, "Device already commissioned");
-    }
-    else if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
-    {
-        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-    }
-    else
-    {
-        chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-    }
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::StartCommissioningHandler(void)
-{
-    /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
-    PlatformMgr().ScheduleWork(StartCommissioning, 0);
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::StopCommissioningHandler(void)
-{
-    /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
-    PlatformMgr().ScheduleWork(StopCommissioning, 0);
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::SwitchCommissioningStateHandler(void)
-{
-    /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
-    PlatformMgr().ScheduleWork(SwitchCommissioningState, 0);
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::FactoryResetHandler(void)
-{
-    /* Emit the ShutDown event before factory reset */
-    chip::Server::GetInstance().GenerateShutDownEvent();
-    chip::Server::GetInstance().ScheduleFactoryReset();
 }

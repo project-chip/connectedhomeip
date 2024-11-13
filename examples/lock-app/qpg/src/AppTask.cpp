@@ -16,6 +16,11 @@
  *    limitations under the License.
  */
 
+#if !defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
+#error This application requires powercycle counting.
+#endif
+
+#include "powercycle_counting.h"
 #include "qvIO.h"
 
 #include "AppConfig.h"
@@ -59,6 +64,10 @@ using namespace ::chip::DeviceLayer;
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define QPG_LOCK_ENDPOINT_ID (1)
+#define SECONDS_IN_HOUR (3600)                                              // we better keep this 3600
+#define TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS (1 * SECONDS_IN_HOUR) // increment every hour
+
+#define NMBR_OF_RESETS_BLE_ADVERTISING (3)
 
 namespace {
 TaskHandle_t sAppTaskHandle;
@@ -114,15 +123,26 @@ void OnTriggerIdentifyEffect(Identify * identify)
     switch (sIdentifyEffect)
     {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "kBlink");
+        qvIO_LedBlink(LOCK_STATE_LED, 100, 100);
+        break;
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "kBreathe");
+        qvIO_LedBlink(LOCK_STATE_LED, 500, 500);
+        break;
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "kOkay");
+        qvIO_LedBlink(LOCK_STATE_LED, 1000, 1000);
+        break;
     case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "kChannelChange");
         SystemLayer().ScheduleLambda([identify] {
             (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
                                                                identify);
         });
         break;
     case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
+        ChipLogProgress(Zcl, "kFinishEffect");
         SystemLayer().ScheduleLambda([identify] {
             (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
             (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
@@ -130,9 +150,11 @@ void OnTriggerIdentifyEffect(Identify * identify)
         });
         break;
     case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
+        ChipLogProgress(Zcl, "kStopEffect");
         SystemLayer().ScheduleLambda(
             [identify] { (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify); });
         sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+        qvIO_LedSet(LOCK_STATE_LED, false);
         break;
     default:
         ChipLogProgress(Zcl, "No identifier effect");
@@ -204,6 +226,21 @@ void AppTask::InitServer(intptr_t arg)
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
 #endif
 }
+
+void AppTask::OpenCommissioning(intptr_t arg)
+{
+    // Enable BLE advertisements
+
+    SystemLayer().ScheduleLambda([] {
+        CHIP_ERROR err;
+        err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+        }
+    });
+}
+
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -245,6 +282,14 @@ CHIP_ERROR AppTask::Init()
     sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
     sIsBLEAdvertisingEnabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
     UpdateLEDs();
+
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS),
+                                                      TotalHoursTimerHandler, this);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+    }
 
     return err;
 }
@@ -361,6 +406,40 @@ void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
     event.TimerEvent.Context = aAppState;
     event.Handler            = FunctionTimerEventHandler;
     sAppTask.PostEvent(&event);
+}
+
+void AppTask::TotalHoursTimerHandler(chip::System::Layer * aLayer, void * aAppState)
+{
+    ChipLogProgress(NotSpecified, "HourlyTimer");
+
+    CHIP_ERROR err;
+    uint32_t totalOperationalHours = 0;
+
+    err = ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                      (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS / SECONDS_IN_HOUR));
+    }
+    else if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        totalOperationalHours = 0; // set this explicitly to 0 for safety
+        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                      (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS / SECONDS_IN_HOUR));
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
+    }
+
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS),
+                                                      TotalHoursTimerHandler, nullptr);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+    }
 }
 
 void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
@@ -660,10 +739,14 @@ void AppTask::UpdateLEDs(void)
     // If the system has ble connection(s) uptill the stage above, THEN blink
     // the LEDs at an even rate of 100ms.
     //
-    // Otherwise, blink the LED ON for a very short time.
+    // Otherwise, turn the LED OFF.
     if (sIsThreadProvisioned && sIsThreadEnabled)
     {
         qvIO_LedSet(SYSTEM_STATE_LED, true);
+    }
+    else if (sIsThreadProvisioned && !sIsThreadEnabled)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
     }
     else if (sHaveBLEConnections)
     {
@@ -676,7 +759,7 @@ void AppTask::UpdateLEDs(void)
     else
     {
         // not commisioned yet
-        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
+        qvIO_LedSet(SYSTEM_STATE_LED, false);
     }
 }
 
@@ -717,4 +800,22 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     default:
         break;
     }
+}
+
+extern "C" {
+void gpAppFramework_Reset_cbTriggerResetCountCompleted(void)
+{
+    uint8_t resetCount = gpAppFramework_Reset_GetResetCount();
+
+    ChipLogProgress(NotSpecified, "%d resets so far", resetCount);
+    if (resetCount >= NMBR_OF_RESETS_BLE_ADVERTISING)
+    {
+        // Open commissioning if no fabric was available
+        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            ChipLogProgress(NotSpecified, "No fabrics, starting commissioning.");
+            AppTask::OpenCommissioning((intptr_t) 0);
+        }
+    }
+}
 }

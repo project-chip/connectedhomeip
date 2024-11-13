@@ -23,6 +23,18 @@
 namespace chip {
 namespace rpc {
 
+enum class ActionType : uint8_t
+{
+    WRITE_ATTRIBUTE = 0x00, // Write an cluster Attribute
+    RUN_COMMAND     = 0x01, // Run a cluster Command
+    EMIT_EVENT      = 0x02, // Emit a cluster Events
+};
+
+using RpcActionsSubscribeCallback = bool (*)(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs,
+                                             uint32_t actionId, std::vector<uint32_t> args);
+
+void SubscribeActions(RpcActionsSubscribeCallback subscriber);
+
 class NrfButton;
 
 void RunRpcService(void *, void *, void *);

@@ -60,6 +60,12 @@
 
 #include <string.h>
 
+#ifdef SLI_SI91X_MCU_INTERFACE
+extern "C" {
+#include "sl_si91x_trng.h"
+}
+#endif // SLI_SI91X_MCU_INTERFACE
+
 namespace chip {
 namespace Crypto {
 
@@ -414,7 +420,7 @@ exit:
 
     return error;
 }
-
+#if !(SLI_SI91X_MCU_INTERFACE)
 static EntropyContext * get_entropy_context()
 {
     if (!gsEntropyContext.mInitialized)
@@ -448,9 +454,15 @@ static mbedtls_ctr_drbg_context * get_drbg_context()
 
     return drbgCtxt;
 }
-
+#endif // !SLI_SI91X_MCU_INTERFACE
 CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
 {
+#if SLI_SI91X_MCU_INTERFACE
+    // SiWx917 has its hardware based generator
+    (void) fn_source;
+    (void) p_source;
+    (void) threshold;
+#else
     VerifyOrReturnError(fn_source != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     EntropyContext * const entropy_ctxt = get_entropy_context();
@@ -459,6 +471,7 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
     const int result =
         mbedtls_entropy_add_source(&entropy_ctxt->mEntropy, fn_source, p_source, threshold, MBEDTLS_ENTROPY_SOURCE_STRONG);
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+#endif // SLI_SI91X_MCU_INTERFACE
     return CHIP_NO_ERROR;
 }
 
@@ -466,12 +479,17 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-
+#if SLI_SI91X_MCU_INTERFACE
+    sl_status_t status;
+    status = sl_si91x_trng_get_random_num(reinterpret_cast<uint32_t *>(out_buffer), out_length);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_RANDOM_DATA_UNAVAILABLE);
+#else
     mbedtls_ctr_drbg_context * const drbg_ctxt = get_drbg_context();
     VerifyOrReturnError(drbg_ctxt != nullptr, CHIP_ERROR_INTERNAL);
 
     const int result = mbedtls_ctr_drbg_random(drbg_ctxt, Uint8::to_uchar(out_buffer), out_length);
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+#endif // SLI_SI91X_MCU_INTERFACE
 
     return CHIP_NO_ERROR;
 }
@@ -1052,7 +1070,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1sin, size_t w1sin_len)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -1062,7 +1080,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
     uECC_word_t w1_bn[NUM_ECC_WORDS];
     uECC_word_t L_tmp[2 * NUM_ECC_WORDS];
 
-    uECC_vli_bytesToNative(tmp, w1in, NUM_ECC_BYTES);
+    uECC_vli_bytesToNative(tmp, w1sin, NUM_ECC_BYTES);
 
     uECC_vli_mmod(w1_bn, tmp, curve_n);
 
@@ -1965,7 +1983,7 @@ CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certif
     size_t len       = 0;
     mbedtls_x509_crt mbedCertificate;
 
-    ReturnErrorCodeIf(certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     mbedtls_x509_crt_init(&mbedCertificate);
     result = mbedtls_x509_crt_parse(&mbedCertificate, Uint8::to_const_uchar(certificate.data()), certificate.size());
@@ -2021,7 +2039,7 @@ CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate,
 
     outCertificate = referenceCertificate;
 
-    ReturnErrorCodeIf(candidateCertificates == nullptr || candidateCertificatesCount == 0, CHIP_NO_ERROR);
+    VerifyOrReturnError(candidateCertificates != nullptr && candidateCertificatesCount != 0, CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(ExtractSubjectFromX509Cert(referenceCertificate, referenceSubject));
     ReturnErrorOnFailure(ExtractSKIDFromX509Cert(referenceCertificate, referenceSKID));

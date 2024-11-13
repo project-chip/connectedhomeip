@@ -15,8 +15,9 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 
 // Include entire C++ file to have access to functions-under-test

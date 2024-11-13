@@ -29,6 +29,11 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
     return AddressResolve::Resolver::Instance().Init(systemLayer);
 }
 
+void CASESessionManager::Shutdown()
+{
+    AddressResolve::Resolver::Instance().Shutdown();
+}
+
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -99,8 +104,8 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
 
             if (onSetupFailure != nullptr)
             {
-                OperationalSessionSetup::ConnnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY,
-                                                                            SessionEstablishmentStage::kUnknown);
+                OperationalSessionSetup::ConnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY,
+                                                                           SessionEstablishmentStage::kUnknown);
                 onSetupFailure->mCall(onSetupFailure->mContext, failureInfo);
             }
             return;
@@ -141,7 +146,7 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Trans
 {
     ReturnErrorOnFailure(mConfig.sessionInitParams.Validate());
     auto optionalSessionHandle = FindExistingSession(peerId, transportPayloadCapability);
-    ReturnErrorCodeIf(!optionalSessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
+    VerifyOrReturnError(optionalSessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
     addr = optionalSessionHandle.Value()->AsSecureSession()->GetPeerAddress();
     return CHIP_NO_ERROR;
 }
@@ -181,6 +186,12 @@ Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNode
 {
     return mConfig.sessionInitParams.sessionManager->FindSecureSessionForNode(
         peerId, MakeOptional(Transport::SecureSession::Type::kCASE), transportPayloadCapability);
+}
+
+void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
+{
+    auto * session = mConfig.sessionSetupPool->FindSessionSetup(peerId, false);
+    ReleaseSession(session);
 }
 
 void CASESessionManager::ReleaseSession(OperationalSessionSetup * session)

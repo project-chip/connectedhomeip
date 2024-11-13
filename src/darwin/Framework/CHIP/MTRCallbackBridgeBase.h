@@ -18,8 +18,10 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRBaseDevice_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
+#import "MTRLogging_Internal.h"
 #import "zap-generated/MTRBaseClusters.h"
 
 #include <app/data-model/NullObject.h>
@@ -37,17 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 class MTRCallbackBridgeBase {
 public:
     /**
-     * Run the given MTRActionBlock on the Matter thread, after getting a CASE
-     * session (possibly pre-existing) to the given node ID on the fabric
-     * represented by the given MTRDeviceController.  On success, convert the
-     * success value to whatever type it needs to be to call the callback type
-     * we're templated over.  Once this function has been called, on a callback
-     * bridge allocated with `new`, the bridge object must not be accessed by
-     * the caller.  The action block will handle deleting the bridge.
-     */
-    void DispatchAction(chip::NodeId nodeID, MTRDeviceController * controller) && { ActionWithNodeID(nodeID, controller); }
-
-    /**
      * Run the given MTRActionBlock on the Matter thread after getting a secure
      * session corresponding to the given MTRBaseDevice.  On success, convert
      * the success value to whatever type it needs to be to call the callback
@@ -60,7 +51,7 @@ public:
         if (device.isPASEDevice) {
             ActionWithPASEDevice(device);
         } else {
-            ActionWithNodeID(device.nodeID, device.deviceController);
+            ActionWithNodeID(device.nodeID, device.concreteController);
         }
     }
 
@@ -81,16 +72,29 @@ protected:
     {
         LogRequestStart();
 
-        [device.deviceController getSessionForCommissioneeDevice:device.nodeID
-                                                      completion:^(chip::Messaging::ExchangeManager * exchangeManager,
-                                                          const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
-                                                          MaybeDoAction(exchangeManager, session, error);
-                                                      }];
+        MTRDeviceController_Concrete * _Nullable controller = device.concreteController;
+        if (!controller) {
+            MTR_LOG_ERROR("Trying to perform action with PASE device with a non-concrete controller");
+            MaybeDoAction(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+            return;
+        }
+
+        [controller getSessionForCommissioneeDevice:device.nodeID
+                                         completion:^(chip::Messaging::ExchangeManager * exchangeManager,
+                                             const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
+                                             MaybeDoAction(exchangeManager, session, error);
+                                         }];
     }
 
-    void ActionWithNodeID(chip::NodeId nodeID, MTRDeviceController * controller)
+    void ActionWithNodeID(chip::NodeId nodeID, MTRDeviceController_Concrete * _Nullable controller)
     {
         LogRequestStart();
+
+        if (!controller) {
+            MTR_LOG_ERROR("Trying to perform action on node ID 0x%016llX (%llu) with a non-concrete controller", nodeID, nodeID);
+            MaybeDoAction(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+            return;
+        }
 
         [controller getSessionForNode:nodeID
                            completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,

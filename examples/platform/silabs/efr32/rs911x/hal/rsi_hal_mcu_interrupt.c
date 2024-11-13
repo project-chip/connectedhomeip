@@ -35,9 +35,6 @@
 #include "event_groups.h"
 #include "task.h"
 
-#include "wfx_host_events.h"
-#include "wfx_rsi.h"
-
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "sl_board_configuration.h"
 
@@ -62,7 +59,7 @@ void rsi_gpio_irq_cb(uint8_t irqnum)
     if (irqnum != SL_WFX_HOST_PINOUT_SPI_IRQ)
         return;
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-    sl_si91x_host_set_bus_event(NCP_HOST_BUS_RX_EVENT);
+    sl_si91x_host_set_bus_event(SL_SI91X_NCP_HOST_BUS_RX_EVENT);
 #else
     GPIO_IntClear(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
     if (call_back != NULL)

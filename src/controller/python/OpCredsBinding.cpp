@@ -26,6 +26,7 @@
 #include "controller/python/chip/crypto/p256keypair.h"
 #include "controller/python/chip/interaction_model/Delegate.h"
 
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -104,6 +105,7 @@ private:
 
 extern chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
+extern chip::app::DefaultICDClientStorage sICDClientStorage;
 
 class TestCommissioner : public chip::Controller::AutoCommissioner
 {
@@ -257,6 +259,7 @@ public:
         mPrematureCompleteAfter = chip::Controller::CommissioningStage::kError;
         mReadCommissioningInfo  = chip::Controller::ReadCommissioningInfo();
         mNeedsDST               = false;
+        mCompletionError        = CHIP_NO_ERROR;
     }
     bool GetTestCommissionerUsed() { return mTestCommissionerUsed; }
     void OnCommissioningSuccess(chip::PeerId peerId) { mReceivedCommissioningSuccess = true; }
@@ -331,6 +334,8 @@ private:
             return mNeedsDST && mParams.GetDSTOffsets().HasValue();
         case chip::Controller::CommissioningStage::kError:
         case chip::Controller::CommissioningStage::kSecurePairing:
+        // "not valid" because attestation verification always fails after entering revocation check step
+        case chip::Controller::CommissioningStage::kAttestationVerification:
             return false;
         default:
             return true;
@@ -408,9 +413,9 @@ PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
     uint8_t * rcac, uint32_t rcacLen, const uint8_t * ipk, uint32_t ipkLen, chip::VendorId adminVendorId,
     bool enableServerInteractions)
 {
-    ReturnErrorCodeIf(nocLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
-    ReturnErrorCodeIf(icacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
-    ReturnErrorCodeIf(rcacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(nocLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(icacLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(rcacLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
 
     ChipLogDetail(Controller, "Creating New Device Controller");
 
@@ -502,15 +507,15 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     }
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
-    ReturnErrorCodeIf(!noc.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(noc.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     MutableByteSpan nocSpan(noc.Get(), Controller::kMaxCHIPDERCertLength);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
-    ReturnErrorCodeIf(!icac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(icac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     MutableByteSpan icacSpan(icac.Get(), Controller::kMaxCHIPDERCertLength);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
-    ReturnErrorCodeIf(!rcac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(rcac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
     CATValues catValues;
@@ -566,6 +571,9 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     err =
         chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
+    pairingDelegate->SetFabricIndex(devCtrl->GetFabricIndex());
 
     *outDevCtrl         = devCtrl.release();
     *outPairingDelegate = pairingDelegate.release();

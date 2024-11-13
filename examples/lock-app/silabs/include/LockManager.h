@@ -119,6 +119,7 @@ public:
     {
         LOCK_ACTION = 0,
         UNLOCK_ACTION,
+        UNLATCH_ACTION,
 
         INVALID_ACTION
     } Action;
@@ -128,7 +129,9 @@ public:
         kState_LockInitiated = 0,
         kState_LockCompleted,
         kState_UnlockInitiated,
+        kState_UnlatchInitiated,
         kState_UnlockCompleted,
+        kState_UnlatchCompleted,
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
@@ -191,7 +194,42 @@ public:
 
     bool ReadConfigValues();
 
+    void UnlockAfterUnlatch();
+
 private:
+    struct UnlatchContext
+    {
+        static constexpr uint8_t kMaxPinLength = UINT8_MAX;
+        uint8_t mPinBuffer[kMaxPinLength];
+        uint8_t mPinLength;
+        chip::EndpointId mEndpointId;
+        Nullable<chip::FabricIndex> mFabricIdx;
+        Nullable<chip::NodeId> mNodeId;
+        OperationErrorEnum mErr;
+
+        void Update(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                    const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+        {
+            mEndpointId = endpointId;
+            mFabricIdx  = fabricIdx;
+            mNodeId     = nodeId;
+            mErr        = err;
+
+            if (pin.HasValue())
+            {
+                memcpy(mPinBuffer, pin.Value().data(), pin.Value().size());
+                mPinLength = static_cast<uint8_t>(pin.Value().size());
+            }
+            else
+            {
+                memset(mPinBuffer, 0, kMaxPinLength);
+                mPinLength = 0;
+            }
+        }
+    };
+    UnlatchContext mUnlatchContext;
+    chip::EndpointId mCurrentEndpointId;
+
     friend LockManager & LockMgr();
     State_t mState;
 
@@ -216,11 +254,7 @@ private:
     uint8_t mCredentialData[kNumCredentialTypes][kMaxCredentials][kMaxCredentialSize];
     CredentialStruct mCredentials[kMaxUsers][kMaxCredentials];
 
-    static LockManager sLock;
     EFR32DoorLock::LockInitParams::LockParam LockParams;
 };
 
-inline LockManager & LockMgr()
-{
-    return LockManager::sLock;
-}
+LockManager & LockMgr();

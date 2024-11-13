@@ -63,7 +63,10 @@ mw320_executable("shell_mw320") {
     "${chip_root}/src/setup_payload",
   ]
 
-  deps = [ "${chip_root}/src/platform:syscalls_stub" ]
+  deps = [
+    "${chip_root}/src/platform:syscalls_stub",
+    "${chip_root}/src/platform/logging:default",
+  ]
 
   include_dirs = [
     "${chip_root}/src/platform/nxp/mw320",
@@ -71,7 +74,10 @@ mw320_executable("shell_mw320") {
     "${chip_root}/src",
     "${chip_root}/src/app/util",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
     "${chip_root}/examples/all-clusters-app/nxp/mw320/include",
   ]
   sources = [
@@ -86,11 +92,16 @@ mw320_executable("shell_mw320") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp",
     "${chip_root}/src/lib/shell/streamer_mw320.cpp",
     "binding-handler.cpp",
     "include/CHIPProjectConfig.h",

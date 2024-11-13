@@ -74,7 +74,6 @@ tests:
           "Step 4: TH1 sends the UpdateNOC command to the Node Operational
           Credentials cluster with the following fields: NOCValue is set to
           noc_original ICACValue is to set icac_original"
-      PICS: OPCREDS.S.C07.Rsp
       verification: |
           Verify that the DUT responds with FAILSAFE_REQUIRED
 
@@ -135,7 +134,6 @@ tests:
           "Step 6: TH1 sends the UpdateNOC command to the Node Operational
           Credentials cluster with the following fields: NOCValue is set to
           noc_original ICACValue is to set icac_original"
-      PICS: OPCREDS.S.C07.Rsp
       verification: |
           Verify that the DUT responds with a NOCResponse with the StatusCode field set to MissingCsr that is status code 4
 
@@ -151,7 +149,6 @@ tests:
     - label:
           "Step 7: TH1 Sends CSRRequest command with the IsForUpdateNOC field
           set to false"
-      PICS: OPCREDS.S.C04.Rsp
       verification: |
           Verify that the DUT returns a CSRResponse and save as csr_not_update
 
@@ -182,7 +179,6 @@ tests:
           "Step 9: TH1 sends the UpdateNOC command to the Node Operational
           Credentials cluster with the following fields: NOCValue is set to
           noc_not_for_update ICACValue is to set icac_not_for_update"
-      PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true
@@ -190,7 +186,6 @@ tests:
     - label:
           "Step 10: TH1 Sends CSRRequest command with the IsForUpdateNOC field
           set to true"
-      PICS: OPCREDS.S.C04.Rsp
       verification: |
 
       disabled: true
@@ -199,7 +194,6 @@ tests:
           "Step 11: TH1 sends the UpdateNOC command to the Node Operational
           Credentials cluster with the following fields: NOCValue is set to
           noc_original ICACValue is to set icac_original"
-      PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true
@@ -225,7 +219,6 @@ tests:
           "Step 14: TH1 sends the UpdateNOC command to the Node Operational
           Credentials cluster with the following fields: NOCValue is set to
           noc_update_new_root ICACValue is to set icac_update_new_root"
-      PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true
@@ -247,7 +240,6 @@ tests:
           Credentials cluster with the following fields: NOCValue is set to
           noc_update_bad_fabric_on_noc ICACValue is to set
           icac_update_bad_fabric_on_noc"
-      PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true
@@ -269,7 +261,6 @@ tests:
           Credentials cluster with the following fields: NOCValue is set to
           noc_update_bad_fabric_on_icac ICACValue is to set
           icac_update_bad_fabric_on_icac"
-      PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true
@@ -277,7 +268,6 @@ tests:
     - label:
           "Step 19: TH1 sends AddTrustedRootCertificate command to DUT again
           with the RootCACertificate field set to new_root_cert"
-      PICS: OPCREDS.S.C0b.Rsp
       verification: |
 
       disabled: true
@@ -286,7 +276,6 @@ tests:
           "Step 20: TH1 sends the UpdateNOC command to the Node Operational
           Credentials cluster with the following fields: NOCValue is set to
           noc_update_new_root ICACValue is to set icac_update_new_root"
-      PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true
@@ -314,7 +303,6 @@ tests:
     - label:
           "Step 24: TH1 Sends CSRRequest command over PASE with the
           IsForUpdateNOC field set to true"
-      PICS: OPCREDS.S.C04.Rsp
       verification: |
 
       disabled: true
@@ -332,7 +320,6 @@ tests:
           "Step 26: TH1 sends the UpdateNOC command to the Node Operational
           Credentials cluster over PASE with the following fields: NOCValue is
           set to noc_pase ICACValue is to set icac_pase"
-      PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true

@@ -22,10 +22,6 @@ import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "linux")
 
-if (chip_use_pw_logging) {
-  import("//build_overrides/pigweed.gni")
-}
-
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
   import("//build_overrides/ot_br_posix.gni")
@@ -78,11 +74,6 @@ static_library("Linux") {
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/setup_payload",
   ]
-
-  if (!chip_use_external_logging) {
-    sources += [ "Logging.cpp" ]
-    deps += [ "${chip_root}/src/platform/logging:headers" ]
-  }
 
   if (chip_enable_openthread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
@@ -146,10 +137,6 @@ static_library("Linux") {
     public_deps += [ "dbus/openthread" ]
   }
 
-  if (chip_use_pw_logging) {
-    deps += [ "$dir_pw_log" ]
-  }
-
   if (chip_enable_wifi) {
     sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
 
@@ -159,4 +146,13 @@ static_library("Linux") {
   if (chip_enable_ble) {
     public_deps += [ "dbus/bluez" ]
   }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+
+  sources = [ "Logging.cpp" ]
 }

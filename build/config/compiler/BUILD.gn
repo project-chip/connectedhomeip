@@ -14,6 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/pigweed.gni")
+import("//build_overrides/pigweed_environment.gni")
 import("${build_root}/chip/java/config.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/config/sysroot.gni")
@@ -23,10 +24,40 @@ if (current_os == "mac" || current_os == "ios") {
   import("${build_root}/config/mac/mac_sdk.gni")
 }
 
+# To use different sanitizer options, use `gn args .` in the out folder and
+# use settings like:
+#
+#   is_clang=true
+#   is_debug=true
+#   optimize_for_size=false
+#   is_asan=true
+#   is_sanitize_fatal=false
+#
+
 declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
   # with unfixed or unsupported wanings.
   treat_warnings_as_errors = true
+
+  # Enable Thread sanitizer
+  is_tsan = false
+
+  # Enable memory sanitizer
+  is_msan = false
+
+  # enable undefined behavior sanitizer
+  is_ubsan = false
+
+  # Exit on sanitize error. Generally standard libraries may get errors
+  # so not stopping on the first error is often useful
+  is_sanitize_fatal = true
+
+  # Enable or disable Runtime Type Information (RTTI).
+  # Defaults true on darwin because Darwin.framework uses it.
+  enable_rtti = current_os == "mac" || current_os == "ios"
+
+  # Enable or disable support for C++ exceptions.
+  enable_exceptions = false
 }
 
 if (current_cpu == "arm" || current_cpu == "arm64") {
@@ -271,6 +302,11 @@ config("strict_warnings") {
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
+  if (current_os == "nuttx") {
+    cflags -= [ "-Wshadow" ]
+    cflags_cc -= [ "-Wnon-virtual-dtor" ]
+  }
+
   configs = []
   ldflags = []
 
@@ -328,7 +364,11 @@ config("warnings_third_party") {
 }
 
 config("symbols_default") {
-  cflags = [ "-g${symbol_level}" ]
+  if (strip_symbols) {
+    cflags = [ "-s" ]
+  } else {
+    cflags = [ "-g${symbol_level}" ]
+  }
 }
 
 config("std_default") {
@@ -343,7 +383,14 @@ config("cosmetic_default") {
 }
 
 config("runtime_default") {
-  if (is_clang) {  # Using Pigweed clang instead of Darwin host clang
+  if (is_clang &&
+      current_os == "mac") {  # Using Pigweed clang instead of Darwin host clang
+    # Without pw_env_setup_CIPD_PIGWEED defined the hostclang:no_system_libcpp
+    # config silently uses the system libc++, usually resulting in linker errors.
+    assert(
+        defined(pw_env_setup_CIPD_PIGWEED),
+        "//build_overrides/pigweed_environment.gni must define pw_env_setup_CIPD_PIGWEED when using pigweed clang")
+
     configs = [
       "$dir_pw_toolchain/host_clang:no_system_libcpp",
       "$dir_pw_toolchain/host_clang:xcode_sysroot",
@@ -351,6 +398,7 @@ config("runtime_default") {
   }
   if (current_os == "linux" || current_os == "tizen" || current_os == "webos") {
     libs = [
+      "atomic",
       "dl",
       "pthread",
       "rt",
@@ -379,24 +427,11 @@ config("runtime_default") {
 #   is_sanitize_fatal=false
 #
 
-declare_args() {
-  # Enable Thread sanitizer
-  is_tsan = false
-
-  # Enable memory sanitizer
-  is_msan = false
-
-  # enable undefined behavior sanitizer
-  is_ubsan = false
-
-  # Exit on sanitize error. Generally standard libraries may get errors
-  # so not stopping on the first error is often useful
-  is_sanitize_fatal = true
-}
-
 config("sanitize_address") {
   defines = []
   cflags = [
+    "-fsanitize-coverage=inline-8bit-counters,trace-cmp",
+    "-fno-sanitize-coverage=pc-table",
     "-fsanitize=address",
     "-fno-omit-frame-pointer",
   ]
@@ -432,8 +467,12 @@ config("sanitize_undefined_behavior") {
       "-fsanitize=unsigned-integer-overflow",
       "-fsanitize=implicit-conversion",
       "-fsanitize=nullability",
-      "-fno-sanitize=vptr,function",
     ]
+  }
+
+  #According to the LLVM UBSan documentation, sanitizing vptr is incompatible with the -fno-rtti flag.
+  if (!enable_rtti) {
+    cflags += [ "-fno-sanitize=vptr" ]
   }
 
   ldflags = cflags
@@ -475,6 +514,7 @@ config("libfuzzer_fuzzing") {
 
 config("oss_fuzz") {
   cflags = string_split(getenv("CFLAGS"))
+  cflags_cc = string_split(getenv("CXXFLAGS"))
   ldflags = string_split(getenv("CXXFLAGS"))
   ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
 }
@@ -499,15 +539,6 @@ config("coverage_default") {
   if (use_coverage) {
     configs += [ ":coverage" ]
   }
-}
-
-declare_args() {
-  # Enable or disable Runtime Type Information (RTTI).
-  # Defaults true on darwin because Darwin.framework uses it.
-  enable_rtti = current_os == "mac" || current_os == "ios"
-
-  # Enable or disable support for C++ exceptions.
-  enable_exceptions = false
 }
 
 config("no_rtti") {

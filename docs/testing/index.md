@@ -37,7 +37,6 @@ from the global ember and message delivery layers.
 ![](./img/unit_tests.png)
 
 -   [Unit tests](./unit_testing.md)
--   [Designing clusters for unit testing and portability](./unit_testing_clusters.md)
 
 ## PICS and PIXIT
 

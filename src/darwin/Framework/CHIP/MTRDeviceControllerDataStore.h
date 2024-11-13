@@ -18,7 +18,9 @@
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#import <Matter/MTRDevice_Internal.h>
+
+#import "MTRDeviceClusterData.h"
+#import "MTRDevice_Internal.h"
 
 #include <lib/core/CHIPError.h>
 
@@ -76,7 +78,20 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
 - (nullable MTRDeviceClusterData *)getStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID;
 - (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID;
+- (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
+- (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+- (void)removeAttributes:(NSSet<NSNumber *> *)attributes fromCluster:(MTRClusterPath *)path forNodeID:(NSNumber *)nodeID;
 - (void)clearAllStoredClusterData;
+
+/**
+ * Storage for miscellaneous MTRDevice data that only needs to be stored
+ * locally.
+ *
+ * storeDeviceData uses data and nodeID async without copying, so callers should
+ * not modify the passed-in dictionary or nodeID.
+ */
+- (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
+- (void)storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID;
 
 @end
 

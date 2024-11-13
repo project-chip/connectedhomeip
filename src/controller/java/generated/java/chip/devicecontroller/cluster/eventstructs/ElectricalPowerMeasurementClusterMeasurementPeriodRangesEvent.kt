@@ -52,7 +52,7 @@ class ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent {
       tlvReader.enterStructure(tlvTag)
       val ranges =

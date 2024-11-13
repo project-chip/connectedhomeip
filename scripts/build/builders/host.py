@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 from platform import uname
+from typing import Optional
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -40,6 +42,7 @@ class HostFuzzingType(Enum):
     NONE = auto()
     LIB_FUZZER = auto()
     OSS_FUZZ = auto()
+    PW_FUZZTEST = auto()
 
 
 class HostApp(Enum):
@@ -54,6 +57,7 @@ class HostApp(Enum):
     TV_APP = auto()
     TV_CASTING_APP = auto()
     LIGHT = auto()
+    LIGHT_DATA_MODEL_NO_UNIQUE_ID = auto()
     LOCK = auto()
     TESTS = auto()
     SHELL = auto()
@@ -66,6 +70,9 @@ class HostApp(Enum):
     EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
+    FABRIC_ADMIN = auto()
+    FABRIC_BRIDGE = auto()
+    FABRIC_SYNC = auto()
     JAVA_MATTER_CONTROLLER = auto()
     KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
@@ -78,6 +85,7 @@ class HostApp(Enum):
     AIR_QUALITY_SENSOR = auto()
     NETWORK_MANAGER = auto()
     ENERGY_MANAGEMENT = auto()
+    WATER_LEAK_DETECTOR = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -100,6 +108,8 @@ class HostApp(Enum):
             return 'tv-casting-app/linux'
         elif self == HostApp.LIGHT:
             return 'lighting-app/linux'
+        elif self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+            return 'lighting-app-data-mode-no-unique-id/linux'
         elif self == HostApp.LOCK:
             return 'lock-app/linux'
         elif self == HostApp.SHELL:
@@ -118,6 +128,12 @@ class HostApp(Enum):
             return 'tv-casting-app/linux'
         elif self == HostApp.BRIDGE:
             return 'bridge-app/linux'
+        elif self == HostApp.FABRIC_ADMIN:
+            return 'fabric-admin'
+        elif self == HostApp.FABRIC_BRIDGE:
+            return 'fabric-bridge-app/linux'
+        elif self == HostApp.FABRIC_SYNC:
+            return 'fabric-sync'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
         elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
@@ -142,6 +158,8 @@ class HostApp(Enum):
             return 'network-manager-app/linux'
         elif self == HostApp.ENERGY_MANAGEMENT:
             return 'energy-management-app/linux'
+        elif self == HostApp.WATER_LEAK_DETECTOR:
+            return 'water-leak-detector/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -179,7 +197,7 @@ class HostApp(Enum):
         elif self == HostApp.TV_CASTING_APP:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
-        elif self == HostApp.LIGHT:
+        elif self == HostApp.LIGHT or self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
             yield 'chip-lighting-app'
             yield 'chip-lighting-app.map'
         elif self == HostApp.LOCK:
@@ -208,13 +226,22 @@ class HostApp(Enum):
         elif self == HostApp.PYTHON_BINDINGS:
             yield 'controller/python'  # Directory containing WHL files
         elif self == HostApp.EFR32_TEST_RUNNER:
-            yield 'chip_nl_test_runner_wheels'
+            yield 'chip_pw_test_runner_wheels'
         elif self == HostApp.TV_CASTING:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
         elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
+        elif self == HostApp.FABRIC_ADMIN:
+            yield 'fabric-admin'
+            yield 'fabric-admin.map'
+        elif self == HostApp.FABRIC_BRIDGE:
+            yield 'fabric-bridge-app'
+            yield 'fabric-bridge-app.map'
+        elif self == HostApp.FABRIC_SYNC:
+            yield 'fabric-sync'
+            yield 'fabric-sync.map'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'
@@ -242,9 +269,15 @@ class HostApp(Enum):
         elif self == HostApp.LIT_ICD:
             yield 'lit-icd-app'
             yield 'lit-icd-app.map'
+        elif self == HostApp.NETWORK_MANAGER:
+            yield 'matter-network-manager-app'
+            yield 'matter-network-manager-app.map'
         elif self == HostApp.ENERGY_MANAGEMENT:
             yield 'chip-energy-management-app'
             yield 'chip-energy-management-app.map'
+        elif self == HostApp.WATER_LEAK_DETECTOR:
+            yield 'water-leak-detector-app'
+            yield 'water-leak-detector-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -298,7 +331,12 @@ class HostBuilder(GnBuilder):
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
-                 enable_test_event_triggers=None):
+                 enable_test_event_triggers=None,
+                 enable_dnssd_tests: Optional[bool] = None,
+                 chip_casting_simplified: Optional[bool] = None,
+                 disable_shell=False,
+                 use_googletest=False,
+                 ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -316,12 +354,16 @@ class HostBuilder(GnBuilder):
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
+            self.extra_gn_options.append('chip_enable_ble=false')
 
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
 
         if not enable_thread:
             self.extra_gn_options.append('chip_enable_openthread=false')
+
+        if disable_shell:
+            self.extra_gn_options.append('chip_build_libshell=false')
 
         if use_tsan:
             self.extra_gn_options.append('is_tsan=true')
@@ -352,6 +394,8 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('is_libfuzzer=true')
         elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
             self.extra_gn_options.append('oss_fuzz=true')
+        elif fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+            self.extra_gn_options.append('pw_enable_fuzz_test_targets=true')
 
         if imgui_ui:
             self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')
@@ -395,7 +439,7 @@ class HostBuilder(GnBuilder):
             self.build_command = 'runner'
             # board will NOT be used, but is required to be able to properly
             # include things added by the test_runner efr32 build
-            self.extra_gn_options.append('silabs_board="BRD4161A"')
+            self.extra_gn_options.append('silabs_board="BRD4187C"')
 
         # Crypto library has per-platform defaults (like openssl for linux/mac
         # and mbedtls for android/freertos/zephyr/mbed/...)
@@ -405,6 +449,15 @@ class HostBuilder(GnBuilder):
         if enable_test_event_triggers is not None:
             if 'EVSE' in enable_test_event_triggers:
                 self.extra_gn_options.append('chip_enable_energy_evse_trigger=true')
+
+        if enable_dnssd_tests is not None:
+            if enable_dnssd_tests:
+                self.extra_gn_options.append('chip_enable_dnssd_tests=true')
+            else:
+                self.extra_gn_options.append('chip_enable_dnssd_tests=false')
+
+        if chip_casting_simplified is not None:
+            self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
@@ -430,6 +483,16 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.TESTS and fuzzing_type != HostFuzzingType.NONE:
             self.build_command = 'fuzz_tests'
+
+        if self.app == HostApp.TESTS and fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+            self.build_command = 'pw_fuzz_tests'
+
+        if self.app == HostApp.TESTS and use_googletest:
+            self.extra_gn_options.append('import("//build_overrides/pigweed.gni")')
+            self.extra_gn_options.append('import("//build_overrides/googletest.gni")')
+            self.extra_gn_options.append('pw_unit_test_BACKEND="$dir_pw_unit_test:googletest"')
+            self.extra_gn_options.append('dir_pw_third_party_googletest="$dir_googletest"')
+            self.extra_gn_options.append('chip_build_tests_googletest=true')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
@@ -511,7 +574,14 @@ class HostBuilder(GnBuilder):
 
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
-            self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
+            cmd = ['ninja', '-C', self.output_dir]
+
+            if self.ninja_jobs is not None:
+                cmd.append('-j' + str(self.ninja_jobs))
+
+            cmd.append('default')
+
+            self._Execute(cmd, title="Build-only")
             self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
                            '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
@@ -543,19 +613,13 @@ class HostBuilder(GnBuilder):
             self.createJavaExecutable("kotlin-matter-controller")
 
     def build_outputs(self):
-        outputs = {}
-
         for name in self.app.OutputNames():
+            if not self.options.enable_link_map_file and name.endswith(".map"):
+                continue
             path = os.path.join(self.output_dir, name)
             if os.path.isdir(path):
                 for root, dirs, files in os.walk(path):
                     for file in files:
-                        outputs.update({
-                            file: os.path.join(root, file)
-                        })
+                        yield BuilderOutput(os.path.join(root, file), file)
             else:
-                outputs.update({
-                    name: os.path.join(self.output_dir, name)
-                })
-
-        return outputs
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)

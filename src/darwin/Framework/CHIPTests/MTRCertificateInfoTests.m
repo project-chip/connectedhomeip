@@ -58,10 +58,22 @@
                             options:0];
 }
 
+- (NSData *)exampleRCACertPublicKey
+{
+    // Needs to match the "Public Key" listed above.
+    const unsigned char publicKeyBytes[] = "\x04\x61\xE7\x5C\xFE\x03\xEC\x90\x5E\xF4\x53\x77\xE5\xF4\xB5\x1D"
+                                           "\xE4\x3D\x55\xF4\xD4\xE7\xEA\x7B\x22\x76\x5E\x59\xCA\x0A\x9B\xDB"
+                                           "\x59\x8F\x69\xDB\x12\x8B\xFB\x35\xBF\x03\x1F\xE9\x51\xED\x53\x37"
+                                           "\x5D\x35\xB0\x53\x22\xF4\xDF\x7E\xBA\xEC\x02\xAC\x52\xF3\x1B\x9A"
+                                           "\xD7";
+    return [NSData dataWithBytes:publicKeyBytes length:sizeof(publicKeyBytes) - 1];
+}
+
 - (void)testParseRootCertificateTLV
 {
     MTRCertificateInfo * info = [[MTRCertificateInfo alloc] initWithTLVBytes:self.exampleRCACertTLV];
     XCTAssertNotNil(info);
+    XCTAssertEqualObjects(info.publicKeyData, self.exampleRCACertPublicKey);
     XCTAssertEqual([NSDate.now compare:info.notBefore], NSOrderedDescending);
     XCTAssertEqual([NSDate.now compare:info.notAfter], NSOrderedAscending);
 
@@ -113,10 +125,22 @@
                             options:0];
 }
 
+- (NSData *)exampleNOCertPublicKey
+{
+    // Needs to match the "Public Key" listed above.
+    const unsigned char publicKeyBytes[] = "\x04\xFD\x7F\x7A\x19\x37\xE0\x6D\xA4\xC2\xC9\x95\xC5\x5F\x01\x10"
+                                           "\xD2\xB0\xFC\x93\x50\x4C\x4A\x2A\xD5\x65\x90\x8B\x42\x7C\xAF\x60"
+                                           "\x4A\x1C\x24\xF9\xC1\x75\x61\x4C\x45\xDC\x87\x34\x0F\xB4\x1C\x24"
+                                           "\xD2\x40\x11\x3F\x82\x6D\x8B\x2A\x24\x0E\xE4\xA5\x9B\x30\xC6\xA9"
+                                           "\x51";
+    return [NSData dataWithBytes:publicKeyBytes length:sizeof(publicKeyBytes) - 1];
+}
+
 - (void)testParseOperationalCertificateTLV
 {
     MTRCertificateInfo * info = [[MTRCertificateInfo alloc] initWithTLVBytes:self.exampleNOCertTLV];
     XCTAssertNotNil(info);
+    XCTAssertEqualObjects(info.publicKeyData, self.exampleNOCertPublicKey);
     XCTAssertEqual([NSDate.now compare:info.notBefore], NSOrderedDescending);
     XCTAssertEqual([NSDate.now compare:info.notAfter], NSOrderedAscending);
 

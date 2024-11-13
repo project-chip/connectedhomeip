@@ -121,8 +121,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
     entry = AllocateEntry(key);
-    VerifyOrExit(entry != nullptr, ChipLogError(DeviceLayer, "%s AllocateEntry %s", __func__, ErrorStr(err));
-                 err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(entry != nullptr, ChipLogError(DeviceLayer, "%s AllocateEntry failed", __func__); err = CHIP_ERROR_NO_MEMORY);
 
     if (value_size != 0)
     {
@@ -196,11 +195,11 @@ KeyValueStoreManagerImpl::KeyConfigIdEntry * KeyValueStoreManagerImpl::AllocateE
 {
     Optional<uint8_t> freeConfigID;
     KeyConfigIdEntry * newEntry = FindEntry(key, &freeConfigID);
-    ReturnErrorCodeIf(newEntry != nullptr, newEntry);
-    ReturnErrorCodeIf(!freeConfigID.HasValue(), nullptr);
+    VerifyOrReturnError(newEntry == nullptr, newEntry);
+    VerifyOrReturnError(freeConfigID.HasValue(), nullptr);
 
     newEntry = Platform::New<KeyConfigIdEntry>(freeConfigID.Value(), KeyStorage(key));
-    ReturnErrorCodeIf(newEntry == nullptr, nullptr);
+    VerifyOrReturnError(newEntry != nullptr, nullptr);
 
     KeyConfigIdEntry * entry = static_cast<KeyConfigIdEntry *>(slist_tail(&mKeyConfigIdList));
     if (entry == nullptr)

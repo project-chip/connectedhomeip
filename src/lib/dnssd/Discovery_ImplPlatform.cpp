@@ -43,6 +43,31 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 {
     DiscoveryContext * discoveryContext = static_cast<DiscoveryContext *>(context);
 
+    if (error != CHIP_NO_ERROR && error != CHIP_ERROR_IN_PROGRESS)
+    {
+        discoveryContext->Release();
+        return;
+    }
+
+    DiscoveredNodeData nodeData;
+
+    result->ToDiscoveredCommissionNodeData(addresses, nodeData);
+
+    nodeData.Get<CommissionNodeData>().LogDetail();
+    discoveryContext->OnNodeDiscovered(nodeData);
+
+    // CHIP_ERROR_IN_PROGRESS indicates that more results are coming, so don't release
+    // the context yet.
+    if (error == CHIP_NO_ERROR)
+    {
+        discoveryContext->Release();
+    }
+}
+
+static void HandleNodeOperationalBrowse(void * context, DnssdService * result, CHIP_ERROR error)
+{
+    DiscoveryContext * discoveryContext = static_cast<DiscoveryContext *>(context);
+
     if (error != CHIP_NO_ERROR)
     {
         discoveryContext->Release();
@@ -50,9 +75,10 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     }
 
     DiscoveredNodeData nodeData;
-    result->ToDiscoveredNodeData(addresses, nodeData);
 
-    nodeData.Get<CommissionNodeData>().LogDetail();
+    result->ToDiscoveredOperationalNodeBrowseData(nodeData);
+
+    nodeData.Get<OperationalNodeBrowseData>().LogDetail();
     discoveryContext->OnNodeDiscovered(nodeData);
     discoveryContext->Release();
 }
@@ -75,8 +101,16 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
 
         auto & ipAddress = services[i].mAddress;
 
-        // Check if SRV, TXT and AAAA records were received in DNS responses
-        if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value())
+        // mType(service name) exactly matches with operational service name
+        bool isOperationalBrowse = strcmp(services[i].mType, kOperationalServiceName) == 0;
+
+        // For operational browse result we currently don't need IP address hence skip resolution and handle differently.
+        if (isOperationalBrowse)
+        {
+            HandleNodeOperationalBrowse(context, &services[i], error);
+        }
+        // check whether SRV, TXT and AAAA records were received in DNS responses
+        else if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value())
         {
             ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
         }
@@ -212,7 +246,8 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     switch (key)
     {
     case TxtFieldKey::kTcpSupported:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
+        VerifyOrReturnError(params.GetTCPSupportModes() != TCPModeAdvertise::kNone, CHIP_ERROR_UNINITIALIZED);
+        return CopyTextRecordValue(buffer, bufferLen, to_underlying(params.GetTCPSupportModes()));
     case TxtFieldKey::kSessionIdleInterval:
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         // A ICD operating as a LIT should not advertise its slow polling interval
@@ -340,7 +375,15 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     impl->mOperationalDelegate->OnOperationalNodeResolved(nodeData);
 }
 
-void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
+void DnssdService::ToDiscoveredOperationalNodeBrowseData(DiscoveredNodeData & nodeData)
+{
+    nodeData.Set<OperationalNodeBrowseData>();
+
+    ExtractIdFromInstanceName(mName, &nodeData.Get<OperationalNodeBrowseData>().peerId);
+    nodeData.Get<OperationalNodeBrowseData>().hasZeroTTL = (mTtlSeconds == 0);
+}
+
+void DnssdService::ToDiscoveredCommissionNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
 {
     nodeData.Set<CommissionNodeData>();
     auto & discoveredData = nodeData.Get<CommissionNodeData>();
@@ -372,7 +415,6 @@ void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses,
         ByteSpan key(reinterpret_cast<const uint8_t *>(mTextEntries[i].mKey), strlen(mTextEntries[i].mKey));
         ByteSpan val(mTextEntries[i].mData, mTextEntries[i].mDataSize);
         FillNodeDataFromTxt(key, val, discoveredData);
-        FillNodeDataFromTxt(key, val, discoveredData);
     }
 }
 
@@ -383,7 +425,12 @@ CHIP_ERROR DiscoveryImplPlatform::InitImpl()
     VerifyOrReturnError(mState == State::kUninitialized, CHIP_NO_ERROR);
     mState = State::kInitializing;
 
-    ReturnErrorOnFailure(ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this));
+    CHIP_ERROR err = ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        mState = State::kUninitialized;
+        return err;
+    }
     UpdateCommissionableInstanceName();
 
     return CHIP_NO_ERROR;
@@ -746,6 +793,31 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, 
     return error;
 }
 
+CHIP_ERROR DiscoveryImplPlatform::DiscoverOperational(DiscoveryFilter filter, DiscoveryContext & context)
+{
+    ReturnErrorOnFailure(InitImpl());
+    StopDiscovery(context);
+
+    char serviceName[kMaxOperationalServiceNameSize];
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kOperational));
+
+    intptr_t browseIdentifier;
+    // Increase the reference count of the context to keep it alive until HandleNodeBrowse is called back.
+    CHIP_ERROR error = ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolTcp, Inet::IPAddressType::kAny,
+                                       Inet::InterfaceId::Null(), HandleNodeBrowse, context.Retain(), &browseIdentifier);
+
+    if (error == CHIP_NO_ERROR)
+    {
+        context.SetBrowseIdentifier(browseIdentifier);
+    }
+    else
+    {
+        context.Release();
+    }
+
+    return error;
+}
+
 CHIP_ERROR DiscoveryImplPlatform::StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context)
 {
     switch (type)
@@ -755,7 +827,7 @@ CHIP_ERROR DiscoveryImplPlatform::StartDiscovery(DiscoveryType type, DiscoveryFi
     case DiscoveryType::kCommissionerNode:
         return DiscoverCommissioners(filter, context);
     case DiscoveryType::kOperational:
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        return DiscoverOperational(filter, context);
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

@@ -367,6 +367,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
                 {
                     ChipLogProgress(AppServer, "TLV end of array");
                     ReturnErrorOnFailure(reader.ExitContainer(listContainerType));
+                    err = CHIP_NO_ERROR;
                 }
             }
             break;
@@ -433,6 +434,8 @@ uint32_t CommissionerDeclaration::WritePayload(uint8_t * payloadBuffer, size_t p
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kCommissionerPasscodeTag), mCommissionerPasscode)),
                  LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kQRCodeDisplayedTag), mQRCodeDisplayed)),
+                 LogErrorOnFailure(err));
+    VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kCancelPasscodeTag), mCancelPasscode)),
                  LogErrorOnFailure(err));
 
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));

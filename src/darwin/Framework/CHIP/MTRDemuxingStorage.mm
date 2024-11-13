@@ -144,6 +144,8 @@ static bool IsMemoryOnlyGlobalKey(NSString * key)
 
     // We do not expect to see the "g/a/*" keys for attribute values.
 
+    // We do not expect to see the "g/sa/*" keys for attribute values.
+
     // We do not expect to see the "g/bt" and "g/bt/*" keys for the binding
     // table.
 
@@ -161,6 +163,11 @@ static bool IsMemoryOnlyGlobalKey(NSString * key)
 
     // We do not expect to see the "g/icd/cic" key; that's only used for an ICD
     // that sends check-in messages.
+
+    // We do not expect to see the "g/icdfl" key; that's only used by
+    // DefaultICDClientStorage, which Matter.framework does not use.
+
+    // We do not expect to see the "g/tnd/*" Thread Network Directory keys.
 
     return false;
 }
@@ -214,6 +221,9 @@ static bool IsMemoryOnlyIndexSpecificKey(NSString * key)
     // We do not expect to see the "icd/*" keys for the ICD Management table.
 
     // We do not expect to see the "e/*" scenes keys.
+
+    // We do not epect to see the "icdc" or "icdk" keys, since those are only
+    // used by DefaultICDClientStorage, which Matter.framework does not use.
 
     return false;
 }

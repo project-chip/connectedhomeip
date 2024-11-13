@@ -15,6 +15,12 @@
 #
 mainmenu "Matter nRF Connect Chef Example Application"
 
+config CHEF_DEVICE_TYPE
+	string "Chef app device type"
+	default ""
+	help
+	  Specifies the device type used to generate data model for the chef app. It should be the string literal matching one of the file names located in the chef's devices directory.
+
 rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
 source "Kconfig.zephyr"

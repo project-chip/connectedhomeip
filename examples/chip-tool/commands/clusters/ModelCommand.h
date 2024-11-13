@@ -57,6 +57,9 @@ public:
             "Whether to treat the peer as a LIT ICD. false: Always no, true: Always yes, (not set): Yes if the peer is registered "
             "to this controller.");
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("allow-large-payload", 0, 1, &mAllowLargePayload,
+                    "If true, indicates that the session should allow large application payloads (which requires a TCP connection)."
+                    "Defaults to false, which uses a UDP+MRP session.");
     }
 
     /////////// CHIPCommand Interface /////////
@@ -67,10 +70,14 @@ public:
 
     virtual CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) { return CHIP_ERROR_BAD_REQUEST; };
 
+    void ClearICDEntry(const chip::ScopedNodeId & nodeId);
+    void StoreICDEntryWithKey(chip::app::ICDClientInfo & clientinfo, chip::ByteSpan key);
     void Shutdown() override;
 
 protected:
-    bool IsPeerLIT() { return mIsPeerLIT.ValueOr(false); }
+    bool IsPeerLIT();
+
+    chip::NodeId GetDestinationId() const { return mDestinationId; }
 
     chip::Optional<uint16_t> mTimeout;
 
@@ -78,8 +85,11 @@ private:
     chip::NodeId mDestinationId;
     std::vector<chip::EndpointId> mEndPointId;
     chip::Optional<bool> mIsPeerLIT;
+    chip::Optional<bool> mAllowLargePayload;
 
     void CheckPeerICDType();
+
+    bool AllowLargePayload();
 
     static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                     const chip::SessionHandle & sessionHandle);

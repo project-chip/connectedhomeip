@@ -43,12 +43,18 @@ public:
     // Buttons
     typedef void (*SilabsButtonCb)(uint8_t, uint8_t);
     virtual void SetButtonsCb(SilabsButtonCb callback) {}
+    virtual uint8_t GetButtonState(uint8_t button) { return 0; }
 
     // LEDS
     virtual void InitLed(void) {}
     virtual CHIP_ERROR SetLed(bool state, uint8_t led) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual bool GetLedState(uint8_t led) { return 0; }
     virtual CHIP_ERROR ToggleLed(uint8_t led) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    // Flash
+    virtual CHIP_ERROR FlashInit() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR FlashErasePage(uint32_t addr) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     // BLE Specific Method
 

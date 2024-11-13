@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -298,8 +298,8 @@ Protocols::InteractionModel::Status HandleWriteOnOffAttribute(Device * dev, chip
 {
     ChipLogProgress(DeviceLayer, "HandleWriteOnOffAttribute: attrId=%" PRIu32, attributeId);
 
-    ReturnErrorCodeIf((attributeId != Clusters::OnOff::Attributes::OnOff::Id) || (!dev->IsReachable()),
-                      Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnError((attributeId == Clusters::OnOff::Attributes::OnOff::Id) && dev->IsReachable(),
+                        Protocols::InteractionModel::Status::Failure);
     dev->SetOnOff(*buffer == 1);
     return Protocols::InteractionModel::Status::Success;
 }
@@ -539,10 +539,10 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
     Action_t action = INVALID_ACTION;
     int32_t actor   = 0;
 
-    if (aEvent->Type == AppEvent::kEventType_Lighting)
+    if (aEvent->Type == AppEvent::kEventType_DeviceAction)
     {
-        action = static_cast<Action_t>(aEvent->LightingEvent.Action);
-        actor  = aEvent->LightingEvent.Actor;
+        action = static_cast<Action_t>(aEvent->DeviceEvent.Action);
+        actor  = aEvent->DeviceEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {

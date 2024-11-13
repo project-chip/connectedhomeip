@@ -15,13 +15,18 @@
  *    limitations under the License.
  */
 
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
-
 #include <app/SimpleSubscriptionResumptionStorage.h>
-#include <lib/support/TestPersistentStorageDelegate.h>
-
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
+#include <pw_unit_test/framework.h>
+
+class TestSimpleSubscriptionResumptionStorage : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
 
 class SimpleSubscriptionResumptionStorageTest : public chip::app::SimpleSubscriptionResumptionStorage
 {
@@ -71,7 +76,7 @@ struct TestSubscriptionInfo : public chip::app::SubscriptionResumptionStorage::S
     }
 };
 
-void TestSubscriptionCount(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionCount)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
@@ -88,7 +93,7 @@ void TestSubscriptionCount(nlTestSuite * inSuite, void * inContext)
 
     // Make sure iterator counts correctly
     auto * iterator = subscriptionStorage.IterateSubscriptions();
-    NL_TEST_ASSERT(inSuite, iterator->Count() == (CHIP_IM_MAX_NUM_SUBSCRIPTIONS / 2));
+    EXPECT_EQ(iterator->Count(), std::make_unsigned_t<int>(CHIP_IM_MAX_NUM_SUBSCRIPTIONS / 2));
 
     // Verify subscriptions manually count correctly
     size_t count = 0;
@@ -97,13 +102,12 @@ void TestSubscriptionCount(nlTestSuite * inSuite, void * inContext)
         count++;
     }
     iterator->Release();
-    NL_TEST_ASSERT(inSuite, count == (CHIP_IM_MAX_NUM_SUBSCRIPTIONS / 2));
+    EXPECT_EQ(count, std::make_unsigned_t<int>(CHIP_IM_MAX_NUM_SUBSCRIPTIONS / 2));
 
     // Delete all and verify iterator counts 0
-    CHIP_ERROR err = subscriptionStorage.DeleteAll(46);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(subscriptionStorage.DeleteAll(46), CHIP_NO_ERROR);
     iterator = subscriptionStorage.IterateSubscriptions();
-    NL_TEST_ASSERT(inSuite, iterator->Count() == 0);
+    EXPECT_EQ(iterator->Count(), 0u);
 
     // Verify subscriptions manually count correctly
     count = 0;
@@ -112,10 +116,10 @@ void TestSubscriptionCount(nlTestSuite * inSuite, void * inContext)
         count++;
     }
     iterator->Release();
-    NL_TEST_ASSERT(inSuite, count == 0);
+    EXPECT_EQ(count, 0u);
 }
 
-void TestSubscriptionMaxCount(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionMaxCount)
 {
     // Force large MacCount value and check that Init resets it properly, and deletes extra subs:
 
@@ -124,35 +128,34 @@ void TestSubscriptionMaxCount(nlTestSuite * inSuite, void * inContext)
 
     // First set a large MaxCount before Init
     uint16_t countMaxToSave = 2 * CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
-    CHIP_ERROR err          = storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(),
-                                                      &countMaxToSave, sizeof(uint16_t));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMaxToSave,
+                                      sizeof(uint16_t)),
+              CHIP_NO_ERROR);
 
     // Then write something beyond CHIP_IM_MAX_NUM_SUBSCRIPTIONS
     chip::Platform::ScopedMemoryBuffer<uint8_t> junkBytes;
     junkBytes.Calloc(subscriptionStorage.TestMaxSubscriptionSize() / 2);
-    NL_TEST_ASSERT(inSuite, junkBytes.Get() != nullptr);
-    NL_TEST_ASSERT(inSuite,
-                   storage.SyncSetKeyValue(
-                       chip::DefaultStorageKeyAllocator::SubscriptionResumption(CHIP_IM_MAX_NUM_SUBSCRIPTIONS + 1).KeyName(),
-                       junkBytes.Get(), static_cast<uint16_t>(subscriptionStorage.TestMaxSubscriptionSize() / 2)) == CHIP_NO_ERROR);
+    ASSERT_NE(junkBytes.Get(), nullptr);
+    EXPECT_EQ(storage.SyncSetKeyValue(
+                  chip::DefaultStorageKeyAllocator::SubscriptionResumption(CHIP_IM_MAX_NUM_SUBSCRIPTIONS + 1).KeyName(),
+                  junkBytes.Get(), static_cast<uint16_t>(subscriptionStorage.TestMaxSubscriptionSize() / 2)),
+              CHIP_NO_ERROR);
 
     subscriptionStorage.Init(&storage);
 
     // First check the MaxCount is reset to CHIP_IM_MAX_NUM_SUBSCRIPTIONS
     uint16_t countMax = 0;
     uint16_t len      = sizeof(countMax);
-    err = storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, countMax == CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(countMax, CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
 
     // Then check the fake sub is no more
-    NL_TEST_ASSERT(inSuite,
-                   !storage.SyncDoesKeyExist(
-                       chip::DefaultStorageKeyAllocator::SubscriptionResumption(CHIP_IM_MAX_NUM_SUBSCRIPTIONS + 1).KeyName()));
+    EXPECT_FALSE(storage.SyncDoesKeyExist(
+        chip::DefaultStorageKeyAllocator::SubscriptionResumption(CHIP_IM_MAX_NUM_SUBSCRIPTIONS + 1).KeyName()));
 }
 
-void TestSubscriptionState(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionState)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
@@ -217,27 +220,23 @@ void TestSubscriptionState(nlTestSuite * inSuite, void * inContext)
     subscriptionInfo3.mEventPaths[1].mEventId       = 8;
     subscriptionInfo2.mEventPaths[1].mIsUrgentEvent = false;
 
-    CHIP_ERROR err;
-    err = subscriptionStorage.Save(subscriptionInfo1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = subscriptionStorage.Save(subscriptionInfo2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = subscriptionStorage.Save(subscriptionInfo3);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(subscriptionStorage.Save(subscriptionInfo1), CHIP_NO_ERROR);
+    EXPECT_EQ(subscriptionStorage.Save(subscriptionInfo2), CHIP_NO_ERROR);
+    EXPECT_EQ(subscriptionStorage.Save(subscriptionInfo3), CHIP_NO_ERROR);
 
     auto * iterator = subscriptionStorage.IterateSubscriptions();
-    NL_TEST_ASSERT(inSuite, iterator->Count() == 3);
+    EXPECT_EQ(iterator->Count(), 3u);
 
     // Verify subscriptions manually count correctly
     TestSubscriptionInfo subscriptionInfo;
-    NL_TEST_ASSERT(inSuite, iterator->Next(subscriptionInfo));
-    NL_TEST_ASSERT(inSuite, subscriptionInfo == subscriptionInfo1);
-    NL_TEST_ASSERT(inSuite, iterator->Next(subscriptionInfo));
-    NL_TEST_ASSERT(inSuite, subscriptionInfo == subscriptionInfo2);
-    NL_TEST_ASSERT(inSuite, iterator->Next(subscriptionInfo));
-    NL_TEST_ASSERT(inSuite, subscriptionInfo == subscriptionInfo3);
+    EXPECT_TRUE(iterator->Next(subscriptionInfo));
+    EXPECT_EQ(subscriptionInfo, subscriptionInfo1);
+    EXPECT_TRUE(iterator->Next(subscriptionInfo));
+    EXPECT_EQ(subscriptionInfo, subscriptionInfo2);
+    EXPECT_TRUE(iterator->Next(subscriptionInfo));
+    EXPECT_EQ(subscriptionInfo, subscriptionInfo3);
     // Verify at end of list
-    NL_TEST_ASSERT(inSuite, !iterator->Next(subscriptionInfo));
+    EXPECT_FALSE(iterator->Next(subscriptionInfo));
     iterator->Release();
 
     // Delete fabric 1 and subscription 2 and check only 3 remains.
@@ -245,30 +244,30 @@ void TestSubscriptionState(nlTestSuite * inSuite, void * inContext)
     subscriptionStorage.DeleteAll(subscriptionInfo2.mFabricIndex);
 
     iterator = subscriptionStorage.IterateSubscriptions();
-    NL_TEST_ASSERT(inSuite, iterator->Count() == 1);
-    NL_TEST_ASSERT(inSuite, iterator->Next(subscriptionInfo));
-    NL_TEST_ASSERT(inSuite, subscriptionInfo == subscriptionInfo3);
+    EXPECT_EQ(iterator->Count(), 1u);
+    EXPECT_TRUE(iterator->Next(subscriptionInfo));
+    EXPECT_EQ(subscriptionInfo, subscriptionInfo3);
     // Verify at end of list
-    NL_TEST_ASSERT(inSuite, !iterator->Next(subscriptionInfo));
+    EXPECT_FALSE(iterator->Next(subscriptionInfo));
     iterator->Release();
 
     // Delete 3 also, and see that both count is 0 and MaxCount is removed from storage
     subscriptionStorage.DeleteAll(subscriptionInfo3.mFabricIndex);
     iterator = subscriptionStorage.IterateSubscriptions();
-    NL_TEST_ASSERT(inSuite, iterator->Count() == 0);
-    NL_TEST_ASSERT(inSuite, !iterator->Next(subscriptionInfo));
+    EXPECT_EQ(iterator->Count(), 0u);
+    EXPECT_FALSE(iterator->Next(subscriptionInfo));
     iterator->Release();
 
     uint16_t countMax = 0;
     uint16_t len      = sizeof(countMax);
-    err = storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len),
+              CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 }
 
 static constexpr chip::TLV::Tag kTestValue1Tag = chip::TLV::ContextTag(30);
 static constexpr chip::TLV::Tag kTestValue2Tag = chip::TLV::ContextTag(31);
 
-void TestSubscriptionStateUnexpectedFields(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionStateUnexpectedFields)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
@@ -293,39 +292,38 @@ void TestSubscriptionStateUnexpectedFields(nlTestSuite * inSuite, void * inConte
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     backingBuffer.Calloc(subscriptionStorage.TestMaxSubscriptionSize());
-    NL_TEST_ASSERT(inSuite, backingBuffer.Get() != nullptr);
+    ASSERT_NE(backingBuffer.Get(), nullptr);
     chip::TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), subscriptionStorage.TestMaxSubscriptionSize());
 
-    NL_TEST_ASSERT(inSuite, subscriptionStorage.TestSave(writer, subscriptionInfo1) == CHIP_NO_ERROR);
+    EXPECT_EQ(subscriptionStorage.TestSave(writer, subscriptionInfo1), CHIP_NO_ERROR);
 
     // Additional stuff
     chip::TLV::TLVType containerType;
-    NL_TEST_ASSERT(inSuite,
-                   writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, containerType) == CHIP_NO_ERROR);
+    EXPECT_EQ(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, containerType), CHIP_NO_ERROR);
     uint32_t value1 = 1;
     uint32_t value2 = 2;
-    NL_TEST_ASSERT(inSuite, writer.Put(kTestValue1Tag, value1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, writer.Put(kTestValue2Tag, value2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, writer.EndContainer(containerType) == CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(kTestValue1Tag, value1), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(kTestValue2Tag, value2), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
 
     const auto len = writer.GetLengthWritten();
 
     writer.Finalize(backingBuffer);
 
-    NL_TEST_ASSERT(inSuite,
-                   storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumption(0).KeyName(),
-                                           backingBuffer.Get(), static_cast<uint16_t>(len)) == CHIP_NO_ERROR);
+    EXPECT_EQ(storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumption(0).KeyName(), backingBuffer.Get(),
+                                      static_cast<uint16_t>(len)),
+              CHIP_NO_ERROR);
 
     // Now read back and verify
     auto * iterator = subscriptionStorage.IterateSubscriptions();
-    NL_TEST_ASSERT(inSuite, iterator->Count() == 1);
+    EXPECT_EQ(iterator->Count(), 1u);
     TestSubscriptionInfo subscriptionInfo;
-    NL_TEST_ASSERT(inSuite, iterator->Next(subscriptionInfo));
-    NL_TEST_ASSERT(inSuite, subscriptionInfo == subscriptionInfo1);
+    EXPECT_TRUE(iterator->Next(subscriptionInfo));
+    EXPECT_EQ(subscriptionInfo, subscriptionInfo1);
     iterator->Release();
 }
 
-void TestSubscriptionStateTooBigToLoad(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionStateTooBigToLoad)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
@@ -350,42 +348,41 @@ void TestSubscriptionStateTooBigToLoad(nlTestSuite * inSuite, void * inContext)
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     backingBuffer.Calloc(subscriptionStorage.TestMaxSubscriptionSize() * 2);
-    NL_TEST_ASSERT(inSuite, backingBuffer.Get() != nullptr);
+    ASSERT_NE(backingBuffer.Get(), nullptr);
     chip::TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), subscriptionStorage.TestMaxSubscriptionSize() * 2);
 
-    NL_TEST_ASSERT(inSuite, subscriptionStorage.TestSave(writer, subscriptionInfo1) == CHIP_NO_ERROR);
+    EXPECT_EQ(subscriptionStorage.TestSave(writer, subscriptionInfo1), CHIP_NO_ERROR);
 
     // Additional too-many bytes
     chip::TLV::TLVType containerType;
-    NL_TEST_ASSERT(inSuite,
-                   writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, containerType) == CHIP_NO_ERROR);
+    EXPECT_EQ(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, containerType), CHIP_NO_ERROR);
     // Write MaxSubscriptionSize() to guarantee Load failure
     chip::Platform::ScopedMemoryBuffer<uint8_t> additionalBytes;
     additionalBytes.Calloc(subscriptionStorage.TestMaxSubscriptionSize());
-    NL_TEST_ASSERT(inSuite, additionalBytes.Get() != nullptr);
-    NL_TEST_ASSERT(inSuite,
-                   writer.PutBytes(kTestValue1Tag, additionalBytes.Get(),
-                                   static_cast<uint32_t>(subscriptionStorage.TestMaxSubscriptionSize())) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, writer.EndContainer(containerType) == CHIP_NO_ERROR);
+    ASSERT_NE(additionalBytes.Get(), nullptr);
+    EXPECT_EQ(writer.PutBytes(kTestValue1Tag, additionalBytes.Get(),
+                              static_cast<uint32_t>(subscriptionStorage.TestMaxSubscriptionSize())),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
 
     const auto len = writer.GetLengthWritten();
 
     writer.Finalize(backingBuffer);
 
-    NL_TEST_ASSERT(inSuite,
-                   storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumption(0).KeyName(),
-                                           backingBuffer.Get(), static_cast<uint16_t>(len)) == CHIP_NO_ERROR);
+    EXPECT_EQ(storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumption(0).KeyName(), backingBuffer.Get(),
+                                      static_cast<uint16_t>(len)),
+              CHIP_NO_ERROR);
 
     // Now read back and verify
     auto * iterator = subscriptionStorage.IterateSubscriptions();
-    NL_TEST_ASSERT(inSuite, iterator->Count() == 1);
+    EXPECT_EQ(iterator->Count(), 1u);
     TestSubscriptionInfo subscriptionInfo;
-    NL_TEST_ASSERT(inSuite, !iterator->Next(subscriptionInfo));
-    NL_TEST_ASSERT(inSuite, iterator->Count() == 0);
+    EXPECT_FALSE(iterator->Next(subscriptionInfo));
+    EXPECT_EQ(iterator->Count(), 0u);
     iterator->Release();
 }
 
-void TestSubscriptionStateJunkData(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionStateJunkData)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
@@ -393,76 +390,16 @@ void TestSubscriptionStateJunkData(nlTestSuite * inSuite, void * inContext)
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> junkBytes;
     junkBytes.Calloc(subscriptionStorage.TestMaxSubscriptionSize() / 2);
-    NL_TEST_ASSERT(inSuite, junkBytes.Get() != nullptr);
-    NL_TEST_ASSERT(inSuite,
-                   storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumption(0).KeyName(), junkBytes.Get(),
-                                           static_cast<uint16_t>(subscriptionStorage.TestMaxSubscriptionSize() / 2)) ==
-                       CHIP_NO_ERROR);
+    ASSERT_NE(junkBytes.Get(), nullptr);
+    EXPECT_EQ(storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumption(0).KeyName(), junkBytes.Get(),
+                                      static_cast<uint16_t>(subscriptionStorage.TestMaxSubscriptionSize() / 2)),
+              CHIP_NO_ERROR);
 
     // Now read back and verify
     auto * iterator = subscriptionStorage.IterateSubscriptions();
-    NL_TEST_ASSERT(inSuite, iterator->Count() == 1);
+    EXPECT_EQ(iterator->Count(), 1u);
     TestSubscriptionInfo subscriptionInfo;
-    NL_TEST_ASSERT(inSuite, !iterator->Next(subscriptionInfo));
-    NL_TEST_ASSERT(inSuite, iterator->Count() == 0);
+    EXPECT_FALSE(iterator->Next(subscriptionInfo));
+    EXPECT_EQ(iterator->Count(), 0u);
     iterator->Release();
 }
-/**
- *  Set up the test suite.
- */
-int TestSubscription_Setup(void * inContext)
-{
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
-
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int TestSubscription_Teardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-// Test Suite
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestSubscriptionCount", TestSubscriptionCount),
-    NL_TEST_DEF("TestSubscriptionMaxCount", TestSubscriptionMaxCount),
-    NL_TEST_DEF("TestSubscriptionState", TestSubscriptionState),
-    NL_TEST_DEF("TestSubscriptionStateUnexpectedFields", TestSubscriptionStateUnexpectedFields),
-    NL_TEST_DEF("TestSubscriptionStateTooBigToLoad", TestSubscriptionStateTooBigToLoad),
-    NL_TEST_DEF("TestSubscriptionStateJunkData", TestSubscriptionStateJunkData),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-// clang-format off
-static nlTestSuite sSuite =
-{
-    "Test-CHIP-SimpleSubscriptionResumptionStorage",
-    &sTests[0],
-    &TestSubscription_Setup, &TestSubscription_Teardown
-};
-// clang-format on
-
-/**
- *  Main
- */
-int TestSimpleSubscriptionResumptionStorage()
-{
-    // Run test suit against one context
-    nlTestRunner(&sSuite, nullptr);
-
-    return (nlTestRunnerStats(&sSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSimpleSubscriptionResumptionStorage)

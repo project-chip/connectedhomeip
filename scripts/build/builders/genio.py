@@ -1,6 +1,7 @@
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -48,9 +49,9 @@ class GenioBuilder(GnBuilder):
         self.app = app
 
     def build_outputs(self):
-        items = {}
-        for extension in ['out', 'out.map', 'bin']:
-            name = '%s.%s' % (self.app.AppNamePrefix(), extension)
-            items[name] = os.path.join(self.output_dir, name)
-
-        return items
+        extensions = ['out', 'bin']
+        if self.options.enable_link_map_file:
+            extensions.append('out.map')
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix()}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)

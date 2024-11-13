@@ -15,27 +15,25 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <map>
+
 #ifdef MATTER_DM_PLUGIN_MEDIA_INPUT_SERVER
 #include "MediaInputManager.h"
 
-using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters::MediaInput;
+using Protocols::InteractionModel::Status;
 
-MediaInputManager::MediaInputManager()
+MediaInputManager::MediaInputManager(chip::EndpointId endpoint) : mEndpoint(endpoint)
 {
-    struct InputData inputData1(1, chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi, "HDMI 1",
-                                "High-Definition Multimedia Interface");
+    struct InputData inputData1(1, InputTypeEnum::kHdmi, "HDMI 1", "High-Definition Multimedia Interface");
     mInputs.push_back(inputData1);
-    struct InputData inputData2(2, chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi, "HDMI 2",
-                                "High-Definition Multimedia Interface");
+    struct InputData inputData2(2, InputTypeEnum::kHdmi, "HDMI 2", "High-Definition Multimedia Interface");
     mInputs.push_back(inputData2);
-    struct InputData inputData3(3, chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi, "HDMI 3",
-                                "High-Definition Multimedia Interface");
+    struct InputData inputData3(3, InputTypeEnum::kHdmi, "HDMI 3", "High-Definition Multimedia Interface");
     mInputs.push_back(inputData3);
-
-    mCurrentInput = 1;
 }
 
 CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
@@ -51,16 +49,32 @@ CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncode
 
 uint8_t MediaInputManager::HandleGetCurrentInput()
 {
-    return mCurrentInput;
+    uint8_t currentInput = 1;
+    Status status        = Attributes::CurrentInput::Get(mEndpoint, &currentInput);
+    if (Status::Success != status)
+    {
+        ChipLogError(Zcl, "Unable to get CurrentInput attribute, err:0x%x", to_underlying(status));
+    }
+    return currentInput;
 }
 
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
+    if (HandleGetCurrentInput() == index)
+    {
+        ChipLogProgress(Zcl, "CurrentInput is same as new value: %u", index);
+        return true;
+    }
     for (auto const & inputData : mInputs)
     {
         if (inputData.index == index)
         {
-            mCurrentInput = index;
+            // Sync the CurrentInput to attribute storage while reporting changes
+            Status status = Attributes::CurrentInput::Set(mEndpoint, index);
+            if (Status::Success != status)
+            {
+                ChipLogError(Zcl, "CurrentInput is not stored successfully, err:0x%x", to_underlying(status));
+            }
             return true;
         }
     }
@@ -70,11 +84,12 @@ bool MediaInputManager::HandleSelectInput(const uint8_t index)
 
 bool MediaInputManager::HandleShowInputStatus()
 {
+    uint8_t currentInput = HandleGetCurrentInput();
     ChipLogProgress(Zcl, " MediaInputManager::HandleShowInputStatus()");
     for (auto const & inputData : mInputs)
     {
         ChipLogProgress(Zcl, " [%d] type=%d selected=%d name=%s desc=%s", inputData.index,
-                        static_cast<uint16_t>(inputData.inputType), (mCurrentInput == inputData.index ? 1 : 0),
+                        static_cast<uint16_t>(inputData.inputType), (currentInput == inputData.index ? 1 : 0),
                         inputData.name.c_str(), inputData.description.c_str());
     }
     return true;
@@ -98,5 +113,16 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
     }
 
     return false;
+}
+
+static std::map<chip::EndpointId, std::unique_ptr<MediaInputManager>> gMediaInputManagerInstance{};
+
+void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: MediaInput::SetDefaultDelegate, endpoint=%x", endpoint);
+
+    gMediaInputManagerInstance[endpoint] = std::make_unique<MediaInputManager>(endpoint);
+
+    SetDefaultDelegate(endpoint, gMediaInputManagerInstance[endpoint].get());
 }
 #endif // MATTER_DM_PLUGIN_MEDIA_INPUT_SERVER

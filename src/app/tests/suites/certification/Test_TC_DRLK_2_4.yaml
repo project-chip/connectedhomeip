@@ -33,104 +33,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Create new user"
-      command: "SetUser"
-      PICS: DRLK.S.F08 && DRLK.S.F00
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "OperationType"
-                value: 0
-              - name: "UserIndex"
-                value: 1
-              - name: "UserName"
-                value: "xxx"
-              - name: "UserUniqueID"
-                value: 6452
-              - name: "UserStatus"
-                value: 1
-              - name: "UserType"
-                value: 0
-              - name: "CredentialRule"
-                value: 0
-
-    - label: "Read the user back and verify its fields"
-      command: "GetUser"
-      PICS: DRLK.S.F08 && DRLK.S.F00
-      arguments:
-          values:
-              - name: "UserIndex"
-                value: 1
-      response:
-          values:
-              - name: "UserIndex"
-                value: 1
-              - name: "UserName"
-                value: "xxx"
-              - name: "UserUniqueID"
-                value: 6452
-              - name: "UserStatus"
-                value: 1
-              - name: "UserType"
-                value: 0
-              - name: "CredentialRule"
-                value: 0
-              - name: "Credentials"
-                value: []
-              - name: "CreatorFabricIndex"
-                value: 1
-              - name: "LastModifiedFabricIndex"
-                value: 1
-              - name: "NextUserIndex"
-                value: null
-
-    - label: "Create new PIN credential and lock/unlock user"
-      command: "SetCredential"
-      PICS: DRLK.S.F08 && DRLK.S.F00
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "OperationType"
-                value: 0
-              - name: "Credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "CredentialData"
-                value: "123456"
-              - name: "UserIndex"
-                value: 1
-              - name: "UserStatus"
-                value: null
-              - name: "UserType"
-                value: null
-      response:
-          values:
-              - name: "Status"
-                value: 0
-              - name: "UserIndex"
-                value: null
-              - name: "NextCredentialIndex"
-                value: 2
-
-    - label: "Verify created PIN credential"
-      PICS: DRLK.S.F08 && DRLK.S.F00
-      command: "GetCredentialStatus"
-      arguments:
-          values:
-              - name: "Credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-      response:
-          values:
-              - name: "CredentialExists"
-                value: true
-              - name: "UserIndex"
-                value: 1
-              - name: "CreatorFabricIndex"
-                value: 1
-              - name: "LastModifiedFabricIndex"
-                value: 1
-              - name: "NextCredentialIndex"
-                value: null
-
     - label:
           "Step 1a: TH writes AutoRelockTime attribute value as 10 seconds on
           the DUT"
@@ -172,7 +74,80 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label:
-          "Step 2a: TH sends the Unlock with Timeout argument value as 10
+          "Step 2a: TH sends SetUser Command to DUT with the following values:"
+      command: "SetUser"
+      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+
+    - label: "Step 2b: TH reads MinPINCodeLength attribute from DUT"
+      PICS: DRLK.S.F00 && DRLK.S.A0018
+      command: "readAttribute"
+      attribute: "MinPINCodeLength"
+      response:
+          saveAs: MinPINCodeLengthValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label: "Step 2c: TH reads MaxPINCodeLength attribute from DUT"
+      PICS: DRLK.S.F00 && DRLK.S.A0017
+      command: "readAttribute"
+      attribute: "MaxPINCodeLength"
+      response:
+          saveAs: MaxPINCodeLengthValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+    - label:
+          "Step 2d: TH sends SetCredential Command to DUT with the following
+          fields and CredentialData Length is in an inclusive range of
+          MaxPINCodeLengthValue to MaxPINCodeLengthValue"
+      command: "SetCredential"
+      PICS: DRLK.S.F00 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: "123456"
+              - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "UserIndex"
+                value: null
+              - name: "NextCredentialIndex"
+                value: 2
+
+    - label:
+          "Step 2e: TH sends the Unlock with Timeout argument value as 10
           seconds"
       PICS: DRLK.S.C03.Rsp && PICS_SDK_CI_ONLY
       command: "UnlockWithTimeout"
@@ -185,7 +160,7 @@ tests:
                 value: "123456"
 
     - label:
-          "Step 2b: TH sends the Unlock with Timeout argument value as 60
+          "Step 2f: TH sends the Unlock with Timeout argument value as 60
           seconds"
       PICS:
           " DRLK.S.F08 && DRLK.S.F00 && DRLK.S.C03.Rsp && PICS_SKIP_SAMPLE_APP "
@@ -199,7 +174,7 @@ tests:
                 value: "123456"
 
     - label:
-          "Step 2b: TH sends the Unlock with Timeout argument value as 60
+          "Step 2g: TH sends the Unlock with Timeout argument value as 60
           seconds"
       PICS:
           " (!DRLK.S.F08 || !DRLK.S.F00) && DRLK.S.C03.Rsp &&
@@ -230,27 +205,30 @@ tests:
               - name: "ms"
                 value: 70000
 
-    - label: "Step 2c: TH reads LockState attribute"
+    - label: "Step 2h: TH reads LockState attribute"
       PICS: DRLK.S.A0000 && DRLK.S.C03.Rsp
       command: "readAttribute"
       attribute: "LockState"
       response:
           value: 1
 
-    - label: "Cleanup the created user"
-      command: "ClearUser"
-      PICS: DRLK.S.F08 && DRLK.S.F00
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "UserIndex"
-                value: 1
-
-    - label: "Clean the created credential"
-      PICS: DRLK.S.F08 && DRLK.S.F00 && DRLK.S.C26.Rsp
+    - label:
+          "Step 3a: TH sends ClearCredential Command to DUT with the following
+          fields:"
+      PICS: DRLK.S.F00 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
               - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
+
+    - label:
+          "Step 3b: TH sends ClearUser Command to DUT with the UserIndex as 1"
+      command: "ClearUser"
+      PICS: DRLK.S.F08 && DRLK.S.C1d.Rsp
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1

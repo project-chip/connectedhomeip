@@ -234,7 +234,7 @@ public:
     virtual CHIP_ERROR ResetEthNetworkDiagnosticsCounts();
 
     /**
-     * WiFi network diagnostics methods
+     * Wi-Fi network diagnostics methods
      */
 
     /**

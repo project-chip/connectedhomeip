@@ -23,15 +23,6 @@ get_filename_component(ENERGY_MANAGEMENT_COMMON_DIR ${CHIP_ROOT}/examples/energy
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
-# Set Kconfig root files that will be processed as a first Kconfig for used child images.
-set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
-set(multiprotocol_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.multiprotocol_rpmsg.root)
-set(hci_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.hci_rpmsg.root)
-
-if(DEFINED CONF_FILE AND NOT CONF_FILE STREQUAL "prj.conf")
-    set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static_dfu.yml)
-endif()
-
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
@@ -43,6 +34,7 @@ target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 
 project(chip-nrfconnect-all-clusters-app-example)
 
+include(${CHIP_ROOT}/config/nrfconnect/app/check-sysbuild-use.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
@@ -50,7 +42,10 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 target_include_directories(app PRIVATE
                            main/include
                            ${ALL_CLUSTERS_COMMON_DIR}/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/include                           
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/common/include
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/include
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/include
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
                            ${NRFCONNECT_COMMON}/util/include)
@@ -65,20 +60,23 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/oven-modes.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/device-energy-management-stub.cpp               
+               ${ALL_CLUSTERS_COMMON_DIR}/src/device-energy-management-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManager.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/ElectricalPowerMeasurementDelegate.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/common/src/EnergyTimeUtils.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/src/DeviceEnergyManagementManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/ChargingTargetsMemMgr.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EVSEManufacturerImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseTargetsStore.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp               
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
 

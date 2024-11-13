@@ -48,12 +48,18 @@ public:
     CHIP_ERROR ToggleLed(uint8_t led) override;
 #endif
 
+    // Buttons
     inline void SetButtonsCb(SilabsButtonCb callback) override { mButtonCallback = callback; }
     inline uint32_t GetRebootCause() { return mRebootCause; }
 
     static SilabsButtonCb mButtonCallback;
+    uint8_t GetButtonState(uint8_t button) override;
 
     void StartScheduler(void) override;
+
+    CHIP_ERROR FlashInit() override;
+    CHIP_ERROR FlashErasePage(uint32_t addr) override;
+    CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) override;
 
 private:
     friend SilabsPlatform & GetPlatform(void);

@@ -64,6 +64,16 @@
             "path": "ComplexArgumentParser-src.zapt",
             "name": "Complex Argument Parser",
             "output": "cluster/ComplexArgumentParser.cpp"
+        },
+        {
+            "path": "logging/EntryToText.zapt",
+            "name": "Entry To Text header",
+            "output": "cluster/logging/EntryToText.h"
+        },
+        {
+            "path": "logging/EntryToText-src.zapt",
+            "name": "Entry To Text",
+            "output": "cluster/logging/EntryToText.cpp"
         }
     ]
 }

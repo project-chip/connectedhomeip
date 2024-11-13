@@ -19,6 +19,7 @@
 
 # Commissioning test.
 
+import asyncio
 import os
 import sys
 from optparse import OptionParser
@@ -45,7 +46,7 @@ LIGHTING_ENDPOINT_ID = 1
 GROUP_ID = 0
 
 
-def main():
+async def main():
     optParser = OptionParser()
     optParser.add_option(
         "-t",
@@ -96,34 +97,33 @@ def main():
 
     # TODO: Start at stage 2 once handling for arming failsafe on pase is done.
     if options.report:
-        for testFailureStage in range(3, 20):
-            FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
-                                        setuppin=20202021,
-                                        nodeid=1),
+        for testFailureStage in range(3, 21):
+            FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
+                                              setuppin=20202021,
+                                              nodeid=1),
                       "Failed to establish PASE connection with device")
-            FailIfNot(test.TestCommissionFailureOnReport(1, testFailureStage),
+            FailIfNot(await test.TestCommissionFailureOnReport(1, testFailureStage),
                       "Commissioning failure tests failed for simulated report failure on stage {}".format(testFailureStage))
 
     else:
-        for testFailureStage in range(3, 20):
-            FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
-                                        setuppin=20202021,
-                                        nodeid=1),
+        for testFailureStage in range(3, 21):
+            FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
+                                              setuppin=20202021,
+                                              nodeid=1),
                       "Failed to establish PASE connection with device")
-            FailIfNot(test.TestCommissionFailure(1, testFailureStage),
+            FailIfNot(await test.TestCommissionFailure(1, testFailureStage),
                       "Commissioning failure tests failed for simulated stage failure on stage {}".format(testFailureStage))
 
     # Ensure we can still commission for real
-    FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
-                                setuppin=20202021,
-                                nodeid=1),
+    FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
+                                      setuppin=20202021,
+                                      nodeid=1),
               "Failed to establish PASE connection with device")
-    FailIfNot(test.TestCommissionFailure(1, 0), "Failed to commission device")
+    FailIfNot(await test.TestCommissionFailure(1, 0), "Failed to commission device")
 
     logger.info("Testing on off cluster")
-    FailIfNot(test.TestOnOffCluster(nodeid=1,
-                                    endpoint=LIGHTING_ENDPOINT_ID,
-                                    group=GROUP_ID), "Failed to test on off cluster")
+    FailIfNot(await test.TestOnOffCluster(nodeid=1,
+                                          endpoint=LIGHTING_ENDPOINT_ID), "Failed to test on off cluster")
 
     timeoutTicker.stop()
 
@@ -136,7 +136,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        asyncio.run(main())
     except Exception as ex:
         logger.exception(ex)
         TestFail("Exception occurred when running tests.")

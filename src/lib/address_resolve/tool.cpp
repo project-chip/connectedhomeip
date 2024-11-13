@@ -56,7 +56,8 @@ public:
         result.address.ToString(addr_string);
 
         ChipLogProgress(Discovery, "Resolve completed: %s", addr_string);
-        ChipLogProgress(Discovery, "   Supports TCP:                  %s", result.supportsTcp ? "YES" : "NO");
+        ChipLogProgress(Discovery, " Supports TCP Client: %s", result.supportsTcpClient ? "YES" : "NO");
+        ChipLogProgress(Discovery, " Supports TCP Server: %s", result.supportsTcpServer ? "YES" : "NO");
         ChipLogProgress(Discovery, "   MRP IDLE retransmit timeout:   %u ms", result.mrpRemoteConfig.mIdleRetransTimeout.count());
         ChipLogProgress(Discovery, "   MRP ACTIVE retransmit timeout: %u ms", result.mrpRemoteConfig.mActiveRetransTimeout.count());
         ChipLogProgress(Discovery, "   MRP ACTIVE Threshold time:     %u ms", result.mrpRemoteConfig.mActiveThresholdTime.count());
@@ -146,7 +147,7 @@ extern "C" void StopSignalHandler(int signal)
 
 } // namespace
 
-extern "C" int main(int argc, const char ** argv)
+int main(int argc, const char ** argv)
 {
     Platform::MemoryInit();
 

@@ -16,6 +16,7 @@ import logging
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -66,12 +67,6 @@ class BouffalolabBoard(Enum):
             raise Exception('Unknown board #: %r' % self)
 
 
-class BouffalolabMfd(Enum):
-    MFD_DISABLE = auto()
-    MFD_TEST = auto()
-    MFD_RELEASE = auto()
-
-
 class BouffalolabBuilder(GnBuilder):
 
     def __init__(self,
@@ -86,13 +81,15 @@ class BouffalolabBuilder(GnBuilder):
                  enable_cdc: bool = False,
                  enable_resetCnt: bool = False,
                  enable_rotating_device_id: bool = False,
-                 function_mfd: BouffalolabMfd = BouffalolabMfd.MFD_DISABLE,
+                 enable_mfd: bool = False,
                  enable_ethernet: bool = False,
                  enable_wifi: bool = False,
                  enable_thread: bool = False,
                  enable_frame_ptr: bool = False,
                  enable_heap_monitoring: bool = False,
-                 use_matter_openthread: bool = False
+                 use_matter_openthread: bool = False,
+                 enable_easyflash: bool = False,
+                 enable_littlefs: bool = False
                  ):
 
         if 'BL602' == module_type:
@@ -112,15 +109,13 @@ class BouffalolabBuilder(GnBuilder):
 
         self.argsOpt = []
         self.chip_name = bouffalo_chip
-        self.enable_frame_ptr = enable_frame_ptr
+        self.app = app
+        self.board = board
 
         toolchain = os.path.join(root, os.path.split(os.path.realpath(__file__))[0], '../../../config/bouffalolab/toolchain')
         toolchain = f'custom_toolchain="{toolchain}:riscv_gcc"'
         if toolchain:
             self.argsOpt.append(toolchain)
-
-        self.app = app
-        self.board = board
 
         self.argsOpt.append(f'board="{self.board.GnArgName()}"')
         self.argsOpt.append(f'baudrate="{baudrate}"')
@@ -134,13 +129,8 @@ class BouffalolabBuilder(GnBuilder):
             elif bouffalo_chip == "bl702l":
                 enable_wifi, enable_thread, enable_ethernet = False, True, False
 
-        if (enable_ethernet or enable_wifi) and enable_thread:
-            raise Exception('Currently, Thread can NOT be enabled with Wi-Fi or Ethernet')
-
-        if enable_thread:
-            chip_mdns = "platform"
-        elif enable_ethernet or enable_wifi:
-            chip_mdns = "minimal"
+        if [enable_wifi, enable_thread, enable_ethernet].count(True) > 1:
+            raise Exception('Currently, only one of wifi, thread and ethernet supports.')
 
         # hardware connectivity support check
         if bouffalo_chip == "bl602":
@@ -155,6 +145,14 @@ class BouffalolabBuilder(GnBuilder):
             if enable_ethernet or enable_wifi:
                 raise Exception(f"SoC {bouffalo_chip} does NOT support connectivity Ethernet/Wi-Fi currently.")
 
+        if enable_thread:
+            chip_mdns = "platform"
+        elif enable_ethernet or enable_wifi:
+            chip_mdns = "minimal"
+
+        if enable_frame_ptr and bouffalo_chip == "bl616":
+            raise Exception("BL616 does NOT support frame pointer for debug purpose.")
+
         self.argsOpt.append(f'chip_enable_ethernet={str(enable_ethernet).lower()}')
         self.argsOpt.append(f'chip_enable_wifi={str(enable_wifi).lower()}')
         self.argsOpt.append(f'chip_enable_openthread={str(enable_thread).lower()}')
@@ -165,13 +163,27 @@ class BouffalolabBuilder(GnBuilder):
         self.argsOpt.append(f'chip_mdns="{chip_mdns}"')
         self.argsOpt.append(f'chip_inet_config_enable_ipv4={str(enable_ethernet or enable_wifi).lower()}')
 
+        if enable_easyflash and enable_littlefs:
+            raise Exception("Only one of easyflash and littlefs can be enabled.")
+
+        if not enable_easyflash and not enable_littlefs:
+            logging.fatal('*' * 80)
+            logging.fatal('littlefs is added to support for flash storage access.')
+            logging.fatal('Please consider and select one of easyflash and littlefs to use.')
+            logging.fatal('*' * 80)
+            raise Exception("None of easyflash and littlefs select to build.")
+        self.argsOpt.append(f'bouffalo_sdk_component_easyflash_enabled={"false" if enable_littlefs else "true"}')
+
         if enable_thread:
             self.argsOpt.append('chip_system_config_use_open_thread_inet_endpoints=true')
             self.argsOpt.append('chip_with_lwip=false')
             self.argsOpt.append(f'openthread_project_core_config_file="{bouffalo_chip}-openthread-core-bl-config.h"')
+            self.argsOpt.append(f'openthread_package_version="7e32165be"')
+
             if not use_matter_openthread:
-                self.argsOpt.append(
-                    'openthread_root="//third_party/connectedhomeip/third_party/bouffalolab/repo/components/network/thread/openthread"')
+                if bouffalo_chip in {"bl702", "bl702l"}:
+                    self.argsOpt.append(
+                        'openthread_root="//third_party/connectedhomeip/third_party/bouffalolab/repo/components/network/thread/openthread"')
 
         if enable_cdc:
             if bouffalo_chip != "bl702":
@@ -193,12 +205,10 @@ class BouffalolabBuilder(GnBuilder):
             self.argsOpt.append('chip_enable_additional_data_advertising=true')
             self.argsOpt.append('chip_enable_rotating_device_id=true')
 
-        if BouffalolabMfd.MFD_DISABLE != function_mfd:
-            if BouffalolabMfd.MFD_RELEASE == function_mfd:
-                self.argsOpt.append("chip_enable_factory_data=true")
-            elif BouffalolabMfd.MFD_TEST == function_mfd:
-                self.argsOpt.append("chip_enable_factory_data_test=true")
+        if enable_mfd:
+            self.argsOpt.append("chip_enable_factory_data=true")
 
+        self.enable_frame_ptr = enable_frame_ptr
         self.argsOpt.append(f"enable_debug_frame_ptr={str(enable_frame_ptr).lower()}")
         self.argsOpt.append(f"enable_heap_monitoring={str(enable_heap_monitoring).lower()}")
 
@@ -210,12 +220,12 @@ class BouffalolabBuilder(GnBuilder):
 
     def print_enviroment_error(self):
         logging.fatal('*' * 80)
+        logging.error('Flashtool is not installed, or environment variable BOUFFALOLAB_SDK_ROOT is not exported.')
         logging.fatal('\tPlease make sure Bouffalo Lab SDK installs as below:')
-        logging.fatal('\t\tcd third_party/bouffalolab/repo')
-        logging.fatal('\t\tsudo bash scripts/setup.sh')
+        logging.fatal('\t\t./integrations/docker/images/stage-2/chip-build-bouffalolab/setup.sh')
 
         logging.fatal('\tPlease make sure BOUFFALOLAB_SDK_ROOT exports before building as below:')
-        logging.fatal('\t\texport BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk')
+        logging.fatal('\t\texport BOUFFALOLAB_SDK_ROOT="your install path"')
         logging.fatal('*' * 80)
 
     def GnBuildArgs(self):
@@ -226,40 +236,39 @@ class BouffalolabBuilder(GnBuilder):
             return self.argsOpt
 
     def build_outputs(self):
-        items = {
-            '%s.out' % self.app.AppNamePrefix(self.chip_name):
-                os.path.join(self.output_dir, '%s.out' %
-                             self.app.AppNamePrefix(self.chip_name)),
-            '%s.out.map' % self.app.AppNamePrefix(self.chip_name):
-                os.path.join(self.output_dir,
-                             '%s.out.map' % self.app.AppNamePrefix(self.chip_name)),
-        }
+        extensions = ["out"]
+        if self.options.enable_link_map_file:
+            extensions.append("out.map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix(self.chip_name)}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
-        return items
+    def PreBuildCommand(self):
+        os.system("rm -rf {}/config".format(self.output_dir))
+        os.system("rm -rf {}/ota_images".format(self.output_dir))
+        os.system("rm -rf {}".format(os.path.join(self.output_dir, 'boot2*.bin')))
+        os.system("rm -rf {}".format(os.path.join(self.output_dir, '%s*' % self.app.AppNamePrefix(self.chip_name))))
 
     def PostBuildCommand(self):
 
-        # Generate Bouffalo Lab format OTA image for development purpose.
-        ota_images_folder_path = self.output_dir + "/ota_images"
-        ota_images_dev_image = self.output_dir + "/" + self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash"
-        ota_images_image = self.output_dir + "/ota_images/FW_OTA.bin.xz.hash"
-        ota_images_firmware = self.output_dir + "/" + self.app.AppNamePrefix(self.chip_name) + ".bin"
+        abs_path_fw = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".bin")
 
-        ota_images_flash_tool = self.output_dir + "/" + self.app.AppNamePrefix(self.chip_name) + ".flash.py"
+        if os.path.isfile(abs_path_fw):
+            target_dir = self.output_dir.replace(self.chip_dir, "").strip("/")
 
-        os.system("rm -rf " + ota_images_folder_path)
-        os.system("rm -rf " + ota_images_dev_image)
+            abs_path_fw_bin = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".bin")
+            path_fw = os.path.join(target_dir, self.app.AppNamePrefix(self.chip_name) + ".bin")
+            path_flash_script = os.path.join(target_dir, self.app.AppNamePrefix(self.chip_name) + ".flash.py")
 
-        if not os.path.isfile(ota_images_firmware):
-            return
+            logging.info('*' * 80)
 
-        os.system("python " + ota_images_flash_tool + " --build > /dev/null")
-
-        if not os.path.isfile(ota_images_image):
-            return
-
-        os.system("cp " + ota_images_image + " " + ota_images_dev_image)
-
-        logging.info("PostBuild:")
-        logging.info("Bouffalo Lab unsigned OTA image: " +
-                     self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash is generated.")
+            logging.info("Firmware is built out at: {}".format(path_fw))
+            logging.info("Command to generate ota image: ")
+            logging.info('./{} --build-ota --vendor-id <vendor id> --product-id <product id> '
+                         '--version <version> --version-str <version string> '
+                         '--digest-algorithm <digest algorithm>'.format(path_flash_script))
+            logging.info("Command to generate and sign ota image: ")
+            logging.info('./{} --build-ota --vendor-id <vendor id> --product-id <product id> '
+                         '--version <version> --version-str <version string> '
+                         '--digest-algorithm <digest algorithm> --sk <private key>'.format(path_flash_script))
+            logging.info('*' * 80)

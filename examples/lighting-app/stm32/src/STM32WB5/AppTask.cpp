@@ -24,12 +24,12 @@
 #include "cmsis_os.h"
 #include "dbg_trace.h"
 #include "flash_wb.h"
+#include "ota.h"
 #include "ssd1315.h"
 #include "stm32_lcd.h"
 #include "stm32_lpm.h"
 #include "stm32wb5mm_dk_lcd.h"
 
-#include "stm_logging.h"
 #if HIGHWATERMARK
 #include "memory_buffer_alloc.h"
 #endif
@@ -65,16 +65,12 @@ using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 AppTask AppTask::sAppTask;
 chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
-#define APP_FUNCTION_BUTTON BUTTON_USER1
-#define STM32ThreadDataSet "STM32DataSet"
 #define APP_EVENT_QUEUE_SIZE 10
 #define NVM_TIMEOUT 1000 // timer to handle PB to save data in nvm or do a factory reset
-#define DELAY_NVM 5000   // save data in nvm after commissioning with a delay of 5 sec
 #define STM32_LIGHT_ENDPOINT_ID 1
 
 static QueueHandle_t sAppEventQueue;
 TimerHandle_t sPushButtonTimeoutTimer;
-TimerHandle_t DelayNvmTimer;
 const osThreadAttr_t AppTask_attr = { .name       = APPTASK_NAME,
                                       .attr_bits  = APP_ATTR_BITS,
                                       .cb_mem     = APP_CB_MEM,
@@ -91,6 +87,8 @@ static bool sFailCommissioning   = false;
 static bool sHaveFabric          = false;
 static uint8_t NvmTimerCpt       = 0;
 static uint8_t NvmButtonStateCpt = 0;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -134,15 +132,7 @@ CHIP_ERROR AppTask::Init()
                                            TimerEventHandler           // timer callback handler
     );
 
-    DelayNvmTimer = xTimerCreate("Delay_NVM",    // Just a text name, not used by the RTOS kernel
-                                 DELAY_NVM,      // == default timer period (mS)
-                                 pdFALSE,        //  timer reload
-                                 0,              // init timer
-                                 DelayNvmHandler // timer callback handler
-    );
-
     ThreadStackMgr().InitThreadStack();
-
     ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
 
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
@@ -174,6 +164,9 @@ CHIP_ERROR AppTask::Init()
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     chip::Server::GetInstance().Init(initParams);
 
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     ConfigurationMgr().LogDeviceConfig();
 
     // Open commissioning after boot if no fabric was available
@@ -186,23 +179,13 @@ CHIP_ERROR AppTask::Init()
     }
     else
     { // try to attach to the thread network
-        uint8_t datasetBytes[Thread::kSizeOperationalDataset];
-        size_t datasetLength = 0;
+        sHaveFabric = true;
+#if (CFG_LCD_SUPPORTED == 1)
         char Message[20];
         snprintf(Message, sizeof(Message), "Fabric Found: %d", chip::Server::GetInstance().GetFabricTable().FabricCount());
-        APP_BLE_Init_Dyn_3();
         UTIL_LCD_DisplayStringAt(0, LINE(1), (uint8_t *) Message, LEFT_MODE);
         BSP_LCD_Refresh(0);
-        CHIP_ERROR error = KeyValueStoreMgr().Get(STM32ThreadDataSet, datasetBytes, sizeof(datasetBytes), &datasetLength);
-        if (error == CHIP_NO_ERROR)
-        {
-            ThreadStackMgr().SetThreadProvision(ByteSpan(datasetBytes, datasetLength));
-            ThreadStackMgr().SetThreadEnabled(true);
-        }
-        else
-        {
-            APP_DBG("Thread network Data set was not found");
-        }
+#endif
     }
 
     err = PlatformMgr().StartEventLoopTask();
@@ -225,7 +208,6 @@ CHIP_ERROR AppTask::InitMatter()
     }
     else
     {
-        APP_DBG("Init CHIP stack");
         err = PlatformMgr().InitChipStack();
         if (err != CHIP_NO_ERROR)
         {
@@ -248,14 +230,14 @@ void AppTask::AppTaskMain(void * pvParameter)
 #endif // endif HIGHWATERMARK
     if (err != CHIP_NO_ERROR)
     {
-        APP_DBG("App task init failled ");
+        APP_DBG("App task init failed ");
     }
 
     APP_DBG("App Task started");
     while (true)
     {
 
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
@@ -309,7 +291,7 @@ void AppTask::ButtonEventHandler(Push_Button_st * Button)
     button_event.ButtonEvent.ButtonIdx = Button->Pushed_Button;
     button_event.ButtonEvent.Action    = Button->State;
 
-    if (Button->Pushed_Button == APP_FUNCTION_BUTTON)
+    if (Button->Pushed_Button == BUTTON_USER1)
     {
         // Hand off to Functionality handler - depends on duration of press
         button_event.Handler = FunctionHandler;
@@ -344,12 +326,16 @@ void AppTask::TimerEventHandler(TimerHandle_t xTimer)
     }
     else if ((NvmTimerCpt > NvmButtonStateCpt) && (NvmTimerCpt <= 2))
     {
-        AppEvent event;
-        event.Type    = AppEvent::kEventType_Timer;
-        event.Handler = UpdateNvmEventHandler;
         xTimerStop(sPushButtonTimeoutTimer, 0);
-        sAppTask.mFunction = kFunction_SaveNvm;
-        sAppTask.PostEvent(&event);
+        if (sHaveFabric == true)
+        {
+            AppEvent event;
+            event.Type    = AppEvent::kEventType_Timer;
+            event.Handler = UpdateNvmEventHandler;
+            xTimerStop(sPushButtonTimeoutTimer, 0);
+            sAppTask.mFunction = kFunction_SaveNvm;
+            sAppTask.PostEvent(&event);
+        }
     }
 }
 
@@ -366,30 +352,40 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 void AppTask::ActionInitiated(LightingManager::Action_t aAction)
 {
     // Placeholder for light action
+#if (CFG_LCD_SUPPORTED == 1)
     UTIL_LCD_ClearStringLine(2);
+#endif
     if (aAction == LightingManager::ON_ACTION)
     {
         APP_DBG("Light goes on");
+#if (CFG_LCD_SUPPORTED == 1)
         char Message[11];
         snprintf(Message, sizeof(Message), "LED ON %d", LightingMgr().GetLevel());
         UTIL_LCD_DisplayStringAt(0, LINE(2), (uint8_t *) Message, CENTER_MODE);
+#endif
     }
     else if (aAction == LightingManager::OFF_ACTION)
     {
         APP_DBG("Light goes off ");
+#if (CFG_LCD_SUPPORTED == 1)
         UTIL_LCD_ClearStringLine(2);
+#endif
     }
     else if (aAction == LightingManager::LEVEL_ACTION)
     {
         if (LightingMgr().IsTurnedOn())
         {
+#if (CFG_LCD_SUPPORTED == 1)
             char Message[11];
             snprintf(Message, sizeof(Message), "LED ON %d", LightingMgr().GetLevel());
             UTIL_LCD_DisplayStringAt(0, LINE(2), (uint8_t *) Message, CENTER_MODE);
+#endif
             APP_DBG("Update level control %d", LightingMgr().GetLevel());
         }
     }
+#if (CFG_LCD_SUPPORTED == 1)
     BSP_LCD_Refresh(0);
+#endif
 }
 
 void AppTask::ActionCompleted(LightingManager::Action_t aAction)
@@ -459,15 +455,7 @@ void AppTask::UpdateClusterState(void)
     }
 }
 
-void AppTask::DelayNvmHandler(TimerHandle_t xTimer)
-{
-    AppEvent event;
-    event.Type         = AppEvent::kEventType_Timer;
-    event.Handler      = UpdateNvmEventHandler;
-    sAppTask.mFunction = kFunction_SaveNvm;
-    sAppTask.PostEvent(&event);
-}
-
+#if (CFG_LCD_SUPPORTED == 1)
 void AppTask::UpdateLCD(void)
 {
     if (sIsThreadProvisioned && sIsThreadEnabled)
@@ -498,6 +486,7 @@ void AppTask::UpdateLCD(void)
     }
     BSP_LCD_Refresh(0);
 }
+#endif
 
 void AppTask::UpdateNvmEventHandler(AppEvent * aEvent)
 {
@@ -505,13 +494,6 @@ void AppTask::UpdateNvmEventHandler(AppEvent * aEvent)
 
     if (sAppTask.mFunction == kFunction_SaveNvm)
     {
-        if (sIsThreadProvisioned && sIsThreadEnabled)
-        {
-            chip::Thread::OperationalDataset dataset{};
-            DeviceLayer::ThreadStackMgrImpl().GetThreadProvision(dataset);
-            ByteSpan datasetbyte = dataset.AsByteSpan();
-            KeyValueStoreMgr().Put(STM32ThreadDataSet, datasetbyte.data(), datasetbyte.size());
-        }
         err = NM_Dump();
         if (err == 0)
         {
@@ -520,8 +502,6 @@ void AppTask::UpdateNvmEventHandler(AppEvent * aEvent)
         else
         {
             APP_DBG("Failed to SAVE NVM");
-            // restart timer to save nvm later
-            xTimerStart(DelayNvmTimer, 0);
         }
     }
     else if (sAppTask.mFunction == kFunction_FactoryReset)
@@ -537,32 +517,42 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     {
     case DeviceEventType::kServiceProvisioningChange: {
         sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+#if (CFG_LCD_SUPPORTED == 1)
         UpdateLCD();
+#endif
         break;
     }
 
     case DeviceEventType::kThreadConnectivityChange: {
         sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+#if (CFG_LCD_SUPPORTED == 1)
         UpdateLCD();
+#endif
         break;
     }
 
     case DeviceEventType::kCHIPoBLEConnectionEstablished: {
         sHaveBLEConnections = true;
         APP_DBG("kCHIPoBLEConnectionEstablished");
+#if (CFG_LCD_SUPPORTED == 1)
         UpdateLCD();
+#endif
         break;
     }
 
     case DeviceEventType::kCHIPoBLEConnectionClosed: {
         sHaveBLEConnections = false;
         APP_DBG("kCHIPoBLEConnectionClosed");
+#if (CFG_LCD_SUPPORTED == 1)
         UpdateLCD();
+#endif
         if (sFabricNeedSaved)
         {
-            APP_DBG("Start timer to save nvm after commissioning finish");
-            // timer is used to avoid to much traffic on m0 side after the end of a commissioning
-            xTimerStart(DelayNvmTimer, 0);
+            AppEvent event;
+            event.Type         = AppEvent::kEventType_Timer;
+            event.Handler      = UpdateNvmEventHandler;
+            sAppTask.mFunction = kFunction_SaveNvm;
+            sAppTask.PostEvent(&event);
             sFabricNeedSaved = false;
         }
         break;
@@ -574,18 +564,30 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
         // check if ble is on, since before save in nvm we need to stop m0, Better to write in nvm when m0 is less busy
         if (sHaveBLEConnections == false)
         {
-            APP_DBG("Start timer to save nvm after commissioning finish");
-            xTimerStart(DelayNvmTimer, 0);
             sFabricNeedSaved = false; // put to false to avoid save in nvm 2 times
+            AppEvent event;
+            event.Type         = AppEvent::kEventType_Timer;
+            event.Handler      = UpdateNvmEventHandler;
+            sAppTask.mFunction = kFunction_SaveNvm;
+            sAppTask.PostEvent(&event);
         }
+#if (CFG_LCD_SUPPORTED == 1)
         UpdateLCD();
+#endif
         break;
     }
     case DeviceEventType::kFailSafeTimerExpired: {
+#if (CFG_LCD_SUPPORTED == 1)
         UpdateLCD();
+#endif
         sFailCommissioning = true;
         break;
     }
+    case DeviceEventType::kDnssdInitialized:
+#if (OTA_SUPPORT == 1)
+        InitializeOTARequestor();
+#endif
+        break;
     default:
         break;
     }

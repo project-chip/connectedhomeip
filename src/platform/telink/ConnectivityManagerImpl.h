@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,7 +33,11 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include "wifi/ConnectivityManagerImplWiFi.h"
+#else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
+#endif
 
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -65,7 +69,11 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+                                      public ConnectivityManagerImplWiFi
+#else
                                       public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>
+#endif
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.

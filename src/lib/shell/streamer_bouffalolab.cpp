@@ -20,6 +20,7 @@
  *      Source implementation of an input / output stream for Bouffalo Lab targets.
  */
 
+#include <cstdio>
 #include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 

@@ -16,9 +16,10 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CASEAuthTag.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 

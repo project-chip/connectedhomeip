@@ -120,6 +120,13 @@ private:
     static void UpdateClusterState(intptr_t context);
 
     /**
+     * @brief Update Cluster State After Unlatch
+     *
+     * @param context current context
+     */
+    static void UpdateClusterStateAfterUnlatch(intptr_t context);
+
+    /**
      * @brief Handle lock update event
      *
      * @param aEvent event received

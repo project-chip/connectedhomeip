@@ -16,42 +16,19 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/cyw30739_sdk.gni")
 import("//build_overrides/openthread.gni")
 
-openthread_ifx_root = "${chip_root}/third_party/openthread/ot-ifx"
+import("ifx_openthread.gni")
+
 openthread_ifx_mcu = "cyw30739"
 
 config("openthread_ifx_config") {
-  include_dirs = [
-    "${openthread_ifx_root}/src/${openthread_ifx_mcu}",
-    "${openthread_ifx_root}/src/${openthread_ifx_mcu}/mbedtls/include",
-  ]
+  include_dirs = [ "${openthread_ifx_root}/src/${openthread_ifx_mcu}" ]
 }
 
 source_set("openthread_core_config_ifx") {
   sources = [ "${openthread_ifx_root}/src/${openthread_ifx_mcu}/openthread-core-cyw30739-config.h" ]
 
-  public_deps = [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
-
-  public_configs = [ ":openthread_ifx_config" ]
-}
-
-source_set("libopenthread-ifx") {
-  sources = [
-    "${openthread_ifx_root}/src/${openthread_ifx_mcu}/alarm.c",
-    "${openthread_ifx_root}/src/${openthread_ifx_mcu}/entropy.c",
-    "${openthread_ifx_root}/src/${openthread_ifx_mcu}/logging.c",
-    "${openthread_ifx_root}/src/${openthread_ifx_mcu}/misc.c",
-    "${openthread_ifx_root}/src/${openthread_ifx_mcu}/radio.c",
-    "${openthread_ifx_root}/src/${openthread_ifx_mcu}/radio_wrapper.cpp",
-    "${openthread_ifx_root}/src/${openthread_ifx_mcu}/settings.c",
-    "${openthread_ifx_root}/src/${openthread_ifx_mcu}/system.c",
-  ]
-
-  defines = [ "CHIP_HAVE_CONFIG_H=1" ]
-
-  public_deps = [
-    ":openthread_core_config_ifx",
-    "${openthread_root}/src/core:libopenthread_core_headers",
-    "..:libopenthread-platform",
-    "..:libopenthread-platform-utils",
+  public_configs = [
+    "${cyw30739_sdk_build_root}:mbedtls_config",
+    ":openthread_ifx_config",
   ]
 }

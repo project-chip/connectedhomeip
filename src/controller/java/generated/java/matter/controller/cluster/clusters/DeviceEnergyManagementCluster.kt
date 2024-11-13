@@ -44,14 +44,14 @@ import matter.tlv.TlvWriter
 
 class DeviceEnergyManagementCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class PowerAdjustmentCapabilityAttribute(
-    val value: List<DeviceEnergyManagementClusterPowerAdjustStruct>?
+    val value: DeviceEnergyManagementClusterPowerAdjustCapabilityStruct?
   )
 
   sealed class PowerAdjustmentCapabilityAttributeSubscriptionState {
-    data class Success(val value: List<DeviceEnergyManagementClusterPowerAdjustStruct>?) :
+    data class Success(val value: DeviceEnergyManagementClusterPowerAdjustCapabilityStruct?) :
       PowerAdjustmentCapabilityAttributeSubscriptionState()
 
     data class Error(val exception: Exception) :
@@ -115,7 +115,7 @@ class DeviceEnergyManagementCluster(
     power: Long,
     duration: UInt,
     cause: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 0u
 
@@ -136,7 +136,7 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -154,7 +154,7 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -164,7 +164,7 @@ class DeviceEnergyManagementCluster(
   suspend fun startTimeAdjustRequest(
     requestedStartTime: UInt,
     cause: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 2u
 
@@ -182,7 +182,7 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -206,7 +206,7 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -224,7 +224,7 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -232,10 +232,10 @@ class DeviceEnergyManagementCluster(
   }
 
   suspend fun modifyForecastRequest(
-    forecastId: UInt,
+    forecastID: UInt,
     slotAdjustments: List<DeviceEnergyManagementClusterSlotAdjustmentStruct>,
     cause: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 5u
 
@@ -243,7 +243,7 @@ class DeviceEnergyManagementCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_FORECAST_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_FORECAST_ID_REQ), forecastId)
+    tlvWriter.put(ContextSpecificTag(TAG_FORECAST_ID_REQ), forecastID)
 
     val TAG_SLOT_ADJUSTMENTS_REQ: Int = 1
     tlvWriter.startArray(ContextSpecificTag(TAG_SLOT_ADJUSTMENTS_REQ))
@@ -260,7 +260,7 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -270,7 +270,7 @@ class DeviceEnergyManagementCluster(
   suspend fun requestConstraintBasedForecast(
     constraints: List<DeviceEnergyManagementClusterConstraintsStruct>,
     cause: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 6u
 
@@ -292,7 +292,7 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -310,7 +310,7 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -350,7 +350,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeESATypeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -363,7 +363,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -431,7 +431,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeESACanGenerateAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -444,7 +444,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -514,7 +514,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeESAStateAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -527,7 +527,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -595,7 +595,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeAbsMinPowerAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -608,7 +608,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -676,7 +676,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeAbsMaxPowerAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -689,7 +689,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -750,16 +750,10 @@ class DeviceEnergyManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<DeviceEnergyManagementClusterPowerAdjustStruct>? =
+    val decodedValue: DeviceEnergyManagementClusterPowerAdjustCapabilityStruct? =
       if (!tlvReader.isNull()) {
         if (tlvReader.isNextTag(AnonymousTag)) {
-          buildList<DeviceEnergyManagementClusterPowerAdjustStruct> {
-            tlvReader.enterArray(AnonymousTag)
-            while (!tlvReader.isEndOfContainer()) {
-              add(DeviceEnergyManagementClusterPowerAdjustStruct.fromTlv(AnonymousTag, tlvReader))
-            }
-            tlvReader.exitContainer()
-          }
+          DeviceEnergyManagementClusterPowerAdjustCapabilityStruct.fromTlv(AnonymousTag, tlvReader)
         } else {
           null
         }
@@ -773,7 +767,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribePowerAdjustmentCapabilityAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<PowerAdjustmentCapabilityAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -786,7 +780,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -812,21 +806,13 @@ class DeviceEnergyManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<DeviceEnergyManagementClusterPowerAdjustStruct>? =
+          val decodedValue: DeviceEnergyManagementClusterPowerAdjustCapabilityStruct? =
             if (!tlvReader.isNull()) {
               if (tlvReader.isNextTag(AnonymousTag)) {
-                buildList<DeviceEnergyManagementClusterPowerAdjustStruct> {
-                  tlvReader.enterArray(AnonymousTag)
-                  while (!tlvReader.isEndOfContainer()) {
-                    add(
-                      DeviceEnergyManagementClusterPowerAdjustStruct.fromTlv(
-                        AnonymousTag,
-                        tlvReader
-                      )
-                    )
-                  }
-                  tlvReader.exitContainer()
-                }
+                DeviceEnergyManagementClusterPowerAdjustCapabilityStruct.fromTlv(
+                  AnonymousTag,
+                  tlvReader,
+                )
               } else {
                 null
               }
@@ -889,7 +875,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeForecastAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ForecastAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -902,7 +888,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -985,7 +971,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeOptOutStateAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -998,7 +984,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1078,7 +1064,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -1091,7 +1077,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1175,7 +1161,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -1188,7 +1174,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1272,7 +1258,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -1285,7 +1271,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1367,7 +1353,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -1380,7 +1366,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1455,7 +1441,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1468,7 +1454,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1536,7 +1522,7 @@ class DeviceEnergyManagementCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1549,7 +1535,7 @@ class DeviceEnergyManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

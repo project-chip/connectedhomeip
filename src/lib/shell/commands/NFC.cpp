@@ -22,9 +22,6 @@
 #endif
 #include <app/server/OnboardingCodesUtil.h>
 #include <lib/shell/Engine.h>
-#include <lib/shell/commands/Help.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
 using chip::DeviceLayer::ConnectivityMgr;
@@ -86,11 +83,10 @@ static CHIP_ERROR NFCHandler(int argc, char ** argv)
 
 void RegisterNFCCommands()
 {
-    static const shell_command_t sDeviceComand = { &NFCHandler, "nfc",
-                                                   "Start, stop or get nfc emulation state. Usage: nfc <start|stop|state>" };
+    static constexpr Command nfcComand = { &NFCHandler, "nfc",
+                                           "Start, stop or get nfc emulation state. Usage: nfc <start|stop|state>" };
 
-    // Register the root `device` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDeviceComand, 1);
+    Engine::Root().RegisterCommands(&nfcComand, 1);
 }
 
 } // namespace Shell

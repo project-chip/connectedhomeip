@@ -90,12 +90,25 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
+#include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
+#include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDManager.h>
+#endif
 #include <app/TestEventTriggerDelegate.h>
 
 #include <signal.h>
 
 #include "AppMain.h"
 #include "CommissionableInit.h"
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include "ExampleAccessRestrictionProvider.h"
+#endif
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/NetworkCommissioningDriver.h>
@@ -115,6 +128,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
+using namespace chip::Access;
 
 // Network comissioning implementation
 namespace {
@@ -173,6 +187,10 @@ Optional<app::Clusters::NetworkCommissioning::Instance> sWiFiNetworkCommissionin
 #if CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
 app::Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kRootEndpointId, &sEthernetDriver);
 #endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+auto exampleAccessRestrictionProvider = std::make_unique<ExampleAccessRestrictionProvider>();
+#endif
 
 void EnableThreadNetworkCommissioning()
 {
@@ -283,6 +301,19 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
+void StopMainEventLoop()
+{
+    if (gMainLoopImplementation != nullptr)
+    {
+        gMainLoopImplementation->SignalSafeStopMainLoop();
+    }
+    else
+    {
+        Server::GetInstance().GenerateShutDownEvent();
+        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
+    }
+}
+
 void Cleanup()
 {
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -299,17 +330,9 @@ void Cleanup()
 // We should stop using signals for those faults, and move to a different notification
 // means, like a pipe. (see issue #19114)
 #if !defined(ENABLE_CHIP_SHELL)
-void StopSignalHandler(int signal)
+void StopSignalHandler(int /* signal */)
 {
-    if (gMainLoopImplementation != nullptr)
-    {
-        gMainLoopImplementation->SignalSafeStopMainLoop();
-    }
-    else
-    {
-        Server::GetInstance().GenerateShutDownEvent();
-        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
-    }
+    StopMainEventLoop();
 }
 #endif // !defined(ENABLE_CHIP_SHELL)
 
@@ -361,11 +384,14 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
 #else  // CONFIG_NETWORK_LAYER_BLE
-    RendezvousInformationFlag rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
+    RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #ifdef CONFIG_RENDEZVOUS_MODE
     rendezvousFlags = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
 #endif
 
     err = Platform::MemoryInit();
@@ -465,6 +491,20 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ChipLogProgress(NotSpecified, "WiFi-PAF: initialzing");
+    if (LinuxDeviceOptions::GetInstance().mWiFi)
+    {
+        if (EnsureWiFiIsStarted())
+        {
+            ChipLogProgress(NotSpecified, "Wi-Fi Management started");
+            DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
+            args.enable  = LinuxDeviceOptions::GetInstance().mWiFiPAF;
+            args.ExtCmds = LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds;
+            DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+        }
+    }
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
     if (LinuxDeviceOptions::GetInstance().mThread)
@@ -495,7 +535,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
-    std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
+    std::thread shellThread([]() {
+        Engine::Root().RunMainLoop();
+        StopMainEventLoop();
+    });
     Shell::RegisterCommissioneeCommands();
 #endif
     initParams.operationalServicePort        = CHIP_PORT;
@@ -553,6 +596,17 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler);
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
+    static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
+    static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    sTestEventTriggerDelegate.AddHandler(&Server::GetInstance().GetICDManager());
+#endif
 
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
@@ -562,8 +616,26 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
         LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
+#endif
+
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    if (LinuxDeviceOptions::GetInstance().commissioningArlEntries.HasValue())
+    {
+        exampleAccessRestrictionProvider->SetCommissioningEntries(
+            LinuxDeviceOptions::GetInstance().commissioningArlEntries.Value());
+    }
+
+    if (LinuxDeviceOptions::GetInstance().arlEntries.HasValue())
+    {
+        // This example use of the ARL feature proactively installs the provided entries on fabric index 1
+        exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value());
+    }
+#endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Set ReadHandler Capacity for Subscriptions
@@ -621,21 +693,22 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     ApplicationShutdown();
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    ShutdownCommissioner();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
 #endif
 
     Server::GetInstance().Shutdown();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    // Commissioner shutdown call shuts down entire stack, including the platform manager.
+    ShutdownCommissioner();
+#else
+    DeviceLayer::PlatformMgr().Shutdown();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
 #if ENABLE_TRACING
     tracing_setup.StopTracing();
 #endif
-
-    DeviceLayer::PlatformMgr().Shutdown();
 
     Cleanup();
 }

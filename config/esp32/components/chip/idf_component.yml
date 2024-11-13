@@ -7,7 +7,7 @@ dependencies:
             - if: "target != esp32h2"
 
     espressif/esp_secure_cert_mgr:
-        version: "^2.3.0"
+        version: "^2.5.0"
         rules:
             - if: "idf_version >=4.3"
 
@@ -18,10 +18,26 @@ dependencies:
             - if: "idf_version >=4.4"
 
     espressif/esp_insights:
-        version: "1.0.1"
+        version: "1.2.2"
         require: public
         # There is an issue with IDF-Component-Manager when ESP Insights is included.
         # Issue: https://github.com/project-chip/connectedhomeip/issues/29125
         rules:
             - if: "idf_version >=5.0"
             - if: "target != esp32h2"
+
+    espressif/esp_rcp_update:
+        version: "1.2.0"
+        rules:
+            - if: "idf_version >=5.0"
+
+    espressif/esp_delta_ota:
+        version: "^1.1.0"
+        require: public
+        rules:
+            - if: "idf_version >=4.3"
+
+    espressif/esp_wifi_remote:
+        version: ">=0.1.12"
+        rules:
+            - if: "target in [esp32p4]"

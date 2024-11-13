@@ -30,12 +30,12 @@ limitations under the License.
 
   <enum name="FanModeSequenceEnum" type="enum8">
     <cluster code="0x0202"/>
-    <item name="Off/Low/Med/High" value="0x00"/>
-    <item name="Off/Low/High" value="0x01"/>
-    <item name="Off/Low/Med/High/Auto" value="0x02"/>
-    <item name="Off/Low/High/Auto" value="0x03"/>
-    <item name="Off/High/Auto" value="0x04"/>
-    <item name="Off/High" value="0x05"/>
+    <item name="OffLowMedHigh" value="0x00"/>
+    <item name="OffLowHigh" value="0x01"/>
+    <item name="OffLowMedHighAuto" value="0x02"/>
+    <item name="OffLowHighAuto" value="0x03"/>
+    <item name="OffHighAuto" value="0x04"/>
+    <item name="OffHigh" value="0x05"/>
   </enum>
 
   <bitmap name="RockBitmap" type="bitmap8">

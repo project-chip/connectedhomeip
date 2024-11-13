@@ -74,14 +74,6 @@ void MemManage_Handler(void)
         /* USER CODE END W1_MemoryManagement_IRQn 0 */
     }
 }
-/**
- * @brief  This function handles SVCall exception.
- * @param  None
- * @retval None
- */
-/*void SVC_Handler(void)
-{
-}*/
 
 /**
  * @brief  This function handles Debug Monitor exception.
@@ -89,25 +81,6 @@ void MemManage_Handler(void)
  * @retval None
  */
 void DebugMon_Handler(void) {}
-
-/**
- * @brief  This function handles PendSVC exception.
- * @param  None
- * @retval None
- */
-/*void PendSV_Handler(void)
-{
-}*/
-
-/**
- * @brief  This function handles SysTick Handler.
- * @param  None
- * @retval None
- */
-/*void SysTick_Handler(void)
-{
-  HAL_IncTick();
-}*/
 
 void IPCC_C1_TX_IRQHandler(void)
 {
@@ -142,7 +115,6 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)
  * @param  None
  * @retval None
  */
-
 void EXTI15_10_IRQHandler(void)
 {
     BSP_PB_IRQHandler(BUTTON_USER1);
