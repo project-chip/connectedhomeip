@@ -18406,17 +18406,6 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementHDRModeEnabledCommandParams
         );
         result.put("readHDRModeEnabledAttribute", readCameraAvStreamManagementHDRModeEnabledAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementCurrentVideoCodecsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementCurrentVideoCodecsAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readCurrentVideoCodecsAttribute(
-              (ChipClusters.CameraAvStreamManagementCluster.CurrentVideoCodecsAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedCameraAvStreamManagementClusterCurrentVideoCodecsAttributeCallback(),
-          readCameraAvStreamManagementCurrentVideoCodecsCommandParams
-        );
-        result.put("readCurrentVideoCodecsAttribute", readCameraAvStreamManagementCurrentVideoCodecsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementFabricsUsingCameraCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementFabricsUsingCameraAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
