@@ -17,8 +17,8 @@
 
 #import <Foundation/Foundation.h>
 #import <Matter/MTRAttributeValueWaiter.h>
-#import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRBaseClusters.h>
+#import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
