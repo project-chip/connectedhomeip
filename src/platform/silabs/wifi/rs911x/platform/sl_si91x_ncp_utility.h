@@ -29,7 +29,9 @@
 #include "semphr.h"
 #include "silabs_utils.h"
 #include "sl_status.h"
-#include "spi_multiplex.h"
+
+// TODO: This is a WF200 specific include. It is not clear why we need this in the 917 NCP files.
+#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
 
 #if defined(CHIP_9117)
 #include "em_usart.h"

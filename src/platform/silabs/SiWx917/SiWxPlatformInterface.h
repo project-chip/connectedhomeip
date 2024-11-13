@@ -27,13 +27,29 @@ extern "C" {
 #include "sl_si91x_button.h"
 #include "sl_si91x_button_pin_config.h"
 #include "sl_si91x_driver_gpio.h"
+
 /**
  * @brief      invoked when button press event is received when in sleep
  * @param[in]  pin_intr GPIO pin interrupt number.
  * @return     none.
  * @note       this is a callback from the Wiseconnect SDK
  */
-void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr);
+void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
+{
+    // UULP_GPIO_2 is used to detect the button 0 press
+    VerifyOrReturn(pin_intr == RTE_UULP_GPIO_2_PIN, ChipLogError(DeviceLayer, "invalid pin interrupt: %ld", pin_intr));
+    sl_status_t status      = SL_STATUS_OK;
+    uint8_t pin_intr_status = sl_si91x_gpio_get_uulp_npss_pin(pin_intr);
+    if (pin_intr_status == LOW)
+    {
+        // BTN_0 is pressed
+        // NOTE: the GPIO is masked since the interrupt is invoked before scheduler is started, thus this is required to hand over
+        // control to scheduler, the PIN is unmasked in the power manager flow before going to sleep
+        status = sl_si91x_gpio_driver_mask_uulp_npss_interrupt(BIT(pin_intr));
+        VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
+    }
+}
+
 #endif // SLI_SI91X_MCU_INTERFACE
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #ifdef __cplusplus
@@ -64,7 +80,29 @@ inline void sl_si91x_btn_event_handler()
  * @param[in]  none.
  * @note       this requires hardware jumping of the GPIO PINs to work with the baseboard.
  */
-void sl_si91x_uart_power_requirement_handler();
+void sl_si91x_uart_power_requirement_handler()
+{
+#ifdef ENABLE_CHIP_SHELL
+    // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
+    if (sl_si91x_gpio_get_uulp_npss_pin(RTE_UULP_GPIO_1_PIN))
+    {
+        if (!ps_requirement_added)
+        {
+            sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
+            ps_requirement_added = true;
+        }
+    }
+    else
+    {
+        if (ps_requirement_added)
+        {
+            sl_si91x_power_manager_remove_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
+            ps_requirement_added = false;
+        }
+    }
+#endif // ENABLE_CHIP_SHELL
+}
+
 #endif // SLI_SI91X_MCU_INTERFACE
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 } // namespace SiWxPlatformInterface

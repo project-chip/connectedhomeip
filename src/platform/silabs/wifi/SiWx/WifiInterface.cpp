@@ -28,22 +28,19 @@
 #endif // SL_MATTER_GN_BUILD
 
 #include "FreeRTOS.h"
-#include "WifiInterfaceAbstraction.h"
-#include "WiseconnectInterfaceAbstraction.h"
 #include "ble_config.h"
-#include "dhcp_client.h"
 #include "event_groups.h"
-#include "sl_board_configuration.h"
 #include "sl_status.h"
 #include "sl_wifi_device.h"
 #include "task.h"
-#include "wfx_host_events.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <inet/IPAddress.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
 
 extern "C" {
 #include "sl_si91x_driver.h"
@@ -70,11 +67,10 @@ extern "C" {
 
 #if (EXP_BOARD)
 #include "rsi_bt_common_apis.h"
+#include <platform/silabs/wifi/rs911x/platform/sl_board_configuration.h>
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
-#include "SiWxPlatformInterface.h"
-
 #include "rsi_rom_power_save.h"
 #include "sl_gpio_board.h"
 #include "sl_si91x_driver_gpio.h"
@@ -554,48 +550,6 @@ int32_t sl_wifi_platform_disconnect(void)
     return sl_net_down((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE);
 }
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-#if SLI_SI91X_MCU_INTERFACE
-void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
-{
-    // UULP_GPIO_2 is used to detect the button 0 press
-    VerifyOrReturn(pin_intr == RTE_UULP_GPIO_2_PIN, ChipLogError(DeviceLayer, "invalid pin interrupt: %ld", pin_intr));
-    sl_status_t status      = SL_STATUS_OK;
-    uint8_t pin_intr_status = sl_si91x_gpio_get_uulp_npss_pin(pin_intr);
-    if (pin_intr_status == LOW)
-    {
-        // BTN_0 is pressed
-        // NOTE: the GPIO is masked since the interrupt is invoked before scheduler is started, thus this is required to hand over
-        // control to scheduler, the PIN is unmasked in the power manager flow before going to sleep
-        status = sl_si91x_gpio_driver_mask_uulp_npss_interrupt(BIT(pin_intr));
-        VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
-    }
-}
-
-void chip::DeviceLayer::Silabs::SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler(void)
-{
-#ifdef ENABLE_CHIP_SHELL
-    // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
-    if (sl_si91x_gpio_get_uulp_npss_pin(RTE_UULP_GPIO_1_PIN))
-    {
-        if (!ps_requirement_added)
-        {
-            sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
-            ps_requirement_added = true;
-        }
-    }
-    else
-    {
-        if (ps_requirement_added)
-        {
-            sl_si91x_power_manager_remove_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
-            ps_requirement_added = false;
-        }
-    }
-#endif // ENABLE_CHIP_SHELL
-}
-#endif // SLI_SI91X_MCU_INTERFACE
-
 /******************************************************************
  * @fn   wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state)
  * @brief
@@ -626,7 +580,6 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
 
     return status;
 }
-#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
 sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
 {

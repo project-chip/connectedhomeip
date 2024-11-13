@@ -18,31 +18,23 @@
 /**
  * Includes
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "FreeRTOS.h"
-#include "event_groups.h"
-#include "semphr.h"
-#include "task.h"
-
-#include "dmadrv.h"
-#include "em_chip.h"
 #include "em_cmu.h"
-#include "em_core.h"
-#include "em_device.h"
-#include "em_gpio.h"
-#include "em_ldma.h"
+#include "em_eusart.h"
 #include "gpiointerrupt.h"
+#include "rsi_board_configuration.h"
+#include "rsi_driver.h"
+#include "semphr.h"
+#include "silabs_utils.h"
 #include "sl_device_init_clocks.h"
 #include "sl_device_init_hfxo.h"
+#include "sl_spidrv_eusart_exp_config.h"
 #include "sl_spidrv_instances.h"
 #include "sl_status.h"
 #include "spidrv.h"
-
-#include "silabs_utils.h"
-#include "spi_multiplex.h"
+#include "task.h"
+#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
 
 #ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
@@ -51,9 +43,6 @@
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
 #endif
-
-#include "rsi_board_configuration.h"
-#include "rsi_driver.h"
 
 #if SL_BTLCTRL_MUX
 #include "btl_interface.h"
@@ -65,10 +54,6 @@
 #if SL_MX25CTRL_MUX
 #include "sl_mx25_flash_shutdown_usart_config.h"
 #endif // SL_MX25CTRL_MUX
-
-#include "em_eusart.h"
-#include "sl_spidrv_eusart_exp_config.h"
-#include "spi_multiplex.h"
 
 #define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE

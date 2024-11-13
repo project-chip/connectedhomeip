@@ -15,24 +15,20 @@
  *    limitations under the License.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "em_bus.h"
-#include "em_cmu.h"
-#include "em_gpio.h"
-#include "em_ldma.h"
-#include "em_usart.h"
-
+#include "lwip/nd6.h"
+#include "silabs_utils.h"
 #include "sl_status.h"
 #include <cmsis_os2.h>
-// TODO Fix include order issue #33120
-#include "wfx_host_events.h"
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/lwip-support/dhcp_client.h>
+#include <platform/silabs/wifi/lwip-support/ethernetif.h>
+#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 #include "rsi_bootup_config.h"
 #include "rsi_common_apis.h"
 #include "rsi_data_types.h"
@@ -45,21 +41,7 @@ extern "C" {
 #include "rsi_wlan_apis.h"
 #include "rsi_wlan_config.h"
 #include "rsi_wlan_non_rom.h"
-#ifdef __cplusplus
 }
-#endif
-
-#include "WifiInterfaceAbstraction.h"
-#include "WiseconnectInterfaceAbstraction.h"
-#include "dhcp_client.h"
-#include "ethernetif.h"
-#include "lwip/nd6.h"
-#include "silabs_utils.h"
-
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPMemString.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 using WifiStateFlags = chip::BitFlags<WifiState>;
 
