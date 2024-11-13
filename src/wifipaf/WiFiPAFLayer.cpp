@@ -74,7 +74,7 @@ void WiFiPAFLayer::AddPafSession(const NodeId nodeId, const uint16_t discriminat
             return;
         }
     }
-    WiFiPAFSession PafInfo{ .id = UINT32_MAX, .nodeId = nodeId, .discriminator = discriminator };
+    WiFiPAFSession PafInfo{ .id = UINT32_MAX, .peer_id = UINT32_MAX, .nodeId = nodeId, .discriminator = discriminator };
     PafInfoVect.push_back(PafInfo);
     ChipLogProgress(Inet, "WiFiPAF: Add session with nodeId: %lu, disc: %x, total %lu sessions", nodeId, discriminator,
                     PafInfoVect.size());
