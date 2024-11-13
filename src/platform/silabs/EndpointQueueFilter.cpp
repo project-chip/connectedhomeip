@@ -1,10 +1,10 @@
 #include "EndpointQueueFilter.h"
 #include <algorithm>
 #include <cctype>
+#include <lib/core/CHIPSafeCasts.h>
 #include <string.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <lib/core/CHIPSafeCasts.h>
 
 using namespace ::chip;
 
