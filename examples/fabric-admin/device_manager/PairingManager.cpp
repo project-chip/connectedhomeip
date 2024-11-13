@@ -560,7 +560,7 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
         FabricIndex fabricIndex = self->CurrentCommissioner().GetFabricIndex();
         app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(fabricIndex, nodeId);
         ScopedNodeId scopedNodeId(nodeId, fabricIndex);
-        DeviceMgr().RemoveSyncedDevice(scopedNodeId);
+        DeviceManager::Instance().RemoveSyncedDevice(scopedNodeId);
     }
     else
     {

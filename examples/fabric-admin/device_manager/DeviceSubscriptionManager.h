@@ -30,7 +30,11 @@ namespace admin {
 class DeviceSubscriptionManager
 {
 public:
-    static DeviceSubscriptionManager & Instance();
+    static DeviceSubscriptionManager & Instance()
+    {
+        static DeviceSubscriptionManager instance;
+        return instance;
+    }
 
     /// Usually called after we have added a synchronized device to fabric-bridge to monitor
     /// for any changes that need to be propagated to fabric-bridge.

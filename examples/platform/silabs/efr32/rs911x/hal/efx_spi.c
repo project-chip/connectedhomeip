@@ -43,7 +43,6 @@
 
 #include "silabs_utils.h"
 #include "spi_multiplex.h"
-#include "wfx_host_events.h"
 
 #ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
@@ -73,6 +72,9 @@
 
 #define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
+
+#define MIN_XLEN (0)
+#define WFX_SPI_NVIC_PRIORITY (5)
 
 #define CONCAT(A, B) (A##B)
 #define SPI_CLOCK(N) CONCAT(cmuClock_USART, N)
@@ -110,16 +112,16 @@ void sl_wfx_host_gpio_init(void)
     CMU_ClockEnable(cmuClock_GPIO, true);
 
     // Set CS pin to high/inactive
-    GPIO_PinModeSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN, gpioModePushPull, PINOUT_SET);
+    GPIO_PinModeSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN, gpioModePushPull, 1);
 
-    GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, PINOUT_SET);
-    GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModePushPull, PINOUT_CLEAR);
+    GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, 1);
+    GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModePushPull, 0);
 
     CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
 
     // Set up interrupt based callback function - trigger on both edges.
     GPIOINT_Init();
-    GPIO_PinModeSet(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, gpioModeInputPull, PINOUT_CLEAR);
+    GPIO_PinModeSet(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, gpioModeInputPull, 0);
     GPIO_ExtIntConfig(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, SL_WFX_HOST_PINOUT_SPI_IRQ, true, false, true);
     GPIOINT_CallbackRegister(SL_WFX_HOST_PINOUT_SPI_IRQ, rsi_gpio_irq_cb);
     GPIO_IntDisable(1 << SL_WFX_HOST_PINOUT_SPI_IRQ); /* Will be enabled by RSI */
@@ -204,7 +206,7 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
         if (SL_STATUS_OK == status)
         {
             GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
-            GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+            GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = 0;
             spi_enabled                                                   = false;
         }
     }
@@ -267,7 +269,7 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 #endif // SL_SPICTRL_MUX
         return SL_STATUS_FAIL;
     }
-    GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+    GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = 0;
 #if SL_MX25CTRL_MUX
     sl_wfx_host_spiflash_cs_deassert();
 #endif // SL_MX25CTRL_MUX
@@ -300,7 +302,7 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 {
     USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
     CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
-    GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+    GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = 0;
     sl_status_t status                                    = sl_board_disable_display();
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);

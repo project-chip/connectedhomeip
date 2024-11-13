@@ -5565,7 +5565,7 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
     case Attributes::Zones::Id: {
         return YES;
     }
-    case Attributes::TimeControl::Id: {
+    case Attributes::Triggers::Id: {
         return YES;
     }
     case Attributes::Sensitivity::Id: {
@@ -5673,15 +5673,6 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::NightVisionIllum::Id: {
         return YES;
     }
-    case Attributes::AWBEnabled::Id: {
-        return YES;
-    }
-    case Attributes::AutoShutterSpeedEnabled::Id: {
-        return YES;
-    }
-    case Attributes::AutoISOEnabled::Id: {
-        return YES;
-    }
     case Attributes::Viewport::Id: {
         return YES;
     }
@@ -5731,9 +5722,6 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
         return YES;
     }
     case Attributes::StatusLightBrightness::Id: {
-        return YES;
-    }
-    case Attributes::DepthSensorStatus::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
