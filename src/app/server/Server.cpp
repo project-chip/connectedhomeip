@@ -156,7 +156,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrDie(chip::audit::ExecutePersistentStorageLoadTestAudit(*mDeviceStorage));
 #endif
 
-
     {
         FabricTable::InitParams fabricTableInitParams;
         fabricTableInitParams.storage             = mDeviceStorage;
