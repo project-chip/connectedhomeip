@@ -289,6 +289,7 @@ enum InternalEventTypes
     kCHIPoBLENotifyConfirm,
     kCHIPoWiFiPAFWriteReceived,
     kCHIPoWiFiPAFConnected,
+    kCHIPoWiFiPAFCancelConnect,
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
