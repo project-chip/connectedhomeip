@@ -121,7 +121,7 @@ public:
                                      Protocols::SecureChannel::CounterType & counter) override;
 
     /**
-     * Shutdown DefaultICDClientStorage
+     * Shut down DefaultICDClientStorage
      *
      */
     void Shutdown();
