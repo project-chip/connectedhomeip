@@ -199,9 +199,9 @@ target_include_directories(
     ${chip_dir}/zzz_generated/light-switch-app
     ${chip_dir}/zzz_generated/light-switch-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
-    ${chip_dir}/examples/all-clusters-app/ameba/main/include #to get AmebaObserver.h
     ${chip_dir}/examples/light-switch-app/ameba/main/include
     ${chip_dir}/examples/platform/ameba
+    ${chip_dir}/examples/platform/ameba/observer
     ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
