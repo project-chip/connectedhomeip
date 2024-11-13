@@ -22,6 +22,7 @@
 #include "FreeRTOS.h"
 #include "em_cmu.h"
 #include "em_eusart.h"
+#include "gpiointerrupt.h"
 #include "rsi_board_configuration.h"
 #include "rsi_driver.h"
 #include "semphr.h"
