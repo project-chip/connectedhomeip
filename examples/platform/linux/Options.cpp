@@ -477,7 +477,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     }
 
     case kDeviceOption_Passcode:
-        LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(atoi(aValue));
         break;
 
     case kDeviceOption_Spake2pSaltBase64: {
