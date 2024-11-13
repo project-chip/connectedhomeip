@@ -453,7 +453,7 @@ config OPENTHREAD_SHELL
 
 # Thread analyzer
 config THREAD_ANALYZER
-    default y
+    default n
     select THREAD_ANALYZER_AUTO
 
 config THREAD_ANALYZER_AUTO_INTERVAL
