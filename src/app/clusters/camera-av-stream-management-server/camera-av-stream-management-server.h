@@ -128,10 +128,6 @@ public:
     virtual CHIP_ERROR GetSupportedSnapshotParamByIndex(uint8_t, Structs::RateDistortionTradeOffPointsStruct::Type &) = 0;
     virtual CHIP_ERROR EndSupportedSnapshotParamsRead()                                                               = 0;
 
-    virtual CHIP_ERROR StartCurrentVideoCodecsRead()                            = 0;
-    virtual CHIP_ERROR GetCurrentVideoCodecByIndex(uint8_t, VideoCodecEnumType) = 0;
-    virtual CHIP_ERROR EndCurrentVideoCodecsRead()                              = 0;
-
     virtual CHIP_ERROR StartFabricsUsingCameraRead()                           = 0;
     virtual CHIP_ERROR GetFabricUsingCameraByIndex(uint8_t, chip::FabricIndex) = 0;
     virtual CHIP_ERROR EndFabricsUsingCameraRead()                             = 0;
@@ -183,8 +179,9 @@ public:
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
      */
     CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
-                             BitMask<CameraAVStreamMgmt::Feature> aFeature, OptionalAttributes aOptionalAttrs, uint8_t aMaxConVideoEncoders,
-                             uint32_t aMaxEncodedPixelRate, VideoSensorParamsStruct aVideoSensorParams, bool aNightVisionCapable,
+                             BitMask<CameraAVStreamMgmt::Feature> aFeature, OptionalAttributes aOptionalAttrs,
+                             uint8_t aMaxConVideoEncoders, uint32_t aMaxEncodedPixelRate,
+                             VideoSensorParamsStruct aVideoSensorParams, bool aNightVisionCapable,
                              VideoResolutionStruct minViewPort, uint32_t aMaxContentBufferSize,
                              AudioCapabilitiesStruct aMicCapabilities, AudioCapabilitiesStruct aSpkrCapabilities,
                              TwoWayTalkSupportTypeEnum aTwoWayTalkSupport, uint32_t aMaxNetworkBandwidth);
@@ -209,10 +206,6 @@ public:
     Protocols::InteractionModel::Status SetCurrentFrameRate(uint16_t aCurrentFrameRate);
 
     Protocols::InteractionModel::Status SetHDRModeEnabled(bool aHDRModeEnabled);
-
-    Protocols::InteractionModel::Status
-    CameraAVStreamMgmtServer::SetCurrentSnapshotConfig(const VideoResolutionStruct & aVideoResolution, uint16_t aMaxFrameRate,
-                                                       ImageCodecEnumType aImageCodecEnum);
 
     Protocols::InteractionModel::Status SetSoftRecordingPrivacyModeEnabled(bool aSoftRecordingPrivacyModeEnabled);
 
@@ -278,8 +271,7 @@ private:
     const uint32_t mMaxNetworkBandwidth;
 
     uint16_t mCurrentFrameRate;
-    bool mHDRModeEnabled = false;
-    SnapshotParamsStruct mCurrentSnapshotConfig;
+    bool mHDRModeEnabled                   = false;
     bool mSoftRecordingPrivacyModeEnabled  = false;
     bool mSoftLivestreamPrivacyModeEnabled = false;
     bool mHardPrivacyModeOn                = false;
@@ -329,7 +321,6 @@ private:
     // Helpers to read list items via delegate APIs
     CHIP_ERROR ReadAndEncodeRateDistortionTradeOffPoints(const AttributeValueEncoder::ListEncodeHelper & encoder);
     CHIP_ERROR ReadAndEncodeSupportedSnapshotParams(const AttributeValueEncoder::ListEncodeHelper & encoder);
-    CHIP_ERROR ReadAndEncodeCurrentVideoCodecs(const AttributeValueEncoder::ListEncodeHelper & encoder);
     CHIP_ERROR ReadAndEncodeFabricsUsingCamera(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     CHIP_ERROR ReadAndEncodeAllocatedVideoStreams(const AttributeValueEncoder::ListEncodeHelper & encoder);
@@ -358,7 +349,6 @@ private:
     void HandleSnapshotStreamDeallocate(HandlerContext & ctx, const Commands::VideoStreamModify::DecodableType & req);
 
     void HandleCaptureSnapshot(HandlerContext & ctx, const Commands::VideoStreamModify::DecodableType & req);
-
 };
 
 } // namespace CameraAVStreamMgmt
