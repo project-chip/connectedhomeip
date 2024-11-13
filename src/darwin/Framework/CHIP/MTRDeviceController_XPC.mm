@@ -467,7 +467,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
     NSArray * deviceInfoList = MTR_SAFE_CAST(configuration[MTRDeviceControllerRegistrationNodeIDsKey], NSArray);
 
-    MTR_LOG("Received controllerConfigurationUpdated: controllerNode ID %@ deviceInfoList %@", self.controllerNodeID, deviceInfoList);
+    MTR_LOG("Received controllerConfigurationUpdated: controllerNodeID %@ compressedFabricID %016lluX deviceInfoList %@", self.controllerNodeID, self.compressedFabricID.unsignedLongLongValue, deviceInfoList);
 
     for (NSDictionary * deviceInfo in deviceInfoList) {
         if (!MTR_SAFE_CAST(deviceInfo, NSDictionary)) {

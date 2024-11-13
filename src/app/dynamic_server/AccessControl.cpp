@@ -18,6 +18,7 @@
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
+#include <access/ProviderDeviceTypeResolver.h>
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -34,22 +35,13 @@ namespace {
 // DynamicDispatch.cpp.
 constexpr EndpointId kSupportedEndpoint = 0;
 
-class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
+class DeviceTypeResolver : public chip::Access::DynamicProviderDeviceTypeResolver
 {
 public:
-    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override
-    {
-        chip::app::DataModel::Provider * model = chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
-
-        for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type))
-        {
-            if (type->deviceTypeId == deviceType)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    DeviceTypeResolver() :
+        chip::Access::DynamicProviderDeviceTypeResolver(
+            [] { return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(); })
+    {}
 };
 
 // TODO: Make the policy more configurable by consumers.

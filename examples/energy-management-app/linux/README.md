@@ -24,6 +24,7 @@ details.
         -   [Activating python virtual env](#activating-python-virtual-env)
         -   [Interacting with CHIP-REPL and the example app](#interacting-with-chip-repl-and-the-example-app)
         -   [Using chip-repl to Fake a charging session](#using-chip-repl-to-fake-a-charging-session)
+    -   [Water Heater App: Interaction using the chip-tool and TestEventTriggers](#water-heater-app-interaction-using-the-chip-tool-and-testeventtriggers)
 
 <hr>
 
@@ -238,8 +239,9 @@ data (e.g. fabric info).
 
 ## CHIP-REPL Interaction
 
--   See chip-repl documentation in
-    [Matter_REPL_Intro](../../../docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb)
+-   See chip-repl documentation in:
+    -   [Working with Python CHIP Controller](../../../docs/development_controllers/chip-repl/python_chip_controller_building.md)
+    -   [Matter_REPL_Intro](../../../docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb)
 
 ### Building chip-repl:
 

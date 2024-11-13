@@ -1878,7 +1878,7 @@ endpoint 1 {
     ram      attribute fanModeSequence default = 2;
     persist  attribute percentSetting default = 0x00;
     ram      attribute percentCurrent default = 0x00;
-    ram      attribute speedMax default = 100;
+    ram      attribute speedMax default = 10;
     persist  attribute speedSetting default = 0x00;
     persist  attribute speedCurrent default = 0;
     ram      attribute rockSupport default = 0x03;
