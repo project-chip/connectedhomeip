@@ -39628,8 +39628,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::TimeControl::Id: {
-            using TypeInfo = Attributes::TimeControl::TypeInfo;
+        case Attributes::Triggers::Id: {
+            using TypeInfo = Attributes::Triggers::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -39672,34 +39672,50 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_blindDurationClassName.c_str(), newElement_0_blindDurationCtorSignature.c_str(),
                     jninewElement_0_blindDuration, newElement_0_blindDuration);
+                jobject newElement_0_sensitivity;
+                if (!entry_0.sensitivity.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_sensitivity);
+                }
+                else
+                {
+                    jobject newElement_0_sensitivityInsideOptional;
+                    std::string newElement_0_sensitivityInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_0_sensitivityInsideOptionalCtorSignature = "(I)V";
+                    jint jninewElement_0_sensitivityInsideOptional = static_cast<jint>(entry_0.sensitivity.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_0_sensitivityInsideOptionalClassName.c_str(),
+                        newElement_0_sensitivityInsideOptionalCtorSignature.c_str(), jninewElement_0_sensitivityInsideOptional,
+                        newElement_0_sensitivityInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_sensitivityInsideOptional,
+                                                                      newElement_0_sensitivity);
+                }
 
                 {
-                    jclass zoneTriggeringTimeControlStructStructClass_1;
+                    jclass zoneTriggerControlStructStructClass_1;
                     err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                        env, "chip/devicecontroller/ChipStructs$ZoneManagementClusterZoneTriggeringTimeControlStruct",
-                        zoneTriggeringTimeControlStructStructClass_1);
+                        env, "chip/devicecontroller/ChipStructs$ZoneManagementClusterZoneTriggerControlStruct",
+                        zoneTriggerControlStructStructClass_1);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$ZoneManagementClusterZoneTriggeringTimeControlStruct");
+                        ChipLogError(Zcl, "Could not find class ChipStructs$ZoneManagementClusterZoneTriggerControlStruct");
                         return nullptr;
                     }
 
-                    jmethodID zoneTriggeringTimeControlStructStructCtor_1;
+                    jmethodID zoneTriggerControlStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
-                        env, zoneTriggeringTimeControlStructStructClass_1, "<init>",
-                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;)V",
-                        &zoneTriggeringTimeControlStructStructCtor_1);
-                    if (err != CHIP_NO_ERROR || zoneTriggeringTimeControlStructStructCtor_1 == nullptr)
+                        env, zoneTriggerControlStructStructClass_1, "<init>",
+                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/util/Optional;)V",
+                        &zoneTriggerControlStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || zoneTriggerControlStructStructCtor_1 == nullptr)
                     {
-                        ChipLogError(Zcl,
-                                     "Could not find ChipStructs$ZoneManagementClusterZoneTriggeringTimeControlStruct constructor");
+                        ChipLogError(Zcl, "Could not find ChipStructs$ZoneManagementClusterZoneTriggerControlStruct constructor");
                         return nullptr;
                     }
 
-                    newElement_0 =
-                        env->NewObject(zoneTriggeringTimeControlStructStructClass_1, zoneTriggeringTimeControlStructStructCtor_1,
-                                       newElement_0_initialDuration, newElement_0_augmentationDuration, newElement_0_maxDuration,
-                                       newElement_0_blindDuration);
+                    newElement_0 = env->NewObject(zoneTriggerControlStructStructClass_1, zoneTriggerControlStructStructCtor_1,
+                                                  newElement_0_initialDuration, newElement_0_augmentationDuration,
+                                                  newElement_0_maxDuration, newElement_0_blindDuration, newElement_0_sensitivity);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

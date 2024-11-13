@@ -5565,7 +5565,7 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
     case Attributes::Zones::Id: {
         return YES;
     }
-    case Attributes::TimeControl::Id: {
+    case Attributes::Triggers::Id: {
         return YES;
     }
     case Attributes::Sensitivity::Id: {

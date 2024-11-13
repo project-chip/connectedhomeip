@@ -5939,23 +5939,22 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ZoneManagement::Struct
     ComplexArgumentParser::Finalize(request.zoneSource);
 }
 
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::Type & request,
-                             Json::Value & value)
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::Type & request,
+                                        Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggeringTimeControlStruct.initialDuration",
-                                                                  "initialDuration", value.isMember("initialDuration")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggeringTimeControlStruct.augmentationDuration",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggerControlStruct.initialDuration", "initialDuration",
+                                                                  value.isMember("initialDuration")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggerControlStruct.augmentationDuration",
                                                                   "augmentationDuration", value.isMember("augmentationDuration")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggeringTimeControlStruct.maxDuration", "maxDuration",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggerControlStruct.maxDuration", "maxDuration",
                                                                   value.isMember("maxDuration")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggeringTimeControlStruct.blindDuration", "blindDuration",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggerControlStruct.blindDuration", "blindDuration",
                                                                   value.isMember("blindDuration")));
 
     char labelWithMember[kMaxLabelLength];
@@ -5976,15 +5975,23 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.blindDuration, value["blindDuration"]));
     valueCopy.removeMember("blindDuration");
 
+    if (value.isMember("sensitivity"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sensitivity");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sensitivity, value["sensitivity"]));
+    }
+    valueCopy.removeMember("sensitivity");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.initialDuration);
     ComplexArgumentParser::Finalize(request.augmentationDuration);
     ComplexArgumentParser::Finalize(request.maxDuration);
     ComplexArgumentParser::Finalize(request.blindDuration);
+    ComplexArgumentParser::Finalize(request.sensitivity);
 }
 
 CHIP_ERROR

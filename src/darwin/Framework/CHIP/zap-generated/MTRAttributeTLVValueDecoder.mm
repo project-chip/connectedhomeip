@@ -16853,8 +16853,8 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
         }
         return value;
     }
-    case Attributes::TimeControl::Id: {
-        using TypeInfo = Attributes::TimeControl::TypeInfo;
+    case Attributes::Triggers::Id: {
+        using TypeInfo = Attributes::Triggers::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -16866,12 +16866,17 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRZoneManagementClusterZoneTriggeringTimeControlStruct * newElement_0;
-                newElement_0 = [MTRZoneManagementClusterZoneTriggeringTimeControlStruct new];
+                MTRZoneManagementClusterZoneTriggerControlStruct * newElement_0;
+                newElement_0 = [MTRZoneManagementClusterZoneTriggerControlStruct new];
                 newElement_0.initialDuration = [NSNumber numberWithUnsignedShort:entry_0.initialDuration];
                 newElement_0.augmentationDuration = [NSNumber numberWithUnsignedShort:entry_0.augmentationDuration];
                 newElement_0.maxDuration = [NSNumber numberWithUnsignedInt:entry_0.maxDuration];
                 newElement_0.blindDuration = [NSNumber numberWithUnsignedShort:entry_0.blindDuration];
+                if (entry_0.sensitivity.HasValue()) {
+                    newElement_0.sensitivity = [NSNumber numberWithUnsignedChar:entry_0.sensitivity.Value()];
+                } else {
+                    newElement_0.sensitivity = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

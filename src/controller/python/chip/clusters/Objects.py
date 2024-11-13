@@ -44337,8 +44337,8 @@ class ZoneManagement(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedZoneSources", Tag=0x00000000, Type=typing.List[ZoneManagement.Enums.ZoneSourceEnum]),
                 ClusterObjectFieldDescriptor(Label="zones", Tag=0x00000001, Type=typing.Optional[typing.List[ZoneManagement.Structs.ZoneInformationStruct]]),
-                ClusterObjectFieldDescriptor(Label="timeControl", Tag=0x00000002, Type=typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct]),
-                ClusterObjectFieldDescriptor(Label="sensitivity", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="triggers", Tag=0x00000002, Type=typing.List[ZoneManagement.Structs.ZoneTriggerControlStruct]),
+                ClusterObjectFieldDescriptor(Label="sensitivity", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -44348,8 +44348,8 @@ class ZoneManagement(Cluster):
 
     supportedZoneSources: typing.List[ZoneManagement.Enums.ZoneSourceEnum] = field(default_factory=lambda: [])
     zones: typing.Optional[typing.List[ZoneManagement.Structs.ZoneInformationStruct]] = None
-    timeControl: typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct] = field(default_factory=lambda: [])
-    sensitivity: uint = 0
+    triggers: typing.List[ZoneManagement.Structs.ZoneTriggerControlStruct] = field(default_factory=lambda: [])
+    sensitivity: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -44413,6 +44413,7 @@ class ZoneManagement(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kTwoDimensionalCartesianZone = 0x1
+            kPerZoneSensitivity = 0x2
 
     class Structs:
         @dataclass
@@ -44461,7 +44462,7 @@ class ZoneManagement(Cluster):
             zoneSource: 'ZoneManagement.Enums.ZoneSourceEnum' = 0
 
         @dataclass
-        class ZoneTriggeringTimeControlStruct(ClusterObject):
+        class ZoneTriggerControlStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -44470,12 +44471,14 @@ class ZoneManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="augmentationDuration", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="maxDuration", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="blindDuration", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sensitivity", Tag=4, Type=typing.Optional[uint]),
                     ])
 
             initialDuration: 'uint' = 0
             augmentationDuration: 'uint' = 0
             maxDuration: 'uint' = 0
             blindDuration: 'uint' = 0
+            sensitivity: 'typing.Optional[uint]' = None
 
     class Commands:
         @dataclass
@@ -44610,7 +44613,7 @@ class ZoneManagement(Cluster):
             value: typing.Optional[typing.List[ZoneManagement.Structs.ZoneInformationStruct]] = None
 
         @dataclass
-        class TimeControl(ClusterAttributeDescriptor):
+        class Triggers(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000550
@@ -44621,9 +44624,9 @@ class ZoneManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.List[ZoneManagement.Structs.ZoneTriggerControlStruct])
 
-            value: typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct] = field(default_factory=lambda: [])
+            value: typing.List[ZoneManagement.Structs.ZoneTriggerControlStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class Sensitivity(ClusterAttributeDescriptor):
@@ -44637,9 +44640,9 @@ class ZoneManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: uint = 0
+            value: typing.Optional[uint] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

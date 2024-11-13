@@ -5526,6 +5526,7 @@ enum class ZoneUseEnum : uint8_t
 enum class Feature : uint32_t
 {
     kTwoDimensionalCartesianZone = 0x1,
+    kPerZoneSensitivity          = 0x2,
 };
 } // namespace ZoneManagement
 

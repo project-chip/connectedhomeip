@@ -59283,7 +59283,7 @@ public class ChipClusters {
 
     private static final long SUPPORTED_ZONE_SOURCES_ATTRIBUTE_ID = 0L;
     private static final long ZONES_ATTRIBUTE_ID = 1L;
-    private static final long TIME_CONTROL_ATTRIBUTE_ID = 2L;
+    private static final long TRIGGERS_ATTRIBUTE_ID = 2L;
     private static final long SENSITIVITY_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -59422,8 +59422,8 @@ public class ChipClusters {
       void onSuccess(List<ChipStructs.ZoneManagementClusterZoneInformationStruct> value);
     }
 
-    public interface TimeControlAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> value);
+    public interface TriggersAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -59494,39 +59494,39 @@ public class ChipClusters {
         }, ZONES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readTimeControlAttribute(
-        TimeControlAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TIME_CONTROL_ATTRIBUTE_ID);
+    public void readTriggersAttribute(
+        TriggersAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TRIGGERS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, TIME_CONTROL_ATTRIBUTE_ID, true);
+        }, TRIGGERS_ATTRIBUTE_ID, true);
     }
 
-    public void writeTimeControlAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> value) {
-      writeTimeControlAttribute(callback, value, 0);
+    public void writeTriggersAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct> value) {
+      writeTriggersAttribute(callback, value, 0);
     }
 
-    public void writeTimeControlAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> value, int timedWriteTimeoutMs) {
+    public void writeTriggersAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct> value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> elementvalue.encodeTlv());
-      writeAttribute(new WriteAttributesCallbackImpl(callback), TIME_CONTROL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), TRIGGERS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
-    public void subscribeTimeControlAttribute(
-        TimeControlAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TIME_CONTROL_ATTRIBUTE_ID);
+    public void subscribeTriggersAttribute(
+        TriggersAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TRIGGERS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, TIME_CONTROL_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, TRIGGERS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSensitivityAttribute(

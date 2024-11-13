@@ -6832,9 +6832,9 @@ namespace Zones {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace Zones
 
-namespace TimeControl {
+namespace Triggers {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace TimeControl
+} // namespace Triggers
 
 namespace Sensitivity {
 static constexpr AttributeId Id = 0x00000003;
