@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "lib/core/CHIPError.h"
+#include "lib/support/CodeUtils.h"
 #include <app/AppConfig.h>
 #include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
@@ -27,6 +29,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
 #include <lib/core/DataModelTypes.h>
+#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -52,6 +55,33 @@ Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eve
     return Status::Success;
 }
 
+/// Returns the status of ACL validation.
+///   if the status is set, the status is FINAL (i.e. permanent failure OR success due to path expansion logic.)
+///   if the status is not set, the processing can continue
+std::optional<CHIP_ERROR> ValidateReadACL(const Access::SubjectDescriptor & subjectDescriptor,
+                                          const ConcreteReadAttributePath & path)
+{
+    Access::RequestPath requestPath{ .cluster     = path.mClusterId,
+                                     .endpoint    = path.mEndpointId,
+                                     .requestType = Access::RequestType::kAttributeReadRequest,
+                                     .entityId    = path.mAttributeId };
+    CHIP_ERROR err = Access::GetAccessControl().Check(subjectDescriptor, requestPath, RequiredPrivilege::ForReadAttribute(path));
+    if (err == CHIP_NO_ERROR)
+    {
+        return std::nullopt;
+    }
+    VerifyOrReturnError((err == CHIP_ERROR_ACCESS_DENIED) || (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
+
+    // Implementation of 8.4.3.2 of the spec for path expansion
+    if (path.mExpanded)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    // access denied and access restricted have specific codes for IM
+    return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess) : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
+}
+
 DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel,
                                                   const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
                                                   AttributeReportIBs::Builder & reportBuilder,
@@ -64,10 +94,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
     DataModel::ReadAttributeRequest readRequest;
 
-    if (isFabricFiltered)
-    {
-        readRequest.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
-    }
+    readRequest.readFlags.Set(DataModel::ReadFlags::kFabricFiltered, isFabricFiltered);
     readRequest.subjectDescriptor = &subjectDescriptor;
     readRequest.path              = path;
 
@@ -84,9 +111,17 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     TLV::TLVWriter checkpoint;
     reportBuilder.Checkpoint(checkpoint);
 
+    DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
-    DataModel::ActionReturnStatus status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
+    if (auto access_status = ValidateReadACL(subjectDescriptor, path); access_status.has_value())
+    {
+        status = *access_status;
+    }
+    else
+    {
+        status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
+    }
 
     if (status.IsSuccess())
     {
