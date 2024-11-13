@@ -20,6 +20,9 @@
 #include <pw_unit_test/framework.h>
 
 #include "DataModelFixtures.h"
+#include "access/Privilege.h"
+#include "app/data-model-provider/MetadataTypes.h"
+#include "lib/support/logging/TextOnlyLogging.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ClusterStateCache.h>
@@ -108,6 +111,45 @@ const MockNodeConfig & TestMockNodeConfig()
     // clang-format on
     return config;
 }
+
+// Customizes attributes to pretend they are always OK to read
+class ReadDataModel : public CustomDataModel
+{
+public:
+    std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override
+    {
+        auto value = CustomDataModel::GetAttributeInfo(path);
+        if (value.has_value())
+        {
+            return value;
+        }
+
+        // TODO: figure out why these are special and fix up the test. This mock seems
+        //       nonsense
+        const ConcreteAttributePath kFakePaths[] = {
+            ConcreteAttributePath(kTestEndpointId, MockClusterId(2), 1),
+            ConcreteAttributePath(kTestEndpointId, MockClusterId(5), MockAttributeId(1)),
+            ConcreteAttributePath(kMockEndpoint1, MockClusterId(2), MockAttributeId(2)),
+            ConcreteAttributePath(kMockEndpoint3, MockClusterId(3), MockAttributeId(1)),
+        };
+        for (auto fakeDataPath : kFakePaths)
+        {
+            if (path == fakeDataPath)
+            {
+                ChipLogError(Test, "!!!! Returning fake info for 0x%X/0x%X/0x%X", path.mEndpointId, path.mClusterId,
+                             path.mAttributeId);
+                DataModel::AttributeInfo info;
+
+                // Pretendint it is readable - allow ALL reads!!!
+                info.readPrivilege = Access::Privilege::kView;
+
+                return info;
+            }
+        }
+        return std::nullopt;
+    }
+};
+ReadDataModel gReadDataModel;
 
 class TestRead : public chip::Test::AppContext, public app::ReadHandler::ApplicationCallback
 {
