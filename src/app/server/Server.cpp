@@ -156,6 +156,17 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrDie(chip::audit::ExecutePersistentStorageLoadTestAudit(*mDeviceStorage));
 #endif
 
+    // Set up attribute persistence before we try to bring up the data model
+    // handler.
+    SuccessOrExit(err = mSafeAttributePersister.Init(mDeviceStorage));
+    SetSafeAttributePersistenceProvider(&mSafeAttributePersister);
+
+    // Ember requires a persistence provider:
+    //   - InitDataModelHandler uses ember init (so needs a data model provider)
+    //   - CodegenDataModelProvider requires a persistence provider to use, so this must be called late
+    //     enough, after SetSafeAttributePersistenceProvider
+    chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
+
     {
         FabricTable::InitParams fabricTableInitParams;
         fabricTableInitParams.storage             = mDeviceStorage;
@@ -276,17 +287,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                        std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
-
-    // Set up attribute persistence before we try to bring up the data model
-    // handler.
-    SuccessOrExit(err = mSafeAttributePersister.Init(mDeviceStorage));
-    SetSafeAttributePersistenceProvider(&mSafeAttributePersister);
-
-    // Ember requires a persistence provider:
-    //   - InitDataModelHandler uses ember init (so needs a data model provider)
-    //   - CodegenDataModelProvider requires a persistence provider to use, so this must be called late
-    //     enough, after SetSafeAttributePersistenceProvider
-    chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler();
