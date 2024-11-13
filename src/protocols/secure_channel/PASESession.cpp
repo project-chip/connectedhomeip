@@ -54,9 +54,7 @@ using namespace Crypto;
 using namespace Messaging;
 using namespace Protocols::SecureChannel;
 
-const char kSpake2pContext[]        = "CHIP PAKE V1 Commissioning";
-const char kSpake2pI2RSessionInfo[] = "Commissioning I2R Key";
-const char kSpake2pR2ISessionInfo[] = "Commissioning R2I Key";
+const char kSpake2pContext[] = "CHIP PAKE V1 Commissioning";
 
 // Amounts of time to allow for server-side processing of messages.
 //

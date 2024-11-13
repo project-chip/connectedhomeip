@@ -241,6 +241,8 @@ DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath
     entry.info.flags.Set(DataModel::CommandQualityFlags::kFabricScoped,
                          CommandIsFabricScoped(clusterPath.mClusterId, clusterCommandId));
 
+    entry.info.flags.Set(DataModel::CommandQualityFlags::kLargeMessage,
+                         CommandHasLargePayload(clusterPath.mClusterId, clusterCommandId));
     return entry;
 }
 

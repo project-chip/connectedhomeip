@@ -26,6 +26,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <set>
 
+namespace admin {
+
 constexpr uint32_t kDefaultSetupPinCode    = 20202021;
 constexpr uint16_t kDefaultLocalBridgePort = 5540;
 constexpr uint16_t kResponseTimeoutSeconds = 30;
@@ -48,10 +50,16 @@ private:
     chip::EndpointId mEndpointId;
 };
 
-class DeviceManager : public PairingDelegate
+class DeviceManager
 {
 public:
     DeviceManager() = default;
+
+    static DeviceManager & Instance()
+    {
+        static DeviceManager instance;
+        return instance;
+    }
 
     void Init();
 
@@ -75,7 +83,7 @@ public:
 
     void AddSyncedDevice(const Device & device);
 
-    void RemoveSyncedDevice(chip::NodeId nodeId);
+    void RemoveSyncedDevice(chip::ScopedNodeId scopedNodeId);
 
     /**
      * @brief Determines whether a given nodeId corresponds to the "current bridge device," either local or remote.
@@ -173,10 +181,6 @@ public:
     Device * FindDeviceByNode(chip::NodeId nodeId);
 
 private:
-    friend DeviceManager & DeviceMgr();
-
-    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
-
     void RequestCommissioningApproval();
 
     void HandleReadSupportedDeviceCategories(chip::TLV::TLVReader & data);
@@ -212,17 +216,4 @@ private:
     FabricSyncGetter mFabricSyncGetter;
 };
 
-/**
- * Returns the public interface of the DeviceManager singleton object.
- *
- * Applications should use this to access features of the DeviceManager
- * object.
- */
-inline DeviceManager & DeviceMgr()
-{
-    if (!DeviceManager::sInstance.mInitialized)
-    {
-        DeviceManager::sInstance.Init();
-    }
-    return DeviceManager::sInstance;
-}
+} // namespace admin

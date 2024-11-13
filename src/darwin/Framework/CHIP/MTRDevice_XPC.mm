@@ -141,6 +141,11 @@
     return [[self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID] copy];
 }
 
+- (MTRNetworkCommissioningFeature)networkCommissioningFeatures
+{
+    return [[self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures] unsignedIntValue];
+}
+
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
 // required methods for MTRDeviceDelegates
@@ -165,6 +170,33 @@
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedAttributeReport:attributeReport];
     }];
+
+    std::lock_guard lock(_lock);
+    for (NSDictionary<NSString *, id> * report in attributeReport) {
+        if (!MTR_SAFE_CAST(report, NSDictionary)) {
+            MTR_LOG_ERROR("%@ handed a response-value that is not a dictionary: %@", self, report);
+            continue;
+        }
+
+        MTRAttributePath * path = MTR_SAFE_CAST(report[MTRAttributePathKey], MTRAttributePath);
+        if (!path) {
+            MTR_LOG_ERROR("%@ no valid path for attribute report %@", self, report);
+            continue;
+        }
+
+        MTRDeviceDataValueDictionary value = report[MTRDataKey];
+        if (!value) {
+            // This is normal; this could be an error report.
+            continue;
+        }
+
+        if (!MTR_SAFE_CAST(value, NSDictionary)) {
+            MTR_LOG_ERROR("%@ invalid data-value reported: %@", self, report);
+            continue;
+        }
+
+        [self _attributeValue:value reportedForPath:path];
+    }
 }
 
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<MTRDeviceResponseValueDictionary> *)eventReport

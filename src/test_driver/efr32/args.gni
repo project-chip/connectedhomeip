@@ -30,8 +30,8 @@ openthread_external_platform =
 
 pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
 
-pw_assert_BACKEND = "$dir_pw_assert_log"
-pw_log_BACKEND = "$dir_pw_log_basic"
+pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
+pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
 
 pw_unit_test_BACKEND = "$dir_pw_unit_test:light"
 
