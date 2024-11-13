@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "app/util/persistence/AttributePersistenceProvider.h"
+#include "app/util/persistence/DefaultAttributePersistenceProvider.h"
 #if !defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
 #error This application requires powercycle counting.
 #endif
@@ -114,9 +116,7 @@ DeferredAttribute gPersisters[] = {
 
 };
 
-DeferredAttributePersistenceProvider gDeferredAttributePersister(Server::GetInstance().GetDefaultAttributePersister(),
-                                                                 Span<DeferredAttribute>(gPersisters, 3),
-                                                                 System::Clock::Milliseconds32(5000));
+DeferredAttributePersistenceProvider gDeferredAttributePersister;
 
 /**********************************************************
  * Identify Callbacks
@@ -279,6 +279,9 @@ void AppTask::InitServer(intptr_t arg)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
+
+    (void) gDeferredAttributePersister.Init(*app::GetAttributePersistenceProvider(), Span<DeferredAttribute>(gPersisters, 3),
+                                            System::Clock::Milliseconds32(5000));
 
     app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
 

@@ -54,13 +54,13 @@ CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttrib
         }
     }
 
-    return mPersister.WriteValue(aPath, aValue);
+    return mPersister->WriteValue(aPath, aValue);
 }
 
 CHIP_ERROR DeferredAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
                                                            const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue)
 {
-    return mPersister.ReadValue(aPath, aMetadata, aValue);
+    return mPersister->ReadValue(aPath, aMetadata, aValue);
 }
 
 void DeferredAttributePersistenceProvider::FlushAndScheduleNext()
@@ -77,7 +77,7 @@ void DeferredAttributePersistenceProvider::FlushAndScheduleNext()
 
         if (da.GetFlushTime() <= now)
         {
-            da.Flush(mPersister);
+            da.Flush(*mPersister);
         }
         else
         {

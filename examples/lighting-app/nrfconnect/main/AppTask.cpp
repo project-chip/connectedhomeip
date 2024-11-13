@@ -23,6 +23,9 @@
 #include "FabricTableDelegate.h"
 #include "LEDUtil.h"
 #include "PWMDevice.h"
+#include "app/SafeAttributePersistenceProvider.h"
+#include "app/util/persistence/AttributePersistenceProvider.h"
+#include "app/util/persistence/DefaultAttributePersistenceProvider.h"
 
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -112,9 +115,7 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 // be written, so it must live so long as the DeferredAttributePersistenceProvider object.
 DeferredAttribute gCurrentLevelPersister(ConcreteAttributePath(kLightEndpointId, Clusters::LevelControl::Id,
                                                                Clusters::LevelControl::Attributes::CurrentLevel::Id));
-DeferredAttributePersistenceProvider gDeferredAttributePersister(Server::GetInstance().GetDefaultAttributePersister(),
-                                                                 Span<DeferredAttribute>(&gCurrentLevelPersister, 1),
-                                                                 System::Clock::Milliseconds32(5000));
+DeferredAttributePersistenceProvider gDeferredAttributePersister;
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
@@ -280,6 +281,10 @@ CHIP_ERROR AppTask::Init()
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    ReturnErrorOnFailure(gDeferredAttributePersister.Init(*app::GetAttributePersistenceProvider(),
+                                                          Span<DeferredAttribute>(&gCurrentLevelPersister, 1),
+                                                          System::Clock::Milliseconds32(5000)));
     app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
 
     ConfigurationMgr().LogDeviceConfig();

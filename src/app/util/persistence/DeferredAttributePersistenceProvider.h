@@ -15,6 +15,7 @@
  */
 #pragma once
 
+#include "lib/core/CHIPError.h"
 #include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
@@ -52,12 +53,17 @@ private:
 class DeferredAttributePersistenceProvider : public AttributePersistenceProvider
 {
 public:
-    DeferredAttributePersistenceProvider(AttributePersistenceProvider & persister,
-                                         const Span<DeferredAttribute> & deferredAttributes,
-                                         System::Clock::Milliseconds32 writeDelay) :
-        mPersister(persister),
-        mDeferredAttributes(deferredAttributes), mWriteDelay(writeDelay)
-    {}
+    DeferredAttributePersistenceProvider() = default;
+
+    CHIP_ERROR Init(AttributePersistenceProvider & persister,
+                    const Span<DeferredAttribute> & deferredAttributes,
+                    System::Clock::Milliseconds32 writeDelay) {
+        mPersister = &persister,
+        mDeferredAttributes = deferredAttributes;
+        mWriteDelay = writeDelay;
+
+        return CHIP_NO_ERROR;
+    }
 
     /*
      * If the written attribute is one of the deferred attributes specified in the constructor,
@@ -74,9 +80,9 @@ public:
 private:
     void FlushAndScheduleNext();
 
-    AttributePersistenceProvider & mPersister;
-    const Span<DeferredAttribute> mDeferredAttributes;
-    const System::Clock::Milliseconds32 mWriteDelay;
+    AttributePersistenceProvider *mPersister;
+    Span<DeferredAttribute> mDeferredAttributes;
+    System::Clock::Milliseconds32 mWriteDelay;
 };
 
 } // namespace app

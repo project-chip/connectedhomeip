@@ -411,6 +411,8 @@ public:
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
+    app::SafeAttributePersistenceProvider &GetSafeAttributePersistenceProvider() { return mSafeAttributePersister; }
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
 
