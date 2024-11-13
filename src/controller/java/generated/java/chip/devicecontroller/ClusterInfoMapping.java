@@ -20252,48 +20252,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterCurrentVideoCodecsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.CurrentVideoCodecsAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Integer> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedCameraAvStreamManagementClusterCurrentSnapshotConfigAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.CurrentSnapshotConfigAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedCameraAvStreamManagementClusterFabricsUsingCameraAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.FabricsUsingCameraAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -29807,8 +29765,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocateimageCodecCommandParameterInfo = new CommandParameterInfo("imageCodec", Integer.class, Integer.class);
     cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("imageCodec",cameraAvStreamManagementsnapshotStreamAllocateimageCodecCommandParameterInfo);
 
-    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocateframeRateCommandParameterInfo = new CommandParameterInfo("frameRate", Integer.class, Integer.class);
-    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("frameRate",cameraAvStreamManagementsnapshotStreamAllocateframeRateCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatemaxFrameRateCommandParameterInfo = new CommandParameterInfo("maxFrameRate", Integer.class, Integer.class);
+    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("maxFrameRate",cameraAvStreamManagementsnapshotStreamAllocatemaxFrameRateCommandParameterInfo);
 
     CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatebitRateCommandParameterInfo = new CommandParameterInfo("bitRate", Long.class, Long.class);
     cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("bitRate",cameraAvStreamManagementsnapshotStreamAllocatebitRateCommandParameterInfo);
@@ -29825,7 +29783,7 @@ public class ClusterInfoMapping {
              commandArguments.get("imageCodec")
 
            , (Integer)
-             commandArguments.get("frameRate")
+             commandArguments.get("maxFrameRate")
 
            , (Long)
              commandArguments.get("bitRate")
