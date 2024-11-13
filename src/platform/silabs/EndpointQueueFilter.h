@@ -41,7 +41,7 @@ struct HostNameFilter : EndpointFilter
     EndpointQueueFilter::FilterOutcome Filter(const void * endpoint, const IPPacketInfo & pktInfo,
                                               const System::PacketBufferHandle & pktPayload) override;
 
-    CHIP_ERROR SetHostName(const CharSpan & name);
+    CHIP_ERROR SetHostName(Span<const unsigned char> & name);
 
 private:
     uint8_t mHostName[kHostNameLengthMax] = { 0 };
@@ -63,7 +63,7 @@ public:
     FilterOutcome FilterAfterDequeue(const void * endpoint, const IPPacketInfo & pktInfo,
                                      const System::PacketBufferHandle & pktPayload);
 
-    CHIP_ERROR SetHostName(const CharSpan & addr) { return mHostNameFilter.SetHostName(addr); }
+    CHIP_ERROR SetHostName(Span<const unsigned char> & addr) { return mHostNameFilter.SetHostName(addr); }
 
     // Method to set the configuration
     void SetConfig(const EndpointQueueFilterConfig & config) { mConfig = config; }

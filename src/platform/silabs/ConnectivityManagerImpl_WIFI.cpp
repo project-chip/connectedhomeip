@@ -438,9 +438,13 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
             config.allowedQueuedPackets = 20; // Set the desired value
 
             mEndpointQueueFilter.SetConfig(config);
-            if (mEndpointQueueFilter.SetHostName(chip::CharSpan(macaddrString)) == CHIP_NO_ERROR)
+
+            // Convert macaddrString to Span<const unsigned char>
+            Span<const unsigned char> macaddrSpan(reinterpret_cast<const unsigned char *>(macaddrString), sizeof(macaddrString));
+
+            if (mEndpointQueueFilter.SetHostName(macaddrSpan) == CHIP_NO_ERROR)
             {
-                chip::Inet::UDPEndPointImpl::SetQueueFilter(&mEndpointQueueFilter);
+                UDPEndPointImpl::SetQueueFilter(&mEndpointQueueFilter);
             }
             else
             {
@@ -448,8 +452,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
             }
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
-        (void) PlatformMgr().PostEvent(&event);
 
         if (haveIPv4Conn != hadIPv4Conn)
         {
