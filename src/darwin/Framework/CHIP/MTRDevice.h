@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRAttributeValueWaiter.h>
 #import <Matter/MTRBaseDevice.h>
+#import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -124,11 +125,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 /**
  * Network commissioning features supported by the device.
- *
- * The value if not nil, represents the options available in MTRNetworkCommissioningFeature type.
- *
  */
-@property (nonatomic, readonly, nullable, copy) NSNumber * networkCommissioningFeatures MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly) MTRNetworkCommissioningFeature networkCommissioningFeatures MTR_NEWLY_AVAILABLE;
 
 /**
  * Set the delegate to receive asynchronous callbacks about the device.

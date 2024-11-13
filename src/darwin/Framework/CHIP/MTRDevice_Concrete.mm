@@ -514,10 +514,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return [_pid copy];
 }
 
-- (nullable NSNumber *)networkCommissioningFeatures
+- (MTRNetworkCommissioningFeature)networkCommissioningFeatures
 {
     std::lock_guard lock(_descriptionLock);
-    return [_allNetworkFeatures copy];
+    return [_allNetworkFeatures unsignedIntValue];
 }
 
 - (void)_notifyDelegateOfPrivateInternalPropertiesChanges
