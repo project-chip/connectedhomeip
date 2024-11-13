@@ -79,7 +79,7 @@ CHIP_ERROR AddBridgeCommand::RunCommand()
     {
         // print to console
         fprintf(stderr, "Remote Fabric Bridge has already been configured.\n");
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     admin::PairingManager::Instance().SetPairingDelegate(this);

@@ -78,25 +78,25 @@ void DeviceManager::SetRemoteBridgeNodeId(chip::NodeId nodeId)
     }
 }
 
-Device * DeviceManager::FindDeviceByEndpoint(EndpointId endpointId)
+SyncedDevice * DeviceManager::FindDeviceByEndpoint(EndpointId endpointId)
 {
     for (auto & device : mSyncedDevices)
     {
         if (device.GetEndpointId() == endpointId)
         {
-            return const_cast<Device *>(&device);
+            return const_cast<SyncedDevice *>(&device);
         }
     }
     return nullptr;
 }
 
-Device * DeviceManager::FindDeviceByNode(NodeId nodeId)
+SyncedDevice * DeviceManager::FindDeviceByNode(NodeId nodeId)
 {
     for (auto & device : mSyncedDevices)
     {
         if (device.GetNodeId() == nodeId)
         {
-            return const_cast<Device *>(&device);
+            return const_cast<SyncedDevice *>(&device);
         }
     }
     return nullptr;
@@ -220,8 +220,8 @@ void DeviceManager::SubscribeRemoteFabricBridge()
 {
     ChipLogProgress(NotSpecified, "Start subscription to the remote bridge.");
 
-        CHIP_ERROR error = mBridgeSubscriber.StartSubscription(PairingManager::Instance().CurrentCommissioner(),
-                                                               mRemoteBridgeNodeId, kAggregatorEndpointId);
+    CHIP_ERROR error = mBridgeSubscriber.StartSubscription(PairingManager::Instance().CurrentCommissioner(), mRemoteBridgeNodeId,
+                                                           kAggregatorEndpointId);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -360,7 +360,7 @@ void DeviceManager::HandleAttributePartsListUpdate(TLV::TLVReader & data)
     std::vector<EndpointId> removedEndpoints;
 
     // Note: We're using vectors and manual searches instead of set operations
-    // because we need to work with the Device objects in mSyncedDevices,
+    // because we need to work with the SyncedDevice objects in mSyncedDevices,
     // not just their EndpointIds. This approach allows us to access the full
     // Device information when processing changes.
 
@@ -395,7 +395,7 @@ void DeviceManager::HandleAttributePartsListUpdate(TLV::TLVReader & data)
     {
         ChipLogProgress(NotSpecified, "Endpoint removed: %u", endpoint);
 
-        Device * device = FindDeviceByEndpoint(endpoint);
+        SyncedDevice * device = FindDeviceByEndpoint(endpoint);
 
         if (device == nullptr)
         {

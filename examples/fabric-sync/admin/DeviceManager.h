@@ -31,15 +31,15 @@ namespace admin {
 constexpr uint32_t kDefaultSetupPinCode    = 20202021;
 constexpr uint16_t kResponseTimeoutSeconds = 30;
 
-class Device
+class SyncedDevice
 {
 public:
-    Device(chip::NodeId nodeId, chip::EndpointId endpointId) : mNodeId(nodeId), mEndpointId(endpointId) {}
+    SyncedDevice(chip::NodeId nodeId, chip::EndpointId endpointId) : mNodeId(nodeId), mEndpointId(endpointId) {}
 
     chip::NodeId GetNodeId() const { return mNodeId; }
     chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
-    bool operator<(const Device & other) const
+    bool operator<(const SyncedDevice & other) const
     {
         return mNodeId < other.mNodeId || (mNodeId == other.mNodeId && mEndpointId < other.mEndpointId);
     }
@@ -166,8 +166,8 @@ public:
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
-    Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
-    Device * FindDeviceByNode(chip::NodeId nodeId);
+    SyncedDevice * FindDeviceByEndpoint(chip::EndpointId endpointId);
+    SyncedDevice * FindDeviceByNode(chip::NodeId nodeId);
 
 private:
     friend DeviceManager & DeviceMgr();
@@ -192,7 +192,7 @@ private:
     // This represents the bridge on the other ecosystem.
     chip::NodeId mRemoteBridgeNodeId = chip::kUndefinedNodeId;
 
-    std::set<Device> mSyncedDevices;
+    std::set<SyncedDevice> mSyncedDevices;
     bool mInitialized   = false;
     uint64_t mRequestId = 0;
 
