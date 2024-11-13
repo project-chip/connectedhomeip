@@ -24,10 +24,8 @@ typedef void * mbedtls_threading_mutex_t;
 extern "C" {
 #endif
 
-void mbedtls_threading_set_alt(void (*mutex_init)(mbedtls_threading_mutex_t *),
-                                      void (*mutex_free)(mbedtls_threading_mutex_t *),
-                                      int (*mutex_lock)(mbedtls_threading_mutex_t *),
-                                      int (*mutex_unlock)(mbedtls_threading_mutex_t *));
+void mbedtls_threading_set_alt(void (*mutex_init)(mbedtls_threading_mutex_t *), void (*mutex_free)(mbedtls_threading_mutex_t *),
+                               int (*mutex_lock)(mbedtls_threading_mutex_t *), int (*mutex_unlock)(mbedtls_threading_mutex_t *));
 
 void mbedtls_threading_free_alt(void);
 

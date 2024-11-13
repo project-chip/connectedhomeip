@@ -78,7 +78,7 @@ static inline int mutex_lock(mbedtls_threading_mutex_t * p_mutex)
 {
     assert(p_mutex != NULL);
     assert(*p_mutex != NULL);
-    return xSemaphoreTake((SemaphoreHandle_t )(*p_mutex), portMAX_DELAY) != pdTRUE;
+    return xSemaphoreTake((SemaphoreHandle_t) (*p_mutex), portMAX_DELAY) != pdTRUE;
 }
 
 static inline int mutex_unlock(mbedtls_threading_mutex_t * p_mutex)
