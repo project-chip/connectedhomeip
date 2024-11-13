@@ -12339,7 +12339,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "TimeControl",
+                "attributeName": "Triggers",
                 "attributeId": 0x00000002,
                 "type": "",
                 "reportable": True,
