@@ -110,16 +110,11 @@ source_set("wifi-platform") {
     "${chip_root}/src/lib/support",
   ]
 
-  cflags = []
-
   if (use_rs9116) {
     sources += rs911x_src_plat
 
     # All the stuff from wiseconnect
     sources += rs911x_src_sapi
-
-    #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
-    cflags = rs911x_cflags
   } else if (use_SiWx917) {
     sources += rs911x_src_plat
 
