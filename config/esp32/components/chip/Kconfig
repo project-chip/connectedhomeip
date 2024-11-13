@@ -37,16 +37,6 @@ menu "CHIP Core"
                 exchange (conversation) with a peer, e.g. a cloud service, a mobile application, or
                 another device.
 
-        config MAX_BINDINGS
-            int "Max Bindings"
-            range 0 65535
-            default 8
-            help
-                The maximum number of simultaneously active CHIP Binding objects.
-
-                A Binding object is used to configure how the local device communicates with
-                a remote entity, be it a cloud service, a mobile application, or another device.
-
         config MAX_FABRICS
             int "Max Fabrics"
             range 5 255
