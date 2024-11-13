@@ -144,7 +144,7 @@ public:
                              path.mAttributeId);
                 DataModel::AttributeInfo info;
 
-                // Pretendint it is readable - allow ALL reads!!!
+                // Pretending these attributes exist and are generaly readable.
                 info.readPrivilege = Access::Privilege::kView;
 
                 return info;
