@@ -71,7 +71,7 @@ config IDLE_STACK_SIZE
     default 512 if PM
 
 config ISR_STACK_SIZE
-    default 502 if PM
+    default 576 if PM
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
     default 616 if PM
@@ -154,7 +154,7 @@ config BT_DEVICE_NAME_GATT_WRITABLE
     default n
 
 config B9X_BLE_CTRL_THREAD_STACK_SIZE
-    default 576
+    default 624
 
 config B9X_BLE_CTRL_MASTER_MAX_NUM
     default 0
@@ -264,7 +264,7 @@ config OPENTHREAD_THREAD_STACK_SIZE
     default 2400 if PM
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
-    default 361 if PM
+    default 432 if PM
     default 608
 
 config OPENTHREAD_SLAAC
@@ -365,6 +365,9 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
 	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 	  within range [-JITTER; +JITTER].
+
+config NET_MGMT_EVENT_STACK_SIZE
+	default 1128
 
 endif # CHIP_WIFI
 
