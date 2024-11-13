@@ -128,7 +128,7 @@ source_set("wifi-platform") {
 
   if (wifi_soc) {
     sources += [
-      "${silabs_platform_dir}/wifi/SiWx/SiWxWifiInterface.cpp",
+      "${silabs_platform_dir}/wifi/SiWx/WifiInterface.cpp",
       "${silabs_platform_dir}/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.cpp",
       "${silabs_platform_dir}/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h",
 
