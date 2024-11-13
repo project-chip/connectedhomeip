@@ -302,6 +302,7 @@ Status GetSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
     {
         if (OccupiedCoolingSetpoint::Get(endpoint, &setpointLimits.occupiedCoolingSetpoint) != Status::Success)
         {
+            // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Occupied Cooling Setpoint");
             return Status::Failure;
         }
@@ -311,6 +312,7 @@ Status GetSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
     {
         if (OccupiedHeatingSetpoint::Get(endpoint, &setpointLimits.occupiedHeatingSetpoint) != Status::Success)
         {
+            // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Occupied Heating Setpoint");
             return Status::Failure;
         }
@@ -320,6 +322,7 @@ Status GetSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
     {
         if (UnoccupiedCoolingSetpoint::Get(endpoint, &setpointLimits.unoccupiedCoolingSetpoint) != Status::Success)
         {
+            // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Unoccupied Cooling Setpoint");
             return Status::Failure;
         }
@@ -329,6 +332,7 @@ Status GetSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
     {
         if (UnoccupiedHeatingSetpoint::Get(endpoint, &setpointLimits.unoccupiedHeatingSetpoint) != Status::Success)
         {
+            // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Unoccupied Heating Setpoint");
             return Status::Failure;
         }
@@ -1156,13 +1160,13 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             {
                 DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
                 CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
-                                                 EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
+                                                              EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
                 {
                     if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
                     {
                         DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
                         HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
-                                                         EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
+                                                                      EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
                         {
                             if (CoolLimit != 0 || HeatLimit != 0)
                             {
