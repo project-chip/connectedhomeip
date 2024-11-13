@@ -125,7 +125,11 @@ public:
         }
 
         // TODO: figure out why these are special and fix up the test. This mock seems
-        //       nonsense
+        //       nonsense, however adding actual paths into the mock config changes existing
+        //       test behaviour.
+        //
+        // These specific paths were obtrained by grepping logs for what fake attributes we
+        // attempt to get info for within this test.
         const ConcreteAttributePath kFakePaths[] = {
             ConcreteAttributePath(kTestEndpointId, MockClusterId(2), 1),
             ConcreteAttributePath(kTestEndpointId, MockClusterId(5), MockAttributeId(1)),
@@ -163,7 +167,7 @@ protected:
         // Register app callback, so we can test it as well to ensure we get the right
         // number of SubscriptionEstablishment/Termination callbacks.
         InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&gReadDataModel);
         chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
 
