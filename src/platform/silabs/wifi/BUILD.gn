@@ -35,7 +35,7 @@ declare_args() {
 
 if (chip_enable_wifi && !wifi_soc) {
   assert(use_rs9116 || use_wf200 || use_SiWx917)
-  import("${chip_root}/src/platform/silabs/wifi_args.gni")
+  import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
   if (use_rs9116) {
     import("${silabs_platform_dir}/wifi/rs911x/rs911x.gni")

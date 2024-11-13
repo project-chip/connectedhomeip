@@ -18,7 +18,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/examples/platform/silabs/args.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/platform/silabs/wifi_args.gni")
+import("${chip_root}/src/platform/silabs/wifi/args.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 import("${silabs_sdk_build_root}/SiWx917_sdk.gni")
 
