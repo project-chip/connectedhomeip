@@ -16897,7 +16897,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedZoneSources(0L),
             Zones(1L),
-            TimeControl(2L),
+            Triggers(2L),
             Sensitivity(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),

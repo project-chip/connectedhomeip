@@ -9443,6 +9443,7 @@ provisional cluster ZoneManagement = 1360 {
 
   bitmap Feature : bitmap32 {
     kTwoDimensionalCartesianZone = 0x1;
+    kPerZoneSensitivity = 0x2;
   }
 
   struct TwoDCartesianVertexStruct {
@@ -9463,11 +9464,12 @@ provisional cluster ZoneManagement = 1360 {
     ZoneSourceEnum zoneSource = 2;
   }
 
-  struct ZoneTriggeringTimeControlStruct {
+  struct ZoneTriggerControlStruct {
     int16u initialDuration = 0;
     int16u augmentationDuration = 1;
     elapsed_s maxDuration = 2;
     int16u blindDuration = 3;
+    optional int8u sensitivity = 4;
   }
 
   info event ZoneTriggered = 0 {
@@ -9482,8 +9484,8 @@ provisional cluster ZoneManagement = 1360 {
 
   readonly attribute ZoneSourceEnum supportedZoneSources[] = 0;
   readonly attribute optional ZoneInformationStruct zones[] = 1;
-  attribute ZoneTriggeringTimeControlStruct timeControl[] = 2;
-  attribute int8u sensitivity = 3;
+  attribute ZoneTriggerControlStruct triggers[] = 2;
+  attribute optional int8u sensitivity = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
