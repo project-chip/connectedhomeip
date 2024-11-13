@@ -21,14 +21,12 @@
 
 #include "DataModelFixtures.h"
 
-#include <access/Privilege.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ClusterStateCache.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
-#include <app/data-model-provider/MetadataTypes.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
@@ -36,7 +34,6 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/logging/TextOnlyLogging.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemClock.h>
@@ -112,49 +109,6 @@ const MockNodeConfig & TestMockNodeConfig()
     return config;
 }
 
-// Customizes attributes to pretend they are always OK to read
-class ReadDataModel : public CustomDataModel
-{
-public:
-    std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override
-    {
-        auto value = CustomDataModel::GetAttributeInfo(path);
-        if (value.has_value())
-        {
-            return value;
-        }
-
-        // TODO: figure out why these are special and fix up the test. This mock seems
-        //       nonsense, however adding actual paths into the mock config changes existing
-        //       test behaviour.
-        //
-        // These specific paths were obtained by grepping logs for what fake attributes we
-        // attempt to get info for within this test.
-        const ConcreteAttributePath kFakePaths[] = {
-            ConcreteAttributePath(kTestEndpointId, MockClusterId(2), 1),
-            ConcreteAttributePath(kTestEndpointId, MockClusterId(5), MockAttributeId(1)),
-            ConcreteAttributePath(kMockEndpoint1, MockClusterId(2), MockAttributeId(2)),
-            ConcreteAttributePath(kMockEndpoint3, MockClusterId(3), MockAttributeId(1)),
-        };
-        for (auto fakeDataPath : kFakePaths)
-        {
-            if (path == fakeDataPath)
-            {
-                ChipLogError(Test, "!!!! Returning fake info for 0x%X/0x%X/0x%X", path.mEndpointId, path.mClusterId,
-                             path.mAttributeId);
-                DataModel::AttributeInfo info;
-
-                // Pretending these attributes exist and are generaly readable.
-                info.readPrivilege = Access::Privilege::kView;
-
-                return info;
-            }
-        }
-        return std::nullopt;
-    }
-};
-ReadDataModel gReadDataModel;
-
 class TestRead : public chip::Test::AppContext, public app::ReadHandler::ApplicationCallback
 {
 protected:
@@ -167,7 +121,7 @@ protected:
         // Register app callback, so we can test it as well to ensure we get the right
         // number of SubscriptionEstablishment/Termination callbacks.
         InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&gReadDataModel);
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
         chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
 

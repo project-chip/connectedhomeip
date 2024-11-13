@@ -83,13 +83,19 @@ std::optional<CHIP_ERROR> ValidateReadACL(DataModel::Provider * dataModel, const
     CHIP_ERROR err = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requiredPrivilege);
     if (err == CHIP_NO_ERROR)
     {
-        // success, but only if this is actually a valid path
-        // Global attributes have no metadata, so allow them through as long as `kView` access is available.
-        if (!IsSupportedGlobalAttributeNotInMetadata(path.mAttributeId))
+        if (IsSupportedGlobalAttributeNotInMetadata(path.mAttributeId))
         {
-            VerifyOrReturnError(info.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-            VerifyOrReturnError(info->readPrivilege.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedRead));
+            // Global attributes passing a kView check is ok
+            return std::nullopt;
         }
+
+        // attribute does not exist, however we do not now if this is a unsupported endpoint, cluster or attribute,
+        // so the info.has_value() is only handled by the ReadAttribute in the DataModel::Provider.
+        //
+        // What we can validate is `write-only attributes` (i.e if we have info, readPrivilege should be set)
+
+        // if the attribute does exist, it should be readable
+        VerifyOrReturnError(!info.has_value() || info->readPrivilege.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedRead));
 
         return std::nullopt;
     }
@@ -1179,6 +1185,6 @@ void Engine::MarkDirty(const AttributePathParams & path)
 
 // TODO: MatterReportingAttributeChangeCallback should just live in libCHIP, It does not depend on any
 // app-specific generated bits.
-void __attribute__((weak))
-MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+void __attribute__((weak)) MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                  chip::AttributeId attributeId)
 {}
