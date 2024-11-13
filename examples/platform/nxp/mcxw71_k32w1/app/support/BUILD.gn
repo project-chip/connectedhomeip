@@ -61,6 +61,6 @@ source_set("freertos_memory_utils") {
 
   public_configs = [
     ":support_config",
-    "${chip_root}/src:includes"
+    "${chip_root}/src:includes",
   ]
 }
