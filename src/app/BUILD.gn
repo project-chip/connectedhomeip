@@ -441,6 +441,7 @@ static_library("app") {
   public_deps = [
     ":app_config",
     ":attribute-access",
+    ":attribute-persistence",
     ":constants",
     ":global-attributes",
     ":interaction-model",
