@@ -43,7 +43,9 @@
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
-
+namespace Testing {
+class TestPASESession;
+}
 extern const char kSpake2pI2RSessionInfo[];
 extern const char kSpake2pR2ISessionInfo[];
 
@@ -174,6 +176,7 @@ private:
         kInvalidKeyConfirmation = 0x00,
         kUnexpected             = 0xff,
     };
+    friend class Testing::TestPASESession;
 
     CHIP_ERROR Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
