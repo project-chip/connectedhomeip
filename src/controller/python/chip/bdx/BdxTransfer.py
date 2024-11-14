@@ -40,22 +40,24 @@ class BdxTransfer:
         # _data is a bytearray when receiving data, so the data to send is converted to one as well for consistency.
         self._data = bytearray(data) if data else None
 
-    async def accept(self):
+    async def accept_and_send_data(self) -> None:
+        assert self._data is not None
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
+        res = Bdx.AcceptReceiveTransfer(self._bdx_transfer, self._data, future)
+        res.raise_on_error()
+        await future
 
-        if self._data is not None:
-            res = Bdx.AcceptReceiveTransfer(self._bdx_transfer, self._data, future)
-            res.raise_on_error()
-            return await future
-        else:
-            self._data = bytearray()
-            res = Bdx.AcceptSendTransfer(self._bdx_transfer, lambda data: self._data.extend(data), future)
-            res.raise_on_error()
-            await future
-            return self._data[:]
+    async def accept_and_receive_data(self) -> bytes:
+        assert self._data is None
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+        self._data = bytearray()
+        res = Bdx.AcceptSendTransfer(self._bdx_transfer, lambda data: self._data.extend(data), future)
+        res.raise_on_error()
+        await future
+        return bytes(self._data)
 
-    async def reject(self):
+    async def reject(self) -> None:
         res = await Bdx.RejectTransfer(self._bdx_transfer)
         res.raise_on_error()
-        return res

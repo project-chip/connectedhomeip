@@ -16,8 +16,8 @@
 #
 
 # These BDX constants are defined by the spec.
-class BdxProtocol:
-    # SendInit/ReceiveInit Proposed Transfer Control field structure.
-    SENDER_DRIVE = 0x10
-    RECEIVER_DRIVE = 0x20
-    ASYNC = 0x40
+
+# SendInit/ReceiveInit Proposed Transfer Control field structure.
+SENDER_DRIVE = 0x10
+RECEIVER_DRIVE = 0x20
+ASYNC = 0x40

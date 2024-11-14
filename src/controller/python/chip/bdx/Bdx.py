@@ -20,6 +20,7 @@ import builtins
 import ctypes
 from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_char_p, c_size_t, c_uint8, c_uint16, c_uint64, c_void_p, py_object
+from typing import Callable, Optional
 
 import chip
 from chip.native import PyChipError
@@ -126,15 +127,15 @@ def _PrepareForBdxTransfer(future: Future, data: Optional[bytes]) -> PyChipError
 
 # Prepares the BDX system for a BDX transfer where this device receives data.
 def PrepareToReceiveBdxData(future: Future) -> PyChipError:
-    _PrepareForBdxTransfer(future, None)
+    return _PrepareForBdxTransfer(future, None)
 
 
 # Prepares the BDX system for a BDX transfer where this device sends data.
 def PrepareToSendBdxData(future: Future, data: bytes) -> PyChipError:
-    _PrepareForBdxTransfer(future, data)
+    return _PrepareForBdxTransfer(future, data)
 
 
-def AcceptSendTransfer(transfer: c_void_p, dataReceivedClosure, transferComplete: Future):
+def AcceptSendTransfer(transfer: c_void_p, dataReceivedClosure: Callable[[bytes], None], transferComplete: Future):
     handle = chip.native.GetLibraryHandle()
     complete_transaction = AsyncTransferCompletedTransaction(future=transferComplete, event_loop=asyncio.get_running_loop())
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(dataReceivedClosure))
@@ -150,9 +151,14 @@ def AcceptSendTransfer(transfer: c_void_p, dataReceivedClosure, transferComplete
 
 def AcceptReceiveTransfer(transfer: c_void_p, data: bytearray, transferComplete: Future):
     handle = chip.native.GetLibraryHandle()
-    return builtins.chipStack.Call(
-        lambda: handle.pychip_Bdx_AcceptReceiveTransfer(transfer, c_char_p(data), len(data), transferComplete)
+    complete_transaction = AsyncTransferCompletedTransaction(future=transferComplete, event_loop=asyncio.get_running_loop())
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(complete_transaction))
+    res = builtins.chipStack.Call(
+        lambda: handle.pychip_Bdx_AcceptReceiveTransfer(transfer, c_char_p(data), len(data), complete_transaction)
     )
+    if not res.is_success:
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(complete_transaction))
+    return res
 
 
 async def RejectTransfer(transfer: c_void_p):

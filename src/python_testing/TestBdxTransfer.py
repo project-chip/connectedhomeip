@@ -93,7 +93,7 @@ class TestBdxTransfer(MatterBaseTest):
                              "Invalid file designator")
 
         self.step(5)
-        data = await bdx_transfer.accept()
+        data = await bdx_transfer.accept_and_receive_data()
 
         self.step(6)
         data_file = open(self.user_params["end_user_support_log"], "rb")
