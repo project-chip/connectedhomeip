@@ -19,12 +19,20 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${TYPE_OF_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import random
@@ -33,6 +41,7 @@ import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from test_plan_support import (commission_if_required, send_command, read_attribute)
 
 
 class TC_OPCREDS_3_4(MatterBaseTest):
@@ -40,40 +49,37 @@ class TC_OPCREDS_3_4(MatterBaseTest):
         return " UpdateNOC-Error Condition [DUT-Server]"
 
     def steps_TC_OPCREDS_3_4(self):
-        return [TestStep(0, "Preconditions"),
-                TestStep(1, "TH1 fully commissions the DUT"),
-                TestStep(2, "TH1 reads the NOCs attribute from the Node Operational Credentials cluster using a fabric-filtered read"),
-                TestStep(3, "TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster"),
+        return [TestStep(1, commission_if_required('TH1'), is_commissioning=True),
+                TestStep(2, f"TH1 {read_attribute('NOCs')} from the Node Operational Credentials cluster using a fabric-filtered read. Save the NOCs as `nocs`."),
+                TestStep(3, f"TH1 {read_attribute('TrustedRootCertificates')} attribute from the Node Operational Credentials cluster"),
                 TestStep(
-                    4, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue"),
-                TestStep(5, "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to 900"),
+                    4, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue"),
+                TestStep(5, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 900"),
                 TestStep(
-                    6, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue"),
-                TestStep(7, "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to false"),
+                    6, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue"),
+                TestStep(7, f"TH1 {send_command('CSRRequest')} with the IsForUpdateNOC field set to false"),
                 TestStep(8, "TH1 generates a new NOC chain with ICAC with the following properties"),
-                TestStep(9, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster"),
-                TestStep(10, "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to true"),
-                TestStep(11, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster"),
+                TestStep(9, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster"),
+                TestStep(10, f"TH1 {send_command('CSRequest')} with the IsForUpdateNOC field set to true"),
+                TestStep(11, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster"),
                 TestStep(12, "TH1 generates a new Trusted Root Certificate and Private Key and saves as new_root_cert and new_root_key so that TH can generate an NOC for UpdateNOC that doesn’t chain to the original root"),
                 TestStep(13, "TH1 generates a new NOC and ICAC"),
-                TestStep(14, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster"),
+                TestStep(14, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster"),
                 TestStep(15, "TH1 generates a new NOC and ICAC"),
-                TestStep(16, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster"),
+                TestStep(16, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster"),
                 TestStep(17, "TH1 generates a new NOC and ICAC"),
-                TestStep(18, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster"),
-                TestStep(19, "TH1 sends AddTrustedRootCertificate command to DUT again with the RootCACertificate field set to new_root_cert"),
-                TestStep(20, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster"),
-                TestStep(21, "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to 0"),
-                TestStep(22, "TH1 sends an OpenCommissioningWindow command to the DUT"),
-                TestStep(23, "TH1 connects to the DUT over PASE and sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to 900. Steps 24-26 are all performed over the PASE connection."),
-                TestStep(24, "TH1 Sends CSRRequest command over PASE with the IsForUpdateNOC field set to true"),
+                TestStep(18, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster"),
+                TestStep(19, f"TH1 {send_command('AddTrustedRootCertificate')} to DUT again with the RootCACertificate field set to new_root_cert"),
+                TestStep(20, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster"),
+                TestStep(21, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 0"),
+                TestStep(22, f"TH1 {send_command('OpenCommissioningWindow')} to the DUT"),
+                TestStep(23, f"TH1 connects to the DUT over PASE and {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 900. Steps 24-26 are all performed over the PASE connection."),
+                TestStep(24, f"TH1 {send_command('CSRequest')} over PASE with the IsForUpdateNOC field set to true"),
                 TestStep(25, "TH1 generates a new NOC chain with ICAC with the following properties: new NOC and ICAC using icac_pase"),
-                TestStep(26, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster over PASE")]
+                TestStep(26, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster over PASE")]
 
     @async_test_body
     async def test_TC_OPCREDS_3_4(self):
-        self.step(0)
-
         self.step(1)
         opcreds = Clusters.OperationalCredentials
 
@@ -156,7 +162,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
 
         self.step(12)
         th1_ca_new = self.certificate_authority_manager.NewCertificateAuthority()
-        th1_fabric_admin_new = th1_ca_new.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+        th1_fabric_admin_new = th1_ca_new.NewFabricAdmin(vendorId=0xFFF2, fabricId=self.matter_test_config.fabric_id)
         th1_new = th1_fabric_admin_new.NewController(nodeId=self.default_controller.nodeId+1)
 
         self.step(13)
@@ -172,7 +178,6 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                              "NOCResponse with the StatusCode InvalidNOC")
 
         self.step(15)
-        cmd = opcreds
         # new NOC is generated from the NOCSR returned in csr_update with the matter-fabric-id set to a different
         # value than noc_original. The NOC is signed by new ICA. Save as noc_update_bad_fabric_on_noc.
         noc_update_bad_fabric_on_noc = th1_certs_new.nocBytes
@@ -216,9 +221,6 @@ class TC_OPCREDS_3_4(MatterBaseTest):
         resp = await self.openCommissioningWindow(self.default_controller, self.dut_node_id)
 
         self.step(23)
-        # self.FindAndEstablishPase(dev_ctrl=th1_new_fabric_ctrl, longDiscriminator=resp.randomDiscriminator,
-        #                          setupPinCode=resp.commissioningParameters.setupPinCode, nodeid=th1_dut_node_id)
-        # setupCode = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code
         await self.default_controller.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=self.dut_node_id)
 
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(900)
@@ -232,12 +234,6 @@ class TC_OPCREDS_3_4(MatterBaseTest):
 
         self.step(25)
         new_noc_chain = await self.default_controller.IssueNOCChain(csr_pase, self.dut_node_id)
-        # cmd = opcreds.Commands.AddTrustedRootCertificate(trusted_root_original)
-        # try:
-        #     await self.send_single_cmd(dev_ctrl=th1_new, node_id=self.default_controller.nodeId+1, cmd=cmd)
-        #     asserts.fail("Success when adding trusted root certificate")
-        # except InteractionModelError as e:
-        #     asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected when adding trusted root certificate")
         noc_pase = csr_pase.NOCSRElements
         icac_pase = new_noc_chain.icacBytes
 
