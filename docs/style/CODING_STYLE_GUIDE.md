@@ -15,9 +15,7 @@ the guidelines below.
 ## Language standard
 
 Code in the SDK conforms to the following standards. Changes to the C++ standard
-happen infrequently and there has been only one change from C++14 to C++17 over
-the course of the SDK lifetime. Changes to the Python version happen more
-frequently.
+happen relatively infrequently. Changes to the Python version are more frequent.
 
 | Language | Version |
 | -------- | ------- |
@@ -44,8 +42,8 @@ live as they do there.
 
 ---
 
-Your extensions or fixes to existing code should match the prevailing style of the
-original code.
+Your extensions or fixes to existing code should match the prevailing style of
+the original code.
 
 If you find the conventions so foreign or otherwise confusing, it may be best to
 let whoever owns the file make the necessary changes or seek the counsel of
@@ -62,15 +60,15 @@ be removed.
 
 We use the following auto-formatters on code:
 
-| Language   | Formatter          | Style File                                                                                 |
-| ---------- | ------------------ | ------------------------------------------------------------------------------------------ |
-| C++        | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format) |
+| Language    | Formatter          | Style File                                                                                 |
+| ----------- | ------------------ | ------------------------------------------------------------------------------------------ |
+| C++         | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format) |
 | Objective-C | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format) |
-| java       | google-java-format | N/A                                                                                        |
-| Python     | pep8, isort, ruff  | [.restyled.yaml][restyle_link] (command line), [isort][isort_link], [ruff][ruff_link]      |
-| YAML       | prettier           | None                                                                                       |
-| JSON       | prettier           | None                                                                                       |
-| markdown   | prettier           | None                                                                                       |
+| java        | google-java-format | N/A                                                                                        |
+| Python      | pep8, isort, ruff  | [.restyled.yaml][restyle_link] (command line), [isort][isort_link], [ruff][ruff_link]      |
+| YAML        | prettier           | None                                                                                       |
+| JSON        | prettier           | None                                                                                       |
+| markdown    | prettier           | None                                                                                       |
 
 [restyle_link]:
     https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml
@@ -96,8 +94,8 @@ Examples of these are: `uint8_t`, `int8_t`, etc.
 
 By doing this, you are effectively forcing every other module that includes the
 header to also be using the namespace. This causes namespace pollution and
-generally defeats the purposes of namespaces. Fully-qualified symbols should be
-used instead.
+generally defeats the purposes of namespaces. Fully-qualified symbols or
+namespace blocks should be used instead.
 
 #### Classes / objects not exposed in a header should be in an anonymous namespace
 
