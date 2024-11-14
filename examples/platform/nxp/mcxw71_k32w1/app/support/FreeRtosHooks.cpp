@@ -27,6 +27,9 @@
 #include <stdio.h>
 #include <string.h>
 
+/* Include CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR */
+#include <platform/CHIPDeviceConfig.h>
+
 #if (CHIP_PLAT_NVM_SUPPORT == 1)
 #include "NVM_Interface.h"
 #elif (CHIP_PLAT_NVM_SUPPORT == 3)
@@ -55,6 +58,8 @@
 #define APP_DBG_LOG(...)
 #endif
 
+extern "C" {
+
 static inline void mutex_init(mbedtls_threading_mutex_t * p_mutex)
 {
     assert(p_mutex != NULL);
@@ -73,7 +78,7 @@ static inline int mutex_lock(mbedtls_threading_mutex_t * p_mutex)
 {
     assert(p_mutex != NULL);
     assert(*p_mutex != NULL);
-    return xSemaphoreTake(*p_mutex, portMAX_DELAY) != pdTRUE;
+    return xSemaphoreTake((SemaphoreHandle_t) (*p_mutex), portMAX_DELAY) != pdTRUE;
 }
 
 static inline int mutex_unlock(mbedtls_threading_mutex_t * p_mutex)
@@ -153,3 +158,5 @@ void vApplicationIdleHook(void)
     OTAIdleActivities();
 #endif
 }
+
+} // extern "C"
