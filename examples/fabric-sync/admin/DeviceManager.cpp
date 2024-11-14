@@ -472,6 +472,7 @@ void DeviceManager::HandleCommandResponse(const app::ConcreteCommandPath & path,
     if (path.mClusterId == app::Clusters::CommissionerControl::Id &&
         path.mCommandId == app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::Id)
     {
+        VerifyOrDie(path.mEndpointId == kAggregatorEndpointId);
         HandleReverseOpenCommissioningWindow(data);
     }
 }

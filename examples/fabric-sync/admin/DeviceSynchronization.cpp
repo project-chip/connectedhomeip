@@ -146,12 +146,15 @@ void DeviceSynchronizer::OnReportEnd()
 
 void DeviceSynchronizer::OnDone(app::ReadClient * apReadClient)
 {
+    ChipLogProgress(NotSpecified, "Synchronization complete for NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+
     if (mState == State::ReceivedResponse && !DeviceMgr().IsCurrentBridgeDevice(mNodeId))
     {
         GetUniqueId();
         if (mState == State::GettingUid)
         {
-            // GetUniqueId was successful and we rely on callback to call SynchronizationCompleteAddDevice.
+            ChipLogProgress(NotSpecified,
+                            "GetUniqueId was successful and we rely on callback to call SynchronizationCompleteAddDevice.");
             return;
         }
         SynchronizationCompleteAddDevice();
@@ -198,8 +201,6 @@ void DeviceSynchronizer::OnDeviceConnectionFailure(const ScopedNodeId & peerId, 
 
 void DeviceSynchronizer::StartDeviceSynchronization(Controller::DeviceController * controller, NodeId nodeId, bool deviceIsIcd)
 {
-    ChipLogProgress(NotSpecified, "Start device synchronization");
-
     VerifyOrDie(controller);
     if (mState != State::Idle)
     {
@@ -208,6 +209,8 @@ void DeviceSynchronizer::StartDeviceSynchronization(Controller::DeviceController
     }
 
     mNodeId = nodeId;
+
+    ChipLogProgress(NotSpecified, "Start device synchronization for NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
     mCurrentDeviceData       = SynchronizedDevice_init_default;
     mCurrentDeviceData.id    = chip::ScopedNodeId(nodeId, controller->GetFabricIndex());
@@ -266,6 +269,7 @@ void DeviceSynchronizer::GetUniqueId()
 void DeviceSynchronizer::SynchronizationCompleteAddDevice()
 {
     VerifyOrDie(mState == State::ReceivedResponse || mState == State::GettingUid);
+    ChipLogProgress(NotSpecified, "Synchronization complete and add device");
 
     bridge::FabricBridge::Instance().AddSynchronizedDevice(mCurrentDeviceData);
 
