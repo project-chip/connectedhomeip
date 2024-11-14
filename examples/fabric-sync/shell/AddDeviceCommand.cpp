@@ -51,7 +51,7 @@ void AddDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
     {
         ChipLogProgress(NotSpecified, "Successfully paired device: NodeId: " ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
-        admin::DeviceMgr().UpdateLastUsedNodeId(mNodeId);
+        admin::DeviceManager::Instance().UpdateLastUsedNodeId(mNodeId);
     }
     else
     {
@@ -64,7 +64,7 @@ void AddDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 
 CHIP_ERROR AddDeviceCommand::RunCommand()
 {
-    if (admin::DeviceMgr().IsCurrentBridgeDevice(mNodeId))
+    if (admin::DeviceManager::Instance().IsCurrentBridgeDevice(mNodeId))
     {
         // print to console
         fprintf(stderr, "The specified node ID has been reserved by the Fabric Bridge.\n");
@@ -76,7 +76,7 @@ CHIP_ERROR AddDeviceCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    return admin::DeviceMgr().PairRemoteDevice(mNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
+    return admin::DeviceManager::Instance().PairRemoteDevice(mNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
 }
 
 } // namespace commands

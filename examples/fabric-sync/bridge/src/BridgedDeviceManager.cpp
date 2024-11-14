@@ -175,9 +175,6 @@ const EmberAfDeviceType sBridgedDeviceTypes[] = { { DEVICE_TYPE_BRIDGED_NODE, DE
 
 } // namespace
 
-// Define the static member
-BridgedDeviceManager BridgedDeviceManager::sInstance;
-
 void BridgedDeviceManager::Init()
 {
     mFirstDynamicEndpointId = static_cast<chip::EndpointId>(

@@ -54,6 +54,12 @@ class DeviceManager
 public:
     DeviceManager() = default;
 
+    static DeviceManager & Instance()
+    {
+        static DeviceManager instance;
+        return instance;
+    }
+
     void Init();
 
     chip::NodeId GetNextAvailableNodeId();
@@ -170,8 +176,6 @@ public:
     SyncedDevice * FindDeviceByNode(chip::NodeId nodeId);
 
 private:
-    friend DeviceManager & DeviceMgr();
-
     void RequestCommissioningApproval();
 
     void HandleReadSupportedDeviceCategories(chip::TLV::TLVReader & data);
@@ -183,8 +187,6 @@ private:
     void SendCommissionNodeRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
 
     void HandleReverseOpenCommissioningWindow(chip::TLV::TLVReader & data);
-
-    static DeviceManager sInstance;
 
     chip::NodeId mLastUsedNodeId = 0;
 
@@ -200,20 +202,5 @@ private:
     CommissionerControl mCommissionerControl;
     FabricSyncGetter mFabricSyncGetter;
 };
-
-/**
- * Returns the public interface of the DeviceManager singleton object.
- *
- * Applications should use this to access features of the DeviceManager
- * object.
- */
-inline DeviceManager & DeviceMgr()
-{
-    if (!DeviceManager::sInstance.mInitialized)
-    {
-        DeviceManager::sInstance.Init();
-    }
-    return DeviceManager::sInstance;
-}
 
 } // namespace admin

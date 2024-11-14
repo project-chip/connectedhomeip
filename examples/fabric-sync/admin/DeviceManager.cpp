@@ -36,9 +36,6 @@ constexpr EndpointId kAggregatorEndpointId = 1;
 
 } // namespace
 
-// Define the static member
-DeviceManager DeviceManager::sInstance;
-
 LinuxCommissionableDataProvider sCommissionableDataProvider;
 
 void DeviceManager::Init()

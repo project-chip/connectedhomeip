@@ -81,7 +81,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
         return;
     }
 
-    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+    BridgedDevice * device = BridgedDeviceManager::Instance().GetDevice(endpointId);
     if (device == nullptr || !device->IsIcd())
     {
         handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Failure);
@@ -125,7 +125,7 @@ CHIP_ERROR BridgeInit(FabricAdminDelegate * delegate)
     CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler);
     AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes);
 
-    BridgeDeviceMgr().Init();
+    BridgedDeviceManager::Instance().Init();
     FabricBridge::Instance().SetDelegate(delegate);
     ReturnErrorOnFailure(gBridgedAdministratorCommissioning.Init());
     ReturnErrorOnFailure(CommissionerControlInit(delegate));

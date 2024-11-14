@@ -52,7 +52,7 @@ void RemoveDeviceCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
 
 CHIP_ERROR RemoveDeviceCommand::RunCommand()
 {
-    if (admin::DeviceMgr().IsCurrentBridgeDevice(mNodeId))
+    if (admin::DeviceManager::Instance().IsCurrentBridgeDevice(mNodeId))
     {
         // print to console
         fprintf(stderr, "The specified node ID has been reserved by the Fabric Bridge.\n");
@@ -63,7 +63,7 @@ CHIP_ERROR RemoveDeviceCommand::RunCommand()
 
     ChipLogProgress(NotSpecified, "Running RemoveDeviceCommand with Node ID: %lu", mNodeId);
 
-    return admin::DeviceMgr().UnpairRemoteDevice(mNodeId);
+    return admin::DeviceManager::Instance().UnpairRemoteDevice(mNodeId);
 }
 
 } // namespace commands

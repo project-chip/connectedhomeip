@@ -36,7 +36,7 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Read(const ConcreteReadAttributePa
     // Registration is done for the bridged device basic information only
     VerifyOrDie(path.mClusterId == app::Clusters::BridgedDeviceBasicInformation::Id);
 
-    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(path.mEndpointId);
+    BridgedDevice * dev = BridgedDeviceManager::Instance().GetDevice(path.mEndpointId);
     VerifyOrReturnError(dev != nullptr, CHIP_ERROR_NOT_FOUND);
 
     switch (path.mAttributeId)
@@ -93,7 +93,7 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Write(const ConcreteDataAttributeP
 {
     VerifyOrDie(path.mClusterId == app::Clusters::BridgedDeviceBasicInformation::Id);
 
-    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(path.mEndpointId);
+    BridgedDevice * dev = BridgedDeviceManager::Instance().GetDevice(path.mEndpointId);
     VerifyOrReturnError(dev != nullptr, CHIP_ERROR_NOT_FOUND);
 
     if (!dev->IsReachable())
