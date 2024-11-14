@@ -136,12 +136,12 @@ class MdnsAsyncServiceInfo(ServiceInfo):
                     this_question_type = question_type or DNSQuestionType.QU if first_request else DNSQuestionType.QM
                     out: DNSOutgoing = self._generate_request_query(this_question_type, record_type)
                     first_request = False
-                    
+
                     if out.questions:
                         zc.async_send(out, addr, port)
                     next_ = now + delay
                     next_ += randint(*_AVOID_SYNC_DELAY_RANDOM_INTERVAL)
-                    
+
                     if this_question_type is DNSQuestionType.QM and delay < _DUPLICATE_QUESTION_INTERVAL:
                         delay = _DUPLICATE_QUESTION_INTERVAL
 
