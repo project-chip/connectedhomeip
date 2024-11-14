@@ -44,7 +44,7 @@ live as they do there.
 
 ---
 
-Your extensions or fixes to existing code should match the prevailing of the
+Your extensions or fixes to existing code should match the prevailing style of the
 original code.
 
 If you find the conventions so foreign or otherwise confusing, it may be best to
@@ -65,7 +65,7 @@ We use the following auto-formatters on code:
 | Language   | Formatter          | Style File                                                                                 |
 | ---------- | ------------------ | ------------------------------------------------------------------------------------------ |
 | C++        | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format) |
-| ObjectiveC | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format) |
+| Objective-C | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format) |
 | java       | google-java-format | N/A                                                                                        |
 | Python     | pep8, isort, ruff  | [.restyled.yaml][restyle_link] (command line), [isort][isort_link], [ruff][ruff_link]      |
 | YAML       | prettier           | None                                                                                       |
@@ -92,7 +92,7 @@ non-volatile storage or across a network is concerned.
 
 Examples of these are: `uint8_t`, `int8_t`, etc.
 
-#### Avoid `using namespace` Statements in Headers
+#### Avoid top-level `using namespace` Statements in Headers
 
 By doing this, you are effectively forcing every other module that includes the
 header to also be using the namespace. This causes namespace pollution and
