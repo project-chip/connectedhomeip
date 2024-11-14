@@ -24,6 +24,7 @@ def read_attribute(attribute: str, cluster: typing.Optional[str] = None):
     else:
         return attr
 
+
 def send_command(command: str, cluster: typing.Optional[str] = None):
     cmd = f"sends the {command} command"
     if cluster:
