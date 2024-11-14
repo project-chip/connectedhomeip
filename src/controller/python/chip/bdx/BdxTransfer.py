@@ -24,7 +24,7 @@ from . import Bdx
 
 @dataclass
 class InitMessage:
-    # The transfer control flag constants SENDER_DRIVE, RECEIVER_DRIVE, and ASYNC are defined in Constants.py.
+    # The transfer control flag constants SENDER_DRIVE, RECEIVER_DRIVE, and ASYNC are defined in BdxProtocol.py.
     TransferControlFlags: int
     MaxBlockSize: int
     StartOffset: int
