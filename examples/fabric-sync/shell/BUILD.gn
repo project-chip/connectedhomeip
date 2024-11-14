@@ -31,6 +31,7 @@ source_set("shell") {
     "AddBridgeCommand.h",
     "AddDeviceCommand.cpp",
     "AddDeviceCommand.h",
+    "CommandRegistry.cpp",
     "CommandRegistry.h",
     "RemoveBridgeCommand.cpp",
     "RemoveBridgeCommand.h",

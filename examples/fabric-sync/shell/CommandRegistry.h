@@ -38,16 +38,23 @@ public:
         return instance;
     }
 
-    void SetActiveCommand(std::unique_ptr<Command> command) { mActiveCommand = std::move(command); }
+    void SetActiveCommand(std::unique_ptr<Command> command, uint32_t timeoutSeconds = 30);
 
     Command * GetActiveCommand() { return mActiveCommand.get(); }
 
-    void ResetActiveCommand() { mActiveCommand.reset(); }
+    void ResetActiveCommand();
 
     bool IsCommandActive() const { return mActiveCommand != nullptr; }
 
 private:
     CommandRegistry() = default;
+
+    static void OnTimeout(chip::System::Layer * layer, void * appState)
+    {
+        // Callback function to reset the command when the timer expires
+        static_cast<CommandRegistry *>(appState)->ResetActiveCommand();
+    }
+
     std::unique_ptr<Command> mActiveCommand;
 };
 
