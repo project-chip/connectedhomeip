@@ -61,6 +61,8 @@ CHIP_ERROR RemoveDeviceCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
+    ChipLogProgress(NotSpecified, "Running RemoveDeviceCommand with Node ID: %lu", mNodeId);
+
     return admin::DeviceMgr().UnpairRemoteDevice(mNodeId);
 }
 
