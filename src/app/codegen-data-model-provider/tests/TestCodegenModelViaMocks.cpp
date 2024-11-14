@@ -875,26 +875,41 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
     CodegenDataModelProviderWithContext model;
 
     // This iteration relies on the hard-coding that occurs when mock_ember is used
-    EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
+    EndpointEntry ep = model.FirstEndpoint();
+    EXPECT_EQ(ep.id, kMockEndpoint1);
+    ep = model.NextEndpoint(kMockEndpoint1);
+    EXPECT_EQ(ep.id, kMockEndpoint2);
+    ep = model.NextEndpoint(kMockEndpoint2);
+    EXPECT_EQ(ep.id, kMockEndpoint3);
+    EXPECT_EQ(model.NextEndpoint(kMockEndpoint3), EndpointEntry::kInvalid);
 
     /// Some out of order requests should work as well
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
-    EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
-    EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
+    ep = model.NextEndpoint(kMockEndpoint2);
+    EXPECT_EQ(ep.id, kMockEndpoint3);
+    ep = model.NextEndpoint(kMockEndpoint2);
+    EXPECT_EQ(ep.id, kMockEndpoint3);
+    ep = model.NextEndpoint(kMockEndpoint1);
+    EXPECT_EQ(ep.id, kMockEndpoint2);
+    ep = model.NextEndpoint(kMockEndpoint1);
+    EXPECT_EQ(ep.id, kMockEndpoint2);
+    ep = model.NextEndpoint(kMockEndpoint2);
+    EXPECT_EQ(ep.id, kMockEndpoint3);
+    ep = model.NextEndpoint(kMockEndpoint1);
+    EXPECT_EQ(ep.id, kMockEndpoint2);
+    ep = model.NextEndpoint(kMockEndpoint3);
+    EXPECT_EQ(ep.id, kInvalidEndpointId);
+    ep = model.NextEndpoint(kMockEndpoint3);
+    EXPECT_EQ(ep.id, kInvalidEndpointId);
+    ep = model.FirstEndpoint();
+    EXPECT_EQ(ep.id, kMockEndpoint1);
+    ep = model.FirstEndpoint();
+    EXPECT_EQ(ep.id, kMockEndpoint1);
 
     // invalid endpoiunts
-    EXPECT_EQ(model.NextEndpoint(kInvalidEndpointId), kInvalidEndpointId);
-    EXPECT_EQ(model.NextEndpoint(987u), kInvalidEndpointId);
+    ep = model.NextEndpoint(kInvalidEndpointId);
+    EXPECT_EQ(ep.id, kInvalidEndpointId);
+    ep = model.NextEndpoint(987u);
+    EXPECT_EQ(ep.id, kInvalidEndpointId);
 }
 
 TEST(TestCodegenModelViaMocks, IterateOverClusters)
