@@ -55,6 +55,11 @@ OID_PRODUCT_ID = x509.ObjectIdentifier("1.3.6.1.4.1.37244.2.2")
 PRODUCTION_NODE_URL = "https://on.dcl.csa-iot.org:26657"
 PRODUCTION_NODE_URL_REST = "https://on.dcl.csa-iot.org"
 TEST_NODE_URL_REST = "https://on.test-net.dcl.csa-iot.org"
+DATA_DIR = "data"
+REVOCATION_LIST_JSON = DATA_DIR + "/" + "revocation_list.json"
+CRL_DER = DATA_DIR + "/" + "crl_der"
+SAME_ISSUER_POINT = DATA_DIR + "/" + "same_issuer_point"
+ISSUER_CERT = DATA_DIR + "/" + "issuer_cert"
 
 
 def extract_single_integer_attribute(subject, oid):
@@ -100,7 +105,9 @@ def get_akid(cert: x509.Certificate) -> Optional[bytes]:
         return None
 
 
-def get_skid(cert: x509.Certificate) -> Optional[bytes]:
+def get_skid(cert: x509.Certificate) -> Optional[bytes]:    
+    logging.debug(f"get_skid: {cert}")
+
     try:
         return cert.extensions.get_extension_for_oid(x509.OID_SUBJECT_KEY_IDENTIFIER).value.key_identifier
     except Exception:
@@ -153,7 +160,6 @@ def validate_cert_chain(crl_signer: x509.Certificate, crl_signer_delegator: x509
     3. CRL Signer delegator is PAA, and we can validate (crl_signer -> crl_signer_delegator(paa) -> paa) chain
     4. CRL Signer delegator is PAI, and we can validate (crl_signer -> crl_signer_delegator -> paa) chain
     '''
-
     if crl_signer_delegator:
         return verify_cert(crl_signer, crl_signer_delegator) and verify_cert(crl_signer_delegator, paa)
     else:
@@ -187,6 +193,34 @@ def validate_vid_pid(revocation_point: dict, crl_signer_certificate: x509.Certif
 
     return True
 
+def get_crl_file(
+    revocation_point: dict,
+    crl_signer_certificate: x509.Certificate,
+    use_local_data: bool,
+) -> x509.CertificateRevocationList:
+    """Obtain the CRL."""
+    crl_signer_subject_key_id = (
+        crl_signer_certificate.extensions.get_extension_for_oid(
+            x509.OID_SUBJECT_KEY_IDENTIFIER
+        ).value.key_identifier
+    )
+    logging.debug(f"crl_signer_subject_key_id: {crl_signer_subject_key_id}")
+    if use_local_data:
+        crl_subject_key_id_hex = "".join("{:02X}".format(x) for x in crl_signer_subject_key_id)
+        logging.debug(
+            "Reading CRL from "
+            + CRL_DER
+            + "."
+            + crl_subject_key_id_hex
+        )
+        with open(CRL_DER + "." + crl_subject_key_id_hex, "rb") as infile:
+            crl_content = infile.read()
+            crl_file = x509.load_der_x509_crl(crl_content)
+    else:
+        crl_file = fetch_crl_from_url(
+            revocation_point["dataURL"], 5
+        )  # timeout in seconds
+    return crl_file
 
 def fetch_crl_from_url(url: str, timeout: int) -> x509.CertificateRevocationList:
     logging.debug(f"Fetching CRL from {url}")
@@ -204,7 +238,7 @@ class DCLDClient:
 
     '''
 
-    def __init__(self, use_rest: bool, dcld_exe: str, production: bool, rest_node_url: str):
+    def __init__(self, use_local_data: bool, use_rest: bool, dcld_exe: str, production: bool):
         '''
         Initialize the client
 
@@ -217,12 +251,12 @@ class DCLDClient:
         rest_node_url: str
             RESTful API URL
         '''
-
+        self.use_local_data = use_local_data
         self.use_rest = use_rest
         self.dcld_exe = dcld_exe
         self.production = production
-        self.rest_node_url = rest_node_url
-
+        self.rest_node_url = PRODUCTION_NODE_URL_REST if production else TEST_NODE_URL_REST
+    
     def build_dcld_command_line(self, cmdlist: list[str]) -> list[str]:
         '''
         Build command line for `dcld` executable.
@@ -272,57 +306,17 @@ class DCLDClient:
             List of revocation points
         '''
 
-        if self.use_rest:
+        if self.use_local_data:
+            with open(REVOCATION_LIST_JSON, "r") as f:
+                response = json.load(f)
+        elif self.use_rest:
             response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points").json()
         else:
             response = self.get_dcld_cmd_output_json(['query', 'pki', 'all-revocation-points'])
 
         return response["PkiRevocationDistributionPoint"]
 
-    def get_issuer_cert(self, cert: x509.Certificate) -> Optional[x509.Certificate]:
-        '''
-        Get the issuer certificate for
-
-        Parameters
-        ----------
-        cert: x509.Certificate
-            Certificate
-
-        Returns
-        -------
-        str
-            Issuer certificate in PEM format
-        '''
-        issuer_name_b64 = get_issuer_b64(cert)
-        akid = get_akid(cert)
-        if akid is None:
-            return
-
-        # Convert CRL Signer AKID to colon separated hex
-        akid_hex = akid.hex().upper()
-        akid_hex = ':'.join([akid_hex[i:i+2] for i in range(0, len(akid_hex), 2)])
-
-        logging.debug(
-            f"Fetching issuer from:{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}")
-
-        if self.use_rest:
-            response = requests.get(
-                f"{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}").json()
-        else:
-            response = self.get_dcld_cmd_output_json(
-                ['query', 'pki', 'x509-cert', '-u', issuer_name_b64, '-k', akid_hex])
-
-        issuer_certificate = response["approvedCertificates"]["certs"][0]["pemCert"]
-
-        logging.debug(f"issuer: {issuer_certificate}")
-
-        try:
-            issuer_certificate_object = x509.load_pem_x509_certificate(bytes(issuer_certificate, 'utf-8'))
-        except Exception:
-            logging.error('Failed to parse PAA certificate')
-            return
-
-        return issuer_certificate_object
+ 
 
     def get_revocations_points_by_skid(self, issuer_subject_key_id) -> list[dict]:
         '''
@@ -339,7 +333,10 @@ class DCLDClient:
             List of revocation points
         '''
 
-        if self.use_rest:
+        if self.use_local_data:
+            with open(SAME_ISSUER_POINT + "." + issuer_subject_key_id, "r") as f:
+                response = json.load(f)
+        elif self.use_rest:
             response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points/{issuer_subject_key_id}").json()
         else:
             response = self.get_dcld_cmd_output_json(['query', 'pki', 'revocation-points',
@@ -347,10 +344,67 @@ class DCLDClient:
 
         return response["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]["points"]
 
+    def get_paa_cert(self, initial_cert: x509.Certificate) -> Optional[x509.Certificate]:
+        """Get the PAA certificate for the CRL Signer Certificate."""
+        issuer_name_b64 = get_issuer_b64(initial_cert)
+        akid = get_akid(initial_cert)
+        if akid is None:
+            return
+        paa_certificate = None
+        while not paa_certificate:
+            try:
+                issuer_certificate = None
+                response = None
+                akid_hex = akid.hex().upper()
+                if self.use_local_data:
+                    logging.debug(
+                        "Reading issuer from " + ISSUER_CERT + "." + akid_hex
+                    )
+                    with open(ISSUER_CERT + "." + akid_hex, "r") as infile:
+                        issuer_certificate = x509.load_pem_x509_certificate(bytes(infile.read(),'utf-8'))
+                        if is_self_signed_certificate(issuer_certificate):
+                            paa_certificate = issuer_certificate
+                            logging.debug(f"Found PAA certificate: {paa_certificate}")
+                            break
+                elif self.use_rest:
+                    akid_hex = ':'.join([akid_hex[i:i+2] for i in range(0, len(akid_hex), 2)])
+                    logging.debug(
+                        f"Fetching issuer from:{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}")
+                    response = requests.get(
+                        f"{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}").json()
+                    if response["approvedCertificates"]["certs"][0]["pemCert"]:
+                        issuer_certificate = x509.load_pem_x509_certificate(bytes(response["approvedCertificates"]["certs"][0]["pemCert"],'utf-8'))
+                    else:
+                        raise requests.exception.NotFound(f"No certificate found for {self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}") 
+                else:
+                    query_cmd_list = ['query', 'pki', 'x509-cert', '-u', issuer_name_b64, '-k', akid_hex]
+                    response = self.get_dcld_cmd_output_json(
+                        ['query', 'pki', 'x509-cert', '-u', issuer_name_b64, '-k', akid_hex])
+                    if response["approvedCertificates"]["certs"][0]["pemCert"]:
+                        issuer_certificate = x509.load_pem_x509_certificate(bytes(response["approvedCertificates"]["certs"][0]["pemCert"],'utf-8'))
+                    else:
+                        raise requests.exception.NotFound(f"No certificate found for dcl query{' '.join(query_cmd_list)}")
+                if response["approvedCertificates"]["certs"][0]["isRoot"]:
+                    paa_certificate = issuer_certificate
+                    break
+            except Exception as e:
+                logging.error('Failed to get PAA certificate', e)
+                return
+            issuer_name_b64 = get_issuer_b64(issuer_certificate)
+            akid = get_akid(issuer_certificate)
+        if paa_certificate is None:
+            logging.warning("PAA Certificate not found, continue...")
+        return paa_certificate
 
 @click.command()
 @click.help_option('-h', '--help')
 @optgroup.group('Input data sources', cls=RequiredMutuallyExclusiveOptionGroup)
+@optgroup.option(
+    "--use-local-data",
+    is_flag=True,
+    type=bool,
+    help="Fake response directory: see /" + DATA_DIR,
+)
 @optgroup.option('--use-main-net-dcld', type=str, default='', metavar='PATH', help="Location of `dcld` binary, to use `dcld` for mirroring MainNet.")
 @optgroup.option('--use-test-net-dcld', type=str, default='', metavar='PATH', help="Location of `dcld` binary, to use `dcld` for mirroring TestNet.")
 @optgroup.option('--use-main-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public MainNet observer.")
@@ -361,7 +415,7 @@ class DCLDClient:
 @optgroup.option('--log-level', default='INFO', show_default=True, type=click.Choice(__LOG_LEVELS__.keys(),
                                                                                      case_sensitive=False), callback=lambda c, p, v: __LOG_LEVELS__[v],
                  help='Determines the verbosity of script output')
-def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool, use_test_net_http: bool, output: str, log_level: str):
+def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool, use_test_net_http: bool, use_local_data: bool, output: str, log_level: str):
     """Tool to construct revocation set from DCL"""
 
     logging.basicConfig(
@@ -370,21 +424,11 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
         datefmt='%Y-%m-%d %H:%M:%S'
     )
 
-    production = False
-    dcld = use_test_net_dcld
-
-    if len(use_main_net_dcld) > 0:
-        dcld = use_main_net_dcld
-        production = True
-
     use_rest = use_main_net_http or use_test_net_http
-    if use_main_net_http:
-        production = True
+    dcld = use_main_net_dcld if use_main_net_dcld else use_test_net_dcld
+    production = use_main_net_http or use_main_net_dcld
 
-    rest_node_url = PRODUCTION_NODE_URL_REST if production else TEST_NODE_URL_REST
-
-    dcld_client = DCLDClient(use_rest, dcld, production, rest_node_url)
-
+    dcld_client = DCLDClient(use_local_data, use_rest, dcld, production)
     revocation_point_list = dcld_client.get_revocation_points()
 
     revocation_set = []
@@ -418,17 +462,17 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
             continue
 
         # 5. Validate the certification path containing CRLSignerCertificate.
-        paa_certificate_object = dcld_client.get_issuer_cert(crl_signer_certificate)
+        paa_certificate_object = dcld_client.get_paa_cert(crl_signer_certificate)
         if paa_certificate_object is None:
             logging.warning("PAA Certificate not found, continue...")
             continue
 
-        if validate_cert_chain(crl_signer_certificate, crl_signer_delegator_cert, paa_certificate_object) is False:
+        if not validate_cert_chain(crl_signer_certificate, crl_signer_delegator_cert, paa_certificate_object):
             logging.warning("Failed to validate CRL Signer Certificate chain, continue...")
             continue
 
         # 6. Obtain the CRL
-        crl_file = fetch_crl_from_url(revocation_point["dataURL"], 5)  # timeout in seconds
+        crl_file = get_crl_file(revocation_point, crl_signer_certificate, use_local_data)
         if crl_file is None:
             continue
 
@@ -448,8 +492,9 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
 
         if count_with_matching_vid_issuer_skid > 1:
             try:
-                issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
-                    x509.OID_ISSUING_DISTRIBUTION_POINT).value
+              issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
+                  x509.oid.ExtensionOID.ISSUING_DISTRIBUTION_POINT
+              ).value
             except Exception:
                 logging.warning("CRL Issuing Distribution Point not found, continue...")
                 continue
@@ -465,8 +510,8 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
 
         # TODO: 8. Validate CRL as per Section 6.3 of RFC 5280
 
-        # 9. decide on certificate authority name and AKID
-        if revocation_point["isPAA"] and not is_self_signed_certificate(crl_signer_certificate):
+        # 9. Decide on certificate authority to match against CRL entries.
+        if revocation_point["isPAA"]:
             certificate_authority_name_b64 = get_subject_b64(paa_certificate_object)
             certificate_akid = get_skid(paa_certificate_object)
         elif crl_signer_delegator_cert:
