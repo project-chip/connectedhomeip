@@ -40,7 +40,7 @@
 #endif
 
 #include "CHIPDevicePlatformConfig.h"
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;

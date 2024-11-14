@@ -102,7 +102,7 @@ public:
      * This function can be overridden in order to implement a specific disallow mechanism.
      *
      */
-    virtual void AppMatter_DisallowDeviceToSleep(void) {}
+    virtual void AppMatter_DisallowDeviceToSleep(void);
 
     /**
      * \brief Allow entering low power mode.
@@ -110,7 +110,7 @@ public:
      * This function can be overridden in order to implement a specific allow mechanism.
      *
      */
-    virtual void AppMatter_AllowDeviceToSleep(void) {}
+    virtual void AppMatter_AllowDeviceToSleep(void);
 
     /**
      * \brief Print onboarding information.

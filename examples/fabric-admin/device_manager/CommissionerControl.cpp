@@ -1,7 +1,27 @@
+/*
+ *   Copyright (c) 2024 Project CHIP Authors
+ *   All rights reserved.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+
 #include "CommissionerControl.h"
-#include <device_manager/DeviceManager.h>
+#include "DeviceManager.h"
 
 using namespace ::chip;
+
+namespace admin {
 
 void CommissionerControl::Init(Controller::DeviceCommissioner & commissioner, NodeId nodeId, EndpointId endpointId)
 {
@@ -64,7 +84,7 @@ void CommissionerControl::OnResponse(app::CommandSender * client, const app::Con
 
     if (data != nullptr)
     {
-        DeviceMgr().HandleCommandResponse(path, *data);
+        DeviceManager::Instance().HandleCommandResponse(path, *data);
     }
 }
 
@@ -102,6 +122,9 @@ void CommissionerControl::OnDone(app::CommandSender * client)
 
 CHIP_ERROR CommissionerControl::SendCommandForType(CommandType commandType, DeviceProxy * device)
 {
+    ChipLogProgress(AppServer, "Sending command with Endpoint ID: %d, Command Type: %d", mEndpointId,
+                    static_cast<int>(commandType));
+
     switch (commandType)
     {
     case CommandType::kRequestCommissioningApproval:
@@ -139,3 +162,5 @@ void CommissionerControl::OnDeviceConnectionFailureFn(void * context, const Scop
     VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
     self->OnDone(nullptr);
 }
+
+} // namespace admin
