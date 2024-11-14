@@ -122,13 +122,13 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
                         ReturnErrorOnFailure(encoder.Encode(endpointEntry.id));
                         break;
                     }
-                    auto endpointInfo =
+                    auto parentEndpointInfo =
                         InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpointInfo(parentEndpointId);
-                    if (!endpointInfo.has_value())
+                    if (!parentEndpointInfo.has_value())
                     {
                         break;
                     }
-                    parentEndpointId = endpointInfo->parentId;
+                    parentEndpointId = parentEndpointInfo->parentId;
                 }
                 endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextEndpoint(endpointEntry.id);
             }
