@@ -20,10 +20,10 @@ import enum
 from random import randint
 from typing import TYPE_CHECKING, Optional
 
-from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis, service_type_name)
-from zeroconf._utils.net import _encode_address
-from zeroconf.const import (_CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME,
-                            _MDNS_PORT, _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT)
+from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis,
+                      service_type_name)
+from zeroconf.const import (_CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME, _MDNS_PORT, _TYPE_A,
+                            _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT)
 
 _AVOID_SYNC_DELAY_RANDOM_INTERVAL = (20, 120)
 
