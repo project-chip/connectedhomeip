@@ -19,7 +19,7 @@
 # Generates a basic RevocationSet from TestNet or MainNet.
 # Note: Indirect CRLs are only supported with py cryptography version 44.0.0.
 #       You may need to patch in a change locally if you are using an older
-#       version of py cryptography. The required changes can be viewed in this 
+#       version of py cryptography. The required changes can be viewed in this
 #       PR: https://github.com/pyca/cryptography/pull/11467/files. The file that
 #       needs to be patched is accessible from your local connectedhomeip
 #       directory at ./.environment/pigweed-venv/lib/python3.11/site-packages/cryptography/x509/extensions.py
@@ -327,16 +327,19 @@ class DCLDClient:
                     response = requests.get(
                         f"{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}").json()
                     if response["approvedCertificates"]["certs"][0]["pemCert"]:
-                        issuer_certificate = x509.load_pem_x509_certificate(bytes(response["approvedCertificates"]["certs"][0]["pemCert"],'utf-8'))
+                        issuer_certificate = x509.load_pem_x509_certificate(
+                            bytes(response["approvedCertificates"]["certs"][0]["pemCert"], 'utf-8'))
                     else:
-                        raise requests.exception.NotFound(f"No certificate found for {self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}") 
+                        raise requests.exception.NotFound(
+                            f"No certificate found for {self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}")
                 else:
                     query_cmd_list = ['query', 'pki', 'x509-cert', '-u', issuer_name_b64, '-k', akid_hex]
 
                     response = self.get_dcld_cmd_output_json(
                         ['query', 'pki', 'x509-cert', '-u', issuer_name_b64, '-k', akid_hex])
                     if response["approvedCertificates"]["certs"][0]["pemCert"]:
-                        issuer_certificate = x509.load_pem_x509_certificate(bytes(response["approvedCertificates"]["certs"][0]["pemCert"],'utf-8'))
+                        issuer_certificate = x509.load_pem_x509_certificate(
+                            bytes(response["approvedCertificates"]["certs"][0]["pemCert"], 'utf-8'))
                     else:
                         raise requests.exception.NotFound(f"No certificate found for dcl query{' '.join(query_cmd_list)}")
                 if response["approvedCertificates"]["certs"][0]["isRoot"]:
@@ -351,6 +354,7 @@ class DCLDClient:
         if paa_certificate is None:
             logging.warning("PAA Certificate not found, continue...")
         return paa_certificate
+
 
 @click.command()
 @click.help_option('-h', '--help')
@@ -452,9 +456,9 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
 
         if count_with_matching_vid_issuer_skid > 1:
             try:
-              issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
-                  x509.oid.ExtensionOID.ISSUING_DISTRIBUTION_POINT
-              ).value
+                issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
+                    x509.oid.ExtensionOID.ISSUING_DISTRIBUTION_POINT
+                ).value
             except Exception:
                 logging.warning("CRL Issuing Distribution Point not found, continue...")
                 continue
