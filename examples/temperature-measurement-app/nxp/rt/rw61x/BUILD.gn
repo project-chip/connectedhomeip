@@ -124,7 +124,7 @@ rt_executable("temperature-sensor") {
     "../../common/main/DeviceCallbacks.cpp",
     "../../common/main/ZclCallbacks.cpp",
     "../../common/main/include/AppEvent.h",
-    "../../common/include/AppTask.h",
+    "../../common/main/include/AppTask.h",
     "../../common/main/include/DeviceCallbacks.h",
     "../../common/main/main.cpp",
     "../../common/main/TemperatureSensorManager.cpp",
