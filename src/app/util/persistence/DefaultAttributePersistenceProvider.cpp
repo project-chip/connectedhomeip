@@ -13,8 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 
-#include <app/DefaultAttributePersistenceProvider.h>
 #include <app/util/ember-strings.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>

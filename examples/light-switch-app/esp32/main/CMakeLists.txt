@@ -30,6 +30,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util/persistence"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/icd/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/access-control-server"

@@ -45,6 +45,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/icd/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util/persistence"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/administrator-commissioning-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/air-quality-server"

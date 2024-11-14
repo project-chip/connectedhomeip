@@ -51,6 +51,7 @@ target_sources(app PRIVATE
                main/AppTask.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
+               ${CHIP_ROOT}/src/app/util/persistence/DeferredAttributePersistenceProvider.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/PWMDevice.cpp)
 

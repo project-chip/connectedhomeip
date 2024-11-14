@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <app/DeferredAttributePersistenceProvider.h>
+#include <app/util/persistence/DeferredAttributePersistenceProvider.h>
 
 #include <platform/CHIPDeviceLayer.h>
 

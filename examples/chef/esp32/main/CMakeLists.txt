@@ -79,6 +79,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util/persistence"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
 )
 

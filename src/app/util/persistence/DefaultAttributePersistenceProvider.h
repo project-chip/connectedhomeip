@@ -15,8 +15,8 @@
  */
 #pragma once
 
-#include <app/AttributePersistenceProvider.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 

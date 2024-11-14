@@ -15,7 +15,7 @@
  */
 #pragma once
 
-#include <app/AttributePersistenceProvider.h>
+#include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <system/SystemClock.h>

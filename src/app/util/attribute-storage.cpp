@@ -20,7 +20,6 @@
 #include <app/util/attribute-storage-detail.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
@@ -28,6 +27,7 @@
 #include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
+#include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>

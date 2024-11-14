@@ -100,7 +100,10 @@ if (chip_build_tests) {
     }
 
     if (chip_device_platform != "efr32") {
-      tests += [ "${chip_root}/src/app/tests" ]
+      tests += [
+        "${chip_root}/src/app/tests",
+        "${chip_root}/src/app/util/persistence/tests",
+      ]
 
       # Disabled for EFR32 because _open is not implemented.
       # https://github.com/project-chip/connectedhomeip/issues/35624

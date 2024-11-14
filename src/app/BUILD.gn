@@ -389,6 +389,18 @@ source_set("command-handler-impl") {
   ]
 }
 
+source_set("attribute-persistence") {
+  sources = [ "SafeAttributePersistenceProvider.h" ]
+
+  public_deps = [
+    ":paths",
+    "${chip_root}/src/app/data-model:nullable",
+    "${chip_root}/src/app/util:types",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:span",
+  ]
+}
+
 # Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.
 # This way, we can have a better understanding of dependencies and other componenets can depend on the different source_sets without needing to depend on the entire app library.
 static_library("app") {
@@ -398,15 +410,10 @@ static_library("app") {
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePathExpandIterator.h",
-    "AttributePersistenceProvider.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
-    "DefaultAttributePersistenceProvider.cpp",
-    "DefaultAttributePersistenceProvider.h",
-    "DeferredAttributePersistenceProvider.cpp",
-    "DeferredAttributePersistenceProvider.h",
     "EventLogging.h",
     "EventManagement.cpp",
     "EventManagement.h",
@@ -416,7 +423,6 @@ static_library("app") {
     "GenericEventManagementTestEventTriggerHandler.h",
     "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
-    "SafeAttributePersistenceProvider.h",
     "TimerDelegates.cpp",
     "TimerDelegates.h",
     "WriteHandler.cpp",

@@ -24,7 +24,6 @@
 #include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
-#include <app/DefaultAttributePersistenceProvider.h>
 #include <app/FailSafeContext.h>
 #include <app/OperationalSessionSetupPool.h>
 #include <app/SimpleSubscriptionResumptionStorage.h>
@@ -80,6 +79,11 @@
 #include <app/icd/server/ICDCheckInBackOffStrategy.h>        // nogncheck
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_CIP
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+// TODO: https://github.com/project-chip/connectedhomeip/issues/36472
+//       this strongly couples Server to Ember and this dependency should
+//       be removed
+#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 
 namespace chip {
 
