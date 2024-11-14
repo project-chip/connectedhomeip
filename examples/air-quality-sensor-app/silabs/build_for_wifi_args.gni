@@ -15,7 +15,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/config/standalone/args.gni")
 
 silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
-import("${chip_root}/src/platform/silabs/wifi_args.gni")
+import("${chip_root}/src/platform/silabs/wifi/args.gni")
 chip_enable_wifi = true
 chip_enable_ota_requestor = true
 app_data_model =

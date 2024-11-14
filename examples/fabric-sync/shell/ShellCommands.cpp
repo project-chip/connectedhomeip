@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -134,7 +133,7 @@ static CHIP_ERROR HandleAddDeviceCommand(int argc, char ** argv)
     const char * remoteAddr = argv[3];
     uint16_t remotePort     = static_cast<uint16_t>(strtoul(argv[4], nullptr, 10));
 
-    auto command = std::make_unique<commands::AddBridgeCommand>(nodeId, setupPINCode, remoteAddr, remotePort);
+    auto command = std::make_unique<commands::AddDeviceCommand>(nodeId, setupPINCode, remoteAddr, remotePort);
 
     CHIP_ERROR result = command->RunCommand();
     if (result == CHIP_NO_ERROR)

@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Matter/MTRAttributeValueWaiter.h>
+#import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
 
@@ -121,6 +122,11 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * A non-nil value if the product identifier has been determined from the device, nil if unknown.
  */
 @property (nonatomic, readonly, nullable, copy) NSNumber * productID MTR_NEWLY_AVAILABLE;
+
+/**
+ * Network commissioning features supported by the device.
+ */
+@property (nonatomic, readonly) MTRNetworkCommissioningFeature networkCommissioningFeatures MTR_NEWLY_AVAILABLE;
 
 /**
  * Set the delegate to receive asynchronous callbacks about the device.
