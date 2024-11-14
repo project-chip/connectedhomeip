@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-# These BDX constants are defined by the spec.
+# These BDX constants are defined in the spec.
 
 # SendInit/ReceiveInit Proposed Transfer Control field structure.
 SENDER_DRIVE = 0x10

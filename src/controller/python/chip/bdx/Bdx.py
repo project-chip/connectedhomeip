@@ -37,9 +37,10 @@ _OnDataReceivedCallbackFunct = CFUNCTYPE(None, py_object, c_uint8_p, c_size_t)
 _OnTransferCompletedCallbackFunct = CFUNCTYPE(None, py_object, PyChipError)
 
 
-# The Python context when obtaining a transfer. This is passed into the C++ code to be sent back to Python as part
-# of the callback when a transfer is obtained.
 class AsyncTransferObtainedTransaction:
+    ''' The Python context when obtaining a transfer. This is passed into the C++ code to be sent back to Python as part
+    of the callback when a transfer is obtained, and sets the result of the future after being called back.
+    '''
     def __init__(self, future, event_loop, data=None):
         self._future = future
         self._data = data
@@ -59,9 +60,10 @@ class AsyncTransferObtainedTransaction:
         self._event_loop.call_soon_threadsafe(self._handleError, result)
 
 
-# The Python context when accepting a transfer. This is passed into the C++ code to be sent back to Python as part
-# of the callback when the transfer completes.
 class AsyncTransferCompletedTransaction:
+    ''' The Python context when accepting a transfer. This is passed into the C++ code to be sent back to Python as part
+    of the callback when the transfer completes, and sets the result of the future after being called back.
+    '''
     def __init__(self, future, event_loop):
         self._future = future
         self._event_loop = event_loop
@@ -111,8 +113,12 @@ def _OnTransferCompletedCallback(transaction: AsyncTransferCompletedTransaction,
     transaction.handleResult(result)
 
 
-# Prepares the BDX system for a BDX transfer.
 def _PrepareForBdxTransfer(future: Future, data: Optional[bytes]) -> PyChipError:
+    ''' Prepares the BDX system for a BDX transfer. The BDX transfer is set as the future's result. This must be called
+    before the BDX transfer is initiated.
+
+    Returns the CHIP_ERROR result from the C++ side.
+    '''
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncTransferObtainedTransaction(future=future, event_loop=asyncio.get_running_loop(), data=data)
 
@@ -125,17 +131,36 @@ def _PrepareForBdxTransfer(future: Future, data: Optional[bytes]) -> PyChipError
     return res
 
 
-# Prepares the BDX system for a BDX transfer where this device receives data.
 def PrepareToReceiveBdxData(future: Future) -> PyChipError:
+    ''' Prepares the BDX system for a BDX transfer where this device receives data. This must be called before the BDX
+    transfer is initiated.
+
+    When a BDX transfer is found it's set as the future's result. If an error occurs while waiting it is set as the future's exception.
+
+    Returns an error if there was an issue preparing to wait a BDX transfer.
+    '''
     return _PrepareForBdxTransfer(future, None)
 
 
-# Prepares the BDX system for a BDX transfer where this device sends data.
 def PrepareToSendBdxData(future: Future, data: bytes) -> PyChipError:
+    ''' Prepares the BDX system for a BDX transfer where this device sends data. This must be called before the BDX
+    transfer is initiated.
+
+    When a BDX transfer is found it's set as the future's result. If an error occurs while waiting it is set as the future's exception.
+
+    Returns an error if there was an issue preparing to wait a BDX transfer.
+    '''
     return _PrepareForBdxTransfer(future, data)
 
 
 def AcceptTransferAndReceiveData(transfer: c_void_p, dataReceivedClosure: Callable[[bytes], None], transferComplete: Future):
+    ''' Accepts a BDX transfer with the intent of receiving data.
+
+    The data will be returned block-by-block in dataReceivedClosure.
+    transferComplete will be fulfilled when the transfer completes.
+
+    Returns an error if one is encountered while accepting the transfer.
+    '''
     handle = chip.native.GetLibraryHandle()
     complete_transaction = AsyncTransferCompletedTransaction(future=transferComplete, event_loop=asyncio.get_running_loop())
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(dataReceivedClosure))
@@ -150,6 +175,13 @@ def AcceptTransferAndReceiveData(transfer: c_void_p, dataReceivedClosure: Callab
 
 
 def AcceptTransferAndSendData(transfer: c_void_p, data: bytearray, transferComplete: Future):
+    ''' Accepts a BDX transfer with the intent of sending data.
+
+    The data will be copied by C++.
+    transferComplete will be fulfilled when the transfer completes.
+
+    Returns an error if one is encountered while accepting the transfer.
+    '''
     handle = chip.native.GetLibraryHandle()
     complete_transaction = AsyncTransferCompletedTransaction(future=transferComplete, event_loop=asyncio.get_running_loop())
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(complete_transaction))
@@ -162,6 +194,10 @@ def AcceptTransferAndSendData(transfer: c_void_p, data: bytearray, transferCompl
 
 
 async def RejectTransfer(transfer: c_void_p):
+    ''' Rejects a BDX transfer.
+
+    Returns an error if one is encountered while rejecting the transfer.
+    '''
     handle = chip.native.GetLibraryHandle()
     return await builtins.chipStack.CallAsyncWithResult(
         lambda: handle.pychip_Bdx_RejectTransfer(transfer)

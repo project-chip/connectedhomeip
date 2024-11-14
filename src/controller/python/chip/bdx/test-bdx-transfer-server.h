@@ -33,7 +33,7 @@ namespace bdx {
 //
 // The controller must inform this manager when a transfer is expected:
 //   bdxTransferServer->ExpectATransfer();
-// At which point the next unsolicited BDX message will allocate a BdxTransfer object.
+// At which point the next unsolicited BDX init message will allocate a BdxTransfer object.
 class TestBdxTransferServer : public Messaging::UnsolicitedMessageHandler
 {
 public:

@@ -24,6 +24,8 @@ from . import Bdx
 
 @dataclass
 class InitMessage:
+    ''' The details of the init message received at the start of a BDX transfer.
+    '''
     # The transfer control flag constants SENDER_DRIVE, RECEIVER_DRIVE, and ASYNC are defined in BdxProtocol.py.
     TransferControlFlags: int
     MaxBlockSize: int
@@ -34,6 +36,12 @@ class InitMessage:
 
 
 class BdxTransfer:
+    ''' A representation of a BDX transfer.
+
+    This is created when a BDX init message is received, and stores the details of that init message.
+    The transfer can be accepted by calling accept_and_send_data or accept_and_receive_data.
+    The transfer can be rejected by calling reject.
+    '''
     def __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data: bytes = None):
         self.init_message = init_message
         self._bdx_transfer = bdx_transfer
@@ -41,6 +49,8 @@ class BdxTransfer:
         self._data = bytearray(data) if data else None
 
     async def accept_and_send_data(self) -> None:
+        ''' Accepts the transfer with the intent of sending data.
+        '''
         assert self._data is not None
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
@@ -49,6 +59,10 @@ class BdxTransfer:
         await future
 
     async def accept_and_receive_data(self) -> bytes:
+        ''' Accepts the transfer with the intent of receiving data.
+
+        Returns the data received when the transfer is complete.
+        '''
         assert self._data is None
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
@@ -59,5 +73,7 @@ class BdxTransfer:
         return bytes(self._data)
 
     async def reject(self) -> None:
+        ''' Rejects the transfer.
+        '''
         res = await Bdx.RejectTransfer(self._bdx_transfer)
         res.raise_on_error()
