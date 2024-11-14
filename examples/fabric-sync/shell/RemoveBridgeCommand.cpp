@@ -57,10 +57,12 @@ CHIP_ERROR RemoveBridgeCommand::RunCommand()
     {
         // print to console
         fprintf(stderr, "Remote Fabric Bridge is not configured yet, nothing to remove.\n");
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     mBridgeNodeId = bridgeNodeId;
+
+    ChipLogProgress(NotSpecified, "Running RemoveBridgeCommand");
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 

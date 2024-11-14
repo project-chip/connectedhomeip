@@ -7783,14 +7783,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"HDRModeEnabled";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentVideoCodecsID:
-            result = @"CurrentVideoCodecs";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentSnapshotConfigID:
-            result = @"CurrentSnapshotConfig";
-            break;
-
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID:
             result = @"FabricsUsingCamera";
             break;
