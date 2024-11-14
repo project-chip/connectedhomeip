@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -17,6 +16,8 @@
  */
 
 #include "PairingManager.h"
+#include "DeviceManager.h"
+#include "DeviceSynchronization.h"
 
 #include <netdb.h>
 #include <sys/socket.h>
@@ -284,6 +285,10 @@ void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     {
         // print to console
         fprintf(stderr, "New device with Node ID: " ChipLogFormatX64 " has been successfully added.\n", ChipLogValueX64(nodeId));
+
+        // mCommissioner has a lifetime that is the entire life of the application itself
+        // so it is safe to provide to StartDeviceSynchronization.
+        DeviceSynchronizer::Instance().StartDeviceSynchronization(mCommissioner, nodeId, false);
     }
     else
     {
