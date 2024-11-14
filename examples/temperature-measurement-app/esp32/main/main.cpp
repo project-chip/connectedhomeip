@@ -76,12 +76,6 @@ extern const char TAG[] = "temperature-measurement-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 
-#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-using namespace chip::Tracing::Diagnostics;
-static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE];
-static size_t buffer_size = CONFIG_END_USER_BUFFER_SIZE;
-#endif
-
 static void InitServer(intptr_t context)
 {
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
@@ -94,7 +88,7 @@ extern "C" void app_main()
 #endif
 
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    static ESP32Diagnostics diagnosticBackend(endUserBuffer, buffer_size);
+    static ESP32Diagnostics diagnosticBackend(endUserBuffer, DIAGNOSTIC_BUFFER_SIZE);
     Tracing::Register(diagnosticBackend);
 #endif
 
