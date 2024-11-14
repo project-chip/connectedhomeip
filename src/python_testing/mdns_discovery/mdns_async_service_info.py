@@ -28,7 +28,6 @@ from zeroconf._utils.net import _encode_address
 from zeroconf.const import (_CLASS_IN, _DNS_HOST_TTL, _DNS_OTHER_TTL, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME,
                             _MDNS_PORT, _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT)
 
-
 _AVOID_SYNC_DELAY_RANDOM_INTERVAL = (20, 120)
 
 

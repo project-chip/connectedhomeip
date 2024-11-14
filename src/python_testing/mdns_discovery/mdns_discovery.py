@@ -309,7 +309,6 @@ class MdnsDiscovery:
             3000,
             record_type=record_type)
 
-        # if not service_type:
         if record_type in [DNSRecordType.A, DNSRecordType.AAAA]:
             # Service type not supplied so we can
             # query against the target/server
