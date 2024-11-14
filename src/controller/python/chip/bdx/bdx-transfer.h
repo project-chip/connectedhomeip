@@ -29,7 +29,8 @@ namespace chip {
 namespace bdx {
 
 // A class that represents a BDX transfer initiated by the other end of the transfer. This implements most of the transfer,
-// but uses a delegate for transfer control and data handling.
+// but uses a delegate for transfer control and data handling. The delegate must call one of ReceiveData, SendData, or Reject
+// after or during a call to InitMessageReceived.
 class BdxTransfer : public Responder
 {
 public:
@@ -51,13 +52,13 @@ public:
 
     ~BdxTransfer() override = default;
 
-    // Accepts the transfer. When a block of data arrives the delegate is invoked with the block. This must only be called if the
-    // transfer sends data to this controller.
-    CHIP_ERROR AcceptSend();
+    // Accepts the transfer with the intent of receiving data. This will send an AcceptSend message to the other end of the
+    // transfer. When a block of data arrives the delegate is invoked with the block.
+    CHIP_ERROR AcceptAndReceiveData();
 
-    // Accepts the transfer. The data provided here will be sent over the transfer. This must only be called if the transfer
-    // receives data from this controller.
-    CHIP_ERROR AcceptReceive(const ByteSpan & data_to_send);
+    // Accepts the transfer with the intent of sending data. This will send an AcceptReceive message to the other end of the
+    // transfer.
+    CHIP_ERROR AcceptAndSendData(const ByteSpan & data_to_send);
 
     // Rejects the transfer.
     CHIP_ERROR Reject();

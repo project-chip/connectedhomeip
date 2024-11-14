@@ -235,24 +235,24 @@ PyChipError pychip_Bdx_StopExpectingBdxTransfer(PyObject transferObtainedContext
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-// Accepts a "Send" transfer, i.e. one where the other device will send data.
-PyChipError pychip_Bdx_AcceptSendTransfer(chip::bdx::BdxTransfer * transfer, PyObject dataReceivedContext,
-                                          PyObject transferCompletedContext)
+// Accepts a transfer with the intent to receive data from the other device.
+PyChipError pychip_Bdx_AcceptTransferAndReceiveData(chip::bdx::BdxTransfer * transfer, PyObject dataReceivedContext,
+                                                    PyObject transferCompletedContext)
 {
     TransferInfo * transferInfo              = gTransfers.TransferInfoForTransfer(transfer);
     transferInfo->OnDataReceivedContext      = dataReceivedContext;
     transferInfo->OnTransferCompletedContext = transferCompletedContext;
-    return ToPyChipError(transfer->AcceptSend());
+    return ToPyChipError(transfer->AcceptAndReceiveData());
 }
 
-// Accepts a "Receive" transfer, i.e. one where the other device will receive data.
-PyChipError pychip_Bdx_AcceptReceiveTransfer(chip::bdx::BdxTransfer * transfer, const uint8_t * dataBuffer, size_t dataLength,
-                                             PyObject transferCompletedContext)
+// Accepts a transfer with the intent to send data to the other device.
+PyChipError pychip_Bdx_AcceptTransferAndSendData(chip::bdx::BdxTransfer * transfer, const uint8_t * dataBuffer, size_t dataLength,
+                                                 PyObject transferCompletedContext)
 {
     TransferInfo * transferInfo              = gTransfers.TransferInfoForTransfer(transfer);
     transferInfo->OnTransferCompletedContext = transferCompletedContext;
     chip::ByteSpan data(dataBuffer, dataLength);
-    return ToPyChipError(transfer->AcceptReceive(data));
+    return ToPyChipError(transfer->AcceptAndSendData(data));
 }
 
 // Rejects a transfer.

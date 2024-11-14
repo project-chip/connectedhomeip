@@ -34,7 +34,7 @@ void BdxTransfer::SetDelegate(BdxTransfer::Delegate * delegate)
     mDelegate = delegate;
 }
 
-CHIP_ERROR BdxTransfer::AcceptSend()
+CHIP_ERROR BdxTransfer::AcceptAndReceiveData()
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;
@@ -47,7 +47,7 @@ CHIP_ERROR BdxTransfer::AcceptSend()
     return mTransfer.AcceptTransfer(acceptData);
 }
 
-CHIP_ERROR BdxTransfer::AcceptReceive(const ByteSpan & data_to_send)
+CHIP_ERROR BdxTransfer::AcceptAndSendData(const ByteSpan & data_to_send)
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;

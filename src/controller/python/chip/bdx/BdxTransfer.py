@@ -44,7 +44,7 @@ class BdxTransfer:
         assert self._data is not None
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
-        res = Bdx.AcceptReceiveTransfer(self._bdx_transfer, self._data, future)
+        res = Bdx.AcceptTransferAndSendData(self._bdx_transfer, self._data, future)
         res.raise_on_error()
         await future
 
@@ -53,7 +53,7 @@ class BdxTransfer:
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
         self._data = bytearray()
-        res = Bdx.AcceptSendTransfer(self._bdx_transfer, lambda data: self._data.extend(data), future)
+        res = Bdx.AcceptTransferAndReceiveData(self._bdx_transfer, lambda data: self._data.extend(data), future)
         res.raise_on_error()
         await future
         return bytes(self._data)

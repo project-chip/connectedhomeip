@@ -135,13 +135,13 @@ def PrepareToSendBdxData(future: Future, data: bytes) -> PyChipError:
     return _PrepareForBdxTransfer(future, data)
 
 
-def AcceptSendTransfer(transfer: c_void_p, dataReceivedClosure: Callable[[bytes], None], transferComplete: Future):
+def AcceptTransferAndReceiveData(transfer: c_void_p, dataReceivedClosure: Callable[[bytes], None], transferComplete: Future):
     handle = chip.native.GetLibraryHandle()
     complete_transaction = AsyncTransferCompletedTransaction(future=transferComplete, event_loop=asyncio.get_running_loop())
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(dataReceivedClosure))
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(complete_transaction))
     res = builtins.chipStack.Call(
-        lambda: handle.pychip_Bdx_AcceptSendTransfer(transfer, dataReceivedClosure, complete_transaction)
+        lambda: handle.pychip_Bdx_AcceptTransferAndReceiveData(transfer, dataReceivedClosure, complete_transaction)
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(dataReceivedClosure))
@@ -149,12 +149,12 @@ def AcceptSendTransfer(transfer: c_void_p, dataReceivedClosure: Callable[[bytes]
     return res
 
 
-def AcceptReceiveTransfer(transfer: c_void_p, data: bytearray, transferComplete: Future):
+def AcceptTransferAndSendData(transfer: c_void_p, data: bytearray, transferComplete: Future):
     handle = chip.native.GetLibraryHandle()
     complete_transaction = AsyncTransferCompletedTransaction(future=transferComplete, event_loop=asyncio.get_running_loop())
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(complete_transaction))
     res = builtins.chipStack.Call(
-        lambda: handle.pychip_Bdx_AcceptReceiveTransfer(transfer, c_char_p(data), len(data), complete_transaction)
+        lambda: handle.pychip_Bdx_AcceptTransferAndSendData(transfer, c_char_p(data), len(data), complete_transaction)
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(complete_transaction))
@@ -178,9 +178,9 @@ def Init():
                    PyChipError, [py_object])
         setter.Set('pychip_Bdx_StopExpectingBdxTransfer',
                    PyChipError, [py_object])
-        setter.Set('pychip_Bdx_AcceptSendTransfer',
+        setter.Set('pychip_Bdx_AcceptTransferAndReceiveData',
                    PyChipError, [c_void_p, py_object, py_object])
-        setter.Set('pychip_Bdx_AcceptReceiveTransfer',
+        setter.Set('pychip_Bdx_AcceptTransferAndSendData',
                    PyChipError, [c_void_p, c_uint8_p, c_size_t])
         setter.Set('pychip_Bdx_RejectTransfer',
                    PyChipError, [c_void_p])
