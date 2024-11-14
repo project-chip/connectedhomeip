@@ -58,7 +58,7 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 
 CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & curTime)
 {
-#if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
+#if CONFIG_ENABLE_AMEBA_SNTP
     time_t seconds = 0, uSeconds = 0;
 
     if (matter_sntp_rtc_is_sync()) // if RTC is already sync with SNTP, read directly from RTC
@@ -111,7 +111,7 @@ CHIP_ERROR InitClock_RealTime()
         Clock::Microseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * UINT64_C(1000000)));
     // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
     // Then the RealTime obtained from GetClock_RealTime will be always valid.
-#if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
+#if CONFIG_ENABLE_AMEBA_SNTP
     time_t seconds = 0, uSeconds = 0;
 
     matter_sntp_init();
