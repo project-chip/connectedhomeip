@@ -1452,6 +1452,7 @@ toJson
 tokenization
 tokenized
 tokenizer
+toml
 toolchain
 toolchains
 topologies
