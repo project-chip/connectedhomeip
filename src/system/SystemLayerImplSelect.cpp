@@ -213,7 +213,8 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
 #if !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     // Note: The dispatch-based implementation (using sockets but not Network.framework) requires this as a fallback
     // for testing purposes. However, it is not needed for LIBEV or when using Network.framework (which lacks a testing
-    // configuration). (and dead code is also not allowed with -Werror).
+    // configuration).  Since dead code is also not allowed with -Werror, we need to ifdef this code out
+    // in those configurations.
     if (mTimerList.Add(timer) == timer)
     {
         // The new timer is the earliest, so the time until the next event has probably changed.
@@ -337,7 +338,8 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
 #if !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     // Note: The dispatch-based implementation (using sockets but not Network.framework) requires this as a fallback
     // for testing purposes. However, it is not needed for LIBEV or when using Network.framework (which lacks a testing
-    // configuration). (and dead code is also not allowed with -Werror).
+    // configuration). Since dead code is also not allowed with -Werror, we need to ifdef this code out
+    // in those configurations.
     // Ideally we would not use a timer here at all, but if we try to just
     // ScheduleLambda the lambda needs to capture the following:
     // 1) onComplete
