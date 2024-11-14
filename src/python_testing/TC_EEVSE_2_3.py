@@ -194,7 +194,6 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
             f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight%60)}"
             f" Expected target_time = {target_time}")
 
-
         matter_base_time = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
 
         target_time_delta = target_time - matter_base_time
