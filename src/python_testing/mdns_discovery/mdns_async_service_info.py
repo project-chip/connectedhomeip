@@ -16,16 +16,13 @@
 #
 
 
-import asyncio
 import enum
-from ipaddress import IPv4Address, IPv6Address
 from random import randint
-from typing import TYPE_CHECKING, Dict, List, Optional, Set
+from typing import TYPE_CHECKING, Optional
 
-from zeroconf import (BadTypeInNameException, DNSAddress, DNSOutgoing, DNSPointer, DNSQuestion, DNSQuestionType, DNSRecord,
-                      DNSService, DNSText, ServiceInfo, Zeroconf, current_time_millis, service_type_name)
+from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis, service_type_name)
 from zeroconf._utils.net import _encode_address
-from zeroconf.const import (_CLASS_IN, _DNS_HOST_TTL, _DNS_OTHER_TTL, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME,
+from zeroconf.const import (_CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME,
                             _MDNS_PORT, _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT)
 
 _AVOID_SYNC_DELAY_RANDOM_INTERVAL = (20, 120)
@@ -51,50 +48,15 @@ class MdnsAsyncServiceInfo(ServiceInfo):
     def __init__(
         self,
         name: str,
-        type_: str,
-        port: Optional[int] = None,
-        weight: int = 0,
-        priority: int = 0,
-        server: Optional[str] = None,
-        host_ttl: int = _DNS_HOST_TTL,
-        other_ttl: int = _DNS_OTHER_TTL,
-        *,
-        addresses: Optional[List[bytes]] = None,
-        parsed_addresses: Optional[List[str]] = None,
-        interface_index: Optional[int] = None,
+        type_: str
     ) -> None:
-        # Accept both none, or one, but not both.
-        if addresses is not None and parsed_addresses is not None:
-            raise TypeError("addresses and parsed_addresses cannot be provided together")
 
         if type_ and not type_.endswith(service_type_name(name, strict=False)):
             raise BadTypeInNameException
 
-        self.interface_index = interface_index
         self._name = name
         self.type = type_
         self.key = name.lower()
-        self._ipv4_addresses: List[IPv4Address] = []
-        self._ipv6_addresses: List[IPv6Address] = []
-        if addresses is not None:
-            self.addresses = addresses
-        elif parsed_addresses is not None:
-            self.addresses = [_encode_address(a) for a in parsed_addresses]
-        self.port = port
-        self.weight = weight
-        self.priority = priority
-        self.server = server if server else None
-        self.server_key = server.lower() if server else None
-        self._properties: Optional[Dict[bytes, Optional[bytes]]] = None
-        self._decoded_properties: Optional[Dict[str, Optional[str]]] = None
-        self.host_ttl = host_ttl
-        self.other_ttl = other_ttl
-        self._new_records_futures: Optional[Set[asyncio.Future]] = None
-        self._dns_address_cache: Optional[List[DNSAddress]] = None
-        self._dns_pointer_cache: Optional[DNSPointer] = None
-        self._dns_service_cache: Optional[DNSService] = None
-        self._dns_text_cache: Optional[DNSText] = None
-        self._get_address_and_nsec_records_cache: Optional[Set[DNSRecord]] = None
 
     async def async_request(
         self,
