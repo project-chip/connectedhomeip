@@ -176,7 +176,7 @@ MTR_DIRECT_MEMBERS
 // expected value for the relevant attribute.
 - (void)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path;
 
-- (void)_attributeWaitCanceled:(MTRAttributeValueWaiter *)attributeValueWaiter;
+- (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter;
 
 @end
 
