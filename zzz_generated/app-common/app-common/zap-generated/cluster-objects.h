@@ -41542,7 +41542,7 @@ namespace SnapshotStreamAllocate {
 enum class Fields : uint8_t
 {
     kImageCodec    = 0,
-    kFrameRate     = 1,
+    kMaxFrameRate  = 1,
     kBitRate       = 2,
     kMinResolution = 3,
     kMaxResolution = 4,
@@ -41557,7 +41557,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
-    uint16_t frameRate        = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
     uint32_t bitRate          = static_cast<uint32_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
@@ -41577,7 +41577,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
-    uint16_t frameRate        = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
     uint32_t bitRate          = static_cast<uint32_t>(0);
     Structs::VideoResolutionStruct::DecodableType minResolution;
     Structs::VideoResolutionStruct::DecodableType maxResolution;
@@ -41932,31 +41932,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HDRModeEnabled
-namespace CurrentVideoCodecs {
-struct TypeInfo
-{
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentVideoCodecs::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentVideoCodecs
-namespace CurrentSnapshotConfig {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type;
-    using DecodableType    = chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentSnapshotConfig::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentSnapshotConfig
 namespace FabricsUsingCamera {
 struct TypeInfo
 {
@@ -42343,8 +42318,6 @@ struct TypeInfo
         Attributes::MaxNetworkBandwidth::TypeInfo::DecodableType maxNetworkBandwidth = static_cast<uint32_t>(0);
         Attributes::CurrentFrameRate::TypeInfo::DecodableType currentFrameRate       = static_cast<uint16_t>(0);
         Attributes::HDRModeEnabled::TypeInfo::DecodableType HDRModeEnabled           = static_cast<bool>(0);
-        Attributes::CurrentVideoCodecs::TypeInfo::DecodableType currentVideoCodecs;
-        Attributes::CurrentSnapshotConfig::TypeInfo::DecodableType currentSnapshotConfig;
         Attributes::FabricsUsingCamera::TypeInfo::DecodableType fabricsUsingCamera;
         Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
         Attributes::AllocatedAudioStreams::TypeInfo::DecodableType allocatedAudioStreams;

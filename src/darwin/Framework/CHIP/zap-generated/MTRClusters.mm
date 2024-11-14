@@ -19397,16 +19397,6 @@ using chip::System::Clock::Timeout;
     [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHDRModeEnabledID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentVideoCodecsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentVideoCodecsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentSnapshotConfigWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentSnapshotConfigID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeFabricsUsingCameraWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID) params:params];
@@ -19430,17 +19420,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeRankedVideoStreamPrioritiesListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRankedVideoStreamPrioritiesListID) params:params];
-}
-
-- (void)writeAttributeRankedVideoStreamPrioritiesListWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeRankedVideoStreamPrioritiesListWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeRankedVideoStreamPrioritiesListWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRankedVideoStreamPrioritiesListID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSoftRecordingPrivacyModeEnabledWithParams:(MTRReadParams * _Nullable)params
