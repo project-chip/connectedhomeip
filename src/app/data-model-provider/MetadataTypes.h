@@ -20,11 +20,11 @@
 #include <optional>
 
 #include <access/Privilege.h>
-#include <app/data-model/List.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
@@ -35,7 +35,7 @@ namespace DataModel {
 
 enum class EndpointCompositionPattern : uint8_t
 {
-    kTreePattern = 0x1,
+    kTreePattern       = 0x1,
     kFullFamilyPattern = 0x2,
 };
 

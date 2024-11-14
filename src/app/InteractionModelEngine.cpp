@@ -1781,7 +1781,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 
     // At this point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
     // is invalid
-    for (DataModel::EndpointEntry ep = provider->FirstEndpoint(); ep.IsValid(); ep= provider->NextEndpoint(ep.id))
+    for (DataModel::EndpointEntry ep = provider->FirstEndpoint(); ep.IsValid(); ep = provider->NextEndpoint(ep.id))
     {
         if (ep.id == aCommandPath.mEndpointId)
         {
