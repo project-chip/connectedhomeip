@@ -151,6 +151,7 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/inc",
 
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/inc",
     ]
 
     if (sl_enable_rgb_led) {
@@ -624,11 +625,13 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/common/src/sl_assert.c",
       "${efr32_sdk_root}/platform/common/src/sl_core_cortexm.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
+      "${efr32_sdk_root}/platform/common/src/sl_string.c",
       "${efr32_sdk_root}/platform/common/src/sli_cmsis_os2_ext_task_register.c",
       "${efr32_sdk_root}/util/third_party/freertos/cmsis/Source/cmsis_os2.c",
       "${wifi_sdk_root}/components/protocol/wifi/si91x/sl_wifi.c",
 
       # wifi component
+      "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_basic_credentials.c",
       "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_callback_framework.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net.c",
 
@@ -636,8 +639,8 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_certificate_store.c",
 
       # basic_network_manager component
-      "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_credentials.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_profiles.c",
+      "${wifi_sdk_root}/components/service/network_manager/src/sl_net_credentials.c",
 
       # ble component
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
@@ -660,19 +663,27 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/aux_reference_volt_config.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_adc.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_dac.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_opamp.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_spi.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_bod.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_adc.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_bjt_temperature_sensor.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_dma.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_driver_gpio.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_peripheral_drivers/src/sl_si91x_peripheral_gpio.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.c",
@@ -685,10 +696,10 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/memory/malloc_buffers.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_callback_framework.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c",
 
@@ -713,6 +724,8 @@ template("siwx917_sdk") {
       "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_ulp_timer_init.c",
       "${sdk_support_root}/matter/si91x/support/hal/rsi_hal_mcu_m4.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/src/sl_si91x_button.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sl_si91x_clock_manager.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sli_si91x_clock_manager.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c",
 
       # sl memory manager
