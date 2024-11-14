@@ -96,7 +96,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
         if nocs[0].icac:
             icac_original = nocs[0].icac
         else:
-            asserts.assert_true(False, "Unexpected fail reading ICAC Value on NOCs response")
+            asserts.fail("Unexpected fail reading ICAC Value on NOCs response")
 
         self.step(3)
         trusted_root_list_original = await self.read_single_attribute_check_success(
@@ -128,10 +128,10 @@ class TC_OPCREDS_3_4(MatterBaseTest):
 
         self.step(7)
         cmd = opcreds.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=False)
-        csr_not_updated = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
+        csr_not_update = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
 
         self.step(8)
-        new_noc_chain = await self.default_controller.IssueNOCChain(csr_not_updated, self.dut_node_id)
+        new_noc_chain = await self.default_controller.IssueNOCChain(csr_not_update, self.dut_node_id)
         noc_not_for_update = new_noc_chain.nocBytes
         icac_not_for_update = new_noc_chain.icacBytes
 
