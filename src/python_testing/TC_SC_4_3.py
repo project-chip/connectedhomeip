@@ -278,6 +278,7 @@ class TC_SC_4_3(MatterBaseTest):
 
         quada_record = await mdns.get_service_by_record_type(
             service_name=hostname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
             record_type=DNSRecordType.AAAA,
             log_output=True
         )

@@ -303,12 +303,14 @@ class MdnsDiscovery:
             self._zc.remove_service_listener(service_listener)
 
         # Prepare and perform query
-        service_info = MdnsAsyncServiceInfo(self._zc, name=service_name, type_=service_type)
+        service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
         is_discovered = await service_info.async_request(
+            self._zc,
             3000,
             record_type=record_type)
 
-        if not service_type:
+        # if not service_type:
+        if record_type in [DNSRecordType.A, DNSRecordType.AAAA]:
             # Service type not supplied so we can
             # query against the target/server
             for protocols in self._zc.engine.protocols:
