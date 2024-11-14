@@ -17,7 +17,11 @@ import("${chip_root}/src/app/chip_data_model.gni")
 import("${chip_root}/src/lib/lib.gni")
 
 config("config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    ".",
+    "${chip_root}/examples/common",
+    "${chip_root}/examples/platform/linux",
+  ]
 }
 
 chip_data_model("fabric-bridge-zap") {
@@ -41,15 +45,22 @@ source_set("fabric-bridge-lib") {
   public_configs = [ ":config" ]
 
   sources = [
+    "include/Bridge.h",
     "include/BridgedAdministratorCommissioning.h",
     "include/BridgedDevice.h",
     "include/BridgedDeviceBasicInformationImpl.h",
     "include/BridgedDeviceManager.h",
     "include/CHIPProjectAppConfig.h",
+    "include/CommissionerControlDelegate.h",
+    "include/FabricAdminDelegate.h",
+    "include/FabricBridge.h",
+    "src/Bridge.cpp",
     "src/BridgedAdministratorCommissioning.cpp",
     "src/BridgedDevice.cpp",
     "src/BridgedDeviceBasicInformationImpl.cpp",
     "src/BridgedDeviceManager.cpp",
+    "src/CommissionerControlDelegate.cpp",
+    "src/FabricBridge.cpp",
   ]
 
   deps = [
