@@ -192,6 +192,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
 
 BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
 BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
+AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 
 } // namespace
@@ -199,6 +200,7 @@ BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 CHIP_ERROR BridgeInit(FabricAdminDelegate * delegate)
 {
     MatterEcosystemInformationPluginServerInitCallback();
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
     CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler);
     AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes);
 
