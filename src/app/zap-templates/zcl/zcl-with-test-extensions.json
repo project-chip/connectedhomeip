@@ -295,6 +295,21 @@
             "ClientsSupportedPerFabric",
             "MaximumCheckInBackOff"
         ],
+        "Network Commissioning": [
+            "MaxNetworks",
+            "Networks",
+            "ScanMaxTimeSeconds",
+            "ConnectMaxTimeSeconds",
+            "InterfaceEnabled",
+            "LastNetworkingStatus",
+            "LastNetworkID",
+            "LastConnectErrorValue",
+            "SupportedWiFiBands",
+            "SupportedThreadFeatures",
+            "ThreadVersion",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",

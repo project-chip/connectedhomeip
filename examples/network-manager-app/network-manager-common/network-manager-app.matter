@@ -1639,17 +1639,17 @@ endpoint 0 {
   }
 
   server cluster NetworkCommissioning {
-    ram      attribute maxNetworks;
+    callback attribute maxNetworks;
     callback attribute networks;
-    callback attribute interfaceEnabled default = 0;
+    callback attribute interfaceEnabled;
     callback attribute lastNetworkingStatus;
     callback attribute lastNetworkID;
     callback attribute lastConnectErrorValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 0;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster GeneralDiagnostics {
