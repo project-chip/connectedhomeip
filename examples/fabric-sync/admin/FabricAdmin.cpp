@@ -38,6 +38,27 @@ FabricAdmin & FabricAdmin::Instance()
     return sInstance;
 }
 
+CHIP_ERROR FabricAdmin::OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams params, FabricIndex fabricIndex)
+{
+    ScopedNodeId scopedNodeId(params.GetNodeId(), fabricIndex);
+    uint32_t iterations              = params.GetIteration();
+    uint16_t discriminator           = params.GetDiscriminator();
+    uint16_t commissioningTimeoutSec = static_cast<uint16_t>(params.GetTimeout().count());
+
+    // Log request details for debugging purposes
+    ChipLogProgress(NotSpecified,
+                    "Received OpenCommissioningWindow request: NodeId " ChipLogFormatX64
+                    ", Timeout: %u, Iterations: %u, Discriminator: %u",
+                    ChipLogValueX64(scopedNodeId.GetNodeId()), commissioningTimeoutSec, iterations, discriminator);
+
+    // Open the device commissioning window with provided salt and verifier data
+    DeviceManager::Instance().OpenDeviceCommissioningWindow(scopedNodeId, iterations, commissioningTimeoutSec, discriminator,
+                                                            ByteSpan(params.GetSalt().data(), params.GetSalt().size()),
+                                                            ByteSpan(params.GetVerifier().data(), params.GetVerifier().size()));
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 FabricAdmin::CommissionRemoteBridge(Controller::CommissioningWindowPasscodeParams params, VendorId vendorId, uint16_t productId)
 {

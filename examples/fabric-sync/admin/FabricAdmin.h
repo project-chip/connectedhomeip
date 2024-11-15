@@ -42,6 +42,9 @@ class FabricAdmin final : public bridge::FabricAdminDelegate
 public:
     static FabricAdmin & Instance();
 
+    CHIP_ERROR OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params,
+                                       chip::FabricIndex fabricIndex) override;
+
     CHIP_ERROR
     CommissionRemoteBridge(chip::Controller::CommissioningWindowPasscodeParams params, chip::VendorId vendorId,
                            uint16_t productId) override;

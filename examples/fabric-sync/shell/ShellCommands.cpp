@@ -19,6 +19,7 @@
 #include "AddDeviceCommand.h"
 #include "RemoveBridgeCommand.h"
 #include "RemoveDeviceCommand.h"
+#include "SyncDeviceCommand.h"
 
 #include <admin/DeviceManager.h>
 #include <inttypes.h>
@@ -129,11 +130,11 @@ static CHIP_ERROR HandleAddDeviceCommand(int argc, char ** argv)
 
     // Parse arguments
     chip::NodeId nodeId     = static_cast<chip::NodeId>(strtoull(argv[1], nullptr, 10));
-    uint32_t setupPINCode   = static_cast<uint32_t>(strtoul(argv[2], nullptr, 10));
+    uint32_t payload        = static_cast<uint32_t>(strtoul(argv[2], nullptr, 10));
     const char * remoteAddr = argv[3];
     uint16_t remotePort     = static_cast<uint16_t>(strtoul(argv[4], nullptr, 10));
 
-    auto command = std::make_unique<commands::AddDeviceCommand>(nodeId, setupPINCode, remoteAddr, remotePort);
+    auto command = std::make_unique<commands::AddDeviceCommand>(nodeId, payload, remoteAddr, remotePort);
 
     CHIP_ERROR result = command->RunCommand();
     if (result == CHIP_NO_ERROR)
@@ -173,6 +174,35 @@ static CHIP_ERROR HandleRemoveDeviceCommand(int argc, char ** argv)
     return result;
 }
 
+static CHIP_ERROR HandleSyncDeviceCommand(int argc, char ** argv)
+{
+    if (argc != 2)
+    {
+        fprintf(stderr, "Invalid arguments. Usage: app sync-device\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Check if there is already an active command
+    if (commands::CommandRegistry::Instance().IsCommandActive())
+    {
+        fprintf(stderr, "Another command is currently active. Please wait until it completes.\n");
+        return CHIP_ERROR_BUSY;
+    }
+
+    // Parse arguments
+    chip::EndpointId endpointId = static_cast<chip::EndpointId>(strtoul(argv[1], nullptr, 10));
+
+    auto command = std::make_unique<commands::SyncDeviceCommand>(endpointId);
+
+    CHIP_ERROR result = command->RunCommand();
+    if (result == CHIP_NO_ERROR)
+    {
+        commands::CommandRegistry::Instance().SetActiveCommand(std::move(command));
+    }
+
+    return result;
+}
+
 static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -200,6 +230,10 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
     else if (strcmp(argv[0], "remove-device") == 0)
     {
         return HandleRemoveDeviceCommand(argc, argv);
+    }
+    else if (strcmp(argv[0], "sync-device") == 0)
+    {
+        return HandleSyncDeviceCommand(argc, argv);
     }
     else
     {
