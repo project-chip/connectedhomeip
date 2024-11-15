@@ -6832,9 +6832,9 @@ namespace Zones {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace Zones
 
-namespace TimeControl {
+namespace Triggers {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace TimeControl
+} // namespace Triggers
 
 namespace Sensitivity {
 static constexpr AttributeId Id = 0x00000003;
@@ -6922,137 +6922,113 @@ namespace HDRModeEnabled {
 static constexpr AttributeId Id = 0x0000000D;
 } // namespace HDRModeEnabled
 
-namespace CurrentVideoCodecs {
-static constexpr AttributeId Id = 0x0000000E;
-} // namespace CurrentVideoCodecs
-
-namespace CurrentSnapshotConfig {
-static constexpr AttributeId Id = 0x0000000F;
-} // namespace CurrentSnapshotConfig
-
 namespace FabricsUsingCamera {
-static constexpr AttributeId Id = 0x00000010;
+static constexpr AttributeId Id = 0x0000000E;
 } // namespace FabricsUsingCamera
 
 namespace AllocatedVideoStreams {
-static constexpr AttributeId Id = 0x00000011;
+static constexpr AttributeId Id = 0x0000000F;
 } // namespace AllocatedVideoStreams
 
 namespace AllocatedAudioStreams {
-static constexpr AttributeId Id = 0x00000012;
+static constexpr AttributeId Id = 0x00000010;
 } // namespace AllocatedAudioStreams
 
 namespace AllocatedSnapshotStreams {
-static constexpr AttributeId Id = 0x00000013;
+static constexpr AttributeId Id = 0x00000011;
 } // namespace AllocatedSnapshotStreams
 
 namespace RankedVideoStreamPrioritiesList {
-static constexpr AttributeId Id = 0x00000014;
+static constexpr AttributeId Id = 0x00000012;
 } // namespace RankedVideoStreamPrioritiesList
 
 namespace SoftRecordingPrivacyModeEnabled {
-static constexpr AttributeId Id = 0x00000015;
+static constexpr AttributeId Id = 0x00000013;
 } // namespace SoftRecordingPrivacyModeEnabled
 
 namespace SoftLivestreamPrivacyModeEnabled {
-static constexpr AttributeId Id = 0x00000016;
+static constexpr AttributeId Id = 0x00000014;
 } // namespace SoftLivestreamPrivacyModeEnabled
 
 namespace HardPrivacyModeOn {
-static constexpr AttributeId Id = 0x00000017;
+static constexpr AttributeId Id = 0x00000015;
 } // namespace HardPrivacyModeOn
 
 namespace NightVision {
-static constexpr AttributeId Id = 0x00000018;
+static constexpr AttributeId Id = 0x00000016;
 } // namespace NightVision
 
 namespace NightVisionIllum {
-static constexpr AttributeId Id = 0x00000019;
+static constexpr AttributeId Id = 0x00000017;
 } // namespace NightVisionIllum
 
-namespace AWBEnabled {
-static constexpr AttributeId Id = 0x0000001A;
-} // namespace AWBEnabled
-
-namespace AutoShutterSpeedEnabled {
-static constexpr AttributeId Id = 0x0000001B;
-} // namespace AutoShutterSpeedEnabled
-
-namespace AutoISOEnabled {
-static constexpr AttributeId Id = 0x0000001C;
-} // namespace AutoISOEnabled
-
 namespace Viewport {
-static constexpr AttributeId Id = 0x0000001D;
+static constexpr AttributeId Id = 0x00000018;
 } // namespace Viewport
 
 namespace SpeakerMuted {
-static constexpr AttributeId Id = 0x0000001E;
+static constexpr AttributeId Id = 0x00000019;
 } // namespace SpeakerMuted
 
 namespace SpeakerVolumeLevel {
-static constexpr AttributeId Id = 0x0000001F;
+static constexpr AttributeId Id = 0x0000001A;
 } // namespace SpeakerVolumeLevel
 
 namespace SpeakerMaxLevel {
-static constexpr AttributeId Id = 0x00000020;
+static constexpr AttributeId Id = 0x0000001B;
 } // namespace SpeakerMaxLevel
 
 namespace SpeakerMinLevel {
-static constexpr AttributeId Id = 0x00000021;
+static constexpr AttributeId Id = 0x0000001C;
 } // namespace SpeakerMinLevel
 
 namespace MicrophoneMuted {
-static constexpr AttributeId Id = 0x00000022;
+static constexpr AttributeId Id = 0x0000001D;
 } // namespace MicrophoneMuted
 
 namespace MicrophoneVolumeLevel {
-static constexpr AttributeId Id = 0x00000023;
+static constexpr AttributeId Id = 0x0000001E;
 } // namespace MicrophoneVolumeLevel
 
 namespace MicrophoneMaxLevel {
-static constexpr AttributeId Id = 0x00000024;
+static constexpr AttributeId Id = 0x0000001F;
 } // namespace MicrophoneMaxLevel
 
 namespace MicrophoneMinLevel {
-static constexpr AttributeId Id = 0x00000025;
+static constexpr AttributeId Id = 0x00000020;
 } // namespace MicrophoneMinLevel
 
 namespace MicrophoneAGCEnabled {
-static constexpr AttributeId Id = 0x00000026;
+static constexpr AttributeId Id = 0x00000021;
 } // namespace MicrophoneAGCEnabled
 
 namespace ImageRotation {
-static constexpr AttributeId Id = 0x00000027;
+static constexpr AttributeId Id = 0x00000022;
 } // namespace ImageRotation
 
 namespace ImageFlipHorizontal {
-static constexpr AttributeId Id = 0x00000028;
+static constexpr AttributeId Id = 0x00000023;
 } // namespace ImageFlipHorizontal
 
 namespace ImageFlipVertical {
-static constexpr AttributeId Id = 0x00000029;
+static constexpr AttributeId Id = 0x00000024;
 } // namespace ImageFlipVertical
 
 namespace LocalVideoRecordingEnabled {
-static constexpr AttributeId Id = 0x0000002A;
+static constexpr AttributeId Id = 0x00000025;
 } // namespace LocalVideoRecordingEnabled
 
 namespace LocalSnapshotRecordingEnabled {
-static constexpr AttributeId Id = 0x0000002B;
+static constexpr AttributeId Id = 0x00000026;
 } // namespace LocalSnapshotRecordingEnabled
 
 namespace StatusLightEnabled {
-static constexpr AttributeId Id = 0x0000002C;
+static constexpr AttributeId Id = 0x00000027;
 } // namespace StatusLightEnabled
 
 namespace StatusLightBrightness {
-static constexpr AttributeId Id = 0x0000002D;
+static constexpr AttributeId Id = 0x00000028;
 } // namespace StatusLightBrightness
-
-namespace DepthSensorStatus {
-static constexpr AttributeId Id = 0x0000002E;
-} // namespace DepthSensorStatus
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

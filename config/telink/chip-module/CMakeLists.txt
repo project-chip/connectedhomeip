@@ -155,6 +155,10 @@ set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 
 include(${TELINK_COMMON}/common.cmake)
 
+if (CONFIG_CHIP_APP_LOG_LEVEL GREATER_EQUAL 4)
+    include(${TELINK_COMMON}/build_info.cmake)
+endif()
+
 # ==============================================================================
 # Define 'process_binaries' target for collecting final binary to flash
 # ==============================================================================

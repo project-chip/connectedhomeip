@@ -514,6 +514,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return [_pid copy];
 }
 
+- (MTRNetworkCommissioningFeature)networkCommissioningFeatures
+{
+    std::lock_guard lock(_descriptionLock);
+    return [_allNetworkFeatures unsignedIntValue];
+}
+
 - (void)_notifyDelegateOfPrivateInternalPropertiesChanges
 {
     os_unfair_lock_assert_owner(&self->_lock);
@@ -3627,6 +3633,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 }
 
                 [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
+
+                [self _attributeValue:attributeDataValue reportedForPath:attributePath];
             }
 
 #ifdef DEBUG
