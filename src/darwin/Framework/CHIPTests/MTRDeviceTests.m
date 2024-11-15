@@ -1470,6 +1470,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __block unsigned eventReportsReceived = 0;
     __block BOOL reportEnded = NO;
     __block BOOL gotOneNonPrimingEvent = NO;
+    __block NSNumber * lastObservedEventNumber = @(0);
     XCTestExpectation * gotNonPrimingEventExpectation = [self expectationWithDescription:@"Received event outside of priming report"];
     delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
         eventReportsReceived += eventReport.count;
@@ -1489,6 +1490,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             if (!reportEnded) {
                 NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
                 XCTAssertTrue(reportIsHistorical.boolValue);
+                lastObservedEventNumber = eventDict[MTREventNumberKey];
             } else {
                 if (!gotOneNonPrimingEvent) {
                     NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
@@ -1509,7 +1511,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             MTREventTimestampDateKey : [NSDate date],
             MTREventIsHistoricalKey : @(NO),
             MTREventPriorityKey : @(MTREventPriorityInfo),
-            MTREventNumberKey : @(1), // Doesn't matter, in practice
+            MTREventNumberKey : @(lastObservedEventNumber.unsignedLongLongValue + 1),
             MTRDataKey : @ {
                 MTRTypeKey : MTRStructureValueType,
                 MTRValueKey : @[],
@@ -3899,6 +3901,70 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Must have gotten some events (at least StartUp!)
     XCTAssertTrue(eventReportsReceived > 0);
+
+    // Now try doing some event injection.
+    __block uint64_t eventNumber = 0x1000000; // Should't have that many events on the device yet!
+    __block uint64_t firstNewEventNumber = eventNumber;
+    __auto_type createEventReport = ^{
+        return @{
+            MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(1)],
+            MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+            MTREventTimestampDateKey : [NSDate date],
+            MTREventPriorityKey : @(MTREventPriorityInfo),
+            MTREventNumberKey : @(eventNumber++),
+            MTRDataKey : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[],
+            },
+        };
+    };
+
+    eventReportsReceived = 0;
+    const int eventReportsToInject = 5;
+    __block XCTestExpectation * eventReportsFinishedExpectation = [self expectationWithDescription:@"Injecting some new event reports"];
+    __block int historicalEvents = 0;
+    __block int eventReportsToExpect = eventReportsToInject;
+
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
+        eventReportsReceived += eventReport.count;
+        for (NSDictionary<NSString *, id> * eventDict in eventReport) {
+            NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+            NSNumber * eventNumber = eventDict[MTREventNumberKey];
+            XCTAssertEqual(reportIsHistorical.boolValue, eventNumber.unsignedLongLongValue < firstNewEventNumber,
+                @"eventNumber: %@, firstNewEventNumber: %llu", eventNumber, firstNewEventNumber);
+            historicalEvents += reportIsHistorical.boolValue;
+        }
+
+        if (eventReportsReceived >= eventReportsToExpect) {
+            [eventReportsFinishedExpectation fulfill];
+        }
+    };
+
+    for (int i = 0; i < eventReportsToInject; ++i) {
+        [device unitTestInjectEventReport:@[ createEventReport() ]];
+    }
+
+    [self waitForExpectations:@[ eventReportsFinishedExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(historicalEvents, 0);
+
+    // Now inject some mix of historical and non-historical events.  Since this
+    // includes events with old event numbers, those should get filtered out
+    // from reporting.
+    const uint64_t expectedHistoricalEvents = 2;
+    firstNewEventNumber = eventNumber;
+    eventNumber -= expectedHistoricalEvents;
+    eventReportsReceived = 0;
+    historicalEvents = 0;
+    // Events with already-observed event numbers do not get reported.
+    eventReportsToExpect = eventReportsToInject - expectedHistoricalEvents;
+    eventReportsFinishedExpectation = [self expectationWithDescription:@"Injecting a mix of old and new reports"];
+
+    for (int i = 0; i < eventReportsToInject; ++i) {
+        [device unitTestInjectEventReport:@[ createEventReport() ]];
+    }
+
+    [self waitForExpectations:@[ eventReportsFinishedExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(historicalEvents, 0);
 }
 
 - (void)test035_TestMTRDeviceSubscriptionNotEstablishedOverXPC
@@ -4266,13 +4332,17 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (NSDictionary<NSString *, id> *)_testEventResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
 {
+    // Pick a large event number, so that in practice these event reports will
+    // all have larger event numbers than anything that might have been observed
+    // before.
+    static uint64_t eventNumber = 0x100000000llu;
     return @{
         MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
         MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
         MTREventTimestampDateKey : [NSDate date],
         MTREventIsHistoricalKey : @(NO),
         MTREventPriorityKey : @(MTREventPriorityInfo),
-        MTREventNumberKey : @(1), // Doesn't matter, in practice
+        MTREventNumberKey : @(eventNumber++),
         // Empty payload.
         MTRDataKey : @ {
             MTRTypeKey : MTRStructureValueType,
