@@ -45,12 +45,12 @@ from test_plan_support import commission_if_required, read_attribute, send_comma
 
 
 def verify_noc() -> str:
-    return (f"- Verify that the returned list has a single entry.\n"
-            f"- Save the NOC field as noc_original and the ICAC field as icac_original.\n")
+    return ("- Verify that the returned list has a single entry.\n"
+            "- Save the NOC field as noc_original and the ICAC field as icac_original.\n")
 
 
 def verify_trusted_root_original() -> str:
-    return (f"Verify that the returned list has a single entry. Save the entry as trusted_root_original")
+    return ("Verify that the returned list has a single entry. Save the entry as trusted_root_original")
 
 
 class TC_OPCREDS_3_4(MatterBaseTest):
