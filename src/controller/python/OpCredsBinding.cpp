@@ -16,7 +16,7 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
- */
+*/
 
 #include <type_traits>
 
@@ -44,6 +44,18 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+
+//Including AutoCommissioner initialization here for getting RootCert
+#include <controller/AutoCommissioner.h>
+#include <openssl/x509.h>
+#include <openssl/bio.h>
+#include <openssl/pem.h>
+#include <cstddef> // Added for size_t
+#include <functional> // Added for std::function
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVTypes.h>
+//#include <thread>  // Include this for std::this_thread
+//#include <chrono>  // Include this for std::chrono::milliseconds
 
 using namespace chip;
 
@@ -110,8 +122,10 @@ extern chip::app::DefaultICDClientStorage sICDClientStorage;
 class TestCommissioner : public chip::Controller::AutoCommissioner
 {
 public:
+    using RCACReadyCallback = std::function<void(const std::vector<uint8_t> &)>;
     TestCommissioner() { Reset(); }
     ~TestCommissioner() {}
+
     CHIP_ERROR SetCommissioningParameters(const chip::Controller::CommissioningParameters & params) override
     {
         mIsWifi   = false;
@@ -147,6 +161,35 @@ public:
             auto params       = chip::Controller::CommissioningParameters();
             commissioner->PerformCommissioningStep(proxy, stage, params, this, 0, GetCommandTimeout(proxy, stage));
             return CHIP_NO_ERROR;
+        }
+
+        if (report.stageCompleted == chip::Controller::CommissioningStage::kGenerateNOCChain)
+        {
+            if (report.Is<chip::Controller::NocChain>())
+            {
+                auto nocChain = report.Get<chip::Controller::NocChain>();
+                MutableByteSpan rcacSpan(const_cast<uint8_t*>(nocChain.rcac.data()), nocChain.rcac.size());
+                
+                chip::ByteSpan rcacByteSpan(rcacSpan.data(), rcacSpan.size());
+
+                // Converting rcac to chip cert format to be decyphered by TLV later in python3
+                chip::Platform::ScopedMemoryBuffer<uint8_t> chipRcac;
+                MutableByteSpan chipRcacSpan;
+                chipRcac.Alloc(Credentials::kMaxCHIPCertLength);
+                chipRcacSpan = MutableByteSpan(chipRcac.Get(), Credentials::kMaxCHIPCertLength);
+                chip::Credentials::ConvertX509CertToChipCert(rcacByteSpan, chipRcacSpan);
+                mCHIPRCACData.assign(chipRcacSpan.data(), chipRcacSpan.data() + chipRcacSpan.size());
+
+                if (!mCHIPRCACData.empty()) 
+                {
+                    // Notify that mCHIPRCACData data is ready
+                    NotifyRCACDataReady();
+                }
+                else
+                {
+                    ChipLogError(Controller, "RCAC data is empty. No data to log.");
+                }
+            }
         }
 
         if (mPrematureCompleteAfter != chip::Controller::CommissioningStage::kError &&
@@ -262,7 +305,9 @@ public:
         mCompletionError        = CHIP_NO_ERROR;
     }
     bool GetTestCommissionerUsed() { return mTestCommissionerUsed; }
+
     void OnCommissioningSuccess(chip::PeerId peerId) { mReceivedCommissioningSuccess = true; }
+
     void OnCommissioningFailure(chip::PeerId peerId, CHIP_ERROR error, chip::Controller::CommissioningStage stageFailed,
                                 chip::Optional<chip::Credentials::AttestationVerificationResult> additionalErrorInfo)
     {
@@ -291,10 +336,39 @@ public:
             }
         }
     }
+    
+    CHIP_ERROR GetCommissioningResultError() const
+    {
+        return mCommissioningResultError;
+    }
+
+    void SetOnRCACReadyCallback(RCACReadyCallback callback)
+    {
+        std::lock_guard<std::mutex> lock(mCallbackMutex);
+        mOnRCACReadyCallback = callback;
+    }
 
     CHIP_ERROR GetCompletionError() { return mCompletionError; }
 
+    // Getter method to access RCAC data
+    //const std::vector<uint8_t>& GetRCACData() const { return mRCACData; }
+    const std::vector<uint8_t>& GetCHIPRCACData() const { return mCHIPRCACData; }
+
 private:
+    void NotifyRCACDataReady()
+    {
+        std::lock_guard<std::mutex> lock(mCallbackMutex);
+        if (mOnRCACReadyCallback && !mCHIPRCACData.empty())
+        {
+            mOnRCACReadyCallback(mCHIPRCACData);
+        }
+    }
+    RCACReadyCallback mOnRCACReadyCallback;
+    std::mutex mCallbackMutex; // Ensure thread-safe access to callback
+
+    std::vector<uint8_t> mCHIPRCACData;
+    std::vector<uint8_t> mRCACData;
+    CHIP_ERROR mCommissioningResultError;
     static constexpr uint8_t kNumCommissioningStages = chip::to_underlying(chip::Controller::CommissioningStage::kCleanup) + 1;
     chip::Controller::CommissioningStage mSimulateFailureOnStage            = chip::Controller::CommissioningStage::kError;
     chip::Controller::CommissioningStage mFailOnReportAfterStage            = chip::Controller::CommissioningStage::kError;
@@ -391,6 +465,7 @@ void pychip_OnCommissioningSuccess(PeerId peerId)
 {
     sTestCommissioner.OnCommissioningSuccess(peerId);
 }
+
 void pychip_OnCommissioningFailure(chip::PeerId peerId, CHIP_ERROR error, chip::Controller::CommissioningStage stageFailed,
                                    chip::Optional<chip::Credentials::AttestationVerificationResult> additionalErrorInfo)
 {
@@ -549,6 +624,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     {
         initParams.defaultCommissioner = &sTestCommissioner;
         pairingDelegate->SetCommissioningSuccessCallback(pychip_OnCommissioningSuccess);
+        //pairingDelegate->SetCommissioningSuccessCallback([](chip::PeerId peerId) { pychip_OnCommissioningSuccess(peerId, sTestCommissioner.GetRCACData().data(), sTestCommissioner.GetRCACData().size()); });
         pairingDelegate->SetCommissioningFailureCallback(pychip_OnCommissioningFailure);
         pairingDelegate->SetCommissioningStatusUpdateCallback(pychip_OnCommissioningStatusUpdate);
     }
@@ -687,4 +763,30 @@ PyChipError pychip_GetCompletionError()
     return ToPyChipError(sTestCommissioner.GetCompletionError());
 }
 
+extern "C" {
+    // Define a global callback to set the RCAC data callback
+    using PythonRCACCallback = void (*)(const uint8_t *, size_t);
+    static PythonRCACCallback gPythonRCACCallback = nullptr;
+
+
+    // Function to set the Python callback
+    void pychip_SetCommissioningRCACCallback(PythonRCACCallback callback)
+    {
+        ChipLogProgress(Controller, "Attempting to set Python RCAC callback in C++");
+        gPythonRCACCallback = callback;
+
+        // Set C++ TestCommissioner callback to notify Python when RCAC data is ready
+        sTestCommissioner.SetOnRCACReadyCallback([](const std::vector<uint8_t> & rcacData) {
+            if (gPythonRCACCallback)
+            {
+                ChipLogProgress(Controller, "RCAC callback in C++ set");
+                gPythonRCACCallback(rcacData.data(), rcacData.size());
+            }
+            else
+            {
+                ChipLogError(Controller, "Python RCAC callback is not set.");
+            }
+        });
+        }
+    }
 } // extern "C"

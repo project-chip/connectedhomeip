@@ -61,6 +61,8 @@ __all__ = ["ChipDeviceController", "CommissioningParameters"]
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
 CHIP_ERROR_TIMEOUT: int = 50
 
+_RCACCallbackType = CFUNCTYPE(None, POINTER(c_uint8), c_size_t)
+
 LOGGER = logging.getLogger(__name__)
 
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, PyChipError)
@@ -266,7 +268,6 @@ class CallbackContext:
         self._future = None
         self._lock.release()
 
-
 class CommissioningContext(CallbackContext):
     """A context manager for handling commissioning callbacks that are expected to be called exactly once.
 
@@ -470,6 +471,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(False, None)
 
             if self._dmLib.pychip_TestCommissionerUsed():
+                # Prepare pointers to store the results
                 err = self._dmLib.pychip_GetCompletionError()
 
             if self._commissioning_context.future is None:
@@ -478,6 +480,7 @@ class ChipDeviceControllerBase():
 
             if err.is_success:
                 self._commissioning_context.future.set_result(nodeId)
+
             else:
                 self._commissioning_context.future.set_exception(err.to_exception())
 
@@ -549,6 +552,7 @@ class ChipDeviceControllerBase():
 
         self.cbHandleCommissioningCompleteFunct = _DevicePairingDelegate_OnCommissioningCompleteFunct(
             HandleCommissioningComplete)
+
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
             self.pairingDelegate, self.cbHandleCommissioningCompleteFunct)
 
@@ -1928,6 +1932,11 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_GetCompletionError.argtypes = []
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
+            #self._dmLib.pychip_GetCommissioningRCACData.argtypes = [POINTER(POINTER(c_uint8)), POINTER(c_size_t)]
+            #self._dmLib.pychip_GetCommissioningRCACData.restype = None
+            self._dmLib.pychip_SetCommissioningRCACCallback.argtypes = [_RCACCallbackType]
+            self._dmLib.pychip_SetCommissioningRCACCallback.restype = None
+            
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64]
             self._dmLib.pychip_DeviceController_IssueNOCChain.restype = PyChipError
@@ -2160,9 +2169,17 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ''' Returns the fabric check result if SetCheckMatchingFabric was used.'''
         return self._fabricCheckNodeId
 
+    async def get_commissioning_rcac_data(self):
+        # Await the future until the RCAC data is available
+        try:
+            rcac_data = await asyncio.wait_for(commissioning_future, timeout=60)
+            return rcac_data
+        except asyncio.TimeoutError:
+            raise Exception("Timeout while waiting for RCAC data")
+
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
                                   filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,
-                                  discoveryTimeoutMsec: int = 30000) -> int:
+                                  discoveryTimeoutMsec: int = 30000, get_rcac: bool = False) -> int:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
         Supported filters are:
@@ -2190,6 +2207,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
         if isinstance(filter, int):
             filter = str(filter)
 
+        if get_rcac:
+            global commissioning_future
+            commissioning_future = asyncio.get_event_loop().create_future()
+            rcac_cb = _RCACCallbackType(self.rcac_callback)
+            self._dmLib.pychip_SetCommissioningRCACCallback(rcac_cb)
+
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
@@ -2197,7 +2220,30 @@ class ChipDeviceController(ChipDeviceControllerBase):
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
             )
 
-            return await asyncio.futures.wrap_future(ctx.future)
+            if get_rcac:
+                try:
+                    rcac_data, rcac_size = await self.get_commissioning_rcac_data()
+                    rcac_data = bytes(ctypes.cast(rcac_data, ctypes.POINTER(ctypes.c_ubyte * rcac_size)).contents)
+
+                except Exception as e:
+                    LOGGER.exception(f"Error when attempting to get rcac data and size after commissioning: {e}")                
+                    return                
+
+                if rcac_size > 0:
+                    return (await asyncio.futures.wrap_future(ctx.future), rcac_data)
+                else:
+                    raise Exception("No RCAC data returned.")
+
+            else:
+                return await asyncio.futures.wrap_future(ctx.future)
+
+    def rcac_callback(res, rcac_data, rcac_size):
+        if rcac_size > 0:
+            # Signal that the rcac data has been received by setting the future result
+            commissioning_future.set_result((rcac_data, rcac_size))
+        else:
+            LOGGER.exception("RCAC data is empty")
+            commissioning_future.set_exception(Exception("RCAC data is empty"))
 
     async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
         ''' Commission with the given nodeid from the setupPayload.

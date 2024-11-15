@@ -157,10 +157,12 @@ class TC_CADMIN(MatterBaseTest):
         # Establishing TH2
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
-        self.th2 = th2_fabric_admin.NewController(nodeId=2)
-        await self.th2.CommissionOnNetwork(
+        self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+        _, rcac = await self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator, get_rcac=True)
+
+        th2_rcac_decoded = TLVReader(rcac).get()["Any"][9]
 
         self.step(5)
         # TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read
@@ -184,9 +186,10 @@ class TC_CADMIN(MatterBaseTest):
 
         # Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device.
         await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
-        th2_cam_rcac = TLVReader(base64.b64decode(
-            self.certificate_authority_manager.activeCaList[1]._persistentStorage._jsonData["sdk-config"]["f/2/r"])).get()["Any"][9]
-        if th2_fabric_info[0].rootPublicKey != th2_cam_rcac:
+        #th2_cam_rcac = TLVReader(base64.b64decode(
+        #    self.certificate_authority_manager.activeCaList[1]._persistentStorage._jsonData["sdk-config"]["f/2/r"])).get()["Any"][9]
+        
+        if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded:
             asserts.fail("public keys from fabric and certs for TH1 are not the same")
         if th2_fabric_info[0].nodeID != self.dut_node_id:
             asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning")
@@ -319,10 +322,12 @@ class TC_CADMIN(MatterBaseTest):
         # Establishing TH2
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
-        self.th2 = th2_fabric_admin.NewController(nodeId=2)
-        await self.th2.CommissionOnNetwork(
+        self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+        _, rcac = await self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=setupPayloadInfo[0].passcode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=setupPayloadInfo[0].filter_value)
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=setupPayloadInfo[0].filter_value, get_rcac=True)
+
+        th2_rcac_decoded = TLVReader(rcac).get()["Any"][9]
 
         self.step(5)
         # TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read
@@ -347,16 +352,7 @@ class TC_CADMIN(MatterBaseTest):
         # Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device.
         await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
 
-        # Following try and except needed in order for this test to pass in CI since we are running this test back to back without factory-reset
-        try:
-            th2_cam_rcac = TLVReader(base64.b64decode(
-                self.certificate_authority_manager.activeCaList[3]._persistentStorage._jsonData["sdk-config"]["f/4/r"])).get()["Any"][9]
-
-        except IndexError:
-            th2_cam_rcac = TLVReader(base64.b64decode(
-                self.certificate_authority_manager.activeCaList[2]._persistentStorage._jsonData["sdk-config"]["f/3/r"])).get()["Any"][9]
-
-        if th2_fabric_info[0].rootPublicKey != th2_cam_rcac:
+        if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded:
             asserts.fail("public keys from fabric and certs for TH1 are not the same")
         if th2_fabric_info[0].nodeID != self.dut_node_id:
             asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning")
@@ -371,7 +367,6 @@ class TC_CADMIN(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
-
 
 if __name__ == "__main__":
     default_matter_test_main()
