@@ -26,7 +26,6 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <map>
 
 #include <functional>
 
@@ -36,7 +35,6 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::FanControl;
 using namespace chip::app::Clusters::FanControl::Attributes;
-using namespace std;
 using Protocols::InteractionModel::Status;
 
 namespace {
