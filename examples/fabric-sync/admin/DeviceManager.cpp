@@ -20,6 +20,7 @@
 #include <LinuxCommissionableDataProvider.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <bridge/include/FabricBridge.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
 
@@ -33,6 +34,9 @@ namespace admin {
 namespace {
 
 constexpr EndpointId kAggregatorEndpointId = 1;
+constexpr uint16_t kWindowTimeout          = 300;
+constexpr uint16_t kIteration              = 1000;
+constexpr uint16_t kMaxDiscriminatorLength = 4095;
 
 } // namespace
 
@@ -75,6 +79,13 @@ void DeviceManager::SetRemoteBridgeNodeId(chip::NodeId nodeId)
     }
 }
 
+void DeviceManager::AddSyncedDevice(const SyncedDevice & device)
+{
+    mSyncedDevices.insert(device);
+    ChipLogProgress(NotSpecified, "Added synced device: NodeId:" ChipLogFormatX64 ", EndpointId %u",
+                    ChipLogValueX64(device.GetNodeId()), device.GetEndpointId());
+}
+
 SyncedDevice * DeviceManager::FindDeviceByEndpoint(EndpointId endpointId)
 {
     for (auto & device : mSyncedDevices)
@@ -97,6 +108,27 @@ SyncedDevice * DeviceManager::FindDeviceByNode(NodeId nodeId)
         }
     }
     return nullptr;
+}
+
+void DeviceManager::RemoveSyncedDevice(chip::ScopedNodeId scopedNodeId)
+{
+    NodeId nodeId = scopedNodeId.GetNodeId();
+
+    if (bridge::FabricBridge::Instance().RemoveSynchronizedDevice(scopedNodeId) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to remove Node ID:" ChipLogFormatX64, ChipLogValueX64(nodeId));
+    }
+
+    SyncedDevice * device = FindDeviceByNode(nodeId);
+    if (device == nullptr)
+    {
+        ChipLogProgress(NotSpecified, "No device found with NodeId:" ChipLogFormatX64, ChipLogValueX64(nodeId));
+        return;
+    }
+
+    mSyncedDevices.erase(*device);
+    ChipLogProgress(NotSpecified, "Removed synced device: NodeId:" ChipLogFormatX64 ", EndpointId %u",
+                    ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
 }
 
 void DeviceManager::OpenLocalBridgeCommissioningWindow(uint32_t iterations, uint16_t commissioningTimeoutSec,
@@ -129,6 +161,46 @@ void DeviceManager::OpenLocalBridgeCommissioningWindow(uint32_t iterations, uint
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to open commissioning window of the local bridge: %s", ErrorStr(err));
+    }
+}
+
+void DeviceManager::OpenDeviceCommissioningWindow(ScopedNodeId scopedNodeId, uint32_t iterations, uint16_t commissioningTimeoutSec,
+                                                  uint16_t discriminator, const ByteSpan & salt, const ByteSpan & verifier)
+{
+    // PairingManager isn't currently capable of OpenCommissioningWindow on a device of a fabric that it doesn't have
+    // the controller for. Currently no implementation need this functionality, but should they need it they will hit
+    // the verify or die below and it will be the responsiblity of whoever requires that functionality to implement.
+    VerifyOrDie(PairingManager::Instance().CurrentCommissioner().GetFabricIndex() == scopedNodeId.GetFabricIndex());
+    ChipLogProgress(NotSpecified, "Opening commissioning window for Node ID: " ChipLogFormatX64,
+                    ChipLogValueX64(scopedNodeId.GetNodeId()));
+
+    // Open the commissioning window of a device within its own fabric.
+    CHIP_ERROR err = PairingManager::Instance().OpenCommissioningWindow(
+        scopedNodeId.GetNodeId(), kRootEndpointId, commissioningTimeoutSec, iterations, discriminator, salt, verifier);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to open commissioning window: %s", ErrorStr(err));
+    }
+}
+
+void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpointId)
+{
+    // Open the commissioning window of a device from another fabric via its fabric bridge.
+    // This method constructs and sends a command to open the commissioning window for a device
+    // that is part of a different fabric, accessed through a fabric bridge.
+
+    // Use random discriminator to have less chance of collision.
+    uint16_t discriminator =
+        Crypto::GetRandU16() % (kMaxDiscriminatorLength + 1); // Include the upper limit kMaxDiscriminatorLength
+
+    ByteSpan emptySalt;
+    ByteSpan emptyVerifier;
+
+    CHIP_ERROR err = PairingManager::Instance().OpenCommissioningWindow(mRemoteBridgeNodeId, remoteEndpointId, kWindowTimeout,
+                                                                        kIteration, discriminator, emptySalt, emptyVerifier);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to open commissioning window: %s", ErrorStr(err));
     }
 }
 

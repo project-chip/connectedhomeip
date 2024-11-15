@@ -31,6 +31,18 @@ public:
     virtual ~FabricAdminDelegate() = default;
 
     /**
+     * Opens a commissioning window for a specified node using pre-computed PAKE passcode verifier.
+     *
+     * @param params    Params for opening the commissioning window using verifier.
+     * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+     * - CHIP_NO_ERROR: The RPC command was successfully sent.
+     * - CHIP_ERROR_BUSY: Another commissioning window is currently in progress.
+     * - CHIP_ERROR_INTERNAL: An internal error occurred.
+     */
+    virtual CHIP_ERROR OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params,
+                                               chip::FabricIndex fabricIndex) = 0;
+
+    /**
      * Reverse commission a bridge using the specified parameters.
      *
      * This function initiates the commissioning process for a bridge node, utilizing
