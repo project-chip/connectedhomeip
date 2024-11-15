@@ -450,13 +450,14 @@ void DeviceManager::HandleAttributePartsListUpdate(TLV::TLVReader & data)
     for (const auto & endpoint : addedEndpoints)
     {
         // print to console
-        fprintf(stderr, "A new device is added on Endpoint: %u\n", endpoint);
+        fprintf(stderr, "A new endpoint %u is added on the remote bridge\n", endpoint);
     }
 
     // Process removed endpoints
     for (const auto & endpoint : removedEndpoints)
     {
-        ChipLogProgress(NotSpecified, "Endpoint removed: %u", endpoint);
+        // print to console
+        fprintf(stderr, "Endpoint %u removed from the remote bridge\n", endpoint);
 
         SyncedDevice * device = FindDeviceByEndpoint(endpoint);
 
