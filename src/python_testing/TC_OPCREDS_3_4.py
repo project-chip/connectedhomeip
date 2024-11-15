@@ -44,6 +44,14 @@ from mobly import asserts
 from test_plan_support import commission_if_required, read_attribute, send_command
 
 
+def verify_noc() -> str:
+    return (f"- Verify that the returned list has a single entry.\n"
+            f"- Save the NOC field as noc_original and the ICAC field as icac_original.\n")
+
+def verify_trusted_root_original() -> str:
+    return (f"Verify that the returned list has a single entry. Save the entry as trusted_root_original")
+
+
 class TC_OPCREDS_3_4(MatterBaseTest):
     def desc_TC_OPCREDS_3_4(self):
         return " UpdateNOC-Error Condition [DUT-Server]"
@@ -51,8 +59,9 @@ class TC_OPCREDS_3_4(MatterBaseTest):
     def steps_TC_OPCREDS_3_4(self):
         return [TestStep(1, commission_if_required('TH1'), is_commissioning=True),
                 TestStep(
-                    2, f"TH1 {read_attribute('NOCs')} from the Node Operational Credentials cluster using a fabric-filtered read. Save the NOCs as `nocs`."),
-                TestStep(3, f"TH1 {read_attribute('TrustedRootCertificates')} attribute from the Node Operational Credentials cluster"),
+                    2, f"TH1 {read_attribute('NOCs')} from the Node Operational Credentials cluster using a fabric-filtered read. Save the NOCs as nocs.", verify_noc()),
+                TestStep(
+                    3, f"TH1 {read_attribute('TrustedRootCertificates')} attribute from the Node Operational Credentials cluster", verify_trusted_root_original),
                 TestStep(
                     4, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue"),
                 TestStep(5, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 900"),
