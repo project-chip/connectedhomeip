@@ -237,6 +237,33 @@ chip::EndpointId emberAfEndpointFromIndex(uint16_t index)
     return config.endpoints[index].id;
 }
 
+namespace chip {
+namespace app {
+
+bool IsFlatCompositionForEndpoint(EndpointId endpoint)
+{
+    return true;
+}
+
+bool IsTreeCompositionForEndpoint(EndpointId endpoint)
+{
+    return false;
+}
+
+} // namespace app
+} // namespace chip
+
+EndpointId emberAfParentEndpointFromIndex(uint16_t index)
+{
+    return kInvalidEndpointId;
+}
+
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
+                                            Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag)
+{
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpointId, uint8_t n, bool server)
 {
     VerifyOrReturnValue(server, NullOptional); // only server clusters supported

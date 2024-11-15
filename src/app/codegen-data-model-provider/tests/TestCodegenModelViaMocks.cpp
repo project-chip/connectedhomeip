@@ -881,7 +881,8 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
     EXPECT_EQ(ep.id, kMockEndpoint2);
     ep = model.NextEndpoint(kMockEndpoint2);
     EXPECT_EQ(ep.id, kMockEndpoint3);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint3), EndpointEntry::kInvalid);
+    ep = model.NextEndpoint(kMockEndpoint3);
+    EXPECT_EQ(ep.id, kInvalidEndpointId);
 
     /// Some out of order requests should work as well
     ep = model.NextEndpoint(kMockEndpoint2);

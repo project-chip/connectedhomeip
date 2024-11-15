@@ -484,7 +484,7 @@ DataModel::EndpointEntry CustomDataModel::NextEndpoint(EndpointId before)
     return CodegenDataModelProviderInstance()->NextEndpoint(before);
 }
 
-std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint)
+std::optional<DataModel::EndpointInfo> CustomDataModel::GetEndpointInfo(EndpointId endpoint)
 {
     return CodegenDataModelProviderInstance()->GetEndpointInfo(endpoint);
 }
