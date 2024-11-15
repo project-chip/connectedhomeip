@@ -184,8 +184,8 @@ public:
     virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
 
     // This iteration will list all client clusters on a given endpoint
-    virtual ClusterId FirstClientCluster(EndpointId endpoint)                              = 0;
-    virtual ClusterId NextClientCluster(const ConcreteClusterPath & before)                = 0;
+    virtual ClusterId FirstClientCluster(EndpointId endpoint)               = 0;
+    virtual ClusterId NextClientCluster(const ConcreteClusterPath & before) = 0;
 
     // Attribute iteration and accessors provide cluster-level access over
     // attributes

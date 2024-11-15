@@ -205,7 +205,6 @@ ClusterId TestImCustomDataModel::NextClientCluster(const ConcreteClusterPath & b
     return CodegenDataModelProviderInstance()->NextClientCluster(before);
 }
 
-
 AttributeEntry TestImCustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
 {
     return CodegenDataModelProviderInstance()->FirstAttribute(cluster);
