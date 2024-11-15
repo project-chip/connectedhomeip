@@ -44,18 +44,7 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
-
-// Including AutoCommissioner initialization here for getting RootCert
-#include <controller/AutoCommissioner.h>
 #include <cstddef>    // Added for size_t
-#include <functional> // Added for std::function
-#include <lib/core/TLVReader.h>
-#include <lib/core/TLVTypes.h>
-#include <openssl/bio.h>
-#include <openssl/pem.h>
-#include <openssl/x509.h>
-// #include <thread>  // Include this for std::this_thread
-// #include <chrono>  // Include this for std::chrono::milliseconds
 
 using namespace chip;
 
