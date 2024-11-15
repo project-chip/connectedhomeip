@@ -145,11 +145,8 @@ void DeviceSynchronizer::OnDone(app::ReadClient * apReadClient)
     ChipLogProgress(NotSpecified, "Synchronization complete for NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
 #if defined(PW_RPC_ENABLED)
-    // We need to register the remote bridge device as a bridged device on the local bridge. This ensures that the ecosystem
-    // triggering the fabric sync process is notified of the successful reverse commissioning.
-    if (mState == State::ReceivedResponse && (mIsReverseCommissioning || !DeviceManager::Instance().IsCurrentBridgeDevice(mNodeId)))
+    if (mState == State::ReceivedResponse && !DeviceManager::Instance().IsCurrentBridgeDevice(mNodeId))
     {
-        mIsReverseCommissioning = false;
         GetUniqueId();
         if (mState == State::GettingUid)
         {

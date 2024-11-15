@@ -42,8 +42,6 @@ class DeviceSynchronizer : public chip::app::ReadClient::Callback
 public:
     DeviceSynchronizer();
 
-    void setReverseCommissioningFlag(bool isReverseCommissioning) { mIsReverseCommissioning = isReverseCommissioning; }
-
     /// Usually called after commissioning is complete, initiates a
     /// read of required data from the remote node ID and then will synchronize
     /// the device towards the fabric bridge
@@ -102,7 +100,6 @@ private:
     chip_rpc_SynchronizedDevice mCurrentDeviceData = chip_rpc_SynchronizedDevice_init_default;
 #endif
     UniqueIdGetter mUniqueIdGetter;
-    bool mIsReverseCommissioning = false;
 };
 
 } // namespace admin
