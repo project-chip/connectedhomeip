@@ -285,7 +285,7 @@ void FabricSyncDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERRO
 
     if (err == CHIP_NO_ERROR)
     {
-        DeviceManager::Instance().AddSyncedDevice(Device(mAssignedNodeId, mRemoteEndpointId));
+        DeviceManager::Instance().AddSyncedDevice(SyncedDevice(mAssignedNodeId, mRemoteEndpointId));
     }
     else
     {

@@ -173,14 +173,14 @@ public:
 
         if (error == CHIP_NO_ERROR)
         {
-            NodeId nodeId = DeviceManager::Instance().GetNextAvailableNodeId();
-            mNodeId       = nodeId;
+            mNodeId = DeviceManager::Instance().GetNextAvailableNodeId();
+            ;
 
             // After responding with RequestCommissioningApproval to the node where the client initiated the
             // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
             usleep(kCommissionPrepareTimeMs * 1000);
             PairingManager::Instance().SetPairingDelegate(this);
-            DeviceManager::Instance().PairRemoteDevice(nodeId, code.c_str());
+            DeviceManager::Instance().PairRemoteDevice(mNodeId, code.c_str());
         }
         else
         {
