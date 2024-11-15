@@ -509,17 +509,20 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mMicrophoneAGCEnabled));
         break;
     case ImageRotation::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttributes::kSupportsImageRotation),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get ImageRotation, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mImageRotation));
         break;
     case ImageFlipHorizontal::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttributes::kSupportsImageFlipHorizontal),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get ImageFlipHorizontal, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipHorizontal));
         break;
     case ImageFlipVertical::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttributes::kSupportsImageFlipVertical),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get ImageFlipHorizontal, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipVertical));
         break;
@@ -569,15 +572,6 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         ReturnErrorOnFailure(SetHDRModeEnabled(hdrModeEnabled));
         return CHIP_NO_ERROR;
     }
-    case RankedVideoStreamPrioritiesList::Id: { // TODO
-        VerifyOrReturnError(
-            HasFeature(Feature::kVideo), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set RankedVideoStreamPrioritiesList, feature is not supported"));
-        uint8_t newValue;
-        ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        ReturnErrorOnFailure(mDelegate.SetRankedVideoStreamPrioritiesList(newValue));
-        return CHIP_NO_ERROR;
-    }
     case SoftRecordingPrivacyModeEnabled::Id: {
         VerifyOrReturnError(
             HasFeature(Feature::kPrivacy), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
@@ -621,9 +615,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         return CHIP_NO_ERROR;
     }
     case Viewport::Id: {
-        VerifyOrReturnError(
-            HasFeature(Feature::kVideo), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set RankedVideoStreamPrioritiesList, feature is not supported"));
+        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set Viewport, feature is not supported"));
         ViewportStruct viewPort;
         ReturnErrorOnFailure(aDecoder.Decode(viewPort));
         ReturnErrorOnFailure(SetViewport(viewPort));
@@ -668,6 +661,33 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         bool micAGCEnabled;
         ReturnErrorOnFailure(aDecoder.Decode(micAGCEnabled));
         ReturnErrorOnFailure(SetMicrophoneAGCEnabled(micAGCEnabled));
+        return CHIP_NO_ERROR;
+    }
+    case ImageRotation::Id: {
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttributes::kSupportsImageRotation),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set ImageRotation, feature is not supported"));
+        uint16_t imageRotation;
+        ReturnErrorOnFailure(aDecoder.Decode(imageRotation));
+        ReturnErrorOnFailure(SetImageRotation(imageRotation));
+        return CHIP_NO_ERROR;
+    }
+    case ImageFlipHorizontal::Id: {
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttributes::kSupportsImageFlipHorizontal),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set ImageFlipHorizontal, feature is not supported"));
+        bool imageFlipHorizontal;
+        ReturnErrorOnFailure(aDecoder.Decode(imageFlipHorizontal));
+        ReturnErrorOnFailure(SetImageFlipHorizontal(imageFlipHorizontal));
+        return CHIP_NO_ERROR;
+    }
+    case ImageFlipVertical::Id: {
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttributes::kSupportsImageFlipVertical),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set ImageFlipVertical, feature is not supported"));
+        bool imageFlipVertical;
+        ReturnErrorOnFailure(aDecoder.Decode(imageFlipVertical));
+        ReturnErrorOnFailure(SetImageFlipVertical(imageFlipVertical));
         return CHIP_NO_ERROR;
     }
     case LocalVideoRecordingEnabled::Id: {

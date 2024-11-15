@@ -161,9 +161,11 @@ enum class OptionalAttributes : uint32_t
     kSupportsNightVision           = 0x0004,
     kSupportsNightVisionIllum      = 0x0008,
     kSupportsMicrophoneAGCEnabled  = 0x0010,
-    kSupportsStatusLightEnabled    = 0x0020,
-    kSupportsStatusLightBrightness = 0x0040,
-    kSupportsDepthSensorStatus     = 0x0080,
+    kSupportsImageRotation         = 0x0020,
+    kSupportsImageFlipHorizontal   = 0x0040,
+    kSupportsImageFlipVertical     = 0x0080,
+    kSupportsStatusLightEnabled    = 0x0100,
+    kSupportsStatusLightBrightness = 0x0200,
 };
 
 class CameraAVStreamMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
