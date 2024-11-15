@@ -403,13 +403,18 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertNil(*error);
     XCTAssertNotNil(root);
 
+    __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
+    XCTAssert(operationalPublicKey != NULL);
+
     __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
                                                            signingCertificate:root
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:operationalPublicKey
                                                                      fabricID:fabricID
                                                                        nodeID:nodeID
                                                         caseAuthenticatedTags:caseAuthenticatedTags
                                                                         error:error];
+    CFRelease(operationalPublicKey);
+
     XCTAssertNil(*error);
     XCTAssertNotNil(operational);
 
