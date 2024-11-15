@@ -111,7 +111,7 @@ void ESP32Diagnostics::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
 void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 {
     DiagnosticStorageImpl & diagnosticStorage = DiagnosticStorageImpl::GetInstance();
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
     switch (event.ValueType())
     {
     case ValueType::kInt32: {
@@ -146,24 +146,28 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 
 void ESP32Diagnostics::TraceCounter(const char * label)
 {
-    ::Diagnostics::ESPDiagnosticCounter::GetInstance(label)->ReportMetrics();
+    ESPDiagnosticCounter::GetInstance(label)->ReportMetrics();
 }
 
-void ESP32Diagnostics::TraceBegin(const char * label, const char * group) {
+void ESP32Diagnostics::TraceBegin(const char * label, const char * group)
+{
     StoreDiagnostics(label, group);
 }
 
-void ESP32Diagnostics::TraceEnd(const char * label, const char * group) {
+void ESP32Diagnostics::TraceEnd(const char * label, const char * group)
+{
     StoreDiagnostics(label, group);
 }
 
-void ESP32Diagnostics::TraceInstant(const char * label, const char * group) {
+void ESP32Diagnostics::TraceInstant(const char * label, const char * group)
+{
     StoreDiagnostics(label, group);
 }
 
-void ESP32Diagnostics::StoreDiagnostics(const char* label, const char* group) {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    HashValue hashValue                           = MurmurHash(group);
+void ESP32Diagnostics::StoreDiagnostics(const char * label, const char * group)
+{
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    HashValue hashValue                       = MurmurHash(group);
     DiagnosticStorageImpl & diagnosticStorage = DiagnosticStorageImpl::GetInstance();
     if (IsPermitted(hashValue))
     {

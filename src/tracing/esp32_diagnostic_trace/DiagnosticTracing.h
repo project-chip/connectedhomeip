@@ -18,12 +18,11 @@
  *    limitations under the License.
  */
 
+#include <esp_log.h>
 #include <lib/core/CHIPError.h>
 #include <tracing/backend.h>
-#include <tracing/metric_event.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorageManager.h>
-#include <esp_log.h>
-
+#include <tracing/metric_event.h>
 
 #include <memory>
 namespace chip {
@@ -35,14 +34,11 @@ namespace Diagnostics {
 class ESP32Diagnostics : public ::chip::Tracing::Backend
 {
 public:
-    ESP32Diagnostics(uint8_t *buffer, size_t buffer_size)
-    {
-        DiagnosticStorageImpl::GetInstance(buffer, buffer_size);
-    }
+    ESP32Diagnostics(uint8_t * buffer, size_t buffer_size) { DiagnosticStorageImpl::GetInstance(buffer, buffer_size); }
 
     // Deleted copy constructor and assignment operator to prevent copying
-    ESP32Diagnostics(const ESP32Diagnostics&) = delete;
-    ESP32Diagnostics& operator=(const ESP32Diagnostics&) = delete;
+    ESP32Diagnostics(const ESP32Diagnostics &)             = delete;
+    ESP32Diagnostics & operator=(const ESP32Diagnostics &) = delete;
 
     void TraceBegin(const char * label, const char * group) override;
 
@@ -60,7 +56,7 @@ public:
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
     void LogMetricEvent(const MetricEvent &) override;
-    void StoreDiagnostics(const char* label, const char* group);
+    void StoreDiagnostics(const char * label, const char * group);
 
 private:
     using ValueType = MetricEvent::Value::Type;
