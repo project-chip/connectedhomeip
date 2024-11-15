@@ -610,8 +610,6 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     {
         initParams.defaultCommissioner = &sTestCommissioner;
         pairingDelegate->SetCommissioningSuccessCallback(pychip_OnCommissioningSuccess);
-        // pairingDelegate->SetCommissioningSuccessCallback([](chip::PeerId peerId) { pychip_OnCommissioningSuccess(peerId,
-        // sTestCommissioner.GetRCACData().data(), sTestCommissioner.GetRCACData().size()); });
         pairingDelegate->SetCommissioningFailureCallback(pychip_OnCommissioningFailure);
         pairingDelegate->SetCommissioningStatusUpdateCallback(pychip_OnCommissioningStatusUpdate);
     }

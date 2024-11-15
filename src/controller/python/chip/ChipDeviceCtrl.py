@@ -472,7 +472,6 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(False, None)
 
             if self._dmLib.pychip_TestCommissionerUsed():
-                # Prepare pointers to store the results
                 err = self._dmLib.pychip_GetCompletionError()
 
             if self._commissioning_context.future is None:
@@ -1933,8 +1932,6 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_GetCompletionError.argtypes = []
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
-            #self._dmLib.pychip_GetCommissioningRCACData.argtypes = [POINTER(POINTER(c_uint8)), POINTER(c_size_t)]
-            #self._dmLib.pychip_GetCommissioningRCACData.restype = None
             self._dmLib.pychip_SetCommissioningRCACCallback.argtypes = [_RCACCallbackType]
             self._dmLib.pychip_SetCommissioningRCACCallback.restype = None
 
