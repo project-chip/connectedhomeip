@@ -176,7 +176,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ZoneManagementClusterTwoDCartesianVertexStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ZoneManagementClusterTwoDCartesianZoneStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ZoneManagementClusterZoneInformationStruct.kt",
-  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ZoneManagementClusterZoneTriggeringTimeControlStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ZoneManagementClusterZoneTriggerControlStruct.kt",
 ]
 
 eventstructs_sources = [

@@ -141,6 +141,11 @@
     return [[self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID] copy];
 }
 
+- (MTRNetworkCommissioningFeature)networkCommissioningFeatures
+{
+    return [[self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures] unsignedIntValue];
+}
+
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
 // required methods for MTRDeviceDelegates

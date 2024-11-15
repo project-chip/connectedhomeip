@@ -688,11 +688,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ZoneManagement:
 
 static void Finalize(chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::Type & request);
+static void Finalize(chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type & request,
