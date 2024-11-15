@@ -1888,22 +1888,6 @@ namespace CaptureSnapshotResponse {
 static constexpr CommandId Id = 0x0000000C;
 } // namespace CaptureSnapshotResponse
 
-namespace SetViewport {
-static constexpr CommandId Id = 0x0000000D;
-} // namespace SetViewport
-
-namespace SetImageRotation {
-static constexpr CommandId Id = 0x0000000E;
-} // namespace SetImageRotation
-
-namespace SetImageFlipHorizontal {
-static constexpr CommandId Id = 0x0000000F;
-} // namespace SetImageFlipHorizontal
-
-namespace SetImageFlipVertical {
-static constexpr CommandId Id = 0x00000010;
-} // namespace SetImageFlipVertical
-
 } // namespace Commands
 } // namespace CameraAvStreamManagement
 

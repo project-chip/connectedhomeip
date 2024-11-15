@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -175,9 +174,6 @@ DataVersion sBridgedNodeDataVersions[ArraySize(bridgedNodeClusters)];
 const EmberAfDeviceType sBridgedDeviceTypes[] = { { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
 } // namespace
-
-// Define the static member
-BridgedDeviceManager BridgedDeviceManager::sInstance;
 
 void BridgedDeviceManager::Init()
 {

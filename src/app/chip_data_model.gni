@@ -460,6 +460,7 @@ template("chip_data_model") {
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/app/common:enums",
       "${chip_root}/src/app/util:types",
+      "${chip_root}/src/app/util/persistence",
       "${chip_root}/src/controller",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",

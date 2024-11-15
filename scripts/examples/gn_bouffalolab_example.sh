@@ -200,7 +200,7 @@ else
     example_dir=$MATTER_ROOT/examples/$example_name/bouffalolab/$bouffalo_chip
     output_dir=$MATTER_ROOT/$output_folder
 
-    gn gen --check --fail-on-unused-args --export-compile-commands --root="$example_dir" "$output_dir" --args="${optArgs[*]}"
+    gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root="$example_dir" "$output_dir" --args="${optArgs[*]}"
 
     ninja -C "$output_dir"
 fi

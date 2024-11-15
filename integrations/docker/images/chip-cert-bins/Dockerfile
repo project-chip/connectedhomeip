@@ -258,30 +258,36 @@ RUN apt-get update -y
 RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2 libcairo2-dev libgirepository1.0-dev python3-pip
 WORKDIR /root/
 COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tool chip-tool
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-shell chip-shell
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-cert chip-cert
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app chip-all-clusters-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app-nlfaultinject chip-all-clusters-app-nlfaultinject
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-minimal-app chip-all-clusters-minimal-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-app chip-lighting-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tv-casting-app chip-tv-casting-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tv-app chip-tv-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-bridge-app chip-bridge-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/thermostat-app thermostat-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-provider-app chip-ota-provider-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-app chip-ota-requestor-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app chip-lock-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 chip-app1
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app lit-icd-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app chip-energy-management-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app chip-microwave-oven-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-rvc-app chip-rvc-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/examples/fabric-admin/scripts/fabric-sync-app.py fabric-sync-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-bridge-app fabric-bridge-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-admin fabric-admin
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-data-model-no-unique-id-app chip-lighting-data-model-no-unique-id-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/matter-network-manager-app matter-network-manager-app
+RUN mkdir apps
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tool apps/chip-tool
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-shell apps/chip-shell
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-cert apps/chip-cert
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app apps/chip-all-clusters-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app-nlfaultinject apps/hip-all-clusters-app-nlfaultinject
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-minimal-app apps/chip-all-clusters-minimal-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-app apps/chip-lighting-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tv-casting-app apps/chip-tv-casting-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tv-app apps/chip-tv-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-bridge-app apps/chip-bridge-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/thermostat-app apps/thermostat-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-provider-app apps/chip-ota-provider-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-app apps/chip-ota-requestor-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app apps/chip-lock-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 apps/chip-app1
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app apps/lit-icd-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app apps/chip-energy-management-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app apps/chip-microwave-oven-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-rvc-app apps/chip-rvc-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/examples/fabric-admin/scripts/fabric-sync-app.py apps/fabric-sync-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-bridge-app apps/fabric-bridge-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-admin apps/fabric-admin
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-data-model-no-unique-id-app apps/chip-lighting-data-model-no-unique-id-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/matter-network-manager-app apps/matter-network-manager-app
+
+# Create symbolic links for now since this allows users to use existing configurations
+# for running just `app-name` instead of `apps/app-name`
+RUN ln -s apps/* .
+
 
 # Stage 3.1: Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
