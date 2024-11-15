@@ -174,6 +174,9 @@ private:
     void HandleThermostatAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
     void ThermostatHeatingSetpointWriteCallback(int16_t aNewHeatingSetpoint);
     void ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode);
+
+    void SetFanPower(bool onoff);
+    void HandleOnOffAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
 };
 
 } // namespace Clusters
