@@ -182,7 +182,7 @@ CHIP_ERROR BdxTransfer::SendBlock()
 CHIP_ERROR BdxTransfer::OnMessageReceived(chip::Messaging::ExchangeContext * exchangeContext,
                                           const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle && payload)
 {
-    bool has_send_init = payloadHeader.HasMessageType(MessageType::SendInit);
+    bool has_send_init    = payloadHeader.HasMessageType(MessageType::SendInit);
     bool has_receive_init = payloadHeader.HasMessageType(MessageType::ReceiveInit);
     if (has_send_init || has_receive_init)
     {
