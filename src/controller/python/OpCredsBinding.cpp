@@ -16,7 +16,7 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
-*/
+ */
 
 #include <type_traits>
 
@@ -45,17 +45,17 @@
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 
-//Including AutoCommissioner initialization here for getting RootCert
+// Including AutoCommissioner initialization here for getting RootCert
 #include <controller/AutoCommissioner.h>
-#include <openssl/x509.h>
-#include <openssl/bio.h>
-#include <openssl/pem.h>
-#include <cstddef> // Added for size_t
+#include <cstddef>    // Added for size_t
 #include <functional> // Added for std::function
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVTypes.h>
-//#include <thread>  // Include this for std::this_thread
-//#include <chrono>  // Include this for std::chrono::milliseconds
+#include <openssl/bio.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
+// #include <thread>  // Include this for std::this_thread
+// #include <chrono>  // Include this for std::chrono::milliseconds
 
 using namespace chip;
 
@@ -168,7 +168,7 @@ public:
             if (report.Is<chip::Controller::NocChain>())
             {
                 auto nocChain = report.Get<chip::Controller::NocChain>();
-                MutableByteSpan rcacSpan(const_cast<uint8_t*>(nocChain.rcac.data()), nocChain.rcac.size());
+                MutableByteSpan rcacSpan(const_cast<uint8_t *>(nocChain.rcac.data()), nocChain.rcac.size());
 
                 chip::ByteSpan rcacByteSpan(rcacSpan.data(), rcacSpan.size());
 
@@ -337,10 +337,7 @@ public:
         }
     }
 
-    CHIP_ERROR GetCommissioningResultError() const
-    {
-        return mCommissioningResultError;
-    }
+    CHIP_ERROR GetCommissioningResultError() const { return mCommissioningResultError; }
 
     void SetOnRCACReadyCallback(RCACReadyCallback callback)
     {
@@ -351,8 +348,8 @@ public:
     CHIP_ERROR GetCompletionError() { return mCompletionError; }
 
     // Getter method to access RCAC data
-    //const std::vector<uint8_t>& GetRCACData() const { return mRCACData; }
-    const std::vector<uint8_t>& GetCHIPRCACData() const { return mCHIPRCACData; }
+    // const std::vector<uint8_t>& GetRCACData() const { return mRCACData; }
+    const std::vector<uint8_t> & GetCHIPRCACData() const { return mCHIPRCACData; }
 
 private:
     void NotifyRCACDataReady()
@@ -624,7 +621,8 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     {
         initParams.defaultCommissioner = &sTestCommissioner;
         pairingDelegate->SetCommissioningSuccessCallback(pychip_OnCommissioningSuccess);
-        //pairingDelegate->SetCommissioningSuccessCallback([](chip::PeerId peerId) { pychip_OnCommissioningSuccess(peerId, sTestCommissioner.GetRCACData().data(), sTestCommissioner.GetRCACData().size()); });
+        // pairingDelegate->SetCommissioningSuccessCallback([](chip::PeerId peerId) { pychip_OnCommissioningSuccess(peerId,
+        // sTestCommissioner.GetRCACData().data(), sTestCommissioner.GetRCACData().size()); });
         pairingDelegate->SetCommissioningFailureCallback(pychip_OnCommissioningFailure);
         pairingDelegate->SetCommissioningStatusUpdateCallback(pychip_OnCommissioningStatusUpdate);
     }
@@ -764,29 +762,28 @@ PyChipError pychip_GetCompletionError()
 }
 
 extern "C" {
-    // Define a global callback to set the RCAC data callback
-    using PythonRCACCallback = void (*)(const uint8_t *, size_t);
-    static PythonRCACCallback gPythonRCACCallback = nullptr;
+// Define a global callback to set the RCAC data callback
+using PythonRCACCallback                      = void (*)(const uint8_t *, size_t);
+static PythonRCACCallback gPythonRCACCallback = nullptr;
 
+// Function to set the Python callback
+void pychip_SetCommissioningRCACCallback(PythonRCACCallback callback)
+{
+    ChipLogProgress(Controller, "Attempting to set Python RCAC callback in C++");
+    gPythonRCACCallback = callback;
 
-    // Function to set the Python callback
-    void pychip_SetCommissioningRCACCallback(PythonRCACCallback callback)
-    {
-        ChipLogProgress(Controller, "Attempting to set Python RCAC callback in C++");
-        gPythonRCACCallback = callback;
-
-        // Set C++ TestCommissioner callback to notify Python when RCAC data is ready
-        sTestCommissioner.SetOnRCACReadyCallback([](const std::vector<uint8_t> & rcacData) {
-            if (gPythonRCACCallback)
-            {
-                ChipLogProgress(Controller, "RCAC callback in C++ set");
-                gPythonRCACCallback(rcacData.data(), rcacData.size());
-            }
-            else
-            {
-                ChipLogError(Controller, "Python RCAC callback is not set.");
-            }
-        });
+    // Set C++ TestCommissioner callback to notify Python when RCAC data is ready
+    sTestCommissioner.SetOnRCACReadyCallback([](const std::vector<uint8_t> & rcacData) {
+        if (gPythonRCACCallback)
+        {
+            ChipLogProgress(Controller, "RCAC callback in C++ set");
+            gPythonRCACCallback(rcacData.data(), rcacData.size());
         }
-    }
+        else
+        {
+            ChipLogError(Controller, "Python RCAC callback is not set.");
+        }
+    });
+}
+}
 } // extern "C"
