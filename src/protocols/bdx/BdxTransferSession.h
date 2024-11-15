@@ -136,7 +136,7 @@ public:
 
         const char * ToString(const OutputEventType outputEventType);
 
-        static const char * TypeToString(const OutputEventType outputEventType);
+        static const char * TypeToString(OutputEventType outputEventType);
 
         static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg);
         static OutputEvent TransferAcceptEvent(TransferAcceptData data);

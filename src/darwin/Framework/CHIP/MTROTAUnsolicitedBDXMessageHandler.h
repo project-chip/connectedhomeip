@@ -26,13 +26,14 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * This class creates an unsolicited handler for listening to all unsolicited BDX messages
- * and when it receives a BDX ReceiveInit message from a node, it creates a new
- * MTROTAImageTransferHandler object as a delegate that will prepare for transfer and
- * handle all BDX messages for the BDX transfer session with that node. If it receives an out of order
- * BDX message or if the message is received on a non-valid session, the OnUnsolicitedMessageReceived
- * returns CHIP_ERROR_INCORRECT_STATE.
+ * This class defines a handler that can listen for all unsolicited BDX messages.
  *
+ * When it receives a BDX ReceiveInit message from a node, it creates a new
+ * MTROTAImageTransferHandler object as the exchange delegate that will
+ * handle the transfer.
+ *
+ * In all other cases, it fails out so that there is no exchange delegate created,
+ * which means the message is potentially acked, but does not get a response.
  */
 class MTROTAUnsolicitedBDXMessageHandler : public chip::Messaging::UnsolicitedMessageHandler {
 public:
@@ -42,23 +43,23 @@ public:
         sInstance = this;
     }
 
-    ~MTROTAUnsolicitedBDXMessageHandler() { mExchangeMgr = nullptr; }
+    ~MTROTAUnsolicitedBDXMessageHandler() {}
 
     static MTROTAUnsolicitedBDXMessageHandler * GetInstance();
 
     CHIP_ERROR Init(chip::Messaging::ExchangeManager * exchangeManager);
 
     // Returns the number of delegates that are currently handling BDX transfers.
-    static uint8_t GetNumberOfDelegates();
+    static uint8_t GetNumberOfOngoingTransfers();
 
     static void IncrementNumberOfDelegates();
 
     // Decrease the number of delegates handling BDX transfers by 1.
     static void DecrementNumberOfDelegates();
 
-    void OnDelegateCreated(void * imageTransferHandler);
+    void OnTransferHandlerCreated(void * imageTransferHandler);
 
-    void OnDelegateDestroyed(void * imageTransferHandler);
+    void OnTransferHandlerDestroyed(void * imageTransferHandler);
 
     void Shutdown();
 
@@ -71,7 +72,7 @@ private:
     void OnExchangeCreationFailed(chip::Messaging::ExchangeDelegate * _Nonnull delegate) override;
 
     // TODO: #36181 - Have a set of MTROTAImageTransferHandler objects.
-    MTROTAImageTransferHandler * mOTAImageTransferHandler = nullptr;
+    MTROTAImageTransferHandler * _Nullable mOTAImageTransferHandler = nullptr;
 
     chip::Messaging::ExchangeManager * mExchangeMgr;
 

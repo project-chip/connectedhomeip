@@ -52,16 +52,14 @@ CHIP_ERROR AsyncTransferFacilitator::Init(System::Layer * layer, Messaging::Exch
 }
 
 /**
- * Calls the GetNextAction on the TransferSession to get the next output events until it receives
- * TransferSession::OutputEventType::kNone If the output event is of type TransferSession::OutputEventType::kMsgToSend, it sends the
- * message over the exchange context, otherwise it calls the HandleTransferSessionOutput method implemented by the subclass to
- * handle the BDX message.
+ * Get events one by one from the TransferSession and process them,
+ * until there are no more events to process.
  */
 void AsyncTransferFacilitator::ProcessOutputEvents()
 {
     if (mProcessingOutputEvents)
     {
-        ChipLogDetail(BDX, "ProcessOutputEvents: Still getting and processing output events from a previous call. Return.");
+        ChipLogDetail(BDX, "ProcessOutputEvents: we are already in the middle of processing events, so nothing to do here; when we unwind to the processing loop the events will get processed.");
         return;
     }
 
@@ -79,21 +77,22 @@ void AsyncTransferFacilitator::ProcessOutputEvents()
         {
             CHIP_ERROR err = SendMessage(outEvent.msgTypeData, outEvent.MsgData);
 
-            // If we failed to send the message across the exchange, there is no way to let the other side know there was an
-            // error so call DestroySelf so the exchange can be released and the other side will be notified the exchange is
-            // closing and will clean up.
+            // If we failed to send the message across the exchange, just abort the transfer.
+            // We have no way to notify our peer we are doing that (we can't send them a
+            // message!) but eventually they will time out.
             if (err != CHIP_NO_ERROR)
             {
                 DestroySelf();
                 return;
             }
 
-            // If we send out a status report across the exchange, schedule a call to DestroySelf() at a little bit later time
-            // since we want the message to be sent before we clean up.
+            // If we send out a status report across the exchange, that means there was an error.
+            // We've sent our report about that error and can now abort the transfer.  Our peer
+            // will respond to the status report by tearing down their side.
             if (outEvent.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
             {
-                DestroySelf();
-                return;
+                mDestroySelf = true;
+                break;
             }
         }
         else

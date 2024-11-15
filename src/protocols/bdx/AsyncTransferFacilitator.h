@@ -29,8 +29,8 @@ namespace bdx {
 /**
  * An abstract class with methods for receiving and sending BDX messages on an ExchangeContext. It interacts with the Transfer
  * Session state machine to process the received messages and send any outgoing messages.
- * Note: If the relevant fabric shuts down, it is the responsibility of the subclass that implements the HandleTransferSessionOutput
- * to destroy this object and its subclasses.
+ * Note: If the relevant fabric shuts down, it is the responsibility of the subclass that implements HandleTransferSessionOutput
+ * to destroy itself (and hence this object).
  *
  * This class does not define any methods for beginning a transfer or initializing the underlying TransferSession object.
  * See AsyncResponder for a class that does.
@@ -48,12 +48,12 @@ protected:
     CHIP_ERROR Init(System::Layer * layer, Messaging::ExchangeContext * exchangeCtx, System::Clock::Timeout timeout);
 
     // If subclasses override this method and they call the superclass's OnMessageReceived, the superclass
-    // may destroy the subclass's object.
+    // may destroy the subclass's object before OnMessageReceived returns.
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
 
     // If subclasses override this method and they call the superclass's OnResponseTimeout, the superclass
-    // may destroy the subclass's object.
+    // may destroy the subclass's object before OnResponseTimeout returns.
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     static bdx::StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR err);
@@ -68,12 +68,16 @@ protected:
 
     /**
      * This method should be implemented to destroy the object subclassing AsyncTransferFacilitator.
+     *
+     * This is a hook that is expected to be called by AsyncTransferFacilitator and allows subclasses
+     * to select an allocation strategy of their choice.
      */
     virtual void DestroySelf() = 0;
 
+    // Calling ProcessOutputEvents can destroy this object before the call returns.
     void ProcessOutputEvents();
 
-    // The transfer session coresponding to this AsyncTransferFacilitator object.
+    // The transfer session corresponding to this AsyncTransferFacilitator object.
     TransferSession mTransfer;
 
     bool mDestroySelf = false;
@@ -123,7 +127,9 @@ public:
      * Every call to HandleTransferSessionOutput must result in a call to NotifyEventHandled.  The call
      * to NotifyEventHandled may happen before HandleTransferSessionOutput returns, or may happen
      * later, asynchronously.
-     * Note: This API is allowed to destroy the AsyncResponder before the call returns.
+
+     * Note: NotifyEventHandled is allowed to destroy the AsyncResponder before the call returns.
+     *.          Callers must be careful about this.
      *
      * @param[in] event The OutputEvent that was handled by the subclass.
      * @param[in] status The error code that occured when handling the event if an error occurs. Otherwise CHIP_NO_ERROR.

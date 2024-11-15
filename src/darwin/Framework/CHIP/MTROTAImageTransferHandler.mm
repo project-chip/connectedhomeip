@@ -32,6 +32,8 @@ constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
 
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
+// An ARC-managed object that lets us do weak references to a MTROTAImageTransferHandler
+// (which is a C++ object).
 @interface MTROTAImageTransferHandlerWrapper : NSObject
 - (instancetype)initWithMTROTAImageTransferHandler:(MTROTAImageTransferHandler *)otaImageTransferHandler;
 @property (nonatomic, nullable, readwrite, assign) MTROTAImageTransferHandler * otaImageTransferHandler;
@@ -141,7 +143,8 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
                 AsyncResponder::NotifyEventHandled(event, err);
             }
                           errorHandler:^(NSError *) {
-                              // Not much we can do here
+                              // Not much we can do here, but if the controller is shut down we
+                              // should already have been destroyed anyway.
                           }];
     };
 
@@ -151,7 +154,6 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
     auto delegateQueue = mDelegateNotificationQueue;
     if (strongDelegate == nil || delegateQueue == nil) {
         LogErrorOnFailure(CHIP_ERROR_INCORRECT_STATE);
-        AsyncResponder::NotifyEventHandled(event, CHIP_ERROR_INCORRECT_STATE);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -216,8 +218,6 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent
 {
     assertChipStackLockedByCurrentThread();
 
-    VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     auto blockSize = @(mTransfer.GetTransferBlockSize());
     auto blockIndex = @(mTransfer.GetNextBlockNum());
@@ -270,7 +270,6 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent
     auto delegateQueue = mDelegateNotificationQueue;
     if (strongDelegate == nil || delegateQueue == nil) {
         LogErrorOnFailure(CHIP_ERROR_INCORRECT_STATE);
-        AsyncResponder::NotifyEventHandled(event, CHIP_ERROR_INCORRECT_STATE);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -381,8 +380,9 @@ CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err;
 
-    // If we receive a ReceiveInit message, then we prepare for transfer. Otherwise we send the message
-    // received to the AsyncTransferFacilitator for processing.
+    // If we receive a ReceiveInit message, then we prepare for transfer.
+    //
+    // If init succeeds, or is not needed, we send the message to the AsyncTransferFacilitator for processing.
     if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
         NodeId nodeId = ec->GetSessionHandle()->GetPeer().GetNodeId();
         FabricIndex fabricIndex = ec->GetSessionHandle()->GetFabricIndex();
@@ -390,7 +390,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
         if (nodeId != kUndefinedNodeId && fabricIndex != kUndefinedFabricIndex) {
             err = Init(&DeviceLayer::SystemLayer(), ec, fabricIndex, nodeId);
             if (err != CHIP_NO_ERROR) {
-                ChipLogError(Controller, "OnMessageReceived: Failed to prepare for transfer for BDX");
+                ChipLogError(Controller, "OnMessageReceived: Failed to prepare for transfer for BDX: %" CHIP_ERROR_FORMAT, err);
                 return err;
             }
         }
