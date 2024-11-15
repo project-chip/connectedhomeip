@@ -72,8 +72,10 @@ def verify_csr_not_update() -> str:
 def verify_constraint_error() -> str:
     return ("Verify that the DUT responds with CONSTRAINT_ERROR")
 
+
 def verify_csr_pase() -> str:
     return ("Verify that the DUT returns a CSRResponse and save as csr_pase")
+
 
 def verify_unsupported_access() -> str:
     return ("Verify that the DUT responds with UNSUPPORTED_ACCESS")
@@ -91,29 +93,40 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                     3, f"TH1 {read_attribute('TrustedRootCertificates')} attribute from the Node Operational Credentials cluster", None, verify_trusted_root_original()),
                 TestStep(
                     4, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue", None, verify_failsafe_status()),
-                TestStep(5, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 900", None, verify_armfailsafe_response()),
+                TestStep(
+                    5, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 900", None, verify_armfailsafe_response()),
                 TestStep(
                     6, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue", None, verify_noc_response("MissingCsr")),
-                TestStep(7, f"TH1 {send_command('CSRRequest')} with the IsForUpdateNOC field set to false", None, verify_csr_not_update()),
+                TestStep(
+                    7, f"TH1 {send_command('CSRRequest')} with the IsForUpdateNOC field set to false", None, verify_csr_not_update()),
                 TestStep(8, "TH1 generates a new NOC chain with ICAC with the following properties"),
-                TestStep(9, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_constraint_error()),
-                TestStep(10, f"TH1 {send_command('CSRequest')} with the IsForUpdateNOC field set to true", None, verify_csr_not_update()),
-                TestStep(11, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_noc_response("InvalidPublicKey")),
+                TestStep(
+                    9, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_constraint_error()),
+                TestStep(
+                    10, f"TH1 {send_command('CSRequest')} with the IsForUpdateNOC field set to true", None, verify_csr_not_update()),
+                TestStep(
+                    11, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_noc_response("InvalidPublicKey")),
                 TestStep(12, "TH1 generates a new Trusted Root Certificate and Private Key and saves as new_root_cert and new_root_key so that TH can generate an NOC for UpdateNOC that doesn’t chain to the original root"),
                 TestStep(13, "TH1 generates a new NOC and ICAC"),
-                TestStep(14, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_noc_response("InvalidNOC")),
+                TestStep(
+                    14, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_noc_response("InvalidNOC")),
                 TestStep(15, "TH1 generates a new NOC and ICAC"),
-                TestStep(16, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_noc_response("InvalidNOC")),
+                TestStep(
+                    16, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_noc_response("InvalidNOC")),
                 TestStep(17, "TH1 generates a new NOC and ICAC"),
-                TestStep(18, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_noc_response("InvalidNOC")),
+                TestStep(
+                    18, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_noc_response("InvalidNOC")),
                 TestStep(
                     19, f"TH1 {send_command('AddTrustedRootCertificate')} to DUT again with the RootCACertificate field set to new_root_cert"),
-                TestStep(20, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_constraint_error()),
-                TestStep(21, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
+                TestStep(
+                    20, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_constraint_error()),
+                TestStep(
+                    21, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
                 TestStep(22, f"TH1 {send_command('OpenCommissioningWindow')} to the DUT"),
                 TestStep(
                     23, f"TH1 connects to the DUT over PASE and {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 900. Steps 24-26 are all performed over the PASE connection.", None, verify_armfailsafe_response()),
-                TestStep(24, f"TH1 {send_command('CSRequest')} over PASE with the IsForUpdateNOC field set to true", None, verify_csr_pase()),
+                TestStep(
+                    24, f"TH1 {send_command('CSRequest')} over PASE with the IsForUpdateNOC field set to true", None, verify_csr_pase()),
                 TestStep(25, "TH1 generates a new NOC chain with ICAC with the following properties: new NOC and ICAC using icac_pase"),
                 TestStep(26, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster over PASE", None, verify_unsupported_access())]
 
