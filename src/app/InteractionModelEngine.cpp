@@ -93,14 +93,14 @@ bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, Endp
                                                                aSubjectDescriptor);
     }
 
-    DataModel::ClusterEntry clusterEntry = aProvider->FirstCluster(aEventPath.mEndpointId);
+    DataModel::ClusterEntry clusterEntry = aProvider->FirstServerCluster(aEventPath.mEndpointId);
     while (clusterEntry.IsValid())
     {
         if (MayHaveAccessibleEventPathForEndpointAndCluster(clusterEntry.path, aEventPath, aSubjectDescriptor))
         {
             return true;
         }
-        clusterEntry = aProvider->NextCluster(clusterEntry.path);
+        clusterEntry = aProvider->NextServerCluster(clusterEntry.path);
     }
 
     return false;
@@ -1774,7 +1774,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 
     // We failed, figure out why ...
     //
-    if (provider->GetClusterInfo(aCommandPath).has_value())
+    if (provider->GetServerClusterInfo(aCommandPath).has_value())
     {
         return Protocols::InteractionModel::Status::UnsupportedCommand; // cluster exists, so command is invalid
     }

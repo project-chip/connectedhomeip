@@ -180,20 +180,31 @@ std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetSemant
     return std::nullopt;
 }
 
-ClusterEntry TestImCustomDataModel::FirstCluster(EndpointId endpoint)
+ClusterEntry TestImCustomDataModel::FirstServerCluster(EndpointId endpoint)
 {
-    return CodegenDataModelProviderInstance()->FirstCluster(endpoint);
+    return CodegenDataModelProviderInstance()->FirstServerCluster(endpoint);
 }
 
-ClusterEntry TestImCustomDataModel::NextCluster(const ConcreteClusterPath & before)
+ClusterEntry TestImCustomDataModel::NextServerCluster(const ConcreteClusterPath & before)
 {
-    return CodegenDataModelProviderInstance()->NextCluster(before);
+    return CodegenDataModelProviderInstance()->NextServerCluster(before);
 }
 
-std::optional<ClusterInfo> TestImCustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
+std::optional<ClusterInfo> TestImCustomDataModel::GetServerClusterInfo(const ConcreteClusterPath & path)
 {
-    return CodegenDataModelProviderInstance()->GetClusterInfo(path);
+    return CodegenDataModelProviderInstance()->GetServerClusterInfo(path);
 }
+
+ClusterId TestImCustomDataModel::FirstClientCluster(EndpointId endpoint)
+{
+    return CodegenDataModelProviderInstance()->FirstClientCluster(endpoint);
+}
+
+ClusterId TestImCustomDataModel::NextClientCluster(const ConcreteClusterPath & before)
+{
+    return CodegenDataModelProviderInstance()->NextClientCluster(before);
+}
+
 
 AttributeEntry TestImCustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
 {

@@ -505,19 +505,29 @@ std::optional<DataModel::Provider::SemanticTag> CustomDataModel::GetSemanticTagA
     return std::nullopt;
 }
 
-ClusterEntry CustomDataModel::FirstCluster(EndpointId endpoint)
+ClusterEntry CustomDataModel::FirstServerCluster(EndpointId endpoint)
 {
-    return CodegenDataModelProviderInstance()->FirstCluster(endpoint);
+    return CodegenDataModelProviderInstance()->FirstServerCluster(endpoint);
 }
 
-ClusterEntry CustomDataModel::NextCluster(const ConcreteClusterPath & before)
+ClusterEntry CustomDataModel::NextServerCluster(const ConcreteClusterPath & before)
 {
-    return CodegenDataModelProviderInstance()->NextCluster(before);
+    return CodegenDataModelProviderInstance()->NextServerCluster(before);
 }
 
-std::optional<ClusterInfo> CustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
+std::optional<ClusterInfo> CustomDataModel::GetServerClusterInfo(const ConcreteClusterPath & path)
 {
-    return CodegenDataModelProviderInstance()->GetClusterInfo(path);
+    return CodegenDataModelProviderInstance()->GetServerClusterInfo(path);
+}
+
+ClusterId CustomDataModel::FirstClientCluster(EndpointId endpoint)
+{
+    return CodegenDataModelProviderInstance()->FirstClientCluster(endpoint);
+}
+
+ClusterId CustomDataModel::NextClientCluster(const ConcreteClusterPath & before)
+{
+    return CodegenDataModelProviderInstance()->NextClientCluster(before);
 }
 
 AttributeEntry CustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)

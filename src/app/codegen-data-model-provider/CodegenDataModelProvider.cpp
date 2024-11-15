@@ -128,15 +128,6 @@ std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteC
     }
 
     DataModel::ClusterInfo info(*versionPtr);
-
-    if (cluster.mask & CLUSTER_MASK_SERVER)
-    {
-        info.mask.Set(DataModel::ClusterMask::kServer);
-    }
-    if (cluster.mask & CLUSTER_MASK_CLIENT)
-    {
-        info.mask.Set(DataModel::ClusterMask::kClient);
-    }
     // TODO: set entry flags:
     //   info->flags.Set(ClusterQualityFlags::kDiagnosticsData)
     return info;
@@ -199,6 +190,23 @@ DataModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const Emb
     }
 
     return DataModel::ClusterEntry::kInvalid;
+}
+
+ClusterId FirstClientClusterId(const EmberAfEndpointType * endpoint, unsigned start_index, unsigned & found_index)
+{
+    for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
+    {
+        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
+        if ((cluster.mask & CLUSTER_MASK_CLIENT) == 0)
+        {
+            continue;
+        }
+
+        found_index = cluster_idx;
+        return cluster.clusterId;
+    }
+
+    return kInvalidClusterId;
 }
 
 /// Load the attribute information into the specified destination
@@ -498,14 +506,14 @@ DataModel::EndpointEntry CodegenDataModelProvider::NextEndpoint(EndpointId befor
     return DataModel::EndpointEntry::kInvalid;
 }
 
-DataModel::ClusterEntry CodegenDataModelProvider::FirstCluster(EndpointId endpointId)
+DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId endpointId)
 {
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
     VerifyOrReturnValue(endpoint != nullptr, DataModel::ClusterEntry::kInvalid);
     VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
     VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
 
-    return FirstServerClusterEntry(endpointId, endpoint, 0, mClusterIterationHint);
+    return FirstServerClusterEntry(endpointId, endpoint, 0, mServerClusterIterationHint);
 }
 
 std::optional<unsigned> CodegenDataModelProvider::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint,
@@ -513,12 +521,12 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindServerClusterIndex(cons
 {
     const unsigned clusterCount = endpoint->clusterCount;
 
-    if (mClusterIterationHint < clusterCount)
+    if (mServerClusterIterationHint < clusterCount)
     {
-        const EmberAfCluster & cluster = endpoint->cluster[mClusterIterationHint];
+        const EmberAfCluster & cluster = endpoint->cluster[mServerClusterIterationHint];
         if (cluster.IsServer() && (cluster.clusterId == id))
         {
-            return std::make_optional(mClusterIterationHint);
+            return std::make_optional(mServerClusterIterationHint);
         }
     }
 
@@ -537,7 +545,7 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindServerClusterIndex(cons
     return std::nullopt;
 }
 
-DataModel::ClusterEntry CodegenDataModelProvider::NextCluster(const ConcreteClusterPath & before)
+DataModel::ClusterEntry CodegenDataModelProvider::NextServerCluster(const ConcreteClusterPath & before)
 {
     // TODO: This search still seems slow (ember will loop). Should use index hints as long
     //       as ember API supports it
@@ -553,10 +561,10 @@ DataModel::ClusterEntry CodegenDataModelProvider::NextCluster(const ConcreteClus
         return DataModel::ClusterEntry::kInvalid;
     }
 
-    return FirstServerClusterEntry(before.mEndpointId, endpoint, *cluster_idx + 1, mClusterIterationHint);
+    return FirstServerClusterEntry(before.mEndpointId, endpoint, *cluster_idx + 1, mServerClusterIterationHint);
 }
 
-std::optional<DataModel::ClusterInfo> CodegenDataModelProvider::GetClusterInfo(const ConcreteClusterPath & path)
+std::optional<DataModel::ClusterInfo> CodegenDataModelProvider::GetServerClusterInfo(const ConcreteClusterPath & path)
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
 
@@ -575,6 +583,47 @@ std::optional<DataModel::ClusterInfo> CodegenDataModelProvider::GetClusterInfo(c
     }
 
     return std::make_optional(std::get<DataModel::ClusterInfo>(info));
+}
+
+ClusterId CodegenDataModelProvider::FirstClientCluster(EndpointId endpointId)
+{
+    const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
+    VerifyOrReturnValue(endpoint != nullptr, kInvalidClusterId);
+    VerifyOrReturnValue(endpoint->clusterCount > 0, kInvalidClusterId);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, kInvalidClusterId);
+
+    return FirstClientClusterId(endpoint, 0, mClientClusterIterationHint);
+}
+
+ClusterId CodegenDataModelProvider::NextClientCluster(const ConcreteClusterPath & before)
+{
+    const EmberAfEndpointType * endpoint = emberAfFindEndpointType(before.mEndpointId);
+    VerifyOrReturnValue(endpoint != nullptr, kInvalidClusterId);
+    VerifyOrReturnValue(endpoint->clusterCount > 0, kInvalidClusterId);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, kInvalidClusterId);
+
+    if (mServerClusterIterationHint < endpoint->clusterCount)
+    {
+        const EmberAfCluster & cluster = endpoint->cluster[mServerClusterIterationHint];
+        if ((cluster.mask & CLUSTER_MASK_CLIENT) && (cluster.clusterId == before.mClusterId))
+        {
+            return FirstClientClusterId(endpoint, mClientClusterIterationHint + 1, mClientClusterIterationHint);
+        }
+    }
+
+    // linear search, this may be slow
+    // does NOT use emberAfClusterIndex to not iterate over endpoints as we have
+    // already found the correct endpoint
+    for (unsigned cluster_idx = 0; cluster_idx < endpoint->clusterCount; cluster_idx++)
+    {
+        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
+        if ((cluster.mask & CLUSTER_MASK_CLIENT) && (cluster.clusterId == before.mClusterId))
+        {
+            return FirstClientClusterId(endpoint, cluster_idx + 1, mClientClusterIterationHint);
+        }
+    }
+
+    return kInvalidClusterId;
 }
 
 DataModel::AttributeEntry CodegenDataModelProvider::FirstAttribute(const ConcreteClusterPath & path)

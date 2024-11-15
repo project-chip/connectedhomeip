@@ -179,24 +179,24 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server)
 {
     CHIP_ERROR err = aEncoder.EncodeList([&endpoint, server](const auto & encoder) -> CHIP_ERROR {
-        auto clusterEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstCluster(endpoint);
-        while (clusterEntry.IsValid())
+        if (server)
         {
-            if (server)
+            auto clusterEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstServerCluster(endpoint);
+            while (clusterEntry.IsValid())
             {
-                if (clusterEntry.info.mask.Has(DataModel::ClusterMask::kServer))
-                {
-                    ReturnErrorOnFailure(encoder.Encode(clusterEntry.path.mClusterId));
-                }
+                ReturnErrorOnFailure(encoder.Encode(clusterEntry.path.mClusterId));
+                clusterEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextServerCluster(clusterEntry.path);
             }
-            else
+        }
+        else
+        {
+            ClusterId clusterId = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstClientCluster(endpoint);
+            while (clusterId != kInvalidClusterId)
             {
-                if (clusterEntry.info.mask.Has(DataModel::ClusterMask::kClient))
-                {
-                    ReturnErrorOnFailure(encoder.Encode(clusterEntry.path.mClusterId));
-                }
+                ReturnErrorOnFailure(encoder.Encode(clusterId));
+                clusterId = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextClientCluster(
+                    ConcreteClusterPath(endpoint, clusterId));
             }
-            clusterEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextCluster(clusterEntry.path);
         }
 
         return CHIP_NO_ERROR;

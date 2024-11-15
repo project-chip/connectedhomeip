@@ -61,17 +61,10 @@ enum class ClusterQualityFlags : uint32_t
     kDiagnosticsData = 0x0001, // `K` quality, may be filtered out in subscriptions
 };
 
-enum class ClusterMask : uint8_t
-{
-    kServer = 0x1,
-    kClient = 0x2,
-};
-
 struct ClusterInfo
 {
     DataVersion dataVersion; // current cluster data version,
     BitFlags<ClusterQualityFlags> flags;
-    BitMask<ClusterMask> mask;
 
     /// Constructor that marks data version as mandatory
     /// for this structure.
@@ -185,10 +178,14 @@ public:
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
     virtual std::optional<SemanticTag> GetSemanticTagAtIndex(EndpointId endpoint, size_t index) = 0;
 
-    // This iteration will list all clusters on a given endpoint
-    virtual ClusterEntry FirstCluster(EndpointId endpoint)                              = 0;
-    virtual ClusterEntry NextCluster(const ConcreteClusterPath & before)                = 0;
-    virtual std::optional<ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) = 0;
+    // This iteration will list all server clusters on a given endpoint
+    virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
+    virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
+    virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
+
+    // This iteration will list all client clusters on a given endpoint
+    virtual ClusterId FirstClientCluster(EndpointId endpoint)                              = 0;
+    virtual ClusterId NextClientCluster(const ConcreteClusterPath & before)                = 0;
 
     // Attribute iteration and accessors provide cluster-level access over
     // attributes
