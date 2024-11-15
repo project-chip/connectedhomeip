@@ -155,6 +155,7 @@ class TelinkBuilder(Builder):
                  mars_board_config: bool = False,
                  usb_board_config: bool = False,
                  compress_lzma_config: bool = False,
+                 thread_analyzer_config: bool = False,
                  ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
@@ -168,6 +169,7 @@ class TelinkBuilder(Builder):
         self.mars_board_config = mars_board_config
         self.usb_board_config = usb_board_config
         self.compress_lzma_config = compress_lzma_config
+        self.thread_analyzer_config = thread_analyzer_config
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -214,6 +216,9 @@ class TelinkBuilder(Builder):
 
         if self.compress_lzma_config:
             flags.append("-DCONFIG_COMPRESS_LZMA=y")
+
+        if self.thread_analyzer_config:
+            flags.append("-DCONFIG_THREAD_ANALYZER=y")
 
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")

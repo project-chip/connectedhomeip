@@ -71,7 +71,7 @@ config IDLE_STACK_SIZE
     default 512 if PM
 
 config ISR_STACK_SIZE
-    default 502 if PM
+    default 576 if PM
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
     default 616 if PM
@@ -154,7 +154,7 @@ config BT_DEVICE_NAME_GATT_WRITABLE
     default n
 
 config B9X_BLE_CTRL_THREAD_STACK_SIZE
-    default 576
+    default 648
 
 config B9X_BLE_CTRL_MASTER_MAX_NUM
     default 0
@@ -261,10 +261,10 @@ config CHIP_ENABLE_ICD_SUPPORT
 	default y if CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
 
 config OPENTHREAD_THREAD_STACK_SIZE
-    default 2178 if PM
+    default 2400 if PM
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
-    default 361 if PM
+    default 432 if PM
     default 608
 
 config OPENTHREAD_SLAAC
@@ -366,6 +366,9 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 	  within range [-JITTER; +JITTER].
 
+config NET_MGMT_EVENT_STACK_SIZE
+	default 1128
+
 endif # CHIP_WIFI
 
 config CHIP_ENABLE_PAIRING_AUTOSTART
@@ -448,7 +451,17 @@ config PWM_SHELL
 config OPENTHREAD_SHELL
     default n
 
-config CHIP_TASK_STACK_SIZE
-	default 4864 if PM
+# Thread analyzer
+config THREAD_ANALYZER
+    default n
+    select THREAD_ANALYZER_AUTO
+
+config THREAD_ANALYZER_AUTO_INTERVAL
+    default 5
+    depends on THREAD_ANALYZER_AUTO
+
+config THREAD_ANALYZER_LOG_LEVEL
+    default 3 # info
+    depends on THREAD_ANALYZER
 
 endif
