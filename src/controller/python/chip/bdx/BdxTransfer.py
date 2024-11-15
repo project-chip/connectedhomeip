@@ -43,6 +43,7 @@ class BdxTransfer:
     The transfer can be accepted by calling accept_and_send_data or accept_and_receive_data.
     The transfer can be rejected by calling reject.
     '''
+
     def __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data: Optional[bytes] = None):
         self.init_message = init_message
         self._bdx_transfer = bdx_transfer

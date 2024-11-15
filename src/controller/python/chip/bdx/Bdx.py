@@ -41,6 +41,7 @@ class AsyncTransferObtainedTransaction:
     ''' The Python context when obtaining a transfer. This is passed into the C++ code to be sent back to Python as part
     of the callback when a transfer is obtained, and sets the result of the future after being called back.
     '''
+
     def __init__(self, future, event_loop, data=None):
         self._future = future
         self._data = data
@@ -64,6 +65,7 @@ class AsyncTransferCompletedTransaction:
     ''' The Python context when accepting a transfer. This is passed into the C++ code to be sent back to Python as part
     of the callback when the transfer completes, and sets the result of the future after being called back.
     '''
+
     def __init__(self, future, event_loop):
         self._future = future
         self._event_loop = event_loop

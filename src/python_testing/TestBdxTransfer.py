@@ -85,7 +85,8 @@ class TestBdxTransfer(MatterBaseTest):
         self.step(4)
         asserts.assert_true(bdx_future in done, "BDX transfer didn't start")
         bdx_transfer: BdxTransfer.BdxTransfer = bdx_future.result()
-        asserts.assert_equal(bdx_transfer.init_message.TransferControlFlags, BdxProtocol.SENDER_DRIVE, "Invalid transfer control flags")
+        asserts.assert_equal(bdx_transfer.init_message.TransferControlFlags,
+                             BdxProtocol.SENDER_DRIVE, "Invalid transfer control flags")
         asserts.assert_equal(bdx_transfer.init_message.MaxBlockSize, 1024, "Invalid max block size")
         asserts.assert_equal(bdx_transfer.init_message.StartOffset, 0, "Invalid start offset")
         asserts.assert_equal(bdx_transfer.init_message.FileDesignator,
