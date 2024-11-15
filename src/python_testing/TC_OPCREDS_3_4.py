@@ -48,6 +48,7 @@ def verify_noc() -> str:
     return (f"- Verify that the returned list has a single entry.\n"
             f"- Save the NOC field as noc_original and the ICAC field as icac_original.\n")
 
+
 def verify_trusted_root_original() -> str:
     return (f"Verify that the returned list has a single entry. Save the entry as trusted_root_original")
 
