@@ -169,7 +169,7 @@ public:
             {
                 auto nocChain = report.Get<chip::Controller::NocChain>();
                 MutableByteSpan rcacSpan(const_cast<uint8_t*>(nocChain.rcac.data()), nocChain.rcac.size());
-                
+
                 chip::ByteSpan rcacByteSpan(rcacSpan.data(), rcacSpan.size());
 
                 // Converting rcac to chip cert format to be decyphered by TLV later in python3
@@ -180,7 +180,7 @@ public:
                 chip::Credentials::ConvertX509CertToChipCert(rcacByteSpan, chipRcacSpan);
                 mCHIPRCACData.assign(chipRcacSpan.data(), chipRcacSpan.data() + chipRcacSpan.size());
 
-                if (!mCHIPRCACData.empty()) 
+                if (!mCHIPRCACData.empty())
                 {
                     // Notify that mCHIPRCACData data is ready
                     NotifyRCACDataReady();
@@ -336,7 +336,7 @@ public:
             }
         }
     }
-    
+
     CHIP_ERROR GetCommissioningResultError() const
     {
         return mCommissioningResultError;
