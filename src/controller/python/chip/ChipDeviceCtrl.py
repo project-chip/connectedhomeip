@@ -268,6 +268,7 @@ class CallbackContext:
         self._future = None
         self._lock.release()
 
+
 class CommissioningContext(CallbackContext):
     """A context manager for handling commissioning callbacks that are expected to be called exactly once.
 
@@ -1936,7 +1937,7 @@ class ChipDeviceControllerBase():
             #self._dmLib.pychip_GetCommissioningRCACData.restype = None
             self._dmLib.pychip_SetCommissioningRCACCallback.argtypes = [_RCACCallbackType]
             self._dmLib.pychip_SetCommissioningRCACCallback.restype = None
-            
+
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64]
             self._dmLib.pychip_DeviceController_IssueNOCChain.restype = PyChipError
@@ -2226,8 +2227,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
                     rcac_data = bytes(ctypes.cast(rcac_data, ctypes.POINTER(ctypes.c_ubyte * rcac_size)).contents)
 
                 except Exception as e:
-                    LOGGER.exception(f"Error when attempting to get rcac data and size after commissioning: {e}")                
-                    return                
+                    LOGGER.exception(f"Error when attempting to get rcac data and size after commissioning: {e}")
+                    return
 
                 if rcac_size > 0:
                     return (await asyncio.futures.wrap_future(ctx.future), rcac_data)
