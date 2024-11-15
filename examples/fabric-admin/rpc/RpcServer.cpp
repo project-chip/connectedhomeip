@@ -29,7 +29,6 @@
 #include <commands/fabric-sync/FabricSyncCommand.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <device_manager/DeviceManager.h>
-#include <device_manager/DeviceSynchronization.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <system/SystemClock.h>
 
@@ -114,7 +113,6 @@ public:
         if (err == CHIP_NO_ERROR)
         {
             DeviceManager::Instance().SetRemoteBridgeNodeId(deviceId);
-            DeviceSynchronizer::Instance().setReverseCommissioningFlag(true);
         }
         else
         {
