@@ -17,11 +17,11 @@
 
 #
 #    @file
-#      Provides Python APIs for CHIP.
+#      Provides BDX Python APIs for CHIP.
 #
 
-"""Provides Python APIs for CHIP."""
+"""Provides BDX Python APIs for CHIP."""
 
 from . import Bdx, BdxProtocol, BdxTransfer
 
-__all__ = [Bdx, BdxProtocol, BdxTransfer]
+__all__ = ["BdxTransfer", "InitMessage"]
