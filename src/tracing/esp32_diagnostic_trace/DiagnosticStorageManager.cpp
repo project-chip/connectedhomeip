@@ -23,12 +23,13 @@
 
 namespace chip {
 namespace Tracing {
+using namespace chip::TLV;
 
 namespace Diagnostics {
-DiagnosticStorageImpl::DiagnosticStorageImpl(uint8_t * buffer, size_t bufferSize)
-    : mEndUserCircularBuffer(buffer, bufferSize) {}
+DiagnosticStorageImpl::DiagnosticStorageImpl(uint8_t * buffer, size_t bufferSize) : mEndUserCircularBuffer(buffer, bufferSize) {}
 
-DiagnosticStorageImpl & DiagnosticStorageImpl::GetInstance(uint8_t * buffer, size_t bufferSize) {
+DiagnosticStorageImpl & DiagnosticStorageImpl::GetInstance(uint8_t * buffer, size_t bufferSize)
+{
     static DiagnosticStorageImpl instance(buffer, bufferSize);
     return instance;
 }
@@ -42,7 +43,6 @@ CHIP_ERROR DiagnosticStorageImpl::Store(DiagnosticEntry & diagnostic)
     CircularTLVWriter writer;
     writer.Init(mEndUserCircularBuffer);
 
-    // Start a TLV structure container (Anonymous)
     TLVType outerContainer;
     err = writer.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainer);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
@@ -98,21 +98,25 @@ CHIP_ERROR DiagnosticStorageImpl::Retrieve(MutableByteSpan & payload)
                                 ChipLogError(DeviceLayer, "Failed to enter outer TLV container: %s", ErrorStr(err)));
 
             err = reader.Next();
-            VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to read next TLV element in outer container: %s", ErrorStr(err)));
+            VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                                ChipLogError(DeviceLayer, "Failed to read next TLV element in outer container: %s", ErrorStr(err)));
 
-            // Check if the current element is a METRIC or TRACE container
             if ((reader.GetType() == kTLVType_Structure) &&
-                (reader.GetTag() == ContextTag(DIAGNOSTICS_TAG::METRIC) || reader.GetTag() == ContextTag(DIAGNOSTICS_TAG::TRACE) || reader.GetTag() == ContextTag(DIAGNOSTICS_TAG::COUNTER)))
+                (reader.GetTag() == ContextTag(DIAGNOSTICS_TAG::METRIC) || reader.GetTag() == ContextTag(DIAGNOSTICS_TAG::TRACE) ||
+                 reader.GetTag() == ContextTag(DIAGNOSTICS_TAG::COUNTER)))
             {
-                if ((reader.GetLengthRead() - writer.GetLengthWritten()) < writer.GetRemainingFreeLength()) {
+                if ((reader.GetLengthRead() - writer.GetLengthWritten()) < writer.GetRemainingFreeLength())
+                {
                     err = writer.CopyElement(reader);
-                    if (err == CHIP_ERROR_BUFFER_TOO_SMALL) {
+                    if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+                    {
                         ChipLogProgress(DeviceLayer, "Buffer too small to occupy current element");
                         break;
                     }
                     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to copy TLV element"));
                 }
-                else {
+                else
+                {
                     ChipLogProgress(DeviceLayer, "Buffer too small to occupy current TLV");
                     break;
                 }
@@ -123,7 +127,6 @@ CHIP_ERROR DiagnosticStorageImpl::Retrieve(MutableByteSpan & payload)
                 reader.ExitContainer(outerReaderContainer);
                 return CHIP_ERROR_WRONG_TLV_TYPE;
             }
-            // Exit the outer container
             err = reader.ExitContainer(outerReaderContainer);
             VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                                 ChipLogError(DeviceLayer, "Failed to exit outer TLV container: %s", ErrorStr(err)));
@@ -136,11 +139,11 @@ CHIP_ERROR DiagnosticStorageImpl::Retrieve(MutableByteSpan & payload)
 
     err = writer.EndContainer(outWriterContainer);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to close outer container"));
-    // Finalize the writing process
     err = writer.Finalize();
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to finalize TLV writing"));
     payload.reduce_size(writer.GetLengthWritten());
-    ChipLogProgress(DeviceLayer, "---------------Total written bytes successfully : %ld----------------\n", writer.GetLengthWritten());
+    ChipLogProgress(DeviceLayer, "---------------Total written bytes successfully : %ld----------------\n",
+                    writer.GetLengthWritten());
     ChipLogProgress(DeviceLayer, "Retrieval successful");
     return CHIP_NO_ERROR;
 }

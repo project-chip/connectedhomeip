@@ -19,8 +19,8 @@
 #include <string.h>
 #include <tracing/esp32_diagnostic_trace/Counter.h>
 
-using namespace chip;
-
+namespace chip {
+namespace Tracing {
 namespace Diagnostics {
 
 // This is a one time allocation for counters. It is not supposed to be freed.
@@ -45,8 +45,8 @@ ESPDiagnosticCounter * ESPDiagnosticCounter::GetInstance(const char * label)
     VerifyOrDie(ptr != nullptr);
 
     ESPDiagnosticCounter * newInstance = new (ptr) ESPDiagnosticCounter(label);
-    newInstance->mNext               = mHead;
-    mHead                            = newInstance;
+    newInstance->mNext                 = mHead;
+    mHead                              = newInstance;
 
     return newInstance;
 }
@@ -61,8 +61,10 @@ void ESPDiagnosticCounter::ReportMetrics()
     CHIP_ERROR err = CHIP_NO_ERROR;
     Counter counter(label, instanceCount, esp_log_timestamp());
     DiagnosticStorageImpl & diagnosticStorage = DiagnosticStorageImpl::GetInstance();
-    err = diagnosticStorage.Store(counter);
+    err                                       = diagnosticStorage.Store(counter);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to store Counter diagnostic data"));
 }
 
 } // namespace Diagnostics
+} // namespace Tracing
+} // namespace chip
