@@ -45,6 +45,77 @@ namespace bridge {
 
 namespace {
 
+class AdministratorCommissioningCommandHandler : public CommandHandlerInterface
+{
+public:
+    // Register for the AdministratorCommissioning cluster on all endpoints.
+    AdministratorCommissioningCommandHandler() :
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), AdministratorCommissioning::Id)
+    {}
+
+    void InvokeCommand(HandlerContext & handlerContext) override;
+};
+
+void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & handlerContext)
+{
+    using Protocols::InteractionModel::Status;
+
+    EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
+    ChipLogProgress(NotSpecified, "Received command to open commissioning window on Endpoint: %d", endpointId);
+
+    if (handlerContext.mRequestPath.mCommandId != AdministratorCommissioning::Commands::OpenCommissioningWindow::Id ||
+        endpointId == kRootEndpointId)
+    {
+        // Proceed with default handling in Administrator Commissioning Server
+        return;
+    }
+
+    handlerContext.SetCommandHandled();
+
+    AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType commandData;
+    if (DataModel::Decode(handlerContext.mPayload, commandData) != CHIP_NO_ERROR)
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
+    Status status                       = Status::Failure;
+    BridgedDevice * device              = BridgedDeviceManager::Instance().GetDevice(endpointId);
+    FabricAdminDelegate * adminDelegate = FabricBridge::Instance().GetDelegate();
+
+    if (device && adminDelegate)
+    {
+        auto nodeId      = device->GetScopedNodeId().GetNodeId();
+        auto fabricIndex = device->GetScopedNodeId().GetFabricIndex();
+
+        Controller::CommissioningWindowVerifierParams params;
+        params.SetNodeId(nodeId)
+            .SetTimeout(commandData.commissioningTimeout)
+            .SetDiscriminator(commandData.discriminator)
+            .SetIteration(commandData.iterations)
+            .SetSalt(commandData.salt)
+            .SetVerifier(commandData.PAKEPasscodeVerifier);
+
+        CHIP_ERROR err = adminDelegate->OpenCommissioningWindow(params, fabricIndex);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NotSpecified, "Commissioning window is now open");
+            status = Status::Success;
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Failed to open commissioning window: %s", ErrorStr(err));
+        }
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Commissioning window failed to open: device or adminDelegate is null");
+    }
+
+    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
+}
+
 class BridgedDeviceInformationCommandHandler : public CommandHandlerInterface
 {
 public:
