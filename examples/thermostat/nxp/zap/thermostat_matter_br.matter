@@ -341,83 +341,6 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
-/** Attributes and commands for group configuration and manipulation. */
-cluster Groups = 4 {
-  revision 4;
-
-  bitmap Feature : bitmap32 {
-    kGroupNames = 0x1;
-  }
-
-  bitmap NameSupportBitmap : bitmap8 {
-    kGroupNames = 0x80;
-  }
-
-  readonly attribute NameSupportBitmap nameSupport = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddGroupRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  response struct AddGroupResponse = 0 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct ViewGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct ViewGroupResponse = 1 {
-    enum8 status = 0;
-    group_id groupID = 1;
-    char_string<16> groupName = 2;
-  }
-
-  request struct GetGroupMembershipRequest {
-    group_id groupList[] = 0;
-  }
-
-  response struct GetGroupMembershipResponse = 2 {
-    nullable int8u capacity = 0;
-    group_id groupList[] = 1;
-  }
-
-  request struct RemoveGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveGroupResponse = 3 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct AddGroupIfIdentifyingRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  /** Command description for AddGroup */
-  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  /** Command description for ViewGroup */
-  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  /** Command description for GetGroupMembership */
-  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  /** Command description for RemoveGroup */
-  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  /** Command description for RemoveAllGroups */
-  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  /** Command description for AddGroupIfIdentifying */
-  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 2;
@@ -2259,7 +2182,6 @@ endpoint 0 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2269,39 +2191,29 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
   server cluster BasicInformation {
     emits event StartUp;
-    emits event ShutDown;
-    emits event Leave;
     callback attribute dataModelRevision;
     callback attribute vendorName;
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
-    persist  attribute nodeLabel;
+    ram      attribute nodeLabel;
     callback attribute location;
     callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
     callback attribute softwareVersion;
     callback attribute softwareVersionString;
-    callback attribute manufacturingDate;
-    callback attribute partNumber;
-    callback attribute productURL;
-    callback attribute productLabel;
-    callback attribute serialNumber;
-    persist  attribute localConfigDisabled default = 0;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
@@ -2311,7 +2223,7 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -2324,7 +2236,6 @@ endpoint 0 {
     ram      attribute updateStateProgress default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2340,10 +2251,9 @@ endpoint 0 {
     callback attribute supportsConcurrentConnection;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2368,7 +2278,7 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
@@ -2424,6 +2334,8 @@ endpoint 0 {
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
+
+    handle command ResetWatermarks;
   }
 
   server cluster WiFiNetworkDiagnostics {
@@ -2456,7 +2368,6 @@ endpoint 0 {
     callback attribute adminVendorId;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2474,7 +2385,6 @@ endpoint 0 {
     callback attribute currentFabricIndex;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2500,7 +2410,6 @@ endpoint 0 {
     callback attribute maxGroupKeysPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2526,27 +2435,10 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -2593,7 +2485,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x3;
-    ram      attribute clusterRevision default = 7;
+    ram      attribute clusterRevision default = 8;
 
     handle command SetpointRaiseLower;
   }
@@ -2703,9 +2595,6 @@ endpoint 2 {
     callback attribute rxErrSecCount;
     callback attribute rxErrFcsCount;
     callback attribute rxErrOtherCount;
-    callback attribute activeTimestamp;
-    callback attribute pendingTimestamp;
-    callback attribute delay;
     callback attribute securityPolicy;
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
@@ -2715,7 +2604,7 @@ endpoint 2 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ResetCounts;
   }
