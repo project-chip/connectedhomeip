@@ -51,7 +51,7 @@ osTimerId_t sRetryTimer;
 void RetryConnectionTimerHandler(void * arg)
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
-    wfx_rsi_power_save(RSI_ACTIVE, HIGH_PERFORMANCE);
+    wfx_power_save(RSI_ACTIVE, HIGH_PERFORMANCE);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
     if (wfx_connect_to_ap() != SL_STATUS_OK)
     {
@@ -192,7 +192,7 @@ void wfx_retry_connection(uint16_t retryAttempt)
         return;
     }
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
-    wfx_rsi_power_save(RSI_SLEEP_MODE_8, DEEP_SLEEP_WITH_RAM_RETENTION);
+    wfx_power_save(RSI_SLEEP_MODE_8, DEEP_SLEEP_WITH_RAM_RETENTION);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
     ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds", retryInterval);
     retryInterval += retryInterval;
