@@ -1215,6 +1215,9 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
     case Commands::SetStreamPriorities::Id:
         ChipLogDetail(Zcl, "CameraAVStreamMgmt: Set Stream Priorities");
         // TODO
+        HandleCommand<Commands::SetStreamPriorities::DecodableType>(
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleSetStreamPriorities(ctx, commandData); });
         return;
 
     case Commands::CaptureSnapshot::Id:
@@ -1377,6 +1380,24 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamDeallocate(HandlerContext & c
 
     // Call the delegate
     Status status = mDelegate.SnapshotStreamDeallocate(snapshotStreamID);
+
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+}
+
+void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
+                                                         const Commands::SnapshotStreamAllocate::DecodableType & commandData)
+{
+
+    auto & streamPriorities = commandData.streamPriorities;
+
+    // Call the delegate
+    Status status = mDelegate.SetStreamPriorities(streamPriorities);
 
     if (status != Status::Success)
     {
