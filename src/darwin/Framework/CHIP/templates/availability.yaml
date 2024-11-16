@@ -10094,8 +10094,7 @@
               - MinPower
               - MaxPower
               - PowerStep
-              # SupportedWatts and SelectedWattIndex are Provisional because WATTS is Provisional in Matter 1.3
-              # WATTS is provisional in 1.3 because no one has submitted a DUT for it
+              # SupportedWatts and SelectedWattIndex are Provisional because WATTS is Provisional in Matter 1.4
               - WattRating
               - GeneratedCommandList
               - AcceptedCommandList
@@ -10150,8 +10149,7 @@
                   - cookMode
                   - cookTime
                   - powerSetting
-                  # wattSettingIndex is provisional because WATTS is provisional in Matter 1.3
-                  # WATTS is provisional in 1.3 because no one has submitted a DUT for it
+                  # wattSettingIndex is provisional because WATTS is provisional in Matter 1.4
                   - startAfterSetting
               AddMoreTime:
                   - timeToAdd
@@ -10278,8 +10276,7 @@
           MicrowaveOvenControl:
               Feature:
                   - PowerAsNumber
-                  # PowerInWatts is provisional because WATTS is provisional in Matter 1.3
-                  # WATTS is provisional in 1.3 because no one has submitted a DUT for it
+                  # PowerInWatts is provisional because WATTS is provisional in Matter 1.4
                   - PowerNumberLimits
   provisional:
       device types:
@@ -10289,15 +10286,18 @@
           - WaterHeater
       attributes:
           MicrowaveOvenControl:
+              # SupportedWatts and SelectedWattIndex are provisional because WATTS is provisional in Matter 1.4
               - SupportedWatts
               - SelectedWattIndex
       command fields:
           MicrowaveOvenControl:
               SetCookingParameters:
+                  # wattSettingIndex is provisional because WATTS is provisional in Matter 1.4
                   - wattSettingIndex
       bitmap values:
           MicrowaveOvenControl:
               Feature:
+                  # PowerInWatts is provisional because WATTS is provisional in Matter 1.4
                   - PowerInWatts
   removed:
       attributes:
