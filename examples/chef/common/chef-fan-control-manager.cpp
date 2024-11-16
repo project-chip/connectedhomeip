@@ -207,11 +207,6 @@ FanControl::FanModeEnum ChefFanControlManager::SpeedToFanMode(uint8_t speed)
 
 void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
 {
-    if (aNewPercentCurrent == mPercentCurrent)
-    {
-        return;
-    }
-
     ChipLogDetail(NotSpecified, "ChefFanControlManager::SetPercentCurrent: %d", aNewPercentCurrent);
     mPercentCurrent = aNewPercentCurrent;
     Status status   = FanControl::Attributes::PercentCurrent::Set(mEndpoint, mPercentCurrent);
@@ -224,12 +219,6 @@ void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
 
 void ChefFanControlManager::SetSpeedCurrent(uint8_t aNewSpeedCurrent)
 {
-    if (aNewSpeedCurrent == mSpeedCurrent)
-    {
-        return;
-    }
-
-    ChipLogDetail(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: %d", aNewSpeedCurrent);
     mSpeedCurrent = aNewSpeedCurrent;
     Status status = FanControl::Attributes::SpeedCurrent::Set(mEndpoint, aNewSpeedCurrent);
     if (status != Status::Success)
@@ -245,11 +234,8 @@ void ChefFanControlManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFan
     switch (aNewFanMode)
     {
     case FanControl::FanModeEnum::kOff: {
-        if (mSpeedCurrent != 0)
-        {
-            DataModel::Nullable<uint8_t> speedSetting(0);
-            SetSpeedSetting(speedSetting);
-        }
+        DataModel::Nullable<uint8_t> speedSetting(0);
+        SetSpeedSetting(speedSetting);
         break;
     }
     case FanControl::FanModeEnum::kLow: {
@@ -291,20 +277,11 @@ void ChefFanControlManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFan
 
 void ChefFanControlManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting)
 {
-    if (aNewSpeedSetting.IsNull())
+    Status status = FanControl::Attributes::SpeedSetting::Set(mEndpoint, aNewSpeedSetting);
+    if (status != Status::Success)
     {
-        ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: null value is invalid");
-        return;
-    }
-
-    if (aNewSpeedSetting.Value() != mSpeedCurrent)
-    {
-        Status status = FanControl::Attributes::SpeedSetting::Set(mEndpoint, aNewSpeedSetting);
-        if (status != Status::Success)
-        {
-            ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",
-                         to_underlying(status));
-        }
+        ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",
+                     to_underlying(status));
     }
 }
 
