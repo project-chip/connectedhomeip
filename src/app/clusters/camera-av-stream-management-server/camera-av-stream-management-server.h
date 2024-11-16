@@ -109,15 +109,15 @@ public:
     virtual uint32_t GetMaxEncodedPixelRate()       = 0;
 
     virtual CHIP_ERROR StartAllocatedVideoStreamsRead()                                            = 0;
-    virtual CHIP_ERROR GetAllocatedVideoStreamByIndex(uint8_t, Structs::VideoStreamSturct::Type &) = 0;
+    virtual CHIP_ERROR GetAllocatedVideoStreamByIndex(uint8_t, Structs::VideoStreamStruct::Type &) = 0;
     virtual CHIP_ERROR EndAllocatedVideoStreamsRead()                                              = 0;
 
     virtual CHIP_ERROR StartAllocatedAudioStreamsRead()                                            = 0;
-    virtual CHIP_ERROR GetAllocatedAudioStreamByIndex(uint8_t, Structs::AudioStreamSturct::Type &) = 0;
+    virtual CHIP_ERROR GetAllocatedAudioStreamByIndex(uint8_t, Structs::AudioStreamStruct::Type &) = 0;
     virtual CHIP_ERROR EndAllocatedAudioStreamsRead()                                              = 0;
 
     virtual CHIP_ERROR StartAllocatedSnapshotStreamsRead()                                               = 0;
-    virtual CHIP_ERROR GetAllocatedSnapshotStreamByIndex(uint8_t, Structs::SnapshotStreamSturct::Type &) = 0;
+    virtual CHIP_ERROR GetAllocatedSnapshotStreamByIndex(uint8_t, Structs::SnapshotStreamStruct::Type &) = 0;
     virtual CHIP_ERROR EndAllocatedSnapshotStreamsRead()                                                 = 0;
 
     virtual CHIP_ERROR StartRateDistortionTradeOffPointsRead()                                                             = 0;
@@ -132,9 +132,11 @@ public:
     virtual CHIP_ERROR GetFabricUsingCameraByIndex(uint8_t, chip::FabricIndex) = 0;
     virtual CHIP_ERROR EndFabricsUsingCameraRead()                             = 0;
 
-    virtual CHIP_ERROR StartRankedVideoStreamPrioritiesListRead                               = 0;
-    virtual CHIP_ERROR GetRankedVideoStreamPrioritiesListByIndex(uint8_t, StreamTypeEnumType) = 0;
-    virtual CHIP_ERROR EndRankedVideoStreamPrioritiesListRead                                 = 0;
+    virtual CHIP_ERROR StartRankedVideoStreamPrioritiesListRead                           = 0;
+    virtual CHIP_ERROR GetRankedVideoStreamPrioritiesListByIndex(uint8_t, StreamTypeEnum) = 0;
+    virtual CHIP_ERROR EndRankedVideoStreamPrioritiesListRead                             = 0;
+
+    virtual CHIP_ERROR SetStreamPriorities(DataModel::List<const StreamTypeEnum> streamPriorities) = 0;
 
 protected:
     friend class CameraAVStreamMgmtServer;
