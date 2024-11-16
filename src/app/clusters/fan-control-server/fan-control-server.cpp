@@ -89,6 +89,7 @@ bool gWriteFromClusterLogic = false;
 // Avoid circular callback calls when adjusting SpeedSetting and PercentSetting together.
 ScopedChangeOnly gSpeedWriteInProgress(false);
 ScopedChangeOnly gPercentWriteInProgress(false);
+ScopedChangeOnly gFanModeWriteInProgress(false);
 
 Status SetFanModeToOff(EndpointId endpointId)
 {
@@ -160,12 +161,16 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
     switch (attributePath.mAttributeId)
     {
     case FanMode::Id: {
+        if (gFanModeWriteInProgress)
+        {
+            return Status::WriteIgnored;
+        }
         if (*value == to_underlying(FanModeEnum::kOn))
         {
             FanMode::Set(attributePath.mEndpointId, FanModeEnum::kHigh);
-            res = Status::WriteIgnored;
+            return Status::WriteIgnored;
         }
-        else if (*value == to_underlying(FanModeEnum::kSmart))
+        if (*value == to_underlying(FanModeEnum::kSmart))
         {
             FanModeSequenceEnum fanModeSequence;
             Status status = FanModeSequence::Get(attributePath.mEndpointId, &fanModeSequence);
@@ -327,6 +332,9 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
         FanModeEnum mode;
         Status status = FanMode::Get(attributePath.mEndpointId, &mode);
         VerifyOrReturn(Status::Success == status);
+
+        // Avoid circular callback calls
+        ScopedChange FanModeWriteInProgress(gFanModeWriteInProgress, true);
 
         // Setting the FanMode value to Off SHALL set the values of PercentSetting, PercentCurrent,
         // SpeedSetting, SpeedCurrent attributes to 0 (zero).
