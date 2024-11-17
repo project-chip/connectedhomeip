@@ -2693,10 +2693,11 @@ endpoint 3 {
 
   server cluster OccupancySensing {
     ram      attribute occupancy default = 0;
-    ram      attribute occupancySensorType default = 0;
+    ram      attribute occupancySensorType default = 1;
     ram      attribute occupancySensorTypeBitmap default = 0x1;
     callback attribute holdTime;
     callback attribute holdTimeLimits;
+    ram      attribute PIROccupiedToUnoccupiedDelay default = 10;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3129,7 +3130,7 @@ endpoint 9 {
     ram      attribute batReplacementDescription default = "2x AA/LR6 Alkaline";
     ram      attribute batCommonDesignation default = 2;
     ram      attribute batApprovedChemistry default = 1;
-    ram      attribute batQuantity;
+    ram      attribute batQuantity default = 1;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
