@@ -113,7 +113,8 @@ def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool,
     names = ', '.join([module.name for module in modules])
     logging.info(f'Checking out: {names}')
 
-    cmd = ['git', '-C', CHIP_ROOT, 'submodule', '--quiet', 'update', '--init']
+    cmd = ['git', '-c', 'core.symlinks=true', '-C', CHIP_ROOT]
+    cmd += ['submodule', '--quiet', 'update', '--init']
     cmd += ['--depth', '1'] if shallow else []
     cmd += ['--force'] if force else []
     cmd += ['--recursive'] if recursive else []
