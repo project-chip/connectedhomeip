@@ -75,6 +75,7 @@
 
 #if CONFIG_LOW_POWER
 #include "LowPower.h"
+#include "PWR_Interface.h"
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -429,6 +430,20 @@ void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
     /* Emit the ShutDown event before factory reset */
     chip::Server::GetInstance().GenerateShutDownEvent();
     chip::Server::GetInstance().ScheduleFactoryReset();
+}
+
+void chip::NXP::App::AppTaskBase::AppMatter_DisallowDeviceToSleep(void)
+{
+#if CONFIG_LOW_POWER
+    PWR_DisallowDeviceToSleep();
+#endif
+}
+
+void chip::NXP::App::AppTaskBase::AppMatter_AllowDeviceToSleep(void)
+{
+#if CONFIG_LOW_POWER
+    PWR_AllowDeviceToSleep();
+#endif
 }
 
 void chip::NXP::App::AppTaskBase::PrintOnboardingInfo()

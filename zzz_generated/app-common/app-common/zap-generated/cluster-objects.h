@@ -40482,13 +40482,14 @@ public:
 using DecodableType = Type;
 
 } // namespace ZoneInformationStruct
-namespace ZoneTriggeringTimeControlStruct {
+namespace ZoneTriggerControlStruct {
 enum class Fields : uint8_t
 {
     kInitialDuration      = 0,
     kAugmentationDuration = 1,
     kMaxDuration          = 2,
     kBlindDuration        = 3,
+    kSensitivity          = 4,
 };
 
 struct Type
@@ -40498,6 +40499,7 @@ public:
     uint16_t augmentationDuration = static_cast<uint16_t>(0);
     uint32_t maxDuration          = static_cast<uint32_t>(0);
     uint16_t blindDuration        = static_cast<uint16_t>(0);
+    Optional<uint8_t> sensitivity;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -40508,7 +40510,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ZoneTriggeringTimeControlStruct
+} // namespace ZoneTriggerControlStruct
 } // namespace Structs
 
 namespace Commands {
@@ -40772,21 +40774,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Zones
-namespace TimeControl {
+namespace Triggers {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::DecodableType>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::DecodableType>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::DecodableType> &;
+        chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TimeControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Triggers::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace TimeControl
+} // namespace Triggers
 namespace Sensitivity {
 struct TypeInfo
 {
@@ -40840,7 +40841,7 @@ struct TypeInfo
 
         Attributes::SupportedZoneSources::TypeInfo::DecodableType supportedZoneSources;
         Attributes::Zones::TypeInfo::DecodableType zones;
-        Attributes::TimeControl::TypeInfo::DecodableType timeControl;
+        Attributes::Triggers::TypeInfo::DecodableType triggers;
         Attributes::Sensitivity::TypeInfo::DecodableType sensitivity = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
@@ -41253,26 +41254,6 @@ struct Type;
 struct DecodableType;
 } // namespace CaptureSnapshotResponse
 
-namespace SetViewport {
-struct Type;
-struct DecodableType;
-} // namespace SetViewport
-
-namespace SetImageRotation {
-struct Type;
-struct DecodableType;
-} // namespace SetImageRotation
-
-namespace SetImageFlipHorizontal {
-struct Type;
-struct DecodableType;
-} // namespace SetImageFlipHorizontal
-
-namespace SetImageFlipVertical {
-struct Type;
-struct DecodableType;
-} // namespace SetImageFlipVertical
-
 } // namespace Commands
 
 namespace Commands {
@@ -41561,7 +41542,7 @@ namespace SnapshotStreamAllocate {
 enum class Fields : uint8_t
 {
     kImageCodec    = 0,
-    kFrameRate     = 1,
+    kMaxFrameRate  = 1,
     kBitRate       = 2,
     kMinResolution = 3,
     kMaxResolution = 4,
@@ -41576,7 +41557,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
-    uint16_t frameRate        = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
     uint32_t bitRate          = static_cast<uint32_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
@@ -41596,7 +41577,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
-    uint16_t frameRate        = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
     uint32_t bitRate          = static_cast<uint32_t>(0);
     Structs::VideoResolutionStruct::DecodableType minResolution;
     Structs::VideoResolutionStruct::DecodableType maxResolution;
@@ -41773,134 +41754,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CaptureSnapshotResponse
-namespace SetViewport {
-enum class Fields : uint8_t
-{
-    kViewport = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetViewport::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    Structs::ViewportStruct::Type viewport;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetViewport::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    Structs::ViewportStruct::DecodableType viewport;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetViewport
-namespace SetImageRotation {
-enum class Fields : uint8_t
-{
-    kAngle = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetImageRotation::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    uint16_t angle = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetImageRotation::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    uint16_t angle = static_cast<uint16_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetImageRotation
-namespace SetImageFlipHorizontal {
-enum class Fields : uint8_t
-{
-    kEnabled = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetImageFlipHorizontal::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    bool enabled = static_cast<bool>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetImageFlipHorizontal::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    bool enabled = static_cast<bool>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetImageFlipHorizontal
-namespace SetImageFlipVertical {
-enum class Fields : uint8_t
-{
-    kEnabled = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetImageFlipVertical::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    bool enabled = static_cast<bool>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetImageFlipVertical::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    bool enabled = static_cast<bool>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetImageFlipVertical
 } // namespace Commands
 
 namespace Attributes {
@@ -42079,31 +41932,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HDRModeEnabled
-namespace CurrentVideoCodecs {
-struct TypeInfo
-{
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentVideoCodecs::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentVideoCodecs
-namespace CurrentSnapshotConfig {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type;
-    using DecodableType    = chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::DecodableType &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentSnapshotConfig::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentSnapshotConfig
 namespace FabricsUsingCamera {
 struct TypeInfo
 {
@@ -42232,42 +42060,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NightVisionIllum
-namespace AWBEnabled {
-struct TypeInfo
-{
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AWBEnabled::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AWBEnabled
-namespace AutoShutterSpeedEnabled {
-struct TypeInfo
-{
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AutoShutterSpeedEnabled::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AutoShutterSpeedEnabled
-namespace AutoISOEnabled {
-struct TypeInfo
-{
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AutoISOEnabled::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AutoISOEnabled
 namespace Viewport {
 struct TypeInfo
 {
@@ -42472,18 +42264,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StatusLightBrightness
-namespace DepthSensorStatus {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum;
-    using DecodableType    = chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum;
-    using DecodableArgType = chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DepthSensorStatus::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DepthSensorStatus
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -42538,8 +42318,6 @@ struct TypeInfo
         Attributes::MaxNetworkBandwidth::TypeInfo::DecodableType maxNetworkBandwidth = static_cast<uint32_t>(0);
         Attributes::CurrentFrameRate::TypeInfo::DecodableType currentFrameRate       = static_cast<uint16_t>(0);
         Attributes::HDRModeEnabled::TypeInfo::DecodableType HDRModeEnabled           = static_cast<bool>(0);
-        Attributes::CurrentVideoCodecs::TypeInfo::DecodableType currentVideoCodecs;
-        Attributes::CurrentSnapshotConfig::TypeInfo::DecodableType currentSnapshotConfig;
         Attributes::FabricsUsingCamera::TypeInfo::DecodableType fabricsUsingCamera;
         Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
         Attributes::AllocatedAudioStreams::TypeInfo::DecodableType allocatedAudioStreams;
@@ -42553,9 +42331,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>(0);
         Attributes::NightVisionIllum::TypeInfo::DecodableType nightVisionIllum =
             static_cast<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>(0);
-        Attributes::AWBEnabled::TypeInfo::DecodableType AWBEnabled                           = static_cast<bool>(0);
-        Attributes::AutoShutterSpeedEnabled::TypeInfo::DecodableType autoShutterSpeedEnabled = static_cast<bool>(0);
-        Attributes::AutoISOEnabled::TypeInfo::DecodableType autoISOEnabled                   = static_cast<bool>(0);
         Attributes::Viewport::TypeInfo::DecodableType viewport;
         Attributes::SpeakerMuted::TypeInfo::DecodableType speakerMuted                                   = static_cast<bool>(0);
         Attributes::SpeakerVolumeLevel::TypeInfo::DecodableType speakerVolumeLevel                       = static_cast<uint8_t>(0);
@@ -42574,8 +42349,6 @@ struct TypeInfo
         Attributes::StatusLightEnabled::TypeInfo::DecodableType statusLightEnabled                       = static_cast<bool>(0);
         Attributes::StatusLightBrightness::TypeInfo::DecodableType statusLightBrightness =
             static_cast<chip::app::Clusters::Globals::ThreeLevelAutoEnum>(0);
-        Attributes::DepthSensorStatus::TypeInfo::DecodableType depthSensorStatus =
-            static_cast<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -47768,6 +47541,7 @@ public:
 
 bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand);
 bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand);
+bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand);
 
 } // namespace app
 } // namespace chip

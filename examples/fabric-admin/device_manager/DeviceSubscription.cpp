@@ -33,6 +33,8 @@ using namespace ::chip;
 using namespace ::chip::app;
 using chip::app::ReadClient;
 
+namespace admin {
+
 namespace {
 
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
@@ -281,3 +283,5 @@ void DeviceSubscription::StopSubscription()
     MoveToState(State::AwaitingDestruction);
     mOnDoneCallback(mScopedNodeId);
 }
+
+} // namespace admin

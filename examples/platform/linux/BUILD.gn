@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
@@ -132,6 +133,9 @@ source_set("app-main") {
       "${chip_root}/examples/common/tracing:commandline",
       "${chip_root}/src/tracing",
     ]
+  }
+  if (chip_enable_icd_server) {
+    deps += [ "${chip_root}/src/app/icd/server:manager" ]
   }
 
   defines += [
