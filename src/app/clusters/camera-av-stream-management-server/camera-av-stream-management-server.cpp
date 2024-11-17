@@ -66,16 +66,17 @@ CameraAVStreamMgmtServer::~CameraAVStreamMgmtServer()
     // null.
     mDelegate.SetCameraAVStreamMgmtServer(nullptr);
 
-    CommandHandlerInterfaceRegistry::CameraAVStreamMgmtServer().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::CameraAVStreamMgmtServer().Unregister(this);
+    // Unregister command handler and attribute access interfaces
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::Init()
 {
-    ReturnErrorOnFailure(InteractionModelEngine::GetCameraAVStreamMgmtServer()->RegisterCommandHandler(this));
+    LoadPersistentAttributes();
 
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
 
@@ -1098,7 +1099,261 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
         ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the HDRModeEnabled from the KVS. Defaulting to %u", mHDRModeEnabled);
     }
 
-    // TODO: Add more Persistent attributes
+    // TODO: Load allocated streams and ranked priorities list
+
+    // Load SoftRecordingPrivacyModeEnabled
+    bool softRecordingPrivacyModeEnabled;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::SoftRecordingPrivacyModeEnabled::Id),
+        softRecordingPrivacyModeEnabled);
+    if (err == CHIP_NO_ERROR)
+    {
+        mSoftRecordingPrivacyModeEnabled = softRecordingPrivacyModeEnabled;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded SoftRecordingPrivacyModeEnabled as %u", mSoftRecordingPrivacyModeEnabled);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the SoftRecordingPrivacyModeEnabled from the KVS. Defaulting to %u",
+                      mSoftRecordingPrivacyModeEnabled);
+    }
+
+    // Load SoftLivestreamPrivacyModeEnabled
+    bool softLivestreamPrivacyModeEnabled;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::SoftLivestreamPrivacyModeEnabled::Id),
+        softLivestreamPrivacyModeEnabled);
+    if (err == CHIP_NO_ERROR)
+    {
+        mSoftLivestreamPrivacyModeEnabled = softLivestreamPrivacyModeEnabled;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded SoftLivestreamPrivacyModeEnabled as %u", mSoftLivestreamPrivacyModeEnabled);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the SoftLivestreamPrivacyModeEnabled from the KVS. Defaulting to %u",
+                      mSoftLivestreamPrivacyModeEnabled);
+    }
+
+    // Load NightVision
+    TriStateAutoEnum nightVision;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::NightVision::Id), nightVision);
+    if (err == CHIP_NO_ERROR)
+    {
+        mNightVision = nightVision;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded NightVision as %u", mNightVision);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the NightVision from the KVS. Defaulting to %u", mNightVision);
+    }
+
+    // Load NightVisionIllum
+    TriStateAutoEnum nightVisionIllum;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::NightVisionIllum::Id), nightVisionIllum);
+    if (err == CHIP_NO_ERROR)
+    {
+        mNightVisionIllum = nightVisionIllum;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded NightVisionIllum as %u", mNightVisionIllum);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the NightVisionIllum from the KVS. Defaulting to %u",
+                      mNightVisionIllum);
+    }
+
+    // Load Viewport
+    ViewportStruct viewport;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::Viewport::Id), viewport);
+    if (err == CHIP_NO_ERROR)
+    {
+        mViewport = viewport;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded Viewport as %u", mViewport);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the Viewport from the KVS. Defaulting to %u", mViewport);
+    }
+
+    // Load SpeakerMuted
+    bool speakerMuted;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::SpeakerMuted::Id), speakerMuted);
+    if (err == CHIP_NO_ERROR)
+    {
+        mSpeakerMuted = speakerMuted;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded SpeakerMuted as %u", mSpeakerMuted);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the SpeakerMuted from the KVS. Defaulting to %u", mSpeakerMuted);
+    }
+
+    // Load SpeakerVolumeLevel
+    uint8_t speakerVolumeLevel;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::SpeakerVolumeLevel::Id), speakerVolumeLevel);
+    if (err == CHIP_NO_ERROR)
+    {
+        mSpeakerVolumeLevel = speakerVolumeLevel;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded SpeakerVolumeLevel as %u", mSpeakerVolumeLevel);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the SpeakerVolumeLevel from the KVS. Defaulting to %u",
+                      mSpeakerVolumeLevel);
+    }
+
+    // Load MicrophoneMuted
+    bool microphoneMuted;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MicrophoneMuted::Id), microphoneMuted);
+    if (err == CHIP_NO_ERROR)
+    {
+        mMicrophoneMuted = microphoneMuted;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded MicrophoneMuted as %u", mMicrophoneMuted);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the MicrophoneMuted from the KVS. Defaulting to %u",
+                      mMicrophoneMuted);
+    }
+
+    // Load MicrophoneVolumeLevel
+    uint8_t microphoneVolumeLevel;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MicrophoneVolumeLevel::Id), microphoneVolumeLevel);
+    if (err == CHIP_NO_ERROR)
+    {
+        mMicrophoneVolumeLevel = microphoneVolumeLevel;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded MicrophoneVolumeLevel as %u", mMicrophoneVolumeLevel);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the MicrophoneVolumeLevel from the KVS. Defaulting to %u",
+                      mMicrophoneVolumeLevel);
+    }
+
+    // Load MicrophoneAGCEnabled
+    bool microphoneAGCEnabled;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MicrophoneAGCEnabled::Id), microphoneAGCEnabled);
+    if (err == CHIP_NO_ERROR)
+    {
+        mMicrophoneAGCEnabled = microphoneAGCEnabled;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded MicrophoneAGCEnabled as %u", mMicrophoneAGCEnabled);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the MicrophoneAGCEnabled from the KVS. Defaulting to %u",
+                      mMicrophoneAGCEnabled);
+    }
+
+    // Load ImageRotation
+    uint16_t imageRotation;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::ImageRotation::Id), imageRotation);
+    if (err == CHIP_NO_ERROR)
+    {
+        mImageRotation = imageRotation;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded ImageRotation as %u", mImageRotation);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the ImageRotation from the KVS. Defaulting to %u", mImageRotation);
+    }
+
+    // Load ImageFlipHorizontal
+    bool imageFlipHorizontal;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::ImageFlipHorizontal::Id), imageFlipHorizontal);
+    if (err == CHIP_NO_ERROR)
+    {
+        mImageFlipHorizontal = imageFlipHorizontal;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded ImageFlipHorizontal as %u", mImageFlipHorizontal);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the ImageFlipHorizontal from the KVS. Defaulting to %u",
+                      mImageFlipHorizontal);
+    }
+
+    // Load ImageFlipVertical
+    bool imageFlipVertical;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::ImageFlipVertical::Id), imageFlipVertical);
+    if (err == CHIP_NO_ERROR)
+    {
+        mImageFlipVertical = imageFlipVertical;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded ImageFlipVertical as %u", mImageFlipVertical);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the ImageFlipVertical from the KVS. Defaulting to %u",
+                      mImageFlipVertical);
+    }
+
+    // Load LocalVideoRecordingEnabled
+    bool localVideoRecordingEnabled;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LocalVideoRecordingEnabled::Id), localVideoRecordingEnabled);
+    if (err == CHIP_NO_ERROR)
+    {
+        mLocalVideoRecordingEnabled = localVideoRecordingEnabled;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded LocalVideoRecordingEnabled as %u", mLocalVideoRecordingEnabled);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the LocalVideoRecordingEnabled from the KVS. Defaulting to %u",
+                      mLocalVideoRecordingEnabled);
+    }
+
+    // Load LocalSnapshotRecordingEnabled
+    bool localSnapshotRecordingEnabled;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LocalSnapshotRecordingEnabled::Id),
+        localSnapshotRecordingEnabled);
+    if (err == CHIP_NO_ERROR)
+    {
+        mLocalSnapshotRecordingEnabled = localSnapshotRecordingEnabled;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded LocalSnapshotRecordingEnabled as %u", mLocalSnapshotRecordingEnabled);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the LocalSnapshotRecordingEnabled from the KVS. Defaulting to %u",
+                      mLocalSnapshotRecordingEnabled);
+    }
+
+    // Load StatusLightEnabled
+    bool statusLightEnabled;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StatusLightEnabled::Id), statusLightEnabled);
+    if (err == CHIP_NO_ERROR)
+    {
+        mStatusLightEnabled = statusLightEnabled;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded StatusLightEnabled as %u", mStatusLightEnabled);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the StatusLightEnabled from the KVS. Defaulting to %u",
+                      mStatusLightEnabled);
+    }
+
+    // Load StatusLightBrightness
+    ThreeLevelAutoEnum statusLightBrightness;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StatusLightBrightness::Id), statusLightBrightness);
+    if (err == CHIP_NO_ERROR)
+    {
+        mStatusLightBrightness = statusLightBrightness;
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded StatusLightBrightness as %u", mStatusLightBrightness);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the StatusLightBrightness from the KVS. Defaulting to %u",
+                      mStatusLightBrightness);
+    }
 }
 
 // CommandHandlerInterface
@@ -1214,7 +1469,6 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
 
     case Commands::SetStreamPriorities::Id:
         ChipLogDetail(Zcl, "CameraAVStreamMgmt: Set Stream Priorities");
-        // TODO
         HandleCommand<Commands::SetStreamPriorities::DecodableType>(
             handlerContext,
             [this](HandlerContext & ctx, const auto & commandData) { HandleSetStreamPriorities(ctx, commandData); });
