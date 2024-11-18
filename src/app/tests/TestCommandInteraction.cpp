@@ -1554,6 +1554,42 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandAsyncSuccessResponseFlow)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+TEST_F(TestCommandInteraction, CommandSenderDeletedWhenResponseIsPending)
+{
+
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender* commandSender = Platform::New<app::CommandSender>(&mockCommandSenderDelegate, &GetExchangeManager());
+
+    AddInvokeRequestData(commandSender);
+    asyncCommand = true;
+
+    EXPECT_EQ(commandSender->SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 1u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 2u);
+
+    // One very important note worthy things to mentions is that this is NOT deleted
+    // in one of the callbacks. This is deleted when no message is being processed.
+    Platform::Delete(commandSender);
+
+    // Decrease CommandHandler refcount and send response
+    asyncCommandHandle = nullptr;
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
 TEST_F(TestCommandInteraction, TestCommandSenderCommandSpecificResponseFlow)
 {
 
