@@ -75,7 +75,7 @@ def main():
         outdated_count += len(outdated_clusters)
         print(*outdated_clusters, sep='\n')
 
-        if (args.print_only):
+        if args.print_only:
             continue
 
         # Update outdated cluster revisions according to the spec
@@ -90,7 +90,7 @@ def main():
         save_zap(body, zap_filename)
 
     # If it's printing only, return the number of outdated clusters, so it can be used as a test
-    if (args.print_only):
+    if args.print_only:
         return outdated_count
 
 
