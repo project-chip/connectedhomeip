@@ -46,7 +46,7 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout,
                     "  add-device       Pair a device to local fabric. Usage: app add-device node-id setup-pin-code "
                     "device-remote-ip device-remote-port\r\n");
-    streamer_printf(sout, "  pair-device       Pair a device to local fabric. Usage: app pair-device node-id code\r\n");
+    streamer_printf(sout, "  pair-device      Pair a device to local fabric. Usage: app pair-device node-id code\r\n");
     streamer_printf(sout, "  remove-device    Remove a device from the local fabric. Usage: app remove-device node-id\r\n");
     streamer_printf(sout, "  sync-device      Sync a device from other ecosystem. Usage: app sync-device endpointid\r\n");
     streamer_printf(sout, "\r\n");
