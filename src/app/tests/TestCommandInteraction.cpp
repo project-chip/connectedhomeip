@@ -1573,8 +1573,9 @@ TEST_F(TestCommandInteraction, CommandSenderDeletedWhenResponseIsPending)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 1u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 2u);
 
-    // One very important note worthy things to mentions is that this is NOT deleted
-    // in one of the callbacks. This is deleted when no message is being processed.
+    // This is NOT deleting CommandSender in one of the callbacks, so we are not violating
+    // the API contract. CommandSender is deleted when no message is being processed which
+    // is a time that deleting CommandSender is considered safe.
     Platform::Delete(commandSender);
 
     // Decrease CommandHandler refcount and send response
