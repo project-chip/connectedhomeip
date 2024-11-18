@@ -62,25 +62,30 @@ Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eve
 /// Returns the status of ACL validation.
 ///   if the status is set, the status is FINAL (i.e. permanent failure OR success due to path expansion logic.)
 ///   if the status is not set, the processing can continue
-std::optional<CHIP_ERROR> ValidateReadACL(DataModel::Provider * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
-                                          const ConcreteReadAttributePath & path)
+std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataModel, const SubjectDescriptor & subjectDescriptor,
+                                                   const ConcreteReadAttributePath & path)
 {
 
-    Access::RequestPath requestPath{ .cluster     = path.mClusterId,
-                                     .endpoint    = path.mEndpointId,
-                                     .requestType = Access::RequestType::kAttributeReadRequest,
-                                     .entityId    = path.mAttributeId };
+    RequestPath requestPath{ .cluster     = path.mClusterId,
+                             .endpoint    = path.mEndpointId,
+                             .requestType = RequestType::kAttributeReadRequest,
+                             .entityId    = path.mAttributeId };
 
     std::optional<DataModel::AttributeInfo> info = dataModel->GetAttributeInfo(path);
 
-    chip::Access::Privilege requiredPrivilege = chip::Access::Privilege::kView; // default
+    // If the attribute exists, we know if it is readable (readPrivilege has value)
+    // and what the required access privilege is. However for attributes missing from the metatada
+    // (e.g. global attributes) or completely missing attributes we do not actually know of a required
+    // privilege and default to kView (this is correct for global attributes and a reasonable check
+    // for others)
+    Privilege requiredPrivilege = Privilege::kView;
     if (info.has_value() && info->readPrivilege.has_value())
     {
-        // set a default even if we do not know and later report the real error if ACL looks ok
+        // attribute exists and is readable, set the correct read privilege
         requiredPrivilege = *info->readPrivilege;
     }
 
-    CHIP_ERROR err = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requiredPrivilege);
+    CHIP_ERROR err = GetAccessControl().Check(subjectDescriptor, requestPath, requiredPrivilege);
     if (err == CHIP_NO_ERROR)
     {
         if (IsSupportedGlobalAttributeNotInMetadata(path.mAttributeId))
@@ -89,12 +94,20 @@ std::optional<CHIP_ERROR> ValidateReadACL(DataModel::Provider * dataModel, const
             return std::nullopt;
         }
 
-        // attribute does not exist, however we do not now if this is a unsupported endpoint, cluster or attribute,
-        // so the info.has_value() is only handled by the ReadAttribute in the DataModel::Provider.
+        // We want to return "success" (i.e. nulopt) IF AND ONLY IF attribute exists and is readable (has read privilege).
+        // Since the Access control check above may have passed with kView, we do another check here:
+        //    - Attribute exists (info has value)
+        //    - Attribute is readable (readProvilege has value) and not "write only"
+        // If the above aret not true, we will return UnsupportedRead (spec 8.4.3.2: "Else if the path indicates attribute
+        // data that is not readable, an AttributeStatusIB SHALL be generated with the UNSUPPORTED_READ Status Code.")
         //
-        // What we can validate is `write-only attributes` (i.e if we have info, readPrivilege should be set)
-
-        // if the attribute does exist, it should be readable
+        // TODO:: https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/9024 requires interleaved ordering that
+        //        is NOT implemented here. Spec requires:
+        //           - check cluster access check (done here as kView at least)
+        //           - unsupported endpoint/cluster/attribute check (NOT done here) when the attribute is missing.
+        //             this SOUND be done here when info does not have a value. This was not done as a first pass to
+        //             minimize amount of delta in the initial PR.
+        //           - "write-only" attributes should retuirn UNSUPPORTED_READ (this is done heere)
         VerifyOrReturnError(!info.has_value() || info->readPrivilege.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedRead));
 
         return std::nullopt;
@@ -111,9 +124,8 @@ std::optional<CHIP_ERROR> ValidateReadACL(DataModel::Provider * dataModel, const
     return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess) : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
 }
 
-DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel,
-                                                  const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
-                                                  AttributeReportIBs::Builder & reportBuilder,
+DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const SubjectDescriptor & subjectDescriptor,
+                                                  bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
                                                   const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
@@ -143,7 +155,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
-    if (auto access_status = ValidateReadACL(dataModel, subjectDescriptor, path); access_status.has_value())
+    if (auto access_status = ValidateReadAttributeACL(dataModel, subjectDescriptor, path); access_status.has_value())
     {
         status = *access_status;
     }
@@ -499,13 +511,13 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
             aHasEncodedData = true;
         }
 
-        Access::RequestPath requestPath{ .cluster     = current->mValue.mClusterId,
-                                         .endpoint    = current->mValue.mEndpointId,
-                                         .requestType = RequestType::kEventReadRequest,
-                                         .entityId    = current->mValue.mEventId };
-        Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
+        RequestPath requestPath{ .cluster     = current->mValue.mClusterId,
+                                 .endpoint    = current->mValue.mEndpointId,
+                                 .requestType = RequestType::kEventReadRequest,
+                                 .entityId    = current->mValue.mEventId };
+        Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
-        err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
+        err = GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
         {
             ReturnErrorOnFailure(err);
@@ -644,13 +656,13 @@ exit:
 CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::System::PacketBufferTLVWriter reportDataWriter;
+    System::PacketBufferTLVWriter reportDataWriter;
     ReportDataMessage::Builder reportDataBuilder;
-    chip::System::PacketBufferHandle bufHandle = nullptr;
-    uint16_t reservedSize                      = 0;
-    bool hasMoreChunks                         = false;
-    bool needCloseReadHandler                  = false;
-    size_t reportBufferMaxSize                 = 0;
+    System::PacketBufferHandle bufHandle = nullptr;
+    uint16_t reservedSize                = 0;
+    bool hasMoreChunks                   = false;
+    bool needCloseReadHandler            = false;
+    size_t reportBufferMaxSize           = 0;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -687,7 +699,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     // Always limit the size of the generated packet to fit within the max size returned by the ReadHandler regardless
     // of the available buffer capacity.
     // Also, we need to reserve some extra space for the MIC field.
-    reportDataWriter.ReserveBuffer(static_cast<uint32_t>(reservedSize + chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
+    reportDataWriter.ReserveBuffer(static_cast<uint32_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Create a report data.
     err = reportDataBuilder.Init(&reportDataWriter);
@@ -1185,6 +1197,6 @@ void Engine::MarkDirty(const AttributePathParams & path)
 
 // TODO: MatterReportingAttributeChangeCallback should just live in libCHIP, It does not depend on any
 // app-specific generated bits.
-void __attribute__((weak))
-MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+void __attribute__((weak)) MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                  chip::AttributeId attributeId)
 {}
