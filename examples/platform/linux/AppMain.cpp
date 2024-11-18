@@ -318,18 +318,13 @@ void Cleanup()
     // TODO(16968): Lifecycle management of storage-using components like GroupDataProvider, etc
 }
 
-// TODO(#20664) REPL test will fail if signal SIGINT is not caught, temporarily keep following logic.
-
-// when the shell is enabled, don't intercept signals since it prevents the user from
-// using expected commands like CTRL-C to quit the application. (see issue #17845)
-// We should stop using signals for those faults, and move to a different notification
-// means, like a pipe. (see issue #19114)
-#if !defined(ENABLE_CHIP_SHELL)
 void StopSignalHandler(int /* signal */)
 {
+#if defined(ENABLE_CHIP_SHELL)
+    Engine::Root().StopMainLoop();
+#endif
     StopMainEventLoop();
 }
-#endif // !defined(ENABLE_CHIP_SHELL)
 
 } // namespace
 
@@ -407,6 +402,18 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(LinuxDeviceOptions::GetInstance().KVS);
     }
     SuccessOrExit(err);
+#endif
+
+#if defined(ENABLE_CHIP_SHELL)
+    /* Block SIGINT and SIGTERM. Other threads created by the main thread
+     * will inherit the signal mask. Then we can explicitly unblock signals
+     * in the shell thread to handle them, so the read(stdin) call can be
+     * interrupted by a signal. */
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, SIGINT);
+    sigaddset(&set, SIGTERM);
+    pthread_sigmask(SIG_BLOCK, &set, NULL);
 #endif
 
     err = DeviceLayer::PlatformMgr().InitChipStack();
@@ -532,6 +539,13 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
     std::thread shellThread([]() {
+        sigset_t set;
+        sigemptyset(&set);
+        sigaddset(&set, SIGINT);
+        sigaddset(&set, SIGTERM);
+        // Unblock SIGINT and SIGTERM, so that the shell thread can handle
+        // them - we need read() call to be interrupted.
+        pthread_sigmask(SIG_UNBLOCK, &set, NULL);
         Engine::Root().RunMainLoop();
         StopMainEventLoop();
     });
@@ -670,12 +684,11 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     ApplicationInit();
 
-#if !defined(ENABLE_CHIP_SHELL)
-    // NOLINTBEGIN(bugprone-signal-handler)
-    signal(SIGINT, StopSignalHandler);
-    signal(SIGTERM, StopSignalHandler);
-    // NOLINTEND(bugprone-signal-handler)
-#endif // !defined(ENABLE_CHIP_SHELL)
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
+    sigaction(SIGINT, &sa, nullptr);
+    sigaction(SIGTERM, &sa, nullptr);
 
     if (impl != nullptr)
     {
