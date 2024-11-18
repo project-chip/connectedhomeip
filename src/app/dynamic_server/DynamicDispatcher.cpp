@@ -277,12 +277,12 @@ Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttrib
 namespace chip {
 namespace app {
 
-bool IsFlatCompositionForEndpoint(EndpointId endpoint)
+bool IsFlatCompositionForEndpointIndex(uint16_t endpointIndex)
 {
     return true;
 }
 
-bool IsTreeCompositionForEndpoint(EndpointId endpoint)
+bool IsTreeCompositionForEndpointIndex(uint16_t endpointIndex)
 {
     return false;
 }

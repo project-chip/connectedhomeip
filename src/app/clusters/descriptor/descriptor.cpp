@@ -165,7 +165,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
         while (deviceType.has_value())
         {
             deviceStruct.deviceType = deviceType->deviceTypeId;
-            deviceStruct.revision   = deviceType->deviceTypeVersion;
+            deviceStruct.revision   = deviceType->deviceTypeRevision;
             ReturnErrorOnFailure(encoder.Encode(deviceStruct));
             deviceType = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextDeviceType(endpoint, *deviceType);
         }

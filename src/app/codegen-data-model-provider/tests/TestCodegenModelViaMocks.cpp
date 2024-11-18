@@ -2617,15 +2617,15 @@ TEST(TestCodegenModelViaMocks, DeviceTypeIteration)
     // Mock endpoint 1 has 3 device types
     std::optional<DeviceTypeEntry> entry = model.FirstDeviceType(kMockEndpoint1);
     ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeVersion = kDeviceTypeId1Version }));
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeRevision = kDeviceTypeId1Version }));
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
     entry = model.NextDeviceType(kMockEndpoint1, *entry);
     ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeVersion = kDeviceTypeId2Version }));
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version }));
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
     entry = model.NextDeviceType(kMockEndpoint1, *entry);
     ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeVersion = kDeviceTypeId3Version }));
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeRevision = kDeviceTypeId3Version }));
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
     entry = model.NextDeviceType(kMockEndpoint1, *entry);
     ASSERT_FALSE(entry.has_value());
@@ -2633,19 +2633,19 @@ TEST(TestCodegenModelViaMocks, DeviceTypeIteration)
     // Mock endpoint 2 has 1 device types
     entry = model.FirstDeviceType(kMockEndpoint2);
     ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeVersion = kDeviceTypeId2Version }));
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version }));
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
     entry = model.NextDeviceType(kMockEndpoint2, *entry);
     ASSERT_FALSE(entry.has_value());
 
     // out of order query works
-    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeVersion = kDeviceTypeId2Version });
+    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version });
     entry = model.NextDeviceType(kMockEndpoint1, *entry);
     ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeVersion = kDeviceTypeId3Version }));
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeRevision = kDeviceTypeId3Version }));
 
     // invalid query fails
-    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeVersion = kDeviceTypeId1Version });
+    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeRevision = kDeviceTypeId1Version });
     entry = model.NextDeviceType(kMockEndpoint2, *entry);
     ASSERT_FALSE(entry.has_value());
 

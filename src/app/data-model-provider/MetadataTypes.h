@@ -41,10 +41,11 @@ enum class EndpointCompositionPattern : uint8_t
 
 struct EndpointInfo
 {
+    // kInvalidEndpointId if having no parent endpoint
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
 
-    EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kTreePattern) {}
+    EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamilyPattern) {}
 };
 
 struct EndpointEntry
@@ -137,11 +138,11 @@ struct CommandEntry
 struct DeviceTypeEntry
 {
     DeviceTypeId deviceTypeId;
-    uint8_t deviceTypeVersion;
+    uint8_t deviceTypeRevision;
 
     bool operator==(const DeviceTypeEntry & other) const
     {
-        return (deviceTypeId == other.deviceTypeId) && (deviceTypeVersion == other.deviceTypeVersion);
+        return (deviceTypeId == other.deviceTypeId) && (deviceTypeRevision == other.deviceTypeRevision);
     }
 };
 

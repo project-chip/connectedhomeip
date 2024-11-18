@@ -378,5 +378,15 @@ bool IsFlatCompositionForEndpoint(EndpointId endpoint);
  */
 bool IsTreeCompositionForEndpoint(EndpointId endpoint);
 
+/**
+ * @brief Returns whether the composition is full family pattern for a given endpoint index
+ */
+bool IsFlatCompositionForEndpointIndex(uint16_t index);
+
+/**
+ * @brief Returns whether the composition is tree pattern for a given endpoint index
+ */
+bool IsTreeCompositionForEndpointIndex(uint16_t index);
+
 } // namespace app
 } // namespace chip

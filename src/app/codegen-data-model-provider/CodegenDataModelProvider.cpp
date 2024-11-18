@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/util/att-storage.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -197,7 +196,7 @@ ClusterId FirstClientClusterId(const EmberAfEndpointType * endpoint, unsigned st
     for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
     {
         const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if ((cluster.mask & CLUSTER_MASK_CLIENT) == 0)
+        if (!cluster.IsClient())
         {
             continue;
         }
@@ -271,7 +270,7 @@ DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & ot
     DataModel::DeviceTypeEntry entry;
 
     entry.deviceTypeId      = other.deviceId;
-    entry.deviceTypeVersion = other.deviceVersion;
+    entry.deviceTypeRevision = other.deviceVersion;
 
     return entry;
 }
@@ -280,7 +279,7 @@ DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & ot
 // so you must do `a == b` and the `b == a` will not work.
 bool operator==(const DataModel::DeviceTypeEntry & a, const EmberAfDeviceType & b)
 {
-    return (a.deviceTypeId == b.deviceId) && (a.deviceTypeVersion == b.deviceVersion);
+    return (a.deviceTypeId == b.deviceId) && (a.deviceTypeRevision == b.deviceVersion);
 }
 
 /// Find the `index` where one of the following holds:
@@ -414,15 +413,24 @@ bool CodegenDataModelProvider::EndpointExists(EndpointId endpoint)
 
 std::optional<DataModel::EndpointInfo> CodegenDataModelProvider::GetEndpointInfo(EndpointId endpoint)
 {
-    uint16_t endpoint_idx = emberAfIndexFromEndpoint(endpoint);
-    if (endpoint_idx != kEmberInvalidEndpointIndex && emberAfEndpointIndexIsEnabled(endpoint_idx))
+    std::optional<unsigned> endpoint_idx = TryFindEndpointIndex(endpoint);
+    if (endpoint_idx.has_value())
     {
-        DataModel::EndpointInfo info(emberAfParentEndpointFromIndex(endpoint_idx));
-        if (IsFlatCompositionForEndpoint(endpoint))
+        return GetEndpointInfoAtIndex(static_cast<uint16_t>(*endpoint_idx));
+    }
+    return std::nullopt;
+}
+
+std::optional<DataModel::EndpointInfo> CodegenDataModelProvider::GetEndpointInfoAtIndex(uint16_t endpointIndex)
+{
+    if (emberAfEndpointIndexIsEnabled(endpointIndex))
+    {
+        DataModel::EndpointInfo info(emberAfParentEndpointFromIndex(endpointIndex));
+        if (IsFlatCompositionForEndpointIndex(endpointIndex))
         {
             info.compositionPattern = DataModel::EndpointCompositionPattern::kFullFamilyPattern;
         }
-        else if (IsTreeCompositionForEndpoint(endpoint))
+        else if (IsTreeCompositionForEndpointIndex(endpointIndex))
         {
             info.compositionPattern = DataModel::EndpointCompositionPattern::kTreePattern;
         }
@@ -442,11 +450,10 @@ DataModel::EndpointEntry CodegenDataModelProvider::FirstEndpoint()
             mEndpointIterationHint                 = endpoint_idx;
             DataModel::EndpointEntry endpointEntry = DataModel::EndpointEntry::kInvalid;
             endpointEntry.id                       = emberAfEndpointFromIndex(endpoint_idx);
-            auto endpointInfo                      = GetEndpointInfo(endpointEntry.id);
-            if (endpointInfo.has_value())
-            {
-                endpointEntry.info = endpointInfo.value();
-            }
+            auto endpointInfo                      = GetEndpointInfoAtIndex(endpoint_idx);
+            // The endpoint info should have value as this endpoint should be valid at this time
+            VerifyOrDie(endpointInfo.has_value());
+            endpointEntry.info = endpointInfo.value();
             return endpointEntry;
         }
     }
@@ -493,11 +500,9 @@ DataModel::EndpointEntry CodegenDataModelProvider::NextEndpoint(EndpointId befor
             mEndpointIterationHint                 = endpoint_idx;
             DataModel::EndpointEntry endpointEntry = DataModel::EndpointEntry::kInvalid;
             endpointEntry.id                       = emberAfEndpointFromIndex(endpoint_idx);
-            auto endpointInfo                      = GetEndpointInfo(endpointEntry.id);
-            if (endpointInfo.has_value())
-            {
-                endpointEntry.info = endpointInfo.value();
-            }
+            auto endpointInfo                      = GetEndpointInfoAtIndex(endpoint_idx);
+            VerifyOrDie(endpointInfo.has_value());
+            endpointEntry.info = endpointInfo.value();
             return endpointEntry;
         }
     }
@@ -516,17 +521,19 @@ DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId 
     return FirstServerClusterEntry(endpointId, endpoint, 0, mServerClusterIterationHint);
 }
 
-std::optional<unsigned> CodegenDataModelProvider::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint,
-                                                                            ClusterId id) const
+std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const EmberAfEndpointType * endpoint,
+                                                                      ClusterId id, bool isServer) const
 {
     const unsigned clusterCount = endpoint->clusterCount;
+    unsigned hint = isServer ? mServerClusterIterationHint : mClientClusterIterationHint;
 
-    if (mServerClusterIterationHint < clusterCount)
+    if (hint < clusterCount)
     {
-        const EmberAfCluster & cluster = endpoint->cluster[mServerClusterIterationHint];
-        if (cluster.IsServer() && (cluster.clusterId == id))
+        const EmberAfCluster & cluster = endpoint->cluster[hint];
+        bool serverClientCheck = isServer ? cluster.IsServer() : cluster.IsClient();
+        if (serverClientCheck && (cluster.clusterId == id))
         {
-            return std::make_optional(mServerClusterIterationHint);
+            return std::make_optional(hint);
         }
     }
 
@@ -536,7 +543,8 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindServerClusterIndex(cons
     for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
     {
         const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (cluster.IsServer() && (cluster.clusterId == id))
+        bool serverClientCheck = isServer ? cluster.IsServer() : cluster.IsClient();
+        if (serverClientCheck && (cluster.clusterId == id))
         {
             return std::make_optional(cluster_idx);
         }
@@ -555,7 +563,7 @@ DataModel::ClusterEntry CodegenDataModelProvider::NextServerCluster(const Concre
     VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
     VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
 
-    std::optional<unsigned> cluster_idx = TryFindServerClusterIndex(endpoint, before.mClusterId);
+    std::optional<unsigned> cluster_idx = TryFindClusterIndex(endpoint, before.mClusterId, true);
     if (!cluster_idx.has_value())
     {
         return DataModel::ClusterEntry::kInvalid;
@@ -597,33 +605,21 @@ ClusterId CodegenDataModelProvider::FirstClientCluster(EndpointId endpointId)
 
 ClusterId CodegenDataModelProvider::NextClientCluster(const ConcreteClusterPath & before)
 {
+    // TODO: This search still seems slow (ember will loop). Should use index hints as long
+    //       as ember API supports it
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(before.mEndpointId);
+
     VerifyOrReturnValue(endpoint != nullptr, kInvalidClusterId);
     VerifyOrReturnValue(endpoint->clusterCount > 0, kInvalidClusterId);
     VerifyOrReturnValue(endpoint->cluster != nullptr, kInvalidClusterId);
 
-    if (mServerClusterIterationHint < endpoint->clusterCount)
+    std::optional<unsigned> cluster_idx = TryFindClusterIndex(endpoint, before.mClusterId, false);
+    if (!cluster_idx.has_value())
     {
-        const EmberAfCluster & cluster = endpoint->cluster[mServerClusterIterationHint];
-        if ((cluster.mask & CLUSTER_MASK_CLIENT) && (cluster.clusterId == before.mClusterId))
-        {
-            return FirstClientClusterId(endpoint, mClientClusterIterationHint + 1, mClientClusterIterationHint);
-        }
+        return kInvalidClusterId;
     }
 
-    // linear search, this may be slow
-    // does NOT use emberAfClusterIndex to not iterate over endpoints as we have
-    // already found the correct endpoint
-    for (unsigned cluster_idx = 0; cluster_idx < endpoint->clusterCount; cluster_idx++)
-    {
-        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if ((cluster.mask & CLUSTER_MASK_CLIENT) && (cluster.clusterId == before.mClusterId))
-        {
-            return FirstClientClusterId(endpoint, cluster_idx + 1, mClientClusterIterationHint);
-        }
-    }
-
-    return kInvalidClusterId;
+    return FirstClientClusterId(endpoint, *cluster_idx + 1, mClientClusterIterationHint);
 }
 
 DataModel::AttributeEntry CodegenDataModelProvider::FirstAttribute(const ConcreteClusterPath & path)

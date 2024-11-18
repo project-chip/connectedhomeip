@@ -207,11 +207,13 @@ private:
     /// Effectively the same as `emberAfFindServerCluster` except with some caching capabilities
     const EmberAfCluster * FindServerCluster(const ConcreteClusterPath & path);
 
+    std::optional<DataModel::EndpointInfo> GetEndpointInfoAtIndex(uint16_t endpointIndex);
+
     /// Find the index of the given attribute id
     std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId id) const;
 
     /// Find the index of the given cluster id
-    std::optional<unsigned> TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id) const;
+    std::optional<unsigned> TryFindClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id, bool isServer) const;
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(chip::EndpointId id) const;
