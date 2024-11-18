@@ -141,34 +141,34 @@ defined:
     Done
     > New device with Node ID: 0000000000000001 has been successfully added.
     A new device has been added on Endpoint: 2.
-    ```    
+    ```
 
 -   Verify Reverse Commissioning of the Fabric-Bridge from E1 on E2
 
     ```sh
-    > New device with Node ID: 0000000000000002 has been successfully added.   
+    > New device with Node ID: 0000000000000002 has been successfully added.
     ```
 
 -   Pair Light Example to E2
 
-    Since Fabric-Bridge also functions as a Matter server, running it alongside the
-    Light Example app on the same machine would cause conflicts. Therefore, you need
-    to run the Matter Light Example app on a separate physical machine from the one
-    hosting Fabric-Sync.
+    Since Fabric-Bridge also functions as a Matter server, running it alongside
+    the Light Example app on the same machine would cause conflicts. Therefore,
+    you need to run the Matter Light Example app on a separate physical machine
+    from the one hosting Fabric-Sync.
 
     ```sh
     > app add-device 3 <setup-pin-code> <device-remote-ip> <device-remote-port>
     ```
 
-    After the device is successfully added, you will observe the following message
-    on E2 with the newly assigned Node ID:
+    After the device is successfully added, you will observe the following
+    message on E2 with the newly assigned Node ID:
 
     ```sh
     > New device with Node ID: 0x3 has been successfully added.
     ```
 
-    Additionally, you should also get notified when a new device is added to
-    E2 from the E1:
+    Additionally, you should also get notified when a new device is added to E2
+    from the E1:
 
     ```sh
     > A new device is added on Endpoint 3.
@@ -177,8 +177,8 @@ defined:
 -   Synchronize Light Example to E1
 
     After the Light Example is successfully paired in E2, we can start to
-    synchronize the light device to E1 using the new assigned dynamic
-    endpointid on Ecosystem 2.
+    synchronize the light device to E1 using the new assigned dynamic endpointid
+    on Ecosystem 2.
 
     ```sh
     > app sync-device <endpointid>
