@@ -98,7 +98,6 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.step(3)
         OC_cluster = Clusters.OperationalCredentials
         max_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.SupportedFabrics)
-        self.print_step("asserts", dir(asserts))
         asserts.assert_greater(max_fabrics, initial_number_of_fabrics, 
                         "max fabrics must be greater than initial fabrics, please remove one non-test-harness fabric and try test again")
 
