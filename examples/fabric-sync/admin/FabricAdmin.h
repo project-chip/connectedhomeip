@@ -37,7 +37,7 @@ struct ScopedNodeIdHasher
     }
 };
 
-class FabricAdmin final : public bridge::FabricAdminDelegate
+class FabricAdmin final : public bridge::FabricAdminDelegate, public PairingDelegate
 {
 public:
     static FabricAdmin & Instance();
@@ -50,6 +50,8 @@ public:
                            uint16_t productId) override;
 
     CHIP_ERROR KeepActive(chip::ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs) override;
+
+    void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) override;
 
     void ScheduleSendingKeepActiveOnCheckIn(chip::ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs);
 
@@ -88,7 +90,8 @@ private:
 
     static FabricAdmin sInstance;
 
-    bool mInitialized = false;
+    bool mInitialized    = false;
+    chip::NodeId mNodeId = chip::kUndefinedNodeId;
 
     void Init() { mInitialized = true; }
 };
