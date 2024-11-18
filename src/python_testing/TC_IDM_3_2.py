@@ -1,6 +1,7 @@
 import inspect
 from enum import IntFlag
 from typing import Union, get_args, get_origin
+
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.ClusterObjects import ClusterObject
