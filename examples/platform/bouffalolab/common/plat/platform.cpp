@@ -246,7 +246,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;

@@ -150,7 +150,7 @@ static void InitServer(intptr_t context)
     initParams.appDelegate = &sAmebaObserver;
 
     initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance();
 
 #if CONFIG_ENABLE_AMEBA_CRYPTO
     ChipLogProgress(DeviceLayer, "platform crypto enabled!");

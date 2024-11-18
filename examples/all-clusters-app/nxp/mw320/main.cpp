@@ -1069,7 +1069,7 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
 
         static chip::CommonCaseDeviceServerInitParams initParams;
         (void) initParams.InitializeStaticResourcesBeforeServerInit();
-        initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+        initParams.dataModelProvider = CodegenDataModelProviderInstance();
         chip::Server::GetInstance().Init(initParams);
         PRINTF("Done to call chip::Server() \r\n");
     }
