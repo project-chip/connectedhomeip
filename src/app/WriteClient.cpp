@@ -142,7 +142,7 @@ CHIP_ERROR WriteClient::FinalizeMessage(bool aHasMoreChunks)
     VerifyOrReturnError(mState == State::AddAttribute, CHIP_ERROR_INCORRECT_STATE);
 
     TLV::TLVWriter * writer = mWriteRequestBuilder.GetWriter();
-    ReturnErrorCodeIf(writer == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
 
     ReturnErrorOnFailure(mWriteRequestBuilder.GetWriteRequests().EndOfAttributeDataIBs());

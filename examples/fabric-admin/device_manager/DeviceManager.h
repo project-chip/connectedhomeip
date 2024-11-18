@@ -19,24 +19,28 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <device_manager/BridgeSubscription.h>
+#include <device_manager/CommissionerControl.h>
+#include <device_manager/FabricSyncGetter.h>
 #include <device_manager/PairingManager.h>
 #include <platform/CHIPDeviceLayer.h>
-
 #include <set>
+
+namespace admin {
 
 constexpr uint32_t kDefaultSetupPinCode    = 20202021;
 constexpr uint16_t kDefaultLocalBridgePort = 5540;
 constexpr uint16_t kResponseTimeoutSeconds = 30;
 
-class Device
+class SyncedDevice
 {
 public:
-    Device(chip::NodeId nodeId, chip::EndpointId endpointId) : mNodeId(nodeId), mEndpointId(endpointId) {}
+    SyncedDevice(chip::NodeId nodeId, chip::EndpointId endpointId) : mNodeId(nodeId), mEndpointId(endpointId) {}
 
     chip::NodeId GetNodeId() const { return mNodeId; }
     chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
-    bool operator<(const Device & other) const
+    bool operator<(const SyncedDevice & other) const
     {
         return mNodeId < other.mNodeId || (mNodeId == other.mNodeId && mEndpointId < other.mEndpointId);
     }
@@ -46,10 +50,16 @@ private:
     chip::EndpointId mEndpointId;
 };
 
-class DeviceManager : public PairingDelegate
+class DeviceManager
 {
 public:
     DeviceManager() = default;
+
+    static DeviceManager & Instance()
+    {
+        static DeviceManager instance;
+        return instance;
+    }
 
     void Init();
 
@@ -61,23 +71,24 @@ public:
 
     void UpdateLastUsedNodeId(chip::NodeId nodeId);
 
-    void SetRemoteBridgeNodeId(chip::NodeId nodeId) { mRemoteBridgeNodeId = nodeId; }
+    void SetRemoteBridgeNodeId(chip::NodeId nodeId);
 
     void SetLocalBridgePort(uint16_t port) { mLocalBridgePort = port; }
     void SetLocalBridgeSetupPinCode(uint32_t pinCode) { mLocalBridgeSetupPinCode = pinCode; }
     void SetLocalBridgeNodeId(chip::NodeId nodeId) { mLocalBridgeNodeId = nodeId; }
 
-    bool IsAutoSyncEnabled() const { return mAutoSyncEnabled; }
-
     bool IsFabricSyncReady() const { return mRemoteBridgeNodeId != chip::kUndefinedNodeId; }
 
     bool IsLocalBridgeReady() const { return mLocalBridgeNodeId != chip::kUndefinedNodeId; }
 
-    void EnableAutoSync(bool state) { mAutoSyncEnabled = state; }
+    void AddSyncedDevice(const SyncedDevice & device);
 
-    void AddSyncedDevice(const Device & device);
+    void RemoveSyncedDevice(chip::ScopedNodeId scopedNodeId);
 
-    void RemoveSyncedDevice(chip::NodeId nodeId);
+    /**
+     * @brief Initializes the CommissionerControl for fabric sync setup process.
+     */
+    void InitCommissionerControl();
 
     /**
      * @brief Determines whether a given nodeId corresponds to the "current bridge device," either local or remote.
@@ -93,7 +104,7 @@ public:
      *
      * This function initiates the process to open the commissioning window for a device identified by the given node ID.
      *
-     * @param nodeId               The ID of the node that should open the commissioning window.
+     * @param scopedNodeId         The scoped node ID of the device that should open the commissioning window.
      * @param iterations           The number of PBKDF (Password-Based Key Derivation Function) iterations to use
      *                             for deriving the PAKE (Password Authenticated Key Exchange) verifier.
      * @param commissioningTimeoutSec The time in seconds before the commissioning window closes. This value determines
@@ -104,7 +115,7 @@ public:
      * @param verifier             The PAKE verifier used to authenticate the commissioning process.
      *
      */
-    void OpenDeviceCommissioningWindow(chip::NodeId nodeId, uint32_t iterations, uint16_t commissioningTimeoutSec,
+    void OpenDeviceCommissioningWindow(chip::ScopedNodeId scopedNodeId, uint32_t iterations, uint16_t commissioningTimeoutSec,
                                        uint16_t discriminator, const chip::ByteSpan & salt, const chip::ByteSpan & verifier);
 
     /**
@@ -171,14 +182,10 @@ public:
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
-    Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
-    Device * FindDeviceByNode(chip::NodeId nodeId);
+    SyncedDevice * FindDeviceByEndpoint(chip::EndpointId endpointId);
+    SyncedDevice * FindDeviceByNode(chip::NodeId nodeId);
 
 private:
-    friend DeviceManager & DeviceMgr();
-
-    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
-
     void RequestCommissioningApproval();
 
     void HandleReadSupportedDeviceCategories(chip::TLV::TLVReader & data);
@@ -190,8 +197,6 @@ private:
     void SendCommissionNodeRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
 
     void HandleReverseOpenCommissioningWindow(chip::TLV::TLVReader & data);
-
-    static DeviceManager sInstance;
 
     chip::NodeId mLastUsedNodeId = 0;
 
@@ -205,23 +210,13 @@ private:
     // This represents the bridge within its own ecosystem.
     chip::NodeId mLocalBridgeNodeId = chip::kUndefinedNodeId;
 
-    std::set<Device> mSyncedDevices;
-    bool mAutoSyncEnabled = false;
-    bool mInitialized     = false;
-    uint64_t mRequestId   = 0;
+    std::set<SyncedDevice> mSyncedDevices;
+    bool mInitialized   = false;
+    uint64_t mRequestId = 0;
+
+    BridgeSubscription mBridgeSubscriber;
+    CommissionerControl mCommissionerControl;
+    FabricSyncGetter mFabricSyncGetter;
 };
 
-/**
- * Returns the public interface of the DeviceManager singleton object.
- *
- * Applications should use this to access features of the DeviceManager
- * object.
- */
-inline DeviceManager & DeviceMgr()
-{
-    if (!DeviceManager::sInstance.mInitialized)
-    {
-        DeviceManager::sInstance.Init();
-    }
-    return DeviceManager::sInstance;
-}
+} // namespace admin

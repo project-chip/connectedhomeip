@@ -20,7 +20,6 @@
 #include <app/util/attribute-storage-detail.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
@@ -28,6 +27,7 @@
 #include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
+#include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -92,6 +92,11 @@ namespace {
 uint8_t singletonAttributeData[ACTUAL_SINGLETONS_SIZE];
 
 uint16_t emberEndpointCount = 0;
+
+/// Determines a incremental unique index for ember
+/// metadata that is increased whenever a structural change is made to the
+/// ember metadata (e.g. changing dynamic endpoints or enabling/disabling endpoints)
+unsigned emberMetadataStructureGeneration = 0;
 
 // If we have attributes that are more than 4 bytes, then
 // we need this data block for the defaults
@@ -315,6 +320,7 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
     // Now enable the endpoint.
     emberAfEndpointEnableDisable(id, true);
 
+    emberMetadataStructureGeneration++;
     return CHIP_NO_ERROR;
 }
 
@@ -332,6 +338,7 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
         emAfEndpoints[index].endpoint = kInvalidEndpointId;
     }
 
+    emberMetadataStructureGeneration++;
     return ep;
 }
 
@@ -944,7 +951,13 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                                 emberAfGlobalInteractionModelAttributesChangedListener());
     }
 
+    emberMetadataStructureGeneration++;
     return true;
+}
+
+unsigned emberAfMetadataStructureGeneration()
+{
+    return emberMetadataStructureGeneration;
 }
 
 // Returns the index of a given endpoint.  Does not consider disabled endpoints.

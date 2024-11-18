@@ -154,7 +154,8 @@ class TelinkBuilder(Builder):
                  enable_4mb_flash: bool = False,
                  mars_board_config: bool = False,
                  usb_board_config: bool = False,
-                 use_data_model_interface: Optional[str] = None,
+                 compress_lzma_config: bool = False,
+                 thread_analyzer_config: bool = False,
                  ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
@@ -167,7 +168,8 @@ class TelinkBuilder(Builder):
         self.enable_4mb_flash = enable_4mb_flash
         self.mars_board_config = mars_board_config
         self.usb_board_config = usb_board_config
-        self.use_data_model_interface = use_data_model_interface
+        self.compress_lzma_config = compress_lzma_config
+        self.thread_analyzer_config = thread_analyzer_config
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -212,12 +214,14 @@ class TelinkBuilder(Builder):
         if self.usb_board_config:
             flags.append("-DTLNK_USB_DONGLE=y")
 
+        if self.compress_lzma_config:
+            flags.append("-DCONFIG_COMPRESS_LZMA=y")
+
+        if self.thread_analyzer_config:
+            flags.append("-DCONFIG_THREAD_ANALYZER=y")
+
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
-
-        if self.use_data_model_interface is not None:
-            value = 'y' if self.use_data_model_interface else 'n'
-            flags.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={value}")
 
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 

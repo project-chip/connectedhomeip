@@ -29,18 +29,20 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="2"/>
 
-    <attribute side="server" code="0x0000" define="TEMPERATURE_DISPLAY_MODE" type="TemperatureDisplayModeEnum" min="0x00" max="0x01" writable="true" default="0x00" optional="false">TemperatureDisplayMode</attribute>
-
-    <attribute side="server" code="0x0001" define="KEYPAD_LOCKOUT" type="KeypadLockoutEnum" min="0x00" max="0x05" writable="true" default="0x00" optional="false">
-      <description>KeypadLockout</description>
+    <attribute side="server" code="0x0000" name="TemperatureDisplayMode" define="TEMPERATURE_DISPLAY_MODE" type="TemperatureDisplayModeEnum" min="0x00" max="0x01" writable="true" default="0x00">
+      <mandatoryConform/>
+    </attribute>
+    
+    <attribute side="server" code="0x0001" name="KeypadLockout" define="KEYPAD_LOCKOUT" type="KeypadLockoutEnum" min="0x00" max="0x05" writable="true" default="0x00">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <mandatoryConform/>
     </attribute>
 
-    <attribute side="server" code="0x0002" define="SCHEDULE_PROGRAMMING_VISIBILITY" type="ScheduleProgrammingVisibilityEnum" min="0x00" max="0x01" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">
-      <description>ScheduleProgrammingVisibility</description>
+    <attribute side="server" code="0x0002" name="ScheduleProgrammingVisibility" define="SCHEDULE_PROGRAMMING_VISIBILITY" type="ScheduleProgrammingVisibilityEnum" min="0x00" max="0x01" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
   </cluster>
 

@@ -51,16 +51,21 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="4"/>
-
-    <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="int16u" writable="true"  default="0x0" optional="false">IdentifyTime</attribute>
-    <attribute side="server" code="0x0001" define="IDENTIFY_TYPE" type="IdentifyTypeEnum" writable="false" default="0x00" optional="false">IdentifyType</attribute>
-
+    
+    <attribute side="server" code="0x0000" name="IdentifyTime" define="IDENTIFY_TIME" type="int16u" writable="true" default="0x0">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="IdentifyType" define="IDENTIFY_TYPE" type="IdentifyTypeEnum" default="0x00">
+      <mandatoryConform/>
+    </attribute>
+    
     <command source="client" code="0x00" name="Identify" optional="false">
       <description>
         Command description for Identify
       </description>
       <arg name="IdentifyTime" type="int16u"/>
       <access op="invoke" privilege="manage"/>
+      <mandatoryConform/>
     </command>
     <command source="client" code="0x40" name="TriggerEffect" optional="true">
       <description>
@@ -69,6 +74,7 @@ limitations under the License.
       <arg name="EffectIdentifier" type="EffectIdentifierEnum"/>
       <arg name="EffectVariant" type="EffectVariantEnum"/>
       <access op="invoke" privilege="manage"/>
+      <optionalConform/>
     </command>
   </cluster>
 </configurator>

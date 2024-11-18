@@ -144,23 +144,17 @@ static uint32_t mServiceListFreeIndex;
 
 CHIP_ERROR NxpChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
-    CHIP_ERROR error            = CHIP_NO_ERROR;
-    otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
-    struct netif * extNetif     = (ConnectivityManagerImpl().GetExternalInterface()).GetPlatformInterface();
-
-    // Don't try to do anything until the mDNS server is started
-    VerifyOrExit(otMdnsIsEnabled(thrInstancePtr), error = CHIP_ERROR_INCORRECT_STATE);
+    struct netif * extNetif = (ConnectivityManagerImpl().GetExternalInterface()).GetPlatformInterface();
 
     mNetifIndex = netif_get_index(extNetif);
+    initCallback(context, CHIP_NO_ERROR);
 
-exit:
-    initCallback(context, error);
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 void NxpChipDnssdShutdown()
 {
-    otMdnsSetEnabled(ThreadStackMgrImpl().OTInstance(), false, 0);
+    // Empty implementation. Intentionally left blank
 }
 #if USE_MDNS_NEXT_SERVICE_API
 CHIP_ERROR NxpChipDnssdRemoveServices()
@@ -230,7 +224,7 @@ CHIP_ERROR NxpChipDnssdRemoveServices()
 
 CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
-    ReturnErrorCodeIf(service == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
     uint32_t txtBufferOffset    = 0;
@@ -640,7 +634,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
             entryIndex++;
         }
 
-        ReturnErrorCodeIf(alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
         mdnsService.mTextEntrySize = entryIndex;

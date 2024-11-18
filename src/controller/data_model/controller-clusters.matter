@@ -5260,13 +5260,13 @@ provisional cluster DeviceEnergyManagement = 152 {
   command ModifyForecastRequest(ModifyForecastRequestRequest): DefaultSuccess = 5;
   /** Allows a client to ask the ESA to recompute its Forecast based on power and time constraints. */
   command RequestConstraintBasedForecast(RequestConstraintBasedForecastRequest): DefaultSuccess = 6;
-  /** Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command */
+  /** Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command. */
   command CancelRequest(): DefaultSuccess = 7;
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
 cluster EnergyEvse = 153 {
-  revision 4;
+  revision 3;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
     kEVStopped = 0;
@@ -5431,9 +5431,9 @@ cluster EnergyEvse = 153 {
 
   /** Allows a client to disable the EVSE from charging and discharging. */
   timed command Disable(): DefaultSuccess = 1;
-  /** This command allows a client to enable the EVSE to charge an EV, */
+  /** This command allows a client to enable the EVSE to charge an EV, and to provide or update the maximum and minimum charge current. */
   timed command EnableCharging(EnableChargingRequest): DefaultSuccess = 2;
-  /** Upon receipt, this SHALL allow a client to enable the discharge of an EV, */
+  /** Upon receipt, this SHALL allow a client to enable the discharge of an EV, and to provide or update the maximum discharge current. */
   timed command EnableDischarging(EnableDischargingRequest): DefaultSuccess = 3;
   /** Allows a client to put the EVSE into a self-diagnostics mode. */
   timed command StartDiagnostics(): DefaultSuccess = 4;
@@ -5502,7 +5502,7 @@ cluster PowerTopology = 156 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster EnergyEvseMode = 157 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -5518,6 +5518,7 @@ cluster EnergyEvseMode = 157 {
     kManual = 16384;
     kTimeOfUse = 16385;
     kSolarCharging = 16386;
+    kV2X = 16387;
   }
 
   bitmap Feature : bitmap32 {
@@ -5537,8 +5538,6 @@ cluster EnergyEvseMode = 157 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5555,8 +5554,7 @@ cluster EnergyEvseMode = 157 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -5597,8 +5595,6 @@ cluster WaterHeaterMode = 158 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5612,17 +5608,16 @@ cluster WaterHeaterMode = 158 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 provisional cluster DeviceEnergyManagementMode = 159 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -5658,8 +5653,6 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5676,8 +5669,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -9451,6 +9443,7 @@ provisional cluster ZoneManagement = 1360 {
 
   bitmap Feature : bitmap32 {
     kTwoDimensionalCartesianZone = 0x1;
+    kPerZoneSensitivity = 0x2;
   }
 
   struct TwoDCartesianVertexStruct {
@@ -9471,11 +9464,12 @@ provisional cluster ZoneManagement = 1360 {
     ZoneSourceEnum zoneSource = 2;
   }
 
-  struct ZoneTriggeringTimeControlStruct {
+  struct ZoneTriggerControlStruct {
     int16u initialDuration = 0;
     int16u augmentationDuration = 1;
     elapsed_s maxDuration = 2;
     int16u blindDuration = 3;
+    optional int8u sensitivity = 4;
   }
 
   info event ZoneTriggered = 0 {
@@ -9490,8 +9484,8 @@ provisional cluster ZoneManagement = 1360 {
 
   readonly attribute ZoneSourceEnum supportedZoneSources[] = 0;
   readonly attribute optional ZoneInformationStruct zones[] = 1;
-  attribute ZoneTriggeringTimeControlStruct timeControl[] = 2;
-  attribute int8u sensitivity = 3;
+  attribute ZoneTriggerControlStruct triggers[] = 2;
+  attribute optional int8u sensitivity = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -9535,7 +9529,7 @@ provisional cluster ZoneManagement = 1360 {
 }
 
 /** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
-cluster CameraAvStreamManagement = 1361 {
+provisional cluster CameraAvStreamManagement = 1361 {
   revision 1;
 
   enum AudioCodecEnum : enum8 {
@@ -9574,12 +9568,12 @@ cluster CameraAvStreamManagement = 1361 {
   }
 
   bitmap Feature : bitmap32 {
-    kPrivacy = 0x1;
-    kAudio = 0x2;
-    kSpeaker = 0x4;
-    kImageControl = 0x8;
-    kVideo = 0x10;
-    kSnapshot = 0x20;
+    kAudio = 0x1;
+    kVideo = 0x2;
+    kSnapshot = 0x4;
+    kPrivacy = 0x8;
+    kSpeaker = 0x10;
+    kImageControl = 0x20;
     kWatermark = 0x40;
     kOnScreenDisplay = 0x80;
     kLocalStorage = 0x100;
@@ -9703,7 +9697,7 @@ cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional boolean nightVisionCapable = 3;
   readonly attribute optional VideoResolutionStruct minViewport = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
-  readonly attribute optional int32u maxPreRollBufferSize = 6;
+  readonly attribute optional int32u maxContentBufferSize = 6;
   readonly attribute optional AudioCapabilitiesStruct microphoneCapabilities = 7;
   readonly attribute optional AudioCapabilitiesStruct speakerCapabilities = 8;
   readonly attribute optional TwoWayTalkSupportTypeEnum twoWayTalkSupport = 9;
@@ -9711,39 +9705,33 @@ cluster CameraAvStreamManagement = 1361 {
   readonly attribute int32u maxNetworkBandwidth = 11;
   readonly attribute optional int16u currentFrameRate = 12;
   attribute access(read: manage, write: manage) optional boolean HDRModeEnabled = 13;
-  readonly attribute optional VideoCodecEnum currentVideoCodecs[] = 14;
-  readonly attribute optional SnapshotParamsStruct currentSnapshotConfig = 15;
-  readonly attribute fabric_idx fabricsUsingCamera[] = 16;
-  readonly attribute optional VideoStreamStruct allocatedVideoStreams[] = 17;
-  readonly attribute optional AudioStreamStruct allocatedAudioStreams[] = 18;
-  readonly attribute optional SnapshotStreamStruct allocatedSnapshotStreams[] = 19;
-  attribute access(read: administer, write: administer) optional StreamTypeEnum rankedVideoStreamPrioritiesList[] = 20;
-  attribute optional boolean softRecordingPrivacyModeEnabled = 21;
-  attribute optional boolean softLivestreamPrivacyModeEnabled = 22;
-  readonly attribute optional boolean hardPrivacyModeOn = 23;
-  attribute access(read: manage, write: manage) optional TriStateAutoEnum nightVision = 24;
-  attribute access(read: manage, write: manage) optional TriStateAutoEnum nightVisionIllum = 25;
-  attribute access(read: manage, write: manage) optional boolean AWBEnabled = 26;
-  attribute access(read: manage, write: manage) optional boolean autoShutterSpeedEnabled = 27;
-  attribute access(read: manage, write: manage) optional boolean autoISOEnabled = 28;
-  readonly attribute optional ViewportStruct viewport = 29;
-  attribute access(read: manage, write: manage) optional boolean speakerMuted = 30;
-  attribute access(read: manage, write: manage) optional int8u speakerVolumeLevel = 31;
-  attribute access(read: manage, write: manage) optional int8u speakerMaxLevel = 32;
-  attribute access(read: manage, write: manage) optional int8u speakerMinLevel = 33;
-  attribute access(read: manage, write: manage) optional boolean microphoneMuted = 34;
-  attribute access(read: manage, write: manage) optional int8u microphoneVolumeLevel = 35;
-  attribute access(read: manage, write: manage) optional int8u microphoneMaxLevel = 36;
-  attribute access(read: manage, write: manage) optional int8u microphoneMinLevel = 37;
-  attribute access(read: manage, write: manage) optional boolean microphoneAGCEnabled = 38;
-  readonly attribute optional int16u imageRotation = 39;
-  readonly attribute optional boolean imageFlipHorizontal = 40;
-  readonly attribute optional boolean imageFlipVertical = 41;
-  attribute access(read: manage, write: manage) optional boolean localVideoRecordingEnabled = 42;
-  attribute access(read: manage, write: manage) optional boolean localSnapshotRecordingEnabled = 43;
-  attribute access(read: manage, write: manage) optional boolean statusLightEnabled = 44;
-  attribute access(read: manage, write: manage) optional ThreeLevelAutoEnum statusLightBrightness = 45;
-  attribute access(read: manage, write: manage) optional TriStateAutoEnum depthSensorStatus = 46;
+  readonly attribute fabric_idx fabricsUsingCamera[] = 14;
+  readonly attribute optional VideoStreamStruct allocatedVideoStreams[] = 15;
+  readonly attribute optional AudioStreamStruct allocatedAudioStreams[] = 16;
+  readonly attribute optional SnapshotStreamStruct allocatedSnapshotStreams[] = 17;
+  readonly attribute optional StreamTypeEnum rankedVideoStreamPrioritiesList[] = 18;
+  attribute optional boolean softRecordingPrivacyModeEnabled = 19;
+  attribute optional boolean softLivestreamPrivacyModeEnabled = 20;
+  readonly attribute optional boolean hardPrivacyModeOn = 21;
+  attribute access(read: manage, write: manage) optional TriStateAutoEnum nightVision = 22;
+  attribute access(read: manage, write: manage) optional TriStateAutoEnum nightVisionIllum = 23;
+  attribute access(read: manage, write: manage) optional ViewportStruct viewport = 24;
+  attribute access(read: manage, write: manage) optional boolean speakerMuted = 25;
+  attribute access(read: manage, write: manage) optional int8u speakerVolumeLevel = 26;
+  readonly attribute access(read: manage) optional int8u speakerMaxLevel = 27;
+  readonly attribute access(read: manage) optional int8u speakerMinLevel = 28;
+  attribute access(read: manage, write: manage) optional boolean microphoneMuted = 29;
+  attribute access(read: manage, write: manage) optional int8u microphoneVolumeLevel = 30;
+  readonly attribute access(read: manage) optional int8u microphoneMaxLevel = 31;
+  readonly attribute access(read: manage) optional int8u microphoneMinLevel = 32;
+  attribute access(read: manage, write: manage) optional boolean microphoneAGCEnabled = 33;
+  attribute access(read: manage, write: manage) optional int16u imageRotation = 34;
+  attribute access(read: manage, write: manage) optional boolean imageFlipHorizontal = 35;
+  attribute access(read: manage, write: manage) optional boolean imageFlipVertical = 36;
+  attribute access(read: manage, write: manage) optional boolean localVideoRecordingEnabled = 37;
+  attribute access(read: manage, write: manage) optional boolean localSnapshotRecordingEnabled = 38;
+  attribute access(read: manage, write: manage) optional boolean statusLightEnabled = 39;
+  attribute access(read: manage, write: manage) optional ThreeLevelAutoEnum statusLightBrightness = 40;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -9800,7 +9788,7 @@ cluster CameraAvStreamManagement = 1361 {
 
   request struct SnapshotStreamAllocateRequest {
     ImageCodecEnum imageCodec = 0;
-    int16u frameRate = 1;
+    int16u maxFrameRate = 1;
     int32u bitRate = 2;
     VideoResolutionStruct minResolution = 3;
     VideoResolutionStruct maxResolution = 4;
@@ -9830,22 +9818,6 @@ cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct resolution = 2;
   }
 
-  request struct SetViewportRequest {
-    ViewportStruct viewport = 0;
-  }
-
-  request struct SetImageRotationRequest {
-    int16u angle = 0;
-  }
-
-  request struct SetImageFlipHorizontalRequest {
-    boolean enabled = 0;
-  }
-
-  request struct SetImageFlipVerticalRequest {
-    boolean enabled = 0;
-  }
-
   /** This command SHALL allocate an audio stream on the camera and return an allocated audio stream identifier. */
   command access(invoke: manage) AudioStreamAllocate(AudioStreamAllocateRequest): AudioStreamAllocateResponse = 0;
   /** This command SHALL deallocate an audio stream on the camera, corresponding to the given audio stream identifier. */
@@ -9863,15 +9835,7 @@ cluster CameraAvStreamManagement = 1361 {
   /** This command SHALL set the relative priorities of the various stream types on the camera. */
   command access(invoke: administer) SetStreamPriorities(SetStreamPrioritiesRequest): DefaultSuccess = 10;
   /** This command SHALL return a Snapshot from the camera. */
-  command access(invoke: manage) CaptureSnapshot(CaptureSnapshotRequest): DefaultSuccess = 11;
-  /** This command sets the viewport in all video streams. */
-  command access(invoke: manage) SetViewport(SetViewportRequest): DefaultSuccess = 13;
-  /** The data fields for this command SHALL be as follows: */
-  command access(invoke: manage) SetImageRotation(SetImageRotationRequest): DefaultSuccess = 14;
-  /** The data fields for this command SHALL be as follows: */
-  command access(invoke: manage) SetImageFlipHorizontal(SetImageFlipHorizontalRequest): DefaultSuccess = 15;
-  /** The data fields for this command SHALL be as follows: */
-  command access(invoke: manage) SetImageFlipVertical(SetImageFlipVerticalRequest): DefaultSuccess = 16;
+  command CaptureSnapshot(CaptureSnapshotRequest): DefaultSuccess = 11;
 }
 
 /** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */

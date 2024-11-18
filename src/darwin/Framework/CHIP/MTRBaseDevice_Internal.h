@@ -18,6 +18,9 @@
 #import "MTRBaseDevice.h"
 #import <Foundation/Foundation.h>
 
+#import "MTRDefines_Internal.h"
+#import "MTRDeviceController_Concrete.h"
+
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -208,6 +211,11 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                                 queue:(dispatch_queue_t)queue
                            completion:(MTRDeviceResponseHandler)completion;
 
+/**
+ * Will return nil if our controller is not in fact a concrete controller.
+ */
+@property (nullable, nonatomic, strong, readonly) MTRDeviceController_Concrete * concreteController;
+
 @end
 
 @interface MTRClusterPath ()
@@ -257,6 +265,6 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
 // TLV Data with an anonymous tag.  This method assumes the encoding of the
 // value fits in a single UDP MTU; for lists this method might need to be used
 // on each list item separately.
-NSData * _Nullable MTREncodeTLVFromDataValueDictionary(NSDictionary<NSString *, id> * value, NSError * __autoreleasing * error);
+NSData * _Nullable MTREncodeTLVFromDataValueDictionary(MTRDeviceDataValueDictionary value, NSError * __autoreleasing * error);
 
 NS_ASSUME_NONNULL_END

@@ -172,17 +172,17 @@ class TC_VALCC_4_4(MatterBaseTest):
             pass
 
         self.step(11)
-        utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
+        utcTime2 = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
 
-        asserts.assert_true(utcTime is not NullValue, "OpenDuration is null")
+        asserts.assert_true(utcTime2 is not NullValue, "OpenDuration is null")
 
         self.step(12)
         auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
 
         asserts.assert_true(auto_close_time_dut is not NullValue, "AutoCloseTime is null")
-        asserts.assert_greater_equal(auto_close_time_dut, (utcTime + ((defaultOpenDuration - 5) * 1000000)),
+        asserts.assert_greater_equal(auto_close_time_dut, (utcTime2 + ((defaultOpenDuration - 5) * 1000000)),
                                      "AutoCloseTime is not in the expected range")
-        asserts.assert_less_equal(auto_close_time_dut, (utcTime + (defaultOpenDuration * 1000000)),
+        asserts.assert_less_equal(auto_close_time_dut, (utcTime2 + (defaultOpenDuration * 1000000)),
                                   "AutoCloseTime is not in the expected range")
 
         self.step(13)

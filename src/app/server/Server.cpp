@@ -17,6 +17,7 @@
 
 #include <app/server/Server.h>
 
+#include <access/ProviderDeviceTypeResolver.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
 
 #include <app/AppConfig.h>
@@ -26,7 +27,6 @@
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
 #include <app/util/DataModelHandler.h>
-#include <app/util/ember-compatibility-functions.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
@@ -83,42 +83,9 @@ using chip::Transport::TcpListenParameters;
 
 namespace {
 
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
-{
-public:
-    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
-    {
-        chip::app::DataModel::Provider * model = chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
-
-        for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type))
-        {
-            if (type->deviceTypeId == deviceType)
-            {
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-                VerifyOrDie(chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
-#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
-                return true;
-            }
-        }
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        VerifyOrDie(!chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
-#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        return false;
-    }
-} sDeviceTypeResolver;
-#else // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-
-// Ember implementation of the device type resolver
-class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
-{
-public:
-    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
-    {
-        return chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
-    }
-} sDeviceTypeResolver;
-#endif
+chip::Access::DynamicProviderDeviceTypeResolver sDeviceTypeResolver([] {
+    return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+});
 
 } // namespace
 
@@ -343,9 +310,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     if (GetFabricTable().FabricCount() != 0)
     {
+#if CONFIG_NETWORK_LAYER_BLE
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
-#if CONFIG_NETWORK_LAYER_BLE
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
 #endif
     }

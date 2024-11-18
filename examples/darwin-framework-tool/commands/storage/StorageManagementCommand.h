@@ -33,7 +33,15 @@ public:
 class StorageViewAll : public Command
 {
 public:
-    StorageViewAll() : Command("view-all") {}
+    StorageViewAll() : Command("view")
+    {
+        AddArgument("commissioner-name", &mCommissionerName,
+                    "If specified, only the keys associated with the given commissioner will be displayed. Valid options are: "
+                    "‘alpha’, ‘beta’, ‘gamma’.");
+    }
 
     CHIP_ERROR Run() override;
+
+private:
+    chip::Optional<char *> mCommissionerName;
 };
