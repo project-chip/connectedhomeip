@@ -365,7 +365,7 @@ CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, 
     if (type == nullptr || callback == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    if(mBrowseContext != nullptr)
+    if (mBrowseContext != nullptr)
     {
         NxpChipDnssdStopBrowse(reinterpret_cast<intptr_t>(mBrowseContext));
     }
@@ -419,7 +419,7 @@ CHIP_ERROR NxpChipDnssdStopBrowse(intptr_t browseIdentifier)
     // that has been freed in DispatchBrowseEmpty.
     if ((true == bBrowseInProgress) && (browseContext))
     {
-        error = otMdnsStopBrowser(thrInstancePtr, &browseContext->mBrowseInfo);
+        error                = otMdnsStopBrowser(thrInstancePtr, &browseContext->mBrowseInfo);
         browseContext->error = MapOpenThreadError(error);
 
         // browse context will be freed in DispatchBrowseEmpty
@@ -438,7 +438,7 @@ CHIP_ERROR NxpChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId in
 
     otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
 
-    if(mResolveContext != nullptr)
+    if (mResolveContext != nullptr)
     {
         // In case there is an ongoing query and NxpChipDnssdResolveNoLongerNeeded has not been called yet
         // free the allocated context and do a proper cleanup of the previous transaction
