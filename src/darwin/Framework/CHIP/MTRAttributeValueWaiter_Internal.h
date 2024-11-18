@@ -37,7 +37,6 @@ MTR_DIRECT_MEMBERS
 @interface MTRAttributeValueWaiter ()
 
 @property (nonatomic, readonly) BOOL allValuesSatisfied;
-@property (nonatomic, retain, readwrite, nullable) dispatch_source_t expirationTimer;
 
 - (instancetype)initWithDevice:(MTRDevice *)device values:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion;
 
@@ -45,6 +44,15 @@ MTR_DIRECT_MEMBERS
 - (BOOL)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path byDevice:(MTRDevice *)device;
 
 - (void)_notifyWithError:(NSError * _Nullable)error;
+
+// Starts the timer for our timeout, using the device's queue as the dispatch
+// queuue for the timer firing.
+- (void)_startTimerWithTimeout:(NSTimeInterval)timeout;
+
+// Cancels the waiter without trying to remove it from the MTRDevice's
+// collection of waiters (unlike "cancel", which does that removal).  This is
+// exposed so that MTRDevice can do it when invalidating.
+- (void)_notifyCancellation;
 
 @end
 

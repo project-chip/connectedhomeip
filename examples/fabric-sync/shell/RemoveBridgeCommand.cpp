@@ -35,7 +35,7 @@ void RemoveBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
 
     if (err == CHIP_NO_ERROR)
     {
-        admin::DeviceMgr().SetRemoteBridgeNodeId(kUndefinedNodeId);
+        admin::DeviceManager::Instance().SetRemoteBridgeNodeId(kUndefinedNodeId);
 
         // print to console
         fprintf(stderr, "Successfully removed bridge device: NodeId: " ChipLogFormatX64 "\n", ChipLogValueX64(mBridgeNodeId));
@@ -51,7 +51,7 @@ void RemoveBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
 
 CHIP_ERROR RemoveBridgeCommand::RunCommand()
 {
-    NodeId bridgeNodeId = admin::DeviceMgr().GetRemoteBridgeNodeId();
+    NodeId bridgeNodeId = admin::DeviceManager::Instance().GetRemoteBridgeNodeId();
 
     if (bridgeNodeId == kUndefinedNodeId)
     {
@@ -66,7 +66,7 @@ CHIP_ERROR RemoveBridgeCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    return admin::DeviceMgr().UnpairRemoteFabricBridge();
+    return admin::DeviceManager::Instance().UnpairRemoteFabricBridge();
 }
 
 } // namespace commands
