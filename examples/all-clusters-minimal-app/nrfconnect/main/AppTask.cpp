@@ -174,7 +174,7 @@ CHIP_ERROR AppTask::Init()
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
 

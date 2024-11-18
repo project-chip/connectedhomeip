@@ -44,7 +44,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
         // ChipLinuxAppMainLoop blocks, and we don't want that here.
         static chip::CommonCaseDeviceServerInitParams initParams;
         (void) initParams.InitializeStaticResourcesBeforeServerInit();
-        initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+        initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
         VerifyOrDie(Server::GetInstance().Init(initParams) == CHIP_NO_ERROR);
 
         ApplicationInit();

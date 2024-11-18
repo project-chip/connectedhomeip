@@ -292,7 +292,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     static chip::CommonCaseDeviceServerInitParams initParams;
 
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();

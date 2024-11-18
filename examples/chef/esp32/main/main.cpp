@@ -160,7 +160,7 @@ void InitServer(intptr_t)
     // Start IM server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
     chip::Server::GetInstance().Init(initParams);
 
     // Device Attestation & Onboarding codes

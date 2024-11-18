@@ -276,7 +276,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
 
 #if CHIP_ENABLE_OPENTHREAD
     // Set up OpenThread configuration when OpenThread is included

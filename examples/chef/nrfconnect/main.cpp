@@ -126,7 +126,7 @@ int main()
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
     err                          = chip::Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)
     {
