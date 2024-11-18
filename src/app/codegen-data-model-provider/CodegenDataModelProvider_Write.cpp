@@ -270,8 +270,10 @@ void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributeP
     }
     else
     {
-        // If cluster Id is invalid, mark the endpoint dirty using the path. This can happen when enabling/disabling the endpoint.
-        change_listener.MarkDirty(path);
+        // When the path has wildcard cluster Id, call the emberAfEndpointChanged to mark attributes on the given endpoint
+        // as having changing, but do NOT increase/alter any cluster data versions, as this happens when a bridged endpoint is
+        // added or removed from a bridge and the cluster data is not changed during the process.
+        emberAfEndpointChanged(path.mEndpointId, &change_listener);
     }
 }
 
