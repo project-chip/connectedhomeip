@@ -55,6 +55,7 @@ void AddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 
         admin::DeviceManager::Instance().UpdateLastUsedNodeId(mBridgeNodeId);
         admin::DeviceManager::Instance().SubscribeRemoteFabricBridge();
+        admin::DeviceManager::Instance().InitCommissionerControl();
 
         // After successful commissioning of the Commissionee, initiate Reverse Commissioning
         // via the Commissioner Control Cluster. However, we must first verify that the
