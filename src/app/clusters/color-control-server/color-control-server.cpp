@@ -1265,7 +1265,7 @@ EmberEventControl * ColorControlServer::configureHSVEventControl(EndpointId endp
  * @param transitionTime Transition time in 10th of seconds
  * @return Status::Success When successful,
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state,
- *         Status::ConstraintError if the saturation or tansitionTime are above maximum.ß
+ *         Status::ConstraintError if the saturation or tansitionTime are above maximum.
  */
 Status ColorControlServer::moveToSaturation(EndpointId endpoint, uint8_t saturation, uint16_t transitionTime)
 {
