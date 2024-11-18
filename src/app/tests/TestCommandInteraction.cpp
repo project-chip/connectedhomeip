@@ -1558,7 +1558,7 @@ TEST_F(TestCommandInteraction, CommandSenderDeletedWhenResponseIsPending)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender* commandSender = Platform::New<app::CommandSender>(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender * commandSender = Platform::New<app::CommandSender>(&mockCommandSenderDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(commandSender);
     asyncCommand = true;
