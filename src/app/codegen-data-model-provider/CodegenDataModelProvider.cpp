@@ -269,7 +269,7 @@ DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & ot
 {
     DataModel::DeviceTypeEntry entry;
 
-    entry.deviceTypeId      = other.deviceId;
+    entry.deviceTypeId       = other.deviceId;
     entry.deviceTypeRevision = other.deviceVersion;
 
     return entry;
@@ -521,16 +521,16 @@ DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId 
     return FirstServerClusterEntry(endpointId, endpoint, 0, mServerClusterIterationHint);
 }
 
-std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const EmberAfEndpointType * endpoint,
-                                                                      ClusterId id, bool isServer) const
+std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id,
+                                                                      bool isServer) const
 {
     const unsigned clusterCount = endpoint->clusterCount;
-    unsigned hint = isServer ? mServerClusterIterationHint : mClientClusterIterationHint;
+    unsigned hint               = isServer ? mServerClusterIterationHint : mClientClusterIterationHint;
 
     if (hint < clusterCount)
     {
         const EmberAfCluster & cluster = endpoint->cluster[hint];
-        bool serverClientCheck = isServer ? cluster.IsServer() : cluster.IsClient();
+        bool serverClientCheck         = isServer ? cluster.IsServer() : cluster.IsClient();
         if (serverClientCheck && (cluster.clusterId == id))
         {
             return std::make_optional(hint);
@@ -543,7 +543,7 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const Embe
     for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
     {
         const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        bool serverClientCheck = isServer ? cluster.IsServer() : cluster.IsClient();
+        bool serverClientCheck         = isServer ? cluster.IsServer() : cluster.IsClient();
         if (serverClientCheck && (cluster.clusterId == id))
         {
             return std::make_optional(cluster_idx);

@@ -1433,8 +1433,6 @@ bool IsTreeCompositionForEndpointIndex(uint16_t endpointIndex)
     return (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isTreeComposition));
 }
 
-
-
 } // namespace app
 } // namespace chip
 
