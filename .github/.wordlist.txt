@@ -41,6 +41,9 @@ AFL
 AIDL
 algs
 alloc
+allocator
+allocators
+Ambrose
 Ameba
 amebad
 amebaiot
@@ -317,6 +320,7 @@ cryptographic
 CSA
 csg
 csrrequest
+cstdint
 csu
 csv
 ctl
@@ -440,6 +444,7 @@ DNSStubListener
 docbuild
 Dockerfile
 Dockerfiles
+docstrings
 Don'ts
 DoorLock
 DoorState
@@ -565,6 +570,8 @@ FlowMeasurement
 FluorideConcentrationMeasurement
 focusable
 forkpty
+formatter
+formatters
 FOTA
 FreeRTOS
 FreeRTOSConfig
@@ -731,6 +738,7 @@ IPython
 ISCAN
 isHexString
 isLowerCase
+isort
 isUpperCase
 itemName
 iterable
@@ -878,6 +886,7 @@ MediaPlayback
 MediaTek
 MEI
 mem
+memcpy
 memdf
 MemMonitoring
 menuconfig
@@ -933,6 +942,7 @@ mv
 MX
 mydir
 MyPASSWORD
+mypy
 MySSID
 NAMESERVER
 NAMESPACE
@@ -1442,6 +1452,7 @@ toJson
 tokenization
 tokenized
 tokenizer
+toml
 toolchain
 toolchains
 topologies
