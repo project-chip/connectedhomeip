@@ -296,7 +296,6 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 #ifdef WF200_WIFI
 void sl_wfx_host_gpio_init(void);
 void wfx_bus_start(void);
-sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
 #endif /* WF200_WIFI */
 
 #ifdef __cplusplus

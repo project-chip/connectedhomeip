@@ -224,16 +224,6 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 
 sl_wfx_get_counters_cnf_t * counters;
 
-/****************************************************************************
- * @brief
- *      get the wifi state
- * @return returns wificonetext state
- *****************************************************************************/
-sl_wfx_state_t wfx_get_wifi_state(void)
-{
-    return wifiContext.state;
-}
-
 sl_status_t get_all_counters(void)
 {
     sl_status_t result;
@@ -328,7 +318,7 @@ static void wfx_events_task_start(void)
  * @returns Returns SL_STATUS_OK if successful,
  *SL_STATUS_FAIL otherwise
  *****************************************************************************/
-sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
+extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
 {
     switch (event_payload->header.id)
     {
@@ -1218,7 +1208,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
      */
     uint8_t ip4_addr[4];
 
-    ip4_addr[0] = (ip) &0xFF;
+    ip4_addr[0] = (ip) & 0xFF;
     ip4_addr[1] = (ip >> 8) & 0xFF;
     ip4_addr[2] = (ip >> 16) & 0xFF;
     ip4_addr[3] = (ip >> 24) & 0xFF;
