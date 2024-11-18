@@ -57,7 +57,8 @@ class TC_CADMIN_1_19(MatterBaseTest):
             TestStep(
                 1, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
             TestStep(2, "TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read. Save the number of fabrics in the list as initial_number_of_fabrics"),
-            TestStep(3, "TH_CR1 reads the SupportedFabrics attribute from the Node Operational Credentials cluster. Save max_fabrics"),
+            TestStep(3, "TH_CR1 reads the SupportedFabrics attribute from the Node Operational Credentials cluster. Save max_fabrics", 
+                "Verify that max_fabrics is larger than initial_number_of_fabrics. If not, instruct the tester to remove one non-test-harness fabric and re-start the test."),
             TestStep(4, "Repeat the following steps (5a and 5b) max_fabrics - initial_number_of_fabrics times"),
             TestStep(
                 "4a", "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", "{resDutSuccess}"),
@@ -97,6 +98,9 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.step(3)
         OC_cluster = Clusters.OperationalCredentials
         max_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.SupportedFabrics)
+        self.print_step("asserts", dir(asserts))
+        asserts.assert_greater(max_fabrics, initial_number_of_fabrics, 
+                        "max fabrics must be greater than initial fabrics, please remove one non-test-harness fabric and try test again")
 
         self.step(4)
         fids_ca_dir = {}
