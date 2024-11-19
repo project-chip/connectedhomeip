@@ -17,6 +17,9 @@
 #pragma once
 
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
+#include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+
 
 class EventData
 {
@@ -27,9 +30,9 @@ public:
 class RefrigeratorAlarmEventData : public EventData
 {
 public:
-    AlarmBitmap alarmCode;
+    chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap doorState;
 };
 
 
-CHIP_ERROR RegisterRefrigeratorAlarmEvents();
+CHIP_ERROR RegisterRefrigeratorEvents();
 void EventWorkerFunction(intptr_t context);

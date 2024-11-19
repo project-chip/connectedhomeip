@@ -104,8 +104,9 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
 
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
     data->eventId         = Events::Notify::Id;
-    data->alarmCode      = static_cast<AlarmBitmap>(atoi(argv[0]));
+    data->doorState      = static_cast<AlarmBitmap>(atoi(argv[0]));
 
+    ChipLogProgress(Zcl, "Setting event for the door state %d", data->doorState);
     DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 
     return CHIP_NO_ERROR;
@@ -131,8 +132,8 @@ CHIP_ERROR RegisterRefrigeratorEvents()
     static const shell_command_t sRefrigeratorEventAlarmDoorSubCommands[] = { { &AlarmHelpHandler, "help",
                                                                         "Usage : Refrigerator event to change door state" } };
 
-    static const shell_command_t sRefrigeratorCommand = { &RefrigeratorCommandHandler, "doorlock",
-                                                      "doorlock commands. Usage: doorlock <subcommand>" };
+    static const shell_command_t sRefrigeratorCommand = { &RefrigeratorCommandHandler, "refrigeratoralarm",
+                                                      "refrigerator alarm commands. Usage: refrigeratoralarm <subcommand>" };
 
     sShellRefrigeratorEventAlarmDoorSubCommands.RegisterCommands(sRefrigeratorEventAlarmDoorSubCommands, ArraySize(sRefrigeratorEventAlarmDoorSubCommands));
 
@@ -142,4 +143,26 @@ CHIP_ERROR RegisterRefrigeratorEvents()
     Engine::Root().RegisterCommands(&sRefrigeratorCommand, 1);
 
     return CHIP_NO_ERROR;
+}
+
+void EventWorkerFunction(intptr_t context)
+{
+    VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "EventWorkerFunction - Invalid work data"));
+
+    EventData * data = reinterpret_cast<EventData *>(context);
+
+    switch (data->eventId)
+    {
+    case Events::Notify::Id: {
+        RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
+        ChipLogProgress(Zcl, "Changing the door state %d", alarmData->doorState);
+        RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId,alarmData->doorState);
+        break;
+    }
+
+    default: {
+        ChipLogError(Zcl, "Invalid Event Id %s, line %d", __func__, __LINE__);
+        break;
+    }
+    }
 }

@@ -24,7 +24,6 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-
 #include "LEDWidget.h"
 
 #ifdef DISPLAY_ENABLED
@@ -34,6 +33,10 @@
 #include "qrcodegen.h"
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
+
+#if defined(ENABLE_CHIP_SHELL)
+#include "EventHandlerLibShell.h"
+#endif // ENABLE_CHIP_SHELL
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
@@ -94,6 +97,15 @@ CHIP_ERROR AppTask::Init()
         appError(err);
     }
 
+#if defined(ENABLE_CHIP_SHELL)
+    err = RegisterRefrigeratorEvents();
+    if (err != CHIP_NO_ERROR)
+    {
+        SILABS_LOG("RegisterRefrigeratorEvents() failed");
+        appError(err);
+    }
+#endif // ENABLE_CHIP_SHELL
+
     return err;
 }
 
@@ -101,6 +113,8 @@ CHIP_ERROR AppTask::StartAppTask()
 {
     return BaseApplication::StartAppTask(AppTaskMain);
 }
+
+
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
