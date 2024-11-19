@@ -47,6 +47,8 @@ source_set("mock_model") {
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core:string-builder-adapters",
   ]
+
+  deps = [ "${chip_root}/src/app/util/persistence:persistence" ]
 }
 
 chip_test_suite("tests") {
