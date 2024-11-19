@@ -21,7 +21,7 @@
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
 
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-#include <src/tracing/esp32_diagnostic_trace/DiagnosticStorageManager.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticStorageManager.h>
 #endif
 
 #include <map>
@@ -31,9 +31,7 @@
 #endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-#define DIAGNOSTIC_BUFFER_SIZE CONFIG_END_USER_BUFFER_SIZE
-static uint8_t endUserBuffer[DIAGNOSTIC_BUFFER_SIZE];
-
+static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE];
 using namespace chip::Tracing::Diagnostics;
 #endif
 
