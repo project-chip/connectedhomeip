@@ -115,7 +115,7 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
         //           - "write-only" attributes should return UNSUPPORTED_READ (this is done here)
         if (info.has_value() && !info->readPrivilege.has_value())
         {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedRead));
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
         }
 
         return std::nullopt;
