@@ -17,6 +17,7 @@
 
 #include <platform_stdlib.h>
 
+#include "AmebaObserver.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "chip_porting.h"
@@ -76,11 +77,14 @@ static void InitServer(intptr_t context)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    static AmebaObserver sAmebaObserver;
+    initParams.appDelegate = &sAmebaObserver;
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     NetWorkCommissioningInstInit();
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
 
 extern "C" void ChipTest(void)
