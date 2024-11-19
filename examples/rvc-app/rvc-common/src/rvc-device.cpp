@@ -168,7 +168,7 @@ bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText)
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() == to_underlying(OperationalState::OperationalStateEnum::kRunning))
     {
-        CopyCharSpanToMutableCharSpan("cannot set the Selected Areas while the device is running"_span, statusText);
+        CopyCharSpanToMutableCharSpanWithTruncation("cannot set the Selected Areas while the device is running"_span, statusText);
         return false;
     }
     return true;
@@ -179,14 +179,14 @@ bool RvcDevice::SaHandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipSta
     if (mServiceAreaInstance.GetCurrentArea() != skippedArea)
     {
         // This device only supports skipping the current location.
-        CopyCharSpanToMutableCharSpan("the skipped area does not match the current area"_span, skipStatusText);
+        CopyCharSpanToMutableCharSpanWithTruncation("the skipped area does not match the current area"_span, skipStatusText);
         return false;
     }
 
     if (mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(OperationalState::OperationalStateEnum::kRunning))
     {
         // This device only accepts the skip are command while in the running state
-        CopyCharSpanToMutableCharSpan("skip area is only accepted when the device is running"_span, skipStatusText);
+        CopyCharSpanToMutableCharSpanWithTruncation("skip area is only accepted when the device is running"_span, skipStatusText);
         return false;
     }
 
@@ -339,12 +339,12 @@ void RvcDevice::HandleAddServiceAreaArea(ServiceArea::AreaStructureWrapper & are
 
 void RvcDevice::HandleRemoveServiceAreaMap(uint32_t mapId)
 {
-    mServiceAreaDelegate.RemoveSupportedMap(mapId);
+    mServiceAreaInstance.RemoveSupportedMap(mapId);
 }
 
 void RvcDevice::HandleRemoveServiceAreaArea(uint32_t areaId)
 {
-    mServiceAreaDelegate.RemoveSupportedArea(areaId);
+    mServiceAreaInstance.RemoveSupportedArea(areaId);
 }
 
 void RvcDevice::HandleErrorEvent(const std::string & error)
@@ -439,7 +439,7 @@ void RvcDevice::UpdateServiceAreaProgressOnExit()
 
     uint32_t i = 0;
     ServiceArea::Structs::ProgressStruct::Type progressElement;
-    while (mServiceAreaDelegate.GetProgressElementByIndex(i, progressElement))
+    while (mServiceAreaInstance.GetProgressElementByIndex(i, progressElement))
     {
         if (progressElement.status == ServiceArea::OperationalStatusEnum::kOperating ||
             progressElement.status == ServiceArea::OperationalStatusEnum::kPending)

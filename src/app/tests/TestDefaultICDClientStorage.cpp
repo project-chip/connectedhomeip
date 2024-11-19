@@ -103,6 +103,12 @@ TEST_F(TestDefaultICDClientStorage, TestClientInfoCount)
 
         iterator->Release();
 
+        EXPECT_TRUE(manager.GetClientInfoStore()->SyncDoesKeyExist(DefaultStorageKeyAllocator::ICDFabricList().KeyName()));
+        EXPECT_TRUE(manager.GetClientInfoStore()->SyncDoesKeyExist(
+            DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricId).KeyName()));
+        EXPECT_TRUE(
+            manager.GetClientInfoStore()->SyncDoesKeyExist(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricId).KeyName()));
+
         // Delete all and verify iterator counts 0
         EXPECT_EQ(manager.DeleteAllEntries(fabricId), CHIP_NO_ERROR);
         iterator = manager.IterateICDClientInfo();
@@ -116,6 +122,14 @@ TEST_F(TestDefaultICDClientStorage, TestClientInfoCount)
         }
         iterator->Release();
         EXPECT_EQ(count, 0u);
+        EXPECT_EQ(manager.GetFabricListSize(), 0u);
+        EXPECT_FALSE(manager.GetClientInfoStore()->SyncDoesKeyExist(DefaultStorageKeyAllocator::ICDFabricList().KeyName()));
+        EXPECT_FALSE(manager.GetClientInfoStore()->SyncDoesKeyExist(
+            DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricId).KeyName()));
+        EXPECT_FALSE(
+            manager.GetClientInfoStore()->SyncDoesKeyExist(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricId).KeyName()));
+
+        EXPECT_EQ(manager.DeleteAllEntries(fabricId), CHIP_NO_ERROR);
     }
 
     {
@@ -174,6 +188,15 @@ TEST_F(TestDefaultICDClientStorage, TestClientInfoCountMultipleFabric)
     EXPECT_EQ(manager.DeleteEntry(ScopedNodeId(nodeId3, fabricId2)), CHIP_NO_ERROR);
     EXPECT_EQ(iterator->Count(), 0u);
 
+    EXPECT_EQ(manager.GetFabricListSize(), 2u);
+    EXPECT_TRUE(manager.GetClientInfoStore()->SyncDoesKeyExist(DefaultStorageKeyAllocator::ICDFabricList().KeyName()));
+    EXPECT_TRUE(manager.GetClientInfoStore()->SyncDoesKeyExist(
+        DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricId1).KeyName()));
+    EXPECT_TRUE(manager.GetClientInfoStore()->SyncDoesKeyExist(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricId1).KeyName()));
+    EXPECT_TRUE(manager.GetClientInfoStore()->SyncDoesKeyExist(
+        DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricId2).KeyName()));
+    EXPECT_TRUE(manager.GetClientInfoStore()->SyncDoesKeyExist(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricId2).KeyName()));
+
     // Verify ClientInfos manually count correctly
     size_t count = 0;
     ICDClientInfo clientInfo;
@@ -183,6 +206,59 @@ TEST_F(TestDefaultICDClientStorage, TestClientInfoCountMultipleFabric)
     }
 
     EXPECT_FALSE(count);
+
+    EXPECT_EQ(manager.DeleteEntry(ScopedNodeId(nodeId3, fabricId2)), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultICDClientStorage, TestClientInfoCountMultipleFabricWithRemovingFabric)
+{
+
+    FabricIndex fabricId1 = 1;
+    FabricIndex fabricId2 = 2;
+    NodeId nodeId1        = 6666;
+    NodeId nodeId2        = 6667;
+    NodeId nodeId3        = 6668;
+    DefaultICDClientStorage manager;
+    TestPersistentStorageDelegate clientInfoStorage;
+    TestSessionKeystoreImpl keystore;
+    EXPECT_EQ(manager.Init(&clientInfoStorage, &keystore), CHIP_NO_ERROR);
+    EXPECT_EQ(manager.UpdateFabricList(fabricId1), CHIP_NO_ERROR);
+    EXPECT_EQ(manager.UpdateFabricList(fabricId2), CHIP_NO_ERROR);
+
+    // Write some ClientInfos and see the counts are correct
+    ICDClientInfo clientInfo1;
+    clientInfo1.peer_node = ScopedNodeId(nodeId1, fabricId1);
+    ICDClientInfo clientInfo2;
+    clientInfo2.peer_node = ScopedNodeId(nodeId2, fabricId1);
+    ICDClientInfo clientInfo3;
+    clientInfo3.peer_node = ScopedNodeId(nodeId3, fabricId2);
+
+    EXPECT_EQ(manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1)), CHIP_NO_ERROR);
+    EXPECT_EQ(manager.StoreEntry(clientInfo1), CHIP_NO_ERROR);
+
+    EXPECT_EQ(manager.SetKey(clientInfo2, ByteSpan(kKeyBuffer2)), CHIP_NO_ERROR);
+    EXPECT_EQ(manager.StoreEntry(clientInfo2), CHIP_NO_ERROR);
+
+    EXPECT_EQ(manager.SetKey(clientInfo3, ByteSpan(kKeyBuffer3)), CHIP_NO_ERROR);
+    EXPECT_EQ(manager.StoreEntry(clientInfo3), CHIP_NO_ERROR);
+    // Make sure iterator counts correctly
+    auto * iterator = manager.IterateICDClientInfo();
+    EXPECT_EQ(iterator->Count(), 3u);
+    iterator->Release();
+
+    EXPECT_EQ(manager.DeleteAllEntries(fabricId1), CHIP_NO_ERROR);
+
+    iterator = manager.IterateICDClientInfo();
+    ASSERT_NE(iterator, nullptr);
+    DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iterator);
+    EXPECT_EQ(iterator->Count(), 1u);
+
+    EXPECT_EQ(manager.DeleteAllEntries(fabricId2), CHIP_NO_ERROR);
+    EXPECT_EQ(iterator->Count(), 0u);
+
+    EXPECT_EQ(manager.StoreEntry(clientInfo1), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    EXPECT_EQ(manager.StoreEntry(clientInfo2), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    EXPECT_EQ(manager.StoreEntry(clientInfo3), CHIP_ERROR_INVALID_FABRIC_INDEX);
 }
 
 TEST_F(TestDefaultICDClientStorage, TestProcessCheckInPayload)
@@ -214,9 +290,103 @@ TEST_F(TestDefaultICDClientStorage, TestProcessCheckInPayload)
     uint32_t checkInCounter = 0;
     ByteSpan payload{ buffer->Start(), buffer->DataLength() };
     EXPECT_EQ(manager.ProcessCheckInPayload(payload, decodeClientInfo, checkInCounter), CHIP_NO_ERROR);
+    EXPECT_EQ(checkInCounter, counter);
 
-    // 2. Use a key not available in the storage for encoding
+    // Validate second check-in message with increased counter
+    counter++;
+    EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
+                  clientInfo.aes_key_handle, clientInfo.hmac_key_handle, counter, ByteSpan(), output),
+              CHIP_NO_ERROR);
+    buffer->SetDataLength(static_cast<uint16_t>(output.size()));
+    ByteSpan payload1{ buffer->Start(), buffer->DataLength() };
+    EXPECT_EQ(manager.ProcessCheckInPayload(payload1, decodeClientInfo, checkInCounter), CHIP_NO_ERROR);
+    EXPECT_EQ(checkInCounter, counter);
+
+    // Use a key not available in the storage for encoding
     EXPECT_EQ(manager.SetKey(clientInfo, ByteSpan(kKeyBuffer2)), CHIP_NO_ERROR);
+    EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
+                  clientInfo.aes_key_handle, clientInfo.hmac_key_handle, counter, ByteSpan(), output),
+              CHIP_NO_ERROR);
+
+    buffer->SetDataLength(static_cast<uint16_t>(output.size()));
+    ByteSpan payload2{ buffer->Start(), buffer->DataLength() };
+    EXPECT_EQ(manager.ProcessCheckInPayload(payload2, decodeClientInfo, checkInCounter), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestDefaultICDClientStorage, TestProcessCheckInPayloadWithRemovedKey)
+{
+    FabricIndex fabricId = 1;
+    NodeId nodeId        = 6666;
+    TestPersistentStorageDelegate clientInfoStorage;
+    TestSessionKeystoreImpl keystore;
+
+    DefaultICDClientStorage manager;
+    EXPECT_EQ(manager.Init(&clientInfoStorage, &keystore), CHIP_NO_ERROR);
+    EXPECT_EQ(manager.UpdateFabricList(fabricId), CHIP_NO_ERROR);
+    // Populate clientInfo
+    ICDClientInfo clientInfo;
+    clientInfo.peer_node = ScopedNodeId(nodeId, fabricId);
+
+    EXPECT_EQ(manager.SetKey(clientInfo, ByteSpan(kKeyBuffer1)), CHIP_NO_ERROR);
+    EXPECT_EQ(manager.StoreEntry(clientInfo), CHIP_NO_ERROR);
+
+    uint32_t counter                  = 1;
+    System::PacketBufferHandle buffer = MessagePacketBuffer::New(chip::Protocols::SecureChannel::CheckinMessage::kMinPayloadSize);
+    MutableByteSpan output{ buffer->Start(), buffer->MaxDataLength() };
+    EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
+                  clientInfo.aes_key_handle, clientInfo.hmac_key_handle, counter, ByteSpan(), output),
+              CHIP_NO_ERROR);
+
+    buffer->SetDataLength(static_cast<uint16_t>(output.size()));
+    ICDClientInfo decodeClientInfo;
+    uint32_t checkInCounter = 0;
+    ByteSpan payload{ buffer->Start(), buffer->DataLength() };
+    EXPECT_EQ(manager.ProcessCheckInPayload(payload, decodeClientInfo, checkInCounter), CHIP_NO_ERROR);
+    EXPECT_EQ(checkInCounter, counter);
+
+    // Use a removed key in the storage for encoding
+    manager.RemoveKey(clientInfo), CHIP_NO_ERROR;
+    EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
+                  clientInfo.aes_key_handle, clientInfo.hmac_key_handle, counter, ByteSpan(), output),
+              CHIP_NO_ERROR);
+
+    buffer->SetDataLength(static_cast<uint16_t>(output.size()));
+    ByteSpan payload1{ buffer->Start(), buffer->DataLength() };
+    EXPECT_EQ(manager.ProcessCheckInPayload(payload1, decodeClientInfo, checkInCounter), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestDefaultICDClientStorage, TestProcessCheckInPayloadWithEmptyIcdStorage)
+{
+    FabricIndex fabricId = 1;
+    NodeId nodeId        = 6666;
+    TestPersistentStorageDelegate clientInfoStorage;
+    TestSessionKeystoreImpl keystore;
+
+    DefaultICDClientStorage manager;
+    EXPECT_EQ(manager.Init(&clientInfoStorage, &keystore), CHIP_NO_ERROR);
+    EXPECT_EQ(manager.UpdateFabricList(fabricId), CHIP_NO_ERROR);
+    // Populate clientInfo
+    ICDClientInfo clientInfo;
+    clientInfo.peer_node = ScopedNodeId(nodeId, fabricId);
+
+    EXPECT_EQ(manager.SetKey(clientInfo, ByteSpan(kKeyBuffer1)), CHIP_NO_ERROR);
+    EXPECT_EQ(manager.StoreEntry(clientInfo), CHIP_NO_ERROR);
+
+    uint32_t counter                  = 1;
+    System::PacketBufferHandle buffer = MessagePacketBuffer::New(chip::Protocols::SecureChannel::CheckinMessage::kMinPayloadSize);
+    MutableByteSpan output{ buffer->Start(), buffer->MaxDataLength() };
+    EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
+                  clientInfo.aes_key_handle, clientInfo.hmac_key_handle, counter, ByteSpan(), output),
+              CHIP_NO_ERROR);
+
+    buffer->SetDataLength(static_cast<uint16_t>(output.size()));
+    ICDClientInfo decodeClientInfo;
+    uint32_t checkInCounter = 0;
+    ByteSpan payload{ buffer->Start(), buffer->DataLength() };
+    EXPECT_EQ(manager.ProcessCheckInPayload(payload, decodeClientInfo, checkInCounter), CHIP_NO_ERROR);
+    EXPECT_EQ(checkInCounter, counter);
+    manager.DeleteAllEntries(fabricId);
+
     EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
                   clientInfo.aes_key_handle, clientInfo.hmac_key_handle, counter, ByteSpan(), output),
               CHIP_NO_ERROR);

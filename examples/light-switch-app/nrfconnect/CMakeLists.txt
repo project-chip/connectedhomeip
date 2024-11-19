@@ -64,6 +64,5 @@ if(CONFIG_MCUMGR_TRANSPORT_BT)
 endif()
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../light-switch-common/light-switch-app.zap
 )

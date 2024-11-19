@@ -120,5 +120,8 @@
     "1295": "Content Control",
     "1296": "Content App Observer",
     "1872": "Ecosystem Information",
-    "1873": "Commissioner Control"
+    "1873": "Commissioner Control",
+    "1874": "Joint Fabric Datastore Cluster",
+    "1875": "Joint Fabric PKI",
+    "2822": "Meter Identification"
 }

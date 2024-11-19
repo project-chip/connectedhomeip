@@ -14,7 +14,8 @@ fabrics.
 For Linux host example:
 
 ```
-./scripts/examples/gn_build_example.sh examples/fabric-admin out/debug/standalone 'import("//with_pw_rpc.gni")'
+source scripts/activate.sh
+./scripts/build/build_examples.py --target linux-x64-fabric-admin-rpc build
 ```
 
 For Raspberry Pi 4 example:
@@ -22,13 +23,13 @@ For Raspberry Pi 4 example:
 ### Pull Docker Images
 
 ```
-docker pull connectedhomeip/chip-build-vscode:latest
+docker pull ghcr.io/project-chip/chip-build-crosscompile:92
 ```
 
 ### Run docker
 
 ```
-docker run -it -v ~/connectedhomeip:/var/connectedhomeip connectedhomeip/chip-build-vscode:latest /bin/bash
+docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:92 /bin/bash
 ```
 
 ### Build
@@ -37,8 +38,6 @@ docker run -it -v ~/connectedhomeip:/var/connectedhomeip connectedhomeip/chip-bu
 cd /var/connectedhomeip
 
 git config --global --add safe.directory /var/connectedhomeip
-git config --global --add safe.directory /var/connectedhomeip/third_party/pigweed/repo
-git config --global --add safe.directory /var/connectedhomeip/examples/common/QRCode/repo
 
 ./scripts/run_in_build_env.sh \
  "./scripts/build/build_examples.py \

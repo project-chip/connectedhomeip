@@ -20,8 +20,6 @@ import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
-silabs_platform_dir = "${chip_root}/src/platform/silabs"
-
 assert(chip_device_platform == "efr32")
 
 if (chip_enable_openthread) {
@@ -32,9 +30,12 @@ if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
 }
 
-config("efr32-platform-wifi-config") {
-  include_dirs = [ "wifi" ]
-  defines = []
+source_set("logging") {
+  sources = [ "${chip_root}/src/platform/silabs/Logging.cpp" ]
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 }
 
 static_library("efr32") {
@@ -70,7 +71,7 @@ static_library("efr32") {
     sources += [
       "../rs911x/BLEManagerImpl.cpp",
       "../rs911x/rsi_ble_config.h",
-      "../rs911x/wfx_sl_ble_init.c",
+      "../rs911x/wfx_sl_ble_init.cpp",
       "../rs911x/wfx_sl_ble_init.h",
     ]
   } else {
@@ -159,29 +160,8 @@ static_library("efr32") {
       "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
-      "wifi/wfx_host_events.h",
-      "wifi/wfx_msgs.h",
-      "wifi/wifi_config.h",
     ]
 
-    if (use_wf200 || use_rs9116 || use_SiWx917) {
-      sources += [
-        "wifi/dhcp_client.cpp",
-        "wifi/dhcp_client.h",
-        "wifi/ethernetif.cpp",
-        "wifi/ethernetif.h",
-        "wifi/lwip_netif.cpp",
-      ]
-    }
-
-    public_configs += [ ":efr32-platform-wifi-config" ]
+    public_deps += [ "${silabs_platform_dir}/wifi:wifi-platform" ]
   }
-}
-
-source_set("logging") {
-  sources = [ "${chip_root}/src/platform/silabs/Logging.cpp" ]
-  deps = [
-    "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
-  ]
 }

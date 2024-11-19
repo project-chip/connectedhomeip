@@ -84,6 +84,7 @@ public:
 
 protected:
     CHIP_ERROR InitCommonParts(void);
+    void PrintFirmwareInfo(void);
 
     void DispatchEvent(AppEvent * event);
     void GetEvent(AppEvent * aEvent);
@@ -109,6 +110,11 @@ protected:
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     static void StartWiFiButtonEventHandler(void);
     static void StartWiFiHandler(AppEvent * aEvent);
+#endif
+
+#if CONFIG_TELINK_OTA_BUTTON_TEST
+    static void TestOTAButtonEventHandler(void);
+    static void TestOTAHandler(AppEvent * aEvent);
 #endif
 
     static void ExampleActionButtonEventHandler(void);

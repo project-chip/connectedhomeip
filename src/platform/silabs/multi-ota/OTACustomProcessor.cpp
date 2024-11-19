@@ -24,7 +24,7 @@
 
 extern "C" {
 #include "btl_interface.h"
-#include "em_bus.h" // For CORE_CRITICAL_SECTION
+#include "sl_core.h"
 #if SL_WIFI
 #include "spi_multiplex.h"
 #endif // SL_WIFI
@@ -43,7 +43,7 @@ uint8_t OTACustomProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(
 
 CHIP_ERROR OTACustomProcessor::Init()
 {
-    ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
 
     return CHIP_NO_ERROR;

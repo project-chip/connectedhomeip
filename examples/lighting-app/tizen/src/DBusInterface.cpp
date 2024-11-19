@@ -42,9 +42,12 @@ class CommandHandlerImplCallback : public CommandHandlerImpl::Callback
 {
 public:
     using Status = Protocols::InteractionModel::Status;
-    void OnDone(CommandHandlerImpl & apCommandObj) {}
-    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
-    Status CommandExists(const ConcreteCommandPath & aCommandPath) { return Status::Success; }
+
+    void OnDone(CommandHandlerImpl & apCommandObj) override {}
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                         TLV::TLVReader & apPayload) override
+    {}
+    Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override { return Status::Success; }
 };
 
 DBusInterface::DBusInterface(chip::EndpointId endpointId) : mEndpointId(endpointId)
@@ -200,7 +203,8 @@ gboolean DBusInterface::OnColorTemperatureChanged(LightAppColorControl * colorCo
     data.colorTemperatureMireds = light_app_color_control_get_color_temperature_mireds(colorControl);
 
     chip::DeviceLayer::StackLock lock;
-    ColorControlServer::Instance().moveToColorTempCommand(&handler, path, data);
+    auto status = ColorControlServer::Instance().moveToColorTempCommand(self->mEndpointId, data);
+    handler.AddStatus(path, status);
 
     return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
@@ -217,11 +221,11 @@ void DBusInterface::InitOnOff()
 void DBusInterface::InitColor()
 {
     {
-        uint8_t value = 0;
-        auto status   = Clusters::ColorControl::Attributes::ColorMode::Get(mEndpointId, &value);
+        auto value  = Clusters::ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation;
+        auto status = Clusters::ColorControl::Attributes::ColorMode::Get(mEndpointId, &value);
         VerifyOrReturn(status == Protocols::InteractionModel::Status::Success,
                        ChipLogError(NotSpecified, "Error getting ColorMode: 0x%x", to_underlying(status)));
-        light_app_color_control_set_color_mode(mIfaceColorControl, value);
+        light_app_color_control_set_color_mode(mIfaceColorControl, to_underlying(value));
     }
     {
         uint16_t value = 0;

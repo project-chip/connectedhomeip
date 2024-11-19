@@ -15,6 +15,7 @@
 import os
 import shlex
 from enum import Enum, auto
+from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
@@ -101,7 +102,8 @@ class MbedBuilder(Builder):
                  runner,
                  app: MbedApp = MbedApp.LOCK,
                  board: MbedBoard = MbedBoard.CY8CPROTO_062_4343W,
-                 profile: MbedProfile = MbedProfile.RELEASE):
+                 profile: MbedProfile = MbedProfile.RELEASE,
+                 ):
         super(MbedBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board

@@ -36,6 +36,7 @@ CommandHandlerInterfaceOnlyClusters:
     - RVC Operational State
     - Sample MEI
     - Microwave Oven Control
+    - Chime
     - Energy EVSE
     - Energy EVSE Mode
     - Device Energy Management
@@ -72,6 +73,7 @@ ClustersWithAttributeChangedFunctions:
     - Pump Configuration and Control
     - Window Covering
     - Fan Control
+    - Thermostat
 
 ClustersWithShutdownFunctions:
     - Barrier Control

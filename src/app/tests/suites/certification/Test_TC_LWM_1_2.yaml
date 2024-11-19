@@ -40,7 +40,6 @@ tests:
           - Verify that the list has at least 2 and at most 255 entries
           - Verify that each ModeOptionsStruct entry has a unique Mode field value and Label field value
           - If ModeOptionsStruct entry’s ModeTags field is not empty,  then Verify the values of the Value fields that are not larger than 16 bits, for each Value field: Is the mode tag value a defined common tag value ( Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined cluster derived tag value ( Normal, Delicate, Heavy, Whites) or in the MfgTags (0x8000 to 0xBFFF) range
-          - If the Value field is in the MfgTags (0x8000 to 0xBFFF) range, the TagName field is a string with a length between 1 and 64
           - Verify that at least one ModeOptionsStruct entry includes the Normal mode tag
           - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 

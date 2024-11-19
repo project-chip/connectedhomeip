@@ -23,19 +23,29 @@
 class MTROperationalBrowser
 {
 public:
-    // Should be created at a point when the factory starts up the event loop,
-    // and destroyed when the event loop is stopped.
+    // Should be created at a point when the dispatch queue is available.
     MTROperationalBrowser(MTRDeviceControllerFactory * aFactory, dispatch_queue_t aQueue);
 
     ~MTROperationalBrowser();
+
+    // ControllerActivated should be called, on the Matter queue, when a
+    // controller is either started in a non-suspended state or stops being
+    // suspended.
+
+    // ControllerDeactivated should be called, on the Matter queue, when a
+    // controller is either suspended or shut down while in a non-suspended
+    // state.
+    void ControllerActivated();
+    void ControllerDeactivated();
 
 private:
     static void OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags aFlags, uint32_t aInterfaceId, DNSServiceErrorType aError,
                          const char * aName, const char * aType, const char * aDomain, void * aContext);
 
-    void TryToStartBrowse();
+    void EnsureBrowse();
+    void StopBrowse();
 
-    MTRDeviceControllerFactory * const mDeviceControllerFactory;
+    MTRDeviceControllerFactory * const __weak mDeviceControllerFactory;
     dispatch_queue_t mQueue;
     DNSServiceRef mBrowseRef;
 
@@ -44,4 +54,8 @@ private:
 
     // If mIsDestroying is true, we're in our destructor, shutting things down.
     bool mIsDestroying = false;
+
+    // Count of controllers that are currently active; we aim to have a browse
+    // going while this is nonzero;
+    size_t mActiveControllerCount = 0;
 };

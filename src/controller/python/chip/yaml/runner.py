@@ -650,7 +650,7 @@ class CommissionerCommandAction(BaseAction):
         if test_step.command == 'GetCommissionerNodeId':
             # Just setting the self._command is enough for run_action below.
             pass
-        elif test_step.command == 'PairWithCode':
+        elif test_step.command in ('PairWithCode', 'EstablishPASESession'):
             args = test_step.arguments['values']
             request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
             self._setup_payload = request_data_as_dict['payload']
@@ -663,7 +663,10 @@ class CommissionerCommandAction(BaseAction):
             return _ActionResult(status=_ActionStatus.SUCCESS, response=_GetCommissionerNodeIdResult(dev_ctrl.nodeId))
 
         try:
-            await dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
+            if self._command == 'PairWithCode':
+                await dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
+            elif self._command == 'EstablishPASESession':
+                await dev_ctrl.EstablishPASESession(self._setup_payload, self._node_id)
             return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
         except ChipStackError:
             return _ActionResult(status=_ActionStatus.ERROR, response=None)
@@ -832,7 +835,8 @@ class ReplTestRunner:
     def _default_pseudo_cluster(self, test_step):
         try:
             return DefaultPseudoCluster(test_step)
-        except ActionCreationError:
+        except ActionCreationError as e:
+            logger.warn(f"Failed create default pseudo cluster: {e}")
             return None
 
     def encode(self, request) -> Optional[BaseAction]:

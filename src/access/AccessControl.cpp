@@ -181,7 +181,7 @@ char GetRequestTypeStringForLogging(RequestType requestType)
         return 'w';
     case RequestType::kCommandInvokeRequest:
         return 'i';
-    case RequestType::kEventReadOrSubscribeRequest:
+    case RequestType::kEventReadRequest:
         return 'e';
     default:
         return '?';
@@ -232,7 +232,7 @@ CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescripto
 
     VerifyOrReturnError((count + 1) <= maxCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t i = 0;
     ReturnErrorOnFailure(mDelegate->CreateEntry(&i, entry, &fabric));
@@ -250,7 +250,7 @@ CHIP_ERROR AccessControl::UpdateEntry(const SubjectDescriptor * subjectDescripto
                                       const Entry & entry)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(mDelegate->UpdateEntry(index, entry, &fabric));
     NotifyEntryChanged(subjectDescriptor, fabric, index, &entry, EntryListener::ChangeType::kUpdated);
     return CHIP_NO_ERROR;
@@ -325,7 +325,11 @@ void AccessControl::RemoveEntryListener(EntryListener & listener)
 
 bool AccessControl::IsAccessRestrictionListSupported() const
 {
-    return false; // not yet supported
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    return mAccessRestrictionProvider != nullptr;
+#else
+    return false;
+#endif
 }
 
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
@@ -333,6 +337,21 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
+    CHIP_ERROR result = CheckACL(subjectDescriptor, requestPath, requestPrivilege);
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    if (result == CHIP_NO_ERROR)
+    {
+        result = CheckARL(subjectDescriptor, requestPath, requestPrivilege);
+    }
+#endif
+
+    return result;
+}
+
+CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                                   Privilege requestPrivilege)
+{
 #if CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
     {
         constexpr size_t kMaxCatsToLog = 6;
@@ -346,11 +365,6 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                         GetRequestTypeStringForLogging(requestPath.requestType));
     }
 #endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
-
-    if (IsAccessRestrictionListSupported())
-    {
-        VerifyOrReturnError(requestPath.requestType != RequestType::kRequestTypeUnknown, CHIP_ERROR_INVALID_ARGUMENT);
-    }
 
     {
         CHIP_ERROR result = mDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
@@ -368,6 +382,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                                 (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
             }
 #endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
+
             return result;
         }
     }
@@ -496,6 +511,40 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     ChipLogProgress(DataManagement, "AccessControl: denied");
     return CHIP_ERROR_ACCESS_DENIED;
 }
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+CHIP_ERROR AccessControl::CheckARL(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                                   Privilege requestPrivilege)
+{
+    CHIP_ERROR result = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(requestPath.requestType != RequestType::kRequestTypeUnknown, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (!IsAccessRestrictionListSupported())
+    {
+        // Access Restriction support is compiled in, but not configured/enabled. Nothing to restrict.
+        return CHIP_NO_ERROR;
+    }
+
+    if (subjectDescriptor.isCommissioning)
+    {
+        result = mAccessRestrictionProvider->CheckForCommissioning(subjectDescriptor, requestPath);
+    }
+    else
+    {
+        result = mAccessRestrictionProvider->Check(subjectDescriptor, requestPath);
+    }
+
+    if (result != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DataManagement, "AccessControl: %s",
+                        (result == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL) ? "denied (restricted)" : "denied (restriction error)");
+        return result;
+    }
+
+    return result;
+}
+#endif
 
 #if CHIP_ACCESS_CONTROL_DUMP_ENABLED
 CHIP_ERROR AccessControl::Dump(const Entry & entry)

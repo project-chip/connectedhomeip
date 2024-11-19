@@ -26,6 +26,8 @@
 #include <vector>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/reporting/reporting.h>
 
 #include <app/AttributeAccessInterface.h>
 
@@ -33,6 +35,21 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace EcosystemInformation {
+
+class MatterContext
+{
+public:
+    virtual ~MatterContext() = default;
+    // MarkDirty
+    virtual void MarkDirty(EndpointId endpointId, AttributeId attributeId)
+    {
+        MatterReportingAttributeChangeCallback(endpointId, Id, attributeId);
+    }
+};
+
+class TestOnlyParameter
+{
+};
 
 // This intentionally mirrors Structs::EcosystemDeviceStruct::Type but has ownership
 // of underlying types.
@@ -143,10 +160,13 @@ private:
     uint64_t mLocationDescriptorLastEditEpochUs;
 };
 
-class EcosystemInformationServer
+class EcosystemInformationServer : public MatterContext
 {
 public:
     static EcosystemInformationServer & Instance();
+
+    EcosystemInformationServer() : mMatterContext(*this){};
+    EcosystemInformationServer(TestOnlyParameter _, MatterContext & aMatterContext) : mMatterContext(aMatterContext){};
 
     /**
      * @brief Add EcosystemInformation Cluster to endpoint so we respond appropriately on endpoint
@@ -186,16 +206,6 @@ public:
      */
     CHIP_ERROR AddLocationInfo(EndpointId aEndpoint, const std::string & aLocationId, FabricIndex aFabricIndex,
                                std::unique_ptr<EcosystemLocationStruct> aLocation);
-
-    /**
-     * @brief Removes device at the provided endpoint.
-     *
-     * @param aEndpoint Endpoint of the associated device that has been removed.
-     * @param aEpochUs Epoch time in micro seconds assoicated with when device was removed.
-     * @return #CHIP_NO_ERROR on success.
-     * @return Other CHIP_ERROR associated with issue.
-     */
-    CHIP_ERROR RemoveDevice(EndpointId aEndpoint, uint64_t aEpochUs);
     // TODO(#33223) Add removal and update counterparts to AddDeviceInfo and AddLocationInfo.
 
     CHIP_ERROR ReadAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
@@ -214,15 +224,14 @@ private:
 
     struct DeviceInfo
     {
-        Optional<uint64_t> mRemovedOn = NullOptional;
         std::vector<std::unique_ptr<EcosystemDeviceStruct>> mDeviceDirectory;
         std::map<EcosystemLocationKey, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;
     };
 
-    CHIP_ERROR EncodeRemovedOnAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR EncodeDeviceDirectoryAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR EncodeLocationStructAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
 
+    MatterContext & mMatterContext;
     std::map<EndpointId, DeviceInfo> mDevicesMap;
 
     static EcosystemInformationServer mInstance;

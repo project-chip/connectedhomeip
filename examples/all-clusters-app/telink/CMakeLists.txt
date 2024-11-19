@@ -76,7 +76,6 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
 

@@ -30,6 +30,8 @@ class MediaPlaybackManager : public chip::app::Clusters::MediaPlayback::Delegate
     using Feature              = chip::app::Clusters::MediaPlayback::Feature;
 
 public:
+    MediaPlaybackManager(chip::EndpointId endpoint) : mEndpoint(endpoint){};
+
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum HandleGetCurrentState() override;
     uint64_t HandleGetStartTime() override;
     uint64_t HandleGetDuration() override;
@@ -41,6 +43,9 @@ public:
     CHIP_ERROR HandleGetAvailableAudioTracks(chip::app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetActiveTextTrack(chip::app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetAvailableTextTracks(chip::app::AttributeValueEncoder & aEncoder) override;
+
+    CHIP_ERROR HandleSetCurrentState(chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState);
+    CHIP_ERROR HandleSetPlaybackSpeed(float playbackSpeed);
 
     void HandlePlay(chip::app::CommandResponseHelper<PlaybackResponseType> & helper) override;
     void HandlePause(chip::app::CommandResponseHelper<PlaybackResponseType> & helper) override;
@@ -66,10 +71,9 @@ public:
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 protected:
+    chip::EndpointId mEndpoint;
     // NOTE: it does not make sense to have default state of playing with a speed of 0, but
     // the CI test cases expect these values, and need to be fixed.
-    chip::app::Clusters::MediaPlayback::PlaybackStateEnum mCurrentState =
-        chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kPlaying;
     PlaybackPositionType mPlaybackPosition       = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
     TrackType mActiveAudioTrack                  = { chip::CharSpan("activeAudioTrackId_0", 20),
                                                      chip::app::DataModel::Nullable<TrackAttributesType>(
@@ -101,8 +105,7 @@ protected:
                 chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName2", 12)) }) }) }
     };
-    float mPlaybackSpeed = 1.0;
-    uint64_t mStartTime  = 0;
+    uint64_t mStartTime = 0;
     // Magic number for testing.
     uint64_t mDuration      = 80000;
     bool mAudioAdvanceMuted = false;

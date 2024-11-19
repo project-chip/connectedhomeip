@@ -57,12 +57,12 @@ private:
     /* TLV offset */
     static constexpr uint32_t kLengthOffset = 1;
     static constexpr uint32_t kValueOffset  = 3;
-    CHIP_ERROR Hash256(const uint8_t * input, size_t inputSize, uint8_t * output);
-    CHIP_ERROR unittest(void);
 
     CHIP_ERROR ReplaceWithBlob(uint8_t * data, uint8_t * blob, size_t blobLen, uint32_t offset);
     CHIP_ERROR ELS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset);
     CHIP_ERROR ELS_ConvertDacKey();
+
+    CHIP_ERROR ReadAndCheckFactoryDataInFlash(void);
 };
 
 inline FactoryDataProvider & FactoryDataPrvd()
