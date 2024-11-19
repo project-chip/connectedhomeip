@@ -130,35 +130,19 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = sKeysStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS keys storage with id: %d. Error: %s", kNvmId_KvsKeys, ErrorStr(err));
-    }
+    ReturnErrorOnFailure(err);
 
     err = sValuesStorage.Init(Internal::RamStorage::kRamBufferInitialSize, true);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS values storage with id: %d. Error: %s", kNvmId_KvsValues, ErrorStr(err));
-    }
+    ReturnErrorOnFailure(err);
 
     err = sSubscriptionStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS subscription storage with id: %d. Error: %s", kNvmId_KvsSubscription,
-                        ErrorStr(err));
-    }
+    ReturnErrorOnFailure(err);
 
     err = sGroupsStorage.Init(Internal::RamStorage::kRamBufferInitialSize, true);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS groups storage with id: %d. Error: %s", kNvmId_KvsGroups, ErrorStr(err));
-    }
+    ReturnErrorOnFailure(err);
 
     err = sAclStorage.Init(Internal::RamStorage::kRamBufferInitialSize, true);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Cannot init KVS acl storage with id: %d. Error: %s", kNvmId_KvsAcl, ErrorStr(err));
-    }
+    ReturnErrorOnFailure(err);
 
 #if CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
     ChipLogProgress(DeviceLayer, "Moving some keys to dedicated storage");
