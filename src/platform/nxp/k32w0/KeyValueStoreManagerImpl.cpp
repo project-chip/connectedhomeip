@@ -131,7 +131,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init()
 
     err = sKeysStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
     ReturnErrorOnFailure(err);
-    
+
     err = sValuesStorage.Init(Internal::RamStorage::kRamBufferInitialSize, true);
     ReturnErrorOnFailure(err);
 
