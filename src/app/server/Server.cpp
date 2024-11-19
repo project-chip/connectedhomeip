@@ -126,6 +126,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.operationalKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.opCertStore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.reportScheduler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Extra log since this is an incremental requirement and existing applications may not be aware
+    if (initParams.dataModelProvider == nullptr)
+    {
+        ChipLogError(AppServer, "Application Server requires a `initParams.dataModelProvider` value.");
+        ChipLogError(AppServer, "For backwards compatibility, you likely can `useCodegenDataModelProviderInstance()`");
+    }
+
     VerifyOrExit(initParams.dataModelProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
