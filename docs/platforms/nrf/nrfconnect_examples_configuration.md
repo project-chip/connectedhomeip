@@ -194,13 +194,13 @@ intervals:
 -   `CONFIG_CHIP_ICD_SLOW_POLL_INTERVAL`
 -   `CONFIG_CHIP_ICD_FAST_POLLING_INTERVAL`
 
-#### Commissioning with NFC support
+#### Onboarding with NFC support
 
-You can configure the Matter protocol to use an NFC tag for commissioning,
-instead of using a QR code, which is the default configuration.
+You can configure the Matter protocol to use an NFC tag for onboarding, instead
+of using a QR code, which is the default configuration.
 
-To enable NFC for commissioning and share the onboarding payload in an NFC tag,
-set the `CONFIG_CHIP_NFC_COMMISSIONING` option.
+To enable NFC for onboarding and share the onboarding payload in an NFC tag, set
+the `CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD` option.
 
 #### Factory reset behavior
 

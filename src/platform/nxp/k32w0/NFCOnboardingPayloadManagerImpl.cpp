@@ -17,8 +17,8 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC
-#include <platform/NFCManager.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
+#include <platform/NFCOnboardingPayloadManager.h>
 
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/CodeUtils.h>
@@ -30,14 +30,14 @@
 namespace chip {
 namespace DeviceLayer {
 
-NFCManagerImpl NFCManagerImpl::sInstance;
+NFCOnboardingPayloadManagerImpl NFCOnboardingPayloadManagerImpl::sInstance;
 
-CHIP_ERROR NFCManagerImpl::_Init()
+CHIP_ERROR NFCOnboardingPayloadManagerImpl::_Init()
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NFCManagerImpl::_StartTagEmulation(const char * payload, size_t payloadLength)
+CHIP_ERROR NFCOnboardingPayloadManagerImpl::_StartTagEmulation(const char * payload, size_t payloadLength)
 {
     ntagDriverHandleInstance = NTAG_InitDevice((NTAG_ID_T) 0, I2C2);
     assert(ntagDriverHandleInstance);
@@ -75,7 +75,7 @@ CHIP_ERROR NFCManagerImpl::_StartTagEmulation(const char * payload, size_t paylo
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NFCManagerImpl::_StopTagEmulation()
+CHIP_ERROR NFCOnboardingPayloadManagerImpl::_StopTagEmulation()
 {
     uint8_t ndefUriRecordSize = AppNdefUriRecordGetSize(sInstance.ndefUriRecord);
 
@@ -95,7 +95,7 @@ CHIP_ERROR NFCManagerImpl::_StopTagEmulation()
     return CHIP_NO_ERROR;
 }
 
-bool NFCManagerImpl::IsNtagConfigured(eAppNtagError * pNtagError, const char * payload)
+bool NFCOnboardingPayloadManagerImpl::IsNtagConfigured(eAppNtagError * pNtagError, const char * payload)
 {
     uint32_t addrToRead                                                = NTAG_I2C_BLOCK_SIZE;
     uint8_t eepromDataBuf[NDEF_URI_ID_MAX_LENGTH + TERMINATOR_TLV_LEN] = { 0 };
@@ -129,7 +129,7 @@ bool NFCManagerImpl::IsNtagConfigured(eAppNtagError * pNtagError, const char * p
             !memcmp((uint8_t *) &(sInstance.ndefUriRecord), eepromDataBuf, ndefUriRecordSize));
 }
 
-NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagWrite(const char * payload)
+NFCOnboardingPayloadManagerImpl::eAppNtagError NFCOnboardingPayloadManagerImpl::AppNtagWrite(const char * payload)
 {
     eAppNtagError ntagErr = E_APP_NTAG_NO_ERROR;
     uint8_t byte0         = 0;
@@ -190,7 +190,7 @@ NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagWrite(const char * payload)
     return ntagErr;
 }
 
-bool NFCManagerImpl::AppNtagEepromWrite(uint8_t originalSize)
+bool NFCOnboardingPayloadManagerImpl::AppNtagEepromWrite(uint8_t originalSize)
 {
     bool wasWritten      = FALSE;
     uint32_t ndefSize    = AppNdefUriRecordGetSize(sInstance.ndefUriRecord);
@@ -238,7 +238,7 @@ bool NFCManagerImpl::AppNtagEepromWrite(uint8_t originalSize)
     return wasWritten;
 }
 
-NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagEepromUnlockThenWrite(uint8_t originalSize)
+NFCOnboardingPayloadManagerImpl::eAppNtagError NFCOnboardingPayloadManagerImpl::AppNtagEepromUnlockThenWrite(uint8_t originalSize)
 {
     eAppNtagError ntagErr = E_APP_NTAG_NO_ERROR;
 
@@ -264,14 +264,14 @@ NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagEepromUnlockThenWrite(uint8
     return ntagErr;
 }
 
-uint8_t NFCManagerImpl::AppNdefUriRecordGetSize(NdefUriRecord_t ndefUriRecord)
+uint8_t NFCOnboardingPayloadManagerImpl::AppNdefUriRecordGetSize(NdefUriRecord_t ndefUriRecord)
 {
     return sizeof(sInstance.ndefUriRecord.recordType) + sizeof(sInstance.ndefUriRecord.recordTypeLen) +
         sizeof(sInstance.ndefUriRecord.payloadLen) + sInstance.ndefUriRecord.payloadLen +
         sizeof(sInstance.ndefUriRecord.recordName);
 }
 
-NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagLockWriteAccess(void)
+NFCOnboardingPayloadManagerImpl::eAppNtagError NFCOnboardingPayloadManagerImpl::AppNtagLockWriteAccess(void)
 {
     eAppNtagError ntagErr = E_APP_NTAG_NO_ERROR;
 
@@ -302,7 +302,7 @@ NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagLockWriteAccess(void)
     return ntagErr;
 }
 
-NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagUnlockWriteAccess(void)
+NFCOnboardingPayloadManagerImpl::eAppNtagError NFCOnboardingPayloadManagerImpl::AppNtagUnlockWriteAccess(void)
 {
     eAppNtagError ntagErr = E_APP_NTAG_NO_ERROR;
 

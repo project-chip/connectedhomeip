@@ -119,11 +119,11 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
-    // Initialize the NFC Manager.
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC
-    err = NFCMgr().Init();
+    // Initialize the CHIP NFC manager for NFC Onboarding
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
+    err = NFCOnboardingPayloadMgr().Init();
     VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "NFC Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format()));
+                 ChipLogError(DeviceLayer, "NFC Onboarding Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format()));
 #endif
 
     // TODO Initialize CHIP Event Logging.

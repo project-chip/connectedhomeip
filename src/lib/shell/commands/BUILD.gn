@@ -46,7 +46,7 @@ source_set("commands") {
     sources += [ "BLE.cpp" ]
   }
 
-  if (chip_enable_nfc && chip_device_platform != "none") {
+  if (chip_enable_nfc_onboarding_payload && chip_device_platform != "none") {
     sources += [ "NFC.cpp" ]
   }
 

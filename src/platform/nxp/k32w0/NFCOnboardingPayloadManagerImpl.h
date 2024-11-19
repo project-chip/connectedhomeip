@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      Platform-specific NFCManager implementation for NXP K32W.
+ *      Platform-specific NFCOnboardingPayloadManager implementation for NXP K32W.
  */
 
 #pragma once
@@ -39,12 +39,12 @@ namespace {
 #define TERMINATOR_TLV_LEN 1
 } // namespace
 
-class NFCManagerImpl final : public NFCManager
+class NFCOnboardingPayloadManagerImpl final : public NFCOnboardingPayloadManager
 {
-    friend class NFCManager;
+    friend class NFCOnboardingPayloadManager;
 
 private:
-    // ===== Members that implement the NFCManager internal interface.
+    // ===== Members that implement the NFCOnboardingPayloadManager internal interface.
 
     CHIP_ERROR _Init();
     CHIP_ERROR _StartTagEmulation(const char * payload, size_t payloadLength);
@@ -60,8 +60,8 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-    friend NFCManager & NFCMgr();
-    friend NFCManagerImpl & NFCMgrImpl();
+    friend NFCOnboardingPayloadManager & NFCOnboardingPayloadMgr();
+    friend NFCOnboardingPayloadManagerImpl & NFCOnboardingPayloadMgrImpl();
 
     typedef enum
     {
@@ -91,18 +91,18 @@ private:
     static uint8_t AppNdefUriRecordGetSize(NdefUriRecord_t ndefUriRecord);
 
     NdefUriRecord_t ndefUriRecord;
-    static NFCManagerImpl sInstance;
+    static NFCOnboardingPayloadManagerImpl sInstance;
     NTAG_HANDLE_T ntagDriverHandleInstance;
 };
 
-inline NFCManager & NFCMgr()
+inline NFCOnboardingPayloadManager & NFCOnboardingPayloadMgr()
 {
-    return NFCManagerImpl::sInstance;
+    return NFCOnboardingPayloadManagerImpl::sInstance;
 }
 
-inline NFCManagerImpl & NFCMgrImpl()
+inline NFCOnboardingPayloadManagerImpl & NFCOnboardingPayloadMgrImpl()
 {
-    return NFCManagerImpl::sInstance;
+    return NFCOnboardingPayloadManagerImpl::sInstance;
 }
 
 } // namespace DeviceLayer
