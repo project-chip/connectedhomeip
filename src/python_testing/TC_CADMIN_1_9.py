@@ -110,7 +110,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
             try:
                 asserts.assert_true(errcode.sdk_code == expectedErrCode,
                                     'Unexpected error code returned from CommissioningComplete')
-            except:
+            except Exception as e:
                 asserts.assert_true(errcode.sdk_code == 3, 'Unexpected error code returned from CommissioningComplete')
 
     def pics_TC_CADMIN_1_9(self) -> list[str]:
