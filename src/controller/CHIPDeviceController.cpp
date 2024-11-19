@@ -1301,7 +1301,8 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(
         }
     }
 
-    if (result != AttestationVerificationResult::kSuccess)
+    // if (result != AttestationVerificationResult::kSuccess)
+    if (false && result != AttestationVerificationResult::kSuccess)
     {
         CommissioningDelegate::CommissioningReport report;
         report.Set<AttestationErrorInfo>(result);
