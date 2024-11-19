@@ -920,7 +920,7 @@ const char * TransferSession::OutputEvent::ToString(OutputEventType outputEventT
     return TypeToString(outputEventType);
 }
 
-const char * TransferSession::OutputEvent::TypeToString(const OutputEventType outputEventType)
+const char * TransferSession::OutputEvent::TypeToString(OutputEventType outputEventType)
 {
     switch (outputEventType)
     {

@@ -61,8 +61,6 @@ MTROTAImageTransferHandler::MTROTAImageTransferHandler(chip::System::Layer * lay
 
     MTROTAUnsolicitedBDXMessageHandler::GetInstance()->OnTransferHandlerCreated(this);
     mOTAImageTransferHandlerWrapper = [[MTROTAImageTransferHandlerWrapper alloc] initWithMTROTAImageTransferHandler:this];
-    mPeer = ScopedNodeId();
-    mNeedToCallTransferSessionEnd = false;
 }
 
 CHIP_ERROR MTROTAImageTransferHandler::Init(Messaging::ExchangeContext * exchangeCtx)
@@ -91,6 +89,7 @@ MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
 
     if (mNeedToCallTransferSessionEnd)
     {
+        // TODO: Store the actual error involved in error cases, so we can pass the right thing here.
         InvokeTransferSessionEndCallback(CHIP_ERROR_INTERNAL);
     }
 
