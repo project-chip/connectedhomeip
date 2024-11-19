@@ -305,7 +305,7 @@ void StopMainEventLoop()
     else
     {
         Server::GetInstance().GenerateShutDownEvent();
-        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
+        SystemLayer().ScheduleLambda([]() { PlatformMgr().StopEventLoopTask(); });
     }
 }
 
@@ -413,7 +413,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     sigemptyset(&set);
     sigaddset(&set, SIGINT);
     sigaddset(&set, SIGTERM);
-    pthread_sigmask(SIG_BLOCK, &set, NULL);
+    pthread_sigmask(SIG_BLOCK, &set, nullptr);
 #endif
 
     err = DeviceLayer::PlatformMgr().InitChipStack();
@@ -538,6 +538,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
+    Shell::RegisterCommissioneeCommands();
     std::thread shellThread([]() {
         sigset_t set;
         sigemptyset(&set);
@@ -545,11 +546,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         sigaddset(&set, SIGTERM);
         // Unblock SIGINT and SIGTERM, so that the shell thread can handle
         // them - we need read() call to be interrupted.
-        pthread_sigmask(SIG_UNBLOCK, &set, NULL);
+        pthread_sigmask(SIG_UNBLOCK, &set, nullptr);
         Engine::Root().RunMainLoop();
         StopMainEventLoop();
     });
-    Shell::RegisterCommissioneeCommands();
 #endif
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
