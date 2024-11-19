@@ -40,7 +40,11 @@ RUN apt-get update \
     icecc \
     && :
 
-RUN groupadd -g $USER_GID $USERNAME \
+RUN (getent passwd $USER_UID && userdel -f $(getent passwd $USER_UID | cut -d: -f1) || true) \
+    && (getent group $USER_GID && groupdel -f $(getent group $USER_GID | cut -d: -f1) || true) \
+    && (getent passwd $USERNAME && userdel -f $USERNAME || true) \
+    && (getent group $USERNAME && groupdel -f $USERNAME || true) \
+    && groupadd -g $USER_GID $USERNAME \
     && useradd --no-log-init -s /bin/bash -u $USER_UID -g $USER_GID -G docker,sudo -m $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
