@@ -76,7 +76,8 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
     {
     case IntentEnum::kEndUserSupport: {
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-        return DIAGNOSTIC_BUFFER_SIZE;
+        // Returning buffer_size > 1024 bytes to transfer data over BDX otherwise it uses Response Payload.
+        return CONFIG_END_USER_BUFFER_SIZE;
 #else
         return static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart);
 #endif
@@ -115,7 +116,7 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
     case IntentEnum::kEndUserSupport: {
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
         DiagnosticStorageImpl & diagnosticStorage = DiagnosticStorageImpl::GetInstance();
-        MutableByteSpan endUserSupportSpan(endUserBuffer, DIAGNOSTIC_BUFFER_SIZE);
+        MutableByteSpan endUserSupportSpan(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
 
         if (diagnosticStorage.IsEmptyBuffer())
         {

@@ -88,7 +88,7 @@ extern "C" void app_main()
 #endif
 
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    static ESP32Diagnostics diagnosticBackend(endUserBuffer, DIAGNOSTIC_BUFFER_SIZE);
+    static ESP32Diagnostics diagnosticBackend(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
     Tracing::Register(diagnosticBackend);
 #endif
 
