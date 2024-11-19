@@ -103,16 +103,16 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
         // Since the Access control check above may have passed with kView, we do another check here:
         //    - Attribute exists (info has value)
         //    - Attribute is readable (readProvilege has value) and not "write only"
-        // If the above aret not true, we will return UnsupportedRead (spec 8.4.3.2: "Else if the path indicates attribute
+        // If the attribute exists and is not readable, we will return UnsupportedRead (spec 8.4.3.2: "Else if the path indicates attribute
         // data that is not readable, an AttributeStatusIB SHALL be generated with the UNSUPPORTED_READ Status Code.")
         //
         // TODO:: https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/9024 requires interleaved ordering that
         //        is NOT implemented here. Spec requires:
         //           - check cluster access check (done here as kView at least)
         //           - unsupported endpoint/cluster/attribute check (NOT done here) when the attribute is missing.
-        //             this SOUND be done here when info does not have a value. This was not done as a first pass to
+        //             this SHOULD be done here when info does not have a value. This was not done as a first pass to
         //             minimize amount of delta in the initial PR.
-        //           - "write-only" attributes should retuirn UNSUPPORTED_READ (this is done heere)
+        //           - "write-only" attributes should return UNSUPPORTED_READ (this is done here)
         VerifyOrReturnError(!info.has_value() || info->readPrivilege.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedRead));
 
         return std::nullopt;
