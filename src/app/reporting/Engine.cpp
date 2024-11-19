@@ -65,7 +65,7 @@ Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eve
 ///   be success, when dealing with non-concrete paths) should be used
 ///   as the status for the read.
 ///
-///   If the returned value is std::nullopt, that means the ACL check passed and the 
+///   If the returned value is std::nullopt, that means the ACL check passed and the
 ///   read should proceed.
 std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataModel, const SubjectDescriptor & subjectDescriptor,
                                                    const ConcreteReadAttributePath & path)
@@ -103,8 +103,8 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
         // Since the Access control check above may have passed with kView, we do another check here:
         //    - Attribute exists (info has value)
         //    - Attribute is readable (readProvilege has value) and not "write only"
-        // If the attribute exists and is not readable, we will return UnsupportedRead (spec 8.4.3.2: "Else if the path indicates attribute
-        // data that is not readable, an AttributeStatusIB SHALL be generated with the UNSUPPORTED_READ Status Code.")
+        // If the attribute exists and is not readable, we will return UnsupportedRead (spec 8.4.3.2: "Else if the path indicates
+        // attribute data that is not readable, an AttributeStatusIB SHALL be generated with the UNSUPPORTED_READ Status Code.")
         //
         // TODO:: https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/9024 requires interleaved ordering that
         //        is NOT implemented here. Spec requires:
