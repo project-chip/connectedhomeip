@@ -162,11 +162,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SetAttributePersistenceProvider(&mAttributePersister);
     SetSafeAttributePersistenceProvider(&mAttributePersister);
 
-     // Ember requires a persistence provider:
-     //   - InitDataModelHandler uses ember init (so needs a data model provider)
-     //   - CodegenDataModelProvider requires a persistence provider to use, so this must be called late
-     //     enough, after SetSafeAttributePersistenceProvider
-     chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
+    // Ember requires a persistence provider:
+    //   - InitDataModelHandler uses ember init (so needs a data model provider)
+    //   - CodegenDataModelProvider requires a persistence provider to use, so this must be called late
+    //     enough, after SetSafeAttributePersistenceProvider
+    chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
     {
         FabricTable::InitParams fabricTableInitParams;
