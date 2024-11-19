@@ -79,9 +79,9 @@ protected:
     ~NFCOnboardingManager() = default;
 
     // No copy, move or assignment.
-    NFCOnboardingManager(const NFCOnboardingManager &)     = delete;
-    NFCOnboardingManager(NFCOnboardingManager &&)          = delete;
-    void operator=(const NFCOnboardingManager &) = delete;
+    NFCOnboardingManager(const NFCOnboardingManager &) = delete;
+    NFCOnboardingManager(NFCOnboardingManager &&)      = delete;
+    void operator=(const NFCOnboardingManager &)       = delete;
 
     // NFCOnboardingManager implementation getters.
     NFCOnboardingManagerImpl * Impl();
