@@ -80,11 +80,6 @@
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_CIP
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-// TODO: https://github.com/project-chip/connectedhomeip/issues/36472
-//       this strongly couples Server to Ember and this dependency should
-//       be removed
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
-
 namespace chip {
 
 inline constexpr size_t kMaxBlePendingPackets = 1;
@@ -192,6 +187,8 @@ struct ServerInitParams
     // If the ICD Check-In protocol use-case is supported and no strategy is provided, server will use the default strategy.
     app::ICDCheckInBackOffStrategy * icdCheckInBackOffStrategy = nullptr;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    chip::app::DataModel::Provider * dataModelProvider = nullptr;
 };
 
 /**

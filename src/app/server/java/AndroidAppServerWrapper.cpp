@@ -50,6 +50,7 @@ CHIP_ERROR ChipAndroidAppInit(AppDelegate * appDelegate)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
     if (appDelegate != nullptr)
     {
         initParams.appDelegate = appDelegate;
