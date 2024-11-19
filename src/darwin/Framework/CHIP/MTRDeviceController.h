@@ -98,12 +98,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Then a PASE session will be established with the device, unless an error
  * occurs.  MTRDeviceControllerDelegate will be notified as follows:
  *
- * * Discovery fails: onStatusUpdate with MTRCommissioningStatusFailed.
+ * * Discovery fails: controller:statusUpdate: with MTRCommissioningStatusFailed.
  *
- * * Discovery succeeds but commissioning session setup fails: onPairingComplete
- *   with an error.
+ * * Commissioning session setup fails:
+ *   controller:commissioningSessionEstablishmentDone: with non-nil error.
  *
- * * Commissioning session setup succeeds: onPairingComplete with no error.
+ * * Commissioning session setup succeeds:
+ *   controller:commissioningSessionEstablishmentDone: with nil error.
  *
  * Once a commissioning session is set up, getDeviceBeingCommissioned
  * can be used to get an MTRBaseDevice and discover what sort of network
@@ -132,11 +133,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Then a PASE session will be established with the device, unless an error
  * occurs.  MTRDeviceControllerDelegate will be notified as follows:
  *
- * * Invalid connection information: onStatusUpdate with MTRCommissioningStatusFailed.
+ * * Invalid connection information: controller:statusUpdate: with MTRCommissioningStatusFailed.
  *
- * * Commissioning session setup fails: onPairingComplete with an error.
+ * * Commissioning session setup fails:
+ *   controller:commissioningSessionEstablishmentDone: with non-nil error.
  *
- * * Commissioning session setup succeeds: onPairingComplete with no error.
+ * * Commissioning session setup succeeds:
+ *   controller:commissioningSessionEstablishmentDone: with nil error.
  *
  * Once a commissioning session is set up, getDeviceBeingCommissioned
  * can be used to get an MTRBaseDevice and discover what sort of network

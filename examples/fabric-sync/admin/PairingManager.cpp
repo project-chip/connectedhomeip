@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -17,6 +16,8 @@
  */
 
 #include "PairingManager.h"
+#include "DeviceManager.h"
+#include "DeviceSynchronization.h"
 
 #include <netdb.h>
 #include <sys/socket.h>
@@ -28,6 +29,8 @@
 
 using namespace ::chip;
 using namespace ::chip::Controller;
+
+namespace admin {
 
 namespace {
 
@@ -278,20 +281,24 @@ void PairingManager::OnPairingDeleted(CHIP_ERROR err)
 
 void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
+    if (mPairingDelegate)
+    {
+        mPairingDelegate->OnCommissioningComplete(nodeId, err);
+        SetPairingDelegate(nullptr);
+    }
+
     if (err == CHIP_NO_ERROR)
     {
         // print to console
         fprintf(stderr, "New device with Node ID: " ChipLogFormatX64 " has been successfully added.\n", ChipLogValueX64(nodeId));
+
+        // mCommissioner has a lifetime that is the entire life of the application itself
+        // so it is safe to provide to StartDeviceSynchronization.
+        DeviceSynchronizer::Instance().StartDeviceSynchronization(mCommissioner, nodeId, false);
     }
     else
     {
         ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
-    }
-
-    if (mCommissioningDelegate)
-    {
-        mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
-        SetCommissioningDelegate(nullptr);
     }
 }
 
@@ -448,10 +455,23 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     PairingManager * self = reinterpret_cast<PairingManager *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnCurrentFabricRemove: context is null"));
 
+    ChipLogProgress(NotSpecified, "PairingManager::OnCurrentFabricRemove");
+
     if (err == CHIP_NO_ERROR)
     {
         // print to console
-        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 "has been successfully removed.\n", ChipLogValueX64(nodeId));
+        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 " has been successfully removed.\n", ChipLogValueX64(nodeId));
+
+        if (self->mPairingDelegate)
+        {
+            self->mPairingDelegate->OnDeviceRemoved(nodeId, err);
+            self->SetPairingDelegate(nullptr);
+        }
+
+        FabricIndex fabricIndex = self->CurrentCommissioner().GetFabricIndex();
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(fabricIndex, nodeId);
+        ScopedNodeId scopedNodeId(nodeId, fabricIndex);
+        DeviceManager::Instance().RemoveSyncedDevice(scopedNodeId);
     }
     else
     {
@@ -548,3 +568,5 @@ CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
         }
     });
 }
+
+} // namespace admin

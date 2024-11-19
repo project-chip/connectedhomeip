@@ -26,6 +26,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
 
+namespace bridge {
+
 CHIP_ERROR BridgedAdministratorCommissioning::Init()
 {
     // We expect initialization after emberAfInit(). This allows us to unregister the existing
@@ -43,7 +45,7 @@ CHIP_ERROR BridgedAdministratorCommissioning::Read(const ConcreteReadAttributePa
 {
     VerifyOrDie(aPath.mClusterId == Clusters::AdministratorCommissioning::Id);
     EndpointId endpointId  = aPath.mEndpointId;
-    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+    BridgedDevice * device = BridgedDeviceManager::Instance().GetDevice(endpointId);
 
     if (!device)
     {
@@ -79,3 +81,5 @@ CHIP_ERROR BridgedAdministratorCommissioning::Read(const ConcreteReadAttributePa
 
     return CHIP_NO_ERROR;
 }
+
+} // namespace bridge

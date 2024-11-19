@@ -1470,6 +1470,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __block unsigned eventReportsReceived = 0;
     __block BOOL reportEnded = NO;
     __block BOOL gotOneNonPrimingEvent = NO;
+    __block NSNumber * lastObservedEventNumber = @(0);
     XCTestExpectation * gotNonPrimingEventExpectation = [self expectationWithDescription:@"Received event outside of priming report"];
     delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
         eventReportsReceived += eventReport.count;
@@ -1489,6 +1490,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             if (!reportEnded) {
                 NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
                 XCTAssertTrue(reportIsHistorical.boolValue);
+                lastObservedEventNumber = eventDict[MTREventNumberKey];
             } else {
                 if (!gotOneNonPrimingEvent) {
                     NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
@@ -1509,7 +1511,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             MTREventTimestampDateKey : [NSDate date],
             MTREventIsHistoricalKey : @(NO),
             MTREventPriorityKey : @(MTREventPriorityInfo),
-            MTREventNumberKey : @(1), // Doesn't matter, in practice
+            MTREventNumberKey : @(lastObservedEventNumber.unsignedLongLongValue + 1),
             MTRDataKey : @ {
                 MTRTypeKey : MTRStructureValueType,
                 MTRValueKey : @[],
@@ -1586,6 +1588,37 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqualObjects([NSSet setWithArray:variousThings],
         [[NSSet setWithArray:clusterRevisions] setByAddingObjectsFromSet:[NSSet setWithArray:basicInformationAllRootAttributes]]);
 
+    // Some quick tests for waitForAttributeValues.  First, values that we know
+    // are already there:
+    XCTestExpectation * deviceTypesWaitExpectation = [self expectationWithDescription:@"deviceTypes is already the value we expect"];
+    __auto_type * deviceTypesToWaitFor = [NSMutableDictionary dictionary];
+    for (NSDictionary<NSString *, id> * deviceTypesValue in deviceTypes) {
+        deviceTypesToWaitFor[deviceTypesValue[MTRAttributePathKey]] = deviceTypesValue[MTRDataKey];
+    }
+    __auto_type * waiter1 = [device waitForAttributeValues:deviceTypesToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [deviceTypesWaitExpectation fulfill];
+    }];
+    XCTAssertNotNil(waiter1);
+    [self waitForExpectations:@[ deviceTypesWaitExpectation ] timeout:kTimeoutInSeconds];
+
+    // Now values that we know will never be there (the type is wrong).
+    __auto_type * bogusDeviceType = @{
+        deviceTypes[0][MTRAttributePathKey] : @ {
+            MTRTypeKey : MTROctetStringValueType,
+            MTRValueKey : [@"abc" dataUsingEncoding:NSUTF8StringEncoding],
+        },
+    };
+    XCTestExpectation * bogusDeviceTypesWaitExpectation = [self expectationWithDescription:@"bogusDeviceTypes wait should time out"];
+    __auto_type * waiter2 = [device waitForAttributeValues:bogusDeviceType timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [bogusDeviceTypesWaitExpectation fulfill];
+    }];
+    XCTAssertNotNil(waiter2);
+    [self waitForExpectations:@[ bogusDeviceTypesWaitExpectation ] timeout:kTimeoutInSeconds];
+
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
     NSNumber * testClusterID = @(8);
@@ -1610,6 +1643,23 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     NSDictionary * writeValue = [NSDictionary
         dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithUnsignedInteger:200], @"value", nil];
+
+    // Also test that waitForAttributeValues does not pick up the transition to
+    // the expected value.
+    XCTestExpectation * nonexistentAttributeValueWaitExpectation = [self expectationWithDescription:@"waiting for a value for an attribute that does not exist should time out"];
+    __auto_type * waiter3 = [device waitForAttributeValues:@{
+        [MTRAttributePath attributePathWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID] : writeValue,
+    }
+                                                   timeout:0.5
+                                                     queue:queue
+                                                completion:^(NSError * _Nullable error) {
+                                                    XCTAssertNotNil(error);
+                                                    XCTAssertEqual(error.domain, MTRErrorDomain);
+                                                    XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+                                                    [nonexistentAttributeValueWaitExpectation fulfill];
+                                                }];
+    XCTAssertNotNil(waiter3);
+
     [device writeAttributeWithEndpointID:testEndpointID
                                clusterID:testClusterID
                              attributeID:testAttributeID
@@ -1619,10 +1669,20 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // expected value interval is 20s but expect it get reverted immediately as the write fails because it's writing to a
     // nonexistent attribute
-    [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation ] timeout:5 enforceOrder:YES];
+    [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation, nonexistentAttributeValueWaitExpectation ] timeout:5 enforceOrder:YES];
 
-    // Test if previous value is reported on a write
-    uint16_t testOnTimeValue = 10;
+    // Get the current OnTime value, to make sure we are writing a different one.
+    __auto_type * currentOnTimeValueDictionary = [device readAttributeWithEndpointID:@(1)
+                                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                                         attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)
+                                                                              params:nil];
+    XCTAssertNotNil(currentOnTimeValueDictionary);
+    XCTAssertEqualObjects(currentOnTimeValueDictionary[MTRTypeKey], MTRUnsignedIntegerValueType);
+    uint16_t currentOnTimeValue = [currentOnTimeValueDictionary[MTRValueKey] unsignedShortValue];
+
+    // Test if previous value is reported on a write.  Make sure to write a
+    // value different from the current one.
+    uint16_t testOnTimeValue = currentOnTimeValue > 10 ? currentOnTimeValue - 1 : currentOnTimeValue + 1;
     XCTestExpectation * onTimeWriteSuccess = [self expectationWithDescription:@"OnTime write success"];
     XCTestExpectation * onTimePreviousValue = [self expectationWithDescription:@"OnTime previous value"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
@@ -1643,7 +1703,63 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             }
         }
     };
-    NSDictionary * writeOnTimeValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(testOnTimeValue) };
+    __auto_type * writeOnTimeValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(testOnTimeValue) };
+
+    // Also set up a few attribute value waits to see what happens.
+    __auto_type * onTimeValueToWaitFor = @{
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID)
+                                          attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)] : writeOnTimeValue,
+    };
+
+    XCTestExpectation * waitingForOnTimeValue1Expectation = [self expectationWithDescription:@"OnTime value is now the expected value"];
+    __auto_type * waiter4 = [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [waitingForOnTimeValue1Expectation fulfill];
+    }];
+    XCTAssertNotNil(waiter4);
+
+    XCTestExpectation * waitingForOnTimeValue2Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is the expected value"];
+    __auto_type * onTimeAndDeviceTypeValuesToWaitFor = [NSMutableDictionary dictionaryWithDictionary:onTimeValueToWaitFor];
+    onTimeAndDeviceTypeValuesToWaitFor[deviceTypes[0][MTRAttributePathKey]] = deviceTypes[0][MTRDataKey];
+
+    __auto_type * waiter5 = [device waitForAttributeValues:onTimeAndDeviceTypeValuesToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [waitingForOnTimeValue2Expectation fulfill];
+    }];
+    XCTAssertNotNil(waiter5);
+
+    XCTestExpectation * waitingForOnTimeValue3Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is bogus, or we timed out"];
+    __auto_type * onTimeAndBogusDeviceTypeValuesToWaitFor = [NSMutableDictionary dictionaryWithDictionary:onTimeValueToWaitFor];
+    [onTimeAndBogusDeviceTypeValuesToWaitFor addEntriesFromDictionary:bogusDeviceType];
+    __auto_type * waiter6 = [device waitForAttributeValues:onTimeAndBogusDeviceTypeValuesToWaitFor timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [waitingForOnTimeValue3Expectation fulfill];
+    }];
+    XCTAssertNotNil(waiter6);
+
+    XCTestExpectation * waitingForOnTimeValue4Expectation = [self expectationWithDescription:@"Waiter should have been canceled"];
+    __auto_type * waiter7 = [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeCancelled);
+        [waitingForOnTimeValue4Expectation fulfill];
+    }];
+    XCTAssertNotNil(waiter7);
+    [waiter7 cancel];
+
+    XCTestExpectation * waitingForOnTimeValue5Expectation = [self expectationWithDescription:@"Waiter should have been canceled due to being destroyed"];
+    @autoreleasepool {
+        // To force the waiter created here to die quickly.
+        [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+            XCTAssertNotNil(error);
+            XCTAssertEqual(error.domain, MTRErrorDomain);
+            XCTAssertEqual(error.code, MTRErrorCodeCancelled);
+            [waitingForOnTimeValue5Expectation fulfill];
+        }];
+    }
+
     [device writeAttributeWithEndpointID:@(1)
                                clusterID:@(MTRClusterIDTypeOnOffID)
                              attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)
@@ -1651,7 +1767,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                    expectedValueInterval:@(10000)
                        timedWriteTimeout:nil];
 
-    [self waitForExpectations:@[ onTimeWriteSuccess, onTimePreviousValue ] timeout:10];
+    [self waitForExpectations:@[
+        onTimeWriteSuccess,
+        onTimePreviousValue,
+        waitingForOnTimeValue1Expectation,
+        waitingForOnTimeValue2Expectation,
+        waitingForOnTimeValue3Expectation,
+        waitingForOnTimeValue4Expectation,
+        waitingForOnTimeValue5Expectation,
+    ]
+                      timeout:10];
 
     __auto_type getOnOffValue = ^{
         return [device readAttributeWithEndpointID:@(1)
@@ -3776,6 +3901,70 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Must have gotten some events (at least StartUp!)
     XCTAssertTrue(eventReportsReceived > 0);
+
+    // Now try doing some event injection.
+    __block uint64_t eventNumber = 0x1000000; // Should't have that many events on the device yet!
+    __block uint64_t firstNewEventNumber = eventNumber;
+    __auto_type createEventReport = ^{
+        return @{
+            MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(1)],
+            MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+            MTREventTimestampDateKey : [NSDate date],
+            MTREventPriorityKey : @(MTREventPriorityInfo),
+            MTREventNumberKey : @(eventNumber++),
+            MTRDataKey : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[],
+            },
+        };
+    };
+
+    eventReportsReceived = 0;
+    const int eventReportsToInject = 5;
+    __block XCTestExpectation * eventReportsFinishedExpectation = [self expectationWithDescription:@"Injecting some new event reports"];
+    __block int historicalEvents = 0;
+    __block int eventReportsToExpect = eventReportsToInject;
+
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
+        eventReportsReceived += eventReport.count;
+        for (NSDictionary<NSString *, id> * eventDict in eventReport) {
+            NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+            NSNumber * eventNumber = eventDict[MTREventNumberKey];
+            XCTAssertEqual(reportIsHistorical.boolValue, eventNumber.unsignedLongLongValue < firstNewEventNumber,
+                @"eventNumber: %@, firstNewEventNumber: %llu", eventNumber, firstNewEventNumber);
+            historicalEvents += reportIsHistorical.boolValue;
+        }
+
+        if (eventReportsReceived >= eventReportsToExpect) {
+            [eventReportsFinishedExpectation fulfill];
+        }
+    };
+
+    for (int i = 0; i < eventReportsToInject; ++i) {
+        [device unitTestInjectEventReport:@[ createEventReport() ]];
+    }
+
+    [self waitForExpectations:@[ eventReportsFinishedExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(historicalEvents, 0);
+
+    // Now inject some mix of historical and non-historical events.  Since this
+    // includes events with old event numbers, those should get filtered out
+    // from reporting.
+    const uint64_t expectedHistoricalEvents = 2;
+    firstNewEventNumber = eventNumber;
+    eventNumber -= expectedHistoricalEvents;
+    eventReportsReceived = 0;
+    historicalEvents = 0;
+    // Events with already-observed event numbers do not get reported.
+    eventReportsToExpect = eventReportsToInject - expectedHistoricalEvents;
+    eventReportsFinishedExpectation = [self expectationWithDescription:@"Injecting a mix of old and new reports"];
+
+    for (int i = 0; i < eventReportsToInject; ++i) {
+        [device unitTestInjectEventReport:@[ createEventReport() ]];
+    }
+
+    [self waitForExpectations:@[ eventReportsFinishedExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(historicalEvents, 0);
 }
 
 - (void)test035_TestMTRDeviceSubscriptionNotEstablishedOverXPC
@@ -4143,13 +4332,17 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (NSDictionary<NSString *, id> *)_testEventResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
 {
+    // Pick a large event number, so that in practice these event reports will
+    // all have larger event numbers than anything that might have been observed
+    // before.
+    static uint64_t eventNumber = 0x100000000llu;
     return @{
         MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
         MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
         MTREventTimestampDateKey : [NSDate date],
         MTREventIsHistoricalKey : @(NO),
         MTREventPriorityKey : @(MTREventPriorityInfo),
-        MTREventNumberKey : @(1), // Doesn't matter, in practice
+        MTREventNumberKey : @(eventNumber++),
         // Empty payload.
         MTRDataKey : @ {
             MTRTypeKey : MTRStructureValueType,
@@ -5455,6 +5648,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     },
                 },
             ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    @"commandPath" : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    @"data" : @ {
+                        @"type" : @"Structure",
+                        @"value" : @[], // Empty structure, valid
+                    },
+                },
+            ],
+            // Same as the previous test, but not using the SDK string constants
             @"valid" : @(YES),
         },
         @{

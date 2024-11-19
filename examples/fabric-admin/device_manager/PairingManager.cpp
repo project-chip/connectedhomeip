@@ -23,14 +23,11 @@
 #include <sys/types.h>
 
 #include <commands/common/CHIPCommand.h>
+#include <device_manager/DeviceManager.h>
 #include <device_manager/DeviceSynchronization.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
-
-#if defined(PW_RPC_ENABLED)
-#include <rpc/RpcClient.h>
-#endif
 
 using namespace ::chip;
 using namespace ::chip::Controller;
@@ -288,6 +285,12 @@ void PairingManager::OnPairingDeleted(CHIP_ERROR err)
 
 void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
+    if (mPairingDelegate)
+    {
+        mPairingDelegate->OnCommissioningComplete(nodeId, err);
+        SetPairingDelegate(nullptr);
+    }
+
     if (err == CHIP_NO_ERROR)
     {
         // print to console
@@ -310,12 +313,6 @@ void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             }
         }
         ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
-    }
-
-    if (mCommissioningDelegate)
-    {
-        mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
-        SetCommissioningDelegate(nullptr);
     }
 }
 
@@ -547,17 +544,23 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     PairingManager * self = reinterpret_cast<PairingManager *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnCurrentFabricRemove: context is null"));
 
+    ChipLogProgress(NotSpecified, "PairingManager::OnCurrentFabricRemove");
+
     if (err == CHIP_NO_ERROR)
     {
         // print to console
-        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 "has been successfully removed.\n", ChipLogValueX64(nodeId));
+        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 " has been successfully removed.\n", ChipLogValueX64(nodeId));
 
-#if defined(PW_RPC_ENABLED)
+        if (self->mPairingDelegate)
+        {
+            self->mPairingDelegate->OnDeviceRemoved(nodeId, err);
+            self->SetPairingDelegate(nullptr);
+        }
+
         FabricIndex fabricIndex = self->CurrentCommissioner().GetFabricIndex();
         app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(fabricIndex, nodeId);
         ScopedNodeId scopedNodeId(nodeId, fabricIndex);
-        RemoveSynchronizedDevice(scopedNodeId);
-#endif
+        DeviceManager::Instance().RemoveSyncedDevice(scopedNodeId);
     }
     else
     {

@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,10 @@
 
 #include "ShellCommands.h"
 #include "AddBridgeCommand.h"
+#include "AddDeviceCommand.h"
 #include "RemoveBridgeCommand.h"
+#include "RemoveDeviceCommand.h"
+#include "SyncDeviceCommand.h"
 
 #include <admin/DeviceManager.h>
 #include <inttypes.h>
@@ -41,6 +43,10 @@ static CHIP_ERROR PrintAllCommands()
                     "  add-bridge       Pair remote fabric bridge to local fabric. Usage: app add-bridge node-id setup-pin-code "
                     "device-remote-ip device-remote-port\r\n");
     streamer_printf(sout, "  remove-bridge    Remove the remote fabric bridge from the local fabric. Usage: app remove-bridge\r\n");
+    streamer_printf(sout,
+                    "  add-device       Pair a device to local fabric. Usage: app add-device node-id setup-pin-code "
+                    "device-remote-ip device-remote-port\r\n");
+    streamer_printf(sout, "  remove-device    Remove a device from the local fabric. Usage: app remove-device node-id\r\n");
     streamer_printf(sout, "  sync-device      Sync a device from other ecosystem. Usage: app sync-device endpointid\r\n");
     streamer_printf(sout, "\r\n");
 
@@ -106,6 +112,97 @@ static CHIP_ERROR HandleRemoveBridgeCommand(int argc, char ** argv)
     return result;
 }
 
+static CHIP_ERROR HandleAddDeviceCommand(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        fprintf(stderr,
+                "Invalid arguments. Usage: app add-device <node-id> <setup-pin-code> <device-remote-ip> <device-remote-port>\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Check if there is already an active command
+    if (commands::CommandRegistry::Instance().IsCommandActive())
+    {
+        fprintf(stderr, "Another command is currently active. Please wait until it completes.\n");
+        return CHIP_ERROR_BUSY;
+    }
+
+    // Parse arguments
+    chip::NodeId nodeId     = static_cast<chip::NodeId>(strtoull(argv[1], nullptr, 10));
+    uint32_t payload        = static_cast<uint32_t>(strtoul(argv[2], nullptr, 10));
+    const char * remoteAddr = argv[3];
+    uint16_t remotePort     = static_cast<uint16_t>(strtoul(argv[4], nullptr, 10));
+
+    auto command = std::make_unique<commands::AddDeviceCommand>(nodeId, payload, remoteAddr, remotePort);
+
+    CHIP_ERROR result = command->RunCommand();
+    if (result == CHIP_NO_ERROR)
+    {
+        commands::CommandRegistry::Instance().SetActiveCommand(std::move(command));
+    }
+
+    return result;
+}
+
+static CHIP_ERROR HandleRemoveDeviceCommand(int argc, char ** argv)
+{
+    if (argc != 2)
+    {
+        fprintf(stderr, "Invalid arguments. Usage: app remove-device <node-id>\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Check if there is already an active command
+    if (commands::CommandRegistry::Instance().IsCommandActive())
+    {
+        fprintf(stderr, "Another command is currently active. Please wait until it completes.\n");
+        return CHIP_ERROR_BUSY;
+    }
+
+    // Parse arguments
+    chip::NodeId nodeId = static_cast<chip::NodeId>(strtoull(argv[1], nullptr, 10));
+
+    auto command = std::make_unique<commands::RemoveDeviceCommand>(nodeId);
+
+    CHIP_ERROR result = command->RunCommand();
+    if (result == CHIP_NO_ERROR)
+    {
+        commands::CommandRegistry::Instance().SetActiveCommand(std::move(command));
+    }
+
+    return result;
+}
+
+static CHIP_ERROR HandleSyncDeviceCommand(int argc, char ** argv)
+{
+    if (argc != 2)
+    {
+        fprintf(stderr, "Invalid arguments. Usage: app sync-device\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Check if there is already an active command
+    if (commands::CommandRegistry::Instance().IsCommandActive())
+    {
+        fprintf(stderr, "Another command is currently active. Please wait until it completes.\n");
+        return CHIP_ERROR_BUSY;
+    }
+
+    // Parse arguments
+    chip::EndpointId endpointId = static_cast<chip::EndpointId>(strtoul(argv[1], nullptr, 10));
+
+    auto command = std::make_unique<commands::SyncDeviceCommand>(endpointId);
+
+    CHIP_ERROR result = command->RunCommand();
+    if (result == CHIP_NO_ERROR)
+    {
+        commands::CommandRegistry::Instance().SetActiveCommand(std::move(command));
+    }
+
+    return result;
+}
+
 static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -126,6 +223,18 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
     {
         return HandleRemoveBridgeCommand(argc, argv);
     }
+    else if (strcmp(argv[0], "add-device") == 0)
+    {
+        return HandleAddDeviceCommand(argc, argv);
+    }
+    else if (strcmp(argv[0], "remove-device") == 0)
+    {
+        return HandleRemoveDeviceCommand(argc, argv);
+    }
+    else if (strcmp(argv[0], "sync-device") == 0)
+    {
+        return HandleSyncDeviceCommand(argc, argv);
+    }
     else
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -140,7 +249,6 @@ void RegisterCommands()
 
     // Register the root `device` command with the top-level shell.
     Engine::Root().RegisterCommands(&sDeviceComand, 1);
-    return;
 }
 
 } // namespace Shell

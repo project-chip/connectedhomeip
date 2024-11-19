@@ -31,6 +31,7 @@ from typing import List
 
 import alive_progress
 import click
+import colorama
 import coloredlogs
 import tabulate
 import yaml
@@ -95,6 +96,7 @@ class ExecutionTimeInfo:
 
     script: str
     duration_sec: float
+    status: str
 
 
 # Top level command, groups all other commands for the purpose of having
@@ -166,8 +168,8 @@ def _do_build_apps():
         f"{target_prefix}-all-clusters-no-ble-clang-boringssl",
         f"{target_prefix}-bridge-no-ble-clang-boringssl",
         f"{target_prefix}-energy-management-no-ble-clang-boringssl",
-        f"{target_prefix}-fabric-admin-rpc-ipv6only-clang-boringssl",
-        f"{target_prefix}-fabric-bridge-rpc-ipv6only-clang-boringssl",
+        f"{target_prefix}-fabric-admin-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
+        f"{target_prefix}-fabric-bridge-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
         f"{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang",
         f"{target_prefix}-lit-icd-no-ble-clang-boringssl",
         f"{target_prefix}-lock-no-ble-clang-boringssl",
@@ -316,11 +318,23 @@ def _add_target_to_cmd(cmd, flag, path, runner):
     help="Don't actually execute the tests, just print out the command that would be run.",
 )
 @click.option(
-    "--show_timings",
+    "--no-show-timings",
+    default=False,
+    is_flag=True,
+    help="At the end of the execution, show how many seconds each test took.",
+)
+@click.option(
+    "--keep-going",
     default=False,
     is_flag=True,
     show_default=True,
-    help="At the end of the execution, show how many seconds each test took.",
+    help="Keep going on errors. Will report all failed tests at the end.",
+)
+@click.option(
+    "--fail-log-dir",
+    default=None,
+    help="Save failure logs into the specified directory instead of logging (as logging can be noisy/slow)",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
 )
 @click.option(
     "--runner",
@@ -329,7 +343,14 @@ def _add_target_to_cmd(cmd, flag, path, runner):
     help="Determines the verbosity of script output",
 )
 def python_tests(
-    test_filter, from_filter, from_skip_filter, dry_run, show_timings, runner
+    test_filter,
+    from_filter,
+    from_skip_filter,
+    dry_run,
+    no_show_timings,
+    runner,
+    keep_going,
+    fail_log_dir,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -359,9 +380,9 @@ def python_tests(
             NETWORK_MANAGEMENT_APP: {
                 as_runner(f'out/{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl/matter-network-manager-app')}
             FABRIC_ADMIN_APP: {
-                as_runner(f'out/{target_prefix}-fabric-admin-rpc-ipv6only-clang-boringssl/fabric-admin')}
+                as_runner(f'out/{target_prefix}-fabric-admin-no-ble-no-wifi-rpc-ipv6only-clang-boringssl/fabric-admin')}
             FABRIC_BRIDGE_APP: {
-                as_runner(f'out/{target_prefix}-fabric-bridge-rpc-ipv6only-clang-boringssl/fabric-bridge-app')}
+                as_runner(f'out/{target_prefix}-fabric-bridge-no-ble-no-wifi-rpc-ipv6only-clang-boringssl/fabric-bridge-app')}
             LIGHTING_APP_NO_UNIQUE_ID: {as_runner(f'out/{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app')}
             TRACE_APP: out/trace_data/app-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_JSON: out/trace_data/test-{{SCRIPT_BASE_NAME}}
@@ -395,7 +416,9 @@ def python_tests(
     excluded_patterns = set([item["name"] for item in metadata["not_automated"]])
 
     # NOTE: for slow tests. we add logs to not get impatient
-    slow_test_duration = dict([(item["name"], item["duration"]) for item in metadata["slow_tests"]])
+    slow_test_duration = dict(
+        [(item["name"], item["duration"]) for item in metadata["slow_tests"]]
+    )
 
     if not os.path.isdir("src/python_testing"):
         raise Exception(
@@ -411,6 +434,7 @@ def python_tests(
     test_scripts.sort()  # order consistent
 
     execution_times = []
+    failed_tests = []
     try:
         to_run = []
         for script in fnmatch.filter(test_scripts, test_filter or "*.*"):
@@ -461,12 +485,33 @@ def python_tests(
 
                 if result.returncode != 0:
                     logging.error("Test failed: %s", script)
-                    logging.info("STDOUT:\n%s", result.stdout.decode("utf8"))
-                    logging.warning("STDERR:\n%s", result.stderr.decode("utf8"))
-                    sys.exit(1)
+                    if fail_log_dir:
+                        out_name = os.path.join(fail_log_dir, f"{base_name}.out.log")
+                        err_name = os.path.join(fail_log_dir, f"{base_name}.err.log")
+
+                        logging.error("STDOUT IN %s", out_name)
+                        logging.error("STDERR IN %s", err_name)
+
+                        with open(out_name, "wb") as f:
+                            f.write(result.stdout)
+                        with open(err_name, "wb") as f:
+                            f.write(result.stdout)
+
+                    else:
+                        logging.info("STDOUT:\n%s", result.stdout.decode("utf8"))
+                        logging.warning("STDERR:\n%s", result.stderr.decode("utf8"))
+                    if not keep_going:
+                        sys.exit(1)
+                    failed_tests.append(script)
 
                 time_info = ExecutionTimeInfo(
-                    script=base_name, duration_sec=(tend - tstart)
+                    script=base_name,
+                    duration_sec=(tend - tstart),
+                    status=(
+                        "PASS"
+                        if result.returncode == 0
+                        else colorama.Fore.RED + "FAILURE" + colorama.Fore.RESET
+                    ),
                 )
                 execution_times.append(time_info)
 
@@ -478,11 +523,24 @@ def python_tests(
                     )
                 bar()
     finally:
-        if execution_times and show_timings:
-            execution_times.sort(key=lambda v: v.duration_sec)
-            print(
-                tabulate.tabulate(execution_times, headers=["Script", "Duration(sec)"])
+        if failed_tests and keep_going:
+            logging.error("FAILED TESTS:")
+            for name in failed_tests:
+                logging.error("  %s", name)
+
+        if execution_times and not no_show_timings:
+            execution_times.sort(
+                key=lambda v: (0 if v.status == "PASS" else 1, v.duration_sec),
             )
+            print(
+                tabulate.tabulate(
+                    execution_times, headers=["Script", "Duration(sec)", "Status"]
+                )
+            )
+
+        if failed_tests:
+            # Propagate the final failure
+            sys.exit(1)
 
 
 def _do_build_fabric_sync_apps():
@@ -491,8 +549,8 @@ def _do_build_fabric_sync_apps():
     """
     target_prefix = _get_native_machine_target()
     targets = [
-        f"{target_prefix}-fabric-bridge-boringssl-rpc-no-ble",
-        f"{target_prefix}-fabric-admin-boringssl-rpc",
+        f"{target_prefix}-fabric-admin-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
+        f"{target_prefix}-fabric-bridge-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
         f"{target_prefix}-all-clusters-boringssl-no-ble",
     ]
 

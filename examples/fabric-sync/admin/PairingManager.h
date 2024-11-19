@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -24,6 +23,8 @@
 #include <controller/CurrentFabricRemover.h>
 #include <crypto/CHIPCryptoPAL.h>
 
+namespace admin {
+
 // Constants
 constexpr uint16_t kMaxManualCodeLength = 22;
 
@@ -34,18 +35,12 @@ public:
     virtual ~CommissioningWindowDelegate()                                                                      = default;
 };
 
-class CommissioningDelegate
-{
-public:
-    virtual void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) = 0;
-    virtual ~CommissioningDelegate()                                            = default;
-};
-
 class PairingDelegate
 {
 public:
-    virtual void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) = 0;
-    virtual ~PairingDelegate()                                          = default;
+    virtual void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) {}
+    virtual void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) {}
+    virtual ~PairingDelegate() = default;
 };
 
 /**
@@ -82,7 +77,6 @@ public:
     CHIP_ERROR Init(chip::Controller::DeviceCommissioner * commissioner);
 
     void SetOpenCommissioningWindowDelegate(CommissioningWindowDelegate * delegate) { mCommissioningWindowDelegate = delegate; }
-    void SetCommissioningDelegate(CommissioningDelegate * delegate) { mCommissioningDelegate = delegate; }
     void SetPairingDelegate(PairingDelegate * delegate) { mPairingDelegate = delegate; }
     PairingDelegate * GetPairingDelegate() { return mPairingDelegate; }
 
@@ -175,7 +169,6 @@ private:
     chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
 
     CommissioningWindowDelegate * mCommissioningWindowDelegate = nullptr;
-    CommissioningDelegate * mCommissioningDelegate             = nullptr;
     PairingDelegate * mPairingDelegate                         = nullptr;
 
     chip::NodeId mNodeId = chip::kUndefinedNodeId;
@@ -201,3 +194,5 @@ private:
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
     chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
 };
+
+} // namespace admin

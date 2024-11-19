@@ -29,11 +29,18 @@ source_set("shell") {
   sources = [
     "AddBridgeCommand.cpp",
     "AddBridgeCommand.h",
+    "AddDeviceCommand.cpp",
+    "AddDeviceCommand.h",
+    "CommandRegistry.cpp",
     "CommandRegistry.h",
     "RemoveBridgeCommand.cpp",
     "RemoveBridgeCommand.h",
+    "RemoveDeviceCommand.cpp",
+    "RemoveDeviceCommand.h",
     "ShellCommands.cpp",
     "ShellCommands.h",
+    "SyncDeviceCommand.cpp",
+    "SyncDeviceCommand.h",
   ]
 
   deps = [

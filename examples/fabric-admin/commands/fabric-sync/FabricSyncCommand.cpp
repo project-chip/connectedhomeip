@@ -51,14 +51,15 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
 
     if (err == CHIP_NO_ERROR)
     {
-        DeviceMgr().SetRemoteBridgeNodeId(mBridgeNodeId);
+        DeviceManager::Instance().SetRemoteBridgeNodeId(mBridgeNodeId);
         ChipLogProgress(NotSpecified, "Successfully paired bridge device: NodeId: " ChipLogFormatX64,
                         ChipLogValueX64(mBridgeNodeId));
 
-        DeviceMgr().UpdateLastUsedNodeId(mBridgeNodeId);
-        DeviceMgr().SubscribeRemoteFabricBridge();
+        DeviceManager::Instance().UpdateLastUsedNodeId(mBridgeNodeId);
+        DeviceManager::Instance().SubscribeRemoteFabricBridge();
+        DeviceManager::Instance().InitCommissionerControl();
 
-        if (DeviceMgr().IsLocalBridgeReady())
+        if (DeviceManager::Instance().IsLocalBridgeReady())
         {
             // After successful commissioning of the Commissionee, initiate Reverse Commissioning
             // via the Commissioner Control Cluster. However, we must first verify that the
@@ -66,7 +67,7 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
             //
             // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
             // if the remote Fabric-Bridge lacks Fabric Synchronization support.
-            DeviceLayer::SystemLayer().ScheduleLambda([]() { DeviceMgr().ReadSupportedDeviceCategories(); });
+            DeviceLayer::SystemLayer().ScheduleLambda([]() { DeviceManager::Instance().ReadSupportedDeviceCategories(); });
         }
     }
     else
@@ -80,18 +81,19 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
 
 CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
 {
-    if (DeviceMgr().IsFabricSyncReady())
+    if (DeviceManager::Instance().IsFabricSyncReady())
     {
         // print to console
-        fprintf(stderr, "Remote Fabric Bridge has already been configured.");
+        fprintf(stderr, "Remote Fabric Bridge has already been configured.\n");
         return CHIP_NO_ERROR;
     }
 
-    PairingManager::Instance().SetCommissioningDelegate(this);
+    PairingManager::Instance().SetPairingDelegate(this);
 
     mBridgeNodeId = remoteId;
 
-    DeviceMgr().PairRemoteFabricBridge(remoteId, mSetupPINCode, reinterpret_cast<const char *>(mRemoteAddr.data()), mRemotePort);
+    DeviceManager::Instance().PairRemoteFabricBridge(remoteId, mSetupPINCode, reinterpret_cast<const char *>(mRemoteAddr.data()),
+                                                     mRemotePort);
 
     return CHIP_NO_ERROR;
 }
@@ -106,7 +108,7 @@ void FabricSyncRemoveBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR 
 
     if (err == CHIP_NO_ERROR)
     {
-        DeviceMgr().SetRemoteBridgeNodeId(kUndefinedNodeId);
+        DeviceManager::Instance().SetRemoteBridgeNodeId(kUndefinedNodeId);
         ChipLogProgress(NotSpecified, "Successfully removed bridge device: NodeId: " ChipLogFormatX64,
                         ChipLogValueX64(mBridgeNodeId));
     }
@@ -121,19 +123,19 @@ void FabricSyncRemoveBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR 
 
 CHIP_ERROR FabricSyncRemoveBridgeCommand::RunCommand()
 {
-    NodeId bridgeNodeId = DeviceMgr().GetRemoteBridgeNodeId();
+    NodeId bridgeNodeId = DeviceManager::Instance().GetRemoteBridgeNodeId();
 
     if (bridgeNodeId == kUndefinedNodeId)
     {
         // print to console
-        fprintf(stderr, "Remote Fabric Bridge is not configured yet, nothing to remove.");
+        fprintf(stderr, "Remote Fabric Bridge is not configured yet, nothing to remove.\n");
         return CHIP_NO_ERROR;
     }
 
     mBridgeNodeId = bridgeNodeId;
 
     PairingManager::Instance().SetPairingDelegate(this);
-    DeviceMgr().UnpairRemoteFabricBridge();
+    DeviceManager::Instance().UnpairRemoteFabricBridge();
 
     return CHIP_NO_ERROR;
 }
@@ -157,8 +159,8 @@ void FabricSyncAddLocalBridgeCommand::OnCommissioningComplete(NodeId deviceId, C
 
     if (err == CHIP_NO_ERROR)
     {
-        DeviceMgr().SetLocalBridgeNodeId(mLocalBridgeNodeId);
-        DeviceMgr().UpdateLastUsedNodeId(mLocalBridgeNodeId);
+        DeviceManager::Instance().SetLocalBridgeNodeId(mLocalBridgeNodeId);
+        DeviceManager::Instance().UpdateLastUsedNodeId(mLocalBridgeNodeId);
         ChipLogProgress(NotSpecified, "Successfully paired local bridge device: NodeId: " ChipLogFormatX64,
                         ChipLogValueX64(mLocalBridgeNodeId));
     }
@@ -173,26 +175,26 @@ void FabricSyncAddLocalBridgeCommand::OnCommissioningComplete(NodeId deviceId, C
 
 CHIP_ERROR FabricSyncAddLocalBridgeCommand::RunCommand(NodeId deviceId)
 {
-    if (DeviceMgr().IsLocalBridgeReady())
+    if (DeviceManager::Instance().IsLocalBridgeReady())
     {
         // print to console
-        fprintf(stderr, "Local Fabric Bridge has already been configured.");
+        fprintf(stderr, "Local Fabric Bridge has already been configured.\n");
         return CHIP_NO_ERROR;
     }
 
-    PairingManager::Instance().SetCommissioningDelegate(this);
+    PairingManager::Instance().SetPairingDelegate(this);
     mLocalBridgeNodeId = deviceId;
 
     if (mSetupPINCode.HasValue())
     {
-        DeviceMgr().SetLocalBridgeSetupPinCode(mSetupPINCode.Value());
+        DeviceManager::Instance().SetLocalBridgeSetupPinCode(mSetupPINCode.Value());
     }
     if (mLocalPort.HasValue())
     {
-        DeviceMgr().SetLocalBridgePort(mLocalPort.Value());
+        DeviceManager::Instance().SetLocalBridgePort(mLocalPort.Value());
     }
 
-    DeviceMgr().PairLocalFabricBridge(deviceId);
+    DeviceManager::Instance().PairLocalFabricBridge(deviceId);
 
     return CHIP_NO_ERROR;
 }
@@ -207,7 +209,7 @@ void FabricSyncRemoveLocalBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_E
 
     if (err == CHIP_NO_ERROR)
     {
-        DeviceMgr().SetLocalBridgeNodeId(kUndefinedNodeId);
+        DeviceManager::Instance().SetLocalBridgeNodeId(kUndefinedNodeId);
         ChipLogProgress(NotSpecified, "Successfully removed local bridge device: NodeId: " ChipLogFormatX64,
                         ChipLogValueX64(mLocalBridgeNodeId));
     }
@@ -222,19 +224,19 @@ void FabricSyncRemoveLocalBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_E
 
 CHIP_ERROR FabricSyncRemoveLocalBridgeCommand::RunCommand()
 {
-    NodeId bridgeNodeId = DeviceMgr().GetLocalBridgeNodeId();
+    NodeId bridgeNodeId = DeviceManager::Instance().GetLocalBridgeNodeId();
 
     if (bridgeNodeId == kUndefinedNodeId)
     {
         // print to console
-        fprintf(stderr, "Local Fabric Bridge is not configured yet, nothing to remove.");
+        fprintf(stderr, "Local Fabric Bridge is not configured yet, nothing to remove.\n");
         return CHIP_NO_ERROR;
     }
 
     mLocalBridgeNodeId = bridgeNodeId;
 
     PairingManager::Instance().SetPairingDelegate(this);
-    DeviceMgr().UnpairLocalFabricBridge();
+    DeviceManager::Instance().UnpairLocalFabricBridge();
 
     return CHIP_NO_ERROR;
 }
@@ -250,14 +252,14 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
         CHIP_ERROR error = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualCode);
         if (error == CHIP_NO_ERROR)
         {
-            NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
+            NodeId nodeId = DeviceManager::Instance().GetNextAvailableNodeId();
 
-            PairingManager::Instance().SetCommissioningDelegate(this);
+            PairingManager::Instance().SetPairingDelegate(this);
             mAssignedNodeId = nodeId;
 
             usleep(kCommissionPrepareTimeMs * 1000);
 
-            DeviceMgr().PairRemoteDevice(nodeId, payloadBuffer);
+            DeviceManager::Instance().PairRemoteDevice(nodeId, payloadBuffer);
         }
         else
         {
@@ -283,7 +285,7 @@ void FabricSyncDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERRO
 
     if (err == CHIP_NO_ERROR)
     {
-        DeviceMgr().AddSyncedDevice(Device(mAssignedNodeId, mRemoteEndpointId));
+        DeviceManager::Instance().AddSyncedDevice(SyncedDevice(mAssignedNodeId, mRemoteEndpointId));
     }
     else
     {
@@ -292,18 +294,18 @@ void FabricSyncDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERRO
     }
 }
 
-CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
+CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteEndpointId)
 {
-    if (!DeviceMgr().IsFabricSyncReady())
+    if (!DeviceManager::Instance().IsFabricSyncReady())
     {
         // print to console
-        fprintf(stderr, "Remote Fabric Bridge is not configured yet.");
+        fprintf(stderr, "Remote Fabric Bridge is not configured yet.\n");
         return CHIP_NO_ERROR;
     }
 
     PairingManager::Instance().SetOpenCommissioningWindowDelegate(this);
 
-    DeviceMgr().OpenRemoteDeviceCommissioningWindow(remoteId);
+    DeviceManager::Instance().OpenRemoteDeviceCommissioningWindow(remoteEndpointId);
 
     return CHIP_NO_ERROR;
 }

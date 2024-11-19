@@ -15,16 +15,44 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
+config("config") {
+  include_dirs = [
+    ".",
+    "${chip_root}/examples/fabric-sync",
+    "${chip_root}/examples/platform/linux",
+    "${chip_root}/src/lib",
+  ]
+}
+
 source_set("fabric-admin-lib") {
+  public_configs = [ ":config" ]
+
   sources = [
+    "BridgeSubscription.cpp",
+    "BridgeSubscription.h",
+    "CommissionerControl.cpp",
+    "CommissionerControl.h",
     "DeviceManager.cpp",
     "DeviceManager.h",
+    "DeviceSubscription.cpp",
+    "DeviceSubscription.h",
+    "DeviceSubscriptionManager.cpp",
+    "DeviceSubscriptionManager.h",
+    "DeviceSynchronization.cpp",
+    "DeviceSynchronization.h",
+    "FabricAdmin.cpp",
+    "FabricAdmin.h",
+    "FabricSyncGetter.cpp",
+    "FabricSyncGetter.h",
     "PairingManager.cpp",
     "PairingManager.h",
+    "UniqueIdGetter.cpp",
+    "UniqueIdGetter.h",
   ]
 
   deps = [
     "${chip_root}/examples/fabric-sync/bridge:fabric-bridge-lib",
+    "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
   ]
 }
