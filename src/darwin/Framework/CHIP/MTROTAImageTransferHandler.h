@@ -21,6 +21,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MTROTAImageTransferHandlerWrapper;
+
 /**
  * This class handles the BDX events for a BDX transfer session.
  *
@@ -34,35 +36,34 @@ NS_ASSUME_NONNULL_BEGIN
 class MTROTAImageTransferHandler : public chip::bdx::AsyncResponder
 {
 public:
-    MTROTAImageTransferHandler();
+    MTROTAImageTransferHandler(chip::System::Layer * layer);
     ~MTROTAImageTransferHandler();
 
-    void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
-    void DestroySelf() override;
+    chip::FabricIndex GetPeerFabricIndex() { return mPeer.GetFabricIndex(); }
 
 protected:
     CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
                                  chip::System::PacketBufferHandle && payload) override;
 
+    void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
+
 private:
-    CHIP_ERROR Init(chip::System::Layer * layer, chip::Messaging::ExchangeContext * exchangeCtx, chip::FabricIndex fabricIndex,
-                    chip::NodeId nodeId);
+    CHIP_ERROR Init(chip::Messaging::ExchangeContext * exchangeCtx);
 
-    CHIP_ERROR ConfigureState(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
+    CHIP_ERROR OnTransferSessionBegin(const chip::bdx::TransferSession::OutputEventType event);
 
-    CHIP_ERROR OnMessageToSend(chip::bdx::TransferSession::OutputEvent & event);
+    CHIP_ERROR OnTransferSessionEnd(const chip::bdx::TransferSession::OutputEventType eventType);
 
-    CHIP_ERROR OnTransferSessionBegin(chip::bdx::TransferSession::OutputEvent & event);
+    CHIP_ERROR OnBlockQuery(const chip::bdx::TransferSession::OutputEventType eventType, uint64_t bytesToSkip);
 
-    CHIP_ERROR OnTransferSessionEnd(chip::bdx::TransferSession::OutputEvent & event);
+    chip::ScopedNodeId GetPeerScopedNodeId(chip::Messaging::ExchangeContext * exchangeCtx);
 
-    CHIP_ERROR OnBlockQuery(chip::bdx::TransferSession::OutputEvent & event);
+    void InvokeTransferSessionEndCallback(CHIP_ERROR error);
 
-    // The fabric index of the node with which the BDX session is established.
-    chip::Optional<chip::FabricIndex> mFabricIndex;
+    void DestroySelf() override;
 
-    // The node id of the node with which the BDX session is established.
-    chip::Optional<chip::NodeId> mNodeId;
+    // The scoped node id of the node with which the BDX session is established.
+    chip::ScopedNodeId mPeer;
 
     // The OTA provider delegate that is responding to the BDX transfer request.
     id<MTROTAProviderDelegate> mDelegate = nil;
@@ -70,6 +71,10 @@ private:
 
     // The queue mDelegate must be called on.
     dispatch_queue_t mDelegateNotificationQueue = nil;
+
+    MTROTAImageTransferHandlerWrapper * mOTAImageTransferHandlerWrapper;
+
+    bool mNeedToCallTransferSessionEnd = false;
 };
 
 NS_ASSUME_NONNULL_END

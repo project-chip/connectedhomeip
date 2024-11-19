@@ -47,7 +47,7 @@ CHIP_ERROR AsyncTransferFacilitator::Init(System::Layer * layer, Messaging::Exch
     mExchange.Grab(exchangeCtx);
     mTimeout                = timeout;
     mProcessingOutputEvents = false;
-    mDestroySelf            = false;
+    mDestroySelfAfterProcessingEvents            = false;
     return CHIP_NO_ERROR;
 }
 
@@ -91,7 +91,7 @@ void AsyncTransferFacilitator::ProcessOutputEvents()
             // will respond to the status report by tearing down their side.
             if (outEvent.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
             {
-                mDestroySelf = true;
+                mDestroySelfAfterProcessingEvents = true;
                 break;
             }
         }
@@ -104,8 +104,8 @@ void AsyncTransferFacilitator::ProcessOutputEvents()
 
     mProcessingOutputEvents = false;
 
-    // If the mDestroySelf is set in NotifyEventHandled, we need to call DestroySelf() after processing all pending output events.
-    if (mDestroySelf)
+    // If the mDestroySelfAfterProcessingEvents is set in NotifyEventHandled, we need to call DestroySelf() after processing all pending output events.
+    if (mDestroySelfAfterProcessingEvents)
     {
         DestroySelf();
     }
@@ -175,22 +175,21 @@ CHIP_ERROR AsyncResponder::Init(System::Layer * layer, Messaging::ExchangeContex
     return CHIP_NO_ERROR;
 }
 
-void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEvent & event, CHIP_ERROR status)
+void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType eventType, CHIP_ERROR status)
 {
     ChipLogDetail(BDX, "NotifyEventHandled : Event %s Error %" CHIP_ERROR_FORMAT,
-                  TransferSession::OutputEvent::TypeToString(event.EventType), status.Format());
+                  TransferSession::OutputEvent::TypeToString(eventType), status.Format());
 
     // If it's a message indicating either the end of the transfer or a timeout reported by the transfer session
-    // or an error occured, we need to call DestroySelf().
-    if (event.EventType == TransferSession::OutputEventType::kAckEOFReceived ||
-        event.EventType == TransferSession::OutputEventType::kInternalError ||
-        event.EventType == TransferSession::OutputEventType::kTransferTimeout ||
-        event.EventType == TransferSession::OutputEventType::kStatusReceived)
+    // or an error occured, the BDX Transfer session might generate a status report that needs to be sent out to
+    // notify the other side of the BDX transfer so we need to call ProcessOutputEvents and destroy ourselves once
+    // we sent the status report out.
+    if (eventType == TransferSession::OutputEventType::kAckEOFReceived ||
+        eventType == TransferSession::OutputEventType::kInternalError ||
+        eventType == TransferSession::OutputEventType::kTransferTimeout ||
+        eventType == TransferSession::OutputEventType::kStatusReceived)
     {
-
-        // Set the mDestroySelf flag to true so that when ProcessOutputEvents finishes processing all pending events, it
-        // will call DestroySelf() to clean up.
-        mDestroySelf = true;
+        mDestroySelfAfterProcessingEvents = true;
     }
 
     // If there was an error handling the output event, this should notify the tranfer object to abort transfer so it can send a

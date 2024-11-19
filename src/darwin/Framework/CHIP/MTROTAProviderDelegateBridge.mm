@@ -15,11 +15,12 @@
  *    limitations under the License.
  */
 
-#include "MTROTAProviderDelegateBridge.h"
+#import "MTROTAProviderDelegateBridge.h"
 #import "MTRBaseClusters.h"
 #import "MTRCommandPayloadsObjC.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRError_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
@@ -30,7 +31,6 @@
 #include <platform/PlatformManager.h>
 #include <protocols/interaction_model/Constants.h>
 
-#include <MTRError_Internal.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/LockTracker.h>
 #include <protocols/bdx/AsyncTransferFacilitator.h>
@@ -73,7 +73,7 @@ CHIP_ERROR MTROTAProviderDelegateBridge::Init(System::Layer * systemLayer, Messa
 
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR err = mOtaUnsolicitedBDXMsgHandler.Init(exchangeManager);
+    CHIP_ERROR err = mOtaUnsolicitedBDXMsgHandler.Init(systemLayer, exchangeManager);
     if (err != CHIP_NO_ERROR) {
         ChipLogError(Controller, "Failed to initialize the unsolicited BDX Message handler with err %s", err.AsString());
     }
@@ -249,8 +249,8 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     return;
                 }
 
-                // If the MTROTAUnsolicitedBDXMessageHandler already has a delegate, send busy error.
-                if (MTROTAUnsolicitedBDXMessageHandler::GetNumberOfDelegates() >= 1) {
+                // If the MTROTAUnsolicitedBDXMessageHandler already has an ongoing transfer, send busy error.
+                if (MTROTAUnsolicitedBDXMessageHandler::GetInstance()->IsInAnOngoingTransfer()) {
                     ChipLogError(
                         Controller, "Responding with Busy due to being in the middle of handling another BDX transfer");
                     Commands::QueryImageResponse::Type response;
@@ -268,7 +268,6 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     LogErrorOnFailure(err);
                     handler->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
                     handle.Release();
-                    Shutdown();
                     return;
                 }
                 delegateResponse.imageURI.SetValue(uri);

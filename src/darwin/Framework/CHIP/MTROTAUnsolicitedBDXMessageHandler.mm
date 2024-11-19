@@ -16,6 +16,7 @@
  */
 
 #import "MTROTAUnsolicitedBDXMessageHandler.h"
+#import "MTRDeviceController_Internal.h"
 
 #include <protocols/bdx/BdxMessages.h>
 
@@ -25,13 +26,14 @@ using namespace chip::bdx;
 
 MTROTAUnsolicitedBDXMessageHandler * MTROTAUnsolicitedBDXMessageHandler::sInstance = nullptr;
 
-CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::Init(ExchangeManager * exchangeManager)
+CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::Init(System::Layer * systemLayer, ExchangeManager * exchangeManager)
 {
     assertChipStackLockedByCurrentThread();
 
+    VerifyOrReturnError(systemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    MTROTAUnsolicitedBDXMessageHandler::mNumberOfDelegates = 0;
+    mSystemLayer = systemLayer;
     mExchangeMgr = exchangeManager;
     return mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
 }
@@ -46,24 +48,33 @@ void MTROTAUnsolicitedBDXMessageHandler::Shutdown()
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturn(mExchangeMgr != nullptr);
-
     mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
-    MTROTAUnsolicitedBDXMessageHandler::mNumberOfDelegates = 0;
 
-    if (mOTAImageTransferHandler != nullptr) {
-        mOTAImageTransferHandler->DestroySelf();
-        delete mOTAImageTransferHandler;
-    }
+    VerifyOrReturn(mOTAImageTransferHandler != nullptr);
+
+    delete mOTAImageTransferHandler;
+    mOTAImageTransferHandler = nullptr;
 }
 
-void MTROTAUnsolicitedBDXMessageHandler::ControllerShuttingDown(MTRDeviceController * controller)
+void MTROTAUnsolicitedBDXMessageHandler::ControllerShuttingDown(MTRDeviceController_Concrete * controller)
 {
     assertChipStackLockedByCurrentThread();
 
-    // Since the OTA provider delegate only supports one BDX transfer at a time, calling ShutDown is fine for now.
-    // TODO: #36181 - This class needs to keep a list of all MTROTAImageTransferHandlers mapped to the fabric index and only
-    // delete the MTROTAImageTransferHandler objects with a fabric index matching the MTRDeviceController's fabric index.
-    Shutdown();
+    VerifyOrReturn(mOTAImageTransferHandler != nullptr);
+
+    FabricIndex peerFabricIndex = mOTAImageTransferHandler->GetPeerFabricIndex();
+    VerifyOrReturn(peerFabricIndex != kUndefinedFabricIndex);
+
+    if (controller.fabricIndex == peerFabricIndex)
+    {
+        delete mOTAImageTransferHandler;
+        mOTAImageTransferHandler = nullptr;
+    }
+}
+
+bool MTROTAUnsolicitedBDXMessageHandler::IsInAnOngoingTransfer()
+{
+    return (mOTAImageTransferHandler != nullptr);
 }
 
 CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, const SessionHandle & session,
@@ -76,17 +87,13 @@ CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::OnUnsolicitedMessageReceived(cons
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    if (GetNumberOfDelegates() >= 1) {
-        return CHIP_ERROR_BUSY;
-    }
-
     // Only proceed if there is a valid fabric index for the SessionHandle.
     if (session->IsSecureSession() && session->AsSecureSession() != nullptr && session->AsSecureSession()->GetFabricIndex() != kUndefinedFabricIndex) {
 
         // If we receive a ReceiveInit BDX message, create a new MTROTAImageTransferHandler and register it
         // as the handler for all BDX messages that will come over this exchange.
         if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
-            mOTAImageTransferHandler = new MTROTAImageTransferHandler();
+            mOTAImageTransferHandler = new MTROTAImageTransferHandler(mSystemLayer);
             newDelegate = mOTAImageTransferHandler;
             return CHIP_NO_ERROR;
         }
@@ -100,37 +107,18 @@ void MTROTAUnsolicitedBDXMessageHandler::OnExchangeCreationFailed(ExchangeDelega
     auto * otaTransferHandler = static_cast<MTROTAImageTransferHandler *>(delegate);
     VerifyOrReturn(otaTransferHandler != nullptr);
 
-    otaTransferHandler->DestroySelf();
+    delete otaTransferHandler;
 }
 
-uint8_t MTROTAUnsolicitedBDXMessageHandler::GetNumberOfDelegates()
-{
-    assertChipStackLockedByCurrentThread();
-    return MTROTAUnsolicitedBDXMessageHandler::mNumberOfDelegates;
-}
-
-void MTROTAUnsolicitedBDXMessageHandler::IncrementNumberOfDelegates()
-{
-    assertChipStackLockedByCurrentThread();
-    MTROTAUnsolicitedBDXMessageHandler::mNumberOfDelegates++;
-}
-
-void MTROTAUnsolicitedBDXMessageHandler::DecrementNumberOfDelegates()
-{
-    assertChipStackLockedByCurrentThread();
-    MTROTAUnsolicitedBDXMessageHandler::mNumberOfDelegates--;
-}
-
-void MTROTAUnsolicitedBDXMessageHandler::OnDelegateCreated(void * imageTransferHandler)
+void MTROTAUnsolicitedBDXMessageHandler::OnTransferHandlerCreated(void * imageTransferHandler)
 {
     assertChipStackLockedByCurrentThread();
 
     // TODO: #36181 - Store the imageTransferHandler in a set of MTROTAImageTransferHandler objects.
     mOTAImageTransferHandler = static_cast<MTROTAImageTransferHandler *>(imageTransferHandler);
-    MTROTAUnsolicitedBDXMessageHandler::IncrementNumberOfDelegates();
 }
 
-void MTROTAUnsolicitedBDXMessageHandler::OnDelegateDestroyed(void * imageTransferHandler)
+void MTROTAUnsolicitedBDXMessageHandler::OnTransferHandlerDestroyed(void * imageTransferHandler)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -138,5 +126,4 @@ void MTROTAUnsolicitedBDXMessageHandler::OnDelegateDestroyed(void * imageTransfe
     if (mOTAImageTransferHandler == static_cast<MTROTAImageTransferHandler *>(imageTransferHandler)) {
         mOTAImageTransferHandler = nullptr;
     }
-    MTROTAUnsolicitedBDXMessageHandler::DecrementNumberOfDelegates();
 }

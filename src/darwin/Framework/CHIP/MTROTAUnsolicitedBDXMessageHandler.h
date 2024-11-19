@@ -16,12 +16,11 @@
  */
 
 #import "MTROTAImageTransferHandler.h"
+#import "MTRDeviceController_Concrete.h"
 #import <Foundation/Foundation.h>
 
 #include <lib/core/CHIPError.h>
 #include <messaging/ExchangeMgr.h>
-
-@class MTRDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -47,15 +46,9 @@ public:
 
     static MTROTAUnsolicitedBDXMessageHandler * GetInstance();
 
-    CHIP_ERROR Init(chip::Messaging::ExchangeManager * exchangeManager);
+    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager);
 
-    // Returns the number of delegates that are currently handling BDX transfers.
-    static uint8_t GetNumberOfOngoingTransfers();
-
-    static void IncrementNumberOfDelegates();
-
-    // Decrease the number of delegates handling BDX transfers by 1.
-    static void DecrementNumberOfDelegates();
+    bool IsInAnOngoingTransfer();
 
     void OnTransferHandlerCreated(void * imageTransferHandler);
 
@@ -63,7 +56,7 @@ public:
 
     void Shutdown();
 
-    void ControllerShuttingDown(MTRDeviceController * controller);
+    void ControllerShuttingDown(MTRDeviceController_Concrete * controller);
 
 private:
     CHIP_ERROR OnUnsolicitedMessageReceived(const chip::PayloadHeader & payloadHeader, const chip::SessionHandle & session,
@@ -74,9 +67,9 @@ private:
     // TODO: #36181 - Have a set of MTROTAImageTransferHandler objects.
     MTROTAImageTransferHandler * _Nullable mOTAImageTransferHandler = nullptr;
 
-    chip::Messaging::ExchangeManager * mExchangeMgr;
+    chip::System::Layer * mSystemLayer;
 
-    static inline uint8_t mNumberOfDelegates = 0;
+    chip::Messaging::ExchangeManager * mExchangeMgr;
 
     static MTROTAUnsolicitedBDXMessageHandler * sInstance;
 };

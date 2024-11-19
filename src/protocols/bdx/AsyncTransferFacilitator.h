@@ -75,13 +75,12 @@ protected:
     virtual void DestroySelf() = 0;
 
     // Calling ProcessOutputEvents can destroy this object before the call returns.
-    // Calling ProcessOutputEvents can destroy this object before the call returns.
     void ProcessOutputEvents();
 
     // The transfer session corresponding to this AsyncTransferFacilitator object.
     TransferSession mTransfer;
 
-    bool mDestroySelf = false;
+    bool mDestroySelfAfterProcessingEvents = false;
 
 private:
     bool mProcessingOutputEvents = false;
@@ -132,10 +131,10 @@ public:
      * Note: NotifyEventHandled is allowed to destroy the AsyncResponder before the call returns.
      *.          Callers must be careful about this.
      *
-     * @param[in] event The OutputEvent that was handled by the subclass.
+     * @param[in] eventType The OutputEventType that was handled by the subclass.
      * @param[in] status The error code that occured when handling the event if an error occurs. Otherwise CHIP_NO_ERROR.
      */
-    void NotifyEventHandled(const TransferSession::OutputEvent & event, CHIP_ERROR status);
+    void NotifyEventHandled(const TransferSession::OutputEventType eventType, CHIP_ERROR status);
 };
 
 } // namespace bdx

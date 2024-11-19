@@ -917,6 +917,11 @@ bool TransferSession::IsTransferLengthDefinite() const
 
 const char * TransferSession::OutputEvent::ToString(OutputEventType outputEventType)
 {
+    return TypeToString(outputEventType);
+}
+
+const char * TransferSession::OutputEvent::TypeToString(const OutputEventType outputEventType)
+{
     switch (outputEventType)
     {
     case OutputEventType::kNone:
@@ -946,12 +951,6 @@ const char * TransferSession::OutputEvent::ToString(OutputEventType outputEventT
     default:
         return "Unknown";
     }
-}
-
-const char * TransferSession::OutputEvent::TypeToString(const OutputEventType outputEventType)
-{
-    OutputEvent event(outputEventType);
-    return event.ToString(outputEventType);
 }
 
 TransferSession::OutputEvent TransferSession::OutputEvent::TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg)

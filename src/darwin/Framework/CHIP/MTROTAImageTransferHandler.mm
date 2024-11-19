@@ -36,6 +36,8 @@ constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 // (which is a C++ object).
 @interface MTROTAImageTransferHandlerWrapper : NSObject
 - (instancetype)initWithMTROTAImageTransferHandler:(MTROTAImageTransferHandler *)otaImageTransferHandler;
+
+// Non-atomic property since it's read or written only on the Matter queue.
 @property (nonatomic, nullable, readwrite, assign) MTROTAImageTransferHandler * otaImageTransferHandler;
 @end
 
@@ -50,25 +52,33 @@ constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 }
 @end
 
-MTROTAImageTransferHandlerWrapper * mOTAImageTransferHandlerWrapper;
-
-MTROTAImageTransferHandler::MTROTAImageTransferHandler()
+MTROTAImageTransferHandler::MTROTAImageTransferHandler(chip::System::Layer * layer)
 {
     assertChipStackLockedByCurrentThread();
 
-    MTROTAUnsolicitedBDXMessageHandler::GetInstance()->OnDelegateCreated(this);
-    mOTAImageTransferHandlerWrapper = [[MTROTAImageTransferHandlerWrapper alloc] initWithMTROTAImageTransferHandler:this];
-}
-
-CHIP_ERROR MTROTAImageTransferHandler::Init(System::Layer * layer,
-    Messaging::ExchangeContext * exchangeCtx, FabricIndex fabricIndex, NodeId nodeId)
-{
-    assertChipStackLockedByCurrentThread();
-    VerifyOrReturnError(layer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
+    VerifyOrReturn(layer != nullptr);
     mSystemLayer = layer;
 
-    ReturnErrorOnFailure(ConfigureState(fabricIndex, nodeId));
+    MTROTAUnsolicitedBDXMessageHandler::GetInstance()->OnTransferHandlerCreated(this);
+    mOTAImageTransferHandlerWrapper = [[MTROTAImageTransferHandlerWrapper alloc] initWithMTROTAImageTransferHandler:this];
+    mPeer = ScopedNodeId();
+    mNeedToCallTransferSessionEnd = false;
+}
+
+CHIP_ERROR MTROTAImageTransferHandler::Init(Messaging::ExchangeContext * exchangeCtx)
+{
+    assertChipStackLockedByCurrentThread();
+
+    mPeer = GetPeerScopedNodeId(exchangeCtx);
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mPeer.GetFabricIndex()];
+    VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+
+    mDelegate = controller.otaProviderDelegate;
+    mDelegateNotificationQueue = controller.otaProviderDelegateQueue;
+
+    // We should have already checked that this controller supports OTA.
+    VerifyOrReturnError(mDelegate != nil, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDelegateNotificationQueue != nil, CHIP_ERROR_INCORRECT_STATE);
 
     BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
 
@@ -78,22 +88,20 @@ CHIP_ERROR MTROTAImageTransferHandler::Init(System::Layer * layer,
 MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
 {
     assertChipStackLockedByCurrentThread();
-    mFabricIndex.ClearValue();
-    mNodeId.ClearValue();
-    mDelegate = nil;
-    mDelegateNotificationQueue = nil;
-    mSystemLayer = nil;
 
-    MTROTAUnsolicitedBDXMessageHandler::GetInstance()->OnDelegateDestroyed(this);
+    if (mNeedToCallTransferSessionEnd)
+    {
+        InvokeTransferSessionEndCallback(CHIP_ERROR_INTERNAL);
+    }
+
+    MTROTAUnsolicitedBDXMessageHandler::GetInstance()->OnTransferHandlerDestroyed(this);
     mOTAImageTransferHandlerWrapper.otaImageTransferHandler = nullptr;
 }
 
-CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::OutputEvent & event)
+CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSession::OutputEventType eventType)
 {
     assertChipStackLockedByCurrentThread();
 
-    VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
     uint16_t fdl = 0;
     auto fd = mTransfer.GetFileDesignator(fdl);
     VerifyOrReturnError(fdl <= bdx::kMaxFileDesignatorLen, CHIP_ERROR_INVALID_ARGUMENT);
@@ -106,7 +114,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
 
     auto offset = @(mTransfer.GetStartOffset());
 
-    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mPeer.GetFabricIndex()];
     VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
     MTROTAImageTransferHandlerWrapper * __weak weakWrapper = mOTAImageTransferHandlerWrapper;
@@ -115,6 +123,8 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
         [controller
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
+
+                TransferSession::OutputEventType outputEventType = eventType;
 
                 // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
                 MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
@@ -125,7 +135,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
                 if (error != nil) {
                     CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
                     LogErrorOnFailure(err);
-                    OnTransferSessionEnd(event);
+                    NotifyEventHandled(outputEventType, err);
                     return;
                 }
 
@@ -140,7 +150,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
 
                 CHIP_ERROR err = mTransfer.AcceptTransfer(acceptData);
                 LogErrorOnFailure(err);
-                AsyncResponder::NotifyEventHandled(event, err);
+                NotifyEventHandled(outputEventType, err);
             }
                           errorHandler:^(NSError *) {
                               // Not much we can do here, but if the controller is shut down we
@@ -148,7 +158,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
                           }];
     };
 
-    auto nodeId = @(mNodeId.Value());
+    auto nodeId = @(mPeer.GetNodeId());
 
     auto strongDelegate = mDelegate;
     auto delegateQueue = mDelegateNotificationQueue;
@@ -173,36 +183,24 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
                                                  completionHandler:completionHandler];
         }
     });
+    mNeedToCallTransferSessionEnd = true;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(TransferSession::OutputEvent & event)
+void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR error)
 {
-    assertChipStackLockedByCurrentThread();
-
-    VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    if (event.EventType == TransferSession::OutputEventType::kTransferTimeout) {
-        error = CHIP_ERROR_TIMEOUT;
-    } else if (event.EventType != TransferSession::OutputEventType::kAckEOFReceived) {
-        error = CHIP_ERROR_INTERNAL;
-    }
-
-    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
-    VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
-    auto nodeId = @(mNodeId.Value());
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mPeer.GetFabricIndex()];
+    VerifyOrReturn(controller != nil);
+    auto nodeId = @(mPeer.GetNodeId());
 
     auto strongDelegate = mDelegate;
     auto delegateQueue = mDelegateNotificationQueue;
     if (strongDelegate == nil || delegateQueue == nil) {
-        error = CHIP_ERROR_INCORRECT_STATE;
-        LogErrorOnFailure(error);
-        AsyncResponder::NotifyEventHandled(event, error);
-        return error;
+        LogErrorOnFailure(CHIP_ERROR_INCORRECT_STATE);
+        return;
     }
 
+    mNeedToCallTransferSessionEnd = false;
     if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {
         dispatch_async(delegateQueue, ^{
             [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId
@@ -210,11 +208,29 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(TransferSession::Out
                                                            error:[MTRError errorForCHIPErrorCode:error]];
         });
     }
-    AsyncResponder::NotifyEventHandled(event, error);
+}
+
+CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(const TransferSession::OutputEventType eventType)
+{
+    assertChipStackLockedByCurrentThread();
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    if (eventType == TransferSession::OutputEventType::kTransferTimeout) {
+        error = CHIP_ERROR_TIMEOUT;
+    } else if (eventType != TransferSession::OutputEventType::kAckEOFReceived) {
+        error = CHIP_ERROR_INTERNAL;
+    }
+
+    InvokeTransferSessionEndCallback(error);
+
+    if (error == CHIP_NO_ERROR)
+    {
+        NotifyEventHandled(eventType, error);
+    }
     return error;
 }
 
-CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent & event)
+CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::OutputEventType eventType, uint64_t bytesToSkip)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -222,12 +238,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent
     auto blockSize = @(mTransfer.GetTransferBlockSize());
     auto blockIndex = @(mTransfer.GetNextBlockNum());
 
-    auto bytesToSkip = @(0);
-    if (event.EventType == TransferSession::OutputEventType::kQueryWithSkipReceived) {
-        bytesToSkip = @(event.bytesToSkip.BytesToSkip);
-    }
-
-    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mPeer.GetFabricIndex()];
     VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
     MTROTAImageTransferHandlerWrapper * __weak weakWrapper = mOTAImageTransferHandlerWrapper;
@@ -237,6 +248,8 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
 
+                TransferSession::OutputEventType outputEventType = eventType;
+
                 // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
                 MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
                 if (!strongWrapper || !strongWrapper.otaImageTransferHandler) {
@@ -244,7 +257,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent
                 }
 
                 if (data == nil) {
-                    AsyncResponder::NotifyEventHandled(event, CHIP_ERROR_INCORRECT_STATE);
+                    NotifyEventHandled(outputEventType, CHIP_ERROR_INCORRECT_STATE);
                     return;
                 }
 
@@ -255,16 +268,17 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent
 
                 CHIP_ERROR err = mTransfer.PrepareBlock(blockData);
                 LogErrorOnFailure(err);
-                AsyncResponder::NotifyEventHandled(event, err);
+                NotifyEventHandled(outputEventType, err);
             }
                           errorHandler:^(NSError *) {
-                              // Not much we can do here
+                              // Not much we can do here, but if the controller is shut down we
+                              // should already have been destroyed anyway.
                           }];
     };
 
     // TODO Handle MaxLength
 
-    auto nodeId = @(mNodeId.Value());
+    auto nodeId = @(mPeer.GetNodeId());
 
     auto strongDelegate = mDelegate;
     auto delegateQueue = mDelegateNotificationQueue;
@@ -280,14 +294,14 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent
                                          controller:controller
                                           blockSize:blockSize
                                          blockIndex:blockIndex
-                                        bytesToSkip:bytesToSkip
+                                        bytesToSkip:@(bytesToSkip)
                                          completion:completionHandler];
         } else {
             [strongDelegate handleBDXQueryForNodeID:nodeId
                                          controller:controller
                                           blockSize:blockSize
                                          blockIndex:blockIndex
-                                        bytesToSkip:bytesToSkip
+                                        bytesToSkip:@(bytesToSkip)
                                   completionHandler:completionHandler];
         }
     });
@@ -298,15 +312,17 @@ void MTROTAImageTransferHandler::HandleTransferSessionOutput(TransferSession::Ou
 {
     VerifyOrReturn(mDelegate != nil);
 
-    ChipLogError(BDX, "OutputEvent type: %s", event.ToString(event.EventType));
+    TransferSession::OutputEventType eventType = event.EventType;
+
+    ChipLogError(BDX, "OutputEvent type: %s", event.ToString(eventType));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     switch (event.EventType) {
     case TransferSession::OutputEventType::kInitReceived:
-        err = OnTransferSessionBegin(event);
+        err = OnTransferSessionBegin(eventType);
         if (err != CHIP_NO_ERROR) {
             LogErrorOnFailure(err);
-            AsyncResponder::NotifyEventHandled(event, err);
+            NotifyEventHandled(eventType, err);
         }
         break;
     case TransferSession::OutputEventType::kStatusReceived:
@@ -315,28 +331,29 @@ void MTROTAImageTransferHandler::HandleTransferSessionOutput(TransferSession::Ou
     case TransferSession::OutputEventType::kAckEOFReceived:
     case TransferSession::OutputEventType::kInternalError:
     case TransferSession::OutputEventType::kTransferTimeout:
-        err = OnTransferSessionEnd(event);
+        err = OnTransferSessionEnd(eventType);
         if (err != CHIP_NO_ERROR) {
             LogErrorOnFailure(err);
-            AsyncResponder::NotifyEventHandled(event, err);
+            NotifyEventHandled(eventType, err);
         }
         break;
     case TransferSession::OutputEventType::kQueryWithSkipReceived:
     case TransferSession::OutputEventType::kQueryReceived:
-        err = OnBlockQuery(event);
+    {
+        uint64_t bytesToSkip = (eventType == TransferSession::OutputEventType::kQueryWithSkipReceived ? event.bytesToSkip.BytesToSkip : 0);
+        err = OnBlockQuery(eventType, bytesToSkip);
         if (err != CHIP_NO_ERROR) {
             LogErrorOnFailure(err);
-            AsyncResponder::NotifyEventHandled(event, err);
+            NotifyEventHandled(eventType, err);
         }
         break;
+    }
     case TransferSession::OutputEventType::kNone:
     case TransferSession::OutputEventType::kAckReceived:
-        // Nothing to do.
-        break;
     case TransferSession::OutputEventType::kAcceptReceived:
     case TransferSession::OutputEventType::kBlockReceived:
     default:
-        // Should never happens.
+        // Should never happen since this implements an OTA provider in BDX Receiver role.
         chipDie();
         break;
     }
@@ -349,24 +366,18 @@ void MTROTAImageTransferHandler::DestroySelf()
     delete this;
 }
 
-CHIP_ERROR MTROTAImageTransferHandler::ConfigureState(chip::FabricIndex fabricIndex, chip::NodeId nodeId)
+ScopedNodeId MTROTAImageTransferHandler::GetPeerScopedNodeId(Messaging::ExchangeContext * ec)
 {
-    assertChipStackLockedByCurrentThread();
+    auto sessionHandle = ec->GetSessionHandle();
 
-    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:fabricIndex];
-    VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
-
-    mDelegate = controller.otaProviderDelegate;
-    mDelegateNotificationQueue = controller.otaProviderDelegateQueue;
-
-    // We should have already checked that this controller supports OTA.
-    VerifyOrReturnError(mDelegate != nil, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mDelegateNotificationQueue != nil, CHIP_ERROR_INCORRECT_STATE);
-
-    mFabricIndex.SetValue(fabricIndex);
-    mNodeId.SetValue(nodeId);
-
-    return CHIP_NO_ERROR;
+    if (sessionHandle->IsSecureSession())
+    {
+        return sessionHandle->AsSecureSession()->GetPeer();
+    } else if (sessionHandle->IsGroupSession())
+    {
+        return sessionHandle->AsIncomingGroupSession()->GetPeer();
+    }
+    return ScopedNodeId();
 }
 
 CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
@@ -384,15 +395,10 @@ CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
     //
     // If init succeeds, or is not needed, we send the message to the AsyncTransferFacilitator for processing.
     if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
-        NodeId nodeId = ec->GetSessionHandle()->GetPeer().GetNodeId();
-        FabricIndex fabricIndex = ec->GetSessionHandle()->GetFabricIndex();
-
-        if (nodeId != kUndefinedNodeId && fabricIndex != kUndefinedFabricIndex) {
-            err = Init(&DeviceLayer::SystemLayer(), ec, fabricIndex, nodeId);
-            if (err != CHIP_NO_ERROR) {
-                ChipLogError(Controller, "OnMessageReceived: Failed to prepare for transfer for BDX: %" CHIP_ERROR_FORMAT, err);
-                return err;
-            }
+        err = Init(ec);
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(Controller, "OnMessageReceived: Failed to prepare for transfer for BDX: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
         }
     }
 
