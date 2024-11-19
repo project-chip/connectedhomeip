@@ -275,7 +275,7 @@ int openiotsdk_chip_run(void)
         ChipLogError(NotSpecified, "Initialize static resources before server init failed: %s", err.AsString());
         return EXIT_FAILURE;
     }
-    initParams.dataModelProvider             = chip::app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider             = app::CodegenDataModelProviderInstance();
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
