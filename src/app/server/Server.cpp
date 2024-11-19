@@ -170,18 +170,15 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SetAttributePersistenceProvider(&mAttributePersister);
     SetSafeAttributePersistenceProvider(&mAttributePersister);
 
-    // Until all ember calls are handled by the data model provider ensure that this is done
-    // early enough.
-    // In particular ember initialization (emberAfInit) is done in InitDataModelHandler which happens
-    // below and may load NVM attributes, so data model should be initialized (e.g. as we transition to
-    // having data model provider initialization starting up ember prerequisites). The call stack is:
-    //    - InitDataModelHandler -> emberAfInit -> emberAfInitializeAttributes -> emAfLoadAttributeDefaults
-    //      may load from persistent storage.
+    // SetDataModelProvider() actually initializes/starts the provider.  We need
+    // to preserve the following ordering guarantees:
     //
-    // As we expect the CodegenDatamodelProvider to everntually be responsible for ember attribute
-    // persistence initialization, we place this:
-    //   - After SetSefeAttributePersistenceProvider (as this is the global persistence provider)
-    //   - Before InitDataModelHandler to allow data model startup to set up persistence for ember as needed
+    // 1) Provider initialization (under SetDataModelProvider) happens after
+    //    SetSafeAttributePersistenceProvider, since the provider can then use
+    //    the safe persistence provider to implement and initialize its own attribute persistence logic.
+    // 2) For now, provider initialization happens before InitDataModelHandler(), which depends
+    //    on atttribute persistence being already set up before it runs.  Longer-term, the logic from
+    //    InitDataModelHandler should just move into the codegen provider.
     chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
     {
