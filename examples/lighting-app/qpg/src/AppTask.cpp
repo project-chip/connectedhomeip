@@ -41,6 +41,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/support/TypeTraits.h>
 
 #include <app/util/persistence/DeferredAttributePersistenceProvider.h>
@@ -113,9 +114,7 @@ DeferredAttribute gPersisters[] = {
 
 };
 
-DeferredAttributePersistenceProvider gDeferredAttributePersister(Server::GetInstance().GetDefaultAttributePersister(),
-                                                                 Span<DeferredAttribute>(gPersisters, 3),
-                                                                 System::Clock::Milliseconds32(5000));
+DeferredAttributePersistenceProvider gDeferredAttributePersister;
 
 /**********************************************************
  * Identify Callbacks
@@ -277,7 +276,11 @@ void AppTask::InitServer(intptr_t arg)
 
     chip::Server::GetInstance().Init(initParams);
 
-    app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
+    // Server will initialize a persistence provider
+    VerifyOrDie(GetAttributePersistenceProvider() != nullptr);
+    VerifyOrDie(gDeferredAttributePersister.Init(*GetAttributePersistenceProvider(), Span<DeferredAttribute>(gPersisters, 3),
+                                                 System::Clock::Milliseconds32(5000)) == CHIP_NO_ERROR);
+    SetAttributePersistenceProvider(&gDeferredAttributePersister);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);

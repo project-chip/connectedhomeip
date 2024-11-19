@@ -111,9 +111,8 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 // be written, so it must live so long as the DeferredAttributePersistenceProvider object.
 DeferredAttribute gCurrentLevelPersister(ConcreteAttributePath(kLightEndpointId, Clusters::LevelControl::Id,
                                                                Clusters::LevelControl::Attributes::CurrentLevel::Id));
-DeferredAttributePersistenceProvider gDeferredAttributePersister(Server::GetInstance().GetDefaultAttributePersister(),
-                                                                 Span<DeferredAttribute>(&gCurrentLevelPersister, 1),
-                                                                 System::Clock::Milliseconds32(5000));
+
+DeferredAttributePersistenceProvider gDeferredAttributePersister;
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
@@ -278,7 +277,13 @@ CHIP_ERROR AppTask::Init()
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-    app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
+
+    // Server will initialize a persistence provider
+    VerifyOrDie(GetAttributePersistenceProvider() != nullptr);
+    VerifyOrDie(gDeferredAttributePersister.Init(*GetAttributePersistenceProvider(),
+                                                 Span<DeferredAttribute>(&gCurrentLevelPersister, 1),
+                                                 System::Clock::Milliseconds32(5000)) == CHIP_NO_ERROR);
+    SetAttributePersistenceProvider(&gDeferredAttributePersister);
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
