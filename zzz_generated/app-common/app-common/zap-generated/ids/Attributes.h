@@ -7077,6 +7077,68 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace CameraAvStreamManagement
 
+namespace CameraAvSettingsUserLevelManagement {
+namespace Attributes {
+
+namespace MptzPosition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MptzPosition
+
+namespace MaxPresets {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MaxPresets
+
+namespace MptzPresets {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MptzPresets
+
+namespace DptzRelativeMove {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace DptzRelativeMove
+
+namespace ZoomMax {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ZoomMax
+
+namespace TiltMin {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace TiltMin
+
+namespace TiltMax {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace TiltMax
+
+namespace PanMin {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace PanMin
+
+namespace PanMax {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace PanMax
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CameraAvSettingsUserLevelManagement
+
 namespace WebRTCTransportProvider {
 namespace Attributes {
 

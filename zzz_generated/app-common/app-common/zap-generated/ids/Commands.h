@@ -1907,6 +1907,40 @@ static constexpr CommandId Id = 0x00000010;
 } // namespace Commands
 } // namespace CameraAvStreamManagement
 
+namespace CameraAvSettingsUserLevelManagement {
+namespace Commands {
+
+namespace MptzSetPosition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace MptzSetPosition
+
+namespace MptzRelativeMove {
+static constexpr CommandId Id = 0x00000001;
+} // namespace MptzRelativeMove
+
+namespace MptzMoveToPreset {
+static constexpr CommandId Id = 0x00000002;
+} // namespace MptzMoveToPreset
+
+namespace MptzSavePreset {
+static constexpr CommandId Id = 0x00000003;
+} // namespace MptzSavePreset
+
+namespace MptzRemovePreset {
+static constexpr CommandId Id = 0x00000004;
+} // namespace MptzRemovePreset
+
+namespace DptzSetViewport {
+static constexpr CommandId Id = 0x00000005;
+} // namespace DptzSetViewport
+
+namespace DptzRelativeMove {
+static constexpr CommandId Id = 0x00000006;
+} // namespace DptzRelativeMove
+
+} // namespace Commands
+} // namespace CameraAvSettingsUserLevelManagement
+
 namespace WebRTCTransportProvider {
 namespace Commands {
 

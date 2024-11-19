@@ -131,6 +131,7 @@ Generally regenerate using one of:
 |       1296 |      0x510 | ContentAppObserver                                      |
 |       1360 |      0x550 | ZoneManagement                                          |
 |       1361 |      0x551 | CameraAvStreamManagement                                |
+|       1362 |      0x552 | CameraAvSettingsUserLevelManagement                     |
 |       1363 |      0x553 | WebRTCTransportProvider                                 |
 |       1364 |      0x554 | WebRTCTransportRequestor                                |
 |       1366 |      0x556 | Chime                                                   |
