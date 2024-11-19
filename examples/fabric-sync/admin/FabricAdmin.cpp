@@ -86,13 +86,14 @@ FabricAdmin::CommissionRemoteBridge(Controller::CommissioningWindowPasscodeParam
 
     if (err == CHIP_NO_ERROR)
     {
-        NodeId nodeId = DeviceManager::Instance().GetNextAvailableNodeId();
+        mNodeId = DeviceManager::Instance().GetNextAvailableNodeId();
 
         // After responding with RequestCommissioningApproval to the node where the client initiated the
         // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
         usleep(kCommissionPrepareTimeMs * 1000);
 
-        DeviceManager::Instance().PairRemoteDevice(nodeId, code.c_str());
+        PairingManager::Instance().SetPairingDelegate(this);
+        DeviceManager::Instance().PairRemoteDevice(mNodeId, code.c_str());
     }
     else
     {
@@ -113,6 +114,28 @@ CHIP_ERROR FabricAdmin::KeepActive(ScopedNodeId scopedNodeId, uint32_t stayActiv
 
     DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
+}
+
+void FabricAdmin::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
+{
+    if (mNodeId != deviceId)
+    {
+        ChipLogError(NotSpecified, "Tried to pair a non-bridge device (0x:" ChipLogFormatX64 ") with result: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(deviceId), err.Format());
+        return;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        DeviceManager::Instance().SetRemoteBridgeNodeId(deviceId);
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to pair bridge device (0x:" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(deviceId), err.Format());
+    }
+
+    mNodeId = kUndefinedNodeId;
 }
 
 void FabricAdmin::ScheduleSendingKeepActiveOnCheckIn(ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
