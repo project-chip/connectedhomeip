@@ -203,7 +203,7 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Bridged Device Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Bridged Device Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>REACHABLE</requireAttribute>
             </include>
             <include cluster="Power Source Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
