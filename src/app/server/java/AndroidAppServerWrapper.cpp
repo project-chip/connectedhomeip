@@ -17,7 +17,7 @@
  */
 
 #include "AndroidAppServerWrapper.h"
-#include <app/codegen-data-model-provider/Instance.h>
+
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
