@@ -169,6 +169,7 @@ class ProviderMetadataTree
 public:
     virtual ~ProviderMetadataTree() = default;
 
+    // This iteration will list all the endpoints in the data model
     virtual EndpointEntry FirstEndpoint()                              = 0;
     virtual EndpointEntry NextEndpoint(EndpointId before)              = 0;
     virtual std::optional<EndpointInfo> GetEndpointInfo(EndpointId id) = 0;
@@ -178,6 +179,7 @@ public:
     virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;
     virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
 
+    // This iteration describes semantic tags registered on an endpoint
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
     virtual std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint)                              = 0;
     virtual std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) = 0;
@@ -189,7 +191,7 @@ public:
 
     // This iteration will list all client clusters on a given endpoint
     // As the client cluster is only a client without any attributes/commands,
-    // this function only returns cluster path.
+    // these functions only return the cluster path.
     virtual ConcreteClusterPath FirstClientCluster(EndpointId endpoint)               = 0;
     virtual ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) = 0;
 
