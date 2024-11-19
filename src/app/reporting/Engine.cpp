@@ -99,7 +99,7 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
             return std::nullopt;
         }
 
-        // We want to return "success" (i.e. nulopt) IF AND ONLY IF attribute exists and is readable (has read privilege).
+        // We want to return "success" (i.e. nulopt) IF AND ONLY IF the attribute exists and is readable (has read privilege).
         // Since the Access control check above may have passed with kView, we do another check here:
         //    - Attribute exists (info has value)
         //    - Attribute is readable (readProvilege has value) and not "write only"
