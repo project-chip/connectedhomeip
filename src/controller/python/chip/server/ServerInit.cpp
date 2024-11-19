@@ -18,7 +18,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
@@ -162,7 +161,6 @@ PyChipError pychip_server_native_init()
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     PyReturnErrorOnFailure(ToPyChipError(initParams.InitializeStaticResourcesBeforeServerInit()));
-    initParams.dataModelProvider             = chip::app::CodegenDataModelProviderInstance();
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
