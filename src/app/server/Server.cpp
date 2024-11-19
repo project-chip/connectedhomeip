@@ -126,7 +126,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.operationalKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.opCertStore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.reportScheduler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(initParams.dataModelProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
@@ -161,11 +160,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err = mSafeAttributePersister.Init(mDeviceStorage));
     SetSafeAttributePersistenceProvider(&mSafeAttributePersister);
 
-    // Ember requires a persistence provider:
+    // Temporary setup until a full ember decoupling (including the InitDataModelHandler) is done outside
+    // of app code:
     //   - InitDataModelHandler uses ember init (so needs a data model provider)
-    //   - CodegenDataModelProvider requires a persistence provider to use, so this must be called late
-    //     enough, after SetSafeAttributePersistenceProvider
-    chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
+    //   - Ember requires a persistence provider which is available currently from CodegenDataModelProvider, so
+    //     ensure the codegen data model provider is initialized.
+    // TODO: this should eventually become a `SetDataModelProvider` that is based on `initParams`
+    (void) chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
 
     {
         FabricTable::InitParams fabricTableInitParams;
