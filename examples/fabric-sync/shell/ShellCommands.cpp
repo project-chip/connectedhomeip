@@ -17,6 +17,7 @@
 #include "ShellCommands.h"
 #include "AddBridgeCommand.h"
 #include "AddDeviceCommand.h"
+#include "PairDeviceCommand.h"
 #include "RemoveBridgeCommand.h"
 #include "RemoveDeviceCommand.h"
 #include "SyncDeviceCommand.h"
@@ -46,6 +47,7 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout,
                     "  add-device       Pair a device to local fabric. Usage: app add-device node-id setup-pin-code "
                     "device-remote-ip device-remote-port\r\n");
+    streamer_printf(sout, "  pair-device      Pair a device to local fabric. Usage: app pair-device node-id code\r\n");
     streamer_printf(sout, "  remove-device    Remove a device from the local fabric. Usage: app remove-device node-id\r\n");
     streamer_printf(sout, "  sync-device      Sync a device from other ecosystem. Usage: app sync-device endpointid\r\n");
     streamer_printf(sout, "\r\n");
@@ -145,6 +147,36 @@ static CHIP_ERROR HandleAddDeviceCommand(int argc, char ** argv)
     return result;
 }
 
+static CHIP_ERROR HandlePairDeviceCommand(int argc, char ** argv)
+{
+    if (argc != 3)
+    {
+        fprintf(stderr, "Invalid arguments. Usage: app pair-device node-id code\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Check if there is already an active command
+    if (commands::CommandRegistry::Instance().IsCommandActive())
+    {
+        fprintf(stderr, "Another command is currently active. Please wait until it completes.\n");
+        return CHIP_ERROR_BUSY;
+    }
+
+    // Parse arguments
+    chip::NodeId nodeId    = static_cast<chip::NodeId>(strtoull(argv[1], nullptr, 10));
+    const char * setUpCode = argv[2];
+
+    auto command = std::make_unique<commands::PairDeviceCommand>(nodeId, setUpCode);
+
+    CHIP_ERROR result = command->RunCommand();
+    if (result == CHIP_NO_ERROR)
+    {
+        commands::CommandRegistry::Instance().SetActiveCommand(std::move(command));
+    }
+
+    return result;
+}
+
 static CHIP_ERROR HandleRemoveDeviceCommand(int argc, char ** argv)
 {
     if (argc != 2)
@@ -226,6 +258,10 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
     else if (strcmp(argv[0], "add-device") == 0)
     {
         return HandleAddDeviceCommand(argc, argv);
+    }
+    else if (strcmp(argv[0], "pair-device") == 0)
+    {
+        return HandlePairDeviceCommand(argc, argv);
     }
     else if (strcmp(argv[0], "remove-device") == 0)
     {
