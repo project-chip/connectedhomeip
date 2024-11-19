@@ -29,6 +29,10 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 LogProvider LogProvider::sInstance;
 LogProvider::CrashLogContext LogProvider::sCrashLogContext;
 
+#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+static uint32_t sIntentSize = CONFIG_END_USER_BUFFER_SIZE;
+#endif
+
 namespace {
 bool IsValidIntent(IntentEnum intent)
 {
@@ -129,6 +133,7 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
             ChipLogError(DeviceLayer, "Failed to retrieve data: %s", chip::ErrorStr(err));
             return err;
         }
+        sIntentSize = endUserSupportSpan.size();
         // Now, assign the span to the EndUserSupport object or whatever is required
         context->EndUserSupport.span = endUserSupportSpan;
 #else
