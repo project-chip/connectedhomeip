@@ -72,11 +72,7 @@ void DeviceManager::UpdateLastUsedNodeId(NodeId nodeId)
 void DeviceManager::SetRemoteBridgeNodeId(chip::NodeId nodeId)
 {
     mRemoteBridgeNodeId = nodeId;
-
-    if (mRemoteBridgeNodeId != kUndefinedNodeId)
-    {
-        mCommissionerControl.Init(PairingManager::Instance().CurrentCommissioner(), mRemoteBridgeNodeId, kAggregatorEndpointId);
-    }
+    ChipLogProgress(NotSpecified, "Set remote bridge NodeId:" ChipLogFormatX64, ChipLogValueX64(mRemoteBridgeNodeId));
 }
 
 void DeviceManager::AddSyncedDevice(const SyncedDevice & device)
@@ -129,6 +125,18 @@ void DeviceManager::RemoveSyncedDevice(chip::ScopedNodeId scopedNodeId)
     mSyncedDevices.erase(*device);
     ChipLogProgress(NotSpecified, "Removed synced device: NodeId:" ChipLogFormatX64 ", EndpointId %u",
                     ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
+}
+
+void DeviceManager::InitCommissionerControl()
+{
+    if (mRemoteBridgeNodeId != kUndefinedNodeId)
+    {
+        mCommissionerControl.Init(PairingManager::Instance().CurrentCommissioner(), mRemoteBridgeNodeId, kAggregatorEndpointId);
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to initialize the Commissioner Control delegate");
+    }
 }
 
 void DeviceManager::OpenLocalBridgeCommissioningWindow(uint32_t iterations, uint16_t commissioningTimeoutSec,

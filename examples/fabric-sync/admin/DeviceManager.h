@@ -77,6 +77,11 @@ public:
     void RemoveSyncedDevice(chip::ScopedNodeId scopedNodeId);
 
     /**
+     * @brief Initializes the CommissionerControl for fabric sync setup process.
+     */
+    void InitCommissionerControl();
+
+    /**
      * @brief Determines whether a given nodeId corresponds to the remote bridge device.
      *
      * @param nodeId            The ID of the node being checked.
