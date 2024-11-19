@@ -258,6 +258,23 @@ static_library("qpg_thermostat_factorydata_lib") {
   public_configs = [ ":qpg_retain_factorydata" ]
 }
 
+qpg_make_build("qpg_doorwindow_factorydata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_doorWindow_static_pake/libFactoryData_doorWindow_static_pake.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_doorWindow_static_pake",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FactoryData_doorWindow_static_pake",
+  ]
+}
+
+static_library("qpg_doorwindow_factorydata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_doorwindow_factorydata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_doorWindow_static_pake/libFactoryData_doorWindow_static_pake.a" ]
+  public_configs = [ ":qpg_retain_factorydata" ]
+}
+
 config("qpg_retain_factorydata") {
   ldflags = [
     "-Wl,-u_binary_factory_data_bin_start",
@@ -326,4 +343,20 @@ qpg_make_build("qpg_thermostat_firmwaredata") {
 static_library("qpg_thermostat_firmwaredata_lib") {
   deps = [ "${chip_root}/third_party/qpg_sdk:qpg_thermostat_firmwaredata" ]
   libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_thermostaticRadiatorValve/libFirmwareData_thermostaticRadiatorValve.a" ]
+}
+
+qpg_make_build("qpg_doorwindow_firmwaredata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_doorWindow/libFirmwareData_doorWindow.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/FactoryData/Makefile.FirmwareData_doorWindow",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FirmwareData_doorWindow",
+  ]
+}
+static_library("qpg_doorwindow_firmwaredata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_doorwindow_firmwaredata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_doorWindow/libFirmwareData_doorWindow.a" ]
 }

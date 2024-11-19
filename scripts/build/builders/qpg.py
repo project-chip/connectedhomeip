@@ -27,6 +27,7 @@ class QpgApp(Enum):
     PERSISTENT_STORAGE = auto()
     LIGHT_SWITCH = auto()
     THERMOSTAT = auto()
+    CONTACT_SENSOR = auto()
 
     def ExampleName(self):
         if self == QpgApp.LIGHT:
@@ -41,6 +42,8 @@ class QpgApp(Enum):
             return 'light-switch-app'
         elif self == QpgApp.THERMOSTAT:
             return 'thermostat'
+        elif self == QpgApp.CONTACT_SENSOR:
+            return 'contact-sensor-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -57,6 +60,8 @@ class QpgApp(Enum):
             return 'chip-qpg6105-light-switch-example'
         elif self == QpgApp.THERMOSTAT:
             return 'chip-qpg6105-thermostat-example'
+        elif self == QpgApp.CONTACT_SENSOR:
+            return 'chip-qpg6105-contact-sensor-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -73,6 +78,8 @@ class QpgApp(Enum):
             return 'light_switch_app.out.flashbundle.txt'
         elif self == QpgApp.THERMOSTAT:
             return 'thermostat.out.flashbundle.txt'
+        elif self == QpgApp.CONTACT_SENSOR:
+            return 'contact_sensor_app.out.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 
