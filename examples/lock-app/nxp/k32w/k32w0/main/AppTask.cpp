@@ -608,23 +608,23 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
         }
     }
 
-#if CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_ONBOARDING
     if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
     {
-        if (!NFCMgr().IsTagEmulationStarted())
+        if (!NFCOnboardingMgr().IsTagEmulationStarted())
         {
             K32W_LOG("NFC Tag emulation is already stopped!");
         }
         else
         {
-            NFCMgr().StopTagEmulation();
+            NFCOnboardingMgr().StopTagEmulation();
             K32W_LOG("Stopped NFC Tag Emulation!");
         }
     }
     else if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange &&
              event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
     {
-        if (NFCMgr().IsTagEmulationStarted())
+        if (NFCOnboardingMgr().IsTagEmulationStarted())
         {
             K32W_LOG("NFC Tag emulation is already started!");
         }

@@ -29,20 +29,20 @@
 namespace chip {
 namespace DeviceLayer {
 
-class NFCManagerImpl;
+class NFCOnboardingManagerImpl;
 
 /**
- * @brief Defines an abstract interface for programming an NFC Tag.
+ * @brief Defines an abstract interface for programming onboarding data in an NFC Tag.
  *
- * NFC Tag can be used in Project CHIP to share commissioning information such
+ * NFC Tag can be used in Project CHIP to share onboarding information such
  * as the device discriminator and PIN code with a commissioner. This class
  * provides an interface to set contents of a programmable NFC Tag.
  */
-class NFCManager
+class NFCOnboardingManager
 {
 public:
     /**
-     * Initializes the NFCManager singleton object.
+     * Initializes the NFCOnboardingManager singleton object.
      *
      * @return CHIP_NO_ERROR On success.
      */
@@ -75,70 +75,70 @@ public:
 
 protected:
     // Construction/destruction limited to subclasses.
-    NFCManager()  = default;
-    ~NFCManager() = default;
+    NFCOnboardingManager()  = default;
+    ~NFCOnboardingManager() = default;
 
     // No copy, move or assignment.
-    NFCManager(const NFCManager &)     = delete;
-    NFCManager(NFCManager &&)          = delete;
-    void operator=(const NFCManager &) = delete;
+    NFCOnboardingManager(const NFCOnboardingManager &)     = delete;
+    NFCOnboardingManager(NFCOnboardingManager &&)          = delete;
+    void operator=(const NFCOnboardingManager &) = delete;
 
-    // NFCManager implementation getters.
-    NFCManagerImpl * Impl();
-    const NFCManagerImpl * Impl() const;
+    // NFCOnboardingManager implementation getters.
+    NFCOnboardingManagerImpl * Impl();
+    const NFCOnboardingManagerImpl * Impl() const;
 };
 
 /**
- * Returns a reference to the public interface of the NFCManager singleton object.
+ * Returns a reference to the public interface of the NFCOnboardingManager singleton object.
  */
-extern NFCManager & NFCMgr();
+extern NFCOnboardingManager & NFCOnboardingMgr();
 
 /**
- * Returns a reference to the platform-specific NFCManager singleton object.
+ * Returns a reference to the platform-specific NFCOnboardingManager singleton object.
  */
-extern NFCManagerImpl & NFCMgrImpl();
+extern NFCOnboardingManagerImpl & NFCOnboardingMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip
 
-#ifdef EXTERNAL_NFCMANAGERIMPL_HEADER
-#include EXTERNAL_NFCMANAGERIMPL_HEADER
+#ifdef EXTERNAL_NFC_ONBOARDING_MANAGER_IMPL_HEADER
+#include EXTERNAL_NFC_ONBOARDING_MANAGER_IMPL_HEADER
 #elif defined(CHIP_DEVICE_LAYER_TARGET)
-#define NFCMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/NFCManagerImpl.h>
-#include NFCMANAGERIMPL_HEADER
+#define NFC_ONBOARDING_MANAGER_IMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/NFCOnboardingManagerImpl.h>
+#include NFC_ONBOARDING_MANAGER_IMPL_HEADER
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 namespace chip {
 namespace DeviceLayer {
 
-inline CHIP_ERROR NFCManager::Init()
+inline CHIP_ERROR NFCOnboardingManager::Init()
 {
     return Impl()->_Init();
 }
 
-inline CHIP_ERROR NFCManager::StartTagEmulation(const char * payload, size_t payloadLength)
+inline CHIP_ERROR NFCOnboardingManager::StartTagEmulation(const char * payload, size_t payloadLength)
 {
     return Impl()->_StartTagEmulation(payload, payloadLength);
 }
 
-inline CHIP_ERROR NFCManager::StopTagEmulation()
+inline CHIP_ERROR NFCOnboardingManager::StopTagEmulation()
 {
     return Impl()->_StopTagEmulation();
 }
 
-inline bool NFCManager::IsTagEmulationStarted() const
+inline bool NFCOnboardingManager::IsTagEmulationStarted() const
 {
     return Impl()->_IsTagEmulationStarted();
 }
 
-inline NFCManagerImpl * NFCManager::Impl()
+inline NFCOnboardingManagerImpl * NFCOnboardingManager::Impl()
 {
-    return static_cast<NFCManagerImpl *>(this);
+    return static_cast<NFCOnboardingManagerImpl *>(this);
 }
 
-inline const NFCManagerImpl * NFCManager::Impl() const
+inline const NFCOnboardingManagerImpl * NFCOnboardingManager::Impl() const
 {
-    return static_cast<const NFCManagerImpl *>(this);
+    return static_cast<const NFCOnboardingManagerImpl *>(this);
 }
 
 } // namespace DeviceLayer

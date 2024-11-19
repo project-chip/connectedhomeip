@@ -117,7 +117,7 @@ void Engine::RegisterDefaultCommands()
     RegisterDeviceCommands();
     RegisterOnboardingCodesCommands();
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING
     RegisterNFCCommands();
 #endif
     RegisterDnsCommands();

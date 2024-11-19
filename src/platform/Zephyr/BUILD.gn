@@ -72,10 +72,10 @@ static_library("Zephyr") {
     }
   }
 
-  if (chip_enable_nfc) {
+  if (chip_enable_nfc_onboarding) {
     sources += [
-      "NFCManagerImpl.cpp",
-      "NFCManagerImpl.h",
+      "NFCOnboardingManagerImpl.cpp",
+      "NFCOnboardingManagerImpl.h",
     ]
   }
 

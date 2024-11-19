@@ -466,10 +466,10 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
         UpdateStatusLED();
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#ifdef CONFIG_CHIP_NFC_ONBOARDING
         if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
         {
-            if (NFCMgr().IsTagEmulationStarted())
+            if (NFCOnboardingMgr().IsTagEmulationStarted())
             {
                 LOG_INF("NFC Tag emulation is already started");
             }
@@ -480,7 +480,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCMgr().StopTagEmulation();
+            NFCOnboardingMgr().StopTagEmulation();
         }
 #endif
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;

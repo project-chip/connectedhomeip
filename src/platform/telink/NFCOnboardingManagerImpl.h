@@ -26,12 +26,12 @@ namespace {
 #define NDEF_MSG_BUF_SIZE 128
 } // namespace
 
-class NFCManagerImpl final : public NFCManager
+class NFCOnboardingManagerImpl final : public NFCOnboardingManager
 {
-    friend class NFCManager;
+    friend class NFCOnboardingManager;
 
 private:
-    // ===== Members that implement the NFCManager internal interface.
+    // ===== Members that implement the NFCOnboardingManager internal interface.
 
     CHIP_ERROR _Init();
     CHIP_ERROR _StartTagEmulation(const char * payload, size_t payloadLength);
@@ -43,20 +43,20 @@ private:
     const struct device * dev = DEV_PTR;
     // ===== Members for internal use by the following friends.
 
-    friend NFCManager & NFCMgr();
-    friend NFCManagerImpl & NFCMgrImpl();
+    friend NFCOnboardingManager & NFCOnboardingMgr();
+    friend NFCOnboardingManagerImpl & NFCOnboardingMgrImpl();
 
-    static NFCManagerImpl sInstance;
+    static NFCOnboardingManagerImpl sInstance;
 };
 
-inline NFCManager & NFCMgr()
+inline NFCOnboardingManager & NFCOnboardingMgr()
 {
-    return NFCManagerImpl::sInstance;
+    return NFCOnboardingManagerImpl::sInstance;
 }
 
-inline NFCManagerImpl & NFCMgrImpl()
+inline NFCOnboardingManagerImpl & NFCOnboardingMgrImpl()
 {
-    return NFCManagerImpl::sInstance;
+    return NFCOnboardingManagerImpl::sInstance;
 }
 
 } // namespace DeviceLayer
