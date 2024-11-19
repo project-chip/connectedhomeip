@@ -186,8 +186,8 @@ uint16_t BLEManagerImpl::_NumConnections()
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
 {
-    mAdapterId   = aAdapterId;
-    mIsCentral   = aIsCentral;
+    mAdapterId = aAdapterId;
+    mIsCentral = aIsCentral;
     return CHIP_NO_ERROR;
 }
 
