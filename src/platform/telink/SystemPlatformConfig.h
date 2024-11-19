@@ -62,3 +62,9 @@ struct ChipDeviceEvent;
 #endif
 
 // ========== Platform-specific Configuration Overrides =========
+#ifdef CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION
+#define CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP   1
+#define CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL   0
+#define CHIP_SYSTEM_CONFIG_POOL_USE_HEAP 1
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX 1280
+#endif
