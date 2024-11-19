@@ -75,13 +75,11 @@ CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeVa
 CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
-        size_t index = 0;
-        auto tag     = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetSemanticTagAtIndex(endpoint, index);
+        auto tag = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetFirstSemanticTag(endpoint);
         while (tag.has_value())
         {
             ReturnErrorOnFailure(encoder.Encode(tag.value()));
-            index++;
-            tag = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetSemanticTagAtIndex(endpoint, index);
+            tag = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNextSemanticTag(endpoint, tag.value());
         }
         return CHIP_NO_ERROR;
     });
@@ -190,12 +188,12 @@ CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, 
         }
         else
         {
-            ClusterId clusterId = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstClientCluster(endpoint);
-            while (clusterId != kInvalidClusterId)
+            ConcreteClusterPath clusterPath =
+                InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstClientCluster(endpoint);
+            while (clusterPath.HasValidIds())
             {
-                ReturnErrorOnFailure(encoder.Encode(clusterId));
-                clusterId = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextClientCluster(
-                    ConcreteClusterPath(endpoint, clusterId));
+                ReturnErrorOnFailure(encoder.Encode(clusterPath.mClusterId));
+                clusterPath = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextClientCluster(clusterPath);
             }
         }
 

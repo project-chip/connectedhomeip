@@ -175,7 +175,13 @@ std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::NextDeviceType(
     return std::nullopt;
 }
 
-std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetSemanticTagAtIndex(EndpointId endpoint, size_t index)
+std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetFirstSemanticTag(EndpointId endpoint)
+{
+    return std::nullopt;
+}
+
+std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetNextSemanticTag(EndpointId endpoint,
+                                                                                          const SemanticTag & previous)
 {
     return std::nullopt;
 }
@@ -195,12 +201,12 @@ std::optional<ClusterInfo> TestImCustomDataModel::GetServerClusterInfo(const Con
     return CodegenDataModelProviderInstance()->GetServerClusterInfo(path);
 }
 
-ClusterId TestImCustomDataModel::FirstClientCluster(EndpointId endpoint)
+ConcreteClusterPath TestImCustomDataModel::FirstClientCluster(EndpointId endpoint)
 {
     return CodegenDataModelProviderInstance()->FirstClientCluster(endpoint);
 }
 
-ClusterId TestImCustomDataModel::NextClientCluster(const ConcreteClusterPath & before)
+ConcreteClusterPath TestImCustomDataModel::NextClientCluster(const ConcreteClusterPath & before)
 {
     return CodegenDataModelProviderInstance()->NextClientCluster(before);
 }

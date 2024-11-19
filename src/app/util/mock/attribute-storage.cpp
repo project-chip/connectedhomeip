@@ -240,14 +240,9 @@ chip::EndpointId emberAfEndpointFromIndex(uint16_t index)
 namespace chip {
 namespace app {
 
-bool IsFlatCompositionForEndpointIndex(uint16_t endpointIndex)
+EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
 {
-    return true;
-}
-
-bool IsTreeCompositionForEndpointIndex(uint16_t endpointIndex)
-{
-    return false;
+    return EndpointComposition::kFullFamily;
 }
 
 } // namespace app

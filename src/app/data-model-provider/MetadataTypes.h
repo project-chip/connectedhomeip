@@ -45,7 +45,9 @@ struct EndpointInfo
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
 
-    EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamilyPattern) {}
+    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamilyPattern)
+    {}
+    explicit EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
 };
 
 struct EndpointEntry
@@ -177,7 +179,8 @@ public:
     virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
 
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
-    virtual std::optional<SemanticTag> GetSemanticTagAtIndex(EndpointId endpoint, size_t index) = 0;
+    virtual std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint)                              = 0;
+    virtual std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) = 0;
 
     // This iteration will list all server clusters on a given endpoint
     virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
@@ -185,8 +188,10 @@ public:
     virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
 
     // This iteration will list all client clusters on a given endpoint
-    virtual ClusterId FirstClientCluster(EndpointId endpoint)               = 0;
-    virtual ClusterId NextClientCluster(const ConcreteClusterPath & before) = 0;
+    // As the client cluster is only a client without any attributes/commands,
+    // this function only returns cluster path.
+    virtual ConcreteClusterPath FirstClientCluster(EndpointId endpoint)               = 0;
+    virtual ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) = 0;
 
     // Attribute iteration and accessors provide cluster-level access over
     // attributes

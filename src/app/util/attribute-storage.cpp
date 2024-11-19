@@ -1415,22 +1415,18 @@ bool IsTreeCompositionForEndpoint(EndpointId endpoint)
     return emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isTreeComposition);
 }
 
-bool IsFlatCompositionForEndpointIndex(uint16_t endpointIndex)
+EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
 {
-    if (endpointIndex >= ArraySize(emAfEndpoints))
+    VerifyOrReturnValue(endpointIndex < ArraySize(emAfEndpoints), EndpointComposition::kInvalid);
+    if (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isFlatComposition))
     {
-        return false;
+        return EndpointComposition::kFullFamily;
     }
-    return (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isFlatComposition));
-}
-
-bool IsTreeCompositionForEndpointIndex(uint16_t endpointIndex)
-{
-    if (endpointIndex >= ArraySize(emAfEndpoints))
+    if (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isTreeComposition))
     {
-        return false;
+        return EndpointComposition::kTree;
     }
-    return (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isTreeComposition));
+    return EndpointComposition::kInvalid;
 }
 
 } // namespace app

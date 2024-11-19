@@ -314,6 +314,87 @@ unsigned FindNextDeviceTypeIndex(Span<const EmberAfDeviceType> types, const Data
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
+std::optional<DataModel::EndpointInfo> GetEndpointInfoAtIndex(uint16_t endpointIndex)
+{
+    VerifyOrReturnValue(emberAfEndpointIndexIsEnabled(endpointIndex), std::nullopt);
+    EndpointId parent = emberAfParentEndpointFromIndex(endpointIndex);
+    if (GetCompositionForEndpointIndex(endpointIndex) == EndpointComposition::kFullFamily)
+    {
+        return DataModel::EndpointInfo(parent, DataModel::EndpointCompositionPattern::kFullFamilyPattern);
+    }
+    if (GetCompositionForEndpointIndex(endpointIndex) == EndpointComposition::kTree)
+    {
+        return DataModel::EndpointInfo(parent, DataModel::EndpointCompositionPattern::kTreePattern);
+    }
+    return std::nullopt;
+}
+
+DataModel::EndpointEntry FirstEndpointEntry(unsigned start_index, uint16_t & found_index)
+{
+    // find the first enabled index after the start index
+    const uint16_t lastEndpointIndex = emberAfEndpointCount();
+    for (uint16_t endpoint_idx = static_cast<uint16_t>(start_index); endpoint_idx < lastEndpointIndex; endpoint_idx++)
+    {
+        if (emberAfEndpointIndexIsEnabled(endpoint_idx))
+        {
+            found_index                            = endpoint_idx;
+            DataModel::EndpointEntry endpointEntry = DataModel::EndpointEntry::kInvalid;
+            endpointEntry.id                       = emberAfEndpointFromIndex(endpoint_idx);
+            auto endpointInfo                      = GetEndpointInfoAtIndex(endpoint_idx);
+            // The endpoint info should have value as this endpoint should be valid at this time
+            VerifyOrDie(endpointInfo.has_value());
+            endpointEntry.info = endpointInfo.value();
+            return endpointEntry;
+        }
+    }
+
+    // No enabled endpoint found. Give up
+    return DataModel::EndpointEntry::kInvalid;
+}
+
+bool SemanticTagsEqual(const DataModel::Provider::SemanticTag & tagA, const DataModel::Provider::SemanticTag & tagB)
+{
+    if (tagA.label.HasValue() != tagA.label.HasValue())
+    {
+        return false;
+    }
+    if (tagA.label.HasValue())
+    {
+        if (tagA.label.Value().Value().size() != tagB.label.Value().Value().size())
+        {
+            return false;
+        }
+        if (strncmp(tagA.label.Value().Value().data(), tagB.label.Value().Value().data(), tagB.label.Value().Value().size()) != 0)
+        {
+            return false;
+        }
+    }
+    return (tagA.tag == tagB.tag) && (tagA.mfgCode == tagB.mfgCode) && (tagA.namespaceID == tagB.namespaceID);
+}
+
+std::optional<unsigned> FindNextSemanticTagIndex(EndpointId endpoint, const DataModel::Provider::SemanticTag & previous,
+                                                 unsigned hintWherePreviousMayBe)
+{
+    DataModel::Provider::SemanticTag hintTag;
+    if (GetSemanticTagForEndpointAtIndex(endpoint, hintWherePreviousMayBe, hintTag) == CHIP_NO_ERROR)
+    {
+        if (SemanticTagsEqual(previous, hintTag))
+        {
+            return std::make_optional(hintWherePreviousMayBe + 1);
+        }
+    }
+    unsigned index = 0;
+    while (GetSemanticTagForEndpointAtIndex(endpoint, index, hintTag) == CHIP_NO_ERROR)
+    {
+        if (SemanticTagsEqual(previous, hintTag))
+        {
+            return std::make_optional(index + 1);
+        }
+        index++;
+    }
+    return std::nullopt;
+}
+
 } // namespace
 
 std::optional<CommandId> CodegenDataModelProvider::EmberCommandListIterator::First(const CommandId * list)
@@ -421,45 +502,9 @@ std::optional<DataModel::EndpointInfo> CodegenDataModelProvider::GetEndpointInfo
     return std::nullopt;
 }
 
-std::optional<DataModel::EndpointInfo> CodegenDataModelProvider::GetEndpointInfoAtIndex(uint16_t endpointIndex)
-{
-    if (emberAfEndpointIndexIsEnabled(endpointIndex))
-    {
-        DataModel::EndpointInfo info(emberAfParentEndpointFromIndex(endpointIndex));
-        if (IsFlatCompositionForEndpointIndex(endpointIndex))
-        {
-            info.compositionPattern = DataModel::EndpointCompositionPattern::kFullFamilyPattern;
-        }
-        else if (IsTreeCompositionForEndpointIndex(endpointIndex))
-        {
-            info.compositionPattern = DataModel::EndpointCompositionPattern::kTreePattern;
-        }
-        return std::make_optional(info);
-    }
-    return std::nullopt;
-}
-
 DataModel::EndpointEntry CodegenDataModelProvider::FirstEndpoint()
 {
-    // find the first enabled index
-    const uint16_t lastEndpointIndex = emberAfEndpointCount();
-    for (uint16_t endpoint_idx = 0; endpoint_idx < lastEndpointIndex; endpoint_idx++)
-    {
-        if (emberAfEndpointIndexIsEnabled(endpoint_idx))
-        {
-            mEndpointIterationHint                 = endpoint_idx;
-            DataModel::EndpointEntry endpointEntry = DataModel::EndpointEntry::kInvalid;
-            endpointEntry.id                       = emberAfEndpointFromIndex(endpoint_idx);
-            auto endpointInfo                      = GetEndpointInfoAtIndex(endpoint_idx);
-            // The endpoint info should have value as this endpoint should be valid at this time
-            VerifyOrDie(endpointInfo.has_value());
-            endpointEntry.info = endpointInfo.value();
-            return endpointEntry;
-        }
-    }
-
-    // No enabled endpoint found. Give up
-    return DataModel::EndpointEntry::kInvalid;
+    return FirstEndpointEntry(0, mEndpointIterationHint);
 }
 
 std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointId id) const
@@ -484,31 +529,12 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
 
 DataModel::EndpointEntry CodegenDataModelProvider::NextEndpoint(EndpointId before)
 {
-    const uint16_t lastEndpointIndex = emberAfEndpointCount();
-
     std::optional<unsigned> before_idx = TryFindEndpointIndex(before);
     if (!before_idx.has_value())
     {
         return DataModel::EndpointEntry::kInvalid;
     }
-
-    // find the first enabled index
-    for (uint16_t endpoint_idx = static_cast<uint16_t>(*before_idx + 1); endpoint_idx < lastEndpointIndex; endpoint_idx++)
-    {
-        if (emberAfEndpointIndexIsEnabled(endpoint_idx))
-        {
-            mEndpointIterationHint                 = endpoint_idx;
-            DataModel::EndpointEntry endpointEntry = DataModel::EndpointEntry::kInvalid;
-            endpointEntry.id                       = emberAfEndpointFromIndex(endpoint_idx);
-            auto endpointInfo                      = GetEndpointInfoAtIndex(endpoint_idx);
-            VerifyOrDie(endpointInfo.has_value());
-            endpointEntry.info = endpointInfo.value();
-            return endpointEntry;
-        }
-    }
-
-    // No enabled enpoint after "before" was found, give up
-    return DataModel::EndpointEntry::kInvalid;
+    return FirstEndpointEntry(*before_idx + 1, mEndpointIterationHint);
 }
 
 DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId endpointId)
@@ -522,18 +548,20 @@ DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId 
 }
 
 std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id,
-                                                                      bool isServer) const
+                                                                      ClusterSide side) const
 {
     const unsigned clusterCount = endpoint->clusterCount;
-    unsigned hint               = isServer ? mServerClusterIterationHint : mClientClusterIterationHint;
+    unsigned hint               = side == ClusterSide::kServer ? mServerClusterIterationHint : mClientClusterIterationHint;
 
     if (hint < clusterCount)
     {
         const EmberAfCluster & cluster = endpoint->cluster[hint];
-        bool serverClientCheck         = isServer ? cluster.IsServer() : cluster.IsClient();
-        if (serverClientCheck && (cluster.clusterId == id))
+        if (((side == ClusterSide::kServer) && cluster.IsServer()) || ((side == ClusterSide::kClient) && cluster.IsClient()))
         {
-            return std::make_optional(hint);
+            if (cluster.clusterId == id)
+            {
+                return std::make_optional(hint);
+            }
         }
     }
 
@@ -543,8 +571,11 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const Embe
     for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
     {
         const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        bool serverClientCheck         = isServer ? cluster.IsServer() : cluster.IsClient();
-        if (serverClientCheck && (cluster.clusterId == id))
+        if (((side == ClusterSide::kServer) && !cluster.IsServer()) || ((side == ClusterSide::kClient) && !cluster.IsClient()))
+        {
+            continue;
+        }
+        if (cluster.clusterId == id)
         {
             return std::make_optional(cluster_idx);
         }
@@ -563,7 +594,7 @@ DataModel::ClusterEntry CodegenDataModelProvider::NextServerCluster(const Concre
     VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
     VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
 
-    std::optional<unsigned> cluster_idx = TryFindClusterIndex(endpoint, before.mClusterId, true);
+    std::optional<unsigned> cluster_idx = TryFindClusterIndex(endpoint, before.mClusterId, ClusterSide::kServer);
     if (!cluster_idx.has_value())
     {
         return DataModel::ClusterEntry::kInvalid;
@@ -593,33 +624,33 @@ std::optional<DataModel::ClusterInfo> CodegenDataModelProvider::GetServerCluster
     return std::make_optional(std::get<DataModel::ClusterInfo>(info));
 }
 
-ClusterId CodegenDataModelProvider::FirstClientCluster(EndpointId endpointId)
+ConcreteClusterPath CodegenDataModelProvider::FirstClientCluster(EndpointId endpointId)
 {
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
-    VerifyOrReturnValue(endpoint != nullptr, kInvalidClusterId);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, kInvalidClusterId);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, kInvalidClusterId);
+    VerifyOrReturnValue(endpoint != nullptr, ConcreteClusterPath(endpointId, kInvalidClusterId));
+    VerifyOrReturnValue(endpoint->clusterCount > 0, ConcreteClusterPath(endpointId, kInvalidClusterId));
+    VerifyOrReturnValue(endpoint->cluster != nullptr, ConcreteClusterPath(endpointId, kInvalidClusterId));
 
-    return FirstClientClusterId(endpoint, 0, mClientClusterIterationHint);
+    return ConcreteClusterPath(endpointId, FirstClientClusterId(endpoint, 0, mClientClusterIterationHint));
 }
 
-ClusterId CodegenDataModelProvider::NextClientCluster(const ConcreteClusterPath & before)
+ConcreteClusterPath CodegenDataModelProvider::NextClientCluster(const ConcreteClusterPath & before)
 {
     // TODO: This search still seems slow (ember will loop). Should use index hints as long
     //       as ember API supports it
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(before.mEndpointId);
 
-    VerifyOrReturnValue(endpoint != nullptr, kInvalidClusterId);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, kInvalidClusterId);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, kInvalidClusterId);
+    VerifyOrReturnValue(endpoint != nullptr, ConcreteClusterPath(before.mEndpointId, kInvalidClusterId));
+    VerifyOrReturnValue(endpoint->clusterCount > 0, ConcreteClusterPath(before.mEndpointId, kInvalidClusterId));
+    VerifyOrReturnValue(endpoint->cluster != nullptr, ConcreteClusterPath(before.mEndpointId, kInvalidClusterId));
 
-    std::optional<unsigned> cluster_idx = TryFindClusterIndex(endpoint, before.mClusterId, false);
+    std::optional<unsigned> cluster_idx = TryFindClusterIndex(endpoint, before.mClusterId, ClusterSide::kClient);
     if (!cluster_idx.has_value())
     {
-        return kInvalidClusterId;
+        return ConcreteClusterPath(before.mEndpointId, kInvalidClusterId);
     }
 
-    return FirstClientClusterId(endpoint, *cluster_idx + 1, mClientClusterIterationHint);
+    return ConcreteClusterPath(before.mEndpointId, FirstClientClusterId(endpoint, *cluster_idx + 1, mClientClusterIterationHint));
 }
 
 DataModel::AttributeEntry CodegenDataModelProvider::FirstAttribute(const ConcreteClusterPath & path)
@@ -857,10 +888,24 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
     return DeviceTypeEntryFromEmber(deviceTypes[idx]);
 }
 
-std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetSemanticTagAtIndex(EndpointId endpoint, size_t index)
+std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetFirstSemanticTag(EndpointId endpoint)
 {
     Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
-    if (GetSemanticTagForEndpointAtIndex(endpoint, index, tag) == CHIP_NO_ERROR)
+    // we start at the beginning
+    mSemanticTagIterationHint = 0;
+    if (GetSemanticTagForEndpointAtIndex(endpoint, 0, tag) == CHIP_NO_ERROR)
+    {
+        return std::make_optional(tag);
+    }
+    return std::nullopt;
+}
+
+std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetNextSemanticTag(EndpointId endpoint,
+                                                                                             const SemanticTag & previous)
+{
+    Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
+    std::optional<unsigned> idx = FindNextSemanticTagIndex(endpoint, previous, mSemanticTagIterationHint);
+    if (idx.has_value() && GetSemanticTagForEndpointAtIndex(endpoint, *idx, tag) == CHIP_NO_ERROR)
     {
         return std::make_optional(tag);
     }

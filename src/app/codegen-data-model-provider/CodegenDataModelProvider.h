@@ -159,14 +159,15 @@ public:
     std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,
                                                              const DataModel::DeviceTypeEntry & previous) override;
 
-    std::optional<SemanticTag> GetSemanticTagAtIndex(EndpointId endpoint, size_t index) override;
+    std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint) override;
+    std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) override;
 
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
     std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;
 
-    ClusterId FirstClientCluster(EndpointId endpoint) override;
-    ClusterId NextClientCluster(const ConcreteClusterPath & before) override;
+    ConcreteClusterPath FirstClientCluster(EndpointId endpoint) override;
+    ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) override;
 
     DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
@@ -187,6 +188,7 @@ private:
     unsigned mClientClusterIterationHint = 0;
     unsigned mAttributeIterationHint     = 0;
     unsigned mDeviceTypeIterationHint    = 0;
+    unsigned mSemanticTagIterationHint   = 0;
     EmberCommandListIterator mAcceptedCommandsIterator;
     EmberCommandListIterator mGeneratedCommandsIterator;
 
@@ -199,6 +201,13 @@ private:
 
         ClusterReference(const ConcreteClusterPath p, const EmberAfCluster * c) : path(p), cluster(c) {}
     };
+
+    enum class ClusterSide : uint8_t
+    {
+        kServer,
+        kClient,
+    };
+
     std::optional<ClusterReference> mPreviouslyFoundCluster;
     unsigned mEmberMetadataStructureGeneration = 0;
 
@@ -207,13 +216,12 @@ private:
     /// Effectively the same as `emberAfFindServerCluster` except with some caching capabilities
     const EmberAfCluster * FindServerCluster(const ConcreteClusterPath & path);
 
-    std::optional<DataModel::EndpointInfo> GetEndpointInfoAtIndex(uint16_t endpointIndex);
-
     /// Find the index of the given attribute id
     std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId id) const;
 
     /// Find the index of the given cluster id
-    std::optional<unsigned> TryFindClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id, bool isServer) const;
+    std::optional<unsigned> TryFindClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id,
+                                                ClusterSide clusterSide) const;
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(chip::EndpointId id) const;

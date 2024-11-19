@@ -30,6 +30,7 @@
 #include <app/WriteHandler.h>
 #include <app/data-model/Decode.h>
 #include <app/util/att-storage.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
 #include <cstddef>
@@ -277,14 +278,9 @@ Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttrib
 namespace chip {
 namespace app {
 
-bool IsFlatCompositionForEndpointIndex(uint16_t endpointIndex)
+EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
 {
-    return true;
-}
-
-bool IsTreeCompositionForEndpointIndex(uint16_t endpointIndex)
-{
-    return false;
+    return EndpointComposition::kFullFamily;
 }
 
 } // namespace app
