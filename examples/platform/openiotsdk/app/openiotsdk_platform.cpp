@@ -42,7 +42,6 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef USE_CHIP_DATA_MODEL
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -275,7 +274,6 @@ int openiotsdk_chip_run(void)
         ChipLogError(NotSpecified, "Initialize static resources before server init failed: %s", err.AsString());
         return EXIT_FAILURE;
     }
-    initParams.dataModelProvider             = chip::app::CodegenDataModelProviderInstance();
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 

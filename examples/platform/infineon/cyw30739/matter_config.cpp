@@ -37,7 +37,6 @@
 #include "wiced_hal_i2c.h"
 #endif
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -217,7 +216,6 @@ void CYW30739MatterConfig::InitApp(void)
     // Create initParams with SDK example defaults here
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance();
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     sExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     SetDeviceInfoProvider(&sExampleDeviceInfoProvider);

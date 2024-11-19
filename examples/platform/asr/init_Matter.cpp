@@ -18,7 +18,6 @@
 
 #include "AppConfig.h"
 #include <DeviceInfoProviderImpl.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -101,7 +100,6 @@ CHIP_ERROR MatterInitializer::Init_Matter_Server(void)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
 
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Server::GetInstance().Init(initParams);

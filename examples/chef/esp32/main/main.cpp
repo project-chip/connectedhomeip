@@ -30,7 +30,6 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
@@ -160,7 +159,6 @@ void InitServer(intptr_t)
     // Start IM server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
     chip::Server::GetInstance().Init(initParams);
 
     // Device Attestation & Onboarding codes

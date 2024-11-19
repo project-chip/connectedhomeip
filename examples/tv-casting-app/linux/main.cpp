@@ -31,7 +31,6 @@
 
 #include "LinuxCommissionableDataProvider.h"
 #include "Options.h"
-#include <app/codegen-data-model-provider/Instance.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -141,7 +140,6 @@ int main(int argc, char * argv[])
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(CHIP_NO_ERROR == initParams.InitializeStaticResourcesBeforeServerInit());
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
     VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
     if (argc > 1)

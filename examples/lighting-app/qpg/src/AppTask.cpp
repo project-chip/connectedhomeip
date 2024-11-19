@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include "app/util/persistence/AttributePersistenceProvider.h"
-#include "app/util/persistence/DefaultAttributePersistenceProvider.h"
 #if !defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
 #error This application requires powercycle counting.
 #endif
@@ -39,7 +37,6 @@
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
-#include <app/codegen-data-model-provider/Instance.h>
 
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -116,7 +113,9 @@ DeferredAttribute gPersisters[] = {
 
 };
 
-DeferredAttributePersistenceProvider gDeferredAttributePersister;
+DeferredAttributePersistenceProvider gDeferredAttributePersister(Server::GetInstance().GetDefaultAttributePersister(),
+                                                                 Span<DeferredAttribute>(gPersisters, 3),
+                                                                 System::Clock::Milliseconds32(5000));
 
 /**********************************************************
  * Identify Callbacks
@@ -258,7 +257,6 @@ void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = CodegenDataModelProviderInstance();
 
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -275,13 +273,9 @@ void AppTask::InitServer(intptr_t arg)
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFaultTestEventTriggerHandler) == CHIP_NO_ERROR);
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance();
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
-
-    (void) gDeferredAttributePersister.Init(*app::GetAttributePersistenceProvider(), Span<DeferredAttribute>(gPersisters, 3),
-                                            System::Clock::Milliseconds32(5000));
 
     app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
 

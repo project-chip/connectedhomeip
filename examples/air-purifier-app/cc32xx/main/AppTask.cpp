@@ -38,7 +38,6 @@
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 
@@ -165,7 +164,6 @@ int AppTask::Init()
     PLAT_LOG("Initialize Server");
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = CodegenDataModelProviderInstance();
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
