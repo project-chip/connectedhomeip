@@ -72,7 +72,7 @@ if(NOT EXISTS "${BOOT_CONF_OVERLAY_FILE}")
   message(FATAL_ERROR "${BOOT_CONF_OVERLAY_FILE} doesn't exist")
 endif()
 
-if(${CONFIG_USB_TELINK_B9X} MATCHES y)
+if((${CONFIG_USB_TELINK_B9X} MATCHES y) OR (${CONFIG_USB_TELINK_TLX} MATCHES y))
   set(BOOT_USB_CONF_OVERLAY_FILE "${CHIP_ROOT}/config/telink/app/bootloader_usb.conf")
   if(NOT EXISTS "${BOOT_USB_CONF_OVERLAY_FILE}")
     message(FATAL_ERROR "${BOOT_USB_CONF_OVERLAY_FILE} doesn't exist")

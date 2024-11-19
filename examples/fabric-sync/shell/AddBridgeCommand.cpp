@@ -48,12 +48,22 @@ void AddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 
     if (err == CHIP_NO_ERROR)
     {
-        admin::DeviceMgr().SetRemoteBridgeNodeId(mBridgeNodeId);
+        admin::DeviceManager::Instance().SetRemoteBridgeNodeId(mBridgeNodeId);
 
         ChipLogProgress(NotSpecified, "Successfully paired bridge device: NodeId: " ChipLogFormatX64,
                         ChipLogValueX64(mBridgeNodeId));
 
-        admin::DeviceMgr().UpdateLastUsedNodeId(mBridgeNodeId);
+        admin::DeviceManager::Instance().UpdateLastUsedNodeId(mBridgeNodeId);
+        admin::DeviceManager::Instance().SubscribeRemoteFabricBridge();
+        admin::DeviceManager::Instance().InitCommissionerControl();
+
+        // After successful commissioning of the Commissionee, initiate Reverse Commissioning
+        // via the Commissioner Control Cluster. However, we must first verify that the
+        // remote Fabric-Bridge supports Fabric Synchronization.
+        //
+        // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
+        // if the remote Fabric-Bridge lacks Fabric Synchronization support.
+        DeviceLayer::SystemLayer().ScheduleLambda([]() { admin::DeviceManager::Instance().ReadSupportedDeviceCategories(); });
     }
     else
     {
@@ -66,16 +76,19 @@ void AddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 
 CHIP_ERROR AddBridgeCommand::RunCommand()
 {
-    if (admin::DeviceMgr().IsFabricSyncReady())
+    if (admin::DeviceManager::Instance().IsFabricSyncReady())
     {
         // print to console
         fprintf(stderr, "Remote Fabric Bridge has already been configured.\n");
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    return admin::DeviceMgr().PairRemoteFabricBridge(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
+    ChipLogProgress(NotSpecified, "Running AddBridgeCommand with Node ID: %lu, PIN Code: %u, Address: %s, Port: %u", mBridgeNodeId,
+                    mSetupPINCode, mRemoteAddr, mRemotePort);
+
+    return admin::DeviceManager::Instance().PairRemoteFabricBridge(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
 }
 
 } // namespace commands

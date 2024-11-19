@@ -46,6 +46,9 @@ declare_args() {
 
   # Enable automatic leak checks before the application exits
   enable_leak_checking = !is_asan && target_os == "mac"
+
+  # Use Network.framework instead of POSIX sockets
+  use_network_framework = false
 }
 
 sdk = "macosx"
@@ -123,6 +126,12 @@ action("build-darwin-framework") {
     args += [ "--enable-encoding-sentinel-enum-values" ]
   } else {
     args += [ "--no-enable-encoding-sentinel-enum-values" ]
+  }
+
+  if (defined(use_network_framework) && use_network_framework) {
+    args += [ "--use-network-framework" ]
+  } else {
+    args += [ "--no-use-network-framework" ]
   }
 
   output_name = "Matter.framework"
@@ -277,10 +286,7 @@ executable("darwin-framework-tool") {
     "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/gen/include",
   ]
 
-  defines = [
-    "CHIP_HAVE_CONFIG_H=1",
-    "CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
-  ]
+  defines = [ "CHIP_HAVE_CONFIG_H=1" ]
 
   frameworks += [
     "CoreFoundation.framework",

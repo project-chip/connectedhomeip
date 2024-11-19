@@ -193,6 +193,13 @@ menu "CHIP Core"
             help
                 Specifies the maximum number of group key sets supported per fabric.
 
+        config CHIP_DEVICE_ENABLE_DYNAMIC_SERVER
+            bool "Enable dynamic server"
+            default n
+            help
+                Enable dynamic server to handle a different interaction model dispatch.
+                Can be implied when users do not want to use the same server clusters.
+
     endmenu # "General Options"
 
     menu "Networking Options"

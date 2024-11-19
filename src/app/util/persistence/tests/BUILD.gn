@@ -12,10 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[metadata]
-name = chip-testing
-version = 1.0.0
-author = Project CHIP Authors
-license-expression = Apache-2.0
-description = Various helpers associated with the python_testing scripts
-url = https://github.com/project-chip/connectedhomeip
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libAppUtilPersistenceTests"
+
+  test_sources = [ "TestAttributePersistenceProvider.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/persistence",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support:testing",
+  ]
+}
