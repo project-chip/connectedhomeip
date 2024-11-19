@@ -60,8 +60,13 @@ Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eve
 }
 
 /// Returns the status of ACL validation.
-///   if the status is set, the status is FINAL (i.e. permanent failure OR success due to path expansion logic.)
-///   if the status is not set, the processing can continue
+///   If the return value has a status set, that means the ACL check failed,
+///   the read must not be performed, and the returned status (which may
+///   be success, when dealing with non-concrete paths) should be used
+///   as the status for the read.
+///
+///   If the returned value is std::nullopt, that means the ACL check passed and the 
+///   read should proceed.
 std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataModel, const SubjectDescriptor & subjectDescriptor,
                                                    const ConcreteReadAttributePath & path)
 {
