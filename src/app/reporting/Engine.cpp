@@ -78,7 +78,7 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
 
     std::optional<DataModel::AttributeInfo> info = dataModel->GetAttributeInfo(path);
 
-    // If the attribute exists, we know if it is readable (readPrivilege has value)
+    // If the attribute exists, we know whether it is readable (readPrivilege has value)
     // and what the required access privilege is. However for attributes missing from the metatada
     // (e.g. global attributes) or completely missing attributes we do not actually know of a required
     // privilege and default to kView (this is correct for global attributes and a reasonable check
