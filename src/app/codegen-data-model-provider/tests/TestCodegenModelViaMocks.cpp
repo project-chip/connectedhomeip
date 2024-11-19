@@ -1321,20 +1321,6 @@ TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
     EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 33)).has_value());
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    ReadOperation testRequest(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
-    testRequest.SetSubjectDescriptor(kDenySubjectDescriptor);
-
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-
-    ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedAccess);
-}
-
 TEST(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
 {
     UseMockNodeConfig config(gTestNodeConfig);
@@ -1390,24 +1376,6 @@ TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
 
         ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedEndpoint);
     }
-}
-
-TEST(TestCodegenModelViaMocks, EmberAttributePathExpansionAccessDeniedRead)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    ReadOperation testRequest(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
-    testRequest.SetSubjectDescriptor(kDenySubjectDescriptor);
-    testRequest.SetPathExpanded(true);
-
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-
-    // For expanded paths, access control failures succeed without encoding anything
-    // This is temporary until ACL checks are moved inside the IM/ReportEngine
-    ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), CHIP_NO_ERROR);
-    ASSERT_FALSE(encoder->TriedEncode());
 }
 
 TEST(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead)

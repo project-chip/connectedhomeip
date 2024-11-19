@@ -60,15 +60,7 @@ public:
     virtual InteractionModelContext CurrentContext() const { return mContext; }
 
     /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
-    ///   ReadAttribute is REQUIRED to perform:
-    ///     - ACL validation (see notes on OperationFlags::kInternal)
-    ///     - Validation of readability/writability (also controlled by OperationFlags::kInternal)
-    ///     - use request.path.mExpanded to skip encoding replies for data according
-    ///       to 8.4.3.2 of the spec:
-    ///         > If the path indicates attribute data that is not readable, then the path SHALL
-    ///           be discarded.
-    ///         > Else if reading from the attribute in the path requires a privilege that is not
-    ///           granted to access the cluster in the path, then the path SHALL be discarded.
+    ///   ReadAttribute is REQUIRED to respond to GlobalAttribute read requests
     ///
     /// Return value notes:
     ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse

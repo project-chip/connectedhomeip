@@ -104,33 +104,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId),
                   request.path.mExpanded);
 
-    // ACL check for non-internal requests
-    if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
-    {
-        VerifyOrReturnError(request.subjectDescriptor != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        Access::RequestPath requestPath{ .cluster     = request.path.mClusterId,
-                                         .endpoint    = request.path.mEndpointId,
-                                         .requestType = Access::RequestType::kAttributeReadRequest,
-                                         .entityId    = request.path.mAttributeId };
-        CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
-                                                          RequiredPrivilege::ForReadAttribute(request.path));
-        if (err != CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError((err == CHIP_ERROR_ACCESS_DENIED) || (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
-
-            // Implementation of 8.4.3.2 of the spec for path expansion
-            if (request.path.mExpanded)
-            {
-                return CHIP_NO_ERROR;
-            }
-
-            // access denied and access restricted have specific codes for IM
-            return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess)
-                                                   : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
-        }
-    }
-
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata

@@ -201,7 +201,10 @@ static_library("interaction-model") {
     "reporting/reporting.h",
   ]
 
-  deps = [ "${chip_root}/src/app:events" ]
+  deps = [
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/app:global-attributes",
+  ]
 
   # Temporary dependency: codegen data provider instance should be provided
   # by the application
