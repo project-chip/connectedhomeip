@@ -174,7 +174,6 @@ public:
         if (error == CHIP_NO_ERROR)
         {
             mNodeId = DeviceManager::Instance().GetNextAvailableNodeId();
-            ;
 
             // After responding with RequestCommissioningApproval to the node where the client initiated the
             // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
