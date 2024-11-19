@@ -24,4 +24,4 @@
 
 from . import Bdx, BdxProtocol, BdxTransfer
 
-__all__ = ["BdxTransfer", "InitMessage"]
+__all__ = ["Bdx", "BdxProtocol", "BdxTransfer", "InitMessage"]
