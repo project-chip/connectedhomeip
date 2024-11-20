@@ -40,8 +40,8 @@
 #endif
 
 #include "CHIPDevicePlatformConfig.h"
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #include "EndpointQueueFilter.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
