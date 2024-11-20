@@ -18,7 +18,12 @@
 #pragma once
 
 #include "DeviceManager.h"
+#include "IcdManager.h"
+#include "StayActiveSender.h"
 
+#include <app/icd/client/CheckInHandler.h>
+#include <app/icd/client/DefaultCheckInDelegate.h>
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <bridge/include/FabricAdminDelegate.h>
 #include <map>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -37,10 +42,11 @@ struct ScopedNodeIdHasher
     }
 };
 
-class FabricAdmin final : public bridge::FabricAdminDelegate, public PairingDelegate
+class FabricAdmin final : public bridge::FabricAdminDelegate, public PairingDelegate, public IcdManager::Delegate
 {
 public:
     static FabricAdmin & Instance();
+    static chip::app::DefaultICDClientStorage & GetDefaultICDClientStorage() { return sICDClientStorage; }
 
     CHIP_ERROR OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params,
                                        chip::FabricIndex fabricIndex) override;
@@ -50,6 +56,8 @@ public:
                            uint16_t productId) override;
 
     CHIP_ERROR KeepActive(chip::ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs) override;
+
+    void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override;
 
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) override;
 
@@ -89,11 +97,13 @@ private:
     std::unordered_map<chip::ScopedNodeId, KeepActiveDataForCheckIn, ScopedNodeIdHasher> mPendingCheckIn;
 
     static FabricAdmin sInstance;
+    static chip::app::DefaultICDClientStorage sICDClientStorage;
+    static chip::app::CheckInHandler sCheckInHandler;
 
     bool mInitialized    = false;
     chip::NodeId mNodeId = chip::kUndefinedNodeId;
 
-    void Init() { mInitialized = true; }
+    CHIP_ERROR Init();
 };
 
 } // namespace admin

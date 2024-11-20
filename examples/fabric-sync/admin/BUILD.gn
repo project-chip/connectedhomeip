@@ -44,8 +44,12 @@ source_set("fabric-admin-lib") {
     "FabricAdmin.h",
     "FabricSyncGetter.cpp",
     "FabricSyncGetter.h",
+    "IcdManager.cpp",
+    "IcdManager.h",
     "PairingManager.cpp",
     "PairingManager.h",
+    "StayActiveSender.cpp",
+    "StayActiveSender.h",
     "UniqueIdGetter.cpp",
     "UniqueIdGetter.h",
   ]
@@ -53,6 +57,8 @@ source_set("fabric-admin-lib") {
   deps = [
     "${chip_root}/examples/fabric-sync/bridge:fabric-bridge-lib",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/icd/client:handler",
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/lib",
   ]
 }

@@ -149,6 +149,8 @@ private:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
+    void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
+    void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
@@ -176,10 +178,19 @@ private:
     chip::ByteSpan mSalt;
     uint16_t mDiscriminator = 0;
     uint32_t mSetupPINCode  = 0;
+    bool mDeviceIsICD       = false;
+    uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
     uint8_t mVerifierBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
     uint8_t mSaltBuffer[chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length];
     char mRemoteIpAddr[chip::Inet::IPAddress::kMaxStringLength];
     char mOnboardingPayload[kMaxManualCodeLength + 1];
+
+    chip::Optional<bool> mICDRegistration;
+    chip::Optional<chip::NodeId> mICDCheckInNodeId;
+    chip::Optional<chip::app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
+    chip::Optional<chip::ByteSpan> mICDSymmetricKey;
+    chip::Optional<uint64_t> mICDMonitoredSubject;
+    chip::Optional<uint32_t> mICDStayActiveDurationMsec;
 
     /**
      * Holds the unique_ptr to the current CommissioningWindowOpener.
