@@ -21,6 +21,7 @@
 #include <app/server/Server.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissionerDiscoveryController.h>
+#include <crypto/RawKeySessionKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
@@ -90,7 +91,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl = nullptr);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+using chip::PersistentStorageDelegate;
 using chip::Controller::DeviceCommissioner;
+using chip::Crypto::SessionKeystore;
 using chip::Transport::PeerAddress;
 
 CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, PeerAddress address);
@@ -98,6 +101,8 @@ CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index);
 
 DeviceCommissioner * GetDeviceCommissioner();
 CommissionerDiscoveryController * GetCommissionerDiscoveryController();
+SessionKeystore * GetSessionKeystore();
+PersistentStorageDelegate * GetPersistentStorageDelegate();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
