@@ -56,7 +56,6 @@ MTROTAImageTransferHandler::MTROTAImageTransferHandler(chip::System::Layer * lay
 {
     assertChipStackLockedByCurrentThread();
 
-    VerifyOrReturn(layer != nullptr);
     mSystemLayer = layer;
 
     MTROTAUnsolicitedBDXMessageHandler::GetInstance()->OnTransferHandlerCreated(this);
@@ -123,8 +122,6 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
 
-                TransferSession::OutputEventType outputEventType = eventType;
-
                 // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
                 MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
                 if (!strongWrapper || !strongWrapper.otaImageTransferHandler) {
@@ -134,7 +131,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
                 if (error != nil) {
                     CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
                     LogErrorOnFailure(err);
-                    NotifyEventHandled(outputEventType, err);
+                    NotifyEventHandled(eventType, err);
                     return;
                 }
 
@@ -149,7 +146,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
 
                 CHIP_ERROR err = mTransfer.AcceptTransfer(acceptData);
                 LogErrorOnFailure(err);
-                NotifyEventHandled(outputEventType, err);
+                NotifyEventHandled(eventType, err);
             }
                           errorHandler:^(NSError *) {
                               // Not much we can do here, but if the controller is shut down we
@@ -188,6 +185,10 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
 
 void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR error)
 {
+    assertChipStackLockedByCurrentThread();
+
+    mNeedToCallTransferSessionEnd = false;
+
     auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mPeer.GetFabricIndex()];
     VerifyOrReturn(controller != nil);
     auto nodeId = @(mPeer.GetNodeId());
@@ -199,12 +200,12 @@ void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR err
         return;
     }
 
-    mNeedToCallTransferSessionEnd = false;
+    auto errorCode = [MTRError errorForCHIPErrorCode:error];
     if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {
         dispatch_async(delegateQueue, ^{
             [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId
                                                       controller:controller
-                                                           error:[MTRError errorForCHIPErrorCode:error]];
+                                                           error:errorCode];
         });
     }
 }
@@ -247,8 +248,6 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
 
-                TransferSession::OutputEventType outputEventType = eventType;
-
                 // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
                 MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
                 if (!strongWrapper || !strongWrapper.otaImageTransferHandler) {
@@ -256,7 +255,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
                 }
 
                 if (data == nil) {
-                    NotifyEventHandled(outputEventType, CHIP_ERROR_INCORRECT_STATE);
+                    NotifyEventHandled(eventType, CHIP_ERROR_INCORRECT_STATE);
                     return;
                 }
 
@@ -267,7 +266,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
 
                 CHIP_ERROR err = mTransfer.PrepareBlock(blockData);
                 LogErrorOnFailure(err);
-                NotifyEventHandled(outputEventType, err);
+                NotifyEventHandled(eventType, err);
             }
                           errorHandler:^(NSError *) {
                               // Not much we can do here, but if the controller is shut down we

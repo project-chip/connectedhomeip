@@ -50,9 +50,9 @@ public:
 
     bool IsInAnOngoingTransfer();
 
-    void OnTransferHandlerCreated(void * imageTransferHandler);
+    void OnTransferHandlerCreated(MTROTAImageTransferHandler * imageTransferHandler);
 
-    void OnTransferHandlerDestroyed(void * imageTransferHandler);
+    void OnTransferHandlerDestroyed(MTROTAImageTransferHandler * imageTransferHandler);
 
     void Shutdown();
 

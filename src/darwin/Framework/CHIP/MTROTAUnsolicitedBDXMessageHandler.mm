@@ -85,6 +85,12 @@ CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::OnUnsolicitedMessageReceived(cons
     ChipLogDetail(BDX, "MTROTAUnsolicitedBDXMessageHandler: OnUnsolicitedMessageReceived: message " ChipLogFormatMessageType " protocol " ChipLogFormatProtocolId,
         payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
 
+    if (IsInAnOngoingTransfer())
+    {
+        ChipLogDetail(BDX, "Already in an ongoing transfer. Return");
+        return CHIP_ERROR_BUSY;
+    }
+
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Only proceed if there is a valid fabric index for the SessionHandle.
@@ -93,8 +99,7 @@ CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::OnUnsolicitedMessageReceived(cons
         // If we receive a ReceiveInit BDX message, create a new MTROTAImageTransferHandler and register it
         // as the handler for all BDX messages that will come over this exchange.
         if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
-            mOTAImageTransferHandler = new MTROTAImageTransferHandler(mSystemLayer);
-            newDelegate = mOTAImageTransferHandler;
+            newDelegate = new MTROTAImageTransferHandler(mSystemLayer);
             return CHIP_NO_ERROR;
         }
     }
@@ -110,20 +115,20 @@ void MTROTAUnsolicitedBDXMessageHandler::OnExchangeCreationFailed(ExchangeDelega
     delete otaTransferHandler;
 }
 
-void MTROTAUnsolicitedBDXMessageHandler::OnTransferHandlerCreated(void * imageTransferHandler)
+void MTROTAUnsolicitedBDXMessageHandler::OnTransferHandlerCreated(MTROTAImageTransferHandler * imageTransferHandler)
 {
     assertChipStackLockedByCurrentThread();
 
     // TODO: #36181 - Store the imageTransferHandler in a set of MTROTAImageTransferHandler objects.
-    mOTAImageTransferHandler = static_cast<MTROTAImageTransferHandler *>(imageTransferHandler);
+    mOTAImageTransferHandler = imageTransferHandler;
 }
 
-void MTROTAUnsolicitedBDXMessageHandler::OnTransferHandlerDestroyed(void * imageTransferHandler)
+void MTROTAUnsolicitedBDXMessageHandler::OnTransferHandlerDestroyed(MTROTAImageTransferHandler * imageTransferHandler)
 {
     assertChipStackLockedByCurrentThread();
 
     // TODO: #36181 - Remove the object matching imageTransferHandler in the set of MTROTAImageTransferHandler objects.
-    if (mOTAImageTransferHandler == static_cast<MTROTAImageTransferHandler *>(imageTransferHandler)) {
+    if (mOTAImageTransferHandler == imageTransferHandler) {
         mOTAImageTransferHandler = nullptr;
     }
 }
