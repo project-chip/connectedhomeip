@@ -256,6 +256,17 @@ EndpointId emberAfParentEndpointFromIndex(uint16_t index)
 CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
                                             Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag)
 {
+    auto ep = GetMockNodeConfig().endpointById(endpoint);
+
+    if (ep)
+    {
+        auto semanticTags = ep->semanticTags();
+        if (index < semanticTags.size())
+        {
+            tag = semanticTags[index];
+            return CHIP_NO_ERROR;
+        }
+    }
     return CHIP_ERROR_NOT_FOUND;
 }
 

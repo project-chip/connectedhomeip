@@ -352,21 +352,25 @@ DataModel::EndpointEntry FirstEndpointEntry(unsigned start_index, uint16_t & fou
     return DataModel::EndpointEntry::kInvalid;
 }
 
-bool SemanticTagsEqual(const DataModel::Provider::SemanticTag & tagA, const DataModel::Provider::SemanticTag & tagB)
+bool operator==(const DataModel::Provider::SemanticTag & tagA, const DataModel::Provider::SemanticTag & tagB)
 {
-    if (tagA.label.HasValue() != tagA.label.HasValue())
+    // Label is an optional and nullable value of CharSpan. Optioanl and Nullable have overload for ==,
+    // But `==` is deleted for CharSpan. Here we only check whether the string is the same.
+    if (tagA.label.HasValue() != tagB.label.HasValue())
     {
         return false;
     }
     if (tagA.label.HasValue())
     {
-        if (tagA.label.Value().Value().size() != tagB.label.Value().Value().size())
-        {
+        if (tagA.label.Value().IsNull() != tagB.label.Value().IsNull()) {
             return false;
         }
-        if (strncmp(tagA.label.Value().Value().data(), tagB.label.Value().Value().data(), tagB.label.Value().Value().size()) != 0)
+        if (!tagA.label.Value().IsNull())
         {
-            return false;
+            if (!tagA.label.Value().Value().data_equal(tagB.label.Value().Value()))
+            {
+                return false;
+            }
         }
     }
     return (tagA.tag == tagB.tag) && (tagA.mfgCode == tagB.mfgCode) && (tagA.namespaceID == tagB.namespaceID);
@@ -376,17 +380,21 @@ std::optional<unsigned> FindNextSemanticTagIndex(EndpointId endpoint, const Data
                                                  unsigned hintWherePreviousMayBe)
 {
     DataModel::Provider::SemanticTag hintTag;
+    // Check whether the hint is the previous tag
     if (GetSemanticTagForEndpointAtIndex(endpoint, hintWherePreviousMayBe, hintTag) == CHIP_NO_ERROR)
     {
-        if (SemanticTagsEqual(previous, hintTag))
+        if (previous == hintTag)
         {
             return std::make_optional(hintWherePreviousMayBe + 1);
         }
     }
+    // If the hint is not the previous tag, iterate over all the tags to find the index for the previous tag
     unsigned index = 0;
-    while (GetSemanticTagForEndpointAtIndex(endpoint, index, hintTag) == CHIP_NO_ERROR)
+    // Ensure that the next index is in the range
+    while (GetSemanticTagForEndpointAtIndex(endpoint, index + 1, hintTag) == CHIP_NO_ERROR &&
+           GetSemanticTagForEndpointAtIndex(endpoint, index, hintTag) == CHIP_NO_ERROR)
     {
-        if (SemanticTagsEqual(previous, hintTag))
+        if (previous == hintTag)
         {
             return std::make_optional(index + 1);
         }
