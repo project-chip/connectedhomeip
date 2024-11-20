@@ -28,7 +28,9 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+using chip::PersistentStorageDelegate;
 using chip::Controller::DeviceCommissioner;
+using chip::Crypto::SessionKeystore;
 using chip::Transport::PeerAddress;
 
 CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, PeerAddress address);
@@ -39,5 +41,7 @@ void ShutdownCommissioner();
 
 DeviceCommissioner * GetDeviceCommissioner();
 CommissionerDiscoveryController * GetCommissionerDiscoveryController();
+SessionKeystore * GetSessionKeystore();
+PersistentStorageDelegate * GetPersistentStorageDelegate();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

@@ -17,6 +17,7 @@
 
 #include <platform_stdlib.h>
 
+#include "AmebaObserver.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "Globals.h"
@@ -106,7 +107,12 @@ static void InitServer(intptr_t context)
     static chip::CommonCaseDeviceServerInitParams initParams;
     initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance();
+
+    static AmebaObserver sAmebaObserver;
+    initParams.appDelegate = &sAmebaObserver;
+
     chip::Server::GetInstance().Init(initParams);
+
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
@@ -117,6 +123,7 @@ static void InitServer(intptr_t context)
         // QR code will be used with CHIP Tool
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
 
 extern "C" void ChipTest(void)
