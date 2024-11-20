@@ -107,11 +107,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             # TODO: Adding try or except clause here as the errcode code be either 50 for timeout or 3 for incorrect state at this time
             # until issue mentioned in https://github.com/project-chip/connectedhomeip/issues/34383 can be resolved
-            try:
-                asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                    'Unexpected error code returned from CommissioningComplete')
-            except Exception:
-                asserts.assert_true(errcode.sdk_code == 3, 'Unexpected error code returned from CommissioningComplete')
+            asserts.assert_in(errcode.sdk_code, [expectedErrCode, 3], 'Unexpected error code returned from CommissioningComplete')
 
     def pics_TC_CADMIN_1_9(self) -> list[str]:
         return ["CADMIN.S"]
