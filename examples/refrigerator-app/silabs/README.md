@@ -5,8 +5,7 @@ Wi-Fi Boards.
 
 <hr>
 
--   [Matter Refrigerator and Temperature Controlled
-    Example](#matter-refrigerator-and-Temperature -controlled-example)
+-   [Matter Refrigerator and Temperature Controlled Example](#matter-refrigerator-and-temperature-controlled-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
@@ -188,9 +187,7 @@ combination with JLinkRTTClient as follows:
 
     For MG24 use:
 
-          ```
           $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
-          ```
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
@@ -315,7 +312,6 @@ combination with JLinkRTTClient as follows:
     chip-tool refrigeratorandtemperaturecontrolledcabinetmode
     chip-tool temperaturecontrol
     chip-tool refrigeratoralarm
-
     ```
 
 ### Notes
