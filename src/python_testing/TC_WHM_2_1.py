@@ -26,7 +26,7 @@
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
-#       --application evse
+#       --application water-heater
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
