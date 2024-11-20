@@ -314,7 +314,6 @@ combination with JLinkRTTClient as follows:
     ```
     chip-tool refrigeratorandtemperaturecontrolledcabinetmode
     chip-tool temperaturecontrol
-    chip-tool refrigeratoralarm subscribe
     ```
 
     Subscribe refrigeratoralarm events
