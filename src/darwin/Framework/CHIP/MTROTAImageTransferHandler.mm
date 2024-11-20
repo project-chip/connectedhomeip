@@ -200,12 +200,12 @@ void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR err
         return;
     }
 
-    auto errorCode = [MTRError errorForCHIPErrorCode:error];
+    auto nsError = [MTRError errorForCHIPErrorCode:error];
     if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {
         dispatch_async(delegateQueue, ^{
             [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId
                                                       controller:controller
-                                                           error:errorCode];
+                                                           error:nsError];
         });
     }
 }
