@@ -76,7 +76,7 @@ class TC_VALCC_2_1(MatterBaseTest):
     async def test_TC_VALCC_2_1(self):
 
         endpoint = self.get_endpoint(default=1)
-        
+
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 

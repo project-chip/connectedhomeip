@@ -95,7 +95,7 @@ class TC_FAN_3_4(MatterBaseTest):
             return
 
         endpoint = self.get_endpoint(default=1)
-        
+
         self.step(1)
 
         self.step(2)

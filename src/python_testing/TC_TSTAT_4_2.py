@@ -253,7 +253,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
     @ async_test_body
     async def test_TC_TSTAT_4_2(self):
-        endpoint = self.get_endpoint() 
+        endpoint = self.get_endpoint()
 
         self.step("1")
         # Commission DUT - already done
