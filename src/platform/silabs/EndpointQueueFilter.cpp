@@ -61,7 +61,7 @@ bool PayloadContainsCaseInsensitive(const System::PacketBufferHandle & payload, 
 
     Span<const unsigned char> payloadView(payload->Start(), payload->TotalLength());
 
-    auto toLower = [](unsigned char c) { return std::tolower(static_cast<unsigned char>(c)); };
+    auto toLower = [](unsigned char c) { return std::tolower(c); };
 
     auto it = std::search(payloadView.begin(), payloadView.end(), pattern.begin(), pattern.end(),
                           [&](unsigned char a, unsigned char b) { return toLower(a) == toLower(b); });
@@ -76,8 +76,8 @@ FilterOutcome HostNameFilter::Filter(const void * endpoint, const IPPacketInfo &
 {
     // Drop the mDNS packets which don't contain 'matter' or '<device-hostname>'.
     const unsigned char matterBytes[] = { 'm', 'a', 't', 't', 'e', 'r' };
-    if (PayloadContainsCaseInsensitive(pktPayload, Span<const unsigned char>(matterBytes, sizeof(matterBytes))) ||
-        PayloadContainsCaseInsensitive(pktPayload, Span<const unsigned char>(mHostName, sizeof(mHostName))))
+    if (PayloadContainsCaseInsensitive(pktPayload, Span<const unsigned char>(matterBytes)) ||
+        PayloadContainsCaseInsensitive(pktPayload, Span<const unsigned char>(mHostName)))
     {
         return FilterOutcome::kAllowPacket;
     }
