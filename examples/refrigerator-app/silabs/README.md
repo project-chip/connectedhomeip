@@ -317,6 +317,7 @@ combination with JLinkRTTClient as follows:
     ```
 
     Subscribe refrigeratoralarm events
+
     ```
     chip-tool interactive start
     refrigeratoralarm subscribe-event notify 1 10 1 1
