@@ -74,7 +74,7 @@ struct MockEventConfig
     const EventId id;
 };
 
-enum class MockClusterSide :uint8_t
+enum class MockClusterSide : uint8_t
 {
     kServer = 0x1,
     kClient = 0x2,
@@ -109,7 +109,7 @@ private:
 struct MockEndpointConfig
 {
     MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters = {},
-                       std::initializer_list<EmberAfDeviceType> aDeviceTypes = {},
+                       std::initializer_list<EmberAfDeviceType> aDeviceTypes                                    = {},
                        std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags = {});
 
     // Endpoint-config is self-referential: mEmberEndpoint.clusters references  mEmberClusters.data()

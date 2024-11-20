@@ -97,15 +97,15 @@ constexpr DeviceTypeId kDeviceTypeId3   = 3;
 constexpr uint8_t kDeviceTypeId3Version = 33;
 
 constexpr uint8_t kNamespaceID1 = 123;
-constexpr uint8_t kTag1 = 10;
-constexpr char kLabel1[] = "Label1";
+constexpr uint8_t kTag1         = 10;
+constexpr char kLabel1[]        = "Label1";
 
 constexpr uint8_t kNamespaceID2 = 254;
-constexpr uint8_t kTag2 = 22;
-constexpr char kLabel2[] = "Label2";
+constexpr uint8_t kTag2         = 22;
+constexpr char kLabel2[]        = "Label2";
 
 constexpr uint8_t kNamespaceID3 = 3;
-constexpr uint8_t kTag3 = 32;
+constexpr uint8_t kTag3         = 32;
 
 static_assert(kEndpointIdThatIsMissing != kInvalidEndpointId);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint1);
@@ -2807,10 +2807,10 @@ TEST(TestCodegenModelViaMocks, SemanticTagIteration)
 
     // out of order query works
     DataModel::Provider::SemanticTag existTag = {
-        .mfgCode = MakeNullable(VendorId::TestVendor1),
+        .mfgCode     = MakeNullable(VendorId::TestVendor1),
         .namespaceID = kNamespaceID1,
-        .tag = kTag1,
-        .label = MakeOptional(MakeNullable(CharSpan::fromCharString(kLabel1))),
+        .tag         = kTag1,
+        .label       = MakeOptional(MakeNullable(CharSpan::fromCharString(kLabel1))),
     };
     tag = model.GetNextSemanticTag(kMockEndpoint1, existTag);
     ASSERT_TRUE(tag.has_value());
@@ -2822,7 +2822,7 @@ TEST(TestCodegenModelViaMocks, SemanticTagIteration)
 
     // invalid query fails
     existTag.tag = kTag2;
-    tag = model.GetNextSemanticTag(kMockEndpoint1, existTag);
+    tag          = model.GetNextSemanticTag(kMockEndpoint1, existTag);
     ASSERT_FALSE(tag.has_value());
 
     // empty endpoint works

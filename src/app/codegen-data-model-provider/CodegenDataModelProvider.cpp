@@ -362,7 +362,8 @@ bool operator==(const DataModel::Provider::SemanticTag & tagA, const DataModel::
     }
     if (tagA.label.HasValue())
     {
-        if (tagA.label.Value().IsNull() != tagB.label.Value().IsNull()) {
+        if (tagA.label.Value().IsNull() != tagB.label.Value().IsNull())
+        {
             return false;
         }
         if (!tagA.label.Value().IsNull())

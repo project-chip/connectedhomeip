@@ -115,8 +115,7 @@ const T * findById(const std::vector<T> & vector, decltype(std::declval<T>().id)
 MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAttributeConfig> aAttributes,
                                      std::initializer_list<MockEventConfig> aEvents,
                                      std::initializer_list<CommandId> aAcceptedCommands,
-                                     std::initializer_list<CommandId> aGeneratedCommands,
-                                     BitMask<MockClusterSide> side) :
+                                     std::initializer_list<CommandId> aGeneratedCommands, BitMask<MockClusterSide> side) :
     id(aId),
     attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
     mGeneratedCommands(aGeneratedCommands)
