@@ -21,6 +21,7 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -532,6 +533,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();

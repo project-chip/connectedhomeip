@@ -189,6 +189,7 @@ source_set("siwx917-common") {
 
   public_deps += [
     "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]

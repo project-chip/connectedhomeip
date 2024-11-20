@@ -20,6 +20,7 @@
 
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -105,6 +106,7 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
