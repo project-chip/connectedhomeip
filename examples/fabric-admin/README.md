@@ -23,13 +23,13 @@ For Raspberry Pi 4 example:
 ### Pull Docker Images
 
 ```
-docker pull ghcr.io/project-chip/chip-build-crosscompile:92
+docker pull ghcr.io/project-chip/chip-build-crosscompile:93
 ```
 
 ### Run docker
 
 ```
-docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:92 /bin/bash
+docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:93 /bin/bash
 ```
 
 ### Build

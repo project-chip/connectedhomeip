@@ -83,7 +83,7 @@ config HEAP_MEM_POOL_SIZE
     default 256
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
-    default 20716 if SOC_RISCV_TELINK_TL321X
+    default 20716 if SOC_RISCV_TELINK_TL321X || SOC_SERIES_RISCV_TELINK_B9X_RETENTION
     default 12288
 
 config NET_IPV6_MLD
@@ -104,13 +104,11 @@ config NET_PKT_TX_COUNT
     default 8
 
 config NET_BUF_RX_COUNT
-    default 16 if PM
-    default 12 if SOC_RISCV_TELINK_TL321X
+    default 12 if PM || SOC_RISCV_TELINK_TL321X
     default 32
 
 config NET_BUF_TX_COUNT
-    default 16 if PM
-    default 12 if SOC_RISCV_TELINK_TL321X
+    default 12 if PM || SOC_RISCV_TELINK_TL321X
     default 32
 
 config GPIO
@@ -206,9 +204,12 @@ endif # SOC_SERIES_RISCV_TELINK_B9X || SOC_SERIES_RISCV_TELINK_TLX
 endif # BT
 
 # Board retention config
+# Cut down the ram cost by matter's change,it can keep ramcode (driver).
+# No need load the ramcode every time in thread mode (retention mode).
+# If the ram is not enough , can change it back , initial setting is n.
 if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
 config SOC_SERIES_RISCV_TELINK_B9X_NON_RETENTION_RAM_CODE
-    default y if PM
+    default n if PM
 
 config TELINK_B9X_MATTER_RETENTION_LAYOUT
     default y if PM
