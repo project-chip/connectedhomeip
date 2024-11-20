@@ -102,7 +102,6 @@ void emberAfWaterHeaterModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(gWaterHeaterModeDelegate == nullptr && gWaterHeaterModeInstance == nullptr);
     gWaterHeaterModeDelegate = new WaterHeaterMode::ExampleWaterHeaterModeDelegate;
-    gWaterHeaterModeInstance =
-        new ModeBase::Instance(gWaterHeaterModeDelegate, endpointId, WaterHeaterMode::Id, chip::to_underlying(Feature::kOnOff));
+    gWaterHeaterModeInstance = new ModeBase::Instance(gWaterHeaterModeDelegate, endpointId, WaterHeaterMode::Id, 0);
     gWaterHeaterModeInstance->Init();
 }

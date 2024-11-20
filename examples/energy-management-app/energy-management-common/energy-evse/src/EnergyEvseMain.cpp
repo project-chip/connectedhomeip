@@ -156,8 +156,9 @@ CHIP_ERROR EnergyEvseShutdown()
  * create the Delegate first, then wrap it in the Instance
  * Then call the Instance->Init() to register the attribute and command handlers
  */
-CHIP_ERROR EVSEManufacturerInit(ElectricalPowerMeasurementInstance & epmInstance, PowerTopologyInstance & ptInstance,
-                                DeviceEnergyManagementManager & demInstance, DeviceEnergyManagementDelegate & demDelegate)
+CHIP_ERROR EVSEManufacturerInit(chip::EndpointId powerSourceEndpointId, ElectricalPowerMeasurementInstance & epmInstance,
+                                PowerTopologyInstance & ptInstance, DeviceEnergyManagementManager & demInstance,
+                                DeviceEnergyManagementDelegate & demDelegate)
 {
     CHIP_ERROR err;
 
@@ -178,7 +179,7 @@ CHIP_ERROR EVSEManufacturerInit(ElectricalPowerMeasurementInstance & epmInstance
     demDelegate.SetDEMManufacturerDelegate(*gEvseManufacturer.get());
 
     /* Call Manufacturer specific init */
-    err = gEvseManufacturer->Init();
+    err = gEvseManufacturer->Init(powerSourceEndpointId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Init failed on gEvseManufacturer");

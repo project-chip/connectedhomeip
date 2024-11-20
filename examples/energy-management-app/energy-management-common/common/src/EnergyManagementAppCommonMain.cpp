@@ -360,8 +360,8 @@ void EvseApplicationInit()
     auto endpointId = GetEnergyDeviceEndpointId();
     VerifyOrDie(EnergyManagementCommonClustersInit(endpointId) == CHIP_NO_ERROR);
     VerifyOrDie(EnergyEvseInit(endpointId) == CHIP_NO_ERROR);
-    VerifyOrDie(EVSEManufacturerInit(*gEPMInstance.get(), *gPTInstance.get(), *gDEMInstance.get(), *gDEMDelegate.get()) ==
-                CHIP_NO_ERROR);
+    VerifyOrDie(EVSEManufacturerInit(endpointId, *gEPMInstance.get(), *gPTInstance.get(), *gDEMInstance.get(),
+                                     *gDEMDelegate.get()) == CHIP_NO_ERROR);
 }
 
 void EvseApplicationShutdown()

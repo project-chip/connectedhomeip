@@ -59,7 +59,6 @@ set(SRC_DIRS_LIST
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/localization-configuration-server"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/time-format-localization-server"
-  "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/thermostat-server"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/energy-evse-server"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/device-energy-management-server"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"

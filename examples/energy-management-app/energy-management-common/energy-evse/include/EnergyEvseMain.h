@@ -27,7 +27,8 @@
 CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId);
 CHIP_ERROR EnergyEvseShutdown();
 
-CHIP_ERROR EVSEManufacturerInit(chip::app::Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance & epmInstance,
+CHIP_ERROR EVSEManufacturerInit(chip::EndpointId powerSourceEndpointId,
+                                chip::app::Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance & epmInstance,
                                 chip::app::Clusters::PowerTopology::PowerTopologyInstance & ptInstance,
                                 chip::app::Clusters::DeviceEnergyManagementManager & demInstance,
                                 chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate & demDelegate);
