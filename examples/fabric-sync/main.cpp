@@ -16,6 +16,7 @@
  */
 
 #include <AppMain.h>
+#include <CommissionerMain.h>
 #include <admin/FabricAdmin.h>
 #include <admin/PairingManager.h>
 #include <bridge/include/Bridge.h>
