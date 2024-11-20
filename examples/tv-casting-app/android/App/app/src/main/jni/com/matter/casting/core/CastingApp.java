@@ -21,6 +21,7 @@ import android.content.Context;
 import android.util.Log;
 import chip.appserver.ChipAppServer;
 import chip.platform.AndroidBleManager;
+import chip.platform.AndroidNfcCommissioningManager;
 import chip.platform.AndroidChipPlatform;
 import chip.platform.ChipMdnsCallbackImpl;
 import chip.platform.DiagnosticDataProviderImpl;
@@ -76,6 +77,7 @@ public final class CastingApp {
     chipPlatform =
         new AndroidChipPlatform(
             new AndroidBleManager(),
+            new AndroidNfcCommissioningManager(),
             new PreferencesKeyValueStoreManager(appParameters.getApplicationContext()),
             appParameters.getConfigurationManagerProvider().get(),
             new NsdManagerServiceResolver(
