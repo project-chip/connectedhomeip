@@ -25,7 +25,7 @@
 #include <mbedtls/platform.h>
 
 #ifdef SL_WIFI
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #endif /* SL_WIFI */
 
 #if PW_RPC_ENABLED
@@ -41,7 +41,8 @@
 #endif
 
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
-#include "WifiInterfaceAbstraction.h"
+#include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
+#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
 #endif // SLI_SI91X_MCU_INTERFACE
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -328,6 +329,7 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 extern "C" void vApplicationIdleHook(void)
 {
 #if (SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER)
-    sl_si91x_invoke_btn_press_event();
+    SiWxPlatformInterface::sl_si91x_btn_event_handler();
+    SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
 #endif
 }

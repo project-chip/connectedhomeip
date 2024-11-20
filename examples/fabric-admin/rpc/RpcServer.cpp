@@ -38,6 +38,8 @@
 
 using namespace ::chip;
 
+namespace admin {
+
 namespace {
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
@@ -53,7 +55,7 @@ struct ScopedNodeIdHasher
     }
 };
 
-class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
+class FabricAdmin final : public rpc::FabricAdmin, public admin::PairingDelegate, public IcdManager::Delegate
 {
 public:
     void OnCheckInCompleted(const app::ICDClientInfo & clientInfo) override
@@ -94,6 +96,33 @@ public:
         }
     }
 
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err) override
+    {
+        if (mNodeId != deviceId)
+        {
+            ChipLogError(NotSpecified,
+                         "Tried to pair a non-bridge device (0x:" ChipLogFormatX64 ") with result: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(deviceId), err.Format());
+            return;
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Reverse commission succeeded for NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+        }
+
+        if (err == CHIP_NO_ERROR)
+        {
+            DeviceManager::Instance().SetRemoteBridgeNodeId(deviceId);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Failed to pair bridge device (0x:" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(deviceId), err.Format());
+        }
+
+        mNodeId = kUndefinedNodeId;
+    }
+
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceCommissioningWindowInfo & request,
                                        chip_rpc_OperationStatus & response) override
     {
@@ -110,9 +139,9 @@ public:
                         ChipLogValueX64(scopedNodeId.GetNodeId()), commissioningTimeoutSec, iterations, discriminator);
 
         // Open the device commissioning window using raw binary data for salt and verifier
-        DeviceMgr().OpenDeviceCommissioningWindow(scopedNodeId, iterations, commissioningTimeoutSec, discriminator,
-                                                  ByteSpan(request.salt.bytes, request.salt.size),
-                                                  ByteSpan(request.verifier.bytes, request.verifier.size));
+        DeviceManager::Instance().OpenDeviceCommissioningWindow(scopedNodeId, iterations, commissioningTimeoutSec, discriminator,
+                                                                ByteSpan(request.salt.bytes, request.salt.size),
+                                                                ByteSpan(request.verifier.bytes, request.verifier.size));
 
         response.success = true;
 
@@ -144,13 +173,13 @@ public:
 
         if (error == CHIP_NO_ERROR)
         {
-            NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
+            mNodeId = DeviceManager::Instance().GetNextAvailableNodeId();
 
             // After responding with RequestCommissioningApproval to the node where the client initiated the
             // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
             usleep(kCommissionPrepareTimeMs * 1000);
-
-            DeviceMgr().PairRemoteDevice(nodeId, code.c_str());
+            PairingManager::Instance().SetPairingDelegate(this);
+            DeviceManager::Instance().PairRemoteDevice(mNodeId, code.c_str());
         }
         else
         {
@@ -222,6 +251,8 @@ private:
         Platform::Delete(data);
     }
 
+    NodeId mNodeId = chip::kUndefinedNodeId;
+
     // Modifications to mPendingCheckIn should be done on the MatterEventLoop thread
     // otherwise we would need a mutex protecting this data to prevent race as this
     // data is accessible by both RPC thread and Matter eventloop.
@@ -254,3 +285,5 @@ void InitRpcServer(uint16_t rpcServerPort)
     std::thread rpc_service(RunRpcService);
     rpc_service.detach();
 }
+
+} // namespace admin

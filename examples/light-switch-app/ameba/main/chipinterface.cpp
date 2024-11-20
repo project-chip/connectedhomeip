@@ -17,6 +17,7 @@
 
 #include <platform_stdlib.h>
 
+#include "AmebaObserver.h"
 #include "BindingHandler.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
@@ -109,6 +110,8 @@ static void InitServer(intptr_t context)
     VerifyOrDie((sAmebaPersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
     initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
 #endif
+    static AmebaObserver sAmebaObserver;
+    initParams.appDelegate = &sAmebaObserver;
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -124,6 +127,7 @@ static void InitServer(intptr_t context)
 #if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
 #endif
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
 
 extern "C" void ChipTest(void)

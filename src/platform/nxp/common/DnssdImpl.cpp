@@ -99,7 +99,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
                            intptr_t * browseIdentifier)
 {
-    if (ConnectivityMgr().IsWiFiStationConnected()) //|| ESP32Utils::HasIPv6LinkLocalAddress(ESP32Utils::kDefaultEthernetNetifKey))
+    if (ConnectivityMgr().IsWiFiStationConnected())
     {
         ReturnErrorOnFailure(NxpChipDnssdBrowse(type, protocol, addressType, interface, callback, context, browseIdentifier));
     }
@@ -119,7 +119,7 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                             void * context)
 {
-    if (ConnectivityMgr().IsWiFiStationConnected()) //|| ESP32Utils::HasIPv6LinkLocalAddress(ESP32Utils::kDefaultEthernetNetifKey))
+    if (ConnectivityMgr().IsWiFiStationConnected())
     {
         ReturnErrorOnFailure(NxpChipDnssdResolve(service, interface, callback, context));
     }

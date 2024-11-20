@@ -18,6 +18,7 @@
 #import <Matter/Matter.h>
 #import <os/lock.h>
 
+#import "MTRAttributeValueWaiter_Internal.h"
 #import "MTRBaseClusters.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCluster.h"
@@ -25,6 +26,7 @@
 #import "MTRConversion.h"
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
@@ -96,6 +98,12 @@
 @end
 #endif
 
+MTR_DIRECT_MEMBERS
+@interface MTRDevice ()
+// nil until the first time we need it.  Access guarded by our lock.
+@property (nonatomic, readwrite, nullable) NSHashTable<MTRAttributeValueWaiter *> * attributeValueWaiters;
+@end
+
 @implementation MTRDevice
 
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -124,6 +132,10 @@
 {
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
     MTR_LOG("MTRDevice dealloc: %p", self);
+
+    // Locking because _cancelAllAttributeValueWaiters has os_unfair_lock_assert_owner(&_lock)
+    std::lock_guard lock(_lock);
+    [self _cancelAllAttributeValueWaiters];
 }
 
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -228,6 +240,7 @@
     std::lock_guard lock(_lock);
 
     [_delegates removeAllObjects];
+    [self _cancelAllAttributeValueWaiters];
 }
 
 - (BOOL)_delegateExists
@@ -631,7 +644,19 @@
                 return NO;
             }
 
-            if (![self _attributeDataValue:observedEntry[MTRDataKey] satisfiesValueExpectation:expectedEntry[MTRDataKey]]) {
+            MTRDeviceDataValueDictionary observedDataValue = observedEntry[MTRDataKey];
+            if (!MTR_SAFE_CAST(observedDataValue, NSDictionary)) {
+                MTR_LOG_ERROR("%@ observed data-value is not an NSDictionary: %@", self, observedDataValue);
+                return NO;
+            }
+
+            MTRDeviceDataValueDictionary expectedDataValue = expectedEntry[MTRDataKey];
+            if (!MTR_SAFE_CAST(expectedDataValue, NSDictionary)) {
+                MTR_LOG_ERROR("%@ expected data-value is not an NSDictionary: %@", self, expectedDataValue);
+                return NO;
+            }
+
+            if (![self _attributeDataValue:observedDataValue satisfiesValueExpectation:expectedDataValue]) {
                 return NO;
             }
         }
@@ -661,7 +686,7 @@
     }
 
     for (NSDictionary<NSString *, id> * expectedField in expectedArray) {
-        if (![expectedField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![expectedField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
+        if (!MTR_SAFE_CAST(expectedField, NSDictionary) || !MTR_SAFE_CAST(expectedField[MTRContextTagKey], NSNumber) || !MTR_SAFE_CAST(expectedField[MTRDataKey], NSDictionary)) {
             MTR_LOG_ERROR("%@ expected structure-value contains invalid field %@", self, expectedField);
             return NO;
         }
@@ -672,7 +697,7 @@
         // pretty small arrays, so the O(N^2) behavior here is ok.
         BOOL found = NO;
         for (NSDictionary<NSString *, id> * observedField in observedArray) {
-            if (![observedField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![observedField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
+            if (!MTR_SAFE_CAST(observedField, NSDictionary) || !MTR_SAFE_CAST(observedField[MTRContextTagKey], NSNumber) || !MTR_SAFE_CAST(observedField[MTRDataKey], NSDictionary)) {
                 MTR_LOG_ERROR("%@ observed structure-value contains invalid field %@", self, observedField);
                 return NO;
             }
@@ -708,6 +733,92 @@
     // clear what "equivalent" should mean for such malformed TLV, expecially if
     // the same context tag maps to different values in one of the structs.
     return YES;
+}
+
+#pragma mark - Handling of waits for attribute values
+
+- (MTRAttributeValueWaiter *)waitForAttributeValues:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values timeout:(NSTimeInterval)timeout queue:(dispatch_queue_t)queue completion:(void (^)(NSError * _Nullable error))completion
+{
+    // Check whether the values coming in make sense.
+    for (MTRAttributePath * path in values) {
+        MTRVerifyArgumentOrDie(MTRDataValueDictionaryIsWellFormed(values[path]),
+            ([NSString stringWithFormat:@"waitForAttributeValues handed invalid data-value %@ for path %@", path, values[path]]));
+    }
+
+    // Check whether we have all these values already.
+    NSMutableArray<MTRAttributeRequestPath *> * requestPaths = [NSMutableArray arrayWithCapacity:values.count];
+    for (MTRAttributePath * path in values) {
+        [requestPaths addObject:[MTRAttributeRequestPath requestPathWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute]];
+    }
+
+    NSArray<MTRDeviceResponseValueDictionary> * currentValues = [self readAttributePaths:requestPaths];
+
+    auto * attributeWaiter = [[MTRAttributeValueWaiter alloc] initWithDevice:self values:values queue:queue completion:completion];
+
+    for (MTRDeviceResponseValueDictionary currentValue in currentValues) {
+        // Pretend as if this got reported, for purposes of the attribute
+        // waiter.
+        [attributeWaiter _attributeValue:currentValue[MTRDataKey] reportedForPath:currentValue[MTRAttributePathKey] byDevice:self];
+    }
+
+    if (attributeWaiter.allValuesSatisfied) {
+        MTR_LOG("%@ waitForAttributeValues no need to wait, values already match: %@", self, values);
+        // We haven't added this waiter to self.attributeValueWaiters yet, so
+        // no need to remove it before notifying.
+        [attributeWaiter _notifyWithError:nil];
+        return attributeWaiter;
+    }
+
+    // Otherwise, wait for one of our termination conditions.
+    {
+        std::lock_guard lock(_lock);
+        if (!self.attributeValueWaiters) {
+            self.attributeValueWaiters = [NSHashTable weakObjectsHashTable];
+        }
+        [self.attributeValueWaiters addObject:attributeWaiter];
+    }
+
+    MTR_LOG("%@ waitForAttributeValues will wait up to %f seconds for %@", self, timeout, values);
+    [attributeWaiter _startTimerWithTimeout:timeout];
+    return attributeWaiter;
+}
+
+- (void)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    // Check whether anyone was waiting for this attribute.
+    NSMutableArray * satisfiedWaiters;
+    for (MTRAttributeValueWaiter * attributeValueWaiter in self.attributeValueWaiters) {
+        if ([attributeValueWaiter _attributeValue:value reportedForPath:path byDevice:self] && attributeValueWaiter.allValuesSatisfied) {
+            if (!satisfiedWaiters) {
+                satisfiedWaiters = [NSMutableArray array];
+            }
+            [satisfiedWaiters addObject:attributeValueWaiter];
+        }
+    }
+
+    for (MTRAttributeValueWaiter * attributeValueWaiter in satisfiedWaiters) {
+        [self.attributeValueWaiters removeObject:attributeValueWaiter];
+        [attributeValueWaiter _notifyWithError:nil];
+    }
+}
+
+- (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter
+{
+    std::lock_guard lock(_lock);
+    [self.attributeValueWaiters removeObject:attributeValueWaiter];
+}
+
+- (void)_cancelAllAttributeValueWaiters
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    auto * attributeValueWaiters = self.attributeValueWaiters;
+    self.attributeValueWaiters = nil;
+    for (MTRAttributeValueWaiter * attributeValueWaiter in attributeValueWaiters) {
+        [attributeValueWaiter _notifyCancellation];
+    }
 }
 
 @end

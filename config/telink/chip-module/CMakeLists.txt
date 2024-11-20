@@ -155,6 +155,10 @@ set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 
 include(${TELINK_COMMON}/common.cmake)
 
+if (CONFIG_CHIP_APP_LOG_LEVEL GREATER_EQUAL 4)
+    include(${TELINK_COMMON}/build_info.cmake)
+endif()
+
 # ==============================================================================
 # Define 'process_binaries' target for collecting final binary to flash
 # ==============================================================================
@@ -170,7 +174,7 @@ add_dependencies(process_binaries ${ZEPHYR_FINAL_EXECUTABLE})
 # Define 'build_mcuboot' target for building the MCUBoot bootloader
 # ==============================================================================
 
-if (CONFIG_BOOTLOADER_MCUBOOT AND CONFIG_SOC_SERIES_RISCV_TELINK_B9X)
+if (CONFIG_BOOTLOADER_MCUBOOT AND (CONFIG_SOC_SERIES_RISCV_TELINK_B9X OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX))
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BASE_BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
@@ -185,8 +189,17 @@ endif()
 # ==============================================================================
 
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
+    if (CONFIG_COMPRESS_LZMA)
+        add_custom_command(
+            OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME}
+            COMMAND ${CMAKE_COMMAND} -E true
+            COMMENT "Fake command, ${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME} file created in process_binaries target"
+            DEPENDS ${ZEPHYR_FINAL_EXECUTABLE}
+        )
+    endif()
+
     chip_ota_image(chip-ota-image
-        INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr.signed.bin
+        INPUT_FILES ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME}
         OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
     )
     add_dependencies(chip-ota-image process_binaries)

@@ -770,6 +770,7 @@ def BuildTelinkTarget():
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
         TargetPart('tlsr9258a', board=TelinkBoard.TLSR9258A),
         TargetPart('tlsr9258a_retention', board=TelinkBoard.TLSR9258A_RETENTION),
+        TargetPart('tl3218x', board=TelinkBoard.TL3218X),
     ])
 
     target.AppendFixedTargets([
@@ -800,6 +801,8 @@ def BuildTelinkTarget():
     target.AppendModifier('4mb', enable_4mb_flash=True)
     target.AppendModifier('mars', mars_board_config=True)
     target.AppendModifier('usb', usb_board_config=True)
+    target.AppendModifier('compress-lzma', compress_lzma_config=True)
+    target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
 
     return target
 

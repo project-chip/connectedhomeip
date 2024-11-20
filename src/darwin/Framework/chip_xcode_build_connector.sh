@@ -187,6 +187,12 @@ esac
     )
 }
 
+[[ $CHIP_USE_NETWORK_FRAMEWORK == YES ]] && {
+    args+=(
+        'chip_system_config_use_network_framework=true'
+    )
+}
+
 # search current (or $2) and its parent directories until
 #  a name match is found, which is output on stdout
 find_in_ancestors() {
