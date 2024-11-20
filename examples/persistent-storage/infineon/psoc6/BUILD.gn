@@ -39,7 +39,7 @@ psoc6_sdk_sources("persistent_storage_app_sdk_sources") {
 
   defines = [
     "BOARD_ID=${psoc6_board}",
-    "P6_LOG_ENABLED=1",
+    "PSOC6_LOG_ENABLED=1",
   ]
 
   sources = [ "${psoc6_project_dir}/include/CHIPProjectConfig.h" ]

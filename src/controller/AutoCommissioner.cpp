@@ -502,8 +502,16 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kEvictPreviousCaseSessions:
         return CommissioningStage::kFindOperationalForStayActive;
     case CommissioningStage::kPrimaryOperationalNetworkFailed:
-        return CommissioningStage::kDisablePrimaryNetworkInterface;
-    case CommissioningStage::kDisablePrimaryNetworkInterface:
+        if (mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId)
+        {
+            return CommissioningStage::kRemoveWiFiNetworkConfig;
+        }
+        else
+        {
+            return CommissioningStage::kRemoveThreadNetworkConfig;
+        }
+    case CommissioningStage::kRemoveWiFiNetworkConfig:
+    case CommissioningStage::kRemoveThreadNetworkConfig:
         return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
     case CommissioningStage::kFindOperationalForStayActive:
         return CommissioningStage::kICDSendStayActive;
@@ -567,7 +575,8 @@ EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage) const
     case CommissioningStage::kThreadNetworkSetup:
     case CommissioningStage::kThreadNetworkEnable:
         return mDeviceCommissioningInfo.network.thread.endpoint;
-    case CommissioningStage::kDisablePrimaryNetworkInterface:
+    case CommissioningStage::kRemoveWiFiNetworkConfig:
+    case CommissioningStage::kRemoveThreadNetworkConfig:
         return kRootEndpointId;
     default:
         return kRootEndpointId;
@@ -590,11 +599,16 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     mStopCommissioning       = false;
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
-    mNeedsNetworkSetup =
-        mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
-        Transport::Type::kBle;
+
+    auto transportType =
+        mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+    mNeedsNetworkSetup = (transportType == Transport::Type::kBle);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kWiFiPAF);
+#endif
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(CommissioningStage::kSecurePairing, err);
+
     mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(mCommissioneeDeviceProxy, nextStage));
     return CHIP_NO_ERROR;

@@ -70,7 +70,7 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="LabelList" type="list" default="empty">
       <entry type="LabelStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
   </attributes>

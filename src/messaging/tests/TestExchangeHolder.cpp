@@ -25,6 +25,7 @@
 
 #include "messaging/ExchangeDelegate.h"
 #include "system/SystemClock.h"
+#include <lib/core/StringBuilderAdapters.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>

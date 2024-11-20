@@ -41,6 +41,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -279,12 +280,6 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         EXPECT_EQ(v.ComputeSize(&arraySize), CHIP_NO_ERROR);
         EXPECT_EQ(arraySize, 0u);
     }
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    else if (aPath.mAttributeId == Globals::Attributes::EventList::Id)
-    {
-        // Nothing to check for this one; depends on the endpoint.
-    }
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
     {
         // Nothing to check for this one; depends on the endpoint.
@@ -359,7 +354,7 @@ public:
     // Register for the Test Cluster cluster on all endpoints.
     TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
-        registerAttributeAccessOverride(this);
+        AttributeAccessInterfaceRegistry::Instance().Register(this);
     }
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
@@ -581,7 +576,7 @@ TEST_F(TestReadChunking, TestListChunking)
     {
         TestReadCallback readCallback;
 
-        ChipLogDetail(DataManagement, "Running iteration %d\n", packetSize);
+        ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(packetSize));
 
         gIterationCount = packetSize;
 

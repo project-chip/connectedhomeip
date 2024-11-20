@@ -148,8 +148,8 @@ public:
 
     void LogDetail() const
     {
-        ChipLogProgress(AppServer, "Endpoint::LogDetail() Endpoint ID: %d, Vendor ID: %d, Product ID: %d", mAttributes.mId,
-                        mAttributes.mVendorId, mAttributes.mProductId);
+        ChipLogProgress(AppServer, "Endpoint::LogDetail() Endpoint ID: %d, Vendor ID: %d, Product ID: %d, Clusters: %d",
+                        mAttributes.mId, mAttributes.mVendorId, mAttributes.mProductId, static_cast<int>(mClusters.size()));
     }
 };
 

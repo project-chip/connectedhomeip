@@ -234,6 +234,36 @@ class TestXmlParser(unittest.TestCase):
                                       qualities=StructQuality.FABRIC_SCOPED)],
                          )]))
 
+    def testGlobalEnum(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <enum name="One" type="ENUM8">
+                <item value="3" name="Three" />
+              </enum>
+
+              <enum name="Two" type="ENUM8">
+                <item value="100" name="Big" />
+                <item value="2000" name="Bigger" />
+              </enum>
+            </configurator>
+        ''')
+        e1 = Enum(
+            name='One',
+            base_type="ENUM8",
+            entries=[
+                ConstantEntry(name="Three", code=3),
+            ]
+        )
+        e2 = Enum(
+            name='Two',
+            base_type="ENUM8",
+            entries=[
+                ConstantEntry(name="Big", code=100),
+                ConstantEntry(name="Bigger", code=2000),
+            ]
+        )
+        self.assertEqual(idl, Idl(global_enums=[e1, e2]))
+
     def testEnum(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
             <configurator>
@@ -307,6 +337,55 @@ class TestXmlParser(unittest.TestCase):
                          Idl(clusters=[
                              Cluster(name='TestFeatures', code=20, bitmaps=[bitmap])
                          ])),
+
+    def testGlobalStruct(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <struct name="SomeStruct" isFabricScoped="true">
+                <item name="FirstMember" type="int16u" />
+                <item name="SecondMember" type="int32u" />
+              </struct>
+
+            </configurator>
+        ''')
+        struct = Struct(
+            name='SomeStruct',
+            qualities=StructQuality.FABRIC_SCOPED,
+            fields=[
+                Field(data_type=DataType(name='int16u'),
+                      code=0, name='FirstMember'),
+                Field(data_type=DataType(name='int32u'),
+                      code=1, name='SecondMember')
+            ]
+        )
+        self.assertEqual(idl, Idl(global_structs=[struct]))
+
+    def testNameAttribute(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <cluster>
+                  <name>TestCluster</name>
+                  <code>20</code>
+
+                  <attribute side="server" code="0x0002" name="SubjectsPerAccessControlEntry" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="4" default="4">
+                     <mandatoryConform/>
+                   </attribute>
+              </cluster>
+            </configurator>
+        ''')
+        self.assertEqual(idl,
+                         Idl(clusters=[
+                             Cluster(name='TestCluster', code=20,
+                                     attributes=[
+                                         Attribute(
+                                             definition=Field(
+                                                 data_type=DataType(name='int16u', min_value=4),
+                                                 code=2,
+                                                 name='SubjectsPerAccessControlEntry',
+                                             ),
+                                             qualities=AttributeQuality.READABLE,
+                                             readacl=AccessPrivilege.VIEW,
+                                             writeacl=AccessPrivilege.OPERATE)])]))
 
     def testStruct(self):
         idl = XmlToIdl('''<?xml version="1.0"?>

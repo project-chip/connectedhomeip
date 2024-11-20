@@ -18,7 +18,7 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <platform/NetworkCommissioning.h>
-#include <wfx_host_events.h>
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -29,6 +29,8 @@ inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
 inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
+
+CHIP_ERROR GetConnectedNetwork(Network & network);
 
 template <typename T>
 class SlScanResponseIterator : public Iterator<T>

@@ -45,12 +45,15 @@
 #endif                                                               // MATTER_DM_PLUGIN_MODE_BASE
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
+
+using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
 namespace {
 
@@ -88,6 +91,28 @@ void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
 }
 
 #endif // MATTER_DM_PLUGIN_MODE_BASE
+
+template <typename EnumType>
+bool IsKnownEnumValue(EnumType value)
+{
+    return (EnsureKnownEnumValue(value) != EnumType::kUnknownEnumValue);
+}
+
+BootReasonType GetBootReason()
+{
+    BootReasonType bootReason = BootReasonType::kUnspecified;
+
+    CHIP_ERROR error = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Unable to retrieve boot reason: %" CHIP_ERROR_FORMAT, error.Format());
+        bootReason = BootReasonType::kUnspecified;
+    }
+
+    ChipLogProgress(Zcl, "Boot reason: %u", to_underlying(bootReason));
+
+    return bootReason;
+}
 
 } // namespace
 
@@ -207,19 +232,8 @@ public:
             return err;
         }
 
-        // This handler assumes it is being used with the default handler for the level control. Therefore if the level control
-        // cluster with on off feature is present on the endpoint and the level control handler is registered, it assumes this
-        // handler will take action on the on-off state. This assumes the level control attributes were also saved in the scene.
-        // This is to prevent a behavior where the on off state is set by this handler, and then the level control handler or vice
-        // versa.
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
-        if (!(LevelControlWithOnOffFeaturePresent(endpoint) &&
-              ScenesManagement::ScenesServer::Instance().IsHandlerRegistered(endpoint, LevelControlServer::GetSceneHandler())))
-#endif
-        {
-            VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-            OnOffServer::Instance().scheduleTimerCallbackMs(mTransitionTimeInterface.sceneEventControl(endpoint), timeMs);
-        }
+        VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        OnOffServer::Instance().scheduleTimerCallbackMs(mTransitionTimeInterface.sceneEventControl(endpoint), timeMs);
 
         return CHIP_NO_ERROR;
     }
@@ -542,35 +556,36 @@ Status OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bool & on
 {
     app::DataModel::Nullable<OnOff::StartUpOnOffEnum> startUpOnOff;
     Status status = Attributes::StartUpOnOff::Get(endpoint, startUpOnOff);
-    if (status == Status::Success)
+    VerifyOrReturnError(status == Status::Success, status);
+
+    bool currentOnOff = false;
+    status            = Attributes::OnOff::Get(endpoint, &currentOnOff);
+    VerifyOrReturnError(status == Status::Success, status);
+
+    if (startUpOnOff.IsNull() || GetBootReason() == BootReasonType::kSoftwareUpdateCompleted)
     {
-        // Initialise updated value to 0
-        bool updatedOnOff = false;
-        status            = Attributes::OnOff::Get(endpoint, &updatedOnOff);
-        if (status == Status::Success)
-        {
-            if (!startUpOnOff.IsNull())
-            {
-                switch (startUpOnOff.Value())
-                {
-                case OnOff::StartUpOnOffEnum::kOff:
-                    updatedOnOff = false; // Off
-                    break;
-                case OnOff::StartUpOnOffEnum::kOn:
-                    updatedOnOff = true; // On
-                    break;
-                case OnOff::StartUpOnOffEnum::kToggle:
-                    updatedOnOff = !updatedOnOff;
-                    break;
-                default:
-                    // All other values 0x03- 0xFE are reserved - no action.
-                    break;
-                }
-            }
-            onOffValueForStartUp = updatedOnOff;
-        }
+        onOffValueForStartUp = currentOnOff;
+        return Status::Success;
     }
-    return status;
+
+    switch (startUpOnOff.Value())
+    {
+    case OnOff::StartUpOnOffEnum::kOff:
+        onOffValueForStartUp = false; // Off
+        break;
+    case OnOff::StartUpOnOffEnum::kOn:
+        onOffValueForStartUp = true; // On
+        break;
+    case OnOff::StartUpOnOffEnum::kToggle:
+        onOffValueForStartUp = !currentOnOff;
+        break;
+    default:
+        // All other values 0x03- 0xFE are reserved - no action.
+        onOffValueForStartUp = currentOnOff;
+        break;
+    }
+
+    return Status::Success;
 }
 
 bool OnOffServer::offCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath)
@@ -608,6 +623,35 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
     auto effectVariant        = commandData.effectVariant;
     chip::EndpointId endpoint = commandPath.mEndpointId;
     Status status             = Status::Success;
+
+    if (effectId != EffectIdentifierEnum::kUnknownEnumValue)
+    {
+        // Depending on effectId value, effectVariant enum type varies.
+        // The following check validates that effectVariant value is valid in relation to the applicable enum type.
+        // DelayedAllOffEffectVariantEnum or DyingLightEffectVariantEnum
+        if (effectId == EffectIdentifierEnum::kDelayedAllOff &&
+            !IsKnownEnumValue(static_cast<DelayedAllOffEffectVariantEnum>(effectVariant)))
+        {
+            // The server does not support the given variant, it SHALL use the default variant.
+            effectVariant = to_underlying(DelayedAllOffEffectVariantEnum::kDelayedOffFastFade);
+        }
+        else if (effectId == EffectIdentifierEnum::kDyingLight &&
+                 !IsKnownEnumValue(static_cast<DyingLightEffectVariantEnum>(effectVariant)))
+        {
+            // The server does not support the given variant, it SHALL use the default variant.
+            effectVariant = to_underlying(DyingLightEffectVariantEnum::kDyingLightFadeOff);
+        }
+    }
+    else
+    {
+        status = Status::ConstraintError;
+    }
+
+    if (status != Status::Success)
+    {
+        commandObj->AddStatus(commandPath, status);
+        return true;
+    }
 
     if (SupportsLightingApplications(endpoint))
     {

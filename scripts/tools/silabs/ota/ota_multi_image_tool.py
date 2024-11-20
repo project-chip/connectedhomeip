@@ -50,7 +50,6 @@ import ota_image_tool  # noqa: E402 isort:skip
 from chip.tlv import TLVWriter  # noqa: E402 isort:skip
 from custom import CertDeclaration, DacCert, DacPKey, PaiCert  # noqa: E402 isort:skip
 from default import InputArgument  # noqa: E402 isort:skip
-from generate import set_logger  # noqa: E402 isort:skip
 
 OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_app_tlv.bin")
 OTA_BOOTLOADER_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_ssbl_tlv.bin")
@@ -63,6 +62,15 @@ class TAG:
     APPLICATION = 1
     BOOTLOADER = 2
     FACTORY_DATA = 3
+
+
+def set_logger():
+    stdout_handler = logging.StreamHandler(stream=sys.stdout)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='[%(levelname)s] %(message)s',
+        handlers=[stdout_handler]
+    )
 
 
 def write_to_temp(path: str, payload: bytearray):

@@ -15,6 +15,7 @@
  */
 #include <app/util/ember-global-attribute-access-interface.h>
 
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 
@@ -35,15 +36,9 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             {
                 AttributeId id              = mCluster->attributes[i].attributeId;
                 constexpr auto lastGlobalId = GlobalAttributesNotInMetadata[ArraySize(GlobalAttributesNotInMetadata) - 1];
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-                // The GlobalAttributesNotInMetadata shouldn't have any gaps in their ids here.
-                static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata) - 1,
-                              "Ids in GlobalAttributesNotInMetadata not consecutive");
-#else
                 // If EventList is not supported. The GlobalAttributesNotInMetadata is missing one id here.
                 static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata),
                               "Ids in GlobalAttributesNotInMetadata not consecutive (except EventList)");
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
                 if (!addedExtraGlobals && id > lastGlobalId)
                 {
                     for (const auto & globalId : GlobalAttributesNotInMetadata)
@@ -63,16 +58,6 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             }
             return CHIP_NO_ERROR;
         });
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    case EventList::Id:
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            for (size_t i = 0; i < mCluster->eventCount; ++i)
-            {
-                ReturnErrorOnFailure(encoder.Encode(mCluster->eventList[i]));
-            }
-            return CHIP_NO_ERROR;
-        });
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     case AcceptedCommandList::Id:
         return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateAcceptedCommands,
                                  mCluster->acceptedCommandList);
@@ -96,7 +81,7 @@ CHIP_ERROR GlobalAttributeReader::EncodeCommandList(const ConcreteClusterPath & 
 {
     return aEncoder.EncodeList([&](const auto & encoder) {
         auto * commandHandler =
-            InteractionModelEngine::GetInstance()->FindCommandHandler(aClusterPath.mEndpointId, aClusterPath.mClusterId);
+            CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aClusterPath.mEndpointId, aClusterPath.mClusterId);
         if (commandHandler)
         {
             struct Context

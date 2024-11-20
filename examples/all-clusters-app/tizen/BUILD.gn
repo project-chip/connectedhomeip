@@ -38,11 +38,16 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp",
   ]
 
   deps = [
@@ -53,7 +58,10 @@ source_set("chip-all-clusters-common") {
 
   include_dirs = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
   ]
 }
 

@@ -17,6 +17,7 @@
 
 #include <platform_stdlib.h>
 
+#include "AmebaObserver.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "Globals.h"
@@ -37,6 +38,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <static-supported-modes-manager.h>
 #include <support/CHIPMem.h>
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
@@ -64,6 +66,7 @@ namespace { // Network Commissioning
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
+Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
                                       &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
@@ -155,6 +158,8 @@ static void InitServer(intptr_t context)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     initParams.InitializeStaticResourcesBeforeServerInit();
+    static AmebaObserver sAmebaObserver;
+    initParams.appDelegate = &sAmebaObserver;
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
@@ -170,6 +175,8 @@ static void InitServer(intptr_t context)
         // QR code will be used with CHIP Tool
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
+    Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
 
 extern "C" void ChipTest(void)

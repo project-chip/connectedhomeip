@@ -114,8 +114,8 @@ CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const Decodable
             oldListSize++;
         }
     }
-    ReturnErrorCodeIf(BindingTable::GetInstance().Size() - oldListSize + listSize > MATTER_BINDING_TABLE_SIZE,
-                      CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+    VerifyOrReturnError(BindingTable::GetInstance().Size() - oldListSize + listSize <= MATTER_BINDING_TABLE_SIZE,
+                        CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
     return CHIP_NO_ERROR;
 }
 
@@ -268,7 +268,7 @@ CHIP_ERROR BindingTableAccess::NotifyBindingsChanged()
 
 void MatterBindingPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
 
 CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry)

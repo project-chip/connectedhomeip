@@ -25,6 +25,7 @@ public class ContentApp {
     this.vendorId = vendorId;
     this.productId = productId;
     this.version = version;
+    this.supportedClusters = Collections.EMPTY_SET;
   }
 
   public ContentApp(
@@ -67,9 +68,7 @@ public class ContentApp {
   }
 
   public Set<SupportedCluster> getSupportedClusters() {
-    return supportedClusters != null
-        ? Collections.unmodifiableSet(supportedClusters)
-        : Collections.EMPTY_SET;
+    return Collections.unmodifiableSet(supportedClusters);
   }
 
   public String getVersion() {

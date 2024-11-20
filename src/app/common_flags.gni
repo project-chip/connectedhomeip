@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+import("${chip_root}/config/recommended.gni")
+
 declare_args() {
   # Temporary flag for interaction model and echo protocols, set it to true to enable
   chip_app_use_echo = false
@@ -21,4 +24,11 @@ declare_args() {
   # Flag that controls whether the time-to-wait from BUSY responses is
   # communicated to OperationalSessionSetup API consumers.
   chip_enable_busy_handling_for_operational_session_setup = true
+
+  # This controls if more logging is supposed to be enabled into the data models.
+  # This is an optimization for small-flash size devices as extra logging requires
+  # additional flash for messages & code for formatting.
+  chip_data_model_extra_logging =
+      current_os == "linux" || current_os == "ios" || current_os == "mac" ||
+      current_os == "android"
 }

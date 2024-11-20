@@ -391,13 +391,13 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="Type" type="TypeEnum" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0001" name="PhysicalClosedLimitLift" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="LF"/>
@@ -408,7 +408,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="PhysicalClosedLimitTilt" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="TL"/>
@@ -419,7 +419,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="CurrentPositionLift" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="LF"/>
@@ -431,7 +431,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="CurrentPositionTilt" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="TL"/>
@@ -443,27 +443,27 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="NumberOfActuationsLift" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="LF"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0006" name="NumberOfActuationsTilt" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="TL"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0007" name="ConfigStatus" type="ConfigStatusBitmap" default="desc">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0008" name="CurrentPositionLiftPercentage" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="LF"/>
@@ -473,7 +473,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="CurrentPositionTiltPercentage" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="TL"/>
@@ -484,13 +484,13 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000A" name="OperationalStatus" type="OperationalStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="allowed" value="0b00xx xxxx"/>
     </attribute>
     <attribute id="0x000B" name="TargetPositionLiftPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="LF"/>
@@ -500,7 +500,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000C" name="TargetPositionTiltPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="TL"/>
@@ -510,13 +510,13 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000D" name="EndProductType" type="EndProductTypeEnum" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x000E" name="CurrentPositionLiftPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="LF"/>
@@ -527,7 +527,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000F" name="CurrentPositionTiltPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="TL"/>
@@ -538,7 +538,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0010" name="InstalledOpenLimitLift" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="LF"/>
@@ -550,7 +550,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0011" name="InstalledClosedLimitLift" type="uint16" default="65534">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="LF"/>
@@ -562,7 +562,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0012" name="InstalledOpenLimitTilt" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="TL"/>
@@ -574,7 +574,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0013" name="InstalledClosedLimitTilt" type="uint16" default="65534">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="TL"/>
@@ -595,7 +595,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0017" name="Mode" type="ModeBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="allowed" value="0b0000 xxxx"/>
     </attribute>
@@ -607,7 +607,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x001A" name="SafetyStatus" type="SafetyStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>

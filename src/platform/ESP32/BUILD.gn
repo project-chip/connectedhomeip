@@ -172,6 +172,13 @@ static_library("ESP32") {
         "../OpenThread/OpenThreadDnssdImpl.h",
       ]
     }
+    if (chip_openthread_border_router) {
+      deps += [ "${chip_root}/src/app/common:ids" ]
+      sources += [
+        "${chip_root}/src/platform/OpenThread/GenericThreadBorderRouterDelegate.cpp",
+        "${chip_root}/src/platform/OpenThread/GenericThreadBorderRouterDelegate.h",
+      ]
+    }
     configs -= [ "${chip_root}/build/config/compiler:warnings_default" ]
   }
 
@@ -195,6 +202,14 @@ static_library("ESP32") {
     sources += [
       "ESP32SecureCertDACProvider.cpp",
       "ESP32SecureCertDACProvider.h",
+    ]
+  }
+
+  if (chip_use_factory_data_provider && chip_use_secure_cert_dac_provider) {
+    # These files have no dependency on chip_use_secure_cert_dac_provider, but if we are reading the commissionable data from the secure cert, we should expect the attestation data to be present there as well.
+    sources += [
+      "ESP32SecureCertDataProvider.cpp",
+      "ESP32SecureCertDataProvider.h",
     ]
   }
 

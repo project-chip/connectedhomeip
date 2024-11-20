@@ -22,6 +22,7 @@
  *          for Silabs platforms using the Silicon Labs SDK.
  */
 /* this file behaves like a config.h, comes first */
+#include <cmsis_os2.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -30,7 +31,7 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #endif
 
 namespace chip {
@@ -121,7 +122,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
         matterBootCause = BootReasonType::kPowerOnReboot;
     }
     else if (rebootCause & EMU_RSTCAUSE_AVDDBOD || rebootCause & EMU_RSTCAUSE_DVDDBOD || rebootCause & EMU_RSTCAUSE_DECBOD ||
-             rebootCause & EMU_RSTCAUSE_VREGIN || rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
+             rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
     {
         matterBootCause = BootReasonType::kBrownOutReset;
     }
@@ -260,6 +261,18 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
+/// @brief Helper to erase Thread info from device
+void ConfigurationManagerImpl::ClearThreadStack()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ThreadStackMgr().ClearAllSrpHostAndServices();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
+    ThreadStackMgr().ErasePersistentInfo();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+}
+
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
@@ -272,21 +285,15 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", chip::ErrorStr(err));
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ThreadStackMgr().ClearAllSrpHostAndServices();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
-    ThreadStackMgr().ErasePersistentInfo();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    GetDefaultInstance().ClearThreadStack();
 
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    sl_status_t status = wfx_sta_discon();
+    sl_status_t status = sl_matter_wifi_disconnect();
     if (status != SL_STATUS_OK)
     {
-        ChipLogError(DeviceLayer, "wfx_sta_discon() failed: %lx", status);
+        ChipLogError(DeviceLayer, "sl_matter_wifi_disconnect() failed: %lx", status);
     }
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
     wfx_clear_wifi_provision();
@@ -298,7 +305,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // When called from an RPC, the following reset occurs before the RPC can respond,
     // which breaks tests (because it looks like the RPC hasn't successfully completed).
     // Block the task for 500 ms before the reset occurs to allow RPC response to be sent
-    vTaskDelay(pdMS_TO_TICKS(500));
+    osDelay(pdMS_TO_TICKS(500));
 
     NVIC_SystemReset();
 }

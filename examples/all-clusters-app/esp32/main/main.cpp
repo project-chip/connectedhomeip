@@ -42,6 +42,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 
 #if CONFIG_HAVE_DISPLAY
@@ -94,6 +95,7 @@ public:
 AppCallbacks sCallbacks;
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
@@ -123,6 +125,7 @@ static void InitServer(intptr_t context)
 #endif
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 
 // #include <laundry-washer-controls-server/laundry-washer-controls-server.h>

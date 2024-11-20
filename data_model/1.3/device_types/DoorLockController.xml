@@ -74,10 +74,7 @@ Davis, CA 95616, USA
       </otherwiseConform>
     </cluster>
     <cluster id="0x0038" name="Time Synchronization" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </cluster>
     <cluster id="0x0101" name="Door Lock" side="client">
       <mandatoryConform/>

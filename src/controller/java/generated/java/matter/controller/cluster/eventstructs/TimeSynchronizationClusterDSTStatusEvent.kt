@@ -32,17 +32,17 @@ class TimeSynchronizationClusterDSTStatusEvent(val DSTOffsetActive: Boolean) {
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_D_S_T_OFFSET_ACTIVE), DSTOffsetActive)
+      put(ContextSpecificTag(TAG_DST_OFFSET_ACTIVE), DSTOffsetActive)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_D_S_T_OFFSET_ACTIVE = 0
+    private const val TAG_DST_OFFSET_ACTIVE = 0
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterDSTStatusEvent {
       tlvReader.enterStructure(tlvTag)
-      val DSTOffsetActive = tlvReader.getBoolean(ContextSpecificTag(TAG_D_S_T_OFFSET_ACTIVE))
+      val DSTOffsetActive = tlvReader.getBoolean(ContextSpecificTag(TAG_DST_OFFSET_ACTIVE))
 
       tlvReader.exitContainer()
 

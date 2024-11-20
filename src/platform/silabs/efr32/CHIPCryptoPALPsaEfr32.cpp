@@ -1406,7 +1406,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1sin, size_t w1sin_len)
 {
     CHIP_ERROR error          = CHIP_NO_ERROR;
     int result                = 0;
@@ -1418,7 +1418,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
     mbedtls_mpi_init(&w1_bn);
     mbedtls_ecp_point_init(&Ltemp);
 
-    result = mbedtls_mpi_read_binary(&w1_bn, Uint8::to_const_uchar(w1in), w1in_len);
+    result = mbedtls_mpi_read_binary(&w1_bn, Uint8::to_const_uchar(w1sin), w1sin_len);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_mpi_mod_mpi(&w1_bn, &w1_bn, &context->curve.N);
@@ -2330,7 +2330,7 @@ CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certif
     size_t len       = 0;
     mbedtls_x509_crt mbedCertificate;
 
-    ReturnErrorCodeIf(certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     mbedtls_x509_crt_init(&mbedCertificate);
     result = mbedtls_x509_crt_parse(&mbedCertificate, Uint8::to_const_uchar(certificate.data()), certificate.size());
@@ -2386,7 +2386,7 @@ CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate,
 
     outCertificate = referenceCertificate;
 
-    ReturnErrorCodeIf(candidateCertificates == nullptr || candidateCertificatesCount == 0, CHIP_NO_ERROR);
+    VerifyOrReturnError(candidateCertificates != nullptr && candidateCertificatesCount != 0, CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(ExtractSubjectFromX509Cert(referenceCertificate, referenceSubject));
     ReturnErrorOnFailure(ExtractSKIDFromX509Cert(referenceCertificate, referenceSKID));

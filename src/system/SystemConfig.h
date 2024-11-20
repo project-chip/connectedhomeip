@@ -558,7 +558,9 @@ struct LwIPEvent;
  *  @def CHIP_SYSTEM_CONFIG_PLATFORM_LOG
  *
  *  @brief
- *      Defines whether (1) or not (0) the system uses a platform-specific logging implementation.
+ *      Defines whether (1) or not (0) the system uses a platform-specific implementation of
+ *      ChipLog* macros. Most platforms do not use this option and simply provide a logging
+ *      backend that implements LogV.
  *
  *  See CHIPLogging.h for details.
  */
@@ -766,7 +768,7 @@ struct LwIPEvent;
  *  Defaults to enabled on platforms that use sockets other than Zephyr sockets.
  */
 #ifndef CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#if (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK) && !CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
 #define CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS 1
 #else
 #define CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS 0

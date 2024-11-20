@@ -26,10 +26,11 @@
 
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <inet/arpa-inet-compatibility.h>

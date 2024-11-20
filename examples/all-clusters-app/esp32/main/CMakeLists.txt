@@ -18,7 +18,11 @@
 # The list of src and include dirs must be in sync with that in all-clusters-app/esp32/main/component.mk
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/include"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/include"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/common/include"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/device-energy-management/include"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-evse/include"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-reporting/include"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/water-heater/include"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
@@ -29,7 +33,11 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/src"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/common/src"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/device-energy-management/src"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-evse/src"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-reporting/src"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/water-heater/src"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/ota"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
@@ -37,6 +45,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/icd/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util/persistence"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/administrator-commissioning-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/air-quality-server"
@@ -52,7 +61,6 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/level-control"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/access-control-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/barrier-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/window-covering-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
@@ -134,8 +142,7 @@ if (CONFIG_ENABLE_ICD_SERVER)
 endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
-                       SRC_DIRS ${SRC_DIRS_LIST}
-                       EXCLUDE_SRCS ${EXCLUDE_SRCS})
+                       SRC_DIRS ${SRC_DIRS_LIST})
 
 get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 

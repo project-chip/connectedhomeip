@@ -50,7 +50,50 @@ using namespace chip::Protocols;
 
 namespace {
 
-using TestCommands = chip::Test::AppContext;
+const chip::Test::MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace chip::app;
+    using namespace chip::Test;
+    using namespace chip::app::Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(kTestEndpointId, {
+            MockClusterConfig(Clusters::UnitTesting::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+            },
+            {},      // events
+            {
+               Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id,
+            }, // accepted commands
+            {} // generated commands
+          ),
+        }),
+    });
+    // clang-format on
+    return config;
+}
+
+class TestCommands : public chip::Test::AppContext
+{
+public:
+    void SetUp() override
+    {
+        AppContext::SetUp();
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+    }
+
+    void TearDown() override
+    {
+        chip::Test::ResetMockNodeConfig();
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        AppContext::TearDown();
+    }
+
+protected:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
+};
 
 TEST_F(TestCommands, TestDataResponse)
 {
@@ -104,7 +147,8 @@ TEST_F(TestCommands, TestDataResponse)
 
     DrainAndServiceIO();
 
-    EXPECT_TRUE(onSuccessWasCalled && !onFailureWasCalled);
+    EXPECT_TRUE(onSuccessWasCalled);
+    EXPECT_FALSE(onFailureWasCalled);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -165,7 +209,7 @@ TEST_F(TestCommands, TestMultipleSuccessNoDataResponses)
     // not safe to do so.
     auto onSuccessCb = [&successCalls, &statusCheck](const ConcreteCommandPath & commandPath, const StatusIB & aStatus,
                                                      const auto & dataResponse) {
-        statusCheck = (aStatus.mStatus == InteractionModel::Status::Success);
+        statusCheck = (aStatus.mStatus == Protocols::InteractionModel::Status::Success);
         ++successCalls;
     };
 
@@ -290,7 +334,7 @@ TEST_F(TestCommands, TestMultipleFailures)
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
     auto onFailureCb = [&failureCalls, &statusCheck](CHIP_ERROR aError) {
-        statusCheck = aError.IsIMStatus() && StatusIB(aError).mStatus == InteractionModel::Status::Failure;
+        statusCheck = aError.IsIMStatus() && StatusIB(aError).mStatus == Protocols::InteractionModel::Status::Failure;
         ++failureCalls;
     };
 
@@ -367,7 +411,7 @@ TEST_F(TestCommands, TestFailureWithClusterStatus)
         {
             app::StatusIB status(aError);
             statusCheck = (status.mStatus == Protocols::InteractionModel::Status::Failure &&
-                           status.mClusterStatus.Value() == kTestFailureClusterStatus);
+                           status.mClusterStatus == MakeOptional(kTestFailureClusterStatus));
         }
         onFailureWasCalled = true;
     };

@@ -19,6 +19,24 @@
 
 # Commissioning test.
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --log-level INFO
+#       --timeout 3600
+#       --disable-test ClusterObjectTests.TestTimedRequestTimeout
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import asyncio
 import os
 

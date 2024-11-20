@@ -71,19 +71,19 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="temperature">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="temperature">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="between" from="-27315" to="MaxMeasuredValue-1"/>
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="temperature">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="between" from="MinMeasuredValue+1" to="32767"/>
     </attribute>

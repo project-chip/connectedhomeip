@@ -18,8 +18,10 @@
 
 #include <inttypes.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <credentials/PersistentStorageOpCertStore.h>
-#include <gtest/gtest.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>

@@ -80,7 +80,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="Latch" type="AlarmBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="RESET"/>
       </mandatoryConform>
@@ -91,7 +91,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="Supported" type="AlarmBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
   </attributes>

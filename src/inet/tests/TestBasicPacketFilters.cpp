@@ -18,11 +18,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <inet/BasicPacketFilters.h>
 #include <inet/IPPacketInfo.h>
 #include <inet/InetInterface.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>

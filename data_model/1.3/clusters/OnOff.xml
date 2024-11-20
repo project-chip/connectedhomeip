@@ -145,7 +145,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="OnOff" type="bool" default="FALSE">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x4000" name="GlobalSceneControl" type="bool" default="TRUE">
@@ -168,7 +168,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x4003" name="StartUpOnOff" type="StartUpOnOffEnum" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>

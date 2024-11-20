@@ -28,7 +28,7 @@
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <platform/internal/GenericPlatformManagerImpl_CMSISOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
@@ -47,13 +47,13 @@ namespace DeviceLayer {
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
-sys_mutex_t PlatformManagerImpl::rngMutexHandle = NULL;
+osMutexId_t PlatformManagerImpl::rngMutexHandle = nullptr;
 
 int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
 {
-    sys_mutex_lock(&rngMutexHandle);
+    osMutexAcquire(rngMutexHandle, osWaitForever);
     int res = (chip::Crypto::DRBG_get_bytes(dest, size) == CHIP_NO_ERROR) ? size : 0;
-    sys_mutex_unlock(&rngMutexHandle);
+    osMutexRelease(rngMutexHandle);
 
     return res;
 }
@@ -84,10 +84,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(SLI_SI91X_MCU_INTERFACE)
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(SLI_SI91X_MCU_INTERFACE)
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
@@ -97,13 +97,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
 #endif // !SLI_SI91X_MCU_INTERFACE
     /* Set RNG function for tinycrypt operations. */
-    VerifyOrExit(sys_mutex_new(&rngMutexHandle) == ERR_OK, err = CHIP_ERROR_NO_MEMORY);
+    rngMutexHandle = osMutexNew(nullptr);
+    VerifyOrExit((&rngMutexHandle != nullptr), err = CHIP_ERROR_NO_MEMORY);
     uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
     // Start timer to increment TotalOperationalHours every hour
@@ -128,14 +129,23 @@ void PlatformManagerImpl::UpdateOperationalHours(System::Layer * systemLayer, vo
 
     SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
 }
+
 void PlatformManagerImpl::_Shutdown()
 {
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+    Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>::_Shutdown();
 }
 
+} // namespace DeviceLayer
+} // namespace chip
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-void PlatformManagerImpl::HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData)
+// This function needs to be global so it can be used from the platform implementation without depending on the platfrom itself.
+// This is a workaround to avoid a circular dependency.
+void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData)
 {
+    using namespace chip;
+    using namespace chip::DeviceLayer;
+
     ChipDeviceEvent event;
     memset(&event, 0, sizeof(event));
     event.Type                              = DeviceEventType::kWFXSystemEvent;
@@ -198,9 +208,7 @@ void PlatformManagerImpl::HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wf
         }
     }
 
-    (void) sInstance.PostEvent(&event);
+    // TODO: We should add error processing here
+    (void) PlatformMgr().PostEvent(&event);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-
-} // namespace DeviceLayer
-} // namespace chip

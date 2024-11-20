@@ -18,11 +18,9 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#if CHIP_DEVICE_LAYER_TARGET_BL602 || CHIP_DEVICE_LAYER_TARGET_BL702 || CHIP_DEVICE_LAYER_TARGET_BL702L
 extern "C" {
 #include <hal_sys.h>
 #include <hosal_ota.h>
-#endif
 
 extern void hal_reboot(void);
 }

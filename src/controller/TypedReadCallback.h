@@ -43,8 +43,8 @@ namespace Controller {
  *     encapsulate a StatusIB).  This could be a path-specific error or it
  *     could be a general error for the entire request; the distinction is not
  *     that important, because we only have one path involved.  If the
- *     CHIP_ERROR encapsulates a StatusIB, StatusIB::InitFromChipError can be
- *     used to extract the status.
+ *     CHIP_ERROR encapsulates a StatusIB, constructing a StatusIB from it will
+ *     extract the status.
  */
 template <typename DecodableAttributeType>
 class TypedReadAttributeCallback final : public app::ReadClient::Callback

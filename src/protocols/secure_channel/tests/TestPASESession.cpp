@@ -22,11 +22,13 @@
  */
 
 #include <errno.h>
+
 #include <pw_unit_test/framework.h>
 
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestUtils.h>

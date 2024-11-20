@@ -116,11 +116,11 @@ class ContentControlCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_OLD_P_I_N_REQ: Int = 0
-    oldPIN?.let { tlvWriter.put(ContextSpecificTag(TAG_OLD_P_I_N_REQ), oldPIN) }
+    val TAG_OLD_PIN_REQ: Int = 0
+    oldPIN?.let { tlvWriter.put(ContextSpecificTag(TAG_OLD_PIN_REQ), oldPIN) }
 
-    val TAG_NEW_P_I_N_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_NEW_P_I_N_REQ), newPIN)
+    val TAG_NEW_PIN_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_NEW_PIN_REQ), newPIN)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -153,13 +153,13 @@ class ContentControlCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_P_I_N_CODE: Int = 0
+    val TAG_PIN_CODE: Int = 0
     var PINCode_decoded: String? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_P_I_N_CODE)) {
+      if (tag == ContextSpecificTag(TAG_PIN_CODE)) {
         PINCode_decoded = tlvReader.getString(tag)
       } else {
         tlvReader.skipElement()
@@ -221,8 +221,8 @@ class ContentControlCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_P_I_N_CODE_REQ: Int = 0
-    PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_P_I_N_CODE_REQ), PINCode) }
+    val TAG_PIN_CODE_REQ: Int = 0
+    PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_PIN_CODE_REQ), PINCode) }
 
     val TAG_BONUS_TIME_REQ: Int = 1
     bonusTime?.let { tlvWriter.put(ContextSpecificTag(TAG_BONUS_TIME_REQ), bonusTime) }

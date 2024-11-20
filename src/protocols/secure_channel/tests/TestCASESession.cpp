@@ -21,6 +21,10 @@
  *      This file implements unit tests for the CASESession implementation.
  */
 
+#include <stdarg.h>
+
+#include <pw_unit_test/framework.h>
+
 #include <credentials/CHIPCert.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
@@ -30,6 +34,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -38,8 +43,6 @@
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <pw_unit_test/framework.h>
-#include <stdarg.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
 

@@ -38,6 +38,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
     }
 
     public_deps = [
+      "${chip_root}/src/lib/core:string-builder-adapters",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/lib/support:test_utils",
       "${chip_root}/src/platform",

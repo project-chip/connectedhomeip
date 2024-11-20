@@ -125,12 +125,12 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="HourFormat" type="HourFormatEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="ActiveCalendarType" type="CalendarTypeEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CALFMT"/>
       </mandatoryConform>
@@ -138,7 +138,7 @@ Davis, CA 95616, USA
     <attribute id="0x0002" name="SupportedCalendarTypes" type="list" default="N/A">
       <entry type="CalendarTypeEnum"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CALFMT"/>
       </mandatoryConform>

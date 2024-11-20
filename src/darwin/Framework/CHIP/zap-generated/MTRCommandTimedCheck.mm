@@ -50,27 +50,9 @@ static BOOL CommandNeedsTimedInvokeInOnOffCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInOnOffSwitchConfigurationCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::OnOffSwitchConfiguration;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInLevelControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::LevelControl;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInBinaryInputBasicCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::BinaryInputBasic;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -701,6 +683,15 @@ static BOOL CommandNeedsTimedInvokeInEnergyEVSEModeCluster(AttributeId aAttribut
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInWaterHeaterModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WaterHeaterMode;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DeviceEnergyManagementMode;
@@ -752,15 +743,6 @@ static BOOL CommandNeedsTimedInvokeInDoorLockCluster(AttributeId aAttributeId)
 static BOOL CommandNeedsTimedInvokeInWindowCoveringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WindowCovering;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInBarrierControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::BarrierControl;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1002,9 +984,6 @@ static BOOL CommandNeedsTimedInvokeInThreadNetworkDirectoryCluster(AttributeId a
     case Commands::RemoveNetwork::Id: {
         return YES;
     }
-    case Commands::GetOperationalDataset::Id: {
-        return YES;
-    }
     default: {
         return NO;
     }
@@ -1145,9 +1124,63 @@ static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttr
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInElectricalMeasurementCluster(AttributeId aAttributeId)
+static BOOL CommandNeedsTimedInvokeInZoneManagementCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::ElectricalMeasurement;
+    using namespace Clusters::ZoneManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInCameraAVStreamManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CameraAvStreamManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInWebRTCTransportProviderCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WebRTCTransportProvider;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInWebRTCTransportRequestorCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WebRTCTransportRequestor;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInChimeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Chime;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInEcosystemInformationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EcosystemInformation;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInCommissionerControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommissionerControl;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1191,14 +1224,8 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::OnOff::Id: {
         return CommandNeedsTimedInvokeInOnOffCluster(commandID);
     }
-    case Clusters::OnOffSwitchConfiguration::Id: {
-        return CommandNeedsTimedInvokeInOnOffSwitchConfigurationCluster(commandID);
-    }
     case Clusters::LevelControl::Id: {
         return CommandNeedsTimedInvokeInLevelControlCluster(commandID);
-    }
-    case Clusters::BinaryInputBasic::Id: {
-        return CommandNeedsTimedInvokeInBinaryInputBasicCluster(commandID);
     }
     case Clusters::PulseWidthModulation::Id: {
         return CommandNeedsTimedInvokeInPulseWidthModulationCluster(commandID);
@@ -1398,6 +1425,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::EnergyEvseMode::Id: {
         return CommandNeedsTimedInvokeInEnergyEVSEModeCluster(commandID);
     }
+    case Clusters::WaterHeaterMode::Id: {
+        return CommandNeedsTimedInvokeInWaterHeaterModeCluster(commandID);
+    }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(commandID);
     }
@@ -1406,9 +1436,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::WindowCovering::Id: {
         return CommandNeedsTimedInvokeInWindowCoveringCluster(commandID);
-    }
-    case Clusters::BarrierControl::Id: {
-        return CommandNeedsTimedInvokeInBarrierControlCluster(commandID);
     }
     case Clusters::ServiceArea::Id: {
         return CommandNeedsTimedInvokeInServiceAreaCluster(commandID);
@@ -1530,8 +1557,26 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
     }
-    case Clusters::ElectricalMeasurement::Id: {
-        return CommandNeedsTimedInvokeInElectricalMeasurementCluster(commandID);
+    case Clusters::ZoneManagement::Id: {
+        return CommandNeedsTimedInvokeInZoneManagementCluster(commandID);
+    }
+    case Clusters::CameraAvStreamManagement::Id: {
+        return CommandNeedsTimedInvokeInCameraAVStreamManagementCluster(commandID);
+    }
+    case Clusters::WebRTCTransportProvider::Id: {
+        return CommandNeedsTimedInvokeInWebRTCTransportProviderCluster(commandID);
+    }
+    case Clusters::WebRTCTransportRequestor::Id: {
+        return CommandNeedsTimedInvokeInWebRTCTransportRequestorCluster(commandID);
+    }
+    case Clusters::Chime::Id: {
+        return CommandNeedsTimedInvokeInChimeCluster(commandID);
+    }
+    case Clusters::EcosystemInformation::Id: {
+        return CommandNeedsTimedInvokeInEcosystemInformationCluster(commandID);
+    }
+    case Clusters::CommissionerControl::Id: {
+        return CommandNeedsTimedInvokeInCommissionerControlCluster(commandID);
     }
     case Clusters::UnitTesting::Id: {
         return CommandNeedsTimedInvokeInUnitTestingCluster(commandID);

@@ -244,6 +244,13 @@ public:
     virtual bool AllowsLargePayload() const                              = 0;
     virtual const SessionParameters & GetRemoteSessionParameters() const = 0;
     virtual System::Clock::Timestamp GetMRPBaseTimeout() const           = 0;
+
+    // Returns true if `subjectDescriptor.IsCommissioning` (based on Core Specification
+    // pseudocode in ACL Architecture chapter) should be true when computing a
+    // subject descriptor for that session. This is only valid to call during
+    // synchronous processing of a message received on the session.
+    virtual bool IsCommissioningSession() const { return false; }
+
     // GetAckTimeout is the estimate for how long it could take for the other
     // side to receive our message (accounting for our MRP retransmits if it
     // gets lost) and send a response.

@@ -38,11 +38,13 @@ appdirs
 coloredlogs
 watchdog
 build==0.8.0
-mypy==0.971
+mypy==1.10.1
 mypy-protobuf==3.5.0
 protobuf==4.24.4
 types-protobuf==4.24.0.2
 
+cffi==1.15.0; python_version < "3.13"
+cffi==1.17.1; python_version >= "3.13"
 cryptography
 
 # python unit tests
@@ -50,4 +52,3 @@ colorama
 
 # update tornado for pw_watch
 tornado
-

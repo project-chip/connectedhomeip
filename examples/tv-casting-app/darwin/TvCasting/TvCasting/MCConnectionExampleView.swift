@@ -65,6 +65,13 @@ struct MCConnectionExampleView: View {
                         .padding()
                 }
             }
+            Spacer()  // Push the error code to the bottom
+            if let errorCode = viewModel.errorCodeDescription {
+
+                Text("\(errorCode)")
+                    .foregroundColor(.red)
+                    .padding()
+            }
         }
         .navigationTitle("Connecting...")
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)

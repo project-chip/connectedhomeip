@@ -20,6 +20,9 @@
 
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
 #include <lib/dnssd/minimal_mdns/records/IP.h>
@@ -28,8 +31,6 @@
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
 #include <lib/support/ScopedBuffer.h>
-
-#include <gtest/gtest.h>
 
 using namespace chip;
 using namespace chip::Dnssd;

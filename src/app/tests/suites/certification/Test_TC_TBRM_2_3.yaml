@@ -1,0 +1,177 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: "[TC-TBRM-2.3] Change dataset configuration of Thread Border Router"
+
+PICS:
+    - TBRM.S
+    - TBRM.S.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: Thread Border Router Management
+    endpoint: 1
+    PIXIT.TBRM.THREAD_ACTIVE_DATASET:
+        type: octet_string
+        defaultValue: "hex:0e080000000000010000000300001235060004001fffe002082ad51c02fe8f64f20708fddb8af85255f93a051083e2b9b2cc609b00125adbf823ea2ab20102c4d904100a133626c411d7de02a570ca3c3d80470c0402a0f7f8031054687265616441637469766554657374"
+    PIXIT.TBRM.THREAD_PENDING_DATASET:
+        type: octet_string
+        defaultValue: "hex:0e08000000000002000033080000000000010000340400004e2035060004001fffe002082ad51c02fe8f64f20708fddb8af85255f93a051083e2b9b2cc609b00125adbf823ea2ab20102c4d904100a133626c411d7de02a570ca3c3d80470c0402a0f7f8030d54687265616450656e64696e67000300000c"
+        # Active Timestamp ----^^^^^^^^^^^^^^^^
+        # Pending Timestamp -----------------------^^^^^^^^^^^^^^^^
+        # Delay Timer -------------------------------------------------^^^^^^^^ == 20000ms Note: waitForReport has a hard-coded 30 second timeout
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: DelayCommands
+      command: WaitForCommissionee
+      arguments:
+          values:
+              - name: nodeId
+                value: nodeId
+    # Step 1
+    - label: "TH reads the ActiveDatasetTimestamp attribute from the DUT"
+      command: readAttribute
+      attribute: ActiveDatasetTimestamp
+      response:
+          saveAs: initialActiveTimestamp
+          constraints:
+              type: int64u
+
+    - label: "If the ActiveDatasetTimestamp attribute not null, go to step 5"
+      cluster: EqualityCommands
+      command: UnsignedNumberEquals
+      arguments:
+          values:
+              - name: Value1
+                value: initialActiveTimestamp
+              - name: Value2
+                value: null
+      response:
+          - values:
+                - name: Equals
+                  saveAs: noActiveDataset
+
+    # Step 2
+    - label: "TH sends ArmFailSafe command to the DUT"
+      runIf: noActiveDataset
+      cluster: General Commissioning
+      command: ArmFailSafe
+      endpoint: 0
+      arguments:
+          values:
+              - name: ExpiryLengthSeconds
+                value: 60
+              - name: Breadcrumb
+                value: 1
+      response:
+          values:
+              - name: ErrorCode
+                value: CommissioningErrorEnum.OK
+
+    # Step 3
+    - label: "TH sends a valid ActiveDatasetRequest command to the DUT"
+      runIf: noActiveDataset
+      command: SetActiveDatasetRequest
+      arguments:
+          values:
+              - name: ActiveDataset
+                value: PIXIT.TBRM.THREAD_ACTIVE_DATASET
+
+    # Step 4
+    - label: "TH sends CommissioningComplete command to the DUT"
+      runIf: noActiveDataset
+      cluster: General Commissioning
+      command: CommissioningComplete
+      endpoint: 0
+
+    # Step 5
+    - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
+      command: readAttribute
+      attribute: PendingDatasetTimestamp
+      response:
+          saveAs: initialPendingTimestamp
+          constraints:
+              type: int64u
+
+    # Step 6
+    - label: "TH sends a SetPendingDatasetRequest command to the DUT"
+      command: SetPendingDatasetRequest
+      arguments:
+          values:
+              - name: PendingDataset
+                value: PIXIT.TBRM.THREAD_PENDING_DATASET
+
+    # Step 7
+    - label: "TH sends a GetPendingDatasetRequest command to the DUT"
+      command: GetPendingDatasetRequest
+      response:
+          values:
+              - name: Dataset
+                constraints:
+                    type: octet_string
+                    # TODO: This should be PIXIT.TBRM.THREAD_PENDING_DATASET but ignoring the Delay Timer element if present
+
+    # Step 8
+    - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
+      command: readAttribute
+      attribute: PendingDatasetTimestamp
+      response:
+          constraints:
+              type: int64u
+              notValue: initialPendingTimestamp
+
+    # Step 9
+    - label:
+          "TH subscribes to the ActiveDatasetTimestamp attribute from the DUT"
+      command: subscribeAttribute
+      attribute: ActiveDatasetTimestamp
+      minInterval: 1
+      maxInterval: 70
+      response:
+          constraints:
+              type: int64u
+              hasValue: true # not null
+
+    - label: "TH waits for an ActiveDatasetTimestamp report"
+      command: waitForReport
+      attribute: ActiveDatasetTimestamp
+      # TODO: waitForReport uses a hard-coded timeout of 30s, should be configurable?
+      response:
+          constraints:
+              hasValue: true
+
+    # Step 10
+    - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
+      command: readAttribute
+      attribute: PendingDatasetTimestamp
+      response:
+          value: null
+
+    # Step 11
+    - label: "TH sends a GetActiveDatasetRequest command to the DUT"
+      command: GetActiveDatasetRequest
+      response:
+          values:
+              - name: Dataset
+                # TODO: This should be PIXIT.TBRM.THREAD_PENDING_DATASET without the Delay Timer and Pending Timestamp elements
+                constraints:
+                    type: octet_string
+
+    # Step 12
+    - label: "TH reads the InterfaceEnabled attribute from the DUT"
+      command: readAttribute
+      attribute: InterfaceEnabled
+      response:
+          value: true

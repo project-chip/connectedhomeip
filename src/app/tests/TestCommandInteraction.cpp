@@ -25,18 +25,19 @@
 #include <cinttypes>
 #include <optional>
 
-#include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/AppConfig.h>
 #include <app/CommandHandlerImpl.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/Optional.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
@@ -95,6 +96,33 @@ public:
         return aWriter.EndContainer(outerType);
     }
 };
+
+const chip::Test::MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace chip::app;
+    using namespace chip::Test;
+    using namespace chip::app::Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(chip::kTestEndpointId, {
+            MockClusterConfig(Clusters::Identify::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+            },
+            {},      // events
+            {
+                kTestCommandIdWithData,
+                kTestCommandIdNoData,
+                kTestCommandIdCommandSpecificResponse,
+                kTestCommandIdFillResponseMessage,
+            }, // accepted commands
+            {} // generated commands
+          ),
+        }),
+    });
+    // clang-format on
+    return config;
+}
 
 } // namespace
 
@@ -165,27 +193,25 @@ struct BadFields
     }
 };
 
-InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath)
+static Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath)
 {
     // Mock cluster catalog, only support commands on one cluster on one endpoint.
-    using InteractionModel::Status;
-
     if (aRequestCommandPath.mEndpointId != kTestEndpointId)
     {
-        return Status::UnsupportedEndpoint;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
 
     if (aRequestCommandPath.mClusterId != kTestClusterId)
     {
-        return Status::UnsupportedCluster;
+        return Protocols::InteractionModel::Status::UnsupportedCluster;
     }
 
     if (aRequestCommandPath.mCommandId == kTestNonExistCommandId)
     {
-        return Status::UnsupportedCommand;
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
 
-    return Status::Success;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
@@ -346,9 +372,21 @@ public:
     {
         DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
     }
-    InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath)
+
+    Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override
     {
-        return ServerClusterCommandExists(aCommandPath);
+        using Protocols::InteractionModel::Status;
+
+        Status status = ServerClusterCommandExists(request.path);
+        if (status != Status::Success)
+        {
+            return status;
+        }
+
+        // NOTE: IM does more validation here, however for now we do minimal options
+        //       to pass the test.
+
+        return Status::Success;
     }
 
     void ResetCounter() { onFinalCalledTimes = 0; }
@@ -356,9 +394,42 @@ public:
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;
 
+class TestCommandInteractionModel : public TestImCustomDataModel
+{
+public:
+    static TestCommandInteractionModel * Instance()
+    {
+        static TestCommandInteractionModel instance;
+        return &instance;
+    }
+
+    TestCommandInteractionModel() {}
+
+    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
+                                                        chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+    {
+        DispatchSingleClusterCommand(request.path, input_arguments, handler);
+        return std::nullopt; // handler status is set by the dispatch
+    }
+};
+
 class TestCommandInteraction : public chip::Test::AppContext
 {
 public:
+    void SetUp() override
+    {
+        AppContext::SetUp();
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(TestCommandInteractionModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+    }
+
+    void TearDown() override
+    {
+        chip::Test::ResetMockNodeConfig();
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        AppContext::TearDown();
+    }
+
     static size_t GetNumActiveCommandResponderObjects()
     {
         return chip::app::InteractionModelEngine::GetInstance()->mCommandResponderObjs.Allocated();
@@ -425,6 +496,9 @@ public:
     static void FillCurrentInvokeResponseBuffer(CommandHandlerImpl * apCommandHandler,
                                                 const ConcreteCommandPath & aRequestCommandPath, uint32_t aSizeToLeaveInBuffer);
     static void ValidateCommandHandlerEncodeInvokeResponseMessage(bool aNeedStatusCode);
+
+protected:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
@@ -1255,7 +1329,8 @@ TEST_F(TestCommandInteraction, TestCommandHandler_WithOnInvokeReceivedNotExistCo
 
     mockCommandHandlerDelegate.ResetCounter();
     MockCommandResponder mockCommandResponder;
-    InteractionModel::Status status = commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), false);
+    Protocols::InteractionModel::Status status =
+        commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), false);
 
     EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidAction);
     EXPECT_TRUE(mockCommandResponder.mChunks.IsNull());
@@ -1479,6 +1554,43 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandAsyncSuccessResponseFlow)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+TEST_F(TestCommandInteraction, CommandSenderDeletedWhenResponseIsPending)
+{
+
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender * commandSender = Platform::New<app::CommandSender>(&mockCommandSenderDelegate, &GetExchangeManager());
+
+    AddInvokeRequestData(commandSender);
+    asyncCommand = true;
+
+    EXPECT_EQ(commandSender->SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 1u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 2u);
+
+    // This is NOT deleting CommandSender in one of the callbacks, so we are not violating
+    // the API contract. CommandSender is deleted when no message is being processed which
+    // is a time that deleting CommandSender is considered safe.
+    Platform::Delete(commandSender);
+
+    // Decrease CommandHandler refcount and send response
+    asyncCommandHandle = nullptr;
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
 TEST_F(TestCommandInteraction, TestCommandSenderCommandSpecificResponseFlow)
 {
 
@@ -1650,8 +1762,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_RejectsMultipleCo
     mockCommandHandlerDelegate.ResetCounter();
     commandDispatchedCount = 0;
 
-    InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
-    EXPECT_EQ(status, InteractionModel::Status::InvalidAction);
+    Protocols::InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidAction);
 
     EXPECT_EQ(commandDispatchedCount, 0u);
 }
@@ -1703,8 +1815,9 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_RejectMultipleCom
 
     CommandHandlerImpl commandHandler(&mockCommandHandlerDelegate);
     MockCommandResponder mockCommandResponder;
-    InteractionModel::Status status = commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), false);
-    EXPECT_EQ(status, InteractionModel::Status::InvalidAction);
+    Protocols::InteractionModel::Status status =
+        commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidAction);
     EXPECT_TRUE(mockCommandResponder.mChunks.IsNull());
 
     EXPECT_EQ(commandDispatchedCount, 0u);
@@ -1759,8 +1872,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_AcceptMultipleCom
     mockCommandHandlerDelegate.ResetCounter();
     commandDispatchedCount = 0;
 
-    InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
-    EXPECT_EQ(status, InteractionModel::Status::Success);
+    Protocols::InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
 
     EXPECT_EQ(commandDispatchedCount, 2u);
 }

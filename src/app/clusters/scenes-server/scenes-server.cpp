@@ -17,10 +17,12 @@
  */
 
 #include "scenes-server.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/reporting/reporting.h>
@@ -52,6 +54,25 @@ namespace ScenesManagement {
 
 namespace {
 
+Protocols::InteractionModel::Status ResponseStatus(CHIP_ERROR err)
+{
+    // TODO : Properly fix mapping between error types (issue https://github.com/project-chip/connectedhomeip/issues/26885)
+    if (CHIP_ERROR_NOT_FOUND == err)
+    {
+        return Protocols::InteractionModel::Status::NotFound;
+    }
+    if (CHIP_ERROR_NO_MEMORY == err)
+    {
+        return Protocols::InteractionModel::Status::ResourceExhausted;
+    }
+    if (CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute) == err)
+    {
+        // TODO: Confirm if we need to add UnsupportedAttribute status as a return for Scene Commands
+        return Protocols::InteractionModel::Status::InvalidCommand;
+    }
+    return StatusIB(err).mStatus;
+}
+
 /// @brief Generate and add a response to a command handler context if err parameter is not CHIP_NO_ERROR
 /// @tparam ResponseType Type of response, depends on the command
 /// @param ctx Command Handler context where to add reponse
@@ -63,19 +84,7 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
 {
     if (CHIP_NO_ERROR != err)
     {
-        // TODO : Properly fix mapping between error types (issue https://github.com/project-chip/connectedhomeip/issues/26885)
-        if (CHIP_ERROR_NOT_FOUND == err)
-        {
-            resp.status = to_underlying(Protocols::InteractionModel::Status::NotFound);
-        }
-        else if (CHIP_ERROR_NO_MEMORY == err)
-        {
-            resp.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
-        }
-        else
-        {
-            resp.status = to_underlying(StatusIB(err).mStatus);
-        }
+        resp.status = to_underlying(ResponseStatus(err));
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, resp);
     }
     return err;
@@ -90,23 +99,27 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
 template <typename ResponseType>
 CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, Status status)
 {
+    // TODO: this seems odd: we convert `status` to a CHIP_ERROR and then back to status. This seems
+    //       potentially lossy and not ideal.
     return AddResponseOnError(ctx, resp, StatusIB(status).ToChipError());
+}
+
+Status SetLastConfiguredBy(HandlerContext & ctx)
+{
+    const Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+
+    if (AuthMode::kCase == descriptor.authMode)
+    {
+        return Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
+    }
+
+    return Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
 }
 
 template <typename ResponseType>
 CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
 {
-    Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
-    Status status                        = Status::Success;
-
-    if (AuthMode::kCase == descriptor.authMode)
-    {
-        status = Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
-    }
-    else
-    {
-        status = Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
-    }
+    Status status = SetLastConfiguredBy(ctx);
 
     // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
     VerifyOrReturnValue(!(Status::Success == status || Status::UnsupportedAttribute == status), CHIP_NO_ERROR);
@@ -337,8 +350,8 @@ CHIP_ERROR ScenesServer::Init()
     // Prevents re-initializing
     VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     mGroupProvider = Credentials::GetGroupDataProvider();
 
     SceneTable * sceneTable = scenes::GetSceneTableImpl();
@@ -351,7 +364,7 @@ CHIP_ERROR ScenesServer::Init()
 
 void ScenesServer::Shutdown()
 {
-    chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 
     mGroupProvider = nullptr;
     mIsInitialized = false;
@@ -374,9 +387,10 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     response.sceneID = req.sceneID;
 
     // Verify the attributes are respecting constraints
-    if (req.transitionTime > scenes::kScenesMaxTransitionTime || req.sceneName.size() > scenes::kSceneNameMaxLength)
+    if (req.transitionTime > scenes::kScenesMaxTransitionTime || req.sceneName.size() > scenes::kSceneNameMaxLength ||
+        req.sceneID == scenes::kUndefinedSceneId)
     {
-        response.status = to_underlying(Protocols::InteractionModel::Status::InvalidCommand);
+        response.status = to_underlying(Protocols::InteractionModel::Status::ConstraintError);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         return;
     }
@@ -480,6 +494,14 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
     // Response data
     response.groupID = req.groupID;
     response.sceneID = req.sceneID;
+
+    // Verify the attributes are respecting constraints
+    if (req.sceneID == scenes::kUndefinedSceneId)
+    {
+        response.status = to_underlying(Protocols::InteractionModel::Status::ConstraintError);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
 
     // Verify Endpoint in group
     VerifyOrReturn(nullptr != groupProvider);
@@ -828,6 +850,14 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
     response.groupID = req.groupID;
     response.sceneID = req.sceneID;
 
+    // Verify the attributes are respecting constraints
+    if (req.sceneID == scenes::kUndefinedSceneId)
+    {
+        response.status = to_underlying(Protocols::InteractionModel::Status::ConstraintError);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+
     // Scene Table interface data
     SceneTableEntry scene(SceneStorageId(req.sceneID, req.groupID));
 
@@ -928,6 +958,14 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
     response.groupID = req.groupID;
     response.sceneID = req.sceneID;
 
+    // Verify the attributes are respecting constraints
+    if (req.sceneID == scenes::kUndefinedSceneId)
+    {
+        response.status = to_underlying(Protocols::InteractionModel::Status::ConstraintError);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+
     CHIP_ERROR err = StoreSceneParse(ctx.mCommandHandler.GetAccessingFabricIndex(), ctx.mRequestPath.mEndpointId, req.groupID,
                                      req.sceneID, mGroupProvider);
 
@@ -941,6 +979,14 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
 void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::RecallScene::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("RecallScene", "Scenes");
+
+    // Verify the attributes are respecting constraints
+    if (req.sceneID == scenes::kUndefinedSceneId)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+        return;
+    }
+
     CHIP_ERROR err = RecallSceneParse(ctx.mCommandHandler.GetAccessingFabricIndex(), ctx.mRequestPath.mEndpointId, req.groupID,
                                       req.sceneID, req.transitionTime, mGroupProvider);
 
@@ -1022,6 +1068,14 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
     // Response data
     response.groupIdentifierFrom = req.groupIdentifierFrom;
     response.sceneIdentifierFrom = req.sceneIdentifierFrom;
+
+    // Verify the attributes are respecting constraints
+    if (req.sceneIdentifierFrom == scenes::kUndefinedSceneId || req.sceneIdentifierTo == scenes::kUndefinedSceneId)
+    {
+        response.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
 
     // Verify Endpoint in group
     VerifyOrReturn(nullptr != mGroupProvider);

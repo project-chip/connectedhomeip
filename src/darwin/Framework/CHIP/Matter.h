@@ -21,6 +21,7 @@
 
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
+#import <Matter/MTRAttributeValueWaiter.h>
 #import <Matter/MTRBackwardsCompatShims.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
@@ -48,6 +49,7 @@
 #import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
 #import <Matter/MTRDeviceStorageBehaviorConfiguration.h>
+#import <Matter/MTRDeviceType.h>
 #import <Matter/MTRDeviceTypeRevision.h>
 #import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTRError.h>
@@ -68,5 +70,8 @@
 #import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>
 #import <Matter/MTRThreadOperationalDataset.h>
+
+#import <Matter/MTRXPCClientProtocol.h>
+#import <Matter/MTRXPCServerProtocol.h>
 
 #undef MTR_INCLUDED_FROM_UMBRELLA_HEADER

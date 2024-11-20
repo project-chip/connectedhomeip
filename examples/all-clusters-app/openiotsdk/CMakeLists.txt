@@ -48,7 +48,10 @@ target_include_directories(${APP_TARGET}
     PRIVATE
         main/include
         ${ALL_CLUSTERS_COMMON}/include
-        ${ENERGY_MANAGEMENT_COMMON}/include         
+        ${ENERGY_MANAGEMENT_COMMON}/common/include
+        ${ENERGY_MANAGEMENT_COMMON}/device-energy-management/include
+        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/include
+        ${ENERGY_MANAGEMENT_COMMON}/energy-reporting/include
 )
 
 target_sources(${APP_TARGET}
@@ -60,16 +63,20 @@ target_sources(${APP_TARGET}
         ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
         ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/oven-modes.cpp
-        ${ALL_CLUSTERS_COMMON}/src/device-energy-management-stub.cpp        
+        ${ALL_CLUSTERS_COMMON}/src/device-energy-management-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/energy-evse-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
         ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
         ${ALL_CLUSTERS_COMMON}/src/binding-handler.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/src/ElectricalPowerMeasurementDelegate.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp        
+        ${ENERGY_MANAGEMENT_COMMON}/common/src/EnergyTimeUtils.cpp        
+        ${ENERGY_MANAGEMENT_COMMON}/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/device-energy-management/src/DeviceEnergyManagementManager.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/ChargingTargetsMemMgr.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EVSEManufacturerImpl.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EnergyEvseDelegateImpl.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EnergyEvseManager.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EnergyEvseTargetsStore.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp
 )
 
 target_link_libraries(${APP_TARGET}

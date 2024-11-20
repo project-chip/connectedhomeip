@@ -13,7 +13,7 @@
 # limitations under the License.
 
 declare_args() {
-  # P6 board used
+  # PSOC6 board used
   psoc6_board = ""
 }
 

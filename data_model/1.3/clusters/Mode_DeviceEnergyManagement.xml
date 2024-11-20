@@ -62,7 +62,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x009F" name="Device Energy Management Mode"/>
+    <clusterId id="0x009F" name="Device Energy Management Mode">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="DEMM" scope="Endpoint"/>
   <dataTypes>

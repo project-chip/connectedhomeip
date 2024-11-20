@@ -31,6 +31,7 @@
 #include <app/EventLoggingTypes.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/data-model-provider/EventsGenerator.h>
 #include <app/util/basic-types.h>
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/CHIPCounter.h>
@@ -73,7 +74,7 @@ namespace app {
 inline constexpr const uint32_t kEventManagementProfile = 0x1;
 inline constexpr const uint32_t kFabricIndexTag         = 0x1;
 inline constexpr size_t kMaxEventSizeReserve            = 512;
-inline constexpr uint16_t kRequiredEventField =
+constexpr uint16_t kRequiredEventField =
     (1 << to_underlying(EventDataIB::Tag::kPriority)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
 /**
@@ -196,7 +197,7 @@ struct LogStorageResources
  *   more space for new events.
  */
 
-class EventManagement
+class EventManagement : public DataModel::EventsGenerator
 {
 public:
     /**
@@ -387,10 +388,11 @@ public:
      */
     void SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes) const;
 
-private:
-    constexpr EventManagement() = default;
-    static EventManagement sInstance;
+    /* EventsGenerator implementation */
+    CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
+                             EventNumber & generatedEventNumber) override;
 
+private:
     /**
      * @brief
      *  Internal structure for traversing events.
@@ -558,9 +560,10 @@ private:
     MonotonicallyIncreasingCounter<EventNumber> * mpEventNumberCounter = nullptr;
 
     EventNumber mLastEventNumber = 0; ///< Last event Number vended
-    Timestamp mLastEventTimestamp{};  ///< The timestamp of the last event in this buffer
+    Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
 
-    System::Clock::Milliseconds64 mMonotonicStartupTime{};
+    System::Clock::Milliseconds64 mMonotonicStartupTime;
 };
+
 } // namespace app
 } // namespace chip

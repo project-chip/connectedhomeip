@@ -15,28 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- * @file
- *   Defines an iterator for iterating all possible paths from a list of AttributePathParams-s according to spec section 8.9.2.2
- * (Valid Attribute Paths)
- */
-
 #pragma once
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/EventManagement.h>
-#include <lib/core/CHIPCore.h>
-#include <lib/core/TLVDebug.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/DLLUtil.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
-#include <messaging/Flags.h>
-#include <protocols/Protocols.h>
-#include <system/SystemPacketBuffer.h>
+#include <app/data-model-provider/Provider.h>
+#include <lib/support/LinkedList.h>
 
 namespace chip {
 namespace app {
@@ -45,20 +29,21 @@ namespace app {
  * AttributePathExpandIterator is used to iterate over a linked list of AttributePathParams-s.
  * The AttributePathExpandIterator is copiable, however, the given cluster info must be valid when calling Next().
  *
- * AttributePathExpandIterator will expand attribute paths with wildcards, and only emit existing paths for AttributePathParams with
- * wildcards. For AttributePathParams with a concrete path (i.e. does not contain wildcards), AttributePathExpandIterator will emit
- * them as-is.
+ * AttributePathExpandIterator will expand attribute paths with wildcards, and only emit existing paths for
+ * AttributePathParams with wildcards. For AttributePathParams with a concrete path (i.e. does not contain wildcards),
+ * AttributePathExpandIterator will emit them as-is.
  *
  * The typical use of AttributePathExpandIterator may look like:
  * ConcreteAttributePath path;
  * for (AttributePathExpandIterator iterator(AttributePathParams); iterator.Get(path); iterator.Next()) {...}
  *
- * The iterator does not copy the given AttributePathParams, The given AttributePathParams must be valid when using the iterator.
- * If the set of endpoints, clusters, or attributes that are supported changes, AttributePathExpandIterator must be reinitialized.
+ * The iterator does not copy the given AttributePathParams. The given AttributePathParams must remain valid when using the
+ * iterator. If the set of endpoints, clusters, or attributes that are supported changes, AttributePathExpandIterator must be
+ * reinitialized.
  *
  * A initialized iterator will return the first valid path, no need to call Next() before calling Get() for the first time.
  *
- * Note: The Next() and Get() are two separate operations by design since a possible call of this iterator might be:
+ * Note: Next() and Get() are two separate operations by design since a possible call of this iterator might be:
  * - Get()
  * - Chunk full, return
  * - In a new chunk, Get()
@@ -69,12 +54,12 @@ namespace app {
 class AttributePathExpandIterator
 {
 public:
-    AttributePathExpandIterator(SingleLinkedListNode<AttributePathParams> * aAttributePath);
+    AttributePathExpandIterator(DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath);
 
     /**
      * Proceed the iterator to the next attribute path in the given cluster info.
      *
-     * Returns false if AttributePathExpandIterator has exhausted all paths in the given AttributePathParams list.
+     * Returns false if AttributePathExpandIteratorDataModeDataModel has exhausted all paths in the given AttributePathParams list.
      */
     bool Next();
 
@@ -85,7 +70,7 @@ public:
     bool Get(ConcreteAttributePath & aPath)
     {
         aPath = mOutputPath;
-        return Valid();
+        return (mpAttributePath != nullptr);
     }
 
     /**
@@ -97,39 +82,48 @@ public:
      */
     void ResetCurrentCluster();
 
-    /**
-     * Returns if the iterator is valid (not exhausted). An iterator is exhausted if and only if:
-     * - Next() is called after iterating last path.
-     * - Iterator is initialized with a null AttributePathParams.
-     */
-    inline bool Valid() const { return mpAttributePath != nullptr; }
+    /** Start iterating over the given `paths` */
+    inline void ResetTo(SingleLinkedListNode<AttributePathParams> * paths)
+    {
+        *this = AttributePathExpandIterator(mDataModelProvider, paths);
+    }
 
 private:
+    DataModel::Provider * mDataModelProvider;
     SingleLinkedListNode<AttributePathParams> * mpAttributePath;
-
     ConcreteAttributePath mOutputPath;
 
-    uint16_t mEndpointIndex, mEndEndpointIndex;
-    uint16_t mAttributeIndex, mEndAttributeIndex;
+    /// Move to the next endpoint/cluster/attribute triplet that is valid given
+    /// the current mOutputPath and mpAttributePath
+    ///
+    /// returns true if such a next value was found.
+    bool AdvanceOutputPath();
 
-    // Note: should use decltype(EmberAfEndpointType::clusterCount) here, but af-types is including app specific generated files.
-    uint8_t mClusterIndex, mEndClusterIndex;
-    // For dealing with global attributes that are not part of the attribute
-    // metadata.
-    uint8_t mGlobalAttributeIndex, mGlobalAttributeEndIndex;
+    /// Get the next attribute ID in mOutputPath(endpoint/cluster) if one is available.
+    /// Will start from the beginning if current mOutputPath.mAttributeId is kInvalidAttributeId
+    ///
+    /// Respects path expansion/values in mpAttributePath
+    ///
+    /// Handles Global attributes (which are returned at the end)
+    std::optional<AttributeId> NextAttributeId();
 
-    /**
-     * Prepare*IndexRange will update mBegin*Index and mEnd*Index variables.
-     * If AttributePathParams contains a wildcard field, it will set mBegin*Index to 0 and mEnd*Index to count.
-     * Or it will set mBegin*Index to the index of the Endpoint/Cluster/Attribute, and mEnd*Index to mBegin*Index + 1.
-     *
-     * If the Endpoint/Cluster/Attribute does not exist, mBegin*Index will be UINT*_MAX, and mEnd*Inde will be 0.
-     *
-     * The index can be used with emberAfEndpointFromIndex, emberAfGetNthClusterId and emberAfGetServerAttributeIdByIndex.
-     */
-    void PrepareEndpointIndexRange(const AttributePathParams & aAttributePath);
-    void PrepareClusterIndexRange(const AttributePathParams & aAttributePath, EndpointId aEndpointId);
-    void PrepareAttributeIndexRange(const AttributePathParams & aAttributePath, EndpointId aEndpointId, ClusterId aClusterId);
+    /// Get the next cluster ID in mOutputPath(endpoint) if one is available.
+    /// Will start from the beginning if current mOutputPath.mClusterId is kInvalidClusterId
+    ///
+    /// Respects path expansion/values in mpAttributePath
+    std::optional<ClusterId> NextClusterId();
+
+    /// Get the next endpoint ID in mOutputPath if one is available.
+    /// Will start from the beginning if current mOutputPath.mEndpointId is kInvalidEndpointId
+    ///
+    /// Respects path expansion/values in mpAttributePath
+    std::optional<ClusterId> NextEndpointId();
+
+    /// Checks if the given attributeId is valid for the current mOutputPath(endpoint/cluster)
+    ///
+    /// Meaning that it is known to the data model OR it is a always-there global attribute.
+    bool IsValidAttributeId(AttributeId attributeId);
 };
+
 } // namespace app
 } // namespace chip

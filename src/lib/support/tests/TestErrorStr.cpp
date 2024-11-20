@@ -19,10 +19,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 
@@ -118,6 +119,13 @@ TEST(TestErrorStr, CheckRegisterDeregisterErrorFormatter)
 TEST(TestErrorStr, CheckNoError)
 {
     EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_NO_ERROR)), CHIP_NO_ERROR_STRING);
+}
+
+TEST(TestErrorStr, CheckErrorWithProvidedStorage)
+{
+    ErrorStrStorage storage;
+    EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_NO_ERROR, true, storage)), CHIP_NO_ERROR_STRING);
+    EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_ERROR_INTERNAL, true, storage)), "Error 0x000000AC");
 }
 
 TEST(TestErrorStr, CheckFormatErr)

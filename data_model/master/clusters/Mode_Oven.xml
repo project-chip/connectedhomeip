@@ -59,12 +59,17 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0049" name="Oven Mode Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0049" name="Oven Mode"/>
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="OTCCM" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+      <disallowConform/>
+    </feature>
+  </features>
   <dataTypes>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label">
@@ -79,4 +84,18 @@ Davis, CA 95616, USA
       </field>
     </struct>
   </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="SupportedModes">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="CurrentMode">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="StartUpMode">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0003" name="OnMode">
+      <disallowConform/>
+    </attribute>
+  </attributes>
 </cluster>

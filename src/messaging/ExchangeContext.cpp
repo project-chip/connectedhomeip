@@ -294,7 +294,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     mDispatch(GetMessageDispatch(isEphemeralExchange, delegate)),
     mSession(*this)
 {
-    VerifyOrDie(mExchangeMgr == nullptr);
+    VerifyOrDieWithObject(mExchangeMgr == nullptr, this);
 
     mExchangeMgr = em;
     mExchangeId  = ExchangeId;
@@ -334,12 +334,12 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
 
 ExchangeContext::~ExchangeContext()
 {
-    VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
+    VerifyOrDieWithObject(mExchangeMgr != nullptr && GetReferenceCount() == 0, this);
 
     //
     // Ensure that DoClose has been called by the time we get here. If not, we have a leak somewhere.
     //
-    VerifyOrDie(mFlags.Has(Flags::kFlagClosed));
+    VerifyOrDieWithObject(mFlags.Has(Flags::kFlagClosed), this);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // TODO(#33075) : Add check for group context to not a req since it serves no purpose
@@ -666,7 +666,7 @@ void ExchangeContext::AbortAllOtherCommunicationOnFabric()
 
 void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHandle & session)
 {
-    VerifyOrDie(session->AsSecureSession()->IsPendingEviction());
+    VerifyOrDieWithObject(session->AsSecureSession()->IsPendingEviction(), this);
     GrabUnchecked(session);
 }
 

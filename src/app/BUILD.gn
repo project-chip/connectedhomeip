@@ -41,8 +41,6 @@ declare_args() {
   # By default, the resources used by each fabric is unlimited if they are allocated on heap. This flag is for checking the resource usage even when they are allocated on heap to increase code coverage in integration tests.
   chip_im_force_fabric_quota_check = false
 
-  enable_eventlist_attribute = false
-
   # Allow building ota-requestor-app with a non-spec-compliant floor
   # (i.e. smaller than 2 minutes) for action delays.
   non_spec_compliant_ota_action_delay_floor = -1
@@ -71,13 +69,13 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY=${chip_access_control_policy_logging_verbosity}",
     "CHIP_CONFIG_PERSIST_SUBSCRIPTIONS=${chip_persist_subscriptions}",
     "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION=${chip_subscription_timeout_resumption}",
-    "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
     "CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE=${chip_im_static_global_interaction_model_engine}",
     "TIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}",
     "NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR=${non_spec_compliant_ota_action_delay_floor}",
     "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=${chip_build_controller_dynamic_server}",
     "CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP=${chip_enable_busy_handling_for_operational_session_setup}",
+    "CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING=${chip_data_model_extra_logging}",
   ]
 
   visibility = [ ":app_config" ]
@@ -203,15 +201,23 @@ static_library("interaction-model") {
     "reporting/reporting.h",
   ]
 
-  deps = [ "${chip_root}/src/app:events" ]
+  deps = [
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/app:global-attributes",
+  ]
+
+  # Temporary dependency: codegen data provider instance should be provided
+  # by the application
+  deps += [ "${chip_root}/src/app/codegen-data-model-provider:instance-header" ]
 
   public_deps = [
     ":app_config",
-    ":command-handler",
+    ":command-handler-impl",
     ":constants",
     ":paths",
     ":subscription-info-provider",
     "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
@@ -245,13 +251,24 @@ static_library("interaction-model") {
       "clusters/ota-provider/ota-provider.cpp",
       "dynamic_server/AccessControl.cpp",
       "dynamic_server/AccessControl.h",
+    ]
+
+    # DynamicDispatcher is actually an ember-override that takes over
+    # util/attribute-storage.cpp and util/attribute-table.cpp functions.
+    #
+    # We likely should formalize and change this with a proper DataModel::Provider that
+    # is consistent instead
+    sources += [
+      "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
+      "${chip_root}/src/app/util/ember-io-storage.cpp",
       "dynamic_server/DynamicDispatcher.cpp",
     ]
 
     public_deps += [
       ":global-attributes",
       "${chip_root}/src/access",
-      "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
+      "${chip_root}/src/access:provider-impl",
+      "${chip_root}/src/app/common:attribute-type",
     ]
 
     public_configs += [ ":config-controller-dynamic-server" ]
@@ -333,25 +350,57 @@ source_set("status-response") {
   ]
 }
 
-source_set("command-handler") {
+source_set("command-handler-interface") {
   sources = [
     "CommandHandler.cpp",
     "CommandHandler.h",
     "CommandHandlerExchangeInterface.h",
+    "CommandHandlerInterface.h",
+    "CommandHandlerInterfaceRegistry.cpp",
+    "CommandHandlerInterfaceRegistry.h",
+  ]
+
+  public_deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
+  ]
+}
+
+source_set("command-handler-impl") {
+  sources = [
     "CommandHandlerImpl.cpp",
     "CommandHandlerImpl.h",
   ]
 
   public_deps = [
+    ":command-handler-interface",
     ":paths",
     ":required-privileges",
     ":status-response",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
+  ]
+}
+
+source_set("attribute-persistence") {
+  sources = [ "SafeAttributePersistenceProvider.h" ]
+
+  public_deps = [
+    ":paths",
+    "${chip_root}/src/app/data-model:nullable",
+    "${chip_root}/src/app/util:types",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:span",
   ]
 }
 
@@ -363,15 +412,11 @@ static_library("app") {
   sources = [
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
-    "AttributePersistenceProvider.h",
+    "AttributePathExpandIterator.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
-    "DefaultAttributePersistenceProvider.cpp",
-    "DefaultAttributePersistenceProvider.h",
-    "DeferredAttributePersistenceProvider.cpp",
-    "DeferredAttributePersistenceProvider.h",
     "EventLogging.h",
     "EventManagement.cpp",
     "EventManagement.h",
@@ -381,7 +426,6 @@ static_library("app") {
     "GenericEventManagementTestEventTriggerHandler.h",
     "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
-    "SafeAttributePersistenceProvider.h",
     "TimerDelegates.cpp",
     "TimerDelegates.h",
     "WriteHandler.cpp",
@@ -401,6 +445,7 @@ static_library("app") {
     ":global-attributes",
     ":interaction-model",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/address_resolve",

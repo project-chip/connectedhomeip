@@ -162,6 +162,7 @@ class Struct:
     code: Optional[int] = None  # for responses only
     qualities: StructQuality = StructQuality.NONE
     api_maturity: ApiMaturity = ApiMaturity.STABLE
+    is_global: bool = False
 
 
 @dataclass
@@ -193,6 +194,7 @@ class Enum:
     base_type: str
     entries: List[ConstantEntry]
     api_maturity: ApiMaturity = ApiMaturity.STABLE
+    is_global: bool = False
 
 
 @dataclass
@@ -201,6 +203,7 @@ class Bitmap:
     base_type: str
     entries: List[ConstantEntry]
     api_maturity: ApiMaturity = ApiMaturity.STABLE
+    is_global: bool = False
 
 
 @dataclass
@@ -289,6 +292,11 @@ class Endpoint:
 class Idl:
     clusters: List[Cluster] = field(default_factory=list)
     endpoints: List[Endpoint] = field(default_factory=list)
+
+    # Global types
+    global_bitmaps: List[Bitmap] = field(default_factory=list)
+    global_enums: List[Enum] = field(default_factory=list)
+    global_structs: List[Struct] = field(default_factory=list)
 
     # IDL file name is available only if parsing provides a file name
     parse_file_name: Optional[str] = field(default=None)

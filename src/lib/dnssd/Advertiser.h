@@ -55,6 +55,14 @@ enum class ICDModeAdvertise : uint8_t
     kLIT,  // The ICD is currently operating as a LIT. ICD=1 in DNS-SD key/value pairs.
 };
 
+enum class TCPModeAdvertise : uint16_t
+{
+    kNone            = 0,                         // The device does not support TCP.
+    kTCPClient       = 1 << 1,                    // The device supports the TCP client.
+    kTCPServer       = 1 << 2,                    // The device supports the TCP server.
+    kTCPClientServer = (kTCPClient | kTCPServer), // The device supports both the TCP client and server.
+};
+
 template <class Derived>
 class BaseAdvertisingParams
 {
@@ -102,13 +110,12 @@ public:
     }
     const std::optional<ReliableMessageProtocolConfig> & GetLocalMRPConfig() const { return mLocalMRPConfig; }
 
-    // NOTE: The SetTcpSupported API is deprecated and not compliant with 1.3. T flag should not be set.
-    Derived & SetTcpSupported(std::optional<bool> tcpSupported)
+    Derived & SetTCPSupportModes(TCPModeAdvertise tcpSupportModes)
     {
-        mTcpSupported = tcpSupported;
+        mTcpSupportModes = tcpSupportModes;
         return *reinterpret_cast<Derived *>(this);
     }
-    std::optional<bool> GetTcpSupported() const { return mTcpSupported; }
+    TCPModeAdvertise GetTCPSupportModes() const { return mTcpSupportModes; }
 
     Derived & SetICDModeToAdvertise(ICDModeAdvertise operatingMode)
     {
@@ -124,7 +131,7 @@ private:
     uint8_t mMacStorage[kMaxMacSize] = {};
     size_t mMacLength                = 0;
     std::optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
-    std::optional<bool> mTcpSupported;
+    TCPModeAdvertise mTcpSupportModes  = TCPModeAdvertise::kNone;
     ICDModeAdvertise mICDModeAdvertise = ICDModeAdvertise::kNone;
 };
 

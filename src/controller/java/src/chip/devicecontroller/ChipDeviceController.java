@@ -471,6 +471,21 @@ public class ChipDeviceController {
   }
 
   /**
+   * Establish a secure PASE connection using the scanned QR code or manual entry code.
+   *
+   * @param deviceId the ID of the node to connect to
+   * @param setupCode the scanned QR code or manual entry code
+   * @param useOnlyOnNetworkDiscovery the flag to indicate the commissionable device is available on
+   *     the network
+   */
+  public void establishPaseConnection(
+      long deviceId, String setupCode, boolean useOnlyOnNetworkDiscovery) {
+    Log.d(TAG, "Establishing PASE connection using Code: " + setupCode);
+    establishPaseConnectionByCode(
+        deviceControllerPtr, deviceId, setupCode, useOnlyOnNetworkDiscovery);
+  }
+
+  /**
    * Initiates the automatic commissioning flow using the specified network credentials. It is
    * expected that a secure session has already been established via {@link
    * #establishPaseConnection(long, int, long)}.
@@ -1623,6 +1638,9 @@ public class ChipDeviceController {
 
   private native void establishPaseConnectionByAddress(
       long deviceControllerPtr, long deviceId, String address, int port, long setupPincode);
+
+  private native void establishPaseConnectionByCode(
+      long deviceControllerPtr, long deviceId, String setupCode, boolean useOnlyOnNetworkDiscovery);
 
   private native void commissionDevice(
       long deviceControllerPtr,

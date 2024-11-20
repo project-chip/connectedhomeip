@@ -403,6 +403,11 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
                                                   const Span<DataVersionFilter> & aDataVersionFilters,
                                                   bool & aEncodedDataVersionList)
 {
+#if CHIP_PROGRESS_LOGGING
+    size_t encodedFilterCount    = 0;
+    size_t irrelevantFilterCount = 0;
+    size_t skippedFilterCount    = 0;
+#endif
     for (auto & filter : aDataVersionFilters)
     {
         VerifyOrReturnError(filter.IsValidDataVersionFilter(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -420,40 +425,42 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
 
         if (!intersected)
         {
+#if CHIP_PROGRESS_LOGGING
+            ++irrelevantFilterCount;
+#endif
             continue;
         }
 
         TLV::TLVWriter backup;
         aDataVersionFilterIBsBuilder.Checkpoint(backup);
-        CHIP_ERROR err = EncodeDataVersionFilter(aDataVersionFilterIBsBuilder, filter);
+        CHIP_ERROR err = aDataVersionFilterIBsBuilder.EncodeDataVersionFilterIB(filter);
         if (err == CHIP_NO_ERROR)
         {
+#if CHIP_PROGRESS_LOGGING
+            ++encodedFilterCount;
+#endif
             aEncodedDataVersionList = true;
         }
         else if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
             // Packet is full, ignore the rest of the list
             aDataVersionFilterIBsBuilder.Rollback(backup);
-            return CHIP_NO_ERROR;
+#if CHIP_PROGRESS_LOGGING
+            ssize_t nonSkippedFilterCount = &filter - aDataVersionFilters.data();
+            skippedFilterCount            = aDataVersionFilters.size() - static_cast<size_t>(nonSkippedFilterCount);
+#endif // CHIP_PROGRESS_LOGGING
+            break;
         }
         else
         {
             return err;
         }
     }
-    return CHIP_NO_ERROR;
-}
 
-CHIP_ERROR ReadClient::EncodeDataVersionFilter(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                               DataVersionFilter const & aFilter)
-{
-    // Caller has checked aFilter.IsValidDataVersionFilter()
-    DataVersionFilterIB::Builder & filterIB = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
-    ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetError());
-    ClusterPathIB::Builder & path = filterIB.CreatePath();
-    ReturnErrorOnFailure(filterIB.GetError());
-    ReturnErrorOnFailure(path.Endpoint(aFilter.mEndpointId).Cluster(aFilter.mClusterId).EndOfClusterPathIB());
-    ReturnErrorOnFailure(filterIB.DataVersion(aFilter.mDataVersion.Value()).EndOfDataVersionFilterIB());
+    ChipLogProgress(DataManagement,
+                    "%lu data version filters provided, %lu not relevant, %lu encoded, %lu skipped due to lack of space",
+                    static_cast<unsigned long>(aDataVersionFilters.size()), static_cast<unsigned long>(irrelevantFilterCount),
+                    static_cast<unsigned long>(encodedFilterCount), static_cast<unsigned long>(skippedFilterCount));
     return CHIP_NO_ERROR;
 }
 
@@ -1074,10 +1081,14 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     VerifyOrReturnError(IsMatchingSubscriptionId(subscriptionId), CHIP_ERROR_INVALID_SUBSCRIPTION);
     ReturnErrorOnFailure(subscribeResponse.GetMaxInterval(&mMaxInterval));
 
+#if CHIP_PROGRESS_LOGGING
+    auto duration = System::Clock::Milliseconds32(System::SystemClock().GetMonotonicTimestamp() - mSubscribeRequestTime);
+#endif
     ChipLogProgress(DataManagement,
-                    "Subscription established with SubscriptionID = 0x%08" PRIx32 " MinInterval = %u"
+                    "Subscription established in %" PRIu32 "ms with SubscriptionID = 0x%08" PRIx32 " MinInterval = %u"
                     "s MaxInterval = %us Peer = %02x:" ChipLogFormatX64,
-                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, GetFabricIndex(), ChipLogValueX64(GetPeerNodeId()));
+                    duration.count(), mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, GetFabricIndex(),
+                    ChipLogValueX64(GetPeerNodeId()));
 
     ReturnErrorOnFailure(subscribeResponse.ExitContainer());
 
@@ -1136,6 +1147,10 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(const ReadPrepareParams & aReadPrepa
 CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadPrepareParams)
 {
     MATTER_LOG_METRIC_BEGIN(Tracing::kMetricDeviceSubscriptionSetup);
+
+#if CHIP_PROGRESS_LOGGING
+    mSubscribeRequestTime = System::SystemClock().GetMonotonicTimestamp();
+#endif
 
     VerifyOrReturnError(ClientState::Idle == mState, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1286,7 +1301,7 @@ void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManage
     }
 }
 
-void ReadClient::HandleDeviceConnectionFailure(void * context, const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo)
+void ReadClient::HandleDeviceConnectionFailure(void * context, const OperationalSessionSetup::ConnectionFailureInfo & failureInfo)
 {
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);

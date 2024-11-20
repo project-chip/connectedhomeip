@@ -103,7 +103,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="Occupancy" type="OccupancyBitmap">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="between" from="0" to="1"/>
     </attribute>

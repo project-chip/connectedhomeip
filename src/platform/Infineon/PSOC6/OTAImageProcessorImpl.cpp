@@ -20,7 +20,6 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/support/CodeUtils.h>
-#include <ota_serial_flash.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip::DeviceLayer::Internal;
@@ -69,7 +68,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
         // If we have not received all the bytes of the OTAImageHeader yet, that is OK.
         // Return CHIP_NO_ERROR and expect that future blocks will contain the rest.
-        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        VerifyOrReturnError(error != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
 
         // If there is some error other than "too small", return that so future
         // processing will be aborted.
@@ -108,10 +107,10 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
     OTARequestorInterface * requestor = GetRequestorInstance();
-    ReturnErrorCodeIf(requestor == nullptr, false);
+    VerifyOrReturnError(requestor != nullptr, false);
 
     uint32_t currentVersion;
-    ReturnErrorCodeIf(ConfigurationMgr().GetSoftwareVersion(currentVersion) != CHIP_NO_ERROR, false);
+    VerifyOrReturnError(ConfigurationMgr().GetSoftwareVersion(currentVersion) == CHIP_NO_ERROR, false);
 
     ChipLogProgress(SoftwareUpdate, "%ld", currentVersion);
     ChipLogProgress(SoftwareUpdate, "%ld", requestor->GetTargetVersion());
@@ -153,7 +152,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     }
 
     /* Initialize SMIF subsystem for OTA Image download */
-    ota_smif_initialize();
+    cy_ota_mem_init();
 
     // Open and erase secondary flash area to prepare
     if (flash_area_open(FLASH_AREA_IMAGE_SECONDARY(0), &(imageProcessor->mFlashArea)) != 0)
@@ -187,7 +186,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
     flash_area_close(imageProcessor->mFlashArea);
     ChipLogProgress(SoftwareUpdate, "Setting boot pending");
-    int ret = boot_set_pending(0, 1);
+    int ret = flash_area_boot_set_pending(0, 1);
 
     if (ret != 0)
     {

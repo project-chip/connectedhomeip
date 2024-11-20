@@ -57,12 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0099" name="Energy EVSE Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0099" name="Energy EVSE Cluster" revision="3">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
-    <revision revision="3" summary="Added Q quality for SessionDuration, SessionEnergyCharged and SessionEnergyDischarged"/>
-    <revision revision="4" summary="Updates to V2X and associated areas"/>
+    <revision revision="3" summary="Added Q quality for SessionDuration, SessionEnergyCharged and SessionEnergyDischarged. Updates to V2X and associated areas. Make PREF mandatory."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0099" name="Energy EVSE"/>
@@ -76,16 +75,25 @@ Davis, CA 95616, USA
       </otherwiseConform>
     </feature>
     <feature bit="1" code="SOC" name="SoCReporting" summary="EVSE supports reporting of vehicle State of Charge (SoC)">
-      <provisionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
     <feature bit="2" code="PNC" name="PlugAndCharge" summary="EVSE supports PLC to support Plug and Charge">
-      <provisionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
     <feature bit="3" code="RFID" name="RFID" summary="EVSE is fitted with an RFID reader">
       <optionalConform/>
     </feature>
     <feature bit="4" code="V2X" name="V2X" summary="EVSE supports bi-directional charging / discharging">
-      <provisionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -254,7 +262,12 @@ Davis, CA 95616, USA
         </otherwiseConform>
       </field>
       <field id="2" name="AddedEnergy" type="energy-mWh" default="0">
-        <optionalConform choice="a" more="true"/>
+        <otherwiseConform>
+          <optionalConform>
+            <feature name="SOC"/>
+          </optionalConform>
+          <optionalConform choice="a" more="true"/>
+        </otherwiseConform>
         <constraint type="min" value="0"/>
       </field>
     </struct>
@@ -262,7 +275,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="State" type="StateEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="SupplyState" type="SupplyStateEnum">
@@ -275,37 +288,37 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="ChargingEnabledUntil" type="epoch-s" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="DischargingEnabledUntil" type="epoch-s" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="V2X"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0005" name="CircuitCapacity" type="amperage-mA" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="min" value="0"/>
     </attribute>
     <attribute id="0x0006" name="MinimumChargeCurrent" type="amperage-mA" default="6000">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="min" value="0"/>
     </attribute>
     <attribute id="0x0007" name="MaximumChargeCurrent" type="amperage-mA" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="min" value="0"/>
     </attribute>
     <attribute id="0x0008" name="MaximumDischargeCurrent" type="amperage-mA" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="V2X"/>
       </mandatoryConform>
@@ -313,33 +326,33 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="UserMaximumChargeCurrent" type="amperage-mA" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x000A" name="RandomizationDelayWindow" type="elapsed-s" default="600">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="max" value="86400"/>
     </attribute>
     <attribute id="0x0023" name="NextChargeStartTime" type="epoch-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0024" name="NextChargeTargetTime" type="epoch-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0025" name="NextChargeRequiredEnergy" type="energy-mWh" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
@@ -347,14 +360,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0026" name="NextChargeTargetSoC" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0027" name="ApproximateEVEfficiency" type="uint16" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="PREF"/>
       </optionalConform>
@@ -362,14 +375,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0030" name="StateOfCharge" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SOC"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0031" name="BatteryCapacity" type="energy-mWh" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SOC"/>
       </mandatoryConform>
@@ -377,7 +390,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0032" name="VehicleID" type="string" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PNC"/>
       </mandatoryConform>
@@ -385,23 +398,23 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0040" name="SessionID" type="uint32" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0041" name="SessionDuration" type="elapsed-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0042" name="SessionEnergyCharged" type="energy-mWh" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform/>
       <constraint type="min" value="0"/>
     </attribute>
     <attribute id="0x0043" name="SessionEnergyDischarged" type="energy-mWh" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="V2X"/>
       </mandatoryConform>
@@ -525,7 +538,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="min" value="0"/>
       </field>
-      <field id="3" name="MaximumDischargingCurrent" type="amperage-mA">
+      <field id="3" name="MaximumDischargeCurrent" type="amperage-mA">
         <mandatoryConform>
           <feature name="V2X"/>
         </mandatoryConform>

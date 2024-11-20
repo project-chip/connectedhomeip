@@ -29,7 +29,7 @@ class MediaInputManager : public chip::app::Clusters::MediaInput::Delegate
     using InputInfoType = chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type;
 
 public:
-    MediaInputManager();
+    MediaInputManager(chip::EndpointId endpoint);
 
     CHIP_ERROR HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder) override;
     uint8_t HandleGetCurrentInput() override;
@@ -63,7 +63,7 @@ public:
     };
 
 protected:
-    uint8_t mCurrentInput;
+    chip::EndpointId mEndpoint;
     std::vector<InputData> mInputs;
 
 private:

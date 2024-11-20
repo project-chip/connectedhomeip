@@ -1,0 +1,67 @@
+{
+    "inputs": [
+        {
+            "tag": 8,
+            "descriptor": [
+                {
+                    "name": "binary_version",
+                    "length": 4,
+                    "value": 1003
+                },
+                {
+                    "name": "binary_version_str",
+                    "length": 64,
+                    "value": "TestVersion"
+                },
+                {
+                    "name": "build_date",
+                    "length": 64,
+                    "value": "2024-03-25"
+                }
+            ],
+            "path": "./binaries/ext_flash_ota_entry_example.bin"
+        },
+        {
+            "tag": 9,
+            "descriptor": [
+                {
+                    "name": "binary_version",
+                    "length": 4,
+                    "value": 1004
+                },
+                {
+                    "name": "binary_version_str",
+                    "length": 64,
+                    "value": "TestVersion2"
+                },
+                {
+                    "name": "build_date",
+                    "length": 64,
+                    "value": "2024-03-25"
+                }
+            ],
+            "path": "./binaries/ext_flash_ota_entry_example.bin"
+        },
+        {
+            "tag": 10,
+            "descriptor": [
+                {
+                    "name": "binary_version",
+                    "length": 4,
+                    "value": 1005
+                },
+                {
+                    "name": "binary_version_str",
+                    "length": 64,
+                    "value": "TestVersion3"
+                },
+                {
+                    "name": "build_date",
+                    "length": 64,
+                    "value": "2024-03-25"
+                }
+            ],
+            "path": "./binaries/ext_flash_ota_entry_example.bin"
+        }
+    ]
+}

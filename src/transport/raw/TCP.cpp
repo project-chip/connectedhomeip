@@ -578,6 +578,9 @@ void TCPBase::HandleIncomingConnection(Inet::TCPEndPoint * listenEndPoint, Inet:
         tcp->mUsedEndPointCount++;
         activeConnection->mConnectionState = TCPState::kConnected;
 
+        // Set the TCPKeepalive configurations on the received connection
+        endPoint->EnableKeepAlive(activeConnection->mTCPKeepAliveIntervalSecs, activeConnection->mTCPMaxNumKeepAliveProbes);
+
         char addrStr[Transport::PeerAddress::kMaxToStringSize];
         peerAddress.ToString(addrStr);
         ChipLogProgress(Inet, "Incoming connection established with peer at %s.", addrStr);

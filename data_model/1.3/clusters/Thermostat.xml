@@ -472,12 +472,12 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="LocalTemperature" type="temperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="OutdoorTemperature" type="temperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0002" name="Occupancy" type="ref_OccupancyBitmap" default="1">
@@ -489,7 +489,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="AbsMinHeatSetpointLimit" type="temperature" default="7°C">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="HEAT"/>
       </optionalConform>
@@ -497,7 +497,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="AbsMaxHeatSetpointLimit" type="temperature" default="30°C">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="HEAT"/>
       </optionalConform>
@@ -505,7 +505,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="AbsMinCoolSetpointLimit" type="temperature" default="16°C">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="COOL"/>
       </optionalConform>
@@ -513,7 +513,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0006" name="AbsMaxCoolSetpointLimit" type="temperature" default="32°C">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="COOL"/>
       </optionalConform>
@@ -521,7 +521,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="PICoolingDemand" type="uint8" default="-">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="COOL"/>
       </optionalConform>
@@ -529,7 +529,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="PIHeatingDemand" type="uint8" default="-">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="HEAT"/>
       </optionalConform>
@@ -537,13 +537,13 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="HVACSystemTypeConfiguration" type="HVACSystemTypeBitmap" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <deprecateConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0010" name="LocalTemperatureCalibration" type="SignedTemperature" default="0°C">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <notTerm>
           <feature name="LTNE"/>
@@ -553,7 +553,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0011" name="OccupiedCoolingSetpoint" type="temperature" default="26°C">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="COOL"/>
       </mandatoryConform>
@@ -561,7 +561,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0012" name="OccupiedHeatingSetpoint" type="temperature" default="20°C">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="HEAT"/>
       </mandatoryConform>
@@ -569,7 +569,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0013" name="UnoccupiedCoolingSetpoint" type="temperature" default="26°C">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="COOL"/>
@@ -580,7 +580,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0014" name="UnoccupiedHeatingSetpoint" type="temperature" default="20°C">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="HEAT"/>
@@ -591,7 +591,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0015" name="MinHeatSetpointLimit" type="temperature" default="AbsMinHeatSetpointLimit">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="HEAT"/>
       </optionalConform>
@@ -599,7 +599,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0016" name="MaxHeatSetpointLimit" type="temperature" default="AbsMaxHeatSetpointLimit">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="HEAT"/>
       </optionalConform>
@@ -607,7 +607,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0017" name="MinCoolSetpointLimit" type="temperature" default="AbsMinCoolSetpointLimit">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="COOL"/>
       </optionalConform>
@@ -615,7 +615,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0018" name="MaxCoolSetpointLimit" type="temperature" default="AbsMaxCoolSetpointLimit">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="COOL"/>
       </optionalConform>
@@ -623,7 +623,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0019" name="MinSetpointDeadBand" type="SignedTemperature" default="2.5°C">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="AUTO"/>
       </mandatoryConform>
@@ -631,19 +631,19 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x001A" name="RemoteSensing" type="RemoteSensingBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="allowed" value="0b0000 0xxx"/>
     </attribute>
     <attribute id="0x001B" name="ControlSequenceOfOperation" type="ControlSequenceOfOperationEnum" default="4">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x001C" name="SystemMode" type="SystemModeEnum" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
@@ -663,7 +663,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0020" name="StartOfWeek" type="StartOfWeekEnum" default="–">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
@@ -671,33 +671,33 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0021" name="NumberOfWeeklyTransitions" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0022" name="NumberOfDailyTransitions" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0023" name="TemperatureSetpointHold" type="TemperatureSetpointHoldEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0024" name="TemperatureSetpointHoldDuration" type="uint16" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="max" value="1440"/>
     </attribute>
     <attribute id="0x0025" name="ThermostatProgrammingOperationMode" type="ProgrammingOperationModeBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
@@ -713,7 +713,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0031" name="SetpointChangeAmount" type="TemperatureDifference" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0032" name="SetpointChangeSourceTimestamp" type="utc" default="0">
@@ -722,7 +722,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0034" name="OccupiedSetback" type="UnsignedTemperature" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SB"/>
       </mandatoryConform>
@@ -730,7 +730,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0035" name="OccupiedSetbackMin" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SB"/>
       </mandatoryConform>
@@ -738,7 +738,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0036" name="OccupiedSetbackMax" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SB"/>
       </mandatoryConform>
@@ -746,7 +746,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0037" name="UnoccupiedSetback" type="UnsignedTemperature" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="SB"/>
@@ -757,7 +757,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0038" name="UnoccupiedSetbackMin" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="SB"/>
@@ -768,7 +768,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0039" name="UnoccupiedSetbackMax" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="SB"/>
@@ -779,29 +779,29 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x003A" name="EmergencyHeatDelta" type="UnsignedTemperature" default="25.5°C">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0040" name="ACType" type="ACTypeEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0041" name="ACCapacity" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0042" name="ACRefrigerantType" type="ACRefrigerantTypeEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0043" name="ACCompressorType" type="ACCompressorTypeEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
@@ -811,18 +811,18 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0045" name="ACLouverPosition" type="ACLouverPositionEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0046" name="ACCoilTemperature" type="temperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0047" name="ACCapacityFormat" type="ACCapacityFormatEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>

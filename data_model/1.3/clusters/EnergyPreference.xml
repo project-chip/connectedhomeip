@@ -62,7 +62,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x009B" name="Energy Preference"/>
+    <clusterId id="0x009B" name="Energy Preference">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="EPREF" scope="Endpoint"/>
   <features>
@@ -102,7 +104,7 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="EnergyBalances" type="list">
       <entry type="BalanceStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
@@ -110,7 +112,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="CurrentEnergyBalance" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
@@ -118,7 +120,7 @@ Davis, CA 95616, USA
     <attribute id="0x0002" name="EnergyPriorities" type="list">
       <entry type="EnergyPriorityEnum"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
@@ -127,7 +129,7 @@ Davis, CA 95616, USA
     <attribute id="0x0003" name="LowPowerModeSensitivities" type="list">
       <entry type="BalanceStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="LPMS"/>
       </mandatoryConform>
@@ -135,7 +137,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="CurrentLowPowerModeSensitivity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="LPMS"/>
       </mandatoryConform>

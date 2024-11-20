@@ -31,6 +31,7 @@
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 

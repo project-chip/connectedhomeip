@@ -181,7 +181,12 @@ public:
             //  - 11 is the maximum length of a %d (-2147483648, 2147483647)
             //  - 2 is the length for the "[" and "]" characters.
             snprintf(labelWithIndex, sizeof(labelWithIndex), "%.241s[%d]", label, i);
-            ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithIndex, content[i], value[i]));
+            auto error = ComplexArgumentParser::Setup(labelWithIndex, content[i], value[i]);
+            if (CHIP_NO_ERROR != error)
+            {
+                chip::Platform::MemoryFree(content);
+                return error;
+            }
         }
 
         request = chip::app::DataModel::List<T>(content, value.size());
@@ -415,7 +420,14 @@ public:
         return ComplexArgumentParser::Setup(label, *mRequest, value);
     }
 
-    void Reset() { *mRequest = T(); }
+    void Reset()
+    {
+        if (mRequest != nullptr)
+        {
+            ComplexArgumentParser::Finalize(*mRequest);
+            *mRequest = T();
+        }
+    }
 
 private:
     T * mRequest;

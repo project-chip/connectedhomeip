@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <pw_unit_test/framework.h>
+
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
@@ -26,7 +28,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <pw_unit_test/framework.h>
 #include <system/SystemClock.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -218,6 +219,10 @@ class LoopbackMessagingContext : public ::testing::Test, public MessagingContext
 {
 public:
     virtual ~LoopbackMessagingContext() {}
+
+    // Pigweed test pure virtual will get overriden
+    // TODO: why is a context a Test?
+    virtual void PigweedTestBody() {}
 
     // These functions wrap spLoopbackTransportManager methods
     static auto & GetSystemLayer() { return spLoopbackTransportManager->GetSystemLayer(); }

@@ -57,91 +57,251 @@ limitations under the License.
 
     <!-- Window Covering Information Attribute Set -->
     <!-- Conformance feature M -->
-    <attribute side="server" writable="false" code="0x0000" define="WC_TYPE"                                      type="Type"     min="0x00"   max="0x09"   default="0x00"   optional="false">Type</attribute>
+    <attribute side="server" code="0x0000" name="Type" define="WC_TYPE" type="Type" min="0x00" max="0x09" default="0x00">
+      <mandatoryConform/>
+    </attribute>
     <!-- Conformance feature [LF & PA_LF & ABS] - for now optional -->
-    <attribute side="server" writable="false" code="0x0001" define="WC_PHYSICAL_CLOSED_LIMIT_LIFT"                type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >PhysicalClosedLimitLift</attribute>
+    <attribute side="server" code="0x0001" name="PhysicalClosedLimitLift" define="WC_PHYSICAL_CLOSED_LIMIT_LIFT" type="int16u" default="0x0000" optional="true">
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
     <!-- Conformance feature [TL & PA_TL & ABS] - for now optional -->
-    <attribute side="server" writable="false" code="0x0002" define="WC_PHYSICAL_CLOSED_LIMIT_TILT"                type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >PhysicalClosedLimitTilt</attribute>
+    <attribute side="server" code="0x0002" name="PhysicalClosedLimitTilt" define="WC_PHYSICAL_CLOSED_LIMIT_TILT" type="int16u" default="0x0000" optional="true">
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
     <!-- Conformance feature [LF & PA_LF & ABS] - for now optional -->
-    <attribute side="server" writable="false" code="0x0003" define="WC_CURRENT_POSITION_LIFT"                     type="int16u"   min="0x0000" max="0xFFFF" isNullable="true" optional="true">CurrentPositionLift</attribute>
+    <attribute side="server" code="0x0003" name="CurrentPositionLift" define="WC_CURRENT_POSITION_LIFT" type="int16u" max="65534" isNullable="true" optional="true">
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
     <!-- Conformance feature [TL & PA_TL & ABS] - for now optional -->
-    <attribute side="server" writable="false" code="0x0004" define="WC_CURRENT_POSITION_TILT"                     type="int16u"   min="0x0000" max="0xFFFF" isNullable="true" optional="true">CurrentPositionTilt</attribute>
+    <attribute side="server" code="0x0004" name="CurrentPositionTilt" define="WC_CURRENT_POSITION_TILT" type="int16u" max="65534" isNullable="true" optional="true">
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
     <!-- Conformance feature [LF] - for now optional -->
-    <attribute side="server" writable="false" code="0x0005" define="WC_NUMBER_OF_ACTUATIONS_LIFT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >NumberOfActuationsLift</attribute>
+    <attribute side="server" code="0x0005" name="NumberOfActuationsLift" define="WC_NUMBER_OF_ACTUATIONS_LIFT" type="int16u" default="0x0000" optional="true">
+      <optionalConform>
+        <feature name="LF"/>
+      </optionalConform>
+    </attribute>
     <!-- Conformance feature [TL] - for now optional -->
-    <attribute side="server" writable="false" code="0x0006" define="WC_NUMBER_OF_ACTUATIONS_TILT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >NumberOfActuationsTilt</attribute>
+    <attribute side="server" code="0x0006" name="NumberOfActuationsTilt" define="WC_NUMBER_OF_ACTUATIONS_TILT" type="int16u" default="0x0000" optional="true">
+      <optionalConform>
+        <feature name="TL"/>
+      </optionalConform>
+    </attribute>
     <!-- Conformance feature M -->
-    <attribute side="server" writable="false" code="0x0007" define="WC_CONFIG_STATUS"                             type="ConfigStatus" min="0x00"   max="0x7F"   default="0x03"   optional="false">ConfigStatus</attribute>
+    <attribute side="server" code="0x0007" name="ConfigStatus" define="WC_CONFIG_STATUS" type="ConfigStatus" min="0x00" max="0x7F" default="0x03">
+      <mandatoryConform/>
+    </attribute>
     <!-- Conformance feature [LF & PA_LF] - for now optional -->
-    <attribute side="server" writable="false" code="0x0008" define="WC_CURRENT_POSITION_LIFT_PERCENTAGE"          type="percent"  min="0"      max="100"    isNullable="true" optional="true" reportable="true" >CurrentPositionLiftPercentage</attribute>
+    <attribute side="server" code="0x0008" name="CurrentPositionLiftPercentage" define="WC_CURRENT_POSITION_LIFT_PERCENTAGE" type="percent" isNullable="true" optional="true" reportable="true">
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
     <!-- Conformance feature [TL & PA_TL] - for now optional -->
-    <attribute side="server" writable="false" code="0x0009" define="WC_CURRENT_POSITION_TILT_PERCENTAGE"          type="percent"  min="0"      max="100"    isNullable="true" optional="true" reportable="true" >CurrentPositionTiltPercentage</attribute>
+    <attribute side="server" code="0x0009" name="CurrentPositionTiltPercentage" define="WC_CURRENT_POSITION_TILT_PERCENTAGE" type="percent" isNullable="true" optional="true" reportable="true">
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
     <!-- Conformance feature M -->
-    <attribute side="server" writable="false" code="0x000A" define="WC_OPERATIONAL_STATUS"                        type="OperationalStatus" min="0x00"   max="0x7F"   default="0x00"   optional="false" reportable="true" >OperationalStatus</attribute>
+    <attribute side="server" code="0x000A" name="OperationalStatus" define="WC_OPERATIONAL_STATUS" type="OperationalStatus" min="0x00" max="0x7F" default="0x00" reportable="true">
+      <mandatoryConform/>
+    </attribute>
     <!-- Conformance feature LF & PA_LF - for now optional -->
-    <attribute side="server" writable="false" code="0x000B" define="WC_TARGET_POSITION_LIFT_PERCENT100THS"        type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >TargetPositionLiftPercent100ths</attribute>
+    <attribute side="server" code="0x000B" name="TargetPositionLiftPercent100ths" define="WC_TARGET_POSITION_LIFT_PERCENT100THS" type="percent100ths" isNullable="true" optional="true" reportable="true">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
     <!-- Conformance feature TL & PA_TL - for now optional -->
-    <attribute side="server" writable="false" code="0x000C" define="WC_TARGET_POSITION_TILT_PERCENT100THS"        type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >TargetPositionTiltPercent100ths</attribute>
+    <attribute side="server" code="0x000C" name="TargetPositionTiltPercent100ths" define="WC_TARGET_POSITION_TILT_PERCENT100THS" type="percent100ths" isNullable="true" optional="true" reportable="true">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
     <!-- Conformance feature M -->
-    <attribute side="server" writable="false" code="0x000D" define="WC_END_PRODUCT_TYPE"                          type="EndProductType" min="0x00"   max="0x20"   default="0x00"   optional="false" >EndProductType</attribute>
+    <attribute side="server" code="0x000D" name="EndProductType" define="WC_END_PRODUCT_TYPE" type="EndProductType" min="0x00" max="0x20" default="0x00">
+      <mandatoryConform/>
+    </attribute>
     <!-- Conformance feature LF & PA_LF - for now optional -->
-    <attribute side="server" writable="false" code="0x000E" define="WC_CURRENT_POSITION_LIFT_PERCENT100THS"       type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >CurrentPositionLiftPercent100ths</attribute>
+    <attribute side="server" code="0x000E" name="CurrentPositionLiftPercent100ths" define="WC_CURRENT_POSITION_LIFT_PERCENT100THS" type="percent100ths" max="10000" isNullable="true" optional="true" reportable="true">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
     <!-- Conformance feature TL & PA_TL - for now optional -->
-    <attribute side="server" writable="false" code="0x000F" define="WC_CURRENT_POSITION_TILT_PERCENT100THS"       type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >CurrentPositionTiltPercent100ths</attribute>
-
+    <attribute side="server" code="0x000F" name="CurrentPositionTiltPercent100ths" define="WC_CURRENT_POSITION_TILT_PERCENT100THS" type="percent100ths" max="10000" isNullable="true" optional="true" reportable="true">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
     <!-- Window Covering Settings Attribute Set -->
     <!-- Conformance feature LF & PA_LF & ABS - for now optional -->
-    <attribute side="server" writable="false" code="0x0010" define="WC_INSTALLED_OPEN_LIMIT_LIFT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >InstalledOpenLimitLift</attribute>
-    <attribute side="server" writable="false" code="0x0011" define="WC_INSTALLED_CLOSED_LIMIT_LIFT"               type="int16u"   min="0x0000" max="0xFFFF" default="0xFFFF" optional="true" >InstalledClosedLimitLift</attribute>
+    <attribute side="server" code="0x0010" name="InstalledOpenLimitLift" define="WC_INSTALLED_OPEN_LIMIT_LIFT" type="int16u" max="65534" default="0x0000" optional="true">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0011" name="InstalledClosedLimitLift" define="WC_INSTALLED_CLOSED_LIMIT_LIFT" type="int16u" max="65534" default="65534" optional="true">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
     <!-- Conformance feature TL & PA_TL & ABS - for now optional -->
-    <attribute side="server" writable="false" code="0x0012" define="WC_INSTALLED_OPEN_LIMIT_TILT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >InstalledOpenLimitTilt</attribute>
-    <attribute side="server" writable="false" code="0x0013" define="WC_INSTALLED_CLOSED_LIMIT_TILT"               type="int16u"   min="0x0000" max="0xFFFF" default="0xFFFF" optional="true" >InstalledClosedLimitTilt</attribute>
+    <attribute side="server" code="0x0012" name="InstalledOpenLimitTilt" define="WC_INSTALLED_OPEN_LIMIT_TILT" type="int16u" max="65534" default="0x0000" optional="true">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0013" name="InstalledClosedLimitTilt" define="WC_INSTALLED_CLOSED_LIMIT_TILT" type="int16u" max="65534" default="65534" optional="true">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
     <!-- Conformance Deprecated -->
     <!-- attribute side="server" writable="true"  code="0x0014" define="WC_VELOCITY_LIFT"                         type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >VelocityLift -->
     <!-- attribute side="server" writable="true"  code="0x0015" define="WC_ACCELERATION_TIME_LIFT"                type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >AccelerationTimeLift -->
     <!-- attribute side="server" writable="true"  code="0x0016" define="WC_DECELERATION_TIME_LIFT"                type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >DecelerationTimeLift -->
     <!-- Conformance feature M -->
-    <attribute side="server" writable="true"  code="0x0017" define="WC_MODE"                                      type="Mode"  min="0x00"   max="0x0F"   default="0x00"   optional="false" >
-      <description>Mode</description>
+    <attribute side="server" writable="true"  code="0x0017" name="Mode" define="WC_MODE"                                      type="Mode"  min="0x00"   max="0x0F"   default="0x00"   optional="false" >
       <access op="read" role="view" />
-      <access op="write" role="manage" />
+      <access op="write" role="manage"/>
+      <mandatoryConform/>
     </attribute>
     <!-- Conformance Deprecated -->
     <!-- attribute side="server" writable="true"  code="0x0018" define="WC_INTERMEDIATE_SETPOINTS_LIFT"           type="octet_string" length="254" default="1,0x0000"        optional="true" >IntermediateSetpointsLift</attribute> -->
     <!-- attribute side="server" writable="true"  code="0x0019" define="WC_INTERMEDIATE_SETPOINTS_TILT"           type="octet_string" length="254" default="1,0x0000"        optional="true" >IntermediateSetpointsTilt</attribute> -->
     <!-- Conformance feature Optional -->
-    <attribute side="server" writable="false" code="0x001A" define="WC_SAFETY_STATUS"                             type="SafetyStatus" min="0x0000" max="0xFFFF" default="0x0000" optional="true" reportable="true" >SafetyStatus</attribute>
-
+    <attribute side="server" code="0x001A" name="SafetyStatus" define="WC_SAFETY_STATUS" type="SafetyStatus" min="0x0000" max="0xFFFF" default="0x0000" optional="true" reportable="true">
+      <optionalConform/>
+    </attribute>
+    
     <!-- Window Covering Command Set -->
     <!-- Conformance feature M -->
     <command source="client" code="0x00" name="UpOrOpen" optional="false" cli="zcl WindowCovering UpOrOpen">
       <description>Moves window covering to InstalledOpenLimitLift and InstalledOpenLimitTilt</description>
+      <mandatoryConform/>
     </command>
     <command source="client" code="0x01" name="DownOrClose" optional="false" cli="zcl WindowCovering DownOrClose">
       <description>Moves window covering to InstalledClosedLimitLift and InstalledCloseLimitTilt</description>
+      <mandatoryConform/>
     </command>
     <command source="client" code="0x02" name="StopMotion" optional="false" cli="zcl WindowCovering StopMotion">
       <description>Stop any adjusting of window covering</description>
+      <mandatoryConform/>
     </command>
     <!-- Conformance feature [LF & ABS] - for now optional -->
     <command source="client" code="0x04" name="GoToLiftValue" optional="true" cli="zcl WindowCovering GoToLiftValue">
       <description>Go to lift value specified</description>
-      <arg name="liftValue" type="int16u"/>
+      <arg name="LiftValue" type="int16u"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
     </command>
     <!-- Conformance feature LF & PA_LF | [LF] - for now optional -->
     <command source="client" code="0x05" name="GoToLiftPercentage" optional="true" cli="zcl WindowCovering GoToLiftPercentage">
       <description>Go to lift percentage specified</description>
-      <arg name="liftPercent100thsValue" type="percent100ths"/>
+      <arg name="LiftPercent100thsValue" type="percent100ths"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="LF"/>
+            <feature name="PA_LF"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="LF"/>
+        </optionalConform>
+      </otherwiseConform>
     </command>
     <!-- Conformance feature [TL & ABS] - for now optional -->
     <command source="client" code="0x07" name="GoToTiltValue" optional="true" cli="zcl WindowCovering GoToTiltValue">
       <description>Go to tilt value specified</description>
-      <arg name="tiltValue" type="int16u"/>
+      <arg name="TiltValue" type="int16u"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
     </command>
     <!-- Conformance feature TL & PA_TL | [TL] - for now optional -->
     <command source="client" code="0x08" name="GoToTiltPercentage" optional="true" cli="zcl WindowCovering GoToTiltPercentage">
       <description>Go to tilt percentage specified</description>
-      <arg name="tiltPercent100thsValue" type="percent100ths"/>
+      <arg name="TiltPercent100thsValue" type="percent100ths"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="TL"/>
+            <feature name="PA_TL"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="TL"/>
+        </optionalConform>
+      </otherwiseConform>
     </command>
   </cluster>
 

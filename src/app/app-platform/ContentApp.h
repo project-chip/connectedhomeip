@@ -135,7 +135,8 @@ public:
                                                             uint16_t maxReadLength);
     Protocols::InteractionModel::Status HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
 
-    void AddClientNode(NodeId clientNodeId);
+    // returns true only if new node is added. If node was added previously, then false is returned.
+    bool AddClientNode(NodeId clientNodeId);
     uint8_t GetClientNodeCount() const { return mClientNodeCount; }
     NodeId GetClientNode(uint8_t index) const { return mClientNodes[index]; }
 
