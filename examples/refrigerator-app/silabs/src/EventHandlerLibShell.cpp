@@ -106,12 +106,10 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
     data->eventId         = Events::Notify::Id;
     data->doorState      = static_cast<AlarmBitmap>(atoi(argv[0]));
 
-    ChipLogProgress(Zcl, "Setting event for the door state %d", data->doorState);
     DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 
     return CHIP_NO_ERROR;
 }
-
 
 /**
  * @brief configures Refrigerator matter shell
@@ -155,7 +153,6 @@ void EventWorkerFunction(intptr_t context)
     {
     case Events::Notify::Id: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
-        ChipLogProgress(Zcl, "Changing the door state %d", alarmData->doorState);
         RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId,alarmData->doorState);
         break;
     }
