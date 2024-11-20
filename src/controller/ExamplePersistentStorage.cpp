@@ -19,6 +19,7 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/IniEscaping.h>
+#include <protocols/secure_channel/PASESession.h>
 
 #include <fstream>
 #include <map>
@@ -30,7 +31,6 @@ using Section  = std::map<String, String>;
 using Sections = std::map<String, Section>;
 
 using namespace ::chip;
-using namespace ::chip::Controller;
 using namespace ::chip::IniEscaping;
 using namespace ::chip::Logging;
 
