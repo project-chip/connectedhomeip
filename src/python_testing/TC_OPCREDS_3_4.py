@@ -85,6 +85,9 @@ class TC_OPCREDS_3_4(MatterBaseTest):
     def desc_TC_OPCREDS_3_4(self):
         return " UpdateNOC-Error Condition [DUT-Server]"
 
+    def pics_OPCREDS_3_4(self):
+        return ['OPCREDS.S']
+
     def steps_TC_OPCREDS_3_4(self):
         return [TestStep(1, commission_if_required('TH1'), is_commissioning=True),
                 TestStep(
