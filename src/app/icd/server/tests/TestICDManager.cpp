@@ -115,13 +115,14 @@ class TestSubscriptionsInfoProvider : public SubscriptionsInfoProvider
 {
 public:
     TestSubscriptionsInfoProvider() = default;
-    ~TestSubscriptionsInfoProvider(){};
+    ~TestSubscriptionsInfoProvider() {};
 
     void SetHasActiveSubscription(bool value) { mHasActiveSubscription = value; };
     void SetHasPersistedSubscription(bool value) { mHasPersistedSubscription = value; };
 
     bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subject) { return mHasActiveSubscription; };
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subject) { return mHasPersistedSubscription; };
+    bool FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex) { return false; };
 
 private:
     bool mHasActiveSubscription    = false;
