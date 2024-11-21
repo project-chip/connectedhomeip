@@ -80,7 +80,7 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
     {
     case IntentEnum::kEndUserSupport: {
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-        return DiagnosticStorageImpl::GetInstance().GetDataSize();
+        return CircularDiagnosticBuffer::GetInstance().GetDataSize();
 #else
         return static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart);
 #endif
@@ -118,7 +118,7 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
     {
     case IntentEnum::kEndUserSupport: {
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-        DiagnosticStorageImpl & diagnosticStorage = DiagnosticStorageImpl::GetInstance();
+        CircularDiagnosticBuffer & diagnosticStorage = CircularDiagnosticBuffer::GetInstance();
         MutableByteSpan endUserSupportSpan(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
 
         if (diagnosticStorage.IsEmptyBuffer())

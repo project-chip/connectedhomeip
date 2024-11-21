@@ -27,7 +27,6 @@ static_library("backend") {
   sources = [
     "Counter.cpp",
     "Counter.h",
-    "DiagnosticStorageManager.cpp",
     "DiagnosticStorageManager.h",
     "DiagnosticTracing.cpp",
     "DiagnosticTracing.h",

@@ -18,36 +18,99 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
-#include <lib/support/CHIPMem.h>
 #include <tracing/esp32_diagnostic_trace/Diagnostics.h>
+
+#define TLV_CLOSING_BYTE 1
 
 namespace chip {
 namespace Tracing {
 namespace Diagnostics {
-class DiagnosticStorageImpl : public DiagnosticStorageInterface
+class CircularDiagnosticBuffer : public chip::TLV::TLVCircularBuffer, public DiagnosticStorageInterface
 {
 public:
-    static DiagnosticStorageImpl & GetInstance(uint8_t * buffer = nullptr, size_t bufferSize = 0);
+    // Singleton instance getter
+    static CircularDiagnosticBuffer & GetInstance()
+    {
+        static CircularDiagnosticBuffer instance;
+        return instance;
+    }
 
-    DiagnosticStorageImpl(const DiagnosticStorageImpl &)             = delete;
-    DiagnosticStorageImpl & operator=(const DiagnosticStorageImpl &) = delete;
+    // Delete copy constructor and assignment operator to ensure singleton
+    CircularDiagnosticBuffer(const CircularDiagnosticBuffer &)             = delete;
+    CircularDiagnosticBuffer & operator=(const CircularDiagnosticBuffer &) = delete;
 
-    CHIP_ERROR Store(DiagnosticEntry & diagnostic) override;
+    void Init(uint8_t * buffer, size_t bufferLength) { chip::TLV::TLVCircularBuffer::Init(buffer, bufferLength); }
 
-    CHIP_ERROR Retrieve(MutableByteSpan & payload) override;
+    CHIP_ERROR Store(DiagnosticEntry & entry) override
+    {
+        chip::TLV::CircularTLVWriter writer;
+        writer.Init(*this);
 
-    bool IsEmptyBuffer();
+        CHIP_ERROR err = entry.Encode(writer);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to write entry: %s", chip::ErrorStr(err));
+        }
+        return err;
+    }
 
-    uint32_t GetDataSize();
+    CHIP_ERROR Retrieve(MutableByteSpan & span) override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVReader reader;
+        reader.Init(*this);
+
+        chip::TLV::TLVWriter writer;
+        writer.Init(span.data(), span.size());
+
+        chip::TLV::TLVType outWriterContainer = chip::TLV::kTLVType_NotSpecified;
+        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_List, outWriterContainer));
+
+        while (CHIP_NO_ERROR == reader.Next())
+        {
+            VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                                ChipLogError(DeviceLayer, "Failed to read next TLV element: %s", ErrorStr(err)));
+
+            if (reader.GetType() == chip::TLV::kTLVType_Structure && reader.GetTag() == chip::TLV::AnonymousTag())
+            {
+                if ((reader.GetLengthRead() - writer.GetLengthWritten()) < ((writer.GetRemainingFreeLength() + TLV_CLOSING_BYTE)))
+                {
+                    err = writer.CopyElement(reader);
+                    if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+                    {
+                        ChipLogProgress(DeviceLayer, "Buffer too small to occupy current element");
+                        break;
+                    }
+                }
+                else
+                {
+                    ChipLogProgress(DeviceLayer, "Buffer too small to occupy current TLV");
+                    break;
+                }
+                VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to copy TLV element"));
+            }
+            else
+            {
+                ChipLogError(DeviceLayer, "Unexpected TLV element type or tag in outer container");
+            }
+        }
+
+        ReturnErrorOnFailure(writer.EndContainer(outWriterContainer));
+        ReturnErrorOnFailure(writer.Finalize());
+        span.reduce_size(writer.GetLengthWritten());
+        ChipLogProgress(DeviceLayer, "---------------Total Retrieved bytes : %ld----------------\n", writer.GetLengthWritten());
+        return CHIP_NO_ERROR;
+    }
+
+    bool IsEmptyBuffer() override { return DataLength() == 0; }
+
+    uint32_t GetDataSize() override { return DataLength(); }
 
 private:
-    DiagnosticStorageImpl(uint8_t * buffer, size_t bufferSize);
-    DiagnosticStorageImpl();
-    ~DiagnosticStorageImpl();
-
-    chip::TLV::TLVCircularBuffer mEndUserCircularBuffer;
+    CircularDiagnosticBuffer() : chip::TLV::TLVCircularBuffer(nullptr, 0) {}
+    ~CircularDiagnosticBuffer() override = default;
 };
+
 } // namespace Diagnostics
 } // namespace Tracing
 } // namespace chip
