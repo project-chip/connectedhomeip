@@ -15,6 +15,25 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import inspect
 import copy
 from datetime import datetime
@@ -30,9 +49,9 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import AttributePath, TypedAttributePath, AsyncReadTransaction, SubscriptionTransaction
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from matter_testing_support import AttributeChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, EventChangeCallback
+from chip.testing.matter_testing import AttributeChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, EventChangeCallback
 from chip.clusters.enum import MatterIntEnum
-from basic_composition_support import BasicCompositionTests
+from chip.testing.basic_composition import BasicCompositionTests
 from enum import IntFlag
 from mobly import asserts, signals
 
@@ -50,15 +69,6 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 
 
 class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
-    
-
-    
-    
-    
-    
-    
-    
-    
 
     # ANSI escape codes for background colors
     BACKGROUND_COLORS = {
@@ -146,7 +156,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
             self.attr_update_report_data_time = time.time()
 
-            logging.info(
+            logging.debug(
                 f"[AttributeChangeCallback | Local] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
         except KeyError:
             asserts.fail("[AttributeChangeCallback | Local] Attribute {expected_attribute} not found in returned report")
@@ -185,15 +195,15 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Get all clusters from device
         self.fprint(f"self.device_clusters: {self.device_clusters}", "red", 2)
         for cluster in self.device_clusters:
-            
+
             # TEMPORARY: if cluster is SmokeCoAlarm skip, as it returns INVALID_ACTION when trying
             # to subscribe to its TestInProgress attribute
             # if cluster.id == 92:
             #     continue
-            
+
             all_types = await self.all_type_attributes_for_cluster(cluster, attribute_type)
             self.fprint(f"all_types: {all_types}", "green", 2)
-            
+
             if all_types:
                 chosen_attribute = all_types[0]
                 chosen_cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_attribute.cluster_id]
@@ -234,9 +244,9 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def test_TC_IDM_4_3(self):
-        
-        await self.setup_class_helper(default_to_pase=False)
-        
+
+        await self.setup_class_helper(allow_pase=False)
+
         # all_clusters = [cluster for cluster in Clusters.ClusterObjects.ALL_ATTRIBUTES]
         # server_list_attr = Clusters.Descriptor.Attributes.ServerList
         # attribute_list = Clusters.Descriptor.Attributes.AttributeList
@@ -247,15 +257,10 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         self.device_clusters = self.all_device_clusters()
         self.all_supported_clusters = [cluster for cluster in Clusters.__dict__.values(
         ) if inspect.isclass(cluster) and issubclass(cluster, ClusterObjects.Cluster)]
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
 
         # Test setup
         # Mandatory writable attributes
@@ -353,10 +358,10 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # MaxInterval time plus an additional duration equal to the total retransmission time
         # according to negotiated MRP parameters.
         # self.step(3)
-        
-        
-        
-        
+
+
+
+
         # *** Step 1 ***
         # DUT and TH activate the subscription for an attribute. Do not change the value of the
         # attribute which has been subscribed. Verify that there is an empty report data message
@@ -407,18 +412,18 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_less(sub_report_data_elapsed_time, sub_timeout_sec, "Empty report not received before the MaxInterval time")
 
         sub_th_step1.Shutdown()
-        
+
         # Activate the subscription between the DUT and the TH for an attribute of
         # data type bool. If no such attribute exists, skip this step. Verify the
         # subscription was successfully activated and a priming data report was sent
         self.step(2)
-        
+
         # Check for attribute of type bool
         out = await self.check_attribute_read_for_type(
             attribute_type=bool,
             return_objects=True
         )
-        
+
         # If found subscribe to attribute
         if out:
             self.fprint(f"out: {out}", "green", 5)

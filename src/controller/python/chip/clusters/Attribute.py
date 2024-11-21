@@ -824,22 +824,24 @@ class AsyncReadTransaction:
 
     def handleDone(self):
         self._event_loop.call_soon_threadsafe(self._handleDone)
-        
+
     def handleReportBegin(self):
         self._handleReportBegin()
-        
+
     def handleReportEnd(self):
         self._handleReportEnd()
 
-    def _handleNotifySubscriptionStillActive(self):
+    # def _handleNotifySubscriptionStillActive(self):
+    #     if self._notify_subscription_still_active_callback:
+    #         self._notify_subscription_still_active_callback()
+
+    def handleNotifySubscriptionStillActive(self):
+        # self._handleNotifySubscriptionStillActive()
         if self._notify_subscription_still_active_callback:
             self._notify_subscription_still_active_callback()
 
-    def handleNotifySubscriptionStillActive(self):
-        self._handleNotifySubscriptionStillActive()
-        
     def register_notify_subscription_still_active_callback(self, callback):
-        self._notify_subscription_still_active_callback = callback        
+        self._notify_subscription_still_active_callback = callback
 
 
 class AsyncWriteTransaction:
@@ -905,6 +907,7 @@ _OnReportEndCallbackFunct = CFUNCTYPE(
     None, py_object)
 _OnNotifySubscriptionStillActiveCallbackFunct = CFUNCTYPE(
     None, py_object)
+
 
 @_OnReadAttributeDataCallbackFunct
 def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, cluster: int, attribute: int, status, data, len):

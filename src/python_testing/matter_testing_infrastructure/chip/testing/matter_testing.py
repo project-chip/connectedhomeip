@@ -577,7 +577,7 @@ class ClusterAttributeChangeAccumulator:
                              f"[AttributeChangeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
         try:
             attribute_value = transaction.GetAttribute(path)
-            logging.info(
+            logging.debug(
                 f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
         except KeyError:
             asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
