@@ -45,11 +45,8 @@ class DNSRecordType(enum.Enum):
 
 
 class MdnsAsyncServiceInfo(ServiceInfo):
-    def __init__(
-        self,
-        name: str,
-        type_: str
-    ) -> None:
+    def __init__(self, name: str, type_: str) -> None:
+        super().__init__(type_=type_, name=name)
 
         if type_ and not type_.endswith(service_type_name(name, strict=False)):
             raise BadTypeInNameException
