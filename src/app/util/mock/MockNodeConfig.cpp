@@ -188,8 +188,8 @@ MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<Moc
                                        std::initializer_list<EmberAfDeviceType> aDeviceTypes,
                                        std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags,
                                        app::EndpointComposition aComposition) :
-    id(aId), composition(aComposition),
-    clusters(aClusters), mDeviceTypes(aDeviceTypes), mSemanticTags(aTags), mEmberEndpoint{}
+    id(aId),
+    composition(aComposition), clusters(aClusters), mDeviceTypes(aDeviceTypes), mSemanticTags(aTags), mEmberEndpoint{}
 {
     VerifyOrDie(aClusters.size() < UINT8_MAX);
 
