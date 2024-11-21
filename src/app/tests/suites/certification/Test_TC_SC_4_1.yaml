@@ -800,7 +800,6 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
-
       arguments:
           values:
               - name: "message"
