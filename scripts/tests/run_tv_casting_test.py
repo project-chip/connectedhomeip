@@ -17,7 +17,6 @@
 import glob
 import logging
 import os
-import signal
 import sys
 import tempfile
 import time
