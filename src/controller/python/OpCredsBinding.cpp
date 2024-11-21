@@ -326,8 +326,6 @@ public:
         }
     }
 
-    CHIP_ERROR GetCommissioningResultError() const { return mCommissioningResultError; }
-
     void SetOnRCACReadyCallback(RCACReadyCallback callback)
     {
         std::lock_guard<std::mutex> lock(mCallbackMutex);
@@ -336,8 +334,6 @@ public:
 
     CHIP_ERROR GetCompletionError() { return mCompletionError; }
 
-    // Getter method to access RCAC data
-    // const std::vector<uint8_t>& GetRCACData() const { return mRCACData; }
     const std::vector<uint8_t> & GetCHIPRCACData() const { return mCHIPRCACData; }
 
 private:
@@ -353,8 +349,6 @@ private:
     std::mutex mCallbackMutex; // Ensure thread-safe access to callback
 
     std::vector<uint8_t> mCHIPRCACData;
-    std::vector<uint8_t> mRCACData;
-    CHIP_ERROR mCommissioningResultError;
     static constexpr uint8_t kNumCommissioningStages = chip::to_underlying(chip::Controller::CommissioningStage::kCleanup) + 1;
     chip::Controller::CommissioningStage mSimulateFailureOnStage            = chip::Controller::CommissioningStage::kError;
     chip::Controller::CommissioningStage mFailOnReportAfterStage            = chip::Controller::CommissioningStage::kError;
@@ -765,10 +759,6 @@ void pychip_SetCommissioningRCACCallback(PythonRCACCallback callback)
         {
             ChipLogProgress(Controller, "RCAC callback in C++ set");
             gPythonRCACCallback(rcacData.data(), rcacData.size());
-        }
-        else
-        {
-            ChipLogError(Controller, "Python RCAC callback is not set.");
         }
     });
 }
