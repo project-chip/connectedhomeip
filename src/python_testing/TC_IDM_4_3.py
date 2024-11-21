@@ -55,7 +55,6 @@ from chip.testing.matter_testing import (AttributeChangeCallback, EventChangeCal
                                          default_matter_test_main)
 from mobly import asserts, signals
 
-
 '''
 Category:
 Functional
