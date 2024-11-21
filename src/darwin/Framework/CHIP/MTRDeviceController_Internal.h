@@ -107,6 +107,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
+- (MTRDevice *)_deviceForNodeID:(NSNumber *)nodeID createIfNeeded:(BOOL)createIfNeeded;
 /**
  * _setupDeviceForNodeID is a hook expected to be implemented by subclasses to
  * actually allocate a device object of the right type.
