@@ -173,7 +173,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             nodeid=self.dut_node_id,
             attributes=parts_list_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
-            keepSubscriptions=False
+            keepSubscriptions=True
         )
 
         parts_list_queue = queue.Queue()
@@ -249,6 +249,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         await self.default_controller.CommissionOnNetwork(nodeId=self.th_server_local_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
 
         self.step(6)
+        max_report_interval_sec = 10
         cadmin_subscription_contents = [
             (newly_added_endpoint, Clusters.AdministratorCommissioning)
         ]
@@ -256,7 +257,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             nodeid=self.dut_node_id,
             attributes=cadmin_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
-            keepSubscriptions=False
+            keepSubscriptions=True
         )
 
         cadmin_queue = queue.Queue()
@@ -282,7 +283,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
                              current_fabric_index, "AdminFabricIndex is unexpected")
 
         self.step(10)
-        report_waiting_timeout_delay_sec = 10
+        report_waiting_timeout_delay_sec = max_report_interval_sec + 1
         logging.info("Waiting for update to AdministratorCommissioning attributes.")
         start_time = time.time()
         elapsed = 0
