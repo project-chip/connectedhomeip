@@ -45,9 +45,9 @@ CHIP_ERROR AsyncTransferFacilitator::Init(System::Layer * layer, Messaging::Exch
 
     mSystemLayer = layer;
     mExchange.Grab(exchangeCtx);
-    mTimeout                = timeout;
-    mProcessingOutputEvents = false;
-    mDestroySelfAfterProcessingEvents            = false;
+    mTimeout                          = timeout;
+    mProcessingOutputEvents           = false;
+    mDestroySelfAfterProcessingEvents = false;
     return CHIP_NO_ERROR;
 }
 
@@ -59,7 +59,9 @@ void AsyncTransferFacilitator::ProcessOutputEvents()
 {
     if (mProcessingOutputEvents)
     {
-        ChipLogDetail(BDX, "ProcessOutputEvents: we are already in the middle of processing events, so nothing to do here; when we unwind to the processing loop the events will get processed.");
+        ChipLogDetail(BDX,
+                      "ProcessOutputEvents: we are already in the middle of processing events, so nothing to do here; when we "
+                      "unwind to the processing loop the events will get processed.");
         return;
     }
 

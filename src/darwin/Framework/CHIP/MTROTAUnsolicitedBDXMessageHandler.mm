@@ -65,8 +65,7 @@ void MTROTAUnsolicitedBDXMessageHandler::ControllerShuttingDown(MTRDeviceControl
     FabricIndex peerFabricIndex = mOTAImageTransferHandler->GetPeerFabricIndex();
     VerifyOrReturn(peerFabricIndex != kUndefinedFabricIndex);
 
-    if (controller.fabricIndex == peerFabricIndex)
-    {
+    if (controller.fabricIndex == peerFabricIndex) {
         delete mOTAImageTransferHandler;
         mOTAImageTransferHandler = nullptr;
     }
@@ -85,8 +84,7 @@ CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::OnUnsolicitedMessageReceived(cons
     ChipLogDetail(BDX, "MTROTAUnsolicitedBDXMessageHandler: OnUnsolicitedMessageReceived: message " ChipLogFormatMessageType " protocol " ChipLogFormatProtocolId,
         payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
 
-    if (IsInAnOngoingTransfer())
-    {
+    if (IsInAnOngoingTransfer()) {
         ChipLogDetail(BDX, "Already in an ongoing transfer. Return");
         return CHIP_ERROR_BUSY;
     }

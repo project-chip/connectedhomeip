@@ -86,8 +86,7 @@ MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
 {
     assertChipStackLockedByCurrentThread();
 
-    if (mNeedToCallTransferSessionEnd)
-    {
+    if (mNeedToCallTransferSessionEnd) {
         // TODO: Store the actual error involved in error cases, so we can pass the right thing here.
         InvokeTransferSessionEndCallback(CHIP_ERROR_INTERNAL);
     }
@@ -223,8 +222,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(const TransferSessio
 
     InvokeTransferSessionEndCallback(error);
 
-    if (error == CHIP_NO_ERROR)
-    {
+    if (error == CHIP_NO_ERROR) {
         NotifyEventHandled(eventType, error);
     }
     return error;
@@ -233,7 +231,6 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(const TransferSessio
 CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::OutputEventType eventType, uint64_t bytesToSkip)
 {
     assertChipStackLockedByCurrentThread();
-
 
     auto blockSize = @(mTransfer.GetTransferBlockSize());
     auto blockIndex = @(mTransfer.GetNextBlockNum());
@@ -336,8 +333,7 @@ void MTROTAImageTransferHandler::HandleTransferSessionOutput(TransferSession::Ou
         }
         break;
     case TransferSession::OutputEventType::kQueryWithSkipReceived:
-    case TransferSession::OutputEventType::kQueryReceived:
-    {
+    case TransferSession::OutputEventType::kQueryReceived: {
         uint64_t bytesToSkip = (eventType == TransferSession::OutputEventType::kQueryWithSkipReceived ? event.bytesToSkip.BytesToSkip : 0);
         err = OnBlockQuery(eventType, bytesToSkip);
         if (err != CHIP_NO_ERROR) {
@@ -368,11 +364,9 @@ ScopedNodeId MTROTAImageTransferHandler::GetPeerScopedNodeId(Messaging::Exchange
 {
     auto sessionHandle = ec->GetSessionHandle();
 
-    if (sessionHandle->IsSecureSession())
-    {
+    if (sessionHandle->IsSecureSession()) {
         return sessionHandle->AsSecureSession()->GetPeer();
-    } else if (sessionHandle->IsGroupSession())
-    {
+    } else if (sessionHandle->IsGroupSession()) {
         return sessionHandle->AsIncomingGroupSession()->GetPeer();
     }
     return ScopedNodeId();

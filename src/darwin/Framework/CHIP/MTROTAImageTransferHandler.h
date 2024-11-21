@@ -26,15 +26,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * This class handles the BDX events for a BDX transfer session.
  *
- * This object may be destroyed directly, when not processing some call it made, to interrupt the BDX 
+ * This object may be destroyed directly, when not processing some call it made, to interrupt the BDX
  * transfer.  Specifically, this has to be done if the fabric it's associated with is shut down. This
  * method of interrupting the BDX transfer will not notify the peer that we are interrupting and it will
  * keep waiting until it times out.
  *
  * If not otherwise destroyed, this object will destroy itself when the transfer completes.
  */
-class MTROTAImageTransferHandler : public chip::bdx::AsyncResponder
-{
+class MTROTAImageTransferHandler : public chip::bdx::AsyncResponder {
 public:
     MTROTAImageTransferHandler(chip::System::Layer * layer);
     ~MTROTAImageTransferHandler();
@@ -43,7 +42,7 @@ public:
 
 protected:
     CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
-                                 chip::System::PacketBufferHandle && payload) override;
+        chip::System::PacketBufferHandle && payload) override;
 
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
 
@@ -67,7 +66,7 @@ private:
 
     // The OTA provider delegate that is responding to the BDX transfer request.
     id<MTROTAProviderDelegate> mDelegate = nil;
-    chip::System::Layer * mSystemLayer   = nil;
+    chip::System::Layer * mSystemLayer = nil;
 
     // The queue mDelegate must be called on.
     dispatch_queue_t mDelegateNotificationQueue = nil;
