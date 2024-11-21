@@ -183,9 +183,8 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
                                                                             chainForAddNOC.ipkBytes,
                                                                             newFabricDevCtrl.nodeId,
                                                                             newFabricDevCtrl.fabricAdmin.vendorId))
-    nocBytes = chainForAddNOC.nocBytes
-    icacBytes = chainForAddNOC.icacBytes
-    rcacBytes = chainForAddNOC.rcacBytes
+
+    rcacResp = chainForAddNOC.rcacBytes
 
     if nocResp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
@@ -202,7 +201,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     if not await _IsNodeInFabricList(newFabricDevCtrl, newNodeId):
         return False, nocResp
 
-    return True, nocResp, nocBytes, rcacBytes, icacBytes
+    return True, nocResp, rcacResp
 
 
 async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
