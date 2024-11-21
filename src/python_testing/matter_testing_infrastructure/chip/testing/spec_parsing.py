@@ -526,18 +526,18 @@ def _get_data_model_root() -> str:
         # Use importlib.resources to get the directory contents
         package = importlib.import_module('chip_testing')
         data_model_path = None
-        
+
         # This lists all resources under the package, filtering for the 'data_model' directory
         for resource in importlib.resources.contents(package):
             if resource.endswith('data_model'):
                 data_model_path = resource
                 break
-        
+
         if not data_model_path:
             raise FileNotFoundError("Data model directory not found in the package.")
-        
+
         return data_model_path
-    
+
     except Exception as e:
         raise FileNotFoundError(f"Failed to find the data model root: {e}")
 
@@ -573,7 +573,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
         # Use importlib.resources to list all files in the data model directory within the package
         package = importlib.import_module(package_name)
         xml_files = [f for f in importlib.resources.contents(package) if f.endswith('.xml') and f.startswith(dir)]
-        
+
         if not xml_files:
             raise SpecParsingException(f'No XML files found in the specified package directory {dir}')
 
@@ -605,7 +605,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
     mask = clusters[descriptor_id].feature_map[code]
     clusters[descriptor_id].features[mask].conformance = optional()
     remove_problem(FeaturePathLocation(endpoint_id=0, cluster_id=descriptor_id, feature_code=code))
-    
+
     action_id = Clusters.Actions.id
     for c in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[action_id]:
         clusters[action_id].accepted_commands[c].conformance = optional()
