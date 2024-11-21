@@ -57,6 +57,7 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
 
         DeviceManager::Instance().UpdateLastUsedNodeId(mBridgeNodeId);
         DeviceManager::Instance().SubscribeRemoteFabricBridge();
+        DeviceManager::Instance().InitCommissionerControl();
 
         if (DeviceManager::Instance().IsLocalBridgeReady())
         {
@@ -284,7 +285,7 @@ void FabricSyncDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERRO
 
     if (err == CHIP_NO_ERROR)
     {
-        DeviceManager::Instance().AddSyncedDevice(Device(mAssignedNodeId, mRemoteEndpointId));
+        DeviceManager::Instance().AddSyncedDevice(SyncedDevice(mAssignedNodeId, mRemoteEndpointId));
     }
     else
     {

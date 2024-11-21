@@ -32,15 +32,15 @@ constexpr uint32_t kDefaultSetupPinCode    = 20202021;
 constexpr uint16_t kDefaultLocalBridgePort = 5540;
 constexpr uint16_t kResponseTimeoutSeconds = 30;
 
-class Device
+class SyncedDevice
 {
 public:
-    Device(chip::NodeId nodeId, chip::EndpointId endpointId) : mNodeId(nodeId), mEndpointId(endpointId) {}
+    SyncedDevice(chip::NodeId nodeId, chip::EndpointId endpointId) : mNodeId(nodeId), mEndpointId(endpointId) {}
 
     chip::NodeId GetNodeId() const { return mNodeId; }
     chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
-    bool operator<(const Device & other) const
+    bool operator<(const SyncedDevice & other) const
     {
         return mNodeId < other.mNodeId || (mNodeId == other.mNodeId && mEndpointId < other.mEndpointId);
     }
@@ -81,9 +81,14 @@ public:
 
     bool IsLocalBridgeReady() const { return mLocalBridgeNodeId != chip::kUndefinedNodeId; }
 
-    void AddSyncedDevice(const Device & device);
+    void AddSyncedDevice(const SyncedDevice & device);
 
     void RemoveSyncedDevice(chip::ScopedNodeId scopedNodeId);
+
+    /**
+     * @brief Initializes the CommissionerControl for fabric sync setup process.
+     */
+    void InitCommissionerControl();
 
     /**
      * @brief Determines whether a given nodeId corresponds to the "current bridge device," either local or remote.
@@ -177,8 +182,8 @@ public:
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
-    Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
-    Device * FindDeviceByNode(chip::NodeId nodeId);
+    SyncedDevice * FindDeviceByEndpoint(chip::EndpointId endpointId);
+    SyncedDevice * FindDeviceByNode(chip::NodeId nodeId);
 
 private:
     void RequestCommissioningApproval();
@@ -193,8 +198,6 @@ private:
 
     void HandleReverseOpenCommissioningWindow(chip::TLV::TLVReader & data);
 
-    static DeviceManager sInstance;
-
     chip::NodeId mLastUsedNodeId = 0;
 
     // The Node ID of the remote bridge used for Fabric-Sync
@@ -207,7 +210,7 @@ private:
     // This represents the bridge within its own ecosystem.
     chip::NodeId mLocalBridgeNodeId = chip::kUndefinedNodeId;
 
-    std::set<Device> mSyncedDevices;
+    std::set<SyncedDevice> mSyncedDevices;
     bool mInitialized   = false;
     uint64_t mRequestId = 0;
 

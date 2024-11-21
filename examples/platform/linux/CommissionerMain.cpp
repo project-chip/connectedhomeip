@@ -457,4 +457,14 @@ CommissionerDiscoveryController * GetCommissionerDiscoveryController()
     return &gCommissionerDiscoveryController;
 }
 
+SessionKeystore * GetSessionKeystore()
+{
+    return &gSessionKeystore;
+}
+
+PersistentStorageDelegate * GetPersistentStorageDelegate()
+{
+    return &gServerStorage;
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

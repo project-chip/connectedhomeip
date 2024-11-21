@@ -819,7 +819,7 @@ MTR_DIRECT_MEMBERS
     } else {
         // No root certificate means the nocSigner is using the root keys, because
         // consumers must provide a root certificate whenever an ICA is used.
-        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(params.nocSigner.publicKey, &pubKey);
+        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromMTRKeypair(params.nocSigner, &pubKey);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Can't extract public key from MTRKeypair: %s", ErrorStr(err));
             return NO;
