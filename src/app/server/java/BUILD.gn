@@ -36,6 +36,7 @@ static_library("jni") {
   ]
 
   deps = [
+    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/server",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib",

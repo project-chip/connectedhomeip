@@ -92,3 +92,12 @@ Replacements for methods are:
     `chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAllForEndpoint`
 -   `chip::app::GetAttributeAccessOverride` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().Get`
+
+### `ServerInitParams::dataModelProvider` in `Server::Init`
+
+Server initialization requires a set data model provider to work rather than
+auto-initializing ember-compatible code-generated data models.
+
+To preserve `codegen/zap` generated logic, use
+`CodegenDataModelProviderInstance` (see changes in
+<https://github.com/project-chip/connectedhomeip/pull/36558>).
