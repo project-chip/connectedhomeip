@@ -25,13 +25,11 @@
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
 
-#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)                 \
-    MTR_SIMPLE_REMOTE_XPC_GETTER(self.xpcConnection, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController \
-                                 : self.uniqueIdentifier)
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME) \
+    MTR_SIMPLE_REMOTE_XPC_GETTER(self.xpcConnection, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController : self.uniqueIdentifier)
 
-#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS)                 \
-    MTR_SIMPLE_REMOTE_XPC_COMMAND(self.xpcConnection, METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController \
-                                  : self.uniqueIdentifier)
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS) \
+    MTR_SIMPLE_REMOTE_XPC_COMMAND(self.xpcConnection, METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController : self.uniqueIdentifier)
 
 @interface MTRDeviceController_XPC ()
 
@@ -56,9 +54,7 @@ NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey 
 
 #pragma mark - Node ID Management
 
-MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
-                                               : (NSDictionary *) controllerState, updateControllerConfiguration
-                                               : (NSDictionary *) controllerState)
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration : (NSDictionary *) controllerState, updateControllerConfiguration : (NSDictionary *) controllerState)
 
 - (void)_updateRegistrationInfo
 {
@@ -487,7 +483,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
             continue;
         }
 
-        auto * device = static_cast<MTRDevice_XPC *>([self deviceForNodeID:nodeID]);
+        auto * device = static_cast<MTRDevice_XPC *>([self _deviceForNodeID:nodeID createIfNeeded:NO]);
         [device device:nodeID internalStateUpdated:deviceInternalState];
     }
 }
