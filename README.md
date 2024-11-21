@@ -45,6 +45,7 @@
 -   [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
 
 # About
+# By Mudassir Alam
 
 Matter (formerly Project CHIP) creates more connections between more objects,
 simplifying development for manufacturers and increasing compatibility for
