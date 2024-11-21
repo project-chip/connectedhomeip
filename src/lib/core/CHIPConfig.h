@@ -618,13 +618,13 @@
 #define _CHIP_CONFIG_IsPlatformLwIPErrorNonCritical(CODE) 0
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE)                                                                         \
     ((CODE) == CHIP_ERROR_POSIX(EHOSTUNREACH) || (CODE) == CHIP_ERROR_POSIX(ENETUNREACH) ||                                        \
      (CODE) == CHIP_ERROR_POSIX(EADDRNOTAVAIL) || (CODE) == CHIP_ERROR_POSIX(EPIPE))
-#else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#else // !(CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) 0
-#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // !(CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
 #define CHIP_CONFIG_IsPlatformErrorNonCritical(CODE)                                                                               \
     (_CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) || _CHIP_CONFIG_IsPlatformLwIPErrorNonCritical(CODE))

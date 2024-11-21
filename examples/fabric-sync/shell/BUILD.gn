@@ -33,12 +33,16 @@ source_set("shell") {
     "AddDeviceCommand.h",
     "CommandRegistry.cpp",
     "CommandRegistry.h",
+    "PairDeviceCommand.cpp",
+    "PairDeviceCommand.h",
     "RemoveBridgeCommand.cpp",
     "RemoveBridgeCommand.h",
     "RemoveDeviceCommand.cpp",
     "RemoveDeviceCommand.h",
     "ShellCommands.cpp",
     "ShellCommands.h",
+    "SyncDeviceCommand.cpp",
+    "SyncDeviceCommand.h",
   ]
 
   deps = [
