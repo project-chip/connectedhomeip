@@ -25,7 +25,7 @@
 #include <mbedtls/platform.h>
 
 #ifdef SL_WIFI
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #endif /* SL_WIFI */
 
 #if PW_RPC_ENABLED
@@ -41,8 +41,8 @@
 #endif
 
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
-#include "SiWxPlatformInterface.h"
-#include "WifiInterfaceAbstraction.h"
+#include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
+#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
 #endif // SLI_SI91X_MCU_INTERFACE
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -56,6 +56,7 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <ProvisionManager.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
+#include <app/codegen-data-model-provider/Instance.h>
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 #include "SilabsTestEventTriggerDelegate.h" // nogncheck
@@ -275,6 +276,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
 
 #if CHIP_ENABLE_OPENTHREAD
     // Set up OpenThread configuration when OpenThread is included
