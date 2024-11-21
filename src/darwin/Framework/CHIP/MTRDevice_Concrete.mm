@@ -3799,7 +3799,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)setPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData
 {
+    [self _doSetPersistedClusterData:clusterData];
+
+    // Log after we do the state update, so the log includes the data we just set.
     MTR_LOG("%@ setPersistedClusterData count: %lu", self, static_cast<unsigned long>(clusterData.count));
+}
+
+- (void)_doSetPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData
+{
     if (!clusterData.count) {
         return;
     }
