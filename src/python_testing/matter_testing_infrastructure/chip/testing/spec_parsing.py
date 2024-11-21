@@ -16,10 +16,10 @@
 #
 
 import glob
-import logging
-import os
 import importlib
 import importlib.resources
+import logging
+import os
 import typing
 import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
