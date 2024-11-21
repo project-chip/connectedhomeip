@@ -19,12 +19,7 @@
 #pragma once
 
 #include "tracing/esp32_diagnostic_trace/Diagnostics.h"
-#include <esp_diagnostics_metrics.h>
-#include <esp_log.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPMemString.h>
 #include <map>
-#include <string.h>
 
 namespace chip {
 namespace Tracing {
@@ -44,7 +39,7 @@ public:
     static ESPDiagnosticCounter & GetInstance(const char * label)
     {
         static ESPDiagnosticCounter instance;
-        CountInit(label);
+        IncreaseCount(label);
         return instance;
     }
 
@@ -55,7 +50,7 @@ public:
 private:
     ESPDiagnosticCounter() {}
     static std::map<const char *, uint32_t> mCounterList;
-    static void CountInit(const char * label);
+    static void IncreaseCount(const char * label);
 };
 
 } // namespace Diagnostics

@@ -88,7 +88,8 @@ extern "C" void app_main()
 #endif
 
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    DiagnosticStorageImpl & diagnosticStorage = DiagnosticStorageImpl::GetInstance(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
+    CircularDiagnosticBuffer & diagnosticStorage = CircularDiagnosticBuffer::GetInstance();
+    diagnosticStorage.Init(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
     static ESP32Diagnostics diagnosticBackend(diagnosticStorage);
     Tracing::Register(diagnosticBackend);
 #endif

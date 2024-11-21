@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <string.h>
+#include <esp_log.h>
 #include <tracing/esp32_diagnostic_trace/Counter.h>
 
 namespace chip {
@@ -25,7 +25,7 @@ namespace Diagnostics {
 
 std::map<const char *, uint32_t> ESPDiagnosticCounter::mCounterList;
 
-void ESPDiagnosticCounter::CountInit(const char * label)
+void ESPDiagnosticCounter::IncreaseCount(const char * label)
 {
     if (mCounterList.find(label) != mCounterList.end())
     {
@@ -45,7 +45,7 @@ uint32_t ESPDiagnosticCounter::GetInstanceCount(const char * label) const
 void ESPDiagnosticCounter::ReportMetrics(const char * label, DiagnosticStorageInterface & mStorageInstance)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Counter counter(label, GetInstanceCount(label), esp_log_timestamp());
+    Diagnostic<uint32_t> counter(label, GetInstanceCount(label), esp_log_timestamp());
     err = mStorageInstance.Store(counter);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to store Counter diagnostic data"));
 }
