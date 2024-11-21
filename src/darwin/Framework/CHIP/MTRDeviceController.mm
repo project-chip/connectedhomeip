@@ -371,15 +371,20 @@ using namespace chip::Tracing::DarwinFramework;
     return [[MTRDevice alloc] initForSubclassesWithNodeID:nodeID controller:self];
 }
 
-- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
+- (MTRDevice *)_deviceForNodeID:(NSNumber *)nodeID createIfNeeded:(BOOL)createIfNeeded
 {
     std::lock_guard lock(*self.deviceMapLock);
     MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
-    if (!deviceToReturn) {
+    if (!deviceToReturn && createIfNeeded) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
     }
 
     return deviceToReturn;
+}
+
+- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
+{
+    return [self _deviceForNodeID:nodeID createIfNeeded:YES];
 }
 
 - (void)removeDevice:(MTRDevice *)device
