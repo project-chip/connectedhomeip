@@ -192,6 +192,11 @@ struct ServerInitParams
     // If the ICD Check-In protocol use-case is supported and no strategy is provided, server will use the default strategy.
     app::ICDCheckInBackOffStrategy * icdCheckInBackOffStrategy = nullptr;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    // MUST NOT be null during initialization: every application must define the
+    // data model it wants to use. Backwards-compatibility can use `CodegenDataModelProviderInstance`
+    // for ember/zap-generated models.
+    chip::app::DataModel::Provider * dataModelProvider = nullptr;
 };
 
 /**
