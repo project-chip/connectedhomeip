@@ -18,6 +18,7 @@
 #import "MTROTAImageTransferHandler.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRError_Internal.h"
 #import "MTROTAUnsolicitedBDXMessageHandler.h"
 #import "NSStringSpanConversion.h"
 
