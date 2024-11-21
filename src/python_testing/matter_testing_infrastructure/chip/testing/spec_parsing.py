@@ -18,12 +18,14 @@
 import glob
 import logging
 import os
+import importlib
+import importlib.resources
 import typing
 import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
@@ -519,49 +521,73 @@ class DataModelLevel(str, Enum):
 
 
 def _get_data_model_root() -> str:
-    """Attempts to find ${CHIP_ROOT}/data_model or equivalent."""
-
-    # Since this class is generally in a module, we have to rely on being bootstrapped or
-    # we use CWD if we cannot
-    choices = [os.getcwd()]
-
-    if 'PW_PROJECT_ROOT' in os.environ:
-        choices.insert(0, os.environ['PW_PROJECT_ROOT'])
-
-    for c in choices:
-        data_model_path = os.path.join(c, 'data_model')
-        if os.path.exists(os.path.join(data_model_path, 'master', 'scraper_version')):
-            return data_model_path
-    raise FileNotFoundError('Cannot find a CHIP_ROOT/data_model path. Tried %r as prefixes.' % choices)
+    """Attempts to find the 'data_model' directory inside the Python package (whl)."""
+    try:
+        # Use importlib.resources to get the directory contents
+        package = importlib.import_module('chip_testing')
+        data_model_path = None
+        
+        # This lists all resources under the package, filtering for the 'data_model' directory
+        for resource in importlib.resources.contents(package):
+            if resource.endswith('data_model'):
+                data_model_path = resource
+                break
+        
+        if not data_model_path:
+            raise FileNotFoundError("Data model directory not found in the package.")
+        
+        return data_model_path
+    
+    except Exception as e:
+        raise FileNotFoundError(f"Failed to find the data model root: {e}")
 
 
 def get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
+    """
+    Get the directory of the data model for a specific version and level from the installed package.
+    """
+    data_model_root = _get_data_model_root()
+
     if data_model_directory == PrebuiltDataModelDirectory.k1_3:
-        return os.path.join(_get_data_model_root(), '1.3', data_model_level)
+        return os.path.join(data_model_root, '1.3', data_model_level)
     elif data_model_directory == PrebuiltDataModelDirectory.k1_4:
-        return os.path.join(_get_data_model_root(), '1.4', data_model_level)
+        return os.path.join(data_model_root, '1.4', data_model_level)
     elif data_model_directory == PrebuiltDataModelDirectory.kMaster:
-        return os.path.join(_get_data_model_root(), 'master', data_model_level)
+        return os.path.join(data_model_root, 'master', data_model_level)
     else:
         return data_model_directory
 
 
-def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlCluster], list[ProblemNotice]]:
+    # Get the data model directory path inside the wheel package
     dir = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
 
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
     ids_by_name: dict[str, int] = {}
     problems: list[ProblemNotice] = []
-    files = glob.glob(f'{dir}/*.xml')
-    if not files:
-        raise SpecParsingException(f'No data model files found in specified directory {dir}')
 
-    for xml in files:
-        logging.info(f'Parsing file {xml}')
-        tree = ElementTree.parse(f'{xml}')
-        root = tree.getroot()
-        add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
+    package_name = "chip_testing"  # The name of the wheel package
+
+    try:
+        # Use importlib.resources to list all files in the data model directory within the package
+        package = importlib.import_module(package_name)
+        xml_files = [f for f in importlib.resources.contents(package) if f.endswith('.xml') and f.startswith(dir)]
+        
+        if not xml_files:
+            raise SpecParsingException(f'No XML files found in the specified package directory {dir}')
+
+        # Parse each XML file found inside the package
+        for xml in xml_files:
+            logging.info(f'Parsing file {xml}')
+            # Open and parse each XML file from the wheel package
+            with importlib.resources.open_text(package, xml) as file:
+                tree = ElementTree.parse(file)
+                root = tree.getroot()
+                add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
+
+    except Exception as e:
+        raise SpecParsingException(f"Error reading XML files from the package: {e}")
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
@@ -569,6 +595,7 @@ def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirec
     # Actions cluster - all commands - these need to be listed in the ActionsList attribute to be supported.
     #                                  We do not currently have a test for this. Please see https://github.com/CHIP-Specifications/chip-test-plans/issues/3646.
 
+    # Define remove_problem function to modify the problems list
     def remove_problem(location: typing.Union[CommandPathLocation, FeaturePathLocation]):
         nonlocal problems
         problems = [p for p in problems if p.location != location]
@@ -578,6 +605,7 @@ def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirec
     mask = clusters[descriptor_id].feature_map[code]
     clusters[descriptor_id].features[mask].conformance = optional()
     remove_problem(FeaturePathLocation(endpoint_id=0, cluster_id=descriptor_id, feature_code=code))
+    
     action_id = Clusters.Actions.id
     for c in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[action_id]:
         clusters[action_id].accepted_commands[c].conformance = optional()
@@ -592,25 +620,11 @@ def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirec
     # see 3.2.8. Defined Primaries Information Attribute Set, affects Primary<#>X/Y/Intensity attributes.
     cc_id = Clusters.ColorControl.id
     cc_attr = Clusters.ColorControl.Attributes
-    affected_attributes = [cc_attr.Primary1X,
-                           cc_attr.Primary1Y,
-                           cc_attr.Primary1Intensity,
-                           cc_attr.Primary2X,
-                           cc_attr.Primary2Y,
-                           cc_attr.Primary2Intensity,
-                           cc_attr.Primary3X,
-                           cc_attr.Primary3Y,
-                           cc_attr.Primary3Intensity,
-                           cc_attr.Primary4X,
-                           cc_attr.Primary4Y,
-                           cc_attr.Primary4Intensity,
-                           cc_attr.Primary5X,
-                           cc_attr.Primary5Y,
-                           cc_attr.Primary5Intensity,
-                           cc_attr.Primary6X,
-                           cc_attr.Primary6Y,
-                           cc_attr.Primary6Intensity,
-                           ]
+    affected_attributes = [cc_attr.Primary1X, cc_attr.Primary1Y, cc_attr.Primary1Intensity, cc_attr.Primary2X,
+                           cc_attr.Primary2Y, cc_attr.Primary2Intensity, cc_attr.Primary3X, cc_attr.Primary3Y,
+                           cc_attr.Primary3Intensity, cc_attr.Primary4X, cc_attr.Primary4Y, cc_attr.Primary4Intensity,
+                           cc_attr.Primary5X, cc_attr.Primary5Y, cc_attr.Primary5Intensity, cc_attr.Primary6X,
+                           cc_attr.Primary6Y, cc_attr.Primary6Intensity]
     for a in affected_attributes:
         clusters[cc_id].attributes[a.attribute_id].conformance = optional()
 
@@ -640,7 +654,7 @@ def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirec
         presents_id = clusters[Clusters.Thermostat.id].attribute_map[presets_name]
         schedules_id = clusters[Clusters.Thermostat.id].attribute_map[schedules_name]
         conformance = or_operation([conformance_support.attribute(presents_id, presets_name),
-                                   conformance_support.attribute(schedules_id, schedules_name)])
+                                    conformance_support.attribute(schedules_id, schedules_name)])
         clusters[Clusters.Thermostat.id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
             id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance)
         clusters[Clusters.Thermostat.id].generated_commands[atomic_response_cmd_id] = XmlCommand(
