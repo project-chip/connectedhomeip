@@ -310,6 +310,10 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
 endif()
 
+if (CONFIG_CHIP_DEVICE_ENABLE_DYNAMIC_SERVER)
+    chip_gn_arg_append("chip_build_controller_dynamic_server" "true")
+endif()
+
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 
@@ -508,9 +512,11 @@ endif()
 idf_component_get_property(lwip_lib lwip COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${lwip_lib}>)
 
+if ("${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}" VERSION_GREATER_EQUAL "5.3" OR CONFIG_ESP32_WIFI_ENABLED)
+    idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)
+endif()
 
-idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)
 if (CONFIG_ESP32_WIFI_ENABLED)
     idf_component_get_property(esp_wifi_dir esp_wifi COMPONENT_DIR)
     if (CONFIG_IDF_TARGET_ESP32C2)
