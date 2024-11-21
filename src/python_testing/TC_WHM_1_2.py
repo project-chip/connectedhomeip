@@ -71,7 +71,7 @@ class TC_WHM_1_2(MatterBaseTest):
     @async_test_body
     async def test_TC_WHM_1_2(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.matter_test_config.endpoint
 
         attributes = Clusters.WaterHeaterMode.Attributes
 
