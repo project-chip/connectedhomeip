@@ -227,8 +227,9 @@ void DeviceManager::SubscribeRemoteFabricBridge()
 
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to subscribe to the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+        ChipLogError(NotSpecified,
+                     "Failed to subscribe to the remote bridge (NodeId: " ChipLogFormatX64 "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
         return;
     }
 }
@@ -251,8 +252,9 @@ void DeviceManager::ReadSupportedDeviceCategories()
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified,
-                     "Failed to read SupportedDeviceCategories from the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+                     "Failed to read SupportedDeviceCategories from the remote bridge (NodeId: " ChipLogFormatX64
+                     "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
     }
 }
 
@@ -293,8 +295,9 @@ void DeviceManager::RequestCommissioningApproval()
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified,
-                     "Failed to request commissioning-approval to the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+                     "Failed to request commissioning-approval to the remote bridge (NodeId: " ChipLogFormatX64
+                     "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
         return;
     }
 
@@ -417,8 +420,9 @@ void DeviceManager::SendCommissionNodeRequest(uint64_t requestId, uint16_t respo
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified,
-                     "Failed to send CommissionNode command to the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+                     "Failed to send CommissionNode command to the remote bridge (NodeId: " ChipLogFormatX64
+                     "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
         return;
     }
 }
