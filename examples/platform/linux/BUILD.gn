@@ -95,6 +95,7 @@ source_set("app-main") {
     ":energy-reporting-test-event-trigger",
     ":smco-test-event-trigger",
     ":water-heater-management-test-event-trigger",
+    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/controller:controller",
     "${chip_root}/src/controller:gen_check_chip_controller_headers",
     "${chip_root}/src/lib",

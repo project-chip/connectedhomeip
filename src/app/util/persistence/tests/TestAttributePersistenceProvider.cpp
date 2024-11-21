@@ -17,7 +17,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/DefaultAttributePersistenceProvider.h>
+#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <pw_unit_test/framework.h>
