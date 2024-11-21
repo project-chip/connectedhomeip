@@ -595,7 +595,6 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
     # Actions cluster - all commands - these need to be listed in the ActionsList attribute to be supported.
     #                                  We do not currently have a test for this. Please see https://github.com/CHIP-Specifications/chip-test-plans/issues/3646.
 
-    # Define remove_problem function to modify the problems list
     def remove_problem(location: typing.Union[CommandPathLocation, FeaturePathLocation]):
         nonlocal problems
         problems = [p for p in problems if p.location != location]
@@ -620,11 +619,25 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
     # see 3.2.8. Defined Primaries Information Attribute Set, affects Primary<#>X/Y/Intensity attributes.
     cc_id = Clusters.ColorControl.id
     cc_attr = Clusters.ColorControl.Attributes
-    affected_attributes = [cc_attr.Primary1X, cc_attr.Primary1Y, cc_attr.Primary1Intensity, cc_attr.Primary2X,
-                           cc_attr.Primary2Y, cc_attr.Primary2Intensity, cc_attr.Primary3X, cc_attr.Primary3Y,
-                           cc_attr.Primary3Intensity, cc_attr.Primary4X, cc_attr.Primary4Y, cc_attr.Primary4Intensity,
-                           cc_attr.Primary5X, cc_attr.Primary5Y, cc_attr.Primary5Intensity, cc_attr.Primary6X,
-                           cc_attr.Primary6Y, cc_attr.Primary6Intensity]
+    affected_attributes = [cc_attr.Primary1X,
+                           cc_attr.Primary1Y,
+                           cc_attr.Primary1Intensity,
+                           cc_attr.Primary2X,
+                           cc_attr.Primary2Y,
+                           cc_attr.Primary2Intensity,
+                           cc_attr.Primary3X,
+                           cc_attr.Primary3Y,
+                           cc_attr.Primary3Intensity,
+                           cc_attr.Primary4X,
+                           cc_attr.Primary4Y,
+                           cc_attr.Primary4Intensity,
+                           cc_attr.Primary5X,
+                           cc_attr.Primary5Y,
+                           cc_attr.Primary5Intensity,
+                           cc_attr.Primary6X,
+                           cc_attr.Primary6Y,
+                           cc_attr.Primary6Intensity,
+                           ]
     for a in affected_attributes:
         clusters[cc_id].attributes[a.attribute_id].conformance = optional()
 
@@ -654,7 +667,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
         presents_id = clusters[Clusters.Thermostat.id].attribute_map[presets_name]
         schedules_id = clusters[Clusters.Thermostat.id].attribute_map[schedules_name]
         conformance = or_operation([conformance_support.attribute(presents_id, presets_name),
-                                    conformance_support.attribute(schedules_id, schedules_name)])
+                                   conformance_support.attribute(schedules_id, schedules_name)])
         clusters[Clusters.Thermostat.id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
             id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance)
         clusters[Clusters.Thermostat.id].generated_commands[atomic_response_cmd_id] = XmlCommand(
