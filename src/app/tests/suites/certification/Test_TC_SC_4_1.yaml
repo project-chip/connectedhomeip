@@ -44,7 +44,9 @@ config:
         defaultValue: 5000
 
 tests:
-    - label: "Step 1: If (CADMIN.S.C01.Rsp) present, wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: If (CADMIN.S.C01.Rsp) present, wait for the commissioned
+          device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       PICS: CADMIN.S.C01.Rsp
@@ -54,8 +56,8 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 1a: If (CADMIN.S.C01.Rsp) present, DUT is put in Commissioning Mode using Open Basic
-          Commissioning Window command "
+          "Step 1a: If (CADMIN.S.C01.Rsp) present, DUT is put in Commissioning
+          Mode using Open Basic Commissioning Window command "
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
@@ -65,7 +67,9 @@ tests:
               - name: "CommissioningTimeout"
                 value: 180
 
-    - label: "If (CADMIN.S.C01.Rsp) present, waiting after opening commissioning window"
+    - label:
+          "If (CADMIN.S.C01.Rsp) present, waiting after opening commissioning
+          window"
       cluster: "DelayCommands"
       command: "WaitForMs"
       PICS: CADMIN.S.C01.Rsp
@@ -211,7 +215,8 @@ tests:
                 value: deviceType
 
     - label:
-          "Step 2g: If (CADMIN.S.C01.Rsp) present, check Commissioning Mode (_CM) subtype _CM must be present"
+          "Step 2g: If (CADMIN.S.C01.Rsp) present, check Commissioning Mode
+          (_CM) subtype _CM must be present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByCommissioningMode"
       PICS: CADMIN.S.C01.Rsp
@@ -293,7 +298,9 @@ tests:
                 constraints:
                     maxValue: 65535
 
-    - label: "Step 2n: If (CADMIN.S.C01.Rsp) present, TXT key for commissioning mode (CM) CM=1 must be present"
+    - label:
+          "Step 2n: If (CADMIN.S.C01.Rsp) present, TXT key for commissioning
+          mode (CM) CM=1 must be present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       PICS: CADMIN.S.C01.Rsp
@@ -404,9 +411,9 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 3a: If (CADMIN.S.C01.Rsp) present, DUT put in Commissioning Mode using Open Basic Commissioning
-          Window command, starting advertising Commissionable Node Discovery
-          service using DNS-SD"
+          "Step 3a: If (CADMIN.S.C01.Rsp) present, DUT put in Commissioning Mode
+          using Open Basic Commissioning Window command, starting advertising
+          Commissionable Node Discovery service using DNS-SD"
       PICS: CADMIN.S.C01.Rsp
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
@@ -416,7 +423,9 @@ tests:
               - name: "CommissioningTimeout"
                 value: 180
 
-    - label: "If (CADMIN.S.C01.Rsp) present, waiting after opening commissioning window"
+    - label:
+          "If (CADMIN.S.C01.Rsp) present, waiting after opening commissioning
+          window"
       cluster: "DelayCommands"
       command: "WaitForMs"
       PICS: CADMIN.S.C01.Rsp
@@ -558,7 +567,9 @@ tests:
               - name: "value"
                 value: deviceType
 
-    - label: "Step 4h: If (CADMIN.S.C01.Rsp) present, check Commissioning Mode (_CM) subtype _CM is present"
+    - label:
+          "Step 4h: If (CADMIN.S.C01.Rsp) present, check Commissioning Mode
+          (_CM) subtype _CM is present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByCommissioningMode"
       PICS: CADMIN.S.C01.Rsp
@@ -642,7 +653,8 @@ tests:
                     maxValue: 65535
 
     - label:
-          "Step 4o: If (CADMIN.S.C01.Rsp) present, TXT key for commissioning mode (CM) key CM=1 must be present"
+          "Step 4o: If (CADMIN.S.C01.Rsp) present, TXT key for commissioning
+          mode (CM) key CM=1 must be present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       PICS: CADMIN.S.C01.Rsp
