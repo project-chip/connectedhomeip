@@ -331,7 +331,8 @@ const MockNodeConfig gTestNodeConfig({
         MockClusterConfig(MockClusterId(4), {}, {}, {}, {}, MockClusterSide::kClient),
     }, {
         { kDeviceTypeId2, kDeviceTypeId2Version},
-    }),
+    }, {},
+    EndpointComposition::kTree),
     MockEndpointConfig(kMockEndpoint3, {
         MockClusterConfig(MockClusterId(1), {
             ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
@@ -901,7 +902,7 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
     ep = model.NextEndpoint(kMockEndpoint1);
     EXPECT_EQ(ep.id, kMockEndpoint2);
     EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTreePattern);
     ep = model.NextEndpoint(kMockEndpoint2);
     EXPECT_EQ(ep.id, kMockEndpoint3);
     EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
@@ -921,11 +922,11 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
     ep = model.NextEndpoint(kMockEndpoint1);
     EXPECT_EQ(ep.id, kMockEndpoint2);
     EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTreePattern);
     ep = model.NextEndpoint(kMockEndpoint1);
     EXPECT_EQ(ep.id, kMockEndpoint2);
     EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTreePattern);
     ep = model.NextEndpoint(kMockEndpoint2);
     EXPECT_EQ(ep.id, kMockEndpoint3);
     EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
@@ -933,11 +934,9 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
     ep = model.NextEndpoint(kMockEndpoint1);
     EXPECT_EQ(ep.id, kMockEndpoint2);
     EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTreePattern);
     ep = model.NextEndpoint(kMockEndpoint3);
     EXPECT_EQ(ep.id, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
     ep = model.NextEndpoint(kMockEndpoint3);
     EXPECT_EQ(ep.id, kInvalidEndpointId);
     ep = model.FirstEndpoint();
@@ -970,7 +969,7 @@ TEST(TestCodegenModelViaMocks, GetEndpointInfo)
     ASSERT_TRUE(info.has_value());
     EXPECT_EQ(info->parentId, kInvalidEndpointId); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->compositionPattern,            // NOLINT(bugprone-unchecked-optional-access)
-              EndpointCompositionPattern::kFullFamilyPattern);
+              EndpointCompositionPattern::kTreePattern);
     info = model.GetEndpointInfo(kMockEndpoint3);
     ASSERT_TRUE(info.has_value());
     EXPECT_EQ(info->parentId, kInvalidEndpointId); // NOLINT(bugprone-unchecked-optional-access)

@@ -186,8 +186,9 @@ const MockAttributeConfig * MockClusterConfig::attributeById(AttributeId attribu
 
 MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters,
                                        std::initializer_list<EmberAfDeviceType> aDeviceTypes,
-                                       std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags) :
-    id(aId),
+                                       std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags,
+                                       app::EndpointComposition aComposition) :
+    id(aId), composition(aComposition),
     clusters(aClusters), mDeviceTypes(aDeviceTypes), mSemanticTags(aTags), mEmberEndpoint{}
 {
     VerifyOrDie(aClusters.size() < UINT8_MAX);
@@ -202,8 +203,8 @@ MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<Moc
 }
 
 MockEndpointConfig::MockEndpointConfig(const MockEndpointConfig & other) :
-    id(other.id), clusters(other.clusters), mEmberClusters(other.mEmberClusters), mDeviceTypes(other.mDeviceTypes),
-    mSemanticTags(other.mSemanticTags), mEmberEndpoint(other.mEmberEndpoint)
+    id(other.id), composition(other.composition), clusters(other.clusters), mEmberClusters(other.mEmberClusters),
+    mDeviceTypes(other.mDeviceTypes), mSemanticTags(other.mSemanticTags), mEmberEndpoint(other.mEmberEndpoint)
 {
     // fix self-referencing pointers
     mEmberEndpoint.cluster = mEmberClusters.data();

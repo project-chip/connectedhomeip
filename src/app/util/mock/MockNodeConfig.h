@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/util/af-types.h>
+#include <app/util/attribute-storage.h>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstddef>
@@ -110,7 +111,8 @@ struct MockEndpointConfig
 {
     MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters = {},
                        std::initializer_list<EmberAfDeviceType> aDeviceTypes                                    = {},
-                       std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags = {});
+                       std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags = {},
+                       app::EndpointComposition composition = app::EndpointComposition::kFullFamily);
 
     // Endpoint-config is self-referential: mEmberEndpoint.clusters references  mEmberClusters.data()
     MockEndpointConfig(const MockEndpointConfig & other);
@@ -129,6 +131,7 @@ struct MockEndpointConfig
     }
 
     const EndpointId id;
+    const app::EndpointComposition composition;
     const std::vector<MockClusterConfig> clusters;
 
 private:

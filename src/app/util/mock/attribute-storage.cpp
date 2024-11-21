@@ -242,7 +242,7 @@ namespace app {
 
 EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
 {
-    return EndpointComposition::kFullFamily;
+    return GetMockNodeConfig().endpoints[endpointIndex].composition;
 }
 
 } // namespace app
