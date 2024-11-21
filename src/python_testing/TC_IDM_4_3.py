@@ -34,26 +34,27 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import inspect
 import copy
-from datetime import datetime
+import inspect
 import logging
 import queue
 import threading
 import time
-# from time import time
+from datetime import datetime
+from enum import IntFlag
 
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import AttributePath, TypedAttributePath, AsyncReadTransaction, SubscriptionTransaction
+from chip.clusters.Attribute import AsyncReadTransaction, AttributePath, SubscriptionTransaction, TypedAttributePath
+from chip.clusters.enum import MatterIntEnum
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from chip.testing.matter_testing import AttributeChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, EventChangeCallback
-from chip.clusters.enum import MatterIntEnum
 from chip.testing.basic_composition import BasicCompositionTests
-from enum import IntFlag
+from chip.testing.matter_testing import (AttributeChangeCallback, EventChangeCallback, MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main)
 from mobly import asserts, signals
+
 
 '''
 Category:
