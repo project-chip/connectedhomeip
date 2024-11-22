@@ -187,15 +187,19 @@ Also, demo **DAC**, **PAI** and **PAA** certificates needed in case
 
 ### 6.1 SSS-based with EdgeLock2go support
 
-EdgeLock2go services could be used to securely provisoned DAC key/cert during manufactory.
+EdgeLock2go services could be used to securely provisoned DAC key/cert during
+manufactory.
 
-Prior to the generation of the factory data binary. EL2Go data needs to be generated following EL2go process. 
+Prior to the generation of the factory data binary. EL2Go data needs to be
+generated following EL2go process.
 
 For the factory data generation following option need to be added:
 
-`--EL2GO_bin ~/secure_objects.bin` containing EL2GO information including encrypted DAC private key and certificate.
-`--EL2GO_DAC_KEY_ID 1234` containing corresponding to the ID of the DAC key chosen during EL2go key generation.
-`--EL2GO_DAC_CERT_ID 4321` containing corresponding to the ID of the DAC certification chosen during EL2go key generation.
+`--EL2GO_bin ~/secure_objects.bin` containing EL2GO information including
+encrypted DAC private key and certificate. `--EL2GO_DAC_KEY_ID 1234` containing
+corresponding to the ID of the DAC key chosen during EL2go key generation.
+`--EL2GO_DAC_CERT_ID 4321` containing corresponding to the ID of the DAC
+certification chosen during EL2go key generation.
 
 Reference factory data generation command:
 
@@ -207,11 +211,15 @@ Supported platforms:
 
 -   `rw61x`
 
-In addition to the GN flag `nxp_use_factory_data=true`, a Matter application needs to be built with `nxp_enable_secure_EL2GO_factory_data=true` to allow loading of EdgeLock2go data to the secure element.
+In addition to the GN flag `nxp_use_factory_data=true`, a Matter application
+needs to be built with `nxp_enable_secure_EL2GO_factory_data=true` to allow
+loading of EdgeLock2go data to the secure element.
 
-In this mode EdgeLock2go keys will always remain encrypted and only usable by the `SSS`. In this case, all operations that requires DAC private access will be transfered to the `SSS`.
+In this mode EdgeLock2go keys will always remain encrypted and only usable by
+the `SSS`. In this case, all operations that requires DAC private access will be
+transfered to the `SSS`.
 
-### 6.2 SSS-based without EdgeLock2go support for DAC private key secure storage 
+### 6.2 SSS-based without EdgeLock2go support for DAC private key secure storage
 
 Supported platforms:
 
@@ -221,10 +229,12 @@ Supported platforms:
 
 For platforms that have a secure subsystem (`SSS`), the DAC private key can be
 converted to an encrypted blob. This blob will overwrite the DAC private key in
-factory data and will be imported in the `SSS` by the factory
-data provider instance.
+factory data and will be imported in the `SSS` by the factory data provider
+instance.
 
-In this architecture, outside of the manufacturying flow, the DAC private will always remain usable only by the `SSS`. In this case, all operations that requires DAC private access will be transfered to the `SSS`.
+In this architecture, outside of the manufacturying flow, the DAC private will
+always remain usable only by the `SSS`. In this case, all operations that
+requires DAC private access will be transfered to the `SSS`.
 
 The application will check at initialization whether the DAC private key has
 been converted or not and convert it if needed. However, the conversion process
@@ -258,4 +268,5 @@ Please note that `--dac_key` now points to a binary file that contains the
 encrypted blob.
 
 The user can use the DAC private in plain text instead of using the `SSS` by
-adding the following gn argument `chip_use_plain_dac_key=true` (not supported on rw61x).
+adding the following gn argument `chip_use_plain_dac_key=true` (not supported on
+rw61x).
