@@ -56,8 +56,6 @@ protected:
     // may destroy the subclass's object before OnResponseTimeout returns.
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    static bdx::StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR err);
-
     /**
      * This method should be implemented to contain business-logic handling of BDX messages
      * and other TransferSession events.
@@ -129,7 +127,7 @@ public:
      * later, asynchronously.
 
      * Note: NotifyEventHandled is allowed to destroy the AsyncResponder before the call returns.
-     *.          Callers must be careful about this.
+     *          Callers must be careful about this.
      *
      * @param[in] eventType The OutputEventType that was handled by the subclass.
      * @param[in] status The error code that occured when handling the event if an error occurs. Otherwise CHIP_NO_ERROR.

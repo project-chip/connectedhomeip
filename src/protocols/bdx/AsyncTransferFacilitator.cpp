@@ -16,6 +16,7 @@
 
 #include "AsyncTransferFacilitator.h"
 
+#include <protocols/bdx/StatusCode.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -23,24 +24,11 @@ namespace bdx {
 
 AsyncTransferFacilitator::~AsyncTransferFacilitator() {}
 
-bdx::StatusCode AsyncTransferFacilitator::GetBdxStatusCodeFromChipError(CHIP_ERROR err)
-{
-    if (err == CHIP_ERROR_INCORRECT_STATE)
-    {
-        return bdx::StatusCode::kUnexpectedMessage;
-    }
-    if (err == CHIP_ERROR_INVALID_ARGUMENT)
-    {
-        return bdx::StatusCode::kBadMessageContents;
-    }
-    return bdx::StatusCode::kUnknown;
-}
-
 CHIP_ERROR AsyncTransferFacilitator::Init(System::Layer * layer, Messaging::ExchangeContext * exchangeCtx,
                                           System::Clock::Timeout timeout)
 {
-    VerifyOrReturnError(layer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(layer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!mExchange, CHIP_ERROR_INCORRECT_STATE);
 
     mSystemLayer = layer;
@@ -148,13 +136,12 @@ CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(Messaging::ExchangeContex
     {
         ChipLogError(BDX, "OnMessageReceived: Failed to handle message: %" CHIP_ERROR_FORMAT, err.Format());
 
-        // This should notify the tranfer object to abort transfer so it can send a status report across the exchange
+        // This should notify the transfer object to abort transfer so it can send a status report across the exchange
         // when we call ProcessOutputEvents below.
-        mTransfer.AbortTransfer(AsyncResponder::GetBdxStatusCodeFromChipError(err));
+        mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
     }
     else if (!payloadHeader.HasMessageType(MessageType::BlockAckEOF))
     {
-
         // Almost every BDX message expect BlockAckEOF will follow up with a response on the exchange.
         ec->WillSendMessage();
     }
@@ -173,7 +160,7 @@ CHIP_ERROR AsyncResponder::Init(System::Layer * layer, Messaging::ExchangeContex
                                 BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
                                 System::Clock::Timeout timeout)
 {
-    AsyncTransferFacilitator::Init(layer, exchangeCtx, timeout);
+    ReturnErrorOnFailure(AsyncTransferFacilitator::Init(layer, exchangeCtx, timeout));
     ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeout));
     return CHIP_NO_ERROR;
 }
@@ -195,7 +182,7 @@ void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType e
         mDestroySelfAfterProcessingEvents = true;
     }
 
-    // If there was an error handling the output event, this should notify the tranfer object to abort transfer so it can send a
+    // If there was an error handling the output event, this should notify the transfer object to abort transfer so it can send a
     // status report across the exchange when we call ProcessOutputEvents below.
     if (status != CHIP_NO_ERROR)
     {

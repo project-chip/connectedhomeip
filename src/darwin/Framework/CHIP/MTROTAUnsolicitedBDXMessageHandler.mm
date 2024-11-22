@@ -30,8 +30,8 @@ CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::Init(System::Layer * systemLayer,
 {
     assertChipStackLockedByCurrentThread();
 
-    VerifyOrReturnError(systemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mSystemLayer = systemLayer;
     mExchangeMgr = exchangeManager;

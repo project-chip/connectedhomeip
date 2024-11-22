@@ -102,7 +102,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
 
     uint16_t fdl = 0;
     auto fd = mTransfer.GetFileDesignator(fdl);
-    VerifyOrReturnError(fdl <= bdx::kMaxFileDesignatorLen, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(fdl <= bdx::kMaxFileDesignatorLen, CHIP_ERROR_INCORRECT_STATE);
     CharSpan fileDesignatorSpan(Uint8::to_const_char(fd), fdl);
 
     auto fileDesignator = AsString(fileDesignatorSpan);
