@@ -98,13 +98,23 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
     }
     if (argc >= 2)
     {
-        ChipLogError(Zcl, "Too many arguments provided to function %s, line %d", __func__, __LINE__);
-        return APP_ERROR_TOO_MANY_SHELL_ARGUMENTS;
+        ChipLogError(Shell, "Too many arguments");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    // Check if the argument is a valid integer
+    if (argv[0] == nullptr || !std::all_of(argv[0], argv[0] + strlen(argv[0]), ::isdigit))
+    {
+        ChipLogError(Shell, "Invalid argument: Input must be a valid integer.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Convert the argument to an integer
+    int value = std::stoi(argv[0]); // Safe to use now, as we validated the input earlier
+
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
-    data->eventId         = Events::Notify::Id;
-    data->doorState      = static_cast<AlarmBitmap>(atoi(argv[0]));
+    data->eventId                     = Events::Notify::Id;
+    data->doorState                   = static_cast<AlarmBitmap>(atoi(argv[0]));
 
     DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 
@@ -118,23 +128,25 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
 
 CHIP_ERROR RegisterRefrigeratorEvents()
 {
-    static const shell_command_t sRefrigeratorSubCommands[] = { { &RefrigeratorHelpHandler, "help", "Usage: refrigeratoralarm <subcommand>" },
-                                                            { &EventRefrigeratorCommandHandler, "event",
-                                                              " Usage: refrigeratoralarm event <subcommand>" } };
+    static const shell_command_t sRefrigeratorSubCommands[] = {
+        { &RefrigeratorHelpHandler, "help", "Usage: refrigeratoralarm <subcommand>" },
+        { &EventRefrigeratorCommandHandler, "event", " Usage: refrigeratoralarm event <subcommand>" }
+    };
 
     static const shell_command_t sRefrigeratorEventSubCommands[] = {
         { &EventHelpHandler, "help", "Usage : refrigeratoralarm event <subcommand>" },
         { &RefrigeratorDoorEventHandler, "door-state-change", "Sends door state change event to Refrigerator app" }
     };
 
-    static const shell_command_t sRefrigeratorEventAlarmDoorSubCommands[] = { { &AlarmHelpHandler, "help",
-                                                                        "Usage : Refrigerator event to change door state" } };
+    static const shell_command_t sRefrigeratorEventAlarmDoorSubCommands[] = {
+        { &AlarmHelpHandler, "help", "Usage : Refrigerator event to change door state" }
+    };
 
     static const shell_command_t sRefrigeratorCommand = { &RefrigeratorCommandHandler, "refrigeratoralarm",
-                                                      "refrigerator alarm commands. Usage: refrigeratoralarm <subcommand>" };
+                                                          "refrigerator alarm commands. Usage: refrigeratoralarm <subcommand>" };
 
-    sShellRefrigeratorEventAlarmDoorSubCommands.RegisterCommands(sRefrigeratorEventAlarmDoorSubCommands, ArraySize(sRefrigeratorEventAlarmDoorSubCommands));
-
+    sShellRefrigeratorEventAlarmDoorSubCommands.RegisterCommands(sRefrigeratorEventAlarmDoorSubCommands,
+                                                                 ArraySize(sRefrigeratorEventAlarmDoorSubCommands));
     sShellRefrigeratorEventSubCommands.RegisterCommands(sRefrigeratorEventSubCommands, ArraySize(sRefrigeratorEventSubCommands));
     sShellRefrigeratorSubCommands.RegisterCommands(sRefrigeratorSubCommands, ArraySize(sRefrigeratorSubCommands));
 
@@ -145,15 +157,14 @@ CHIP_ERROR RegisterRefrigeratorEvents()
 
 void EventWorkerFunction(intptr_t context)
 {
-    VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "EventWorkerFunction - Invalid work data"));
-
+    VerifyOrReturn(reinterpret_cast<void*>(context) != nullptr, ChipLogError(Shell, "EventWorkerFunction - Invalid work data"));
     EventData * data = reinterpret_cast<EventData *>(context);
 
     switch (data->eventId)
     {
     case Events::Notify::Id: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
-        RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId,alarmData->doorState);
+        RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, alarmData->doorState);
         break;
     }
 
@@ -161,5 +172,7 @@ void EventWorkerFunction(intptr_t context)
         ChipLogError(Zcl, "Invalid Event Id %s, line %d", __func__, __LINE__);
         break;
     }
+    // Free memory
+    Platform::Delete(data);
     }
 }
