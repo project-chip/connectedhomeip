@@ -23,7 +23,7 @@
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
-#       --end_user_support_log ${END_USER_SUPPORT_LOG}
+#       --end_user_support_log /tmp/eusl.txt
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,12 +31,12 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --string-arg "end_user_support_log:${END_USER_SUPPORT_LOG}"
 #     factory-reset: true
 #     quiet: false
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+import random
 
 import chip.clusters as Clusters
 from chip.bdx import BdxProtocol, BdxTransfer
@@ -50,22 +50,29 @@ class TestBdxTransfer(MatterBaseTest):
 
     def steps_bdx_transfer(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Set up the system to receive a BDX transfer."),
-            TestStep(2, "Send the command to request logs."),
-            TestStep(3, "Wait for the command's response or a BDX transfer."),
-            TestStep(4, "Verify the init message's parameters."),
-            TestStep(5, "Accept the transfer and obtain the data."),
-            TestStep(6, "Verify the obtained data."),
-            TestStep(7, "Check the command's response."),
+            TestStep(1, "Generate the diagnostic log file."),
+            TestStep(2, "Set up the system to receive a BDX transfer."),
+            TestStep(3, "Send the command to request logs."),
+            TestStep(4, "Wait for the command's response or a BDX transfer."),
+            TestStep(5, "Verify the init message's parameters."),
+            TestStep(6, "Accept the transfer and obtain the data."),
+            TestStep(7, "Verify the obtained data."),
+            TestStep(8, "Check the command's response."),
         ]
         return steps
 
     @async_test_body
     async def test_bdx_transfer(self):
         self.step(1)
-        bdx_future: asyncio.futures.Future = self.default_controller.TestOnlyPrepareToReceiveBdxData()
+        expected_data = random.randbytes(9240)
+        diagnostic_file = open("/tmp/eusl.txt", "wb")
+        diagnostic_file.write(expected_data)
+        diagnostic_file.close()
 
         self.step(2)
+        bdx_future: asyncio.futures.Future = self.default_controller.TestOnlyPrepareToReceiveBdxData()
+
+        self.step(3)
         file_designator = "filename"
         command: Clusters.DiagnosticLogs.Commands.RetrieveLogsRequest = Clusters.DiagnosticLogs.Commands.RetrieveLogsRequest(
             intent=Clusters.DiagnosticLogs.Enums.IntentEnum.kEndUserSupport,
@@ -79,10 +86,10 @@ class TestBdxTransfer(MatterBaseTest):
             responseType=Clusters.DiagnosticLogs.Commands.RetrieveLogsResponse)
         )
 
-        self.step(3)
+        self.step(4)
         done, pending = await asyncio.wait([command_send_future, bdx_future], return_when=asyncio.FIRST_COMPLETED)
 
-        self.step(4)
+        self.step(5)
         asserts.assert_true(bdx_future in done, "BDX transfer didn't start")
         bdx_transfer: BdxTransfer.BdxTransfer = bdx_future.result()
         asserts.assert_equal(bdx_transfer.init_message.TransferControlFlags,
@@ -93,14 +100,13 @@ class TestBdxTransfer(MatterBaseTest):
                              bytes(file_designator, encoding='utf8'),
                              "Invalid file designator")
 
-        self.step(5)
+        self.step(6)
         data = await bdx_transfer.accept_and_receive_data()
 
-        self.step(6)
-        data_file = open(self.user_params["end_user_support_log"], "rb")
-        asserts.assert_equal(data, data_file.read(), "Transferred data doesn't match")
-
         self.step(7)
+        asserts.assert_equal(data, expected_data, "Transferred data doesn't match")
+
+        self.step(8)
         command_response: Clusters.DiagnosticLogs.Commands.RetrieveLogsResponse
         if command_send_future in done:
             command_response = command_send_future.result()
