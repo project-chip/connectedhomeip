@@ -50,10 +50,6 @@
 #include <lib/support/FibonacciUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-// TODO: defaulting to codegen should eventually be an application choice and not
-//       hard-coded in the interaction model
-#include <app/codegen-data-model-provider/Instance.h>
-
 namespace chip {
 namespace app {
 namespace {
@@ -1836,14 +1832,11 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     return oldModel;
 }
 
-DataModel::Provider * InteractionModelEngine::GetDataModelProvider()
+DataModel::Provider * InteractionModelEngine::GetDataModelProvider() const
 {
-    if (mDataModelProvider == nullptr)
-    {
-        // These should be called within the CHIP processing loop.
-        assertChipStackLockedByCurrentThread();
-        SetDataModelProvider(CodegenDataModelProviderInstance());
-    }
+    // These should be called within the CHIP processing loop.
+    assertChipStackLockedByCurrentThread();
+
     return mDataModelProvider;
 }
 
