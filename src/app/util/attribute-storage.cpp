@@ -732,7 +732,8 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                             }
 
                             {
-                                // attribute storage can be
+                                // Determine the attribute storage base address
+                                // Attribute storage can be
                                 // - singleton: statically allocated in singletonAttributeData global
                                 // - static endpoint: statically allocated in attributeData global
                                 // - dynamic endpoint with dynamic storage: in memory block provided at endpoint instantiation
@@ -751,6 +752,8 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                                 {
                                     attributeLocation = attributeData;
                                 }
+                                // Apply the offset to the attribute
+                                attributeLocation += attributeStorageOffset;
 
                                 uint8_t *src, *dst;
                                 if (write)
