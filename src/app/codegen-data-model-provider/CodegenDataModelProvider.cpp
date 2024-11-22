@@ -355,7 +355,7 @@ DataModel::EndpointEntry FirstEndpointEntry(unsigned start_index, uint16_t & fou
 
 bool operator==(const DataModel::Provider::SemanticTag & tagA, const DataModel::Provider::SemanticTag & tagB)
 {
-    // Label is an optional and nullable value of CharSpan. Optioanl and Nullable have overload for ==,
+    // Label is an optional and nullable value of CharSpan. Optional and Nullable have overload for ==,
     // But `==` is deleted for CharSpan. Here we only check whether the string is the same.
     if (tagA.label.HasValue() != tagB.label.HasValue())
     {
