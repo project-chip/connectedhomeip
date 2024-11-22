@@ -41,7 +41,8 @@ enum class EndpointCompositionPattern : uint8_t
 
 struct EndpointInfo
 {
-    // kInvalidEndpointId if having no parent endpoint
+    // kInvalidEndpointId if there is no explicit parent endpoint (which means the parent is endpoint 0,
+    // for endpoints other than endpoint 0).
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
 
