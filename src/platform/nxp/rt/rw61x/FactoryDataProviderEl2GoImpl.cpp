@@ -149,7 +149,7 @@ CHIP_ERROR FactoryDataProviderImpl::GetDeviceAttestationCert(MutableByteSpan & o
     STATUS_SUCCESS_OR_EXIT_MSG("decrypt_el2go_cert_blob failed: 0x%08x", status);
 
     return CHIP_NO_ERROR;
-    
+
 exit:
     return CHIP_ERROR_INTERNAL;
 }
@@ -248,7 +248,7 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
 
     status = els_delete_key(key_index);
     STATUS_SUCCESS_OR_EXIT_MSG("Deletion of el2goimport_auth failed", status);
-    
+
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
     (void)mcux_els_mutex_unlock();
 #endif
