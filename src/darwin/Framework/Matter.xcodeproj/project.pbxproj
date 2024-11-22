@@ -422,6 +422,10 @@
 		B4FCD5722B603A6300832859 /* DownloadLogCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4FCD56F2B603A6300832859 /* DownloadLogCommand.mm */; };
 		B4FCD5732B611EB300832859 /* MTRDiagnosticLogsDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = B4C8E6B32B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.h */; };
 		BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB3F2474762900605257 /* libCHIP.a */; };
+		CF3B63CF2CA31E71003C1C87 /* MTROTAImageTransferHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = CF3B63CB2CA31E71003C1C87 /* MTROTAImageTransferHandler.h */; };
+		CF3B63D02CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = CF3B63CC2CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.h */; };
+		CF3B63D12CA31E71003C1C87 /* MTROTAImageTransferHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF3B63CD2CA31E71003C1C87 /* MTROTAImageTransferHandler.mm */; };
+		CF3B63D22CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF3B63CE2CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.mm */; };
 		D4288E872C8A273F002FEC53 /* MTRDevice_XPC_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D4288E862C8A273F002FEC53 /* MTRDevice_XPC_Internal.h */; };
 		D444F9A72C6E8F9D007761E5 /* MTRXPCServerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D444F9A62C6E8F9D007761E5 /* MTRXPCServerProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D444F9AA2C6E9A08007761E5 /* MTRXPCClientProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D444F9A82C6E99CA007761E5 /* MTRXPCClientProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -901,6 +905,10 @@
 		B4FCD56F2B603A6300832859 /* DownloadLogCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DownloadLogCommand.mm; sourceTree = "<group>"; };
 		BA09EB3F2474762900605257 /* libCHIP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCHIP.a; path = lib/libCHIP.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = chip_xcode_build_connector.sh; sourceTree = "<group>"; };
+		CF3B63CB2CA31E71003C1C87 /* MTROTAImageTransferHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTROTAImageTransferHandler.h; sourceTree = "<group>"; };
+		CF3B63CC2CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTROTAUnsolicitedBDXMessageHandler.h; sourceTree = "<group>"; };
+		CF3B63CD2CA31E71003C1C87 /* MTROTAImageTransferHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROTAImageTransferHandler.mm; sourceTree = "<group>"; };
+		CF3B63CE2CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROTAUnsolicitedBDXMessageHandler.mm; sourceTree = "<group>"; };
 		D4288E862C8A273F002FEC53 /* MTRDevice_XPC_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDevice_XPC_Internal.h; sourceTree = "<group>"; };
 		D437613E285BDC0D0051FEA2 /* MTRErrorTestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRErrorTestUtils.h; sourceTree = "<group>"; };
 		D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestKeys.h; sourceTree = "<group>"; };
@@ -1371,6 +1379,10 @@
 		B202528F2459E34F00F97062 /* CHIP */ = {
 			isa = PBXGroup;
 			children = (
+				CF3B63CB2CA31E71003C1C87 /* MTROTAImageTransferHandler.h */,
+				CF3B63CD2CA31E71003C1C87 /* MTROTAImageTransferHandler.mm */,
+				CF3B63CC2CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.h */,
+				CF3B63CE2CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.mm */,
 				D444F9A12C6E8058007761E5 /* XPC Protocol */,
 				88E07D602B9A89A4005FD53E /* MTRMetricKeys.h */,
 				88FA798B2B7B257100CD4B6F /* MTRMetricsCollector.h */,
@@ -1835,6 +1847,7 @@
 				B2E0D7B2245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h in Headers */,
 				5109E9C02CCAD64F0006884B /* MTRDeviceDataValidation.h in Headers */,
 				3CF134A7289D8ADA0017A19E /* MTRCSRInfo.h in Headers */,
+				CF3B63D02CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.h in Headers */,
 				88E07D612B9A89A4005FD53E /* MTRMetricKeys.h in Headers */,
 				3D4733B32BE2D1DA003DC19B /* MTRUtilities.h in Headers */,
 				B2E0D7B1245B0B5C003C5B48 /* Matter.h in Headers */,
@@ -1882,6 +1895,7 @@
 				9B231B042C62EF650030EB37 /* (null) in Headers */,
 				515BE4ED2B72C0C5000BC1FD /* MTRUnfairLock.h in Headers */,
 				998F286F26D55EC5001846C6 /* MTRP256KeypairBridge.h in Headers */,
+				CF3B63CF2CA31E71003C1C87 /* MTROTAImageTransferHandler.h in Headers */,
 				2C222ADF255C811800E446B9 /* MTRBaseDevice_Internal.h in Headers */,
 				514C7A022B64223400DD6D7B /* MTRServerEndpoint_Internal.h in Headers */,
 				511913FC28C100EF009235E9 /* MTRBaseSubscriptionCallback.h in Headers */,
@@ -2163,6 +2177,7 @@
 				997DED162695343400975E97 /* MTRThreadOperationalDataset.mm in Sources */,
 				515C1C6F284F9FFB00A48F0C /* MTRFramework.mm in Sources */,
 				51029DF6293AA6100087AFB0 /* MTROperationalCertificateIssuer.mm in Sources */,
+				CF3B63D22CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.mm in Sources */,
 				27A53C1827FBC6920053F131 /* MTRAttestationTrustStoreBridge.mm in Sources */,
 				7592BCF62CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp in Sources */,
 				7592BCF72CBEE98C00EB74A0 /* Instance.cpp in Sources */,
@@ -2202,6 +2217,7 @@
 				1EC4CE5D25CC26E900D7304F /* MTRBaseClusters.mm in Sources */,
 				514C79F62B62F0B900DD6D7B /* util.cpp in Sources */,
 				51565CB22A7AD77600469F18 /* MTRDeviceControllerDataStore.mm in Sources */,
+				CF3B63D12CA31E71003C1C87 /* MTROTAImageTransferHandler.mm in Sources */,
 				51D0B12F2B617800006E3511 /* MTRAccessGrant.mm in Sources */,
 				88E6C9482B6334ED001A1FE0 /* MTRMetrics.mm in Sources */,
 				1ED276E226C5812A00547A89 /* MTRCluster.mm in Sources */,
