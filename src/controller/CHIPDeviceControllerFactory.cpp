@@ -22,9 +22,9 @@
  *      that vends Controller objects
  */
 
-#include "app/InteractionModelEngine.h"
 #include <controller/CHIPDeviceControllerFactory.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
