@@ -42,6 +42,7 @@
 
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/icd/client/CheckInHandler.h>
 #include <app/icd/client/DefaultCheckInDelegate.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
@@ -271,6 +272,7 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
 
     factoryParams.fabricIndependentStorage = storageAdapter;
     factoryParams.sessionKeystore          = &sSessionKeystore;
+    factoryParams.dataModelProvider        = app::CodegenDataModelProviderInstance();
 
     sICDClientStorage.Init(storageAdapter, &sSessionKeystore);
 
