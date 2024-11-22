@@ -156,7 +156,8 @@ rt_executable("thermostat") {
     ]
   }
 
-  if (nxp_enable_secure_whole_factory_data || nxp_enable_secure_EL2GO_factory_data) {
+  if (nxp_enable_secure_whole_factory_data ||
+      nxp_enable_secure_EL2GO_factory_data) {
     sources += [ "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp" ]
     if (nxp_enable_secure_whole_factory_data) {
       defines += [ "ENABLE_SECURE_WHOLE_FACTORY_DATA" ]
