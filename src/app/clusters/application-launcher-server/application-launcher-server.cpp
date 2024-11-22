@@ -201,6 +201,15 @@ CHIP_ERROR ApplicationLauncherAttrAccess::Read(const app::ConcreteReadAttributeP
 
         return ReadCurrentAppAttribute(aEncoder, delegate);
     }
+    case chip::app::Clusters::ApplicationLauncher::Attributes::FeatureMap::Id: {
+            uint32_t featureMap = 0;
+            return aEncoder.Encode(featureMap);
+
+    }
+    case chip::app::Clusters::ApplicationLauncher::Attributes::ClusterRevision::Id: {
+            uint16_t clusterRevision = 0;
+            return aEncoder.Encode(clusterRevision);
+    }
     default: {
         break;
     }

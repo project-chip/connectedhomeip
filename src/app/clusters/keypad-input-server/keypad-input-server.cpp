@@ -150,6 +150,10 @@ CHIP_ERROR KeypadInputAttrAccess::Read(const app::ConcreteReadAttributePath & aP
     case app::Clusters::KeypadInput::Attributes::FeatureMap::Id: {
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     }
+    case app::Clusters::KeypadInput::Attributes::ClusterRevision::Id: {
+            uint16_t clusterRevision = 0;
+            return aEncoder.Encode(clusterRevision);
+    }
 
     default: {
         break;

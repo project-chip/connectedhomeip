@@ -159,6 +159,11 @@ CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath 
     }
     case app::Clusters::TargetNavigator::Attributes::ClusterRevision::Id:
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    case app::Clusters::TargetNavigator::Attributes::FeatureMap::Id: {
+            uint32_t featureMap = 0;
+            return aEncoder.Encode(featureMap);
+
+    }
     default:
         break;
     }
