@@ -23,10 +23,10 @@ import subprocess
 import sys
 
 from crc import Calculator, Crc16
-from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVersion, HardwareVersionStr, IterationCount,
-                    ManufacturingDate, PaiCert, PartNumber, ProductFinish, ProductId, ProductLabel, ProductName,
-                    ProductPrimaryColor, ProductURL, Salt, SerialNum, SetupPasscode, StrArgument, UniqueId, VendorId, VendorName,
-                    Verifier, El2GoObject, El2GoDacKeyID, El2GoDacCertID)
+from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, El2GoDacCertID, El2GoDacKeyID, El2GoObject, HardwareVersion,
+                    HardwareVersionStr, IterationCount, ManufacturingDate, PaiCert, PartNumber, ProductFinish, ProductId,
+                    ProductLabel, ProductName, ProductPrimaryColor, ProductURL, Salt, SerialNum, SetupPasscode, StrArgument,
+                    UniqueId, VendorId, VendorName, Verifier)
 from default import InputArgument
 
 # Global variable for hash ID
