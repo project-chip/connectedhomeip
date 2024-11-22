@@ -14,6 +14,27 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import copy
 import random
 #from cryptography import x509
@@ -22,8 +43,9 @@ import random
 import chip.clusters as Clusters
 from chip.tlv import TLVReader, TLVWriter
 from chip.utils import CommissioningBuildingBlocks
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+from pprint import pprint
 
 class TC_OPCREDS_3_5(MatterBaseTest):
 
@@ -37,6 +59,13 @@ class TC_OPCREDS_3_5(MatterBaseTest):
         dev_ctrl = self.default_controller
 
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        second_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority(maximizeCertChains=True)
+        third_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority(certificateValidityPeriod=100)
+
+        print("certificate1: ", dir(new_certificate_authority))
+        print("certificate2: ", second_certificate_authority.maximizeCertChains)
+        print("certificate3: ", second_certificate_authority.certificateValidityPeriod)
+
         th1_vid = 0xFFF1
         th1_fabricId = 1111
         th1_new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=th1_vid, fabricId=th1_fabricId)

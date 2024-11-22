@@ -77,11 +77,15 @@ class CertificateAuthority:
         self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.restype = PyChipError
         self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.argtypes = [ctypes.c_void_p, ctypes.c_bool]
 
+        self._Handle().pychip_OpCreds_SetCertValidityInSeconds.restype = PyChipError
+        self._Handle().pychip_OpCreds_SetCertValidityInSeconds.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
+
         if (persistentStorage is None):
             persistentStorage = self._chipStack.GetStorageManager()
 
         self._persistentStorage = persistentStorage
         self._maximizeCertChains = False
+        self._certificateValidityPeriod = 0
 
         self._closure = self._chipStack.Call(
             lambda: self._Handle().pychip_OpCreds_InitializeDelegate(
@@ -189,6 +193,10 @@ class CertificateAuthority:
     def maximizeCertChains(self) -> bool:
         return self._maximizeCertChains
 
+    @property
+    def certificateValidityPeriod(self) -> int:
+        return self._certificateValidityPeriod
+
     @maximizeCertChains.setter
     def maximizeCertChains(self, enabled: bool):
         self._chipStack.Call(
@@ -196,6 +204,17 @@ class CertificateAuthority:
         ).raise_on_error()
 
         self._maximizeCertChains = enabled
+
+    @certificateValidityPeriod.setter
+    def certificateValidityPeriod(self, validity: int):
+        if validity < 0:
+            raise ValueError("Validity period must be a non-negative integer")
+
+        self._chipStack.Call(
+            lambda: self._Handle().pychip_OpCreds_SetCertValidityInSeconds(ctypes.c_void_p(self._closure), ctypes.c_uint32(validity))
+        ).raise_on_error()
+
+        self._certificateValidityPeriod = validity
 
     def __del__(self):
         self.Shutdown()
@@ -258,7 +277,7 @@ class CertificateAuthorityManager:
             ca = self.NewCertificateAuthority(int(caIndex))
             ca.LoadFabricAdminsFromStorage()
 
-    def NewCertificateAuthority(self, caIndex: Optional[int] = None, maximizeCertChains: bool = False):
+    def NewCertificateAuthority(self, caIndex: Optional[int] = None, maximizeCertChains: bool = False, certificateValidityPeriod: int = 0):
         ''' Creates a new CertificateAuthority instance with the provided CA Index and the PersistentStorage
             instance previously setup in the constructor.
 
@@ -284,6 +303,7 @@ class CertificateAuthorityManager:
 
         ca = CertificateAuthority(chipStack=self._chipStack, caIndex=caIndex, persistentStorage=self._persistentStorage)
         ca.maximizeCertChains = maximizeCertChains
+        ca.certificateValidityPeriod = certificateValidityPeriod
         self._activeCaList.append(ca)
 
         return ca
