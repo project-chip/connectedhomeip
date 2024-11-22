@@ -1310,7 +1310,7 @@ Status ColorControlServer::moveToSaturation(EndpointId endpoint, uint8_t saturat
  * was called by MoveHue command and rate is a uint8 value.
  * @return Status::Success When successful,
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state,
- *         Status::ConstraintError if the hue, saturation or tansitionTime, are above maximum.
+ *         Status::ConstraintError if the hue, saturation or transitionTime, are above maximum.
  */
 Status ColorControlServer::moveToHueAndSaturation(EndpointId endpoint, uint16_t hue, uint8_t saturation, uint16_t transitionTime,
                                                   bool isEnhanced)
