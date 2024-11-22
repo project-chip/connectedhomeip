@@ -136,7 +136,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
         factoryParams.fabricIndependentStorage = &gServerStorage;
         factoryParams.sessionKeystore          = &gSessionKeystore;
-        factoryParams.dataModelProvider        = app::CodegenDataModelProviderInstance();
+        factoryParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance();
 
         // Initialize group data provider for local group key state and IPKs
         gGroupDataProvider.SetStorageDelegate(&gServerStorage);
