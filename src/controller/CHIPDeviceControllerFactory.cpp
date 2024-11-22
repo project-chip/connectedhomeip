@@ -251,6 +251,13 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.bdxTransferServer->Init(stateParams.systemLayer, stateParams.exchangeMgr));
 
     chip::app::InteractionModelEngine * interactionModelEngine = chip::app::InteractionModelEngine::GetInstance();
+
+    // Note placement of this BEFORE `InitDataModelHandler` since InitDataModelHandler may
+    // rely on ember (does emberAfInit() and configure which may load data from NVM).
+    //
+    // Expected forward path is that we will move move and more things inside datamodel
+    // provider (e.g. storage settings) so we want datamodelprovider available before
+    // `InitDataModelHandler`.
     interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
 
     InitDataModelHandler();
