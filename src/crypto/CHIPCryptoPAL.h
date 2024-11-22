@@ -901,6 +901,13 @@ public:
     CHIP_ERROR Begin();
 
     /**
+     * @brief check if the digest computation has been initialized.
+     *
+     * @return True if the context is correctly initialized; otherwise, false.
+     */
+    bool IsInitialized();
+
+    /**
      * @brief Add some data to the digest computation, updating internal state.
      *
      * @param[in] data The span of bytes to include in the digest update process.
@@ -942,9 +949,6 @@ public:
 
 private:
     HashSHA256OpaqueContext mContext;
-#if CHIP_CRYPTO_BORINGSSL || CHIP_CRYPTO_OPENSSL
-    bool mInitialized = false;
-#endif
 };
 
 class HKDF_sha
