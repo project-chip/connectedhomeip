@@ -53,6 +53,8 @@ CHIP_ERROR X509_PemToDer(const std::string & pemCert, MutableByteSpan & derCert)
     std::size_t endPos = pemCert.find(endMarker);
     VerifyOrReturnError(endPos != std::string::npos, CHIP_ERROR_INVALID_ARGUMENT);
 
+    VerifyOrReturnError(beginPos < endPos, CHIP_ERROR_INVALID_ARGUMENT);
+
     // Extract content between markers
     std::string plainB64Str = pemCert.substr(beginPos + beginMarker.length(), endPos - (beginPos + beginMarker.length()));
 
@@ -90,6 +92,8 @@ void TestDACRevocationDelegateImpl::ClearDeviceAttestationRevocationSetPath()
     mDeviceAttestationRevocationSetPath = mDeviceAttestationRevocationSetPath.substr(0, 0);
 }
 
+// outSubject is subject encoded as base64 string
+// outKeyId is SKID encoded as hex string
 CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectAndKeyIdFromPEMCert(const std::string & certPEM, std::string & outSubject,
                                                                         std::string & outKeyId)
 {
@@ -215,7 +219,8 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akid
 
 CHIP_ERROR TestDACRevocationDelegateImpl::GetKeyIDHexStr(const ByteSpan & certDer, MutableCharSpan & outKeyIDHexStr, bool isAKID)
 {
-    // kAuthorityKeyIdentifierLength and kSubjectKeyIdentifierLength are equal
+    static_assert(kAuthorityKeyIdentifierLength == kSubjectKeyIdentifierLength, "AKID and SKID length mismatch");
+
     uint8_t keyIdBuf[kAuthorityKeyIdentifierLength];
     MutableByteSpan keyId(keyIdBuf);
 
@@ -284,7 +289,7 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectNameBase64Str(const ByteSpan
     return GetRDNBase64Str(certDer, outSubjectNameBase64String, false /* isIssuer */);
 }
 
-// @param certDer Certificate being tested for revocation in
+// @param certDer Certificate to check for revocation in DER format
 bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDer)
 {
     char issuerNameBuffer[kMaxIssuerBase64Len]                           = { 0 };
