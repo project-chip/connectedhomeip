@@ -22,9 +22,9 @@
 
 #define FACTORY_DATA_MAX_SIZE 4096
 
-#define EL2GO_MAX_BLOB_SIZE     3072U
-#define EL2GO_MAX_CERT_SIZE     2048U
-#define PUBLIC_KEY_SIZE         64U
+#define EL2GO_MAX_BLOB_SIZE 3072U
+#define EL2GO_MAX_CERT_SIZE 2048U
+#define PUBLIC_KEY_SIZE 64U
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,10 +46,12 @@ public:
     CHIP_ERROR Init(void);
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
-    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);;
+    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
+    ;
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & outBuffer) override;
 
-private:    struct Header
+private:
+    struct Header
     {
         uint32_t hashId;
         uint32_t size;

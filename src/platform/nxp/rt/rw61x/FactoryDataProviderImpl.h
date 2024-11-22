@@ -67,7 +67,7 @@ private:
     CHIP_ERROR ReplaceWithBlob(uint8_t * data, uint8_t * blob, size_t blobLen, uint32_t offset);
     CHIP_ERROR ELS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset);
     CHIP_ERROR ELS_ConvertDacKey();
-    CHIP_ERROR DecryptAes128Ecb(uint8_t *dest, uint8_t *source, const uint8_t *aes128Key);
+    CHIP_ERROR DecryptAes128Ecb(uint8_t * dest, uint8_t * source, const uint8_t * aes128Key);
 
     CHIP_ERROR ReadAndCheckFactoryDataInFlash(void);
 };

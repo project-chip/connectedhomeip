@@ -125,21 +125,23 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
 
 CHIP_ERROR FactoryDataProviderImpl::GetDeviceAttestationCert(MutableByteSpan & outBuffer)
 {
-    status_t status = STATUS_SUCCESS;
-    uint8_t el2go_blob[EL2GO_MAX_BLOB_SIZE] = {0U};
-    size_t el2go_blob_size = 0U;
-    size_t outBufferSize = 0U;
-    uint16_t CertificateIdSize = 0;
-    uint16_t BlobSize = 0;
+    status_t status                         = STATUS_SUCCESS;
+    uint8_t el2go_blob[EL2GO_MAX_BLOB_SIZE] = { 0U };
+    size_t el2go_blob_size                  = 0U;
+    size_t outBufferSize                    = 0U;
+    uint16_t CertificateIdSize              = 0;
+    uint16_t BlobSize                       = 0;
     uint32_t Addr;
     uint32_t el2go_dac_cert_id = 0;
 
     /* Search key ID FactoryDataId::kEl2GoBlob address */
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kEl2GoBlob, NULL, 0, BlobSize, &Addr));
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kEl2GoDacCertId, (uint8_t *) &el2go_dac_cert_id, sizeof(el2go_dac_cert_id), CertificateIdSize));
+    ReturnErrorOnFailure(
+        SearchForId(FactoryDataId::kEl2GoDacCertId, (uint8_t *) &el2go_dac_cert_id, sizeof(el2go_dac_cert_id), CertificateIdSize));
 
     /* Read DAC certificate from EL2GO data */
-    status = read_el2go_blob((uint8_t *)Addr, (size_t)BlobSize, el2go_dac_cert_id, el2go_blob, EL2GO_MAX_BLOB_SIZE, &el2go_blob_size);
+    status =
+        read_el2go_blob((uint8_t *) Addr, (size_t) BlobSize, el2go_dac_cert_id, el2go_blob, EL2GO_MAX_BLOB_SIZE, &el2go_blob_size);
 
     STATUS_SUCCESS_OR_EXIT_MSG("DAC Private key not found: 0x%08x", status);
 
@@ -199,39 +201,42 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
 
 CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer)
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
-    status_t status = STATUS_SUCCESS;
-    uint8_t el2go_blob[EL2GO_MAX_BLOB_SIZE] = {0U};
-    size_t el2go_blob_size = 0U;
-    mcuxClEls_EccSignOption_t sign_options = { 0 };
-    uint8_t public_key[MCUXCLELS_ECC_PUBLICKEY_SIZE] = {0};
-    size_t public_key_size = sizeof(public_key);
-    uint8_t hash[MCUXCLHASH_OUTPUT_SIZE_SHA_256] = {0};
-    mcuxClEls_KeyIndex_t key_index = MCUXCLELS_KEY_SLOTS;
+    CHIP_ERROR res                                   = CHIP_NO_ERROR;
+    status_t status                                  = STATUS_SUCCESS;
+    uint8_t el2go_blob[EL2GO_MAX_BLOB_SIZE]          = { 0U };
+    size_t el2go_blob_size                           = 0U;
+    mcuxClEls_EccSignOption_t sign_options           = { 0 };
+    uint8_t public_key[MCUXCLELS_ECC_PUBLICKEY_SIZE] = { 0 };
+    size_t public_key_size                           = sizeof(public_key);
+    uint8_t hash[MCUXCLHASH_OUTPUT_SIZE_SHA_256]     = { 0 };
+    mcuxClEls_KeyIndex_t key_index                   = MCUXCLELS_KEY_SLOTS;
     mcuxClEls_EccByte_t ecc_signature[MCUXCLELS_ECC_SIGNATURE_SIZE];
     uint8_t digest[kSHA256_Hash_Length];
-    uint16_t BlobSize = 0;
+    uint16_t BlobSize  = 0;
     uint16_t KeyIdSize = 0;
     uint32_t Addr;
     uint32_t el2go_dac_key_id = 0;
 
     /* Search key ID FactoryDataId::kEl2GoBlob */
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kEl2GoBlob, NULL, 0, BlobSize, &Addr));
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kEl2GoDacKeyId, (uint8_t *) &el2go_dac_key_id, sizeof(el2go_dac_key_id), KeyIdSize));
+    ReturnErrorOnFailure(
+        SearchForId(FactoryDataId::kEl2GoDacKeyId, (uint8_t *) &el2go_dac_key_id, sizeof(el2go_dac_key_id), KeyIdSize));
 
     /* Calculate message HASH to sign */
     memset(&digest[0], 0, sizeof(digest));
     res = Hash_SHA256(digestToSign.data(), digestToSign.size(), &digest[0]);
-    if (res != CHIP_NO_ERROR){
+    if (res != CHIP_NO_ERROR)
+    {
         return res;
     }
 
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void)mcux_els_mutex_lock();
+    (void) mcux_els_mutex_lock();
 #endif
 
     /* Read DAC key from EL2GO data*/
-    status = read_el2go_blob((uint8_t *) Addr, (size_t) BlobSize, el2go_dac_key_id, el2go_blob, EL2GO_MAX_BLOB_SIZE, &el2go_blob_size);
+    status =
+        read_el2go_blob((uint8_t *) Addr, (size_t) BlobSize, el2go_dac_key_id, el2go_blob, EL2GO_MAX_BLOB_SIZE, &el2go_blob_size);
     STATUS_SUCCESS_OR_EXIT_MSG("DAC Provate key not found: 0x%08x", status);
 
     // Import EL2GO blobs in ELS
@@ -250,12 +255,12 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     STATUS_SUCCESS_OR_EXIT_MSG("Deletion of el2goimport_auth failed", status);
 
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void)mcux_els_mutex_unlock();
+    (void) mcux_els_mutex_unlock();
 #endif
     return CHIP_NO_ERROR;
 exit:
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void)mcux_els_mutex_unlock();
+    (void) mcux_els_mutex_unlock();
 #endif
     return CHIP_ERROR_INTERNAL;
 }
@@ -265,7 +270,7 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     uint16_t len;
     uint8_t type;
     uint16_t keySize = 0;
-    status_t status = STATUS_SUCCESS;
+    status_t status  = STATUS_SUCCESS;
 
     ReturnLogErrorOnFailure(ReadAndCheckFactoryDataInFlash());
 
@@ -273,7 +278,6 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
 
     return CHIP_NO_ERROR;
 }
-
 
 } // namespace DeviceLayer
 } // namespace chip

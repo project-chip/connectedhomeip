@@ -67,7 +67,7 @@ FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
 
 static constexpr size_t kPrivateKeyBlobLength = Crypto::kP256_PrivateKey_Length + ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD;
 
-CHIP_ERROR FactoryDataProviderImpl::DecryptAes128Ecb(uint8_t *dest, uint8_t *source, const uint8_t *aes128Key)
+CHIP_ERROR FactoryDataProviderImpl::DecryptAes128Ecb(uint8_t * dest, uint8_t * source, const uint8_t * aes128Key)
 {
     uint8_t res = 0;
     mbedtls_aes_context aesCtx;
@@ -171,14 +171,15 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     /* Calculate message HASH to sign */
     memset(&digest[0], 0, sizeof(digest));
     res = Hash_SHA256(digestToSign.data(), digestToSign.size(), &digest[0]);
-    if (res != CHIP_NO_ERROR){
+    if (res != CHIP_NO_ERROR)
+    {
         return res;
     }
 
     PLOG_DEBUG_BUFFER("digestToSign", digestToSign.data(), digestToSign.size());
 
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void)mcux_els_mutex_lock();
+    (void) mcux_els_mutex_lock();
 #endif
     /* Import blob DAC key into SE50 (reserved key slot) */
     status = import_die_int_wrapped_key_into_els(els_key_blob, els_key_blob_size, plain_key_properties, &key_index);
@@ -202,14 +203,14 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
 
     /* Generate MutableByteSpan with ECC signature and ECC signature size */
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void)mcux_els_mutex_unlock();
+    (void) mcux_els_mutex_unlock();
 #endif
     return CopySpanToMutableSpan(ByteSpan{ ecc_signature, MCUXCLELS_ECC_SIGNATURE_SIZE }, outSignBuffer);
 
 exit:
     els_delete_key(key_index);
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void)mcux_els_mutex_unlock();
+    (void) mcux_els_mutex_unlock();
 #endif
     return CHIP_ERROR_INVALID_SIGNATURE;
 }
@@ -222,7 +223,7 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
     uint32_t hashId;
     uint8_t calculatedHash[SHA256_OUTPUT_SIZE];
     CHIP_ERROR res;
-    uint8_t  currentBlock[16];
+    uint8_t currentBlock[16];
 
     /* Init mflash */
     status = mflash_drv_init();
@@ -254,7 +255,7 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
         /* HASH value didn't match, test if factory data are encrypted */
 
         /* try to decrypt factory data, reset factory data buffer content*/
-        memset(factoryDataRamBuffer, 0, sizeof(factoryDataRamBuffer) );
+        memset(factoryDataRamBuffer, 0, sizeof(factoryDataRamBuffer));
         memset(calculatedHash, 0, sizeof(calculatedHash));
 
         factoryDataAddress += sizeof(Header);
@@ -262,8 +263,8 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
         /* Load the buffer into RAM by reading each 16 bytes blocks */
         for (int i = 0; i < (mHeader.size / 16); i++)
         {
-            if (mflash_drv_read(factoryDataAddress + i * 16, (uint32_t *)&currentBlock[0],
-                                sizeof(currentBlock)) != kStatus_Success)
+            if (mflash_drv_read(factoryDataAddress + i * 16, (uint32_t *) &currentBlock[0], sizeof(currentBlock)) !=
+                kStatus_Success)
             {
                 return CHIP_ERROR_INTERNAL;
             }
@@ -359,8 +360,7 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ConvertDacKey()
     PLOG_DEBUG_BUFFER("blob", blob, blobSize);
 
     /* Read all factory data */
-    hal_flash_status_t status =
-        HAL_FlashRead(factoryDataAddress + MFLASH_BASE_ADDRESS, sizeof(Header), data);
+    hal_flash_status_t status = HAL_FlashRead(factoryDataAddress + MFLASH_BASE_ADDRESS, sizeof(Header), data);
     memcpy(data + sizeof(Header), factoryDataRamBuffer, mHeader.size);
     VerifyOrReturnError(status == kStatus_HAL_Flash_Success, CHIP_ERROR_INTERNAL);
     ChipLogError(DeviceLayer, "SSS: cached factory data in RAM");
