@@ -114,7 +114,7 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
 
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
     data->eventId                     = Events::Notify::Id;
-    data->doorState                   = static_cast<AlarmBitmap>(atoi(argv[0]));
+    data->doorState                   = static_cast<AlarmBitmap>(value);
 
     DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 
@@ -172,7 +172,7 @@ void EventWorkerFunction(intptr_t context)
         ChipLogError(Zcl, "Invalid Event Id %s, line %d", __func__, __LINE__);
         break;
     }
-        // Free memory
-        Platform::Delete(data);
     }
+    // Free memory
+    Platform::Delete(data);
 }
