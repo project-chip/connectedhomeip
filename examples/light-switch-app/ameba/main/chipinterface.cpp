@@ -29,6 +29,7 @@
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
@@ -104,6 +105,7 @@ static void InitServer(intptr_t context)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance();
 #if CONFIG_ENABLE_AMEBA_CRYPTO
     ChipLogProgress(DeviceLayer, "platform crypto enabled!");
     static chip::AmebaPersistentStorageOperationalKeystore sAmebaPersistentStorageOpKeystore;

@@ -76,7 +76,7 @@ CHIP_ERROR AddDeviceCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    return admin::DeviceManager::Instance().PairRemoteDevice(mNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
+    return admin::PairingManager::Instance().PairDevice(mNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
 }
 
 } // namespace commands

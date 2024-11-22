@@ -114,7 +114,7 @@ void cmdSilabsInit()
 void startShellTask()
 {
     int status = chip::Shell::Engine::Root().Init();
-    assert(status == 0);
+    VerifyOrDie(status == 0);
 
     // For now also register commands from shell_common (shell app).
     // TODO move at least OTCLI to default commands in lib/shell/commands
