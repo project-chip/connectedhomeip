@@ -92,7 +92,6 @@ rt_sdk("sdk") {
   if (chip_enable_wifi && chip_enable_openthread) {
     defines += [
       "configTOTAL_HEAP_SIZE=(size_t)(170 * 1024)",
-      "CHIP_DEVICE_CONFIG_ENABLE_TBR=1",
     ]
   }
 
