@@ -69,7 +69,8 @@ CHIP_ERROR PairDeviceCommand::RunCommand()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ChipLogProgress(NotSpecified, "Running PairDeviceCommand with Node ID: %lu, Code: %s", mNodeId, mPayload);
+    ChipLogProgress(NotSpecified, "Running PairDeviceCommand with Node ID: " ChipLogFormatX64 ", Code: %s",
+                    ChipLogValueX64(mNodeId), mPayload);
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 

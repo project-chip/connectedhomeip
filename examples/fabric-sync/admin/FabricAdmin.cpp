@@ -17,6 +17,7 @@
 
 #include "FabricAdmin.h"
 #include <AppMain.h>
+#include <CommissionerMain.h>
 #include <bridge/include/FabricBridge.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 

@@ -61,7 +61,7 @@ CHIP_ERROR RemoveDeviceCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    ChipLogProgress(NotSpecified, "Running RemoveDeviceCommand with Node ID: %lu", mNodeId);
+    ChipLogProgress(NotSpecified, "Running RemoveDeviceCommand with Node ID: " ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
     return admin::PairingManager::Instance().UnpairDevice(mNodeId);
 }
