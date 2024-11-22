@@ -167,7 +167,10 @@ source_set("commissioner-main") {
     "${chip_root}/src/controller:gen_check_chip_controller_headers",
     "${chip_root}/src/lib",
   ]
-  deps = [ "${chip_root}/src/app/server" ]
+  deps = [
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
+  ]
 
   if (chip_enable_transport_trace) {
     deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
