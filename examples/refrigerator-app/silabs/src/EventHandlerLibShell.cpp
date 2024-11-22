@@ -157,7 +157,7 @@ CHIP_ERROR RegisterRefrigeratorEvents()
 
 void EventWorkerFunction(intptr_t context)
 {
-    VerifyOrReturn(reinterpret_cast<void*>(context) != nullptr, ChipLogError(Shell, "EventWorkerFunction - Invalid work data"));
+    VerifyOrReturn(reinterpret_cast<void *>(context) != nullptr, ChipLogError(Shell, "EventWorkerFunction - Invalid work data"));
     EventData * data = reinterpret_cast<EventData *>(context);
 
     switch (data->eventId)
@@ -172,7 +172,7 @@ void EventWorkerFunction(intptr_t context)
         ChipLogError(Zcl, "Invalid Event Id %s, line %d", __func__, __LINE__);
         break;
     }
-    // Free memory
-    Platform::Delete(data);
+        // Free memory
+        Platform::Delete(data);
     }
 }

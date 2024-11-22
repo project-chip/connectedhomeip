@@ -114,8 +114,6 @@ CHIP_ERROR AppTask::StartAppTask()
     return BaseApplication::StartAppTask(AppTaskMain);
 }
 
-
-
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
