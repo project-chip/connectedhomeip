@@ -100,6 +100,9 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.opCertStore               = mOpCertStore;
     params.certificateValidityPolicy = mCertificateValidityPolicy;
     params.sessionResumptionStorage  = mSessionResumptionStorage;
+
+    // re-initialization keeps any previously initialized values. The only place where
+    // a provider exists is in the InteractionModelEngine, so just say "keep it as is".
     params.dataModelProvider         = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
 
     return InitSystemState(params);
@@ -247,6 +250,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
     ReturnErrorOnFailure(stateParams.bdxTransferServer->Init(stateParams.systemLayer, stateParams.exchangeMgr));
 
+    chip::app::InteractionModelEngine * interactionModelEngine = chip::app::InteractionModelEngine::GetInstance();
+    interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
+
     InitDataModelHandler();
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
@@ -304,9 +310,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.caseSessionManager = Platform::New<CASESessionManager>();
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
 
-    chip::app::InteractionModelEngine * interactionModelEngine = chip::app::InteractionModelEngine::GetInstance();
 
-    interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
     ReturnErrorOnFailure(interactionModelEngine->Init(stateParams.exchangeMgr, stateParams.fabricTable, stateParams.reportScheduler,
                                                       stateParams.caseSessionManager));
 
