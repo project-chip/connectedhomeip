@@ -22,6 +22,7 @@
  *      that vends Controller objects
  */
 
+#include "app/InteractionModelEngine.h"
 #include <controller/CHIPDeviceControllerFactory.h>
 
 #include <app/OperationalSessionSetup.h>
@@ -99,6 +100,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.opCertStore               = mOpCertStore;
     params.certificateValidityPolicy = mCertificateValidityPolicy;
     params.sessionResumptionStorage  = mSessionResumptionStorage;
+    params.dataModelProvider         = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
 
     return InitSystemState(params);
 }
@@ -127,6 +129,13 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ChipLogError(Controller, "Warning: Device Controller Factory should be with a CHIP Device Layer...");
 #endif // CONFIG_DEVICE_LAYER
 
+    if (params.dataModelProvider == nullptr)
+    {
+        ChipLogError(AppServer, "Device Controller Factory Server a `dataModelProvider` value.");
+        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance()`");
+    }
+
+    VerifyOrReturnError(params.dataModelProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(stateParams.systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(stateParams.udpEndPointManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -295,8 +304,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.caseSessionManager = Platform::New<CASESessionManager>();
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(
-        stateParams.exchangeMgr, stateParams.fabricTable, stateParams.reportScheduler, stateParams.caseSessionManager));
+    chip::app::InteractionModelEngine * interactionModelEngine = chip::app::InteractionModelEngine::GetInstance();
+
+    interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
+    ReturnErrorOnFailure(interactionModelEngine->Init(stateParams.exchangeMgr, stateParams.fabricTable, stateParams.reportScheduler,
+                                                      stateParams.caseSessionManager));
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));
