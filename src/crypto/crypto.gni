@@ -23,8 +23,8 @@ declare_args() {
   # Use PSA Spake2+ implementation. Only used if chip_crypto == "psa"
   chip_crypto_psa_spake2p = false
 
-  # Use custom PSA crypto.
-  chip_crypto_psa_custom = false
+  # Crypto storage: psa, raw.
+  chip_crypto_keystore = ""
 }
 
 assert(

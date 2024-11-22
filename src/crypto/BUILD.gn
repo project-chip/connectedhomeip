@@ -38,12 +38,24 @@ assert(
         chip_crypto == "platform",
     "Please select a valid crypto implementation: mbedtls, psa, openssl, boringssl, platform")
 
+if (chip_crypto_keystore == "") {
+  if (chip_crypto == "psa") {
+    chip_crypto_keystore = "psa"
+  } else {
+    chip_crypto_keystore = "raw"
+  }
+}
+
+assert(chip_crypto_keystore == "psa" || chip_crypto_keystore == "raw",
+       "Please select a valid crypto keystore: psa, raw")
+
 buildconfig_header("crypto_buildconfig") {
   header = "CryptoBuildConfig.h"
   header_dir = "crypto"
 
   chip_crypto_mbedtls = chip_crypto == "mbedtls"
   chip_crypto_psa = chip_crypto == "psa"
+  chip_crypto_psa_keystore = chip_crypto_keystore == "psa"
   chip_crypto_openssl = chip_crypto == "openssl"
   chip_crypto_boringssl = chip_crypto == "boringssl"
   chip_crypto_platform = chip_crypto == "platform"
@@ -52,7 +64,7 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_CRYPTO_MBEDTLS=${chip_crypto_mbedtls}",
     "CHIP_CRYPTO_PSA=${chip_crypto_psa}",
     "CHIP_CRYPTO_PSA_SPAKE2P=${chip_crypto_psa_spake2p}",
-    "CHIP_CRYPTO_PSA_CUSTOM=${chip_crypto_psa_custom}",
+    "CHIP_CRYPTO_PSA_KEYSTORE=${chip_crypto_psa_keystore}",
     "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
     "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
     "CHIP_CRYPTO_PLATFORM=${chip_crypto_platform}",
@@ -145,14 +157,14 @@ static_library("crypto") {
     "RandUtils.h",
   ]
 
-  if (chip_crypto == "psa" || chip_crypto_psa_custom) {
+  if (chip_crypto_keystore == "psa") {
     sources += [
       "PSAOperationalKeystore.cpp",
       "PSAOperationalKeystore.h",
       "PSASessionKeystore.cpp",
       "PSASessionKeystore.h",
     ]
-  } else if (!chip_crypto_psa_custom) {
+  } else if (chip_crypto_keystore == "raw") {
     sources += [
       "RawKeySessionKeystore.cpp",
       "RawKeySessionKeystore.h",
