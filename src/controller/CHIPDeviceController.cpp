@@ -78,6 +78,7 @@
 #include <string>
 #include <time.h>
 
+using namespace chip::app;
 using namespace chip::Inet;
 using namespace chip::System;
 using namespace chip::Transport;
@@ -1096,6 +1097,7 @@ void DeviceCommissioner::CancelCommissioningInteractions()
     {
         ChipLogDetail(Controller, "Cancelling read request for step '%s'", StageToString(mCommissioningStage));
         mReadClient.reset(); // destructor cancels
+        mAttributeCache.reset();
     }
     if (mInvokeCancelFn)
     {
@@ -2189,7 +2191,7 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
-// ClusterStateCache::Callback impl
+// ClusterStateCache::Callback / ReadClient::Callback
 void DeviceCommissioner::OnDone(app::ReadClient * readClient)
 {
     VerifyOrDie(readClient != nullptr && readClient == mReadClient.get());
@@ -2197,13 +2199,7 @@ void DeviceCommissioner::OnDone(app::ReadClient * readClient)
     switch (mCommissioningStage)
     {
     case CommissioningStage::kReadCommissioningInfo:
-        // Silently complete the stage, data will be saved in attribute cache and
-        // will be parsed after all ReadCommissioningInfo stages are completed.
-        CommissioningStageComplete(CHIP_NO_ERROR);
-        break;
-    case CommissioningStage::kReadCommissioningInfo2:
-        // Note: Only parse commissioning info in the last ReadCommissioningInfo stage.
-        ParseCommissioningInfo();
+        ContinueReadingCommissioningInfo(mCommissioningDelegate->GetCommissioningParameters());
         break;
     default:
         VerifyOrDie(false);
@@ -2211,7 +2207,94 @@ void DeviceCommissioner::OnDone(app::ReadClient * readClient)
     }
 }
 
-void DeviceCommissioner::ParseCommissioningInfo()
+void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningParameters & params)
+{
+    VerifyOrDie(mCommissioningStage == CommissioningStage::kReadCommissioningInfo);
+
+    // We can ony read 9 paths per Read Interaction, since that is the minimum
+    // a server has to support per spec (see "Interaction Model Limits").
+    app::AttributePathParams readPaths[InteractionModelEngine::kMinSupportedPathsPerReadRequest];
+    static_assert(InteractionModelEngine::kMinSupportedPathsPerReadRequest >= 9);
+
+    const auto proxy    = mDeviceBeingCommissioned;
+    const auto endpoint = kRootEndpointId;
+    const auto timeout =
+        MakeOptional(app::kExpectedIMProcessingTime); // TODO: Do we need to save the actual timeout from PerformCommissioningStep?
+
+    // TODO: Refactor this further to dynamically pack paths into requests.
+    if (mReadCommissioningInfoProgress == 0)
+    {
+        // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
+        readPaths[0] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
+                                                app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id);
+        // Get required general commissioning attributes on this endpoint (recommended failsafe time, regulatory location
+        // info, breadcrumb)
+        readPaths[1] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
+                                                app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::Id);
+        readPaths[2] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
+                                                app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::Id);
+        readPaths[3] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
+                                                app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::Id);
+        readPaths[4] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
+                                                app::Clusters::GeneralCommissioning::Attributes::LocationCapability::Id);
+        // Read attributes from the basic info cluster (vendor id / product id / software version)
+        readPaths[5] = app::AttributePathParams(endpoint, app::Clusters::BasicInformation::Id,
+                                                app::Clusters::BasicInformation::Attributes::VendorID::Id);
+        readPaths[6] = app::AttributePathParams(endpoint, app::Clusters::BasicInformation::Id,
+                                                app::Clusters::BasicInformation::Attributes::ProductID::Id);
+        // Read the requested minimum connection times from all network commissioning clusters
+        readPaths[7] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
+                                                app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id);
+        // Read everything from the time cluster so we can assess what information needs to be set.
+        readPaths[8] = app::AttributePathParams(endpoint, app::Clusters::TimeSynchronization::Id);
+
+        mReadCommissioningInfoProgress = 1;
+        SendCommissioningReadRequest(proxy, timeout, readPaths, 9);
+    }
+    else if (mReadCommissioningInfoProgress == 1)
+    {
+        size_t numberOfAttributes = 0;
+
+        // Mandatory attribute
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
+                                     app::Clusters::GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id);
+
+        // Read the current fabrics
+        if (params.GetCheckForMatchingFabric())
+        {
+            readPaths[numberOfAttributes++] =
+                app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
+        }
+
+        if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+        {
+            readPaths[numberOfAttributes++] =
+                app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
+        }
+
+        // Always read the active mode trigger hint attributes to notify users about it.
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerHint::Id);
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id);
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::IdleModeDuration::Id);
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeDuration::Id);
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeThreshold::Id);
+
+        mReadCommissioningInfoProgress = 2;
+        SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
+    }
+    else
+    {
+        FinishReadingCommissioningInfo();
+    }
+}
+
+void DeviceCommissioner::FinishReadingCommissioningInfo()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReadCommissioningInfo info;
@@ -2863,7 +2946,7 @@ void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optio
     readParams.mpAttributePathParamsList    = readPaths;
     readParams.mAttributePathParamsListSize = readPathsSize;
 
-    // Take ownership of the attribute cache, so it can be released when SendRequest fails.
+    // Take ownership of the attribute cache, so it can be released if SendRequest fails.
     auto attributeCache = std::move(mAttributeCache);
     auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(
         engine, proxy->GetExchangeManager(), attributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
@@ -2916,85 +2999,24 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kReadCommissioningInfo: {
-        ChipLogProgress(Controller, "Sending read request for commissioning information");
-        // Allocate a new ClusterStateCache when starting reading the first batch of attributes.
+        VerifyOrDie(endpoint == kRootEndpointId);
+        ChipLogProgress(Controller, "Sending read requests for commissioning information");
+
+        // Allocate a ClusterStateCache to collect the data from our read requests.
         // The cache will be released in:
         // - SendCommissioningReadRequest when failing to send a read request.
-        // - ParseCommissioningInfo when the last ReadCommissioningInfo stage is completed.
-        // Currently, we have two ReadCommissioningInfo* stages.
+        // - FinishReadingCommissioningInfo when the ReadCommissioningInfo stage is completed.
+        // - CancelCommissioningInteractions
         mAttributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
 
-        // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
-        // See R1.1, 2.11.2 Interaction Model Limits
-        app::AttributePathParams readPaths[9];
-        // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
-        readPaths[0] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
-                                                app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id);
-        // Get required general commissioning attributes on this endpoint (recommended failsafe time, regulatory location
-        // info, breadcrumb)
-        readPaths[1] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
-                                                app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::Id);
-        readPaths[2] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
-                                                app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::Id);
-        readPaths[3] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
-                                                app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::Id);
-        readPaths[4] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
-                                                app::Clusters::GeneralCommissioning::Attributes::LocationCapability::Id);
-        // Read attributes from the basic info cluster (vendor id / product id / software version)
-        readPaths[5] = app::AttributePathParams(endpoint, app::Clusters::BasicInformation::Id,
-                                                app::Clusters::BasicInformation::Attributes::VendorID::Id);
-        readPaths[6] = app::AttributePathParams(endpoint, app::Clusters::BasicInformation::Id,
-                                                app::Clusters::BasicInformation::Attributes::ProductID::Id);
-        // Read the requested minimum connection times from all network commissioning clusters
-        readPaths[7] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
-                                                app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id);
-        // Read everything from the time cluster so we can assess what information needs to be set.
-        readPaths[8] = app::AttributePathParams(endpoint, app::Clusters::TimeSynchronization::Id);
-
-        SendCommissioningReadRequest(proxy, timeout, readPaths, 9);
+        // Generally we need to make more than one read request, because as per spec a server only
+        // supports a limited number of paths per Read Interaction. Because the actual number of
+        // interactions we end up performing is dynamic, we track all of them within a single
+        // commissioning stage.
+        mReadCommissioningInfoProgress = 0;
+        ContinueReadingCommissioningInfo(params); // Note: assume params == delegate.GetCommissioningParameters()
+        break;
     }
-    break;
-    case CommissioningStage::kReadCommissioningInfo2: {
-        size_t numberOfAttributes = 0;
-        // This is done in a separate step since we've already used up all the available read paths in the previous read step
-        // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
-        // See R1.1, 2.11.2 Interaction Model Limits
-
-        // Currently, we have at most 8 attributes to read in this stage.
-        app::AttributePathParams readPaths[8];
-
-        // Mandatory attribute
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
-                                     app::Clusters::GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id);
-
-        // Read the current fabrics
-        if (params.GetCheckForMatchingFabric())
-        {
-            readPaths[numberOfAttributes++] =
-                app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
-        }
-
-        if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
-        {
-            readPaths[numberOfAttributes++] =
-                app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
-        }
-
-        // Always read the active mode trigger hint attributes to notify users about it.
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerHint::Id);
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id);
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::IdleModeDuration::Id);
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeDuration::Id);
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeThreshold::Id);
-        SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
-    }
-    break;
     case CommissioningStage::kConfigureUTCTime: {
         TimeSynchronization::Commands::SetUTCTime::Type request;
         uint64_t kChipEpochUsSinceUnixEpoch = static_cast<uint64_t>(kChipEpochSecondsSinceUnixEpoch) * chip::kMicrosecondsPerSecond;

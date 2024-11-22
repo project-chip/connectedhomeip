@@ -839,7 +839,9 @@ private:
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
-    bool mRunCommissioningAfterConnection  = false;
+    uint8_t mReadCommissioningInfoProgress = 0;
+
+    bool mRunCommissioningAfterConnection = false;
     Internal::InvokeCancelFn mInvokeCancelFn;
     Internal::WriteCancelFn mWriteCancelFn;
 
@@ -1050,10 +1052,10 @@ private:
     void CancelCASECallbacks();
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-    void ParseCommissioningInfo();
+    void ContinueReadingCommissioningInfo(const CommissioningParameters & params);
+    void FinishReadingCommissioningInfo();
     // Parsing attributes read in kReadCommissioningInfo stage.
     CHIP_ERROR ParseCommissioningInfo1(ReadCommissioningInfo & info);
-    // Parsing attributes read in kReadCommissioningInfo2 stage.
     CHIP_ERROR ParseCommissioningInfo2(ReadCommissioningInfo & info);
     // Called by ParseCommissioningInfo2
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
