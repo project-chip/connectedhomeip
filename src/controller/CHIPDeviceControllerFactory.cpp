@@ -103,7 +103,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
 
     // re-initialization keeps any previously initialized values. The only place where
     // a provider exists is in the InteractionModelEngine, so just say "keep it as is".
-    params.dataModelProvider         = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    params.dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
 
     return InitSystemState(params);
 }
@@ -309,7 +309,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     // TODO: Need to be able to create a CASESessionManagerConfig here!
     stateParams.caseSessionManager = Platform::New<CASESessionManager>();
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
-
 
     ReturnErrorOnFailure(interactionModelEngine->Init(stateParams.exchangeMgr, stateParams.fabricTable, stateParams.reportScheduler,
                                                       stateParams.caseSessionManager));
