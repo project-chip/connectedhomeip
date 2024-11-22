@@ -389,7 +389,6 @@ externalproject_add(
     BUILD_COMMAND           ninja "esp32"
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${chip_libraries}
-    WORKING_DIRECTORY       ${CMAKE_CURRENT_LIST_DIR}
     DEPENDS                 args_gn
     BUILD_ALWAYS            1
 )
