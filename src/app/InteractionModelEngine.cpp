@@ -1801,7 +1801,8 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     // Alternting data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
-    if (model == mDataModelProvider) {
+    if (model == mDataModelProvider)
+    {
         // no-op, just return
         return model;
     }
