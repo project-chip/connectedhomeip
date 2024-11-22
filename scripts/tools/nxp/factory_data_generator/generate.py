@@ -85,11 +85,11 @@ class KlvGenerator:
             )
         if self.args.dac_key and self.args.EL2GO_bin:
             logging.error("Could not provide two DAC Key provisionning method at the same time")
-        
-        if (not self.args.dac_key or not self.args.dac_cert) and not self.args.EL2GO_bin :
+
+        if (not self.args.dac_key or not self.args.dac_cert) and not self.args.EL2GO_bin:
             logging.error("Need to provide a DAC provisionner")
             raise Exception("Could not generate factory data")
-        
+
         if self.args.EL2GO_bin and (not self.args.EL2GO_DAC_CERT_ID or not self.args.EL2GO_DAC_KEY_ID):
             logging.error("Need to provide EdgeLock 2Go DAC IDs")
             raise Exception("Could not generate factory data")

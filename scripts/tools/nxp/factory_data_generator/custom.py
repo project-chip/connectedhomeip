@@ -347,6 +347,7 @@ class El2GoObject(FileArgument):
     def key(self):
         return 24
 
+
 class El2GoDacKeyID(IntArgument):
 
     def __init__(self, arg):
@@ -354,6 +355,7 @@ class El2GoDacKeyID(IntArgument):
 
     def key(self):
         return 25
+
 
 class El2GoDacCertID(IntArgument):
 
