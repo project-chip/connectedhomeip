@@ -115,7 +115,13 @@ FabricAdmin::CommissionRemoteBridge(Controller::CommissioningWindowPasscodeParam
         usleep(kCommissionPrepareTimeMs * 1000);
 
         PairingManager::Instance().SetPairingDelegate(this);
-        DeviceManager::Instance().PairRemoteDevice(mNodeId, code.c_str());
+        err = PairingManager::Instance().PairDeviceWithCode(mNodeId, code.c_str());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified,
+                         "Failed to commission remote bridge device: Node ID " ChipLogFormatX64 " with error: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(mNodeId), err.Format());
+        }
     }
     else
     {
