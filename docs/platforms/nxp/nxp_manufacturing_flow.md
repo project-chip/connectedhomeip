@@ -187,19 +187,19 @@ Also, demo **DAC**, **PAI** and **PAA** certificates needed in case
 
 ### 6.1 SSS-based with EdgeLock2go support
 
-EdgeLock2go services could be used to securely provisoned DAC key/cert during
-manufactory.
+EdgeLock2go services could be used to securely provisioned DAC key/cert during
+manufacturing.
 
-Prior to the generation of the factory data binary. EL2Go data needs to be
-generated following EL2go process.
+Prior to the generation of the factory data binary. `EL2GO` data needs to be
+generated following `EL2GO` process.
 
 For the factory data generation following option need to be added:
 
-`--EL2GO_bin ~/secure_objects.bin` containing EL2GO information including
+`--EL2GO_bin ~/secure_objects.bin` containing `EL2GO` information including
 encrypted DAC private key and certificate. `--EL2GO_DAC_KEY_ID 1234` containing
-corresponding to the ID of the DAC key chosen during EL2go key generation.
+corresponding to the ID of the DAC key chosen during `EL2GO` key generation.
 `--EL2GO_DAC_CERT_ID 4321` containing corresponding to the ID of the DAC
-certification chosen during EL2go key generation.
+certification chosen during `EL2GO` key generation.
 
 Reference factory data generation command:
 
@@ -217,7 +217,7 @@ loading of EdgeLock2go data to the secure element.
 
 In this mode EdgeLock2go keys will always remain encrypted and only usable by
 the `SSS`. In this case, all operations that requires DAC private access will be
-transfered to the `SSS`.
+transferred to the `SSS`.
 
 ### 6.2 SSS-based without EdgeLock2go support for DAC private key secure storage
 
@@ -232,9 +232,9 @@ converted to an encrypted blob. This blob will overwrite the DAC private key in
 factory data and will be imported in the `SSS` by the factory data provider
 instance.
 
-In this architecture, outside of the manufacturying flow, the DAC private will
+In this architecture, outside of the manufacturing flow, the DAC private will
 always remain usable only by the `SSS`. In this case, all operations that
-requires DAC private access will be transfered to the `SSS`.
+requires DAC private access will be transferred to the `SSS`.
 
 The application will check at initialization whether the DAC private key has
 been converted or not and convert it if needed. However, the conversion process
