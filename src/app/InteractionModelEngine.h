@@ -406,10 +406,7 @@ public:
     }
 #endif
 
-    // Temporarily NOT const because the data model provider will be auto-set
-    // to codegen on first usage. This behaviour will be changed once each
-    // application must explicitly set the data model provider.
-    DataModel::Provider * GetDataModelProvider();
+    DataModel::Provider * GetDataModelProvider() const;
 
     // MUST NOT be used while the interaction model engine is running as interaction
     // model functionality (e.g. active reads/writes/subscriptions) rely on data model

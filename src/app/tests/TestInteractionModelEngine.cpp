@@ -88,6 +88,7 @@ TEST_F(TestInteractionModelEngine, TestAttributePathParamsPushRelease)
 
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
 
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     SingleLinkedListNode<AttributePathParams> * attributePathParamsList = nullptr;
@@ -123,6 +124,7 @@ TEST_F(TestInteractionModelEngine, TestRemoveDuplicateConcreteAttribute)
 
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
 
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     EXPECT_EQ(CHIP_NO_ERROR, engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()));
 
     SingleLinkedListNode<AttributePathParams> * attributePathParamsList = nullptr;
@@ -259,6 +261,7 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscription
     ASSERT_TRUE(exchangeCtx1);
 
     // InteractionModelEngine init
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     EXPECT_EQ(CHIP_NO_ERROR, engine->Init(&GetExchangeManager(), &GetFabricTable(), reporting::GetDefaultReportScheduler()));
 
     // Verify that there are no active subscriptions
@@ -306,6 +309,7 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscription
     ASSERT_TRUE(exchangeCtx1);
 
     // InteractionModelEngine init
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     EXPECT_EQ(CHIP_NO_ERROR, engine->Init(&GetExchangeManager(), &GetFabricTable(), reporting::GetDefaultReportScheduler()));
 
     // Verify that both Alice and Bob have no active subscriptions
@@ -364,6 +368,7 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscription
     ASSERT_TRUE(exchangeCtx2);
 
     // InteractionModelEngine init
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     EXPECT_EQ(CHIP_NO_ERROR, engine->Init(&GetExchangeManager(), &GetFabricTable(), reporting::GetDefaultReportScheduler()));
 
     // Verify that both Alice and Bob have no active subscriptions
@@ -446,6 +451,7 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscription
     ASSERT_TRUE(exchangeCtx22);
 
     // InteractionModelEngine init
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     EXPECT_EQ(CHIP_NO_ERROR, engine->Init(&GetExchangeManager(), &GetFabricTable(), reporting::GetDefaultReportScheduler()));
 
     // Verify that both Alice and Bob have no active subscriptions
@@ -525,6 +531,7 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscription
     FabricIndex bobFabricIndex = 1;
 
     // InteractionModelEngine init
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     EXPECT_EQ(CHIP_NO_ERROR, engine->Init(&GetExchangeManager(), &GetFabricTable(), reporting::GetDefaultReportScheduler()));
 
     // Make sure we are using CASE sessions, because there is no defunct-marking for PASE.
@@ -575,6 +582,7 @@ TEST_F(TestInteractionModelEngine, TestSubjectHasPersistedSubscription)
 
     EXPECT_EQ(subscriptionStorage.Init(&storage), CHIP_NO_ERROR);
 
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     EXPECT_EQ(CHIP_NO_ERROR,
               engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler(), nullptr,
                            &subscriptionStorage));
@@ -630,6 +638,7 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubscriptionResumptionTimer)
 
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
 
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     uint32_t timeTillNextResubscriptionMs;
@@ -661,6 +670,7 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestDecrementNumSubscriptionsToR
     constexpr uint8_t kNumberOfSubsToResume = 5;
     uint8_t numberOfSubsRemaining           = kNumberOfSubsToResume;
 
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION

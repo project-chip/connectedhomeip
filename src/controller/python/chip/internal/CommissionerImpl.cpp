@@ -16,6 +16,7 @@
  */
 #include <memory>
 
+#include <app/codegen-data-model-provider/Instance.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -135,6 +136,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
         factoryParams.fabricIndependentStorage = &gServerStorage;
         factoryParams.sessionKeystore          = &gSessionKeystore;
+        factoryParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance();
 
         // Initialize group data provider for local group key state and IPKs
         gGroupDataProvider.SetStorageDelegate(&gServerStorage);
