@@ -68,13 +68,13 @@ independent of the InteractionModelEngine class.
 
 The following replacements exist:
 
--   `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
+- `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler`
--   `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
+- `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler`
--   `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
+- `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().GetCommandHandler`
--   `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
+- `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterAllCommandHandlersForEndpoint`
 
 ### AttributeAccessInterface registration and removal
@@ -84,20 +84,22 @@ A new object exists for the attribute access interface registry, accessible as
 
 Replacements for methods are:
 
--   `registerAttributeAccessOverride` replaced by
+- `registerAttributeAccessOverride` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().Register`
--   `unregisterAttributeAccessOverride` replaced by
+- `unregisterAttributeAccessOverride` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister`
--   `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
+- `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAllForEndpoint`
--   `chip::app::GetAttributeAccessOverride` replaced by
+- `chip::app::GetAttributeAccessOverride` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().Get`
 
-### `ServerInitParams::dataModelProvider` in `Server::Init`
+### `ServerInitParams::dataModelProvider` in `Server::Init` and `FactoryInitParams`
 
-Server initialization requires a set data model provider to work rather than
+Server and controller initialization require a set data model provider to work rather than
 auto-initializing ember-compatible code-generated data models.
 
 To preserve `codegen/zap` generated logic, use
 `CodegenDataModelProviderInstance` (see changes in
-<https://github.com/project-chip/connectedhomeip/pull/36558>).
+[36558](https://github.com/project-chip/connectedhomeip/pull/36558)
+and [36613](https://github.com/project-chip/connectedhomeip/pull/36613)
+).
