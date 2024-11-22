@@ -613,3 +613,19 @@ Step-by-step:
 
     [1730312762.703] [2153606:2153609] [TOO]   TankVolume: 100
     ```
+
+1. Set boost state:
+
+    - `durationIndicates` the time period in seconds for which the BOOST state
+      is activated before it automatically reverts to the previous mode (e.g.
+      OFF, MANUAL or TIMED).
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool waterheatermanagement boost '{ "duration": 1800 }' 0x12344321 2
+    ```
+
+1. Cancel boost state:
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool waterheatermanagement cancel-boost 0x12344321 2
+    ```
