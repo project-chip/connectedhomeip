@@ -100,7 +100,7 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
     mBridgeNodeId = remoteId;
 
     return PairingManager::Instance().PairDevice(remoteId, mSetupPINCode, reinterpret_cast<const char *>(mRemoteAddr.data()),
-                                                     mRemotePort);
+                                                 mRemotePort);
 }
 
 void FabricSyncRemoveBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
@@ -189,7 +189,7 @@ CHIP_ERROR FabricSyncAddLocalBridgeCommand::RunCommand(NodeId deviceId)
     PairingManager::Instance().SetPairingDelegate(this);
     mLocalBridgeNodeId = deviceId;
 
-    uint16_t localBridgePort = mLocalPort.ValueOr(kDefaultLocalBridgePort);
+    uint16_t localBridgePort         = mLocalPort.ValueOr(kDefaultLocalBridgePort);
     uint32_t localBridgeSetupPinCode = mSetupPINCode.ValueOr(kDefaultSetupPinCode);
 
     return PairingManager::Instance().PairDevice(deviceId, localBridgeSetupPinCode, "::1", localBridgePort);
