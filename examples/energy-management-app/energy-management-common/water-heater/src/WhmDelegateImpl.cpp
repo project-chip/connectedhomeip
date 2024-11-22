@@ -415,6 +415,27 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
     return true;
 }
 
+void WaterHeaterManagementDelegate::UpdateEnergyManagementLed()
+{
+    uint8_t mode = WaterHeaterMode::Instance()->GetCurrentMode();
+    sEnergyManagementLED.Set(false);
+
+    switch (opState)
+    {
+    case WaterHeaterMode::kModeManual:
+        sEnergyManagementLED.Set(true);
+        break;
+    case WaterHeaterMode::kModeOff:
+        sEnergyManagementLED.Blink(300, 700);
+        break;
+    case WaterHeaterMode::kModeTimed:
+        sEnergyManagementLED.Blink(100);
+        break;
+    default:
+        break;
+    }
+}
+
 Status WaterHeaterManagementDelegate::ChangeHeatingIfNecessary()
 {
     VerifyOrReturnError(mpWhmManufacturer != nullptr, Status::InvalidInState);
