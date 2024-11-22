@@ -88,7 +88,7 @@ CHIP_ERROR AddBridgeCommand::RunCommand()
     ChipLogProgress(NotSpecified, "Running AddBridgeCommand with Node ID: %lu, PIN Code: %u, Address: %s, Port: %u", mBridgeNodeId,
                     mSetupPINCode, mRemoteAddr, mRemotePort);
 
-    return admin::DeviceManager::Instance().PairRemoteFabricBridge(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
+    return admin::PairingManager::Instance().PairDevice(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
 }
 
 } // namespace commands

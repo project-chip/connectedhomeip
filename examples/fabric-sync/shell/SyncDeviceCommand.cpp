@@ -53,7 +53,12 @@ void SyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR 
 
             usleep(kCommissionPrepareTimeMs * 1000);
 
-            admin::DeviceManager::Instance().PairRemoteDevice(nodeId, payloadBuffer);
+            error = admin::PairingManager::Instance().PairDeviceWithCode(nodeId, payloadBuffer);
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Failed to sync device: Node ID " ChipLogFormatX64 " with error: %" CHIP_ERROR_FORMAT,
+                             ChipLogValueX64(nodeId), err.Format());
+            }
         }
         else
         {

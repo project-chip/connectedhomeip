@@ -66,7 +66,7 @@ CHIP_ERROR RemoveBridgeCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    return admin::DeviceManager::Instance().UnpairRemoteFabricBridge();
+    return admin::PairingManager::Instance().UnpairDevice(bridgeNodeId);
 }
 
 } // namespace commands
