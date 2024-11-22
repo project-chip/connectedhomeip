@@ -1794,7 +1794,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 
 DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model)
 {
-    // Alternting data model should not be done while IM is actively handling requests.
+    // Altering data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
     if (model == mDataModelProvider)
