@@ -32,6 +32,13 @@ using namespace ::chip;
 
 namespace admin {
 
+namespace {
+
+constexpr uint32_t kDefaultSetupPinCode    = 20202021;
+constexpr uint16_t kDefaultLocalBridgePort = 5540;
+
+} // namespace
+
 void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 {
     if (mBridgeNodeId != deviceId)
@@ -92,10 +99,8 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
 
     mBridgeNodeId = remoteId;
 
-    DeviceManager::Instance().PairRemoteFabricBridge(remoteId, mSetupPINCode, reinterpret_cast<const char *>(mRemoteAddr.data()),
-                                                     mRemotePort);
-
-    return CHIP_NO_ERROR;
+    return PairingManager::Instance().PairDevice(remoteId, mSetupPINCode, reinterpret_cast<const char *>(mRemoteAddr.data()),
+                                                 mRemotePort);
 }
 
 void FabricSyncRemoveBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
@@ -135,9 +140,8 @@ CHIP_ERROR FabricSyncRemoveBridgeCommand::RunCommand()
     mBridgeNodeId = bridgeNodeId;
 
     PairingManager::Instance().SetPairingDelegate(this);
-    DeviceManager::Instance().UnpairRemoteFabricBridge();
 
-    return CHIP_NO_ERROR;
+    return PairingManager::Instance().UnpairDevice(bridgeNodeId);
 }
 
 void FabricSyncAddLocalBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
@@ -185,18 +189,10 @@ CHIP_ERROR FabricSyncAddLocalBridgeCommand::RunCommand(NodeId deviceId)
     PairingManager::Instance().SetPairingDelegate(this);
     mLocalBridgeNodeId = deviceId;
 
-    if (mSetupPINCode.HasValue())
-    {
-        DeviceManager::Instance().SetLocalBridgeSetupPinCode(mSetupPINCode.Value());
-    }
-    if (mLocalPort.HasValue())
-    {
-        DeviceManager::Instance().SetLocalBridgePort(mLocalPort.Value());
-    }
+    uint16_t localBridgePort         = mLocalPort.ValueOr(kDefaultLocalBridgePort);
+    uint32_t localBridgeSetupPinCode = mSetupPINCode.ValueOr(kDefaultSetupPinCode);
 
-    DeviceManager::Instance().PairLocalFabricBridge(deviceId);
-
-    return CHIP_NO_ERROR;
+    return PairingManager::Instance().PairDevice(deviceId, localBridgeSetupPinCode, "::1", localBridgePort);
 }
 
 void FabricSyncRemoveLocalBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
@@ -236,9 +232,8 @@ CHIP_ERROR FabricSyncRemoveLocalBridgeCommand::RunCommand()
     mLocalBridgeNodeId = bridgeNodeId;
 
     PairingManager::Instance().SetPairingDelegate(this);
-    DeviceManager::Instance().UnpairLocalFabricBridge();
 
-    return CHIP_NO_ERROR;
+    return PairingManager::Instance().UnpairDevice(mLocalBridgeNodeId);
 }
 
 void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR err, SetupPayload payload)
@@ -259,7 +254,10 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
 
             usleep(kCommissionPrepareTimeMs * 1000);
 
-            DeviceManager::Instance().PairRemoteDevice(nodeId, payloadBuffer);
+            if (PairingManager::Instance().PairDeviceWithCode(nodeId, payloadBuffer) != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Failed to sync device " ChipLogFormatX64, ChipLogValueX64(nodeId));
+            }
         }
         else
         {
