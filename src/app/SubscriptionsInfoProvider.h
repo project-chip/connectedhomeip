@@ -35,7 +35,7 @@ namespace app {
 class SubscriptionsInfoProvider
 {
 public:
-    virtual ~SubscriptionsInfoProvider() {};
+    virtual ~SubscriptionsInfoProvider(){};
 
     /**
      * @brief Check if a given subject (CAT or operational NodeId) has at least 1 active subscription.
