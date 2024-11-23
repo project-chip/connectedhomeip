@@ -289,7 +289,7 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectNameBase64Str(const ByteSpan
     return GetRDNBase64Str(certDer, outSubjectNameBase64String, false /* isIssuer */);
 }
 
-// @param certDer Certificate to check for revocation in DER format
+// @param certDer Certificate, in DER format, to check for revocation
 bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDer)
 {
     char issuerNameBuffer[kMaxIssuerBase64Len]                           = { 0 };
