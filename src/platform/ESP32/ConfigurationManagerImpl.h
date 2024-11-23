@@ -36,6 +36,7 @@
 #endif
 
 #include <platform/ESP32/ESP32Config.h>
+#include "freertos/timers.h"  // TimerHandle_t
 
 namespace chip {
 namespace DeviceLayer {

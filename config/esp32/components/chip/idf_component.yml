@@ -36,3 +36,5 @@ dependencies:
         require: public
         rules:
             - if: "idf_version >=4.3"
+
+    espressif/esp_diag_data_store: "1.0.1"
