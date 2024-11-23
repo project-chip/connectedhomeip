@@ -643,18 +643,6 @@ template("efr32_sdk") {
           ]
         }
       }
-
-      if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
-        defines += [
-          # Used for wifi devices to get packet details
-          # TODO: Remove this flag, once the communication is fixed
-          "WIFI_DEBUG_ENABLED=1",
-        ]
-
-        # This is kept due to the warning on the LWIP when on demand timer is added
-        # TODO: remove this flag once the warning is fixed in SiSDK MATTER-3946
-        cflags_c = [ "-Wno-implicit-function-declaration" ]
-      }
     }
 
     if (chip_build_libshell) {  # matter shell
@@ -1022,7 +1010,6 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/bus/sl_wfx_bus.c",
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/bus/sl_wfx_bus_spi.c",
-        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/secure_link/sl_wfx_secure_link.c",
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/sl_wfx.c",
       ]
     }

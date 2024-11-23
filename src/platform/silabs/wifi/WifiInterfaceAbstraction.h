@@ -63,11 +63,6 @@
 #define GET_IPV6_FAIL (0)
 #define IP_STATUS_SUCCESS (1)
 
-#define SL_WFX_STARTUP_IND_ID (1)
-#define SL_WFX_CONNECT_IND_ID (2)
-#define SL_WFX_DISCONNECT_IND_ID (3)
-#define SL_WFX_SCAN_COMPLETE_ID (4)
-
 // TASK and Interrupt Macros
 #define SUCCESS_STATUS (1)
 
