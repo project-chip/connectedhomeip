@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-//TODO: Should use the file from simplicity sdk
+// TODO: Should use the file from simplicity sdk
 
 #pragma once
 
