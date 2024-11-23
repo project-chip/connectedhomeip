@@ -58,12 +58,14 @@ config("wifi-platform-config") {
     # All the stuff from wiseconnect
     include_dirs += rs9117_inc_plat
   }
+
   if (chip_default_wifi_ssid != "") {
     defines += [
       "SL_ONNETWORK_PAIRING=1",
       "SL_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
     ]
   }
+
   if (chip_default_wifi_psk != "") {
     assert(chip_default_wifi_ssid != "",
            "ssid can't be null if psk is provided")
