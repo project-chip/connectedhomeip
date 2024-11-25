@@ -16,10 +16,8 @@
 #
 
 import glob
-import importlib
-import importlib.resources
+import pathlib
 import logging
-import os
 import typing
 import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
@@ -27,6 +25,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Callable, Optional, Union
 
+import chip.testing
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
 from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
@@ -520,59 +519,58 @@ class DataModelLevel(str, Enum):
     kDeviceType = 'device_types'
 
 
-def _get_data_model_root() -> str:
-    """Attempts to find the 'data_model' directory inside the Python package (whl)."""
+def _get_data_model_root() -> pathlib.PosixPath:
+    """Attempts to find the 'data_model' directory inside the 'chip.testing' package."""
     try:
-        # Use importlib.resources to get the directory contents
-        package = importlib.import_module('chip_testing')
-        data_model_path = None
-
-        # This lists all resources under the package, filtering for the 'data_model' directory
-        for resource in importlib.resources.contents(package):
-            if resource.endswith('data_model'):
-                data_model_path = resource
-                break
-
-        if not data_model_path:
-            raise FileNotFoundError("Data model directory not found in the package.")
-
-        return data_model_path
+        # Locate the directory where the 'chip.testing' module is located
+        package_dir = pathlib.Path(chip.testing.__file__).parent
+        
+        # Construct the path to the 'data_model' directory (assuming this structure)
+        data_model_root = package_dir / 'data_model'
+        
+        if not data_model_root.exists():
+            raise FileNotFoundError(f"Data model directory not found in the package at {data_model_root}.")
+        
+        return data_model_root
 
     except Exception as e:
         raise FileNotFoundError(f"Failed to find the data model root: {e}")
 
-
-def get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
+def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, str], data_model_level: str) -> pathlib.PosixPath:
     """
     Get the directory of the data model for a specific version and level from the installed package.
     """
     data_model_root = _get_data_model_root()
-
-    if data_model_directory == PrebuiltDataModelDirectory.k1_3:
-        return os.path.join(data_model_root, '1.3', data_model_level)
-    elif data_model_directory == PrebuiltDataModelDirectory.k1_4:
-        return os.path.join(data_model_root, '1.4', data_model_level)
-    elif data_model_directory == PrebuiltDataModelDirectory.kMaster:
-        return os.path.join(data_model_root, 'master', data_model_level)
+    
+    # Build path based on the version and data model level
+    if isinstance(data_model_directory, PrebuiltDataModelDirectory):
+        version_map = {
+            PrebuiltDataModelDirectory.k1_3: '1.3',
+            PrebuiltDataModelDirectory.k1_4: '1.4',
+            PrebuiltDataModelDirectory.kMaster: 'master',
+        }
+        
+        version = version_map.get(data_model_directory)
+        if not version:
+            raise ValueError(f"Unsupported data model directory: {data_model_directory}")
+        
+        return data_model_root / version / data_model_level
     else:
-        return data_model_directory
-
+        # If it's a custom directory, return it directly
+        return pathlib.Path(data_model_directory)
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlCluster], list[ProblemNotice]]:
-    # Get the data model directory path inside the wheel package
-    dir = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
+    # Get the data model directory path inside the package
+    dir = get_data_model_directory(data_model_directory, 'kCluster')
 
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
     ids_by_name: dict[str, int] = {}
     problems: list[ProblemNotice] = []
 
-    package_name = "chip_testing"  # The name of the wheel package
-
     try:
-        # Use importlib.resources to list all files in the data model directory within the package
-        package = importlib.import_module(package_name)
-        xml_files = [f for f in importlib.resources.contents(package) if f.endswith('.xml') and f.startswith(dir)]
+        # Use pathlib.Path to list all XML files in the data model directory
+        xml_files = [f for f in dir.glob('**/*.xml')]  # Recursively find all .xml files
 
         if not xml_files:
             raise SpecParsingException(f'No XML files found in the specified package directory {dir}')
@@ -580,8 +578,8 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
         # Parse each XML file found inside the package
         for xml in xml_files:
             logging.info(f'Parsing file {xml}')
-            # Open and parse each XML file from the wheel package
-            with importlib.resources.open_text(package, xml) as file:
+            # Open and parse each XML file from the directory
+            with xml.open('r') as file:
                 tree = ElementTree.parse(file)
                 root = tree.getroot()
                 add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
