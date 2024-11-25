@@ -83,7 +83,7 @@ class TC_OCC_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OCC_2_1(self):
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint()
         cluster = Clusters.Objects.OccupancySensing
         attributes = cluster.Attributes
 

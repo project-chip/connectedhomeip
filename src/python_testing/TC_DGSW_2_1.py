@@ -74,7 +74,7 @@ class TC_DGSW_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_DGSW_2_1(self):
 
-        endpoint = self.user_params.get("endpoint", 0)
+        endpoint = self.get_endpoint(default=0)
 
         # STEP 1: Commission DUT (already done)
         self.step(1)

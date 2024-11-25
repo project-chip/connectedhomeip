@@ -93,7 +93,7 @@ class TC_WHM_2_1(MatterBaseTest):
         ModeManual = 1
         # ModeTimed  = 2
 
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
 
         attributes = Clusters.WaterHeaterMode.Attributes
 
