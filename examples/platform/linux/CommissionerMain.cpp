@@ -16,10 +16,7 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
-
-#include <string>
+#include "CommissionerMain.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
@@ -48,9 +45,11 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/PlatformManager.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
 #include <controller/CHIPDeviceControllerFactory.h>
@@ -63,8 +62,7 @@
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #include <signal.h>
-
-#include "CommissionerMain.h"
+#include <string>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -459,7 +457,7 @@ CommissionerDiscoveryController * GetCommissionerDiscoveryController()
     return &gCommissionerDiscoveryController;
 }
 
-SessionKeystore * GetSessionKeystore()
+Crypto::SessionKeystore * GetSessionKeystore()
 {
     return &gSessionKeystore;
 }
