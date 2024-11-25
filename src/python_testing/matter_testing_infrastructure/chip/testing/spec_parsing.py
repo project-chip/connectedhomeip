@@ -563,7 +563,7 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlCluster], list[ProblemNotice]]:
     # Get the data model directory path inside the package
-    dir = get_data_model_directory(data_model_directory, 'kCluster')
+    dir = get_data_model_directory(data_model_directory, 'clusters')
 
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
