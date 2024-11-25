@@ -22,8 +22,9 @@ import multiprocessing
 import os
 import subprocess
 import sys
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
+
 from chip.testing.spec_parsing import build_xml_clusters
 
 BASIC_INFORMATION_CLUSTER_ID = int("0x0039", 16)
