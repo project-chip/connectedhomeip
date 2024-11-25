@@ -330,7 +330,7 @@ combination with JLinkRTTClient as follows:
 -   Trigger refrigeratoralarm door-state-change event:
 
     ```
-    -> matterCli> refrigeratoralarm event door-state-change
+    -> matterCli> refrigeratoralarm event door-state-change open
     -> Done
     ```
 
