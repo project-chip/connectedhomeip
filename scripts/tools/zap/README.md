@@ -6,7 +6,6 @@ orphan: true
 
 This directory contains various tools related to ZAP.
 
-
 # ZAP Cluster Revision Update Tool (update_cluster_revisions.py)
 
 This tool parses all ZAP files in the codebase and updates cluster revisions.
@@ -49,12 +48,16 @@ options:
 ```
 
 [Note]
-* Use `--dry-run` to print only, don't update ZAP files
-* Omit `--cluster-id` to search for all clusters
-* Omit `--new-revision` to update to the latest revision according to the specification
-* Optionally provide `--old-revision`, `--cluster-id` and `--new-revision` to update only clusters that match `old-revision`.
 
-Example #1: Check all outdated cluster revisions and print only (do not modify the ZAP file `--dry-run`):
+-   Use `--dry-run` to print only, don't update ZAP files
+-   Omit `--cluster-id` to search for all clusters
+-   Omit `--new-revision` to update to the latest revision according to the
+    specification
+-   Optionally provide `--old-revision`, `--cluster-id` and `--new-revision` to
+    update only clusters that match `old-revision`.
+
+Example #1: Check all outdated cluster revisions and print only (do not modify
+the ZAP file `--dry-run`):
 
 ```
 ./scripts/tools/zap/update_cluster_revisions.py --dry-run --no-parallel
@@ -105,8 +108,8 @@ Endpoint: 1 cluster_code: 1030 cluster_revision: 4 cluster_spec_revision: 5 name
 ...
 ```
 
-Example #2: Check for possible outdated revisions of the cluster 0x28 revisions and
-print only (do not modify the ZAP file):
+Example #2: Check for possible outdated revisions of the cluster 0x28 revisions
+and print only (do not modify the ZAP file):
 
 ```
 ./scripts/tools/zap/update_cluster_revisions.py --dry-run --no-parallel --cluster-id 0x28
@@ -135,10 +138,13 @@ Endpoint: 1 cluster_code: 0x28 cluster_revision: 2 cluster_spec_revision: 4 name
 ...
 ```
 
-Example #3: Update outdated revisions of the cluster 0x28 to the latest in the specification:
+Example #3: Update outdated revisions of the cluster 0x28 to the latest in the
+specification:
+
 ```
 ./scripts/tools/zap/update_cluster_revisions.py --no-parallel --cluster-id 0x28
 ```
+
 Example output:
 
 ```
@@ -159,13 +165,13 @@ Searching for zcl file from /usr/local/google/home/sergiosoares/connectedhomeip/
 
 🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
 
-Application is failing the Device Type Specification as follows: 
+Application is failing the Device Type Specification as follows:
 
   - ⚠ Check Device Type Compliance on endpoint: 0, device type: MA-rootdevice, cluster: Localization Configuration, attribute: ActiveLocale needs to be enabled
   - ⚠ Check Device Type Compliance on endpoint: 0, device type: MA-rootdevice, cluster: Localization Configuration, attribute: SupportedLocales needs to be enabled
   - ⚠ Check Device Type Compliance on endpoint: 2, device type: MA-windowcovering, cluster: Window Covering server needs bit 3 enabled in the Feature Map attribute
 
-Application is failing the Cluster Specification as follows: 
+Application is failing the Cluster Specification as follows:
 
 
 🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
