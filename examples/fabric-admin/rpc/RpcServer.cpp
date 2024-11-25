@@ -174,13 +174,16 @@ public:
         if (error == CHIP_NO_ERROR)
         {
             mNodeId = DeviceManager::Instance().GetNextAvailableNodeId();
-            ;
 
             // After responding with RequestCommissioningApproval to the node where the client initiated the
             // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
             usleep(kCommissionPrepareTimeMs * 1000);
             PairingManager::Instance().SetPairingDelegate(this);
-            DeviceManager::Instance().PairRemoteDevice(mNodeId, code.c_str());
+
+            if (PairingManager::Instance().PairDeviceWithCode(mNodeId, code.c_str()) != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Failed to commission device " ChipLogFormatX64, ChipLogValueX64(mNodeId));
+            }
         }
         else
         {

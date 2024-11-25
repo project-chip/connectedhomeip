@@ -55,6 +55,7 @@ void AddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 
         admin::DeviceManager::Instance().UpdateLastUsedNodeId(mBridgeNodeId);
         admin::DeviceManager::Instance().SubscribeRemoteFabricBridge();
+        admin::DeviceManager::Instance().InitCommissionerControl();
 
         // After successful commissioning of the Commissionee, initiate Reverse Commissioning
         // via the Commissioner Control Cluster. However, we must first verify that the
@@ -84,10 +85,11 @@ CHIP_ERROR AddBridgeCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    ChipLogProgress(NotSpecified, "Running AddBridgeCommand with Node ID: %lu, PIN Code: %u, Address: %s, Port: %u", mBridgeNodeId,
-                    mSetupPINCode, mRemoteAddr, mRemotePort);
+    ChipLogProgress(NotSpecified,
+                    "Running AddBridgeCommand with Node ID: " ChipLogFormatX64 ", PIN Code: %u, Address: %s, Port: %u",
+                    ChipLogValueX64(mBridgeNodeId), mSetupPINCode, mRemoteAddr, mRemotePort);
 
-    return admin::DeviceManager::Instance().PairRemoteFabricBridge(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
+    return admin::PairingManager::Instance().PairDevice(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
 }
 
 } // namespace commands
