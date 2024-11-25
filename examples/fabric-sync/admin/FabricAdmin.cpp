@@ -17,6 +17,7 @@
 
 #include "FabricAdmin.h"
 #include <AppMain.h>
+#include <CommissionerMain.h>
 #include <bridge/include/FabricBridge.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 
@@ -34,15 +35,6 @@ FabricAdmin FabricAdmin::sInstance;
 app::DefaultICDClientStorage FabricAdmin::sICDClientStorage;
 app::CheckInHandler FabricAdmin::sCheckInHandler;
 
-FabricAdmin & FabricAdmin::Instance()
-{
-    if (!sInstance.mInitialized)
-    {
-        VerifyOrDie(sInstance.Init() == CHIP_NO_ERROR);
-    }
-    return sInstance;
-}
-
 CHIP_ERROR FabricAdmin::Init()
 {
     IcdManager::Instance().SetDelegate(&sInstance);
@@ -54,8 +46,6 @@ CHIP_ERROR FabricAdmin::Init()
     ReturnLogErrorOnFailure(IcdManager::Instance().Init(&sICDClientStorage, engine));
     ReturnLogErrorOnFailure(sCheckInHandler.Init(Controller::DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
                                                  &sICDClientStorage, &IcdManager::Instance(), engine));
-
-    mInitialized = true;
 
     return CHIP_NO_ERROR;
 }
