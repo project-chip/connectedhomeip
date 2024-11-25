@@ -901,13 +901,6 @@ public:
     CHIP_ERROR Begin();
 
     /**
-     * @brief check if the digest computation has been initialized.
-     *
-     * @return True if the context is correctly initialized; otherwise, false.
-     */
-    bool IsInitialized();
-
-    /**
      * @brief Add some data to the digest computation, updating internal state.
      *
      * @param[in] data The span of bytes to include in the digest update process.
@@ -948,6 +941,9 @@ public:
     void Clear();
 
 private:
+    // Check if the digest computation has been initialized; implement this if your backend needs it.
+    bool IsInitialized();
+
     HashSHA256OpaqueContext mContext;
 };
 
