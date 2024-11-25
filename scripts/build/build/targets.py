@@ -210,6 +210,7 @@ def BuildEsp32Target():
         TargetPart('c3devkit', board=Esp32Board.C3DevKit),
         TargetPart('devkitc', board=Esp32Board.DevKitC),
         TargetPart('qemu', board=Esp32Board.QEMU).OnlyIfRe('-tests'),
+        TargetPart('c61devkit', board=Esp32Board.C61DevKit),
     ])
 
     # applications
