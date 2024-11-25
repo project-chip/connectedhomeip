@@ -40,9 +40,7 @@ public:
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
-#if NXP_USE_MML
     bool SupportsWatermarks() override { return true; }
-#endif
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
