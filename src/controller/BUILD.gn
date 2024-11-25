@@ -24,30 +24,21 @@ source_set("nodatamodel") {
   public_deps = [ "${chip_root}/src/app" ]
 }
 
-CHIP_CONTROLLER_HEADERS = [ "ExampleOperationalCredentialsIssuer.h" ]
-CHIP_READ_CLIENT_HEADERS = [
-  "CommissioningWindowOpener.h",
-  "CurrentFabricRemover.h",
-]
-
-# This source set exists specifically to deny including them without dependencies
-# if "controller" sources do not contain them
-#
-# They are NOT intended to be used directly.
-#
-# The intent for this is to force gn to be aware that these files are known and
-# error out as `include not allowed due to missing dependency` even if
-# controller is built without these sources
-source_set("gen_check_chip_controller_headers") {
-  sources = CHIP_CONTROLLER_HEADERS
-}
-
-source_set("gen_check_chip_read_client_headers") {
-  sources = CHIP_READ_CLIENT_HEADERS
-}
-
 source_set("delegates") {
   sources = [ "OperationalCredentialsDelegate.h" ]
+}
+
+source_set("interactions") {
+  sources = [
+    "CHIPCluster.h",
+    "CommandSenderAllocator.h",
+    "InvokeInteraction.h",
+    "ReadInteraction.h",
+    "TypedCommandCallback.h",
+    "TypedReadCallback.h",
+    "WriteInteraction.h",
+  ]
+  public_deps = [ "${chip_root}/src/app" ]
 }
 
 static_library("controller") {
@@ -67,26 +58,23 @@ static_library("controller") {
     # dependencies
     "AbstractDnssdDiscoveryController.h",
     "AutoCommissioner.h",
-    "CHIPCluster.h",
     "CHIPCommissionableNodeController.h",
     "CHIPDeviceController.h",
     "CHIPDeviceControllerSystemState.h",
-    "CommandSenderAllocator.h",
     "CommissioneeDeviceProxy.h",
     "CommissioningDelegate.h",
+    "CommissioningWindowOpener.h",
     "CommissioningWindowParams.h",
+    "CurrentFabricRemover.h",
     "DeviceDiscoveryDelegate.h",
     "DevicePairingDelegate.h",
-    "InvokeInteraction.h",
-    "ReadInteraction.h",
+    "ExampleOperationalCredentialsIssuer.h",
     "SetUpCodePairer.h",
-    "TypedCommandCallback.h",
-    "TypedReadCallback.h",
-    "WriteInteraction.h",
   ]
 
+  deps = [ "${chip_root}/src/lib/address_resolve" ]
+
   if (chip_controller && chip_build_controller) {
-    sources += CHIP_CONTROLLER_HEADERS
     sources += [
       "AbstractDnssdDiscoveryController.cpp",
       "AutoCommissioner.cpp",
@@ -100,8 +88,11 @@ static_library("controller") {
       "ExampleOperationalCredentialsIssuer.cpp",
       "SetUpCodePairer.cpp",
     ]
+
+    # ExampleOperationalCredentialsIssuer uses TestGroupData
+    deps += [ "${chip_root}/src/lib/support:testing" ]
+
     if (chip_enable_read_client) {
-      sources += CHIP_READ_CLIENT_HEADERS
       sources += [
         "CHIPDeviceController.cpp",
         "CommissioningWindowOpener.cpp",
@@ -110,9 +101,8 @@ static_library("controller") {
     }
   }
 
-  cflags = [ "-Wconversion" ]
-
   public_deps = [
+    ":interactions",
     "${chip_root}/src/app",
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib/core",
@@ -127,12 +117,7 @@ static_library("controller") {
     "${chip_root}/src/transport",
   ]
 
-  deps = [ "${chip_root}/src/lib/address_resolve" ]
-
-  if (chip_controller && chip_build_controller) {
-    # ExampleOperationalCredentialsIssuer uses TestGroupData
-    deps += [ "${chip_root}/src/lib/support:testing" ]
-  }
+  cflags = [ "-Wconversion" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 }

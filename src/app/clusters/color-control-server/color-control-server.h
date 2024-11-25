@@ -294,6 +294,9 @@ private:
         MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
     static_assert(kColorControlClusterServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "ColorControl endpoint count error");
 
+    static constexpr uint16_t kMaxTransitionTime         = 65534; // Max value as defined by the spec.
+    static constexpr uint16_t kMaxColorTemperatureMireds = 65279; // Max value as defined by the spec (0xFEFF).
+
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
     ColorHueTransitionState colorHueTransitionStates[kColorControlClusterServerMaxEndpointCount];
     Color16uTransitionState colorSatTransitionStates[kColorControlClusterServerMaxEndpointCount];
