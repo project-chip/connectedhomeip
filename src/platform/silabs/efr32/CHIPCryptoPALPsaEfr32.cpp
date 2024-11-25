@@ -132,7 +132,7 @@ void _log_PSA_error(psa_status_t status)
  * @param t2 Second time to compare
  * @return int  0 If both times are idential to the second, -1 if t1 < t2, 1 if t1 > t2.
  */
-int timeCompare(mbedtls_x509_time * t1, mbedtls_x509_time * t2)
+int TimeCompare(mbedtls_x509_time * t1, mbedtls_x509_time * t2)
 {
     VerifyOrReturnValue(t1->year >= t2->year, -1);
     VerifyOrReturnValue(t1->year <= t2->year, 1);
@@ -155,12 +155,12 @@ int timeCompare(mbedtls_x509_time * t1, mbedtls_x509_time * t2)
     return 0;
 }
 
-bool isBufferNonEmpty(const uint8_t * data, size_t data_length)
+bool IsBufferNonEmpty(const uint8_t * data, size_t data_length)
 {
     return data != nullptr && data_length > 0;
 }
 
-bool isValidTag(const uint8_t * tag, size_t tag_length)
+bool IsValidTag(const uint8_t * tag, size_t tag_length)
 {
     return tag != nullptr && (tag_length == 8 || tag_length == 12 || tag_length == 16);
 }
@@ -171,8 +171,8 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
                            const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
 {
-    VerifyOrReturnError(isBufferNonEmpty(nonce, nonce_length), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(isValidTag(tag, tag_length), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsBufferNonEmpty(nonce, nonce_length), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValidTag(tag, tag_length), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((ciphertext != nullptr && plaintext != nullptr) || plaintext_length == 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aad != nullptr || aad_length == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -191,15 +191,8 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     status = psa_aead_set_nonce(&operation, nonce, nonce_length);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-    if (aad_length != 0)
-    {
-        status = psa_aead_update_ad(&operation, aad, aad_length);
-        VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-    }
-    else
-    {
-        ChipLogDetail(Crypto, "AES_CCM_encrypt: Using aad == null path");
-    }
+    status = psa_aead_update_ad(&operation, aad, aad_length);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     if (plaintext_length != 0)
     {
@@ -225,8 +218,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
                            const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext)
 {
-    VerifyOrReturnError(isBufferNonEmpty(nonce, nonce_length), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(isValidTag(tag, tag_length), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsBufferNonEmpty(nonce, nonce_length), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValidTag(tag, tag_length), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((ciphertext != nullptr && plaintext != nullptr) || ciphertext_length == 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aad != nullptr || aad_length == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1686,15 +1679,15 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     VerifyOrExit(mbedResult == 0, (result = CertificateChainValidationResult::kRootFormatInvalid, error = CHIP_ERROR_INTERNAL));
 
     /* Validates that intermediate and root certificates are valid at the time of the leaf certificate's start time.  */
-    compare_from  = timeCompare(&leaf_valid_from, &rootCert.valid_from);
-    compare_until = timeCompare(&leaf_valid_from, &rootCert.valid_to);
+    compare_from  = TimeCompare(&leaf_valid_from, &rootCert.valid_from);
+    compare_until = TimeCompare(&leaf_valid_from, &rootCert.valid_to);
     VerifyOrExit((compare_from >= 0) && (compare_until <= 0),
                  (result = CertificateChainValidationResult::kChainInvalid, error = CHIP_ERROR_CERT_NOT_TRUSTED));
     cert = certChain.next;
     while (cert)
     {
-        compare_from  = timeCompare(&leaf_valid_from, &cert->valid_from);
-        compare_until = timeCompare(&leaf_valid_from, &cert->valid_to);
+        compare_from  = TimeCompare(&leaf_valid_from, &cert->valid_from);
+        compare_until = TimeCompare(&leaf_valid_from, &cert->valid_to);
         VerifyOrExit((compare_from >= 0) && (compare_until <= 0),
                      (result = CertificateChainValidationResult::kChainInvalid, error = CHIP_ERROR_CERT_NOT_TRUSTED));
         cert = cert->next;
