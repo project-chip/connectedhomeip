@@ -524,24 +524,25 @@ def _get_data_model_root() -> pathlib.PosixPath:
     try:
         # Locate the directory where the 'chip.testing' module is located
         package_dir = pathlib.Path(chip.testing.__file__).parent
-        
+
         # Construct the path to the 'data_model' directory (assuming this structure)
         data_model_root = package_dir / 'data_model'
-        
+
         if not data_model_root.exists():
             raise FileNotFoundError(f"Data model directory not found in the package at {data_model_root}.")
-        
+
         return data_model_root
 
     except Exception as e:
         raise FileNotFoundError(f"Failed to find the data model root: {e}")
+
 
 def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, str], data_model_level: str) -> pathlib.PosixPath:
     """
     Get the directory of the data model for a specific version and level from the installed package.
     """
     data_model_root = _get_data_model_root()
-    
+
     # Build path based on the version and data model level
     if isinstance(data_model_directory, PrebuiltDataModelDirectory):
         version_map = {
@@ -549,15 +550,16 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
             PrebuiltDataModelDirectory.k1_4: '1.4',
             PrebuiltDataModelDirectory.kMaster: 'master',
         }
-        
+
         version = version_map.get(data_model_directory)
         if not version:
             raise ValueError(f"Unsupported data model directory: {data_model_directory}")
-        
+
         return data_model_root / version / data_model_level
     else:
         # If it's a custom directory, return it directly
         return pathlib.Path(data_model_directory)
+
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlCluster], list[ProblemNotice]]:
     # Get the data model directory path inside the package
