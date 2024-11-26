@@ -77,15 +77,16 @@ class CertificateAuthority:
         self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.restype = PyChipError
         self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.argtypes = [ctypes.c_void_p, ctypes.c_bool]
 
-        self._Handle().pychip_OpCreds_SetCertValidityInSeconds.restype = PyChipError
-        self._Handle().pychip_OpCreds_SetCertValidityInSeconds.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
+        self._Handle().pychip_OpCreds_SetCertificateValidityPeriod.restype = PyChipError
+        self._Handle().pychip_OpCreds_SetCertificateValidityPeriod.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
 
         if (persistentStorage is None):
             persistentStorage = self._chipStack.GetStorageManager()
 
         self._persistentStorage = persistentStorage
         self._maximizeCertChains = False
-        self._certificateValidityPeriod = 0
+        # By default, let's set validity to 10 years
+        self._certificateValidityPeriod = 365 * 24 * 60 * 60 * 10
 
         self._closure = self._chipStack.Call(
             lambda: self._Handle().pychip_OpCreds_InitializeDelegate(
@@ -211,11 +212,15 @@ class CertificateAuthority:
             raise ValueError("Validity period must be a non-negative integer")
 
         self._chipStack.Call(
-            lambda: self._Handle().pychip_OpCreds_SetCertValidityInSeconds(ctypes.c_void_p(self._closure), ctypes.c_uint32(validity))
+            lambda: self._Handle().pychip_OpCreds_SetCertificateValidityPeriod(ctypes.c_void_p(self._closure), ctypes.c_uint32(validity))
         ).raise_on_error()
 
         self._certificateValidityPeriod = validity
 
+        c_uint32_validity = ctypes.c_uint32(validity)
+
+        print("CertificateAuthority.py -> validity as int: ", validity)
+        print("CertificateAuthority.py -> validity cast into int: ", c_uint32_validity.value)
     def __del__(self):
         self.Shutdown()
 
@@ -277,7 +282,7 @@ class CertificateAuthorityManager:
             ca = self.NewCertificateAuthority(int(caIndex))
             ca.LoadFabricAdminsFromStorage()
 
-    def NewCertificateAuthority(self, caIndex: Optional[int] = None, maximizeCertChains: bool = False, certificateValidityPeriod: int = 0):
+    def NewCertificateAuthority(self, caIndex: Optional[int] = None, maximizeCertChains: bool = False, certificateValidityPeriod: Optional[int] = None):
         ''' Creates a new CertificateAuthority instance with the provided CA Index and the PersistentStorage
             instance previously setup in the constructor.
 
@@ -300,6 +305,12 @@ class CertificateAuthorityManager:
         if (str(caIndex) not in caList):
             caList[str(caIndex)] = []
             self._persistentStorage.SetReplKey(key='caList', value=caList)
+
+        if (certificateValidityPeriod is None):
+            # By default, let's set validity to 10 years
+            certificateValidityPeriod = 365 * 24 * 60 * 60 * 10
+
+        print("CertificateAuthority -> certificateValidityPeriod = ", certificateValidityPeriod)
 
         ca = CertificateAuthority(chipStack=self._chipStack, caIndex=caIndex, persistentStorage=self._persistentStorage)
         ca.maximizeCertChains = maximizeCertChains

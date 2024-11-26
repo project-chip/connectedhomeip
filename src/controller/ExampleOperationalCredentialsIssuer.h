@@ -67,8 +67,6 @@ public:
 
     void SetMaximallyLargeCertsUsed(bool areMaximallyLargeCertsUsed) { mUseMaximallySizedCerts = areMaximallyLargeCertsUsed; }
 
-    void SetCertValidityInSeconds(uint32_t validityPeriodInSeconds) { mValidity = validityPeriodInSeconds; }
-
     void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
 
     void SetCATValuesForNextNOCRequest(CATValues cats) { mNextCATs = cats; }

@@ -58,13 +58,15 @@ class TC_OPCREDS_3_5(MatterBaseTest):
         self.print_step(1, "TH1 fully commissions the DUT")
         dev_ctrl = self.default_controller
 
-        new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        second_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority(maximizeCertChains=True)
-        third_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority(certificateValidityPeriod=100)
+        #certValidity = 365*24*60*60*10
 
-        print("certificate1: ", dir(new_certificate_authority))
-        print("certificate2: ", second_certificate_authority.maximizeCertChains)
-        print("certificate3: ", second_certificate_authority.certificateValidityPeriod)
+        new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority(certificateValidityPeriod=204000000)
+        #second_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority(maximizeCertChains=True)
+        #third_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority(certificateValidityPeriod=certValidity)
+
+        #print("certificate1: ", dir(new_certificate_authority))
+        #print("certificate2: ", second_certificate_authority.maximizeCertChains)
+        #print("certificate3: ", third_certificate_authority.certificateValidityPeriod)
 
         th1_vid = 0xFFF1
         th1_fabricId = 1111
@@ -73,7 +75,7 @@ class TC_OPCREDS_3_5(MatterBaseTest):
         th1_dut_node_id = self.dut_node_id+1
 
         th1_new_fabric_ctrl = th1_new_fabric_admin.NewController(nodeId=th1_nodeId)
-        success, nocResp, nocBytes, rcacBytes, icacBytes = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(
+        success, nocResp, rcacResp = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(
             commissionerDevCtrl=dev_ctrl, newFabricDevCtrl=th1_new_fabric_ctrl,
             existingNodeId=self.dut_node_id, newNodeId=th1_dut_node_id)
 

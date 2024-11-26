@@ -83,7 +83,8 @@ public:
 
     void SetMaximallyLargeCertsUsed(bool enabled) { mExampleOpCredsIssuer.SetMaximallyLargeCertsUsed(enabled); }
 
-    void SetCertValidityInSeconds(uint32_t validityPeriodInSeconds) { mExampleOpCredsIssuer.SetCertValidityInSeconds(validityPeriodInSeconds); }
+    void SetCertificateValidityPeriod(uint32_t validity) { mExampleOpCredsIssuer.SetCertificateValidityPeriod(validity); }
+
 
 private:
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
@@ -607,11 +608,11 @@ PyChipError pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext * context, 
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_OpCreds_SetCertValidityInSeconds(OpCredsContext * context, uint32_t validity)
+PyChipError pychip_OpCreds_SetCertificateValidityPeriod(OpCredsContext * context, uint32_t validity)
 {
     VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
 
-    context->mAdapter->SetCertValidityInSeconds(validity);
+    context->mAdapter->SetCertificateValidityPeriod(validity);
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
