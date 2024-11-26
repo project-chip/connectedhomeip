@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "Diagnostics.h"
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
+#include <tracing/esp32_diagnostic_trace/Diagnostics.h>
 
 namespace chip {
 namespace Tracing {
@@ -38,6 +38,8 @@ public:
     CHIP_ERROR Retrieve(MutableByteSpan & payload) override;
 
     bool IsEmptyBuffer();
+
+    uint32_t GetDataSize();
 
 private:
     DiagnosticStorageImpl(uint8_t * buffer, size_t bufferSize);

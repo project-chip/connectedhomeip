@@ -110,21 +110,20 @@ void ESP32Diagnostics::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
 
 void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 {
-    DiagnosticStorageImpl & diagnosticStorage = DiagnosticStorageImpl::GetInstance();
-    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     switch (event.ValueType())
     {
     case ValueType::kInt32: {
         ESP_LOGI("mtr", "The value of %s is %ld ", event.key(), event.ValueInt32());
         Metric<int32_t> metric(event.key(), event.ValueInt32(), esp_log_timestamp());
-        err = diagnosticStorage.Store(metric);
+        err = mStorageInstance.Store(metric);
     }
     break;
 
     case ValueType::kUInt32: {
         ESP_LOGI("mtr", "The value of %s is %lu ", event.key(), event.ValueUInt32());
         Metric<uint32_t> metric(event.key(), event.ValueUInt32(), esp_log_timestamp());
-        err = diagnosticStorage.Store(metric);
+        err = mStorageInstance.Store(metric);
     }
     break;
 
@@ -146,7 +145,7 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 
 void ESP32Diagnostics::TraceCounter(const char * label)
 {
-    ESPDiagnosticCounter::GetInstance(label)->ReportMetrics();
+    ESPDiagnosticCounter::GetInstance(label).ReportMetrics(label, mStorageInstance);
 }
 
 void ESP32Diagnostics::TraceBegin(const char * label, const char * group)
@@ -166,13 +165,12 @@ void ESP32Diagnostics::TraceInstant(const char * label, const char * group)
 
 void ESP32Diagnostics::StoreDiagnostics(const char * label, const char * group)
 {
-    CHIP_ERROR err                            = CHIP_NO_ERROR;
-    HashValue hashValue                       = MurmurHash(group);
-    DiagnosticStorageImpl & diagnosticStorage = DiagnosticStorageImpl::GetInstance();
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    HashValue hashValue = MurmurHash(group);
     if (IsPermitted(hashValue))
     {
         Trace trace(label, group, esp_log_timestamp());
-        err = diagnosticStorage.Store(trace);
+        err = mStorageInstance.Store(trace);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to store Trace Diagnostic data"));
     }
 }

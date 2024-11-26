@@ -17,7 +17,6 @@
  */
 
 #pragma once
-
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/Span.h>

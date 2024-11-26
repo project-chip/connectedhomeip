@@ -21,6 +21,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorageManager.h>
 
+#define TLV_CLOSING_BYTES 4
+
 namespace chip {
 namespace Tracing {
 using namespace chip::TLV;
@@ -105,7 +107,7 @@ CHIP_ERROR DiagnosticStorageImpl::Retrieve(MutableByteSpan & payload)
                 (reader.GetTag() == ContextTag(DIAGNOSTICS_TAG::METRIC) || reader.GetTag() == ContextTag(DIAGNOSTICS_TAG::TRACE) ||
                  reader.GetTag() == ContextTag(DIAGNOSTICS_TAG::COUNTER)))
             {
-                if ((reader.GetLengthRead() - writer.GetLengthWritten()) < writer.GetRemainingFreeLength())
+                if ((reader.GetLengthRead() - writer.GetLengthWritten()) < (writer.GetRemainingFreeLength() + TLV_CLOSING_BYTES))
                 {
                     err = writer.CopyElement(reader);
                     if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
@@ -151,6 +153,11 @@ CHIP_ERROR DiagnosticStorageImpl::Retrieve(MutableByteSpan & payload)
 bool DiagnosticStorageImpl::IsEmptyBuffer()
 {
     return mEndUserCircularBuffer.DataLength() == 0;
+}
+
+uint32_t DiagnosticStorageImpl::GetDataSize()
+{
+    return mEndUserCircularBuffer.DataLength();
 }
 } // namespace Diagnostics
 } // namespace Tracing

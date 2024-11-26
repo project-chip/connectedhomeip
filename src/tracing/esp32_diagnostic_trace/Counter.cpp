@@ -23,45 +23,30 @@ namespace chip {
 namespace Tracing {
 namespace Diagnostics {
 
-// This is a one time allocation for counters. It is not supposed to be freed.
-ESPDiagnosticCounter * ESPDiagnosticCounter::mHead = nullptr;
+std::map<const char *, uint32_t> ESPDiagnosticCounter::mCounterList;
 
-ESPDiagnosticCounter * ESPDiagnosticCounter::GetInstance(const char * label)
+void ESPDiagnosticCounter::CountInit(const char * label)
 {
-    ESPDiagnosticCounter * current = mHead;
-
-    while (current != nullptr)
+    if (mCounterList.find(label) != mCounterList.end())
     {
-        if (strcmp(current->label, label) == 0)
-        {
-            current->instanceCount++;
-            return current;
-        }
-        current = current->mNext;
+        mCounterList[label]++;
     }
-
-    // Allocate a new instance if counter is not present in the list.
-    void * ptr = Platform::MemoryAlloc(sizeof(ESPDiagnosticCounter));
-    VerifyOrDie(ptr != nullptr);
-
-    ESPDiagnosticCounter * newInstance = new (ptr) ESPDiagnosticCounter(label);
-    newInstance->mNext                 = mHead;
-    mHead                              = newInstance;
-
-    return newInstance;
+    else
+    {
+        mCounterList[label] = 1;
+    }
 }
 
-int32_t ESPDiagnosticCounter::GetInstanceCount() const
+uint32_t ESPDiagnosticCounter::GetInstanceCount(const char * label) const
 {
-    return instanceCount;
+    return mCounterList[label];
 }
 
-void ESPDiagnosticCounter::ReportMetrics()
+void ESPDiagnosticCounter::ReportMetrics(const char * label, DiagnosticStorageInterface & mStorageInstance)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Counter counter(label, instanceCount, esp_log_timestamp());
-    DiagnosticStorageImpl & diagnosticStorage = DiagnosticStorageImpl::GetInstance();
-    err                                       = diagnosticStorage.Store(counter);
+    Counter counter(label, GetInstanceCount(label), esp_log_timestamp());
+    err = mStorageInstance.Store(counter);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to store Counter diagnostic data"));
 }
 
