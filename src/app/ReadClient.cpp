@@ -930,6 +930,25 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
     return err;
 }
 
+CHIP_ERROR ReadClient::ForceResubscribe()
+{
+    if (IsSubscriptionActive())
+    {
+        CancelLivenessCheckTimer();
+        OnLivenessTimeoutCallback(nullptr, this);
+        return CHIP_NO_ERROR;
+    }
+    else if (IsIdle())
+    {
+        TriggerResubscribeIfScheduled("ForceResubscribe called");
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+}
+
 void ReadClient::OverrideLivenessTimeout(System::Clock::Timeout aLivenessTimeout)
 {
     mLivenessTimeoutOverride = aLivenessTimeout;
