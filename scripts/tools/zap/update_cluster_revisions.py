@@ -86,7 +86,7 @@ def get_outdated_clusters(data: object, xml_clusters: dict, args) -> list[Cluste
                 try:
                     cluster_revision = int(attribute.get("defaultValue"))
                     spec_revision = xml_clusters[cluster.get("code")].revision
-                except:
+                except (KeyError, ValueError):
                     continue
                 # Filter in outdated clusters only
                 if (cluster_revision == spec_revision):
