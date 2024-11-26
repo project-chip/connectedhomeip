@@ -16,6 +16,7 @@
  */
 
 #include <AppMain.h>
+#include <CommissionerMain.h>
 #include <admin/FabricAdmin.h>
 #include <admin/PairingManager.h>
 #include <bridge/include/Bridge.h>
@@ -109,7 +110,19 @@ int main(int argc, char * argv[])
     Shell::RegisterCommands();
 #endif
 
-    CHIP_ERROR err = admin::PairingManager::Instance().Init(GetDeviceCommissioner());
+    ChipLinuxAppMainLoop();
+
+    CHIP_ERROR err = admin::FabricAdmin::Instance().Init();
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "Failed to init FabricAdmin: %s ", ErrorStr(err));
+
+        // End the program with non zero error code to indicate a error.
+        return 1;
+    }
+
+    err = admin::PairingManager::Instance().Init(GetDeviceCommissioner());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Failed to init PairingManager: %s ", ErrorStr(err));
@@ -117,8 +130,6 @@ int main(int argc, char * argv[])
         // End the program with non zero error code to indicate a error.
         return 1;
     }
-
-    ChipLinuxAppMainLoop();
 
     return 0;
 }

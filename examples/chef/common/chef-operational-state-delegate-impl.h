@@ -110,6 +110,7 @@ private:
         GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
     };
+    const CharSpan opPhaseList[3] = { "pre-soak"_span, "rinse"_span, "spin"_span };
 
 public:
     const uint32_t kExampleCountDown = 30;
@@ -117,6 +118,7 @@ public:
     OperationalStateDelegate()
     {
         GenericOperationalStateDelegateImpl::mOperationalStateList = Span<const GenericOperationalState>(opStateList);
+        GenericOperationalStateDelegateImpl::mOperationalPhaseList = Span<const CharSpan>(opPhaseList);
     }
 
     /**

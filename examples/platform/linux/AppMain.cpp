@@ -33,8 +33,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
-#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
@@ -51,10 +49,6 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include "CommissionerMain.h"
 #include <ControllerShellCommands.h>
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <platform/KeyValueStoreManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if defined(ENABLE_CHIP_SHELL)

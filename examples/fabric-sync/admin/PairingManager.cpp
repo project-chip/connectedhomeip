@@ -636,6 +636,12 @@ CHIP_ERROR PairingManager::PairDevice(chip::NodeId nodeId, uint32_t setupPINCode
 
 CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
 {
+    if (nodeId == kUndefinedNodeId)
+    {
+        ChipLogError(NotSpecified, "node ID is undefined; cannot unpair device.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     return DeviceLayer::SystemLayer().ScheduleLambda([nodeId]() {
         PairingManager & self = PairingManager::Instance();
 
