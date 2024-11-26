@@ -28,6 +28,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/RawKeySessionKeystore.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -49,13 +50,12 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <platform/KeyValueStoreManager.h>
+#include <controller/CHIPDeviceControllerFactory.h>         // nogncheck
+#include <controller/ExampleOperationalCredentialsIssuer.h> // nogncheck
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceHandlers.h"
