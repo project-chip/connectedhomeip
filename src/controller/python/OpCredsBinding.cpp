@@ -111,7 +111,6 @@ extern chip::app::DefaultICDClientStorage sICDClientStorage;
 class TestCommissioner : public chip::Controller::AutoCommissioner
 {
 public:
-    using RCACReadyCallback = std::function<void(const std::vector<uint8_t> &)>;
     TestCommissioner() { Reset(); }
     ~TestCommissioner() {}
 
@@ -156,20 +155,21 @@ public:
         {
             if (report.Is<chip::Controller::NocChain>())
             {
-                auto nocChain = report.Get<chip::Controller::NocChain>();
-                MutableByteSpan rcacSpan(const_cast<uint8_t *>(nocChain.rcac.data()), nocChain.rcac.size());
+                
+                auto nocChain = report.Get<chip::Controller::NocChain>().rcac;
+                MutableByteSpan rcacSpan(const_cast<uint8_t *>(nocChain.data()), nocChain.size());
                 chip::ByteSpan rcacByteSpan(rcacSpan.data(), rcacSpan.size());
 
-                // Converting rcac to chip cert format to be decyphered by TLV later in python3
+                // Convert RCAC to CHIP cert format to be deciphered by TLV later in python3
                 std::vector<uint8_t> chipRcac(Credentials::kMaxCHIPCertLength);
                 MutableByteSpan chipRcacSpan(chipRcac.data(), chipRcac.size());
                 chip::Credentials::ConvertX509CertToChipCert(rcacByteSpan, chipRcacSpan);
+
                 mCHIPRCACData.assign(chipRcacSpan.data(), chipRcacSpan.data() + chipRcacSpan.size());
 
                 if (!mCHIPRCACData.empty())
                 {
-                    // Notify that mCHIPRCACData data is ready
-                    NotifyRCACDataReady();
+                    ChipLogProgress(Controller, "RCAC data converted and stored.");
                 }
                 else
                 {
@@ -323,28 +323,11 @@ public:
         }
     }
 
-    void SetOnRCACReadyCallback(RCACReadyCallback callback)
-    {
-        std::lock_guard<std::mutex> lock(mCallbackMutex);
-        mOnRCACReadyCallback = callback;
-    }
-
     CHIP_ERROR GetCompletionError() { return mCompletionError; }
 
     const std::vector<uint8_t> & GetCHIPRCACData() const { return mCHIPRCACData; }
 
 private:
-    void NotifyRCACDataReady()
-    {
-        std::lock_guard<std::mutex> lock(mCallbackMutex);
-        if (mOnRCACReadyCallback && !mCHIPRCACData.empty())
-        {
-            mOnRCACReadyCallback(mCHIPRCACData);
-        }
-    }
-    RCACReadyCallback mOnRCACReadyCallback;
-    std::mutex mCallbackMutex; // Ensure thread-safe access to callback
-
     std::vector<uint8_t> mCHIPRCACData;
     static constexpr uint8_t kNumCommissioningStages = chip::to_underlying(chip::Controller::CommissioningStage::kCleanup) + 1;
     chip::Controller::CommissioningStage mSimulateFailureOnStage            = chip::Controller::CommissioningStage::kError;
@@ -740,24 +723,23 @@ PyChipError pychip_GetCompletionError()
 }
 
 extern "C" {
-// Define a global callback to set the RCAC data callback
-using PythonRCACCallback                      = void (*)(const uint8_t *, size_t);
-static PythonRCACCallback gPythonRCACCallback = nullptr;
-
-// Function to set the Python callback
-void pychip_SetCommissioningRCACCallback(PythonRCACCallback callback)
+// Function to get the RCAC data from the sTestCommissioner
+void pychip_GetCommissioningRCACData(uint8_t ** rcacDataPtr, size_t * rcacSize)
 {
-    ChipLogProgress(Controller, "Attempting to set Python RCAC callback in C++");
-    gPythonRCACCallback = callback;
+    ChipLogProgress(Controller, "Attempting to get Python RCAC data in C++");
+    const auto & rcacData = sTestCommissioner.GetCHIPRCACData();
 
-    // Set C++ TestCommissioner callback to notify Python when RCAC data is ready
-    sTestCommissioner.SetOnRCACReadyCallback([](const std::vector<uint8_t> & rcacData) {
-        if (gPythonRCACCallback)
-        {
-            ChipLogProgress(Controller, "RCAC callback in C++ set");
-            gPythonRCACCallback(rcacData.data(), rcacData.size());
-        }
-    });
+    if (rcacData.empty())
+    {
+        ChipLogError(Controller, "RCAC data is empty in C++. Nothing to return.");
+        *rcacDataPtr = nullptr;
+        *rcacSize = 0;
+    }
+    else
+    {
+        *rcacSize = rcacData.size();
+        *rcacDataPtr = const_cast<uint8_t *>(rcacData.data());
+    }
 }
 }
 } // extern "C"

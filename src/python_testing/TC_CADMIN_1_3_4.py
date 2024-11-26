@@ -60,7 +60,6 @@ from mobly import asserts
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
-
 class TC_CADMIN(MatterBaseTest):
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
         OC_cluster = Clusters.OperationalCredentials
@@ -106,7 +105,7 @@ class TC_CADMIN(MatterBaseTest):
                      "Verify DUT_CE responds to both write/read with a success"),
             TestStep(4, "TH creates a controller (TH_CR2) on a new fabric and commissions DUT_CE using that controller. TH_CR2 should commission the device using a different NodeID than TH_CR1.",
                      "Commissioning is successful"),
-            TestStep(5, "TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read",
+            TestStep(5, "TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read",            
                      "Verify that the RootPublicKey matches the root public key for TH_CR1 and the NodeID matches the node ID used when TH_CR1 commissioned the device."),
             TestStep(6, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read",
                      "Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device."),
@@ -186,7 +185,7 @@ class TC_CADMIN(MatterBaseTest):
 
         # Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device.
         await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
-        # th2_cam_rcac = TLVReader(base64.b64decode(
+        #th2_cam_rcac = TLVReader(base64.b64decode(
         #    self.certificate_authority_manager.activeCaList[1]._persistentStorage._jsonData["sdk-config"]["f/2/r"])).get()["Any"][9]
 
         if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded:

@@ -37,6 +37,7 @@ import enum
 import json
 import logging
 import secrets
+from time import sleep
 import threading
 import typing
 from ctypes import (CDLL, CFUNCTYPE, POINTER, Structure, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_uint8,
@@ -1932,8 +1933,11 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_GetCompletionError.argtypes = []
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
-            self._dmLib.pychip_SetCommissioningRCACCallback.argtypes = [_RCACCallbackType]
-            self._dmLib.pychip_SetCommissioningRCACCallback.restype = None
+            #self._dmLib.pychip_SetCommissioningRCACCallback.argtypes = [_RCACCallbackType]
+            #self._dmLib.pychip_SetCommissioningRCACCallback.restype = None
+
+            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [POINTER(POINTER(c_uint8)), POINTER(c_size_t)]
+            self._dmLib.pychip_GetCommissioningRCACData.restype = None
 
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64]
@@ -2167,6 +2171,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ''' Returns the fabric check result if SetCheckMatchingFabric was used.'''
         return self._fabricCheckNodeId
 
+    '''
     async def get_commissioning_rcac_data(self):
         # Await the future until the RCAC data is available
         try:
@@ -2174,6 +2179,18 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return rcac_data
         except asyncio.TimeoutError:
             raise Exception("Timeout while waiting for RCAC data")
+    '''
+
+    # Function to await the RCAC data
+    async def get_commissioning_rcac_data_async(self):
+        try:
+            # Directly call the non-async function to get the data
+            rcac_data = self.get_commissioning_rcac_data()
+            LOGGER.info(f"RCAC data from get_commissioning_rcac_data was {rcac_data}")
+            return rcac_data
+        except Exception as e:
+            LOGGER.error(f"Error while getting RCAC data: {e}")
+            raise
 
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
                                   filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,
@@ -2205,12 +2222,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
         if isinstance(filter, int):
             filter = str(filter)
 
-        if get_rcac:
-            global commissioning_future
-            commissioning_future = asyncio.get_event_loop().create_future()
-            rcac_cb = _RCACCallbackType(self.rcac_callback)
-            self._dmLib.pychip_SetCommissioningRCACCallback(rcac_cb)
-
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
@@ -2218,30 +2229,32 @@ class ChipDeviceController(ChipDeviceControllerBase):
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
             )
 
+            # If RCAC data is needed, await the result
             if get_rcac:
                 try:
-                    rcac_data, rcac_size = await self.get_commissioning_rcac_data()
-                    rcac_data = bytes(ctypes.cast(rcac_data, ctypes.POINTER(ctypes.c_ubyte * rcac_size)).contents)
+                    sleep(60)
+                    rcac_data_ptr = POINTER(c_uint8)()
+                    rcac_size = c_size_t()
+
+                    # Call the C++ function to get the RCAC data
+                    self._dmLib.pychip_GetCommissioningRCACData(byref(rcac_data_ptr), byref(rcac_size))
+
+                    # Check if data is available
+                    if rcac_size.value > 0:
+                        # Convert the data to a Python bytes object
+                        rcac_data = cast(rcac_data_ptr, POINTER(c_uint8 * rcac_size.value)).contents
+                        rcac_bytes = bytes(rcac_data)
+                    else:
+                        raise Exception("RCAC data is empty")
 
                 except Exception as e:
-                    LOGGER.exception(f"Error when attempting to get rcac data and size after commissioning: {e}")
-                    return
+                    LOGGER.error(f"Error during RCAC data fetching: {e}")
 
-                if rcac_size > 0:
-                    return (await asyncio.futures.wrap_future(ctx.future), rcac_data)
-                else:
-                    raise Exception("No RCAC data returned.")
+                LOGGER.info(f"Commissioning RCAC Data: {rcac_bytes}")
+                return (await asyncio.futures.wrap_future(ctx.future), rcac_bytes)
 
             else:
                 return await asyncio.futures.wrap_future(ctx.future)
-
-    def rcac_callback(res, rcac_data, rcac_size):
-        if rcac_size > 0:
-            # Signal that the rcac data has been received by setting the future result
-            commissioning_future.set_result((rcac_data, rcac_size))
-        else:
-            LOGGER.exception("RCAC data is empty")
-            commissioning_future.set_exception(Exception("RCAC data is empty"))
 
     async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
         ''' Commission with the given nodeid from the setupPayload.
