@@ -733,11 +733,11 @@ void pychip_GetCommissioningRCACData(uint8_t ** rcacDataPtr, size_t * rcacSize)
     {
         ChipLogError(Controller, "RCAC data is empty in C++. Nothing to return.");
         *rcacDataPtr = nullptr;
-        *rcacSize = 0;
+        *rcacSize    = 0;
     }
     else
     {
-        *rcacSize = rcacData.size();
+        *rcacSize    = rcacData.size();
         *rcacDataPtr = const_cast<uint8_t *>(rcacData.data());
     }
 }
