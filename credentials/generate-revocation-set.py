@@ -20,7 +20,7 @@
 # Generates a basic RevocationSet from TestNet or MainNet.
 # Note: Indirect CRLs are only supported with py cryptography version 44.0.0.
 #       You may need to patch in a change locally if you are using an older
-#       version of py cryptography. The required changes can be viewed in this 
+#       version of py cryptography. The required changes can be viewed in this
 #       PR: https://github.com/pyca/cryptography/pull/11467/files. The file that
 #       needs to be patched is accessible from your local connectedhomeip
 #       directory at ./.environment/pigweed-venv/lib/python3.11/site-packages/cryptography/x509/extensions.py
@@ -237,23 +237,24 @@ class DCLDClientInterface:
             List of revocation points
         '''
         raise NotImplementedError
-    
+
     def get_certificate(self, issuer_name_b64: str, akid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
         '''
         Get certificate from DCL
         '''
         raise NotImplementedError
-    
+
     def get_first_approved_certificate(self, response: dict, akid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
         '''
         Get first approved certificate from DCL resposne.
         '''
         if response["approvedCertificates"]["certs"][0]["pemCert"]:
-            issuer_certificate = x509.load_pem_x509_certificate(bytes(response["approvedCertificates"]["certs"][0]["pemCert"],'utf-8'))
+            issuer_certificate = x509.load_pem_x509_certificate(
+                bytes(response["approvedCertificates"]["certs"][0]["pemCert"], 'utf-8'))
         else:
             raise requests.exception.NotFound(f"No certificate found for {akid_hex}")
         return response["approvedCertificates"]["certs"][0]["isRoot"], issuer_certificate
-    
+
     def get_paa_cert(self, initial_cert: x509.Certificate) -> Optional[x509.Certificate]:
         """Get the PAA certificate for the CRL Signer Certificate."""
         issuer_name_b64 = get_issuer_b64(initial_cert)
@@ -278,6 +279,7 @@ class DCLDClientInterface:
             logging.warning("PAA Certificate not found, continue...")
         return paa_certificate
 
+
 class DCLDClient(DCLDClientInterface):
     '''
     A client for interacting with DCLD using command line interface (CLI).
@@ -288,7 +290,7 @@ class DCLDClient(DCLDClientInterface):
         '''
         Initialize the client
 
-    
+
         dcld_exe: str
             Path to `dcld` executable
         production: bool
@@ -367,7 +369,7 @@ class DCLDClient(DCLDClientInterface):
         '''
 
         response = self.get_dcld_cmd_output_json(['query', 'pki', 'revocation-points',
-                                                      '--issuer-subject-key-id', issuer_subject_key_id])
+                                                  '--issuer-subject-key-id', issuer_subject_key_id])
         logging.debug(f"Response revocation points: {response}")
         return response["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]["points"]
 
@@ -377,7 +379,7 @@ class DCLDClient(DCLDClientInterface):
         '''
         query_cmd_list = ['query', 'pki', 'x509-cert', '-u', issuer_name_b64, '-k', akid_hex]
         logging.debug(
-                    f"Fetching issuer from dcl query{' '.join(query_cmd_list)}")
+            f"Fetching issuer from dcl query{' '.join(query_cmd_list)}")
         response = self.get_dcld_cmd_output_json(query_cmd_list)
         return self.get_first_approved_certificate(response, akid_hex)
 
@@ -437,9 +439,10 @@ class RESTDCLDClient(DCLDClientInterface):
         akid_hex = ':'.join([akid_hex[i:i+2] for i in range(0, len(akid_hex), 2)])
 
         logging.debug(
-                    f"Fetching issuer from:{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}")
+            f"Fetching issuer from:{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}")
         response = requests.get(f"{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}").json()
         return self.get_first_approved_certificate(response, akid_hex)
+
 
 @click.command()
 @click.help_option('-h', '--help')
@@ -544,9 +547,9 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
 
         if count_with_matching_vid_issuer_skid > 1:
             try:
-              issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
-                  x509.oid.ExtensionOID.ISSUING_DISTRIBUTION_POINT
-              ).value
+                issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
+                    x509.oid.ExtensionOID.ISSUING_DISTRIBUTION_POINT
+                ).value
             except Exception:
                 logging.warning("CRL Issuing Distribution Point not found, continue...")
                 continue
