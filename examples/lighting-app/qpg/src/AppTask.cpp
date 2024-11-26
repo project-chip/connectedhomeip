@@ -37,6 +37,7 @@
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
+#include <app/codegen-data-model-provider/Instance.h>
 
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -273,6 +274,7 @@ void AppTask::InitServer(intptr_t arg)
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFaultTestEventTriggerHandler) == CHIP_NO_ERROR);
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider        = CodegenDataModelProviderInstance();
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);

@@ -74,8 +74,6 @@ source_set("app-main") {
     "AppMain.h",
     "CommissionableInit.cpp",
     "CommissionableInit.h",
-    "CommissionerMain.cpp",
-    "CommissionerMain.h",
     "LinuxCommissionableDataProvider.cpp",
     "LinuxCommissionableDataProvider.h",
     "NamedPipeCommands.cpp",
@@ -90,6 +88,7 @@ source_set("app-main") {
 
   public_deps = [
     ":boolean-state-configuration-test-event-trigger",
+    ":commissioner-main",
     ":device-energy-management-test-event-trigger",
     ":energy-evse-test-event-trigger",
     ":energy-reporting-test-event-trigger",
