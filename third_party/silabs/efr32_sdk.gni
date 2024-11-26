@@ -370,10 +370,8 @@ template("efr32_sdk") {
 
     if (use_rs9116) {
       # TODO: we should create a seperate directory for headers that are necessary for the underlying sdks
-      _include_dirs += [
-        "${chip_root}/src/platform/silabs/wifi/rs911x/platform",
-        "${chip_root}/src/platform/silabs/wifi/rs911x",
-      ]
+      _include_dirs +=
+          [ "${chip_root}/src/platform/silabs/wifi/rs911x/ncp-platform" ]
     }
 
     if (use_rs9116 || use_SiWx917) {

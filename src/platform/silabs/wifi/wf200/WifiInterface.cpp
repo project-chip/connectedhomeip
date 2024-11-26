@@ -33,9 +33,9 @@
 #include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #include <platform/silabs/wifi/lwip-support/dhcp_client.h>
 #include <platform/silabs/wifi/lwip-support/ethernetif.h>
-#include <platform/silabs/wifi/wf200/platform/sl_wfx_board.h>
-#include <platform/silabs/wifi/wf200/platform/sl_wfx_host.h>
-#include <platform/silabs/wifi/wf200/platform/sl_wfx_task.h>
+#include <platform/silabs/wifi/wf200/ncp-platform/sl_wfx_board.h>
+#include <platform/silabs/wifi/wf200/ncp-platform/sl_wfx_host.h>
+#include <platform/silabs/wifi/wf200/ncp-platform/sl_wfx_task.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1209,7 +1209,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
      */
     uint8_t ip4_addr[4];
 
-    ip4_addr[0] = (ip) &0xFF;
+    ip4_addr[0] = (ip) & 0xFF;
     ip4_addr[1] = (ip >> 8) & 0xFF;
     ip4_addr[2] = (ip >> 16) & 0xFF;
     ip4_addr[3] = (ip >> 24) & 0xFF;
