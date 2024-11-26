@@ -88,6 +88,7 @@ source_set("app-main") {
 
   public_deps = [
     ":boolean-state-configuration-test-event-trigger",
+    ":commissioner-main",
     ":device-energy-management-test-event-trigger",
     ":energy-evse-test-event-trigger",
     ":energy-reporting-test-event-trigger",
@@ -98,7 +99,6 @@ source_set("app-main") {
     "${chip_root}/src/platform/logging:default",
   ]
   deps = [
-    ":commissioner-main",
     ":ota-test-event-trigger",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
