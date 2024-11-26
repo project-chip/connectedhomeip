@@ -106,8 +106,6 @@ using namespace chip::Tracing::DarwinFramework;
 @property (nonatomic, readonly, nullable) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (nonatomic, readonly, nullable) NSMutableArray<MTRServerEndpoint *> * serverEndpoints;
 
-@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
-
 @property (nonatomic, readonly) MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration;
 
 // Whether we should be advertising our operational identity when we are not suspended.
@@ -1149,7 +1147,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     os_unfair_lock_assert_owner(self.deviceMapLock);
 
-    MTRDevice * deviceToReturn = [[MTRDevice_Concrete alloc] initWithNodeID:nodeID controller:self];
+    MTRDevice_Concrete * deviceToReturn = [[MTRDevice_Concrete alloc] initWithNodeID:nodeID controller:self];
     // If we're not running, don't add the device to our map.  That would
     // create a cycle that nothing would break.  Just return the device,
     // which will be in exactly the state it would be in if it were created
@@ -1190,7 +1188,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     std::lock_guard lock(*self.deviceMapLock);
     NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
     for (NSNumber * nodeID in self.nodeIDToDeviceMap) {
-        deviceAttributeCounts[nodeID] = @([[self.nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
+        MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
+
+        // TODO: Can we not just assume this isKindOfClass test is true?  Would be
+        // really nice if we had compile-time checking for this somehow...
+        if (![device isKindOfClass:MTRDevice_Concrete.class]) {
+            continue;
+        }
+
+        auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
+        deviceAttributeCounts[nodeID] = @([concreteDevice unitTestAttributeCount]);
     }
     return deviceAttributeCounts;
 }
@@ -1389,9 +1396,19 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // Get the corresponding MTRDevice object to determine if the case/subscription pool is to be used
     MTRDevice * device = [self deviceForNodeID:@(nodeID)];
 
+    // TODO: Can we not just assume this isKindOfClass test is true?  Would be
+    // really nice if we had compile-time checking for this somehow...
+    if (![device isKindOfClass:MTRDevice_Concrete.class]) {
+        MTR_LOG_ERROR("%@ somehow has %@ instead of MTRDevice_Concrete for node ID 0x%016llX (%llu)", self, device, nodeID, nodeID);
+        completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
+
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
-    if ([device deviceUsesThread]) {
+    if ([concreteDevice deviceUsesThread]) {
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
             MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
@@ -1602,12 +1619,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)operationalInstanceAdded:(NSNumber *)nodeID
 {
-    // Don't use deviceForNodeID here, because we don't want to create the
-    // device if it does not already exist.
-    os_unfair_lock_lock(self.deviceMapLock);
-    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
-    os_unfair_lock_unlock(self.deviceMapLock);
-
+    // If we don't have an existing MTRDevice for this node ID, that's fine;
+    // nothing to do.
+    MTRDevice * device = [self _deviceForNodeID:nodeID createIfNeeded:NO];
     if (device == nil) {
         return;
     }

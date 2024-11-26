@@ -659,12 +659,12 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
     ABORT_ON_UNINITIALIZED_IF_ENABLED();
 
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    if (IsContainerOpen())
-        return CHIP_ERROR_TLV_CONTAINER_OPEN;
+    VerifyOrReturnError(!IsContainerOpen(), CHIP_ERROR_TLV_CONTAINER_OPEN);
 
     uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
-    uint8_t * p     = stagingBuf;
     uint32_t tagNum = TagNumFromTag(tag);
+
+    Encoding::LittleEndian::BufferWriter writer(stagingBuf, sizeof(stagingBuf));
 
     if (IsSpecialTag(tag))
     {
@@ -673,8 +673,8 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
             if (mContainerType != kTLVType_Structure && mContainerType != kTLVType_List)
                 return CHIP_ERROR_INVALID_TLV_TAG;
 
-            Write8(p, TLVTagControl::ContextSpecific | elemType);
-            Write8(p, static_cast<uint8_t>(tagNum));
+            writer.Put8(TLVTagControl::ContextSpecific | elemType);
+            writer.Put8(static_cast<uint8_t>(tagNum));
         }
         else
         {
@@ -682,7 +682,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
                 mContainerType != kTLVType_Array && mContainerType != kTLVType_List)
                 return CHIP_ERROR_INVALID_TLV_TAG;
 
-            Write8(p, TLVTagControl::Anonymous | elemType);
+            writer.Put8(TLVTagControl::Anonymous | elemType);
         }
     }
     else
@@ -694,28 +694,28 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
 
         if (profileId == kCommonProfileId)
         {
-            if (tagNum < 65536)
+            if (tagNum <= std::numeric_limits<uint16_t>::max())
             {
-                Write8(p, TLVTagControl::CommonProfile_2Bytes | elemType);
-                LittleEndian::Write16(p, static_cast<uint16_t>(tagNum));
+                writer.Put8(TLVTagControl::CommonProfile_2Bytes | elemType);
+                writer.Put16(static_cast<uint16_t>(tagNum));
             }
             else
             {
-                Write8(p, TLVTagControl::CommonProfile_4Bytes | elemType);
-                LittleEndian::Write32(p, tagNum);
+                writer.Put8(TLVTagControl::CommonProfile_4Bytes | elemType);
+                writer.Put32(tagNum);
             }
         }
         else if (profileId == ImplicitProfileId)
         {
-            if (tagNum < 65536)
+            if (tagNum <= std::numeric_limits<uint16_t>::max())
             {
-                Write8(p, TLVTagControl::ImplicitProfile_2Bytes | elemType);
-                LittleEndian::Write16(p, static_cast<uint16_t>(tagNum));
+                writer.Put8(TLVTagControl::ImplicitProfile_2Bytes | elemType);
+                writer.Put16(static_cast<uint16_t>(tagNum));
             }
             else
             {
-                Write8(p, TLVTagControl::ImplicitProfile_4Bytes | elemType);
-                LittleEndian::Write32(p, tagNum);
+                writer.Put8(TLVTagControl::ImplicitProfile_4Bytes | elemType);
+                writer.Put32(tagNum);
             }
         }
         else
@@ -723,44 +723,33 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
             uint16_t vendorId   = static_cast<uint16_t>(profileId >> 16);
             uint16_t profileNum = static_cast<uint16_t>(profileId);
 
-            if (tagNum < 65536)
+            if (tagNum <= std::numeric_limits<uint16_t>::max())
             {
-                Write8(p, TLVTagControl::FullyQualified_6Bytes | elemType);
-                LittleEndian::Write16(p, vendorId);
-                LittleEndian::Write16(p, profileNum);
-                LittleEndian::Write16(p, static_cast<uint16_t>(tagNum));
+
+                writer.Put8(TLVTagControl::FullyQualified_6Bytes | elemType);
+                writer.Put16(vendorId);
+                writer.Put16(profileNum);
+                writer.Put16(static_cast<uint16_t>(tagNum));
             }
             else
             {
-                Write8(p, TLVTagControl::FullyQualified_8Bytes | elemType);
-                LittleEndian::Write16(p, vendorId);
-                LittleEndian::Write16(p, profileNum);
-                LittleEndian::Write32(p, tagNum);
+                writer.Put8(TLVTagControl::FullyQualified_8Bytes | elemType);
+                writer.Put16(vendorId);
+                writer.Put16(profileNum);
+                writer.Put32(tagNum);
             }
         }
     }
 
-    switch (GetTLVFieldSize(elemType))
+    uint8_t lengthSize = TLVFieldSizeToBytes(GetTLVFieldSize(elemType));
+    if (lengthSize > 0)
     {
-    case kTLVFieldSize_0Byte:
-        break;
-    case kTLVFieldSize_1Byte:
-        Write8(p, static_cast<uint8_t>(lenOrVal));
-        break;
-    case kTLVFieldSize_2Byte:
-        LittleEndian::Write16(p, static_cast<uint16_t>(lenOrVal));
-        break;
-    case kTLVFieldSize_4Byte:
-        LittleEndian::Write32(p, static_cast<uint32_t>(lenOrVal));
-        break;
-    case kTLVFieldSize_8Byte:
-        LittleEndian::Write64(p, lenOrVal);
-        break;
+        writer.EndianPut(lenOrVal, lengthSize);
     }
 
-    uint32_t bytesStaged = static_cast<uint32_t>(p - stagingBuf);
-    VerifyOrDie(bytesStaged <= sizeof(stagingBuf));
-    return WriteData(stagingBuf, bytesStaged);
+    size_t written = 0;
+    VerifyOrDie(writer.Fit(written));
+    return WriteData(stagingBuf, static_cast<uint32_t>(written));
 }
 
 CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, Tag tag, const uint8_t * data, uint32_t dataLen)

@@ -52,6 +52,10 @@ public:
     }
 
     virtual CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endPointId) = 0;
+    virtual CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endPointId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+protected:
+    chip::Optional<bool> mUseMTRDevice;
 
 private:
     chip::NodeId mNodeId;

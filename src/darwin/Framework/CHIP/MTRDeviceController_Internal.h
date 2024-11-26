@@ -25,39 +25,24 @@
 #import "MTRDeviceConnectionBridge.h" // For MTRInternalDeviceConnectionCallback
 #import "MTRDeviceController.h"
 
-#include <lib/core/CHIPError.h>
-#include <lib/core/DataModelTypes.h>
-
 #import <os/lock.h>
 
 #import "MTRBaseDevice.h"
+#import "MTRDeviceClusterData.h"
 #import "MTRDeviceController.h"
-#import "MTRDeviceControllerDataStore.h"
 #import "MTRDeviceControllerDelegate.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 
-#import <Matter/MTRP256KeypairBridge.h>
-
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
 @class MTRDeviceControllerParameters;
 @class MTRDeviceControllerFactory;
 @class MTRDevice;
-@class MTRAsyncWorkQueue;
 @protocol MTRDevicePairingDelegate;
 @protocol MTRDeviceControllerDelegate;
 @class MTRDevice_Concrete;
-
-namespace chip {
-class FabricTable;
-
-namespace Controller {
-    class DeviceCommissioner;
-}
-} // namespace chip
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -67,19 +52,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, assign) os_unfair_lock_t deviceMapLock;
 
 @property (readwrite, nonatomic) NSUUID * uniqueIdentifier;
-
-// queue used to serialize all work performed by the MTRDeviceController
 // (moved here so subclasses can initialize differently)
-@property (readwrite, retain) dispatch_queue_t chipWorkQueue;
 
 - (instancetype)initForSubclasses:(BOOL)startSuspended;
 
 #pragma mark - MTRDeviceControllerFactory methods
-
-/**
- * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.
- */
-@property (readonly) chip::FabricIndex fabricIndex;
 
 /**
  * Will return the compressed fabric id of the fabric if the controller is
@@ -88,22 +65,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
 
 /**
- * The per-controller data store this controller was initialized with, if any.
- */
-@property (nonatomic, readonly, nullable) MTRDeviceControllerDataStore * controllerDataStore;
-
-/**
  * OTA delegate and its queue, if this controller supports OTA.  Either both
  * will be non-nil or both will be nil.
  */
 @property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
 @property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
-
-/**
- * A queue with a fixed width that allows a number of MTRDevice objects to perform
- * subscription at the same time.
- */
-@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 
 /**
  * Fabric ID tied to controller
@@ -119,40 +85,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Root Public Key tied to controller
  */
 @property (nonatomic, retain, nullable) NSData * rootPublicKey;
-
-/**
- * Ensure we have a CASE session to the given node ID and then call the provided
- * connection callback.  This may be called on any queue (including the Matter
- * event queue) and on success will always call the provided connection callback
- * on the Matter queue, asynchronously.  Consumers must be prepared to run on
- * the Matter queue (an in particular must not use any APIs that will try to do
- * sync dispatch to the Matter queue).
- *
- * If the controller is not running when this function is called, it will
- * synchronously invoke the completion with an error, on whatever queue
- * getSessionForNode was called on.
- *
- * If the controller is not running when the async dispatch on the Matter queue
- * happens, the completion will be invoked with an error on the Matter queue.
- */
-- (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
-
-/**
- * Get a session for the commissionee device with the given device id.  This may
- * be called on any queue (including the Matter event queue) and on success will
- * always call the provided connection callback on the Matter queue,
- * asynchronously.  Consumers must be prepared to run on the Matter queue (an in
- * particular must not use any APIs that will try to do sync dispatch to the
- * Matter queue).
- *
- * If the controller is not running when this function is called, it will
- * synchronously invoke the completion with an error, on whatever queue
- * getSessionForCommissioneeDevice was called on.
- *
- * If the controller is not running when the async dispatch on the Matter queue
- * happens, the completion will be invoked with an error on the Matter queue.
- */
-- (void)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
  * Try to asynchronously dispatch the given block on the Matter queue.  If the
@@ -175,6 +107,8 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
+// _deviceForNodeID:createIfNeeded: can only return nil if NO is passed for createIfNeeded.
+- (MTRDevice * _Nullable)_deviceForNodeID:(NSNumber *)nodeID createIfNeeded:(BOOL)createIfNeeded;
 /**
  * _setupDeviceForNodeID is a hook expected to be implemented by subclasses to
  * actually allocate a device object of the right type.

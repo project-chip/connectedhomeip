@@ -10227,8 +10227,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
-            StartUpMode(2L),
-            OnMode(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -10349,8 +10347,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
-            StartUpMode(2L),
-            OnMode(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -10471,8 +10467,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
-            StartUpMode(2L),
-            OnMode(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -16903,7 +16897,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedZoneSources(0L),
             Zones(1L),
-            TimeControl(2L),
+            Triggers(2L),
             Sensitivity(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
@@ -17085,7 +17079,7 @@ public class ClusterIDMapping {
             NightVisionCapable(3L),
             MinViewport(4L),
             RateDistortionTradeOffPoints(5L),
-            MaxPreRollBufferSize(6L),
+            MaxContentBufferSize(6L),
             MicrophoneCapabilities(7L),
             SpeakerCapabilities(8L),
             TwoWayTalkSupport(9L),
@@ -17093,39 +17087,33 @@ public class ClusterIDMapping {
             MaxNetworkBandwidth(11L),
             CurrentFrameRate(12L),
             HDRModeEnabled(13L),
-            CurrentVideoCodecs(14L),
-            CurrentSnapshotConfig(15L),
-            FabricsUsingCamera(16L),
-            AllocatedVideoStreams(17L),
-            AllocatedAudioStreams(18L),
-            AllocatedSnapshotStreams(19L),
-            RankedVideoStreamPrioritiesList(20L),
-            SoftRecordingPrivacyModeEnabled(21L),
-            SoftLivestreamPrivacyModeEnabled(22L),
-            HardPrivacyModeOn(23L),
-            NightVision(24L),
-            NightVisionIllum(25L),
-            AWBEnabled(26L),
-            AutoShutterSpeedEnabled(27L),
-            AutoISOEnabled(28L),
-            Viewport(29L),
-            SpeakerMuted(30L),
-            SpeakerVolumeLevel(31L),
-            SpeakerMaxLevel(32L),
-            SpeakerMinLevel(33L),
-            MicrophoneMuted(34L),
-            MicrophoneVolumeLevel(35L),
-            MicrophoneMaxLevel(36L),
-            MicrophoneMinLevel(37L),
-            MicrophoneAGCEnabled(38L),
-            ImageRotation(39L),
-            ImageFlipHorizontal(40L),
-            ImageFlipVertical(41L),
-            LocalVideoRecordingEnabled(42L),
-            LocalSnapshotRecordingEnabled(43L),
-            StatusLightEnabled(44L),
-            StatusLightBrightness(45L),
-            DepthSensorStatus(46L),
+            FabricsUsingCamera(14L),
+            AllocatedVideoStreams(15L),
+            AllocatedAudioStreams(16L),
+            AllocatedSnapshotStreams(17L),
+            RankedVideoStreamPrioritiesList(18L),
+            SoftRecordingPrivacyModeEnabled(19L),
+            SoftLivestreamPrivacyModeEnabled(20L),
+            HardPrivacyModeOn(21L),
+            NightVision(22L),
+            NightVisionIllum(23L),
+            Viewport(24L),
+            SpeakerMuted(25L),
+            SpeakerVolumeLevel(26L),
+            SpeakerMaxLevel(27L),
+            SpeakerMinLevel(28L),
+            MicrophoneMuted(29L),
+            MicrophoneVolumeLevel(30L),
+            MicrophoneMaxLevel(31L),
+            MicrophoneMinLevel(32L),
+            MicrophoneAGCEnabled(33L),
+            ImageRotation(34L),
+            ImageFlipHorizontal(35L),
+            ImageFlipVertical(36L),
+            LocalVideoRecordingEnabled(37L),
+            LocalSnapshotRecordingEnabled(38L),
+            StatusLightEnabled(39L),
+            StatusLightBrightness(40L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -17183,11 +17171,7 @@ public class ClusterIDMapping {
             SnapshotStreamAllocate(7L),
             SnapshotStreamDeallocate(9L),
             SetStreamPriorities(10L),
-            CaptureSnapshot(11L),
-            SetViewport(13L),
-            SetImageRotation(14L),
-            SetImageFlipHorizontal(15L),
-            SetImageFlipVertical(16L),;
+            CaptureSnapshot(11L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -17290,7 +17274,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SnapshotStreamAllocateCommandField {ImageCodec(0),FrameRate(1),BitRate(2),MinResolution(3),MaxResolution(4),Quality(5),;
+                }public enum SnapshotStreamAllocateCommandField {ImageCodec(0),MaxFrameRate(1),BitRate(2),MinResolution(3),MaxResolution(4),Quality(5),;
                     private final int id;
                     SnapshotStreamAllocateCommandField(int id) {
                         this.id = id;
@@ -17352,74 +17336,6 @@ public class ClusterIDMapping {
                     }
                     public static CaptureSnapshotCommandField value(int id) throws NoSuchFieldError {
                         for (CaptureSnapshotCommandField field : CaptureSnapshotCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum SetViewportCommandField {Viewport(0),;
-                    private final int id;
-                    SetViewportCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static SetViewportCommandField value(int id) throws NoSuchFieldError {
-                        for (SetViewportCommandField field : SetViewportCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum SetImageRotationCommandField {Angle(0),;
-                    private final int id;
-                    SetImageRotationCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static SetImageRotationCommandField value(int id) throws NoSuchFieldError {
-                        for (SetImageRotationCommandField field : SetImageRotationCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum SetImageFlipHorizontalCommandField {Enabled(0),;
-                    private final int id;
-                    SetImageFlipHorizontalCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static SetImageFlipHorizontalCommandField value(int id) throws NoSuchFieldError {
-                        for (SetImageFlipHorizontalCommandField field : SetImageFlipHorizontalCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum SetImageFlipVerticalCommandField {Enabled(0),;
-                    private final int id;
-                    SetImageFlipVerticalCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static SetImageFlipVerticalCommandField value(int id) throws NoSuchFieldError {
-                        for (SetImageFlipVerticalCommandField field : SetImageFlipVerticalCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

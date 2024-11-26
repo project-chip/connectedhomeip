@@ -261,5 +261,21 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     return false;
 }
 
+bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
+{
+    {{#zcl_clusters}}
+      {{#zcl_commands}}
+          {{#if isLargeMessage}}
+          if ((aCluster == Clusters::{{asUpperCamelCase parent.name}}::Id) &&
+              (aCommand == Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id))
+          {
+              return true;
+          }
+          {{/if}}
+      {{/zcl_commands}}
+    {{/zcl_clusters}}
+    return false;
+}
+
 } // namespace app
 } // namespace chip

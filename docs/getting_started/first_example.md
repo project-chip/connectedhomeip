@@ -1,4 +1,4 @@
-# An SDK example
+# Compiling, Running, and Controlling Matter examples
 
 The SDK provides a number of example devices and controllers that can be used to
 familiarize yourself with the SDK and the Matter ecosystem.
@@ -37,7 +37,7 @@ for testing. More information about the python controller can be found in the
 
 The examples directory contains a set of apps using an example device
 composition \.zap file. For more information about device composition and zap,
-see [ZAP documentation](./zap.md).
+see [ZAP documentation](../zap_and_codegen/zap_intro.md).
 
 This quick start guide will walk you through
 

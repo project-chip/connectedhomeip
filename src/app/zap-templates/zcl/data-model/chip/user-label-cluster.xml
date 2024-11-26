@@ -23,10 +23,10 @@ limitations under the License.
     <code>0x0041</code>
     <define>USER_LABEL_CLUSTER</define>
     <description>The User Label Cluster provides a feature to tag an endpoint with zero or more labels.</description>
-    <attribute side="server" code="0x0000" define="LABEL_LIST" type="array" entryType="LabelStruct" writable="true" optional="false">
-      <description>LabelList</description>
+    <attribute side="server" code="0x0000" name="LabelList" define="LABEL_LIST" type="array" entryType="LabelStruct" writable="true" optional="false">
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
+      <mandatoryConform/>
     </attribute>
   </cluster>
 </configurator>

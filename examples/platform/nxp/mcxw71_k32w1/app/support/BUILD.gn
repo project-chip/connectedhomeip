@@ -17,8 +17,6 @@ import("//build_overrides/nxp_sdk.gni")
 
 import("${nxp_sdk_matter_support_root}/gn_build/nxp_sdk.gni")
 
-import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
-
 config("support_config") {
   include_dirs = [ "${chip_root}" ]
 
@@ -44,20 +42,25 @@ config("support_config") {
 
 source_set("freertos_memory_utils") {
   sources = [
-    "FreeRtosHooks.c",
-    "FreeRtosHooks.h",
+    "FreeRtosHooks.cpp",
     "Memconfig.cpp",
   ]
 
-  deps = [ "${chip_root}/src/lib/support" ]
+  deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform:platform_config_header",
+  ]
 
   cflags = [ "-Wconversion" ]
 
-  if (chip_key_storage == "fwk_nvm") {
+  if (nxp_nvm_component == "fwk_nvm") {
     defines = [ "CHIP_PLAT_NVM_SUPPORT=1" ]
-  } else if (chip_key_storage == "littlefs") {
+  } else if (nxp_nvm_component == "littlefs") {
     defines = [ "CHIP_PLAT_NVM_SUPPORT=3" ]
   }
 
-  public_configs = [ ":support_config" ]
+  public_configs = [
+    ":support_config",
+    "${chip_root}/src:includes",
+  ]
 }

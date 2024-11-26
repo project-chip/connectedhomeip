@@ -68,7 +68,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
         // If we have not received all the bytes of the OTAImageHeader yet, that is OK.
         // Return CHIP_NO_ERROR and expect that future blocks will contain the rest.
-        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        VerifyOrReturnError(error != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
 
         // If there is some error other than "too small", return that so future
         // processing will be aborted.
@@ -107,10 +107,10 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
     OTARequestorInterface * requestor = GetRequestorInstance();
-    ReturnErrorCodeIf(requestor == nullptr, false);
+    VerifyOrReturnError(requestor != nullptr, false);
 
     uint32_t currentVersion;
-    ReturnErrorCodeIf(ConfigurationMgr().GetSoftwareVersion(currentVersion) != CHIP_NO_ERROR, false);
+    VerifyOrReturnError(ConfigurationMgr().GetSoftwareVersion(currentVersion) == CHIP_NO_ERROR, false);
 
     ChipLogProgress(SoftwareUpdate, "%ld", currentVersion);
     ChipLogProgress(SoftwareUpdate, "%ld", requestor->GetTargetVersion());

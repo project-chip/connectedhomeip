@@ -27,13 +27,7 @@
 #include "FreeRTOS.h"
 #include "timers.h"
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
 #include "wfx_sl_ble_init.h"
-#ifdef __cplusplus
-}
-#endif // __cplusplus
 #else
 #include "gatt_db.h"
 #include "sl_bgapi.h"
@@ -58,16 +52,17 @@ public:
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
     // Used for posting the event in the BLE queue
     void BlePostEvent(SilabsBleWrapper::BleEvent_t * event);
-    void HandleConnectEvent(SilabsBleWrapper::sl_wfx_msg_t * evt);
-    void HandleConnectionCloseEvent(SilabsBleWrapper::sl_wfx_msg_t * evt);
-    void HandleWriteEvent(SilabsBleWrapper::sl_wfx_msg_t * evt);
-    void UpdateMtu(SilabsBleWrapper::sl_wfx_msg_t * evt);
+    void HandleConnectEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt);
+    void HandleConnectionCloseEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt);
+    void HandleWriteEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt);
+    void UpdateMtu(const SilabsBleWrapper::sl_wfx_msg_t & evt);
     void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
-    void HandleTXCharCCCDWrite(SilabsBleWrapper::sl_wfx_msg_t * evt);
+    void HandleTXCharCCCDWrite(const SilabsBleWrapper::sl_wfx_msg_t & evt);
     void HandleSoftTimerEvent(void);
     int32_t SendBLEAdvertisementCommand(void);
 #else
     void HandleConnectEvent(volatile sl_bt_msg_t * evt);
+    void HandleConnectParams(volatile sl_bt_msg_t * evt);
     void HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt);
     void HandleWriteEvent(volatile sl_bt_msg_t * evt);
     void UpdateMtu(volatile sl_bt_msg_t * evt);
@@ -194,7 +189,7 @@ private:
 #endif
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    void HandleRXCharWrite(SilabsBleWrapper::sl_wfx_msg_t * evt);
+    void HandleRXCharWrite(const SilabsBleWrapper::sl_wfx_msg_t & evt);
 #else
     void HandleRXCharWrite(volatile sl_bt_msg_t * evt);
 #endif

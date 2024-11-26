@@ -19,16 +19,16 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/silabs/OTAImageProcessorImpl.h>
+#include <platform/silabs/SilabsConfig.h>
+
+#if SL_WIFI
+#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
+#endif // SL_WIFI
 
 extern "C" {
 #include "btl_interface.h"
 #include "sl_core.h"
-#if SL_WIFI
-#include "spi_multiplex.h"
-#endif // SL_WIFI
 }
-
-#include <platform/silabs/SilabsConfig.h>
 
 /// No error, operation OK
 #define SL_BOOTLOADER_OK 0L
@@ -45,7 +45,7 @@ uint8_t OTAImageProcessorImpl::writeBuffer[kAlignmentBytes] __attribute__((align
 
 CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
 {
-    ReturnErrorCodeIf(downloader == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(downloader != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     gImageProcessor.SetOTADownloader(downloader);
 
@@ -357,7 +357,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
         CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(block, header);
 
         // Needs more data to decode the header
-        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        VerifyOrReturnError(error != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
         // SL TODO -- store version somewhere
