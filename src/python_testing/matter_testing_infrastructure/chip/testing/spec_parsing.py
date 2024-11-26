@@ -521,20 +521,16 @@ class DataModelLevel(str, Enum):
 
 def _get_data_model_root() -> pathlib.PosixPath:
     """Attempts to find the 'data_model' directory inside the 'chip.testing' package."""
-    try:
-        # Locate the directory where the 'chip.testing' module is located
-        package_dir = pathlib.Path(chip.testing.__file__).parent
+    # Locate the directory where the 'chip.testing' module is located
+    package_dir = pathlib.Path(chip.testing.__file__).parent
 
-        # Construct the path to the 'data_model' directory (assuming this structure)
-        data_model_root = package_dir / 'data_model'
+    # Construct the path to the 'data_model' directory (assuming this structure)
+    data_model_root = package_dir / 'data_model'
 
-        if not data_model_root.exists():
-            raise FileNotFoundError(f"Data model directory not found in the package at {data_model_root}.")
+    if not data_model_root.exists():
+        raise FileNotFoundError(f"Data model directory not found in the package at {data_model_root}.")
 
-        return data_model_root
-
-    except Exception as e:
-        raise FileNotFoundError(f"Failed to find the data model root: {e}")
+    return data_model_root
 
 
 def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, str], data_model_level: str) -> pathlib.PosixPath:
@@ -570,24 +566,24 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
     ids_by_name: dict[str, int] = {}
     problems: list[ProblemNotice] = []
 
-    try:
-        # Use pathlib.Path to list all XML files in the data model directory
-        xml_files = [f for f in dir.glob('**/*.xml')]  # Recursively find all .xml files
+    # Use pathlib.Path to list all XML files in the data model directory
+    xml_files = [f for f in dir.glob('**/*.xml')]  # Recursively find all .xml files
 
-        if not xml_files:
-            raise SpecParsingException(f'No XML files found in the specified package directory {dir}')
+    if not xml_files:
+        raise SpecParsingException(f'No XML files found in the specified package directory {dir}')
 
-        # Parse each XML file found inside the package
-        for xml in xml_files:
-            logging.info(f'Parsing file {xml}')
-            # Open and parse each XML file from the directory
-            with xml.open('r') as file:
+    # Parse each XML file found inside the package
+    for xml in xml_files:
+        logging.info(f'Parsing file {xml}')
+        # Open and parse each XML file from the directory
+        with xml.open('r') as file:
+            try:
                 tree = ElementTree.parse(file)
                 root = tree.getroot()
                 add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
+            except Exception as e:
+                logging.error(f"Error parsing XML file {xml}: {e}")
 
-    except Exception as e:
-        raise SpecParsingException(f"Error reading XML files from the package: {e}")
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
