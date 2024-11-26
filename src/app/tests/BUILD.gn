@@ -305,10 +305,9 @@ chip_test_suite("tests") {
     test_sources += [ "TestClusterStateCache.cpp" ]
   }
 
-  # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available, so
-  # TestEventLogging.cpp would be testing the same thing as
-  # TestEventLoggingNoUTCTime, but it's not set up to deal with the timestamps
-  # being that low.
+  # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available,
+  # so TestEventLogging.cpp would be testing the same thing as TestEventLoggingNoUTCTime,
+  # but it's not set up to deal with the timestamps being that low.
   if (chip_device_platform != "nrfconnect" &&
       chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]
