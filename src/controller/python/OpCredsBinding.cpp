@@ -155,7 +155,7 @@ public:
         {
             if (report.Is<chip::Controller::NocChain>())
             {
-                
+
                 auto nocChain = report.Get<chip::Controller::NocChain>().rcac;
                 MutableByteSpan rcacSpan(const_cast<uint8_t *>(nocChain.data()), nocChain.size());
                 chip::ByteSpan rcacByteSpan(rcacSpan.data(), rcacSpan.size());
