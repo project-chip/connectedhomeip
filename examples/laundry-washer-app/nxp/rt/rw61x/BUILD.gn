@@ -56,15 +56,6 @@ app_common_folder = "laundry-washer-app/nxp/zap"
 rt_sdk("sdk") {
   defines = []
 
-  # To be moved, temporary mbedtls config fix to build app with factory data
-  if (nxp_enable_secure_dac_private_key_storage ||
-      nxp_enable_secure_whole_factory_data) {
-    defines += [
-      "MBEDTLS_NIST_KW_C",
-      "MBEDTLS_PSA_CRYPTO_CLIENT",
-    ]
-  }
-
   cflags = []
   public_deps = []
   public_configs = []
@@ -142,8 +133,8 @@ rt_executable("laundry-washer") {
     "../../common/main/main.cpp",
   ]
 
-  if (nxp_enable_secure_dac_private_key_storage ||
-      nxp_enable_secure_whole_factory_data) {
+  if (nxp_enable_secure_whole_factory_data ||
+      nxp_enable_secure_EL2GO_factory_data) {
     sources += [ "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp" ]
     if (nxp_enable_secure_whole_factory_data) {
       defines += [ "ENABLE_SECURE_WHOLE_FACTORY_DATA" ]
