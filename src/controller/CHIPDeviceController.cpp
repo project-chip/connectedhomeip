@@ -70,8 +70,11 @@
 #include <transport/raw/WiFiPAF.h>
 #endif
 
+#include <algorithm>
+#include <array>
 #include <errno.h>
 #include <inttypes.h>
+#include <limits>
 #include <memory>
 #include <stdint.h>
 #include <stdlib.h>
@@ -2207,91 +2210,126 @@ void DeviceCommissioner::OnDone(app::ReadClient * readClient)
     }
 }
 
+namespace {
+// Helper for grouping attribute paths into read interactions
+class ReadInteractionBuilder
+{
+    static constexpr auto kCapacity = InteractionModelEngine::kMinSupportedPathsPerReadRequest;
+
+    size_t mSkip  = 0;
+    size_t mCount = 0;
+    app::AttributePathParams mPaths[kCapacity];
+
+public:
+    ReadInteractionBuilder(size_t skip = 0) : mSkip(skip) {}
+
+    size_t size() { return std::min(mCount, kCapacity); }
+    bool exceeded() { return mCount > kCapacity; }
+    app::AttributePathParams * paths() { return mPaths; }
+
+    // Adds an attribute path if within the current window.
+    // Returns false if the available space has been exceeded.
+    template <typename... Ts>
+    bool AddAttributePath(Ts &&... args)
+    {
+        VerifyOrReturnValue(mSkip == 0, true, mSkip--);
+        VerifyOrReturnValue(mCount < kCapacity, false, mCount = kCapacity + 1);
+        mPaths[mCount++] = app::AttributePathParams(std::forward<Ts>(args)...);
+        return true;
+    }
+};
+} // namespace
+
 void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningParameters & params)
 {
     VerifyOrDie(mCommissioningStage == CommissioningStage::kReadCommissioningInfo);
 
-    // We can ony read 9 paths per Read Interaction, since that is the minimum
-    // a server has to support per spec (see "Interaction Model Limits").
-    app::AttributePathParams readPaths[InteractionModelEngine::kMinSupportedPathsPerReadRequest];
-    static_assert(InteractionModelEngine::kMinSupportedPathsPerReadRequest >= 9);
-
-    const auto proxy    = mDeviceBeingCommissioned;
-    const auto endpoint = kRootEndpointId;
-    const auto timeout =
-        MakeOptional(app::kExpectedIMProcessingTime); // TODO: Do we need to save the actual timeout from PerformCommissioningStep?
-
-    // TODO: Refactor this further to dynamically pack paths into requests.
-    if (mReadCommissioningInfoProgress == 0)
+    // A marker value is used to indicate that there are no further attributes to read.
+    static constexpr auto kReadProgressNoFurtherAttributes = std::numeric_limits<decltype(mReadCommissioningInfoProgress)>::max();
+    if (mReadCommissioningInfoProgress == kReadProgressNoFurtherAttributes)
     {
-        // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
-        readPaths[0] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
-                                                app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id);
-        // Get required general commissioning attributes on this endpoint (recommended failsafe time, regulatory location
-        // info, breadcrumb)
-        readPaths[1] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
-                                                app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::Id);
-        readPaths[2] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
-                                                app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::Id);
-        readPaths[3] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
-                                                app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::Id);
-        readPaths[4] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
-                                                app::Clusters::GeneralCommissioning::Attributes::LocationCapability::Id);
-        // Read attributes from the basic info cluster (vendor id / product id / software version)
-        readPaths[5] = app::AttributePathParams(endpoint, app::Clusters::BasicInformation::Id,
-                                                app::Clusters::BasicInformation::Attributes::VendorID::Id);
-        readPaths[6] = app::AttributePathParams(endpoint, app::Clusters::BasicInformation::Id,
-                                                app::Clusters::BasicInformation::Attributes::ProductID::Id);
-        // Read the requested minimum connection times from all network commissioning clusters
-        readPaths[7] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
-                                                app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id);
-        // Read everything from the time cluster so we can assess what information needs to be set.
-        readPaths[8] = app::AttributePathParams(endpoint, app::Clusters::TimeSynchronization::Id);
-
-        mReadCommissioningInfoProgress = 1;
-        SendCommissioningReadRequest(proxy, timeout, readPaths, 9);
+        FinishReadingCommissioningInfo();
+        return;
     }
-    else if (mReadCommissioningInfoProgress == 1)
-    {
-        size_t numberOfAttributes = 0;
 
-        // Mandatory attribute
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
-                                     app::Clusters::GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id);
+    // We can ony read 9 paths per Read Interaction, since that is the minimum a server has to
+    // support per spec (see "Interaction Model Limits"), so we generally need to perform more
+    // that one interaction. To build the list of attributes for each interaction, we use a
+    // builder that skips adding paths that we already handled in a previous interaction, and
+    // returns false if the current request is exhausted. This construction avoids allocating
+    // memory to hold the complete list of attributes to read up front; however the logic to
+    // determine the attributes to include must be deterministic since it runs multiple times.
+    // The use of an immediately-invoked lambda is convenient for control flow.
+    ReadInteractionBuilder builder(mReadCommissioningInfoProgress);
+    [&]() -> void {
+        // General Commissioning
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
+                                                Clusters::GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
+                                                Clusters::GeneralCommissioning::Attributes::Breadcrumb::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
+                                                Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
+                                                Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
+                                                Clusters::GeneralCommissioning::Attributes::LocationCapability::Id));
 
-        // Read the current fabrics
+        // Basic Information: VID and PID for device attestation purposes
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::BasicInformation::Id,
+                                                Clusters::BasicInformation::Attributes::VendorID::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::BasicInformation::Id,
+                                                Clusters::BasicInformation::Attributes::ProductID::Id));
+
+        // Time Synchronization: all attributes
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::TimeSynchronization::Id));
+
+        // Network Commissioning (all endpoints): Read the feature map and connect time
+        // TODO: Expose a flag that disables network setup so we don't need to read this
+        VerifyOrReturn(builder.AddAttributePath(Clusters::NetworkCommissioning::Id,
+                                                Clusters::NetworkCommissioning::Attributes::FeatureMap::Id));
+        VerifyOrReturn(builder.AddAttributePath(Clusters::NetworkCommissioning::Id,
+                                                Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id));
+
+        // OperationalCredentials: existing fabrics, if necessary
         if (params.GetCheckForMatchingFabric())
         {
-            readPaths[numberOfAttributes++] =
-                app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::OperationalCredentials::Id,
+                                                    Clusters::OperationalCredentials::Attributes::Fabrics::Id));
         }
 
+        // ICD Management
         if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
         {
-            readPaths[numberOfAttributes++] =
-                app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::FeatureMap::Id));
         }
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                Clusters::IcdManagement::Attributes::IdleModeDuration::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                Clusters::IcdManagement::Attributes::ActiveModeDuration::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
+    }();
 
-        // Always read the active mode trigger hint attributes to notify users about it.
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerHint::Id);
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id);
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::IdleModeDuration::Id);
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeDuration::Id);
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeThreshold::Id);
-
-        mReadCommissioningInfoProgress = 2;
-        SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
+    VerifyOrDie(builder.size() > 0); // our logic is broken if there is nothing to read
+    if (builder.exceeded())
+    {
+        // Keep track of the number of attributes we have read already so we can resume from there.
+        auto progress = mReadCommissioningInfoProgress + builder.size();
+        VerifyOrDie(progress < kReadProgressNoFurtherAttributes);
+        mReadCommissioningInfoProgress = static_cast<decltype(mReadCommissioningInfoProgress)>(progress);
     }
     else
     {
-        FinishReadingCommissioningInfo();
+        mReadCommissioningInfoProgress = kReadProgressNoFurtherAttributes;
     }
+
+    const auto timeout = MakeOptional(app::kExpectedIMProcessingTime); // TODO: Save timeout from PerformCommissioningStep?
+    SendCommissioningReadRequest(mDeviceBeingCommissioned, timeout, builder.paths(), builder.size());
 }
 
 void DeviceCommissioner::FinishReadingCommissioningInfo()
