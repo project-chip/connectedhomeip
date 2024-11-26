@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pylint: disable=C,R,F,I,W,E
 
 #
 # Copyright (c) 2023-2024 Project CHIP Authors
@@ -19,7 +20,7 @@
 # Generates a basic RevocationSet from TestNet or MainNet.
 # Note: Indirect CRLs are only supported with py cryptography version 44.0.0.
 #       You may need to patch in a change locally if you are using an older
-#       version of py cryptography. The required changes can be viewed in this
+#       version of py cryptography. The required changes can be viewed in this 
 #       PR: https://github.com/pyca/cryptography/pull/11467/files. The file that
 #       needs to be patched is accessible from your local connectedhomeip
 #       directory at ./.environment/pigweed-venv/lib/python3.11/site-packages/cryptography/x509/extensions.py
@@ -204,27 +205,96 @@ def fetch_crl_from_url(url: str, timeout: int) -> x509.CertificateRevocationList
         logging.error('Failed to fetch a valid CRL')
 
 
-class DCLDClient:
+class DCLDClientInterface:
     '''
-    A client for interacting with DCLD using either the REST API or command line interface (CLI).
+    An interface for interacting with DCLD.
 
     '''
 
-    def __init__(self, use_rest: bool, dcld_exe: str, production: bool, rest_node_url: str):
+    def get_revocation_points(self) -> list[dict]:
+        '''
+        Get revocation points from DCL
+
+        Returns
+        -------
+        list[dict]
+            List of revocation points
+        '''
+        raise NotImplementedError
+
+    def get_revocations_points_by_skid(self, issuer_subject_key_id) -> list[dict]:
+        '''
+        Get revocation points by subject key ID
+
+        Parameters
+        ----------
+        issuer_subject_key_id: str
+            Subject key ID
+
+        Returns
+        -------
+        list[dict]
+            List of revocation points
+        '''
+        raise NotImplementedError
+    
+    def get_certificate(self, issuer_name_b64: str, akid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
+        '''
+        Get certificate from DCL
+        '''
+        raise NotImplementedError
+    
+    def get_first_approved_certificate(self, response: dict, akid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
+        '''
+        Get first approved certificate from DCL resposne.
+        '''
+        if response["approvedCertificates"]["certs"][0]["pemCert"]:
+            issuer_certificate = x509.load_pem_x509_certificate(bytes(response["approvedCertificates"]["certs"][0]["pemCert"],'utf-8'))
+        else:
+            raise requests.exception.NotFound(f"No certificate found for {akid_hex}")
+        return response["approvedCertificates"]["certs"][0]["isRoot"], issuer_certificate
+    
+    def get_paa_cert(self, initial_cert: x509.Certificate) -> Optional[x509.Certificate]:
+        """Get the PAA certificate for the CRL Signer Certificate."""
+        issuer_name_b64 = get_issuer_b64(initial_cert)
+        akid = get_akid(initial_cert)
+        if akid is None:
+            return
+        paa_certificate = None
+        while not paa_certificate:
+            try:
+                akid_hex = akid.hex().upper()
+                is_root, issuer_certificate = self.get_certificate(issuer_name_b64, akid_hex)
+                if is_root:
+                    paa_certificate = issuer_certificate
+                    break
+
+            except Exception as e:
+                logging.error('Failed to get PAA certificate', e)
+                return
+            issuer_name_b64 = get_issuer_b64(issuer_certificate)
+            akid = get_akid(issuer_certificate)
+        if paa_certificate is None:
+            logging.warning("PAA Certificate not found, continue...")
+        return paa_certificate
+
+class DCLDClient(DCLDClientInterface):
+    '''
+    A client for interacting with DCLD using command line interface (CLI).
+
+    '''
+
+    def __init__(self, dcld_exe: str, production: bool, rest_node_url: str):
         '''
         Initialize the client
 
-        use_rest: bool
-            Use RESTful API with HTTPS against `rest_node_url`
+    
         dcld_exe: str
             Path to `dcld` executable
         production: bool
             Use MainNet DCL URL with dcld executable
-        rest_node_url: str
-            RESTful API URL
         '''
 
-        self.use_rest = use_rest
         self.dcld_exe = dcld_exe
         self.production = production
         self.rest_node_url = rest_node_url
@@ -278,11 +348,7 @@ class DCLDClient:
             List of revocation points
         '''
 
-        if self.use_rest:
-            response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points").json()
-        else:
-            response = self.get_dcld_cmd_output_json(['query', 'pki', 'all-revocation-points'])
-
+        response = self.get_dcld_cmd_output_json(['query', 'pki', 'all-revocation-points'])
         return response["PkiRevocationDistributionPoint"]
 
     def get_revocations_points_by_skid(self, issuer_subject_key_id) -> list[dict]:
@@ -300,61 +366,80 @@ class DCLDClient:
             List of revocation points
         '''
 
-        if self.use_rest:
-            response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points/{issuer_subject_key_id}").json()
-        else:
-            response = self.get_dcld_cmd_output_json(['query', 'pki', 'revocation-points',
+        response = self.get_dcld_cmd_output_json(['query', 'pki', 'revocation-points',
                                                       '--issuer-subject-key-id', issuer_subject_key_id])
-
+        logging.debug(f"Response revocation points: {response}")
         return response["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]["points"]
 
-    def get_paa_cert(self, initial_cert: x509.Certificate) -> Optional[x509.Certificate]:
-        """Get the PAA certificate for the CRL Signer Certificate."""
-        issuer_name_b64 = get_issuer_b64(initial_cert)
-        akid = get_akid(initial_cert)
-        if akid is None:
-            return
-        paa_certificate = None
-        while not paa_certificate:
-            try:
-                issuer_certificate = None
-                response = None
-                akid_hex = akid.hex().upper()
-                if self.use_rest:
-                    akid_hex = ':'.join([akid_hex[i:i+2] for i in range(0, len(akid_hex), 2)])
-                    logging.debug(
-                        f"Fetching issuer from:{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}")
-                    response = requests.get(
-                        f"{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}").json()
-                    if response["approvedCertificates"]["certs"][0]["pemCert"]:
-                        issuer_certificate = x509.load_pem_x509_certificate(
-                            bytes(response["approvedCertificates"]["certs"][0]["pemCert"], 'utf-8'))
-                    else:
-                        raise requests.exception.NotFound(
-                            f"No certificate found for {self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}")
-                else:
-                    query_cmd_list = ['query', 'pki', 'x509-cert', '-u', issuer_name_b64, '-k', akid_hex]
+    def get_certificate(self, issuer_name_b64: str, akid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
+        '''
+        Get certificate from DCL
+        '''
+        query_cmd_list = ['query', 'pki', 'x509-cert', '-u', issuer_name_b64, '-k', akid_hex]
+        logging.debug(
+                    f"Fetching issuer from dcl query{' '.join(query_cmd_list)}")
+        response = self.get_dcld_cmd_output_json(query_cmd_list)
+        return self.get_first_approved_certificate(response, akid_hex)
 
-                    response = self.get_dcld_cmd_output_json(
-                        ['query', 'pki', 'x509-cert', '-u', issuer_name_b64, '-k', akid_hex])
-                    if response["approvedCertificates"]["certs"][0]["pemCert"]:
-                        issuer_certificate = x509.load_pem_x509_certificate(
-                            bytes(response["approvedCertificates"]["certs"][0]["pemCert"], 'utf-8'))
-                    else:
-                        raise requests.exception.NotFound(f"No certificate found for dcl query{' '.join(query_cmd_list)}")
-                if response["approvedCertificates"]["certs"][0]["isRoot"]:
-                    paa_certificate = issuer_certificate
-                    break
 
-            except Exception as e:
-                logging.error('Failed to get PAA certificate', e)
-                return
-            issuer_name_b64 = get_issuer_b64(issuer_certificate)
-            akid = get_akid(issuer_certificate)
-        if paa_certificate is None:
-            logging.warning("PAA Certificate not found, continue...")
-        return paa_certificate
+class RESTDCLDClient(DCLDClientInterface):
+    '''
+    A client for interacting with DCLD using the REST API.
 
+    '''
+
+    def __init__(self, rest_node_url: str):
+        '''
+        Initialize the client
+
+        rest_node_url: str
+            RESTful API URL
+        '''
+
+        self.rest_node_url = rest_node_url
+
+    def get_revocation_points(self) -> list[dict]:
+        '''
+        Get revocation points from DCL
+
+        Returns
+        -------
+        list[dict]
+            List of revocation points
+        '''
+
+        response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points").json()
+        return response["PkiRevocationDistributionPoint"]
+
+    def get_revocations_points_by_skid(self, issuer_subject_key_id) -> list[dict]:
+        '''
+        Get revocation points by subject key ID
+
+        Parameters
+        ----------
+        issuer_subject_key_id: str
+            Subject key ID
+
+        Returns
+        -------
+        list[dict]
+            List of revocation points
+        '''
+
+        response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points/{issuer_subject_key_id}").json()
+        logging.debug(f"Response revocation points: {response}")
+        return response["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]["points"]
+
+    def get_certificate(self, issuer_name_b64: str, akid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
+        '''
+        Get certificate from DCL
+        '''
+        akid_hex = ':'.join([akid_hex[i:i+2] for i in range(0, len(akid_hex), 2)])
+
+        logging.debug(
+                    f"Fetching issuer from:{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}")
+        response = requests.get(f"{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}").json()
+        return self.get_first_approved_certificate(response, akid_hex)
 
 @click.command()
 @click.help_option('-h', '--help')
@@ -391,7 +476,10 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
 
     rest_node_url = PRODUCTION_NODE_URL_REST if production else TEST_NODE_URL_REST
 
-    dcld_client = DCLDClient(use_rest, dcld, production, rest_node_url)
+    if use_rest:
+        dcld_client = RESTDCLDClient(rest_node_url)
+    else:
+        dcld_client = DCLDClient(dcld, production, rest_node_url)
 
     revocation_point_list = dcld_client.get_revocation_points()
 
@@ -456,9 +544,9 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
 
         if count_with_matching_vid_issuer_skid > 1:
             try:
-                issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
-                    x509.oid.ExtensionOID.ISSUING_DISTRIBUTION_POINT
-                ).value
+              issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
+                  x509.oid.ExtensionOID.ISSUING_DISTRIBUTION_POINT
+              ).value
             except Exception:
                 logging.warning("CRL Issuing Distribution Point not found, continue...")
                 continue
@@ -500,13 +588,12 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
         # 10. Iterate through the Revoked Certificates List
         for revoked_cert in crl_file:
             try:
-                revoked_cert_issuer = revoked_cert.extensions.get_extension_for_oid(
-                    x509.CRLEntryExtensionOID.CERTIFICATE_ISSUER).value.get_values_for_type(x509.DirectoryName).value
-
+                revoked_cert_issuer = base64.b64encode(revoked_cert.extensions.get_extension_for_oid(
+                    x509.CRLEntryExtensionOID.CERTIFICATE_ISSUER).value.get_values_for_type(x509.DirectoryName)[0].public_bytes()).decode("utf-8")
                 if revoked_cert_issuer is not None:
                     # check if this really are the same thing
                     if revoked_cert_issuer != certificate_authority_name_b64:
-                        logging.warning("CRL Issuer is not CRL File Issuer, continue...")
+                        logging.debug("CRL Issuer is not CRL File Issuer, continue...")
                         continue
             except Exception:
                 logging.warning("certificateIssuer entry extension not found in CRL")
