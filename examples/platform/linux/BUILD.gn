@@ -74,8 +74,6 @@ source_set("app-main") {
     "AppMain.h",
     "CommissionableInit.cpp",
     "CommissionableInit.h",
-    "CommissionerMain.cpp",
-    "CommissionerMain.h",
     "LinuxCommissionableDataProvider.cpp",
     "LinuxCommissionableDataProvider.h",
     "NamedPipeCommands.cpp",
@@ -100,6 +98,7 @@ source_set("app-main") {
     "${chip_root}/src/platform/logging:default",
   ]
   deps = [
+    ":commissioner-main",
     ":ota-test-event-trigger",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
