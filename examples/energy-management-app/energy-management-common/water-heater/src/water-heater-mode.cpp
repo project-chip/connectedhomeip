@@ -24,9 +24,12 @@ using chip::Protocols::InteractionModel::Status;
 template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
+namespace {
 
-static ExampleWaterHeaterModeDelegate * gWaterHeaterModeDelegate = nullptr;
-static ModeBase::Instance * gWaterHeaterModeInstance             = nullptr;
+ExampleWaterHeaterModeDelegate * gWaterHeaterModeDelegate = nullptr;
+ModeBase::Instance * gWaterHeaterModeInstance             = nullptr;
+
+} // namespace
 
 CHIP_ERROR ExampleWaterHeaterModeDelegate::Init()
 {
@@ -99,7 +102,6 @@ void emberAfWaterHeaterModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(gWaterHeaterModeDelegate == nullptr && gWaterHeaterModeInstance == nullptr);
     gWaterHeaterModeDelegate = new WaterHeaterMode::ExampleWaterHeaterModeDelegate;
-    gWaterHeaterModeInstance =
-        new ModeBase::Instance(gWaterHeaterModeDelegate, endpointId, WaterHeaterMode::Id, chip::to_underlying(Feature::kOnOff));
+    gWaterHeaterModeInstance = new ModeBase::Instance(gWaterHeaterModeDelegate, endpointId, WaterHeaterMode::Id, 0);
     gWaterHeaterModeInstance->Init();
 }

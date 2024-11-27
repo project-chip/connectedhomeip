@@ -117,7 +117,7 @@ public:
     /**
      * @brief   Called at start up to apply hardware settings
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(chip::EndpointId powerSourceEndpointId);
 
     /**
      * @brief   Called at shutdown
@@ -143,7 +143,7 @@ public:
     /**
      * @brief   Allows a client application to initialise the PowerSource cluster
      */
-    CHIP_ERROR InitializePowerSourceCluster();
+    CHIP_ERROR InitializePowerSourceCluster(chip::EndpointId endpointId);
 
     /**
      * @brief   Allows a client application to send in power readings into the system
