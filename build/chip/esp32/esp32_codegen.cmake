@@ -71,7 +71,12 @@ macro(chip_app_component_zapgen ZAP_NAME)
 
     add_dependencies(${COMPONENT_LIB} app-zapgen)
     target_include_directories(${COMPONENT_LIB} PUBLIC "${APP_TEMPLATE_GEN_DIR}")
-    target_sources(${COMPONENT_LIB} PRIVATE ${APP_TEMPLATE_GEN_FILES} ${CODEGEN_DATA_MODEL_SOURCES})
+    target_sources(${COMPONENT_LIB} PRIVATE 
+      ${APP_TEMPLATE_GEN_FILES} ${CODEGEN_DATA_MODEL_SOURCES}
 
+      # SafeAttributePersistence neets ot be available for clusters
+      "${CHIP_ROOT}/src/app/SafeAttributePersistenceProvider.cpp"
+      "${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp"
+    )
   endif()
 endmacro()
