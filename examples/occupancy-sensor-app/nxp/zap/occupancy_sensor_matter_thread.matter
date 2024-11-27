@@ -1720,7 +1720,6 @@ endpoint 0 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -1730,49 +1729,38 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
   server cluster BasicInformation {
     emits event StartUp;
-    emits event ShutDown;
-    emits event Leave;
     callback attribute dataModelRevision;
     callback attribute vendorName;
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
-    persist  attribute nodeLabel;
+    ram      attribute nodeLabel;
     callback attribute location;
     callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
     callback attribute softwareVersion;
     callback attribute softwareVersionString;
-    callback attribute manufacturingDate;
-    callback attribute partNumber;
-    callback attribute productURL;
-    callback attribute productLabel;
-    callback attribute serialNumber;
-    persist  attribute localConfigDisabled default = 0;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -1785,7 +1773,6 @@ endpoint 0 {
     ram      attribute updateStateProgress default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -1801,10 +1788,9 @@ endpoint 0 {
     callback attribute supportsConcurrentConnection;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -1827,14 +1813,12 @@ endpoint 0 {
     ram      attribute threadVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
-    handle command AddOrUpdateWiFiNetwork;
     handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
     handle command NetworkConfigResponse;
@@ -1846,7 +1830,6 @@ endpoint 0 {
   server cluster DiagnosticLogs {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -1865,7 +1848,6 @@ endpoint 0 {
     callback attribute testEventTriggersEnabled default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -1882,10 +1864,11 @@ endpoint 0 {
     callback attribute currentHeapHighWatermark;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
+
+    handle command ResetWatermarks;
   }
 
   server cluster ThreadNetworkDiagnostics {
@@ -1947,9 +1930,6 @@ endpoint 0 {
     callback attribute rxErrSecCount;
     callback attribute rxErrFcsCount;
     callback attribute rxErrOtherCount;
-    callback attribute activeTimestamp;
-    callback attribute pendingTimestamp;
-    callback attribute delay;
     callback attribute securityPolicy;
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
@@ -1958,7 +1938,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ResetCounts;
   }
@@ -1969,7 +1949,6 @@ endpoint 0 {
     callback attribute adminVendorId;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -1987,7 +1966,6 @@ endpoint 0 {
     callback attribute currentFabricIndex;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2013,7 +1991,6 @@ endpoint 0 {
     callback attribute maxGroupKeysPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
