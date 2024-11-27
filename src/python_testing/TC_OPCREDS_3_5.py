@@ -101,8 +101,8 @@ class TC_OPCREDS_3_5(MatterBaseTest):
                          "Verify that DUT sends ArmFailSafeResponse with the ErrorCode set to OK"),
                 TestStep(18, "TH1 reads the NOCs attribute from the Node Operational Credentials cluster using a fabric-filtered read",
                          "Verify that the returned list has a single entry. Verify that the NOC field matches noc_update2 and the ICAC field matches icac_update2"),
-                # TODO: Gibran - Please rephrase using standard cleanup language add this to the test plan
-                TestStep(19, "remove fabric for TH2")
+                TestStep(19, "TH1 reads its fabric index from the CurrentFabricIndex attribute and saves as fabric_idx"),
+                TestStep(20, "TH0 sends the RemoveFabric command with the fabric index set to fabric_idx")
                 ]
 
     @async_test_body
@@ -238,6 +238,8 @@ class TC_OPCREDS_3_5(MatterBaseTest):
 
         self.step(19)
         fabric_idx = resp = await self.read_single_attribute_check_success(dev_ctrl=th1, node_id=self.dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.CurrentFabricIndex)
+
+        self.step(20)
         cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric_idx)
         await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
 
