@@ -32,7 +32,7 @@
 #include "sl_wfx_host_api.h"
 #include "sl_wfx_task.h"
 #include "spidrv.h"
-#include <platform/silabs/wifi/ncp-common/spi_multiplex.h>
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -22,7 +22,7 @@
 #include <platform/silabs/SilabsConfig.h>
 
 #if SL_WIFI
-#include <platform/silabs/wifi/ncp-common/spi_multiplex.h>
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #endif // SL_WIFI
 
 extern "C" {
