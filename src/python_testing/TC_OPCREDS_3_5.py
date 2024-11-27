@@ -162,16 +162,10 @@ class TC_OPCREDS_3_5(MatterBaseTest):
         resp = await self.send_single_cmd(dev_ctrl=th1, cmd=cmd, node_id=self.dut_node_id)
         asserts.assert_equal(resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk,
                              "Received unexpected error response from UpdateNOC")
-
-        # Re-establish the CASE session - TODO: Please open an issue to add this to the spec as a warning that once updating the NOC the commissioner will need to re-establish the CASE session
+        # Expire the session since hte DUT now has a new cert
+        th1.ExpireSessions(self.dut_node_id)
 
         self.step(8)
-        # TODO: no. need session expiry
-        try:
-            resp = await self.read_single_attribute_check_success(dev_ctrl=th1, node_id=self.dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=True)
-        except:
-            pass
-
         resp = await self.read_single_attribute_check_success(dev_ctrl=th1, node_id=self.dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=True)
         asserts.assert_equal(resp[0].noc, update1_cert_chain.nocBytes, "Returned NOC does not match generated NOC")
         asserts.assert_equal(resp[0].icac, update1_cert_chain.icacBytes, "Returned ICAC does not match generated ICAC")
@@ -181,15 +175,11 @@ class TC_OPCREDS_3_5(MatterBaseTest):
         resp = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
+        # Expire the session since hte DUT now has a new cert
+        th1.ExpireSessions(self.dut_node_id)
 
         self.step(10)
-        # TODO: NO. need session expiry
-        try:
-            resp = await self.read_single_attribute_check_success(dev_ctrl=th1, node_id=self.dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=True)
-        except:
-            pass
         resp = await self.read_single_attribute_check_success(dev_ctrl=th1, node_id=self.dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=True)
-
         asserts.assert_equal(resp[0].noc, original_cert_chain.nocBytes, "Returned NOC does not match original NOC")
         asserts.assert_equal(resp[0].icac, original_cert_chain.icacBytes, "Returned ICAC does not match original ICAC")
 
@@ -221,15 +211,10 @@ class TC_OPCREDS_3_5(MatterBaseTest):
         resp = await self.send_single_cmd(dev_ctrl=th1, cmd=cmd, node_id=self.dut_node_id)
         asserts.assert_equal(resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk,
                              "Received unexpected error response from UpdateNOC")
+        # Expire the session since hte DUT now has a new cert
+        th1.ExpireSessions(self.dut_node_id)
 
-        # Re-establish the CASE session - TODO: Please open an issue to add this to the spec as a warning that once updating the NOC the commissioner will need to re-establish the CASE session
         self.step(15)
-        # TODO: no. need session expiry
-        try:
-            resp = await self.read_single_attribute_check_success(dev_ctrl=th1, node_id=self.dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=True)
-        except:
-            pass
-
         resp = await self.read_single_attribute_check_success(dev_ctrl=th1, node_id=self.dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=True)
         asserts.assert_equal(resp[0].noc, update2_cert_chain.nocBytes, "Returned NOC does not match generated NOC")
         asserts.assert_equal(resp[0].icac, update2_cert_chain.icacBytes, "Returned ICAC does not match generated ICAC")
