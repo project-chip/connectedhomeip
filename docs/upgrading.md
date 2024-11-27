@@ -105,4 +105,5 @@ To preserve `codegen/zap` generated logic, use
 
 To use default attribute persistence, you need to pass in a
 `PersistentStorageDelegate` to `CodegenDataModelProviderInstance`. See example
-changes in [TODO](https://github.com/project-chip/connectedhomeip/pull/TODO) ).
+changes in [36658](https://github.com/project-chip/connectedhomeip/pull/36658)
+).
