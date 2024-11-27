@@ -18,6 +18,7 @@
 #pragma once
 
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <json/json.h>
 #include <lib/support/Span.h>
 
 #include <string>
@@ -52,11 +53,23 @@ public:
     void ClearDeviceAttestationRevocationSetPath();
 
 private:
+    bool CrossValidateCert(const Json::Value & revokedSet, const std::string & akIdHexStr, const std::string & issuerNameBase64Str);
+
+    CHIP_ERROR GetKeyIDHexStr(const ByteSpan & certDer, MutableCharSpan & outKeyIDHexStr, bool isAKID);
     CHIP_ERROR GetAKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outAKIDHexStr);
+    CHIP_ERROR GetSKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outSKIDHexStr);
+
     CHIP_ERROR GetSerialNumberHexStr(const ByteSpan & certDer, MutableCharSpan & outSerialNumberHexStr);
+
+    CHIP_ERROR GetRDNBase64Str(const ByteSpan & certDer, MutableCharSpan & outRDNBase64String, bool isIssuer);
     CHIP_ERROR GetIssuerNameBase64Str(const ByteSpan & certDer, MutableCharSpan & outIssuerNameBase64String);
+    CHIP_ERROR GetSubjectNameBase64Str(const ByteSpan & certDer, MutableCharSpan & outSubjectNameBase64String);
+
+    CHIP_ERROR GetSubjectAndKeyIdFromPEMCert(const std::string & certPEM, std::string & outSubject, std::string & outKeyId);
+
     bool IsEntryInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
                                 const CharSpan & serialNumberHexStr);
+
     bool IsCertificateRevoked(const ByteSpan & certDer);
 
     std::string mDeviceAttestationRevocationSetPath;
