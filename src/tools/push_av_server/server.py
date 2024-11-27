@@ -489,11 +489,6 @@ async def segment_upload(file_path: str, stream_id: int, req: Request):
     return Response(status_code=202)
 
 
-@app.get("/streams/{stream_id}/{file_path:path}")
-async def segment_download(file_path: str, stream_id: int):
-    return FileResponse(wd.path("streams", str(stream_id), file_path))
-
-
 @app.get("/streams/probe/{stream_id}/{file_path:path}")
 def ffprobe_check(stream_id: int, file_path: str):
 
@@ -512,6 +507,11 @@ def ffprobe_check(stream_id: int, file_path: str):
         return HTTPException(500)
 
     return json.loads(proc.stdout)
+
+
+@app.get("/streams/{stream_id}/{file_path:path}")
+async def segment_download(file_path: str, stream_id: int):
+    return FileResponse(wd.path("streams", str(stream_id), file_path))
 
 
 # TODO app.post("streams/convert/{stream_id}")
