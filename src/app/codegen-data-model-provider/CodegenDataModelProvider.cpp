@@ -310,14 +310,26 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 {
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
 
-    // Ember MUST have a data model provider. attempt to create one if one is not available
+    // Ember NVM requires have a data model provider. attempt to create one if one is not available
+    //
+    // It is not a critical failure to not have one, however if one is not set up, ember NVM operations
+    // will error out with a `persistence not available`.
     if (GetAttributePersistenceProvider() == nullptr)
     {
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogProgress(DataManagement, "Setting up ember attribute persistence to default");
+        ChipLogProgress(DataManagement, "Ember attribute persistence requires setting up");
 #endif
-        ReturnErrorOnFailure(gDefaultAttributePersistence.Init(mPersistentStorageDelegate));
-        SetAttributePersistenceProvider(&gDefaultAttributePersistence);
+        if (mPersistentStorageDelegate != nullptr)
+        {
+            ReturnErrorOnFailure(gDefaultAttributePersistence.Init(mPersistentStorageDelegate));
+            SetAttributePersistenceProvider(&gDefaultAttributePersistence);
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        }
+        else
+        {
+            ChipLogError(DataManagement, "No storage delegate available, will not set up attribute persistence.");
+#endif
+        }
     }
 
     return CHIP_NO_ERROR;

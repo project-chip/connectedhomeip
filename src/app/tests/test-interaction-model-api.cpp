@@ -151,12 +151,12 @@ std::optional<ActionReturnStatus> TestImCustomDataModel::Invoke(const InvokeRequ
 
 EndpointId TestImCustomDataModel::FirstEndpoint()
 {
-    return CodegenDataModelProviderInstance()->FirstEndpoint();
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstEndpoint();
 }
 
 EndpointId TestImCustomDataModel::NextEndpoint(EndpointId before)
 {
-    return CodegenDataModelProviderInstance()->NextEndpoint(before);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextEndpoint(before);
 }
 
 std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::FirstDeviceType(EndpointId endpoint)
@@ -172,57 +172,57 @@ std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::NextDeviceType(
 
 ClusterEntry TestImCustomDataModel::FirstCluster(EndpointId endpoint)
 {
-    return CodegenDataModelProviderInstance()->FirstCluster(endpoint);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstCluster(endpoint);
 }
 
 ClusterEntry TestImCustomDataModel::NextCluster(const ConcreteClusterPath & before)
 {
-    return CodegenDataModelProviderInstance()->NextCluster(before);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextCluster(before);
 }
 
 std::optional<ClusterInfo> TestImCustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
 {
-    return CodegenDataModelProviderInstance()->GetClusterInfo(path);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetClusterInfo(path);
 }
 
 AttributeEntry TestImCustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
 {
-    return CodegenDataModelProviderInstance()->FirstAttribute(cluster);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAttribute(cluster);
 }
 
 AttributeEntry TestImCustomDataModel::NextAttribute(const ConcreteAttributePath & before)
 {
-    return CodegenDataModelProviderInstance()->NextAttribute(before);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextAttribute(before);
 }
 
 std::optional<AttributeInfo> TestImCustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
 {
-    return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAttributeInfo(path);
 }
 
 CommandEntry TestImCustomDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
 {
-    return CodegenDataModelProviderInstance()->FirstAcceptedCommand(cluster);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAcceptedCommand(cluster);
 }
 
 CommandEntry TestImCustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
 {
-    return CodegenDataModelProviderInstance()->NextAcceptedCommand(before);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextAcceptedCommand(before);
 }
 
 std::optional<CommandInfo> TestImCustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAcceptedCommandInfo(path);
 }
 
 ConcreteCommandPath TestImCustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
 {
-    return CodegenDataModelProviderInstance()->FirstGeneratedCommand(cluster);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstGeneratedCommand(cluster);
 }
 
 ConcreteCommandPath TestImCustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
 {
-    return CodegenDataModelProviderInstance()->NextGeneratedCommand(before);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextGeneratedCommand(before);
 }
 
 } // namespace app

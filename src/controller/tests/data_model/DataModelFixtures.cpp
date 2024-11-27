@@ -476,12 +476,12 @@ std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & 
 
 EndpointId CustomDataModel::FirstEndpoint()
 {
-    return CodegenDataModelProviderInstance()->FirstEndpoint();
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstEndpoint();
 }
 
 EndpointId CustomDataModel::NextEndpoint(EndpointId before)
 {
-    return CodegenDataModelProviderInstance()->NextEndpoint(before);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextEndpoint(before);
 }
 
 std::optional<DataModel::DeviceTypeEntry> CustomDataModel::FirstDeviceType(EndpointId endpoint)
@@ -497,57 +497,57 @@ std::optional<DataModel::DeviceTypeEntry> CustomDataModel::NextDeviceType(Endpoi
 
 ClusterEntry CustomDataModel::FirstCluster(EndpointId endpoint)
 {
-    return CodegenDataModelProviderInstance()->FirstCluster(endpoint);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstCluster(endpoint);
 }
 
 ClusterEntry CustomDataModel::NextCluster(const ConcreteClusterPath & before)
 {
-    return CodegenDataModelProviderInstance()->NextCluster(before);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextCluster(before);
 }
 
 std::optional<ClusterInfo> CustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
 {
-    return CodegenDataModelProviderInstance()->GetClusterInfo(path);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetClusterInfo(path);
 }
 
 AttributeEntry CustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
 {
-    return CodegenDataModelProviderInstance()->FirstAttribute(cluster);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAttribute(cluster);
 }
 
 AttributeEntry CustomDataModel::NextAttribute(const ConcreteAttributePath & before)
 {
-    return CodegenDataModelProviderInstance()->NextAttribute(before);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextAttribute(before);
 }
 
 std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
 {
-    return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAttributeInfo(path);
 }
 
 CommandEntry CustomDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
 {
-    return CodegenDataModelProviderInstance()->FirstAcceptedCommand(cluster);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAcceptedCommand(cluster);
 }
 
 CommandEntry CustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
 {
-    return CodegenDataModelProviderInstance()->NextAcceptedCommand(before);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextAcceptedCommand(before);
 }
 
 std::optional<CommandInfo> CustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAcceptedCommandInfo(path);
 }
 
 ConcreteCommandPath CustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
 {
-    return CodegenDataModelProviderInstance()->FirstGeneratedCommand(cluster);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstGeneratedCommand(cluster);
 }
 
 ConcreteCommandPath CustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
 {
-    return CodegenDataModelProviderInstance()->NextGeneratedCommand(before);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextGeneratedCommand(before);
 }
 
 } // namespace app
