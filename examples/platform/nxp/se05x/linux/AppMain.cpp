@@ -296,8 +296,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
-    std::thread shellThread([]() {
-        Engine::Root().RunMainLoop(); });
+    std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     Shell::RegisterCommissioneeCommands();
 #endif
     initParams.operationalServicePort        = CHIP_PORT;

@@ -225,10 +225,8 @@ void CYW30739MatterConfig::InitApp(void)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     // Set up OpenThread configuration when OpenThread is included
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
-    nativeParams.lockCb                = [] {
-        ThreadStackMgr().LockThreadStack(); };
-    nativeParams.unlockCb              = [] {
-        ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.lockCb                = [] { ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = [] { ThreadStackMgr().UnlockThreadStack(); };
     nativeParams.openThreadInstancePtr = ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
