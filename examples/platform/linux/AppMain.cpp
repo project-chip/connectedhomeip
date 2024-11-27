@@ -684,11 +684,12 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     ApplicationInit();
 
-    struct sigaction sa = {};
-    sa.sa_handler       = StopSignalHandler;
-    sa.sa_flags         = SA_RESETHAND;
-    sigaction(SIGINT, &sa, nullptr);
-    sigaction(SIGTERM, &sa, nullptr);
+#if !defined(ENABLE_CHIP_SHELL)
+    // NOLINTBEGIN(bugprone-signal-handler)
+    signal(SIGINT, StopSignalHandler);
+    signal(SIGTERM, StopSignalHandler);
+    // NOLINTEND(bugprone-signal-handler)
+#endif // !defined(ENABLE_CHIP_SHELL)
 
     if (impl != nullptr)
     {
