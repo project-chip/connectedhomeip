@@ -599,6 +599,9 @@ void HandleDHCPPolling(void)
      */
     if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
     {
+        char addrStr[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
+        VerifyOrReturn(ip6addr_ntoa_r(netif_ip6_addr(sta_netif, 0), addrStr, sizeof(addrStr)) != nullptr);
+        ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
         NotifyIPv6Change(true);
         hasNotifiedIPV6         = true;
         WifiPlatformEvent event = WifiPlatformEvent::kStationDhcpDone;
