@@ -1,9 +1,9 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| build-example-nrf-connect-sdk           |           0 |
-| tests                                   |          75 |
-| darwin                                  |          89 |
+| build-example-nrf-connect-sdk           |          50 |
+| darwin                                  |          75 |
+| delete-old-artifacts                    |          96 |
 | build-example-telink                    |         100 |
 | build-example-esp32                     |         100 |
 | unit-integration-tests                  |         100 |
@@ -18,19 +18,19 @@
 | build-example-ti-cc32xx                 |         100 |
 | build-example-nuttx                     |         100 |
 | documentation-build                     |         100 |
+| tests                                   |         100 |
 | run-misspell                            |         100 |
-| build-example-linux-standalone          |         100 |
 | validate-gradle-wrapper                 |         100 |
 | build-chef-ci-examples-on-all-platforms |         100 |
 | build-example-infineon                  |         100 |
+| build-example-linux-standalone          |         100 |
 | build-example-mw320                     |         100 |
 | process-stale-issues-and-prs            |         100 |
-| build-example-nxp                       |         100 |
 | darwin-tests                            |         100 |
+| build-example-nxp                       |         100 |
 | build-example-stm32                     |         100 |
 | build-example-asr                       |         100 |
 | qemu                                    |         100 |
-| delete-old-artifacts                    |         100 |
 | issue-labeler                           |         100 |
 | builds                                  |         100 |
 | recent-fail-summary                     |         100 |
