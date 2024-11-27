@@ -45,8 +45,10 @@ struct ScopedNodeIdHasher
 class FabricAdmin final : public bridge::FabricAdminDelegate, public PairingDelegate, public IcdManager::Delegate
 {
 public:
-    static FabricAdmin & Instance();
+    static FabricAdmin & Instance() { return sInstance; }
     static chip::app::DefaultICDClientStorage & GetDefaultICDClientStorage() { return sICDClientStorage; }
+
+    CHIP_ERROR Init();
 
     CHIP_ERROR OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params,
                                        chip::FabricIndex fabricIndex) override;
@@ -100,10 +102,7 @@ private:
     static chip::app::DefaultICDClientStorage sICDClientStorage;
     static chip::app::CheckInHandler sCheckInHandler;
 
-    bool mInitialized    = false;
     chip::NodeId mNodeId = chip::kUndefinedNodeId;
-
-    CHIP_ERROR Init();
 };
 
 } // namespace admin
