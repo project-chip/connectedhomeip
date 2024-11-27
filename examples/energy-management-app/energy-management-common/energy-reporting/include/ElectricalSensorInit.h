@@ -18,15 +18,16 @@
 
 #pragma once
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace WaterHeaterManagement {
+#include <ElectricalPowerMeasurementDelegate.h>
+#include <PowerTopologyDelegate.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 
-void FullWhmApplicationInit();
-void FullWhmApplicationShutdown();
+chip::app::Clusters::PowerTopology::PowerTopologyInstance * GetPTInstance();
+chip::app::Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * GetEPMInstance();
 
-} // namespace WaterHeaterManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId);
+CHIP_ERROR PowerTopologyShutdown();
+
+CHIP_ERROR ElectricalPowerMeasurementInit(chip::EndpointId endpointId);
+CHIP_ERROR ElectricalPowerMeasurementShutdown();
