@@ -548,8 +548,6 @@ template("siwx917_sdk") {
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config",
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/preset",
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/inc",
-          "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/config",
-          "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/autogen",
 
           # tinycrypt specific headers
           "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",

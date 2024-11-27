@@ -21,6 +21,7 @@
  */
 #include <string.h>
 
+// Use ECDH legacy context format
 #define MBEDTLS_ALLOW_PRIVATE_ACCESS
 #include <crypto/CHIPCryptoPAL.h>
 
