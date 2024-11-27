@@ -122,11 +122,11 @@ config NET_PKT_TX_COUNT
     default 8
 
 config NET_BUF_RX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 32
 
 config NET_BUF_TX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 32
 
 config GPIO
