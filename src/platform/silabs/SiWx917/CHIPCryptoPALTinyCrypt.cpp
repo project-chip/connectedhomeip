@@ -21,8 +21,6 @@
  */
 #include <string.h>
 
-// Use ECDH legacy context format
-#define MBEDTLS_ALLOW_PRIVATE_ACCESS
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <type_traits>
@@ -132,11 +130,6 @@ bool _isValidTagLength(size_t tag_length)
         return true;
     }
     return false;
-}
-
-inline mbedtls_uecc_keypair * mbedtls_pk_uecc(const mbedtls_pk_context pk)
-{
-    return ((mbedtls_uecc_keypair *) (pk).pk_ctx);
 }
 
 } // namespace
@@ -1498,7 +1491,7 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
     VerifyOrExit(mbedtls_pk_get_type(&(mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(pk))) == MBEDTLS_PK_ECKEY,
                  error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    keypair                    = (mbedtls_uecc_keypair *) (mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(pk)).pk_ctx;
+    keypair                    = (mbedtls_uecc_keypair *) (mbedtls_pk_ec(mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(pk)));
     Uint8::to_uchar(pubkey)[0] = 0x04; // uncompressed type
     memcpy(Uint8::to_uchar(pubkey) + 1, keypair->public_key, 2 * NUM_ECC_BYTES);
 
