@@ -1837,7 +1837,7 @@ endpoint 1 {
   server cluster RefrigeratorAlarm {
     ram      attribute mask default = 1;
     ram      attribute state default = 0;
-    ram      attribute supported default = 0;
+    ram      attribute supported default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
