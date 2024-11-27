@@ -1054,14 +1054,12 @@ private:
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     void ContinueReadingCommissioningInfo(const CommissioningParameters & params);
     void FinishReadingCommissioningInfo();
-    // Parsing attributes read in kReadCommissioningInfo stage.
-    CHIP_ERROR ParseCommissioningInfo1(ReadCommissioningInfo & info);
-    CHIP_ERROR ParseCommissioningInfo2(ReadCommissioningInfo & info);
-    // Called by ParseCommissioningInfo2
+    CHIP_ERROR ParseGeneralCommissioningInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
-    // Called by ParseCommissioningInfo
-    void ParseTimeSyncInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     static CHIP_ERROR
