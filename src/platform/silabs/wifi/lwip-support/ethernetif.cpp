@@ -346,7 +346,8 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     struct pbuf * q;
     uint16_t framelength = 0;
     uint16_t datalength  = 0;
-#if WIFI_DEBUG_ENABLED
+    int32_t status       = 0;
+#ifdef WIFI_DEBUG_ENABLED
     ChipLogProgress(DeviceLayer, "LWIP : low_level_output");
 #endif
     if (xSemaphoreTake(ethout_sem, portMAX_DELAY) != pdTRUE)
@@ -367,14 +368,14 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
 #endif
     if ((netif->flags & (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP)) != (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP))
     {
-        ChipLogProgress(DeviceLayer, "EN-RSI:NOT UP");
+        ChipLogError(DeviceLayer, "EN-RSI:NOT UP");
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }
     packet = wfx_rsi_alloc_pkt();
     if (!packet)
     {
-        ChipLogProgress(DeviceLayer, "EN-RSI:No buf");
+        ChipLogError(DeviceLayer, "EN-RSI:No buf");
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }
@@ -402,9 +403,10 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     /* forward the generated packet to RSI to
      * send the data over wifi network
      */
-    if (wfx_rsi_send_data(packet, datalength))
+    status = wfx_rsi_send_data(packet, datalength);
+    if (status != 0)
     {
-        ChipLogProgress(DeviceLayer, "*ERR*EN-RSI:Send fail");
+        ChipLogError(DeviceLayer, "*ERR*EN-RSI:Send fail: %d", status);
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }
