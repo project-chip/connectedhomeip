@@ -317,6 +317,8 @@ public:
 
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
+    bool FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex) override;
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
      * @brief Function decrements the number of subscriptions to resume counter - mNumOfSubscriptionsToResume.
