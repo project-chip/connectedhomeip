@@ -78,8 +78,8 @@ function(chip_configure_data_model APP_TARGET)
 
     # CMAKE data model auto-includes the server side implementation
     target_sources(${APP_TARGET} ${SCOPE}
-        ${CHIP_APP_BASE_DIR}/app/SafeAttributePersistenceProvider.cpp
-        ${CHIP_APP_BASE_DIR}/app/StorageDelegateWrapper.cpp
+        ${CHIP_APP_BASE_DIR}/SafeAttributePersistenceProvider.cpp
+        ${CHIP_APP_BASE_DIR}/StorageDelegateWrapper.cpp
         ${CHIP_APP_BASE_DIR}/server/AclStorage.cpp
         ${CHIP_APP_BASE_DIR}/server/DefaultAclStorage.cpp
         ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
