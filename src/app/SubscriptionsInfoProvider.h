@@ -68,7 +68,7 @@ public:
      * @param aFabricIndex fabric index for which we want to validate is has at least one active subscription
      *
      * @return true fabric has at least one active subscription
-     * @return false fabric doesn't have any active subscription or failed to validate
+     *         false fabric doesn't have any active subscription or failed to validate
      */
     virtual bool FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex) = 0;
 };
