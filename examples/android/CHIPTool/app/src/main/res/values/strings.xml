@@ -275,6 +275,8 @@
     <string name="ota_provider_read_attribute_btn_text">Read</string>
     <string name="ota_provider_write_attribute_btn_text">Write</string>
     <string name="ota_provider_vendorId_text">Vendor ID</string>
+    <string name="ota_provider_softwareVersion_text">SW Version</string>
+    <string name="ota_provider_softwareVersion_default_text">1</string>
     <string name="ota_provider_select_firmware_file_text">Select Firmware</string>
     <string name="ota_provider_update_ota_status_text">Update OTA Status</string>
     <string name="ota_provider_start_firmware_update_text">Start Firmware Update</string>

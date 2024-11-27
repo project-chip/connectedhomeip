@@ -166,7 +166,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         events_callback = EventChangeCallback(Clusters.WaterHeaterManagement)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
-                                    self.matter_test_config.endpoint)
+                                    self.get_endpoint())
 
         self.step("3")
         await self.check_test_event_triggers_enabled()
