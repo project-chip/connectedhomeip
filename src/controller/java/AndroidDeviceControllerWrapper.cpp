@@ -209,7 +209,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
     initParams.fabricIndependentStorage        = wrapperStorage;
     initParams.sessionKeystore                 = &wrapper->mSessionKeystore;
-    initParams.dataModelProvider               = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider               = app::CodegenDataModelProviderInstance(wrapperStorage);
     wrapper->mGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
 
     CommissioningParameters params = wrapper->GetCommissioningParameters();

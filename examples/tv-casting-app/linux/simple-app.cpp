@@ -84,7 +84,8 @@ public:
         CHIP_ERROR err = serverInitParams.InitializeStaticResourcesBeforeServerInit();
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogError(AppServer, "Initialization of ServerInitParams failed %" CHIP_ERROR_FORMAT, err.Format()));
-        serverInitParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(serverInitParams.persistentStorageDelegate);
+        serverInitParams.dataModelProvider =
+            chip::app::CodegenDataModelProviderInstance(serverInitParams.persistentStorageDelegate);
         return &serverInitParams;
     }
 };
