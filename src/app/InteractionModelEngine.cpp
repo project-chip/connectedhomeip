@@ -128,7 +128,8 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
 class AutoReleaseSubscriptionInfoIterator
 {
 public:
-    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) :
+        mIterator(iterator) {};
     ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
 
     SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
@@ -471,10 +472,11 @@ bool InteractionModelEngine::FabricHasAtLeastOneActiveSubscription(FabricIndex a
         Access::SubjectDescriptor subject = handler->GetSubjectDescriptor();
         VerifyOrReturnValue(subject.fabricIndex == aFabricIndex, Loop::Continue);
 
-        if (subject.authMode == Access::AuthMode::kCase)
+        if ((subject.authMode == Access::AuthMode::kCase) && handler->IsActiveSubscription())
         {
-            hasActiveSubscription = handler->IsActiveSubscription();
-            VerifyOrReturnValue(!hasActiveSubscription, Loop::Break);
+            // On first subscription found for fabric, we can immediately stop checking.
+            hasActiveSubscription = true;
+            return Loop::Break;
         }
 
         return Loop::Continue;
