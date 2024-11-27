@@ -30,6 +30,8 @@
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <app/util/persistence/AttributePersistenceProvider.h>
+#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -300,7 +302,26 @@ unsigned FindNextDeviceTypeIndex(Span<const EmberAfDeviceType> types, const Data
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
+DefaultAttributePersistenceProvider gDefaultAttributePersistence;
+
 } // namespace
+
+CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
+{
+    ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+
+    // Ember MUST have a data model provider. attempt to create one if one is not available
+    if (GetAttributePersistenceProvider() == nullptr)
+    {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogProgress(DataManagement, "Setting up ember attribute persistence to default");
+#endif
+        ReturnErrorOnFailure(gDefaultAttributePersistence.Init(mPersistentStorageDelegate));
+        SetAttributePersistenceProvider(&gDefaultAttributePersistence);
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 std::optional<CommandId> CodegenDataModelProvider::EmberCommandListIterator::First(const CommandId * list)
 {

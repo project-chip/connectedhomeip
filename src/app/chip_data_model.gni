@@ -457,6 +457,8 @@ template("chip_data_model") {
       }
     }
 
+    deps += [ "${chip_root}/src/app:attribute-persistence" ]
+
     public_deps += [
       ":${_data_model_name}_codegen",
       ":${_data_model_name}_zapgen",
