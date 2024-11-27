@@ -595,7 +595,7 @@ Step-by-step:
 
 1. Set the default TestEventTrigger (`0x0094000000000000`):
 
--   `0x0094000000000000` corresponds to `kBasicInstallationTestEvent` from
+-   `0x0094000000000000` corresponds to [`kBasicInstallationTestEvent`](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h#L47) from
     `WaterHeadermanagementTestEventTriggerHandler.h`
 -   `hex:00010203...0e0f` is the `--enable-key` passed to the startup of
     chip-energy-management-app
