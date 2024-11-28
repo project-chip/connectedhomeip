@@ -252,6 +252,7 @@ template("siwx917_sdk") {
       "UDMA_ROMDRIVER_PRESENT=1",
       "PLL_ROMDRIVER_PRESENT=1",
       "SL_MATTER_GN_BUILD=1",
+      "SILABS_LOG_OUT_UART=${sl_uart_log_output}",
     ]
 
     if (silabs_log_enabled && chip_logging) {
@@ -330,12 +331,6 @@ template("siwx917_sdk") {
         "SL_ENABLE_GPIO_WAKEUP_SOURCE=1",
         "ENABLE_NPSS_GPIO_2=1",
       ]
-    }
-
-    if (sl_uart_log_output) {
-      defines += [ "SILABS_LOG_OUT_UART=1" ]
-    } else {
-      defines += [ "SILABS_LOG_OUT_UART=0" ]
     }
 
     if (chip_build_libshell) {  # matter shell
