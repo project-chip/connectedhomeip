@@ -590,12 +590,11 @@ or
 bootstrap.sh should be used for for the first setup, activate.sh may be used for
 subsequent setups as it is faster.
 
-Next build the python wheels and create / activate a venv (called `pyenv` here,
-but any name may be used)
+Next build the python wheels and create / activate a venv
 
 ```
 ./scripts/build_python.sh -i out/python_env
-source pyenv/bin/activate
+source out/python_env/bin/activate
 ```
 
 ## Running tests
