@@ -160,7 +160,7 @@ sl_status_t wfx_connect_to_ap(void)
     VerifyOrReturnError(wfx_rsi.sec.ssid_length <= WFX_MAX_SSID_LENGTH, SL_STATUS_HAS_OVERFLOWED);
     ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
 
-    WifiEvent event = WifiEvent::kStationStartJoin;
+    WifiPlatformEvent event = WifiPlatformEvent::kStationStartJoin;
     sl_matter_wifi_post_event(event);
     return SL_STATUS_OK;
 }
@@ -327,7 +327,7 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
     VerifyOrReturnError(wfx_rsi.scan_ssid != nullptr, false);
     chip::Platform::CopyString(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length, ssid);
 
-    WifiEvent event = WifiEvent::kScan;
+    WifiPlatformEvent event = WifiPlatformEvent::kScan;
     sl_matter_wifi_post_event(event);
 
     return true;

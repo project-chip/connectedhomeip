@@ -44,4 +44,4 @@ sl_status_t sl_matter_wifi_platform_init(void);
  *
  * @param[in] event Event to process.
  */
-void sl_matter_wifi_post_event(WifiEvent event);
+void sl_matter_wifi_post_event(WifiPlatformEvent event);

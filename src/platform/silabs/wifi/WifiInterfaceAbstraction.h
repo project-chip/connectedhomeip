@@ -81,24 +81,18 @@ enum class WifiState : uint16_t
     kScanStarted        = (1 << 10), /* Scan Started */
 };
 
-enum class WifiEvent : uint8_t
+enum class WifiPlatformEvent : uint8_t
 {
-    kStationConnect    = 0,
-    kStationDisconnect = 1,
-    kAPStart           = 2,
-    kAPStop            = 3,
-    kScan              = 4, /* This is used as scan result and start */
-    kStationStartJoin  = 5,
-    kStationDoDhcp     = 6,
-    kStationDhcpDone   = 7,
-    kStationDhcpPoll   = 8
+    kStationConnect    = 1,
+    kStationDisconnect = 2,
+    kAPStart           = 3,
+    kAPStop            = 4,
+    kScan              = 5, /* This is used as scan result and start */
+    kStationStartJoin  = 6,
+    kStationDoDhcp     = 7,
+    kStationDhcpDone   = 8,
+    kStationDhcpPoll   = 9,
 };
-
-typedef enum
-{
-    WIFI_EVENT,
-    IP_EVENT,
-} wfx_event_base_t;
 
 /* Note that these are same as RSI_security */
 typedef enum
