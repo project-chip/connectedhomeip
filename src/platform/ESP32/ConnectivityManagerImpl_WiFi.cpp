@@ -41,12 +41,23 @@
 #include <lwip/nd6.h>
 #include <lwip/netif.h>
 
+#include <tracing/macros.h>
+#include <tracing/metric_event.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using chip::DeviceLayer::Internal::ESP32Utils;
+
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+static int max_rssi     = -100;
+static int current_rssi = 1;
+static int min_rssi     = 0;
+constexpr chip::Tracing::MetricKey kMetricWiFiMaxRSSI = "max_rssi";
+constexpr chip::Tracing::MetricKey kMetricWiFiMinRSSI = "min_rssi";
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 namespace chip {
 namespace DeviceLayer {
@@ -554,6 +565,20 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 
 void ConnectivityManagerImpl::DriveStationState()
 {
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    esp_wifi_sta_get_rssi(&current_rssi);
+    if (current_rssi != 1 && current_rssi > max_rssi)
+    {
+        max_rssi = current_rssi;
+        MATTER_LOG_METRIC(kMetricWiFiMaxRSSI, static_cast<int32_t>(max_rssi));
+    }
+    else if (current_rssi < min_rssi)
+    {
+        min_rssi = current_rssi;
+        MATTER_LOG_METRIC(kMetricWiFiMinRSSI, static_cast<int32_t>(min_rssi));
+    }
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
     bool stationConnected;
 
     // Refresh the current station mode.  Specifically, this reads the ESP auto_connect flag,
@@ -598,6 +623,7 @@ void ConnectivityManagerImpl::DriveStationState()
             if (err != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "esp_wifi_disconnect() failed: %s", esp_err_to_name(err));
+                MATTER_TRACE_INSTANT("WiFi_Error", esp_err_to_name(err));
                 return;
             }
 
@@ -641,12 +667,14 @@ void ConnectivityManagerImpl::DriveStationState()
             {
                 ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
                 esp_err_t err = esp_wifi_connect();
+                MATTER_TRACE_COUNTER("WiFi_con_attempt");
                 if (err != ESP_OK)
                 {
                     ChipLogError(DeviceLayer, "esp_wifi_connect() failed: %s", esp_err_to_name(err));
+                    MATTER_TRACE_INSTANT("WiFi_Error", esp_err_to_name(err));
+                    MATTER_TRACE_COUNTER("WiFi_fail_attempt");
                     return;
                 }
-
                 ChangeWiFiStationState(kWiFiStationState_Connecting);
             }
 
@@ -670,6 +698,10 @@ void ConnectivityManagerImpl::DriveStationState()
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
+    MATTER_TRACE_INSTANT("WiFi", "Station Connected");
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    LogWiFiInfo();
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     // Assign an IPv6 link local address to the station interface.
     esp_err_t err = esp_netif_create_ip6_linklocal(esp_netif_get_handle_from_ifkey(ESP32Utils::kDefaultWiFiStationNetifKey));
     if (err != ESP_OK)
@@ -698,6 +730,8 @@ void ConnectivityManagerImpl::OnStationConnected()
 
 void ConnectivityManagerImpl::OnStationDisconnected()
 {
+    MATTER_TRACE_INSTANT("WiFi", "Station Disconnected");
+
     // TODO Invoke WARM to perform actions that occur when the WiFi station interface goes down.
 
     // Alert other components of the new state.
@@ -707,6 +741,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     PlatformMgr().PostEventOrDie(&event);
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
     uint16_t reason                    = NetworkCommissioning::ESPWiFiDriver::GetInstance().GetLastDisconnectReason();
+    MATTER_TRACE_INSTANT("WiFi_disconnect_Reason", ESP32Utils::WiFiDisconnectReasonToStr(reason));
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
 
@@ -1152,6 +1187,103 @@ CHIP_ERROR ConnectivityManagerImpl::_SetPollingInterval(System::Clock::Milliseco
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+void ConnectivityManagerImpl::LogWiFiInfo()
+{
+    esp_err_t err;
+    uint8_t protocol_bitmap;
+    wifi_bandwidth_t bandwidth;
+    wifi_ps_type_t ps_type;
+    wifi_second_chan_t secondary_channel;
+
+    // Get AP protocol
+    err = esp_wifi_get_protocol(WIFI_IF_STA, &protocol_bitmap);
+    if (err == ESP_OK)
+    {
+        const char * protocol;
+        if (protocol_bitmap & WIFI_PROTOCOL_11B)
+            protocol = "11b";
+        else if (protocol_bitmap & WIFI_PROTOCOL_11G)
+            protocol = "11g";
+        else if (protocol_bitmap & WIFI_PROTOCOL_11N)
+            protocol = "11n";
+        else
+            protocol = "Unknown";
+        MATTER_TRACE_INSTANT("AP_protocol", protocol);
+    }
+    else
+    {
+        ESP_LOGE("LogWiFiInfo", "Failed to get AP protocol: %d", err);
+    }
+
+    // Get bandwidth
+    err = esp_wifi_get_bandwidth(WIFI_IF_STA, &bandwidth);
+    if (err == ESP_OK)
+    {
+        const char * bandwidth_str = (bandwidth == WIFI_BW_HT20) ? "HT20" : "HT40";
+        MATTER_TRACE_INSTANT("Bandwidth", bandwidth_str);
+    }
+    else
+    {
+        ESP_LOGE("LogWiFiInfo", "Failed to get bandwidth: %d", err);
+    }
+
+    // Get power save type
+    err = esp_wifi_get_ps(&ps_type);
+    if (err == ESP_OK)
+    {
+        const char * ps_type_str;
+        switch (ps_type)
+        {
+        case WIFI_PS_NONE:
+            ps_type_str = "No power save";
+            break;
+        case WIFI_PS_MIN_MODEM:
+            ps_type_str = "Min modem power save";
+            break;
+        case WIFI_PS_MAX_MODEM:
+            ps_type_str = "Max modem power save";
+            break;
+        default:
+            ps_type_str = "Unknown";
+            break;
+        }
+        MATTER_TRACE_INSTANT("Power_save_type", ps_type_str);
+    }
+    else
+    {
+        ESP_LOGE("LogWiFiInfo", "Failed to get power save type: %d", err);
+    }
+
+    // Get secondary channel
+    err = esp_wifi_get_channel(NULL, &secondary_channel);
+    if (err == ESP_OK)
+    {
+        const char * second_ch;
+        switch (secondary_channel)
+        {
+        case WIFI_SECOND_CHAN_NONE:
+            second_ch = "HT20: No channel";
+            break;
+        case WIFI_SECOND_CHAN_ABOVE:
+            second_ch = "HT40: above primary";
+            break;
+        case WIFI_SECOND_CHAN_BELOW:
+            second_ch = "HT40: below primary";
+            break;
+        default:
+            second_ch = "Unknown";
+            break;
+        }
+        MATTER_TRACE_INSTANT("Secondary_channel", second_ch);
+    }
+    else
+    {
+        ESP_LOGE("LogWiFiInfo", "Failed to get secondary channel: %d", err);
+    }
+}
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 } // namespace DeviceLayer
 } // namespace chip
