@@ -331,10 +331,9 @@ template("siwx917_sdk") {
     }
 
     if (sl_uart_log_output) {
-      defines += [
-        "SILABS_LOG_OUT_UART=1",
-        "SILABS_LOG_OUT_RTT=0",
-      ]
+      defines += [ "SILABS_LOG_OUT_UART=1" ]
+    } else {
+      defines += [ "SILABS_LOG_OUT_UART=0" ]
     }
 
     if (chip_build_libshell) {  # matter shell
