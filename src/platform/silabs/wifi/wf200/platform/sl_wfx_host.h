@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+// TODO: Should use the file from simplicity sdk
+
 #pragma once
 
 #include "FreeRTOS.h"
@@ -26,6 +28,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
 uint8_t sl_wfx_host_get_waited_event(void);
 sl_status_t wfx_soft_init(void);
 

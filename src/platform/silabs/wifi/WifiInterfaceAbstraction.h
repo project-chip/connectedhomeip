@@ -63,11 +63,6 @@
 #define GET_IPV6_FAIL (0)
 #define IP_STATUS_SUCCESS (1)
 
-#define SL_WFX_STARTUP_IND_ID (1)
-#define SL_WFX_CONNECT_IND_ID (2)
-#define SL_WFX_DISCONNECT_IND_ID (3)
-#define SL_WFX_SCAN_COMPLETE_ID (4)
-
 // TASK and Interrupt Macros
 #define SUCCESS_STATUS (1)
 
@@ -275,14 +270,6 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t sl_wifi_platform_disconnect();
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-#if SLI_SI917
-int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
-#else
-int32_t wfx_rsi_power_save();
-#endif /* SLI_SI917 */
-#endif /* SL_ICD_ENABLED */
-
 /**
  * @brief Posts an event to the Wi-Fi task
  *
@@ -304,7 +291,6 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 #ifdef WF200_WIFI
 void sl_wfx_host_gpio_init(void);
 void wfx_bus_start(void);
-sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
 #endif /* WF200_WIFI */
 
 #ifdef __cplusplus

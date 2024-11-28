@@ -234,39 +234,6 @@ int32_t sl_wifi_platform_disconnect(void)
     return rsi_wlan_disconnect();
 }
 
-#if SL_ICD_ENABLED
-/******************************************************************
- * @fn   wfx_rsi_power_save(void)
- * @brief
- *       Setting the RS911x in DTIM sleep based mode
- *
- * @param[in] None
- * @return
- *        None
- *********************************************************************/
-int32_t wfx_rsi_power_save(void)
-{
-    int32_t status;
-#ifdef RSI_BLE_ENABLE
-    status = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
-    if (status != RSI_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "BT Powersave Config Failed, Error Code : 0x%lX", status);
-        return status;
-    }
-#endif /* RSI_BLE_ENABLE */
-
-    status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
-    if (status != RSI_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "Powersave Config Failed, Error Code : 0x%lX", status);
-        return status;
-    }
-    ChipLogDetail(DeviceLayer, "Powersave Config Success");
-    return status;
-}
-#endif /* SL_ICD_ENABLED */
-
 /******************************************************************
  * @fn   wfx_rsi_join_cb(uint16_t status, const uint8_t *buf, const uint16_t len)
  * @brief
@@ -964,8 +931,26 @@ int32_t wfx_rsi_send_data(void * p, uint16_t len)
  * @return  SL_STATUS_OK if successful,
  *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
-sl_status_t wfx_power_save(void) // TODO : Figure out why the extern C is necessary
+sl_status_t wfx_power_save(void)
 {
-    return (wfx_rsi_power_save() ? SL_STATUS_FAIL : SL_STATUS_OK);
+    int32_t status;
+#ifdef RSI_BLE_ENABLE
+    status = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    if (status != RSI_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "BT Powersave Config Failed, Error Code : 0x%lX", status);
+        return SL_STATUS_FAIL;
+    }
+#endif /* RSI_BLE_ENABLE */
+
+    status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    if (status != RSI_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Powersave Config Failed, Error Code : 0x%lX", status);
+        return SL_STATUS_FAIL;
+    }
+
+    ChipLogDetail(DeviceLayer, "Powersave Config Success");
+    return SL_STATUS_OK;
 }
 #endif /* SL_ICD_ENABLED */
