@@ -35,11 +35,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.utils import CommissioningBuildingBlocks
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, TestStep
-from mobly import asserts
 import random
+
+import chip.clusters as Clusters
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, TestStep
+from chip.utils import CommissioningBuildingBlocks
+from mobly import asserts
 
 
 class TC_OPCREDS_3_5(MatterBaseTest):
