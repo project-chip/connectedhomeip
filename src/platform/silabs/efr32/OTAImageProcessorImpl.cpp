@@ -224,7 +224,11 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         return;
     }
 #endif // SL_BTLCTRL_MUX
+#if defined(SL_TRUSTZONE_NONSECURE)
+    CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId);)
+#else
     CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
+#endif
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "bootloader_verifyImage() error: %ld", err);
