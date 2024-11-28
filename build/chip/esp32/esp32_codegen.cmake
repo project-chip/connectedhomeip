@@ -74,7 +74,7 @@ macro(chip_app_component_zapgen ZAP_NAME)
     target_sources(${COMPONENT_LIB} PRIVATE 
       ${APP_TEMPLATE_GEN_FILES} ${CODEGEN_DATA_MODEL_SOURCES}
 
-      # SafeAttributePersistence neets ot be available for clusters
+      # SafeAttributePersistence needs ot be available for clusters
       "${CHIP_ROOT}/src/app/SafeAttributePersistenceProvider.cpp"
       "${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp"
     )
