@@ -26,6 +26,7 @@
 #include "sl_wfx_cmd_api.h"
 #include "sl_wfx_constants.h"
 #include "task.h"
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -224,16 +225,6 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 
 sl_wfx_get_counters_cnf_t * counters;
 
-/****************************************************************************
- * @brief
- *      get the wifi state
- * @return returns wificonetext state
- *****************************************************************************/
-sl_wfx_state_t wfx_get_wifi_state(void)
-{
-    return wifiContext.state;
-}
-
 sl_status_t get_all_counters(void)
 {
     sl_status_t result;
@@ -328,7 +319,7 @@ static void wfx_events_task_start(void)
  * @returns Returns SL_STATUS_OK if successful,
  *SL_STATUS_FAIL otherwise
  *****************************************************************************/
-sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
+extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
 {
     switch (event_payload->header.id)
     {
@@ -739,14 +730,14 @@ static void wfx_events_task(void * p_arg)
             retryJoin = 0;
             wfx_lwip_set_sta_link_up();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-            if (!(wfx_get_wifi_state() & SL_WFX_AP_INTERFACE_UP))
+            if (!(wifiContext.state & SL_WFX_AP_INTERFACE_UP))
             {
                 // Enable the power save
                 ChipLogProgress(DeviceLayer, "WF200 going to DTIM based sleep");
                 sl_wfx_set_power_mode(WFM_PM_MODE_DTIM, WFM_PM_POLL_FAST_PS, BEACON_1, 0 /*timeout*/);
                 sl_wfx_enable_device_power_save();
             }
-#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         }
 
         if (flags & SL_WFX_DISCONNECT)

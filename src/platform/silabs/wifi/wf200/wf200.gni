@@ -26,5 +26,4 @@ wf200_plat_src = [
   "${chip_root}/src/platform/silabs/wifi/wf200/platform/sl_wfx_task.h",
   "${chip_root}/src/platform/silabs/wifi/wf200/platform/sl_custom_board.h",
   "${chip_root}/src/platform/silabs/wifi/wf200/platform/spi_multiplex.h",
-  "${chip_root}/src/platform/silabs/wifi/wf200/platform/sl_wfx_board.h",
 ]
