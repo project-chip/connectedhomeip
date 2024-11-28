@@ -2450,45 +2450,36 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
     // times. Note that here we don't know what endpoints the network
     // commissioning clusters might be on.
     err = mAttributeCache->ForEachAttribute(NetworkCommissioning::Id, [this, &info](const ConcreteAttributePath & path) {
-        if (path.mAttributeId != FeatureMap::Id)
+        VerifyOrReturnError(path.mAttributeId == FeatureMap::Id, CHIP_NO_ERROR);
+        BitFlags<NetworkCommissioning::Feature> features;
+        if (mAttributeCache->Get<FeatureMap::TypeInfo>(path, *features.RawStorage()) == CHIP_NO_ERROR)
         {
-            return CHIP_NO_ERROR;
-        }
-        TLV::TLVReader reader;
-        if (this->mAttributeCache->Get(path, reader) == CHIP_NO_ERROR)
-        {
-            BitFlags<NetworkCommissioning::Feature> features;
-            if (app::DataModel::Decode(reader, features) == CHIP_NO_ERROR)
+            if (features.Has(NetworkCommissioning::Feature::kWiFiNetworkInterface))
             {
-                if (features.Has(NetworkCommissioning::Feature::kWiFiNetworkInterface))
+                ChipLogProgress(Controller, "NetworkCommissioning Features: has WiFi. endpointid = %u", path.mEndpointId);
+                info.network.wifi.endpoint = path.mEndpointId;
+            }
+            else if (features.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
+            {
+                ChipLogProgress(Controller, "NetworkCommissioning Features: has Thread. endpointid = %u", path.mEndpointId);
+                info.network.thread.endpoint = path.mEndpointId;
+            }
+            else if (features.Has(NetworkCommissioning::Feature::kEthernetNetworkInterface))
+            {
+                ChipLogProgress(Controller, "NetworkCommissioning Features: has Ethernet. endpointid = %u", path.mEndpointId);
+                info.network.eth.endpoint = path.mEndpointId;
+            }
+            else
+            {
+                ChipLogProgress(Controller, "NetworkCommissioning Features: no features.");
+                // TODO: Gross workaround for the empty feature map on all clusters. Remove.
+                if (info.network.thread.endpoint == kInvalidEndpointId)
                 {
-                    ChipLogProgress(Controller, "----- NetworkCommissioning Features: has WiFi. endpointid = %u", path.mEndpointId);
-                    info.network.wifi.endpoint = path.mEndpointId;
-                }
-                else if (features.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
-                {
-                    ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Thread. endpointid = %u",
-                                    path.mEndpointId);
                     info.network.thread.endpoint = path.mEndpointId;
                 }
-                else if (features.Has(NetworkCommissioning::Feature::kEthernetNetworkInterface))
+                if (info.network.wifi.endpoint == kInvalidEndpointId)
                 {
-                    ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Ethernet. endpointid = %u",
-                                    path.mEndpointId);
-                    info.network.eth.endpoint = path.mEndpointId;
-                }
-                else
-                {
-                    ChipLogProgress(Controller, "----- NetworkCommissioning Features: no features.");
-                    // TODO: Gross workaround for the empty feature map on all clusters. Remove.
-                    if (info.network.thread.endpoint == kInvalidEndpointId)
-                    {
-                        info.network.thread.endpoint = path.mEndpointId;
-                    }
-                    if (info.network.wifi.endpoint == kInvalidEndpointId)
-                    {
-                        info.network.wifi.endpoint = path.mEndpointId;
-                    }
+                    info.network.wifi.endpoint = path.mEndpointId;
                 }
             }
         }
@@ -2496,34 +2487,34 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
     });
     AccumulateErrors(return_err, err);
 
-    err = mAttributeCache->ForEachAttribute(Clusters::NetworkCommissioning::Id, [this, &info](const ConcreteAttributePath & path) {
-        if (path.mAttributeId != ConnectMaxTimeSeconds::Id)
+    if (info.network.thread.endpoint != kInvalidEndpointId)
+    {
+        err = mAttributeCache->Get<ConnectMaxTimeSeconds::TypeInfo>(info.network.thread.endpoint,
+                                                                    info.network.thread.minConnectionTime);
+        if (err != CHIP_NO_ERROR)
         {
-            return CHIP_NO_ERROR;
+            ChipLogError(Controller, "Failed to read Thread ConnectMaxTimeSeconds (endpoint %u): %" CHIP_ERROR_FORMAT,
+                         info.network.thread.endpoint, err.Format());
+            return_err = err;
         }
-        ConnectMaxTimeSeconds::TypeInfo::DecodableArgType time;
-        ReturnErrorOnFailure(this->mAttributeCache->Get<ConnectMaxTimeSeconds::TypeInfo>(path, time));
-        if (path.mEndpointId == info.network.wifi.endpoint)
+    }
+
+    if (info.network.wifi.endpoint != kInvalidEndpointId)
+    {
+        err =
+            mAttributeCache->Get<ConnectMaxTimeSeconds::TypeInfo>(info.network.wifi.endpoint, info.network.wifi.minConnectionTime);
+        if (err != CHIP_NO_ERROR)
         {
-            info.network.wifi.minConnectionTime = time;
+            ChipLogError(Controller, "Failed to read Wi-Fi ConnectMaxTimeSeconds (endpoint %u): %" CHIP_ERROR_FORMAT,
+                         info.network.wifi.endpoint, err.Format());
+            return_err = err;
         }
-        else if (path.mEndpointId == info.network.thread.endpoint)
-        {
-            info.network.thread.minConnectionTime = time;
-        }
-        else if (path.mEndpointId == info.network.eth.endpoint)
-        {
-            info.network.eth.minConnectionTime = time;
-        }
-        return CHIP_NO_ERROR;
-    });
-    AccumulateErrors(return_err, err);
+    }
 
     if (return_err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to parsing Network Commissioning information: %" CHIP_ERROR_FORMAT, return_err.Format());
     }
-
     return return_err;
 }
 

@@ -690,7 +690,7 @@ struct OperationalNodeFoundData
 struct NetworkClusterInfo
 {
     EndpointId endpoint = kInvalidEndpointId;
-    app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime;
+    app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime = 0;
 };
 struct NetworkClusters
 {
