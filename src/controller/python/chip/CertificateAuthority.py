@@ -217,10 +217,6 @@ class CertificateAuthority:
 
         self._certificateValidityPeriod = validity
 
-        c_uint32_validity = ctypes.c_uint32(validity)
-
-        print("CertificateAuthority.py -> validity as int: ", validity)
-        print("CertificateAuthority.py -> validity cast into int: ", c_uint32_validity.value)
     def __del__(self):
         self.Shutdown()
 
@@ -309,8 +305,6 @@ class CertificateAuthorityManager:
         if (certificateValidityPeriod is None):
             # By default, let's set validity to 10 years
             certificateValidityPeriod = 365 * 24 * 60 * 60 * 10
-
-        print("CertificateAuthority -> certificateValidityPeriod = ", certificateValidityPeriod)
 
         ca = CertificateAuthority(chipStack=self._chipStack, caIndex=caIndex, persistentStorage=self._persistentStorage)
         ca.maximizeCertChains = maximizeCertChains

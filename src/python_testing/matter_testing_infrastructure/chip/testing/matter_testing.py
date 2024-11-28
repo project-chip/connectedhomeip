@@ -864,8 +864,6 @@ class MatterStackState:
         self._certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self._chip_stack)
         self._certificate_authority_manager.LoadAuthoritiesFromStorage()
 
-        print("self._config.certificate_validity_period: ", self._config.certificate_validity_period)
-
         if (len(self._certificate_authority_manager.activeCaList) == 0):
             self._logger.warn(
                 "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")

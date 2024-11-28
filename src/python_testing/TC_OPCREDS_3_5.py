@@ -35,17 +35,11 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import copy
-import random
-# from cryptography import x509
-# from cryptography.hazmat.backends import default_backend
-
 import chip.clusters as Clusters
-from chip.tlv import TLVReader, TLVWriter
 from chip.utils import CommissioningBuildingBlocks
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, TestStep
 from mobly import asserts
-from pprint import pprint
+import random
 
 
 class TC_OPCREDS_3_5(MatterBaseTest):
