@@ -36,35 +36,39 @@
 #include "sl_si91x_types.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_device.h"
+#endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 
-/*
- * Interface to RSI Sapis
- */
+/* Updated constants */
 
-#define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP		*/
+constexpr uint8_t kWifiMacAddressLength = 6;
 
-// MAX SSID LENGTH excluding NULL character
-#define WFX_MAX_SSID_LENGTH (32)
+/* Defines to update */
+
+// TODO: Not sure why the pass key max length differs for the 917 SoC & NCP
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 // MAX PASSKEY LENGTH including NULL character
 #define WFX_MAX_PASSKEY_LENGTH (SL_WIFI_MAX_PSK_LENGTH)
-#define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS (1000)
 #else
-// MAX SSID LENGTH excluding NULL character
-#define WFX_MAX_SSID_LENGTH (32)
 // MAX PASSKEY LENGTH including NULL character
 #define WFX_MAX_PASSKEY_LENGTH (64)
 #endif // (SLI_SI91X_MCU_INTERFACE  | EXP_BOARD)
 
+// MAX SSID LENGTH excluding NULL character
+#define WFX_MAX_SSID_LENGTH (32)
 #define MAX_JOIN_RETRIES_COUNT (5)
-#define BSSID_LEN (6)
-#define MAC_ADDRESS_FIRST_OCTET (6)
-#define CONNECTION_STATUS_SUCCESS (1)
-#define IP_STATUS_FAIL (0)
-#define GET_IPV6_FAIL (0)
-#define IP_STATUS_SUCCESS (1)
 
-// TASK and Interrupt Macros
-#define SUCCESS_STATUS (1)
+/* Update Enums */
+
+enum class WifiEvent : uint8_t
+{
+    kStartUp      = 1,
+    kConnect      = 2,
+    kDisconnect   = 3,
+    kScanComplete = 4,
+    kGotIPv4      = 5,
+    kGotIPv6      = 6,
+    kLostIP       = 7,
+};
 
 enum class WifiState : uint16_t
 {
@@ -81,18 +85,16 @@ enum class WifiState : uint16_t
     kScanStarted        = (1 << 10), /* Scan Started */
 };
 
-enum class WifiPlatformEvent : uint8_t
+enum class WifiDisconnectionReasons : uint16_t // using uint16 to match current structure during the transition
 {
-    kStationConnect    = 1,
-    kStationDisconnect = 2,
-    kAPStart           = 3,
-    kAPStop            = 4,
-    kScan              = 5, /* This is used as scan result and start */
-    kStationStartJoin  = 6,
-    kStationDoDhcp     = 7,
-    kStationDhcpDone   = 8,
-    kStationDhcpPoll   = 9,
+    kUnknownError      = 1, // Disconnation due to an internal error
+    kAccessPointLost   = 2, // Device did not receive AP beacon too many times
+    kAccessPoint       = 3, // AP disconnected the device
+    kApplication       = 4, // Application requested disconnection
+    kWPACouterMeasures = 5, // WPA contermeasures triggered a disconnection
 };
+
+/* Enums to update */
 
 /* Note that these are same as RSI_security */
 typedef enum
@@ -129,7 +131,7 @@ typedef struct wfx_wifi_scan_result
     char ssid[WFX_MAX_SSID_LENGTH + 1];
     size_t ssid_length;
     wfx_sec_t security;
-    uint8_t bssid[BSSID_LEN];
+    uint8_t bssid[kWifiMacAddressLength];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
 } wfx_wifi_scan_result_t;
@@ -144,13 +146,6 @@ typedef struct wfx_wifi_scan_ext
     uint32_t ucast_tx_count;
     uint32_t overrun_count;
 } wfx_wifi_scan_ext_t;
-
-typedef enum
-{
-    IP_EVENT_STA_GOT_IP,
-    IP_EVENT_GOT_IP6,
-    IP_EVENT_STA_LOST_IP,
-} ip_event_id_t;
 
 #ifdef RS911X_WIFI
 /*
@@ -187,6 +182,42 @@ typedef struct wfx_rsi_s
 // TODO: We shouldn't need to have access to a global variable in the interface here
 extern WfxRsi_t wfx_rsi;
 
+/* Updated functions */
+
+/**
+ * @brief Function notifies the PlatformManager that an IPv6 event occured on the WiFi interface.
+ *
+ * @param gotIPv6Addr true, got an IPv6 address
+ *                    false, lost or wasn't able to get an IPv6 address
+ */
+void NotifyIPv6Change(bool gotIPv6Addr);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+/**
+ * @brief Function notifies the PlatformManager that an IPv4 event occured on the WiFi interface.
+ *
+ * @param gotIPv4Addr true, got an IPv4 address
+ *                    false, lost or wasn't able to get an IPv4 address
+ */
+void NotifyIPv4Change(bool gotIPv4Addr);
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+
+/**
+ * @brief Function notifies the PlatformManager that a disconnection event occurred
+ *
+ * @param reason reason for the disconnection
+ */
+void NotifyDisconnection(WifiDisconnectionReasons reason);
+
+/**
+ * @brief Function notifies the PlatformManager that a connection event occurred
+ *
+ * @param[in] ap pointer to the structure that contains the MAC address of the AP
+ */
+void NotifyConnection(sl_wfx_mac_address_t * ap);
+
+/* Function to update */
+
 sl_status_t wfx_wifi_start(void);
 void wfx_enable_sta_mode(void);
 void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr);
@@ -215,8 +246,6 @@ void wfx_cancel_scan(void);
  * Call backs into the Matter Platform code
  */
 void sl_matter_wifi_task_started(void);
-void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap);
-void wfx_disconnected_notify(int32_t status);
 
 /* Implemented for LWIP */
 void wfx_lwip_set_sta_link_up(void);
@@ -226,9 +255,7 @@ struct netif * wfx_get_netif(sl_wfx_interface_t interface);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 void wfx_dhcp_got_ipv4(uint32_t);
-void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-void wfx_ipv6_notify(int got_ip);
 void wfx_retry_connection(uint16_t retryAttempt);
 
 #ifdef RS911X_WIFI
@@ -255,21 +282,10 @@ sl_status_t wfx_power_save();
 
 void sl_matter_wifi_task(void * arg);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-void wfx_ip_changed_notify(int got_ip);
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-
 int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t sl_wifi_platform_disconnect();
-
-/**
- * @brief Posts an event to the Wi-Fi task
- *
- * @param[in] event Event to process.
- */
-void sl_matter_wifi_post_event(WifiEvent event);
 
 #ifdef __cplusplus
 extern "C" {

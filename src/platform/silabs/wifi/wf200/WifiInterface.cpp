@@ -45,7 +45,7 @@ using namespace ::chip::DeviceLayer;
 
 // TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
 //       As such we can't depend on the platform here as well
-extern void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData);
+extern void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData);
 
 /* wfxRsi Task will use as its stack */
 StackType_t wfxEventTaskStack[1024] = { 0 };
@@ -326,7 +326,10 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
     /******** INDICATION ********/
     case SL_WFX_STARTUP_IND_ID: {
         ChipLogProgress(DeviceLayer, "startup completed.");
-        HandleWFXSystemEvent(WIFI_EVENT, event_payload);
+
+        // TODO: This is a workaround until we unify the Matter Data structures
+        event_payload->header.id = to_underlying(WifiEvent::kStartUp);
+        HandleWFXSystemEvent(event_payload);
         break;
     }
     case SL_WFX_CONNECT_IND_ID: {
@@ -480,7 +483,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
         }
         ap->scan.chan = scan_result->channel;
         ap->scan.rssi = scan_result->rcpi;
-        memcpy(&ap->scan.bssid[0], &scan_result->mac[0], BSSID_LEN);
+        memcpy(&ap->scan.bssid[0], &scan_result->mac[0], kWifiMacAddressLength);
         scan_count++;
     }
 }
@@ -515,7 +518,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
     {
     case WFM_STATUS_SUCCESS: {
         ChipLogProgress(DeviceLayer, "STA-Connected");
-        memcpy(&ap_mac.octet[0], mac, MAC_ADDRESS_FIRST_OCTET);
+        memcpy(&ap_mac.octet[0], mac, kWifiMacAddressLength);
         sl_wfx_context->state =
             static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) | static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
         xEventGroupSetBits(sl_wfx_event_group, SL_WFX_CONNECT);
@@ -692,23 +695,23 @@ static void wfx_events_task(void * p_arg)
                     if (!hasNotifiedWifiConnectivity)
                     {
                         ChipLogProgress(DeviceLayer, "will notify WiFi connectivity");
-                        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &ap_mac);
+                        NotifyConnection(&ap_mac);
                         hasNotifiedWifiConnectivity = true;
                     }
                 }
                 else if (dhcp_state == DHCP_OFF)
                 {
-                    wfx_ip_changed_notify(IP_STATUS_FAIL);
+                    NotifyIPv4Change(false);
                     hasNotifiedIPV4 = false;
                 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
                 if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
                 {
-                    wfx_ipv6_notify(1);
+                    NotifyIPv6Change(true);
                     hasNotifiedIPV6 = true;
                     if (!hasNotifiedWifiConnectivity)
                     {
-                        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &ap_mac);
+                        NotifyConnection(&ap_mac);
                         hasNotifiedWifiConnectivity = true;
                     }
                 }
@@ -719,10 +722,10 @@ static void wfx_events_task(void * p_arg)
         if (flags & SL_WFX_CONNECT)
         {
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-            wfx_ip_changed_notify(IP_STATUS_FAIL);
+            NotifyIPv4Change(false);
             hasNotifiedIPV4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
-            wfx_ipv6_notify(GET_IPV6_FAIL);
+            NotifyIPv6Change(false);
             hasNotifiedIPV6             = false;
             hasNotifiedWifiConnectivity = false;
             ChipLogProgress(DeviceLayer, "connected to AP");
@@ -744,10 +747,10 @@ static void wfx_events_task(void * p_arg)
         {
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-            wfx_ip_changed_notify(IP_STATUS_FAIL);
+            NotifyIPv4Change(false);
             hasNotifiedIPV4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
-            wfx_ipv6_notify(GET_IPV6_FAIL);
+            NotifyIPv6Change(false);
             hasNotifiedIPV6             = false;
             hasNotifiedWifiConnectivity = false;
             wifi_extra &= ~WE_ST_STA_CONN;
@@ -1209,7 +1212,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
      */
     uint8_t ip4_addr[4];
 
-    ip4_addr[0] = (ip) &0xFF;
+    ip4_addr[0] = (ip) & 0xFF;
     ip4_addr[1] = (ip >> 8) & 0xFF;
     ip4_addr[2] = (ip >> 16) & 0xFF;
     ip4_addr[3] = (ip >> 24) & 0xFF;
@@ -1217,7 +1220,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", ip4_addr[0], ip4_addr[1], ip4_addr[2], ip4_addr[3]);
     sta_ip = ip;
 
-    wfx_ip_changed_notify(IP_STATUS_SUCCESS);
+    NotifyIPv4Change(true);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 

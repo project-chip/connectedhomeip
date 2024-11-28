@@ -154,7 +154,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
     uint8_t rssi;
     ap->security = wfx_rsi.sec.security;
     ap->chan     = wfx_rsi.ap_chan;
-    memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_LEN);
+    memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], kWifiMacAddressLength);
     status = rsi_wlan_get(RSI_RSSI, &rssi, sizeof(rssi));
     if (status == RSI_SUCCESS)
     {
@@ -451,7 +451,7 @@ static void wfx_rsi_save_ap_info(void) // translation
     }
     wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
     wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
-    memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_LEN);
+    memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], kWifiMacAddressLength);
 
     switch (rsp.scan_info->security_mode)
     {
@@ -563,7 +563,7 @@ void NotifyConnectivity(void)
 {
     if (!hasNotifiedWifiConnectivity)
     {
-        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
+        NotifyConnection(&wfx_rsi.ap_mac);
         hasNotifiedWifiConnectivity = true;
     }
 }
@@ -590,7 +590,7 @@ void HandleDHCPPolling(void)
     }
     else if (dhcp_state == DHCP_OFF)
     {
-        wfx_ip_changed_notify(IP_STATUS_FAIL);
+        NotifyIPv4Change(false);
         hasNotifiedIPV4 = false;
     }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
@@ -599,7 +599,7 @@ void HandleDHCPPolling(void)
      */
     if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
     {
-        wfx_ipv6_notify(GET_IPV6_SUCCESS);
+        NotifyIPv6Change(true);
         hasNotifiedIPV6         = true;
         WifiPlatformEvent event = WifiPlatformEvent::kStationDhcpDone;
         sl_matter_wifi_post_event(event);
@@ -655,11 +655,6 @@ void ProcessEvent(WifiPlatformEvent event)
         wfx_rsi.dev_state.Set(WifiState::kStationConnected);
         ResetDHCPNotificationFlags();
         wfx_lwip_set_sta_link_up();
-        /* We need to get AP Mac - TODO */
-        // Uncomment once the hook into MATTER is moved to IP connectivty instead
-        // of AP connectivity.
-        // wfx_connected_notify(0, &wfx_rsi.ap_mac); // This
-        // is independant of IP connectivity.
     }
     break;
     case WifiPlatformEvent::kStationDisconnect: {
@@ -670,12 +665,12 @@ void ProcessEvent(WifiPlatformEvent event)
         wfx_rsi.dev_state.Clear(flagsToClear);
         /* TODO: Implement disconnect notify */
         ResetDHCPNotificationFlags();
-        wfx_lwip_set_sta_link_down(); // Internally dhcpclient_poll(netif) ->
-                                      // wfx_ip_changed_notify(0) for IPV4
+        wfx_lwip_set_sta_link_down();
+
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-        wfx_ip_changed_notify(IP_STATUS_FAIL);
+        NotifyIPv4Change(false);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-        wfx_ipv6_notify(GET_IPV6_FAIL);
+        NotifyIPv6Change(false);
     }
     break;
     case WifiPlatformEvent::kAPStart:
@@ -720,9 +715,9 @@ void ProcessEvent(WifiPlatformEvent event)
             ap.security = static_cast<wfx_sec_t>(scan->security_mode);
             ap.rssi     = (-1) * scan->rssi_val;
 
-            configASSERT(sizeof(ap.bssid) == BSSID_LEN);
-            configASSERT(sizeof(scan->bssid) == BSSID_LEN);
-            memcpy(ap.bssid, scan->bssid, BSSID_LEN);
+            configASSERT(sizeof(ap.bssid) == kWifiMacAddressLength);
+            configASSERT(sizeof(scan->bssid) == kWifiMacAddressLength);
+            memcpy(ap.bssid, scan->bssid, kWifiMacAddressLength);
             (*wfx_rsi.scan_cb)(&ap);
 
             // no ssid filter set, return all results
@@ -823,7 +818,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[0] = (ip) & 0xFF;
     wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
     wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
@@ -831,7 +826,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
                     wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
     wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone, WifiState::kStationReady);
-    wfx_ip_changed_notify(IP_STATUS_SUCCESS);
+    NotifyIPv4Change(true);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 

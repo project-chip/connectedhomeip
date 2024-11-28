@@ -300,7 +300,7 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
     {
         security        = static_cast<sl_wifi_security_t>(scan_result->scan_info[0].security_mode);
         wfx_rsi.ap_chan = scan_result->scan_info[0].rf_channel;
-        memcpy(&wfx_rsi.ap_mac.octet, scan_result->scan_info[0].bssid, BSSID_LEN);
+        memcpy(&wfx_rsi.ap_mac.octet, scan_result->scan_info[0].bssid, kWifiMacAddressLength);
     }
 
     osSemaphoreRelease(sScanCompleteSemaphore);
@@ -480,7 +480,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
     ap->security       = wfx_rsi.sec.security;
     ap->chan           = wfx_rsi.ap_chan;
     chip::Platform::CopyString(ap->ssid, ap->ssid_length, wfx_rsi.sec.ssid);
-    memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_LEN);
+    memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], kWifiMacAddressLength);
     sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &rssi);
     ap->rssi = rssi;
     return status;
@@ -570,7 +570,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         }
         cur_scan_result.security = static_cast<wfx_sec_t>(scan_result->scan_info[idx].security_mode);
         cur_scan_result.rssi     = (-1) * scan_result->scan_info[idx].rssi_val;
-        memcpy(cur_scan_result.bssid, scan_result->scan_info[idx].bssid, BSSID_LEN);
+        memcpy(cur_scan_result.bssid, scan_result->scan_info[idx].bssid, kWifiMacAddressLength);
         wfx_rsi.scan_cb(&cur_scan_result);
 
         // if user has not provided the ssid, then call the callback for each scan result
@@ -606,7 +606,7 @@ sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_
 void NotifyConnectivity(void)
 {
     VerifyOrReturn(!hasNotifiedWifiConnectivity);
-    wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
+    NotifyConnection(&wfx_rsi.ap_mac);
     hasNotifiedWifiConnectivity = true;
 }
 
@@ -630,7 +630,7 @@ void HandleDHCPPolling(void)
     }
     else if (dhcp_state == DHCP_OFF)
     {
-        wfx_ip_changed_notify(IP_STATUS_FAIL);
+        NotifyIPv4Change(false);
         hasNotifiedIPV4 = false;
     }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
@@ -642,7 +642,7 @@ void HandleDHCPPolling(void)
         char addrStr[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
         VerifyOrReturn(ip6addr_ntoa_r(netif_ip6_addr(sta_netif, 0), addrStr, sizeof(addrStr)) != nullptr);
         ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
-        wfx_ipv6_notify(GET_IPV6_SUCCESS);
+        NotifyIPv6Change(true);
         hasNotifiedIPV6 = true;
         event           = WifiPlatformEvent::kStationDhcpDone;
         sl_matter_wifi_post_event(event);
@@ -699,10 +699,9 @@ void ProcessEvent(WifiPlatformEvent event)
         /* TODO: Implement disconnect notify */
         ResetDHCPNotificationFlags();
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-        wfx_ip_changed_notify(0); // for IPV4
-        wfx_ip_changed_notify(IP_STATUS_FAIL);
+        NotifyIPv4Change(false);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-        wfx_ipv6_notify(GET_IPV6_FAIL);
+        NotifyIPv6Change(false);
     }
     break;
 
@@ -840,7 +839,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[0] = (ip) & 0xFF;
     wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
     wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
@@ -848,7 +847,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
                   wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
     wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone).Set(WifiState::kStationReady);
-    wfx_ip_changed_notify(IP_STATUS_SUCCESS);
+    NotifyIPv4Change(true);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 

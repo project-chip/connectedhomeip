@@ -18,6 +18,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
 
+extern WfxRsi_t wfx_rsi;
+
 namespace {
 
 // Thread for the WLAN RSI
