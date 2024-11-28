@@ -417,7 +417,7 @@ config CHIP_ICD_UAT_SUPPORT
 	  means (e.g. button press) to trigger an ICD device to enter the active mode and become responsive.
 
 config CHIP_ICD_DSLS_SUPPORT
-	bool "Intermittenttly Connected Device Dynamic SIT LIT support"
+	bool "Intermittently Connected Device Dynamic SIT LIT support"
 	depends on CHIP_ICD_LIT_SUPPORT
 	help
 	  Enables the Dynamic SIT LIT support in Matter. It allows the application to dynamically switch between
@@ -430,6 +430,11 @@ config CHIP_ICD_CLIENTS_PER_FABRIC
 	help
 	  Provides the Intermittently Connected Device number of clients per fabric. It determines the maximum number
 	  of clients per fabric that can be registered to receive notification from a device if their subscription is lost.
+
+config CHIP_ICD_REPORT_ON_ACTIVE_MODE
+	bool "Intermittently Connected Device report on active mode"
+	help
+	  Enables an ICD to send data report to the subscribers on entering the active mode.
 
 endif # CHIP_ENABLE_ICD_SUPPORT
 
