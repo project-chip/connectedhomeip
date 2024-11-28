@@ -132,6 +132,8 @@ class TC_OPCREDS_3_5(MatterBaseTest):
             node_id=self.dut_node_id,
             cluster=opcreds,
             attribute=opcreds.Attributes.TrustedRootCertificates)
+        asserts.assert_equal(len(trusted_root_original), 2,
+                             "Unexpected number of entries in the TrustedRootCertificates table")
 
         self.step(4)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
