@@ -1363,6 +1363,43 @@ cluster GeneralDiagnostics = 51 {
   command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
+/** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+cluster SoftwareDiagnostics = 52 {
+  revision 1; // NOTE: Default/not specifically set
+
+  bitmap Feature : bitmap32 {
+    kWatermarks = 0x1;
+  }
+
+  struct ThreadMetricsStruct {
+    int64u id = 0;
+    optional char_string<8> name = 1;
+    optional int32u stackFreeCurrent = 2;
+    optional int32u stackFreeMinimum = 3;
+    optional int32u stackSize = 4;
+  }
+
+  info event SoftwareFault = 0 {
+    int64u id = 0;
+    optional char_string name = 1;
+    optional octet_string faultRecording = 2;
+  }
+
+  readonly attribute optional ThreadMetricsStruct threadMetrics[] = 0;
+  readonly attribute optional int64u currentHeapFree = 1;
+  readonly attribute optional int64u currentHeapUsed = 2;
+  readonly attribute optional int64u currentHeapHighWatermark = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
+  command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
+}
+
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster WiFiNetworkDiagnostics = 54 {
   revision 1; // NOTE: Default/not specifically set
@@ -1919,7 +1956,8 @@ cluster OperationalState = 96 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 0;
+  device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -1928,6 +1966,9 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -1936,39 +1977,31 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
   server cluster BasicInformation {
     emits event StartUp;
-    emits event ShutDown;
-    emits event Leave;
     callback attribute dataModelRevision;
     callback attribute vendorName;
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
-    persist  attribute nodeLabel;
+    ram      attribute nodeLabel;
     callback attribute location;
     callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
     callback attribute softwareVersion;
     callback attribute softwareVersionString;
-    callback attribute manufacturingDate;
-    callback attribute partNumber;
-    callback attribute productURL;
-    callback attribute productLabel;
-    callback attribute serialNumber;
-    persist  attribute localConfigDisabled default = 0;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
-    callback attribute productAppearance;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
     callback attribute generatedCommandList;
@@ -2020,8 +2053,11 @@ endpoint 0 {
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2040,11 +2076,12 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    callback attribute supportedWiFiBands;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
@@ -2087,24 +2124,53 @@ endpoint 0 {
     handle command TimeSnapshotResponse;
   }
 
+  server cluster SoftwareDiagnostics {
+    callback attribute threadMetrics;
+    callback attribute currentHeapFree;
+    callback attribute currentHeapUsed;
+    callback attribute currentHeapHighWatermark;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ResetWatermarks;
+  }
+
   server cluster WiFiNetworkDiagnostics {
+    emits event Disconnection;
+    emits event AssociationFailure;
+    emits event ConnectionStatus;
     callback attribute bssid;
     callback attribute securityType;
     callback attribute wiFiVersion;
     callback attribute channelNumber;
     callback attribute rssi;
+    callback attribute beaconLostCount;
+    callback attribute beaconRxCount;
+    callback attribute packetMulticastRxCount;
+    callback attribute packetMulticastTxCount;
+    callback attribute packetUnicastRxCount;
+    callback attribute packetUnicastTxCount;
     callback attribute currentMaxRate;
+    callback attribute overrunCount;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
+
+    handle command ResetCounts;
   }
 
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2119,6 +2185,9 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2141,6 +2210,9 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2198,8 +2270,8 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 6;
 
     handle command Off;
     handle command On;
@@ -2257,7 +2329,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
@@ -2300,7 +2372,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command Pause;
     handle command Stop;
