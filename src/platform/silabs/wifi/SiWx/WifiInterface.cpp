@@ -93,9 +93,6 @@ namespace {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
 bool btn0_pressed = false;
-#ifdef ENABLE_CHIP_SHELL
-bool ps_requirement_added = false;
-#endif // ENABLE_CHIP_SHELL
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 
 bool hasNotifiedWifiConnectivity = false;
@@ -550,37 +547,6 @@ int32_t sl_wifi_platform_disconnect(void)
     return sl_net_down((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE);
 }
 
-/******************************************************************
- * @fn   wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state)
- * @brief
- *       Setting the RS911x in DTIM sleep based mode
- *
- * @param[in] sl_si91x_ble_state : State to set for the BLE
- * @param[in] sl_si91x_wifi_state : State to set for the WiFi
- * @return
- *        None
- *********************************************************************/
-int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state)
-{
-    int32_t status;
-
-    status = rsi_bt_power_save_profile(sl_si91x_ble_state, 0);
-    if (status != RSI_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "rsi_bt_power_save_profile failed: 0x%lx", static_cast<uint32_t>(status));
-        return status;
-    }
-    sl_wifi_performance_profile_t wifi_profile = { .profile = sl_si91x_wifi_state };
-    status                                     = sl_wifi_set_performance_profile(&wifi_profile);
-    if (status != RSI_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "sl_wifi_set_performance_profile failed: 0x%lx", static_cast<uint32_t>(status));
-        return status;
-    }
-
-    return status;
-}
-
 sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
 {
     SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
@@ -897,9 +863,23 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
  * @return  SL_STATUS_OK if successful,
  *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
-sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,
-                           sl_si91x_performance_profile_t sl_si91x_wifi_state) // TODO : Figure out why the extern C is necessary
+sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state)
 {
-    return (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) ? SL_STATUS_FAIL : SL_STATUS_OK);
+    int32_t error = rsi_bt_power_save_profile(sl_si91x_ble_state, 0);
+    if (error != RSI_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "rsi_bt_power_save_profile failed: %ld", error);
+        return SL_STATUS_FAIL;
+    }
+
+    sl_wifi_performance_profile_t wifi_profile = { .profile = sl_si91x_wifi_state };
+    sl_status_t status                         = sl_wifi_set_performance_profile(&wifi_profile);
+    if (status != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "sl_wifi_set_performance_profile failed: 0x%lx", static_cast<uint32_t>(status));
+        return status;
+    }
+
+    return SL_STATUS_OK;
 }
 #endif
