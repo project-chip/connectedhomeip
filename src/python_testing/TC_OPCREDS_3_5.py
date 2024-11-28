@@ -133,7 +133,7 @@ class TC_OPCREDS_3_5(MatterBaseTest):
             node_id=self.dut_node_id,
             cluster=opcreds,
             attribute=opcreds.Attributes.TrustedRootCertificates)
-        if(len(trusted_root_certificates) > 1):
+        if (len(trusted_root_certificates) > 1):
             trusted_root_original = trusted_root_certificates[-1]
         else:
             print("Unexpected error returned list is empty or has no entries")
