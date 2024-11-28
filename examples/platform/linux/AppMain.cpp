@@ -684,10 +684,22 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     ApplicationInit();
 
+    // NOTE: For some reason, on Darwin, the signal handler is not called if the signal is
+    //       registered with sigaction() call and TSAN is enabled. The problem seems to be
+    //       related with the dispatch_semaphore_wait() function in the RunEventLoop() method.
+    //       If this call is commented out, the signal handler is called as expected...
+#if defined(__APPLE__)
     // NOLINTBEGIN(bugprone-signal-handler)
     signal(SIGINT, StopSignalHandler);
     signal(SIGTERM, StopSignalHandler);
     // NOLINTEND(bugprone-signal-handler)
+#else
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
+    sigaction(SIGINT, &sa, nullptr);
+    sigaction(SIGTERM, &sa, nullptr);
+#endif
 
     if (impl != nullptr)
     {
