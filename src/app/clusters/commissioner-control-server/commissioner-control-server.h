@@ -138,8 +138,6 @@ public:
                                                        const Events::CommissioningRequestResult::Type & result);
 
 private:
-    Delegate * mDelegate = nullptr;
-
     /**
      * @brief Inherited from CommandHandlerInterface
      */
@@ -161,6 +159,8 @@ private:
      * If the operational state is in 'Error', returns the Interaction Model status code of INVALID_IN_STATE.
      */
     void HandleCommissionNode(HandlerContext & ctx, const Commands::CommissionNode::DecodableType & req);
+
+    Delegate * mDelegate = nullptr;
 };
 
 } // namespace CommissionerControl
