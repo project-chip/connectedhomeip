@@ -41,5 +41,3 @@ dependencies:
         version: ">=0.1.12"
         rules:
             - if: "target in [esp32p4]"
-
-espressif/esp_diag_data_store: "1.0.1"
