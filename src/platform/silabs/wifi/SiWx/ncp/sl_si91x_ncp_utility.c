@@ -15,9 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- * Includes
- */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

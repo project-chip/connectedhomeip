@@ -43,7 +43,7 @@ if (chip_enable_wifi && !wifi_soc) {
   if (use_rs9116) {
     import("${silabs_platform_dir}/wifi/rs911x/rs911x.gni")
   } else if (use_SiWx917) {
-    import("${silabs_platform_dir}/wifi/rs911x/rs9117.gni")
+    import("${silabs_platform_dir}/wifi/SiWx/ncp/rs9117.gni")
   }
   if (use_wf200) {
     import("${silabs_platform_dir}/wifi/wf200/wf200.gni")
