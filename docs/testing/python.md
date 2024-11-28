@@ -45,7 +45,7 @@ Python tests located in src/python_testing
 
 ### A simple test
 
-```python
+```
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
@@ -320,7 +320,7 @@ callbacks are called on update.
 
 Example for setting callbacks:
 
-```python
+```
 q = queue.Queue()
 cb = SimpleEventCallback("cb", cluster_id, event_id, q)
 
@@ -345,7 +345,7 @@ PyChipError
 
 Example:
 
-```python
+```
 res = await devCtrl.WriteAttribute(nodeid=0, attributes=[(0,Clusters.BasicInformation.Attributes.NodeLabel("Test"))])
 asserts.assert_equal(ret[0].status, Status.Success, “write failed”)
 ```
