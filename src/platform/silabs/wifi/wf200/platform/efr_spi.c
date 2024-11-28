@@ -437,8 +437,6 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 #endif // SL_SPICTRL_MUX
     return SL_STATUS_OK;
 }
-#else
-#error still not working
 #endif // SL_LCDCTRL_MUX
 
 #if SL_UARTCTRL_MUX
