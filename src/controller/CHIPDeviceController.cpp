@@ -2232,8 +2232,17 @@ public:
     template <typename... Ts>
     bool AddAttributePath(Ts &&... args)
     {
-        VerifyOrReturnValue(mSkip == 0, true, mSkip--);
-        VerifyOrReturnValue(mCount < kCapacity, false, mCount = kCapacity + 1);
+        if (mSkip > 0)
+        {
+            mSkip--;
+            return true;
+        }
+        if (mCount >= kCapacity)
+        {
+            // capacity exceeded
+            mCount = kCapacity + 1;
+            return false;
+        }
         mPaths[mCount++] = app::AttributePathParams(std::forward<Ts>(args)...);
         return true;
     }
