@@ -631,6 +631,12 @@ example DUT on the host and includes factory reset support
 ./scripts/tests/run_python_test.py --factory-reset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"
 ```
 
+For example, to run TC-ACE-1.2 tests against the linux `chip-lighting-app`:
+
+```shell
+./scripts/tests/run_python_test.py --factory-reset --app ./out/linux-x64-light-no-ble/chip-lighting-app --app-args "--trace-to json:log" --script src/python_testing/TC_ACE_1_2.py --script-args "--commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00"
+```
+
 # Running tests in CI
 
 -   Add test to the `repl_tests_linux` section of `.github/workflows/tests.yaml`
