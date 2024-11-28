@@ -68,6 +68,7 @@ static_library("ESP32") {
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/tracing:macros",
   ]
 
   public = [
