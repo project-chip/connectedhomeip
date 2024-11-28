@@ -53,7 +53,7 @@ class TC_OPCREDS_3_5(MatterBaseTest):
                 TestStep(2, "TH1 reads the NOCs attribute from the Node Operational Credentials cluster using a fabric-filtered read",
                          "Verify that the returned list has a single entry. Save the NOC field as noc_original and the ICAC field as icac_original"),
                 TestStep(3, "TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster",
-                         "Verify that the returned list has a single entry. Save the entry as trusted_root_original"),
+                         "Verify that at least one of the trusted_root_certificates in the returned list matches the RCAC"),
                 TestStep(4, "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to 900",
                          "Verify that DUT sends ArmFailSafeResponse with the ErrorCode set to OK"),
                 TestStep(5, "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to true",
@@ -127,13 +127,17 @@ class TC_OPCREDS_3_5(MatterBaseTest):
         asserts.assert_equal(icac_original, original_cert_chain.icacBytes, "Returned ICAC does not match generated ICAC")
 
         self.step(3)
-        trusted_root_original = await self.read_single_attribute_check_success(
+        rcac_original = original_cert_chain.rcacBytes
+        trusted_root_certificates = await self.read_single_attribute_check_success(
             dev_ctrl=th1,
             node_id=self.dut_node_id,
             cluster=opcreds,
             attribute=opcreds.Attributes.TrustedRootCertificates)
-        asserts.assert_equal(len(trusted_root_original), 2,
-                             "Unexpected number of entries in the TrustedRootCertificates table")
+        if(len(trusted_root_certificates) > 1):
+            trusted_root_original = trusted_root_certificates[-1]
+        else:
+            print("Unexpected error returned list is empty or has no entries")
+        asserts.assert_equal(trusted_root_original, rcac_original, "Returned RCAC does not match the TrustedRootCertificates.")
 
         self.step(4)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
