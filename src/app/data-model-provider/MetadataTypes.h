@@ -39,7 +39,7 @@ enum class EndpointCompositionPattern : uint8_t
 {
     // Tree pattern supports a general tree of endpoints. Commonly used for
     // device types that support physical device composition (e.g. Refrigerator)
-    kTree       = 0x1,
+    kTree = 0x1,
 
     // A full-family pattern is a list fo all descendant endpoints, with no
     // imposed hierarchy.
@@ -56,8 +56,7 @@ struct EndpointInfo
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
 
-    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamily)
-    {}
+    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamily) {}
     EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
 };
 
