@@ -32,13 +32,13 @@ namespace Credentials {
 
 namespace {
 
-static constexpr uint32_t kMaxIssuerBase64Len = BASE64_ENCODED_LEN(kMaxCertificateDistinguishedNameLength);
-
-CHIP_ERROR BytesToHexStr(const ByteSpan & bytes, MutableCharSpan & outHexStr)
+CHIP_ERROR BytesToHexStr(const ByteSpan & bytes, std::string & outHexStr)
 {
+    size_t hexLength = bytes.size() * 2;
+    outHexStr.resize(hexLength);
+
     Encoding::HexFlags flags = Encoding::HexFlags::kUppercase;
-    ReturnErrorOnFailure(BytesToHex(bytes.data(), bytes.size(), outHexStr.data(), outHexStr.size(), flags));
-    outHexStr.reduce_size(2 * bytes.size());
+    ReturnErrorOnFailure(BytesToHex(bytes.data(), bytes.size(), &outHexStr[0], hexLength, flags));
     return CHIP_NO_ERROR;
 }
 
@@ -98,20 +98,12 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectAndKeyIdFromPEMCert(const st
                                                                         std::string & outKeyId)
 {
     // buffers and spans for storing crl signer delegator OR crl signer cert info
-    char subjectBuf[kMaxIssuerBase64Len]             = { 0 };
-    char skidBuf[2 * kAuthorityKeyIdentifierLength]  = { 0 };
     uint8_t certDerBuf[kMax_x509_Certificate_Length] = { 0 };
-
-    MutableCharSpan subject(subjectBuf);
-    MutableCharSpan keyId(skidBuf);
     MutableByteSpan certDER(certDerBuf);
 
     ReturnLogErrorOnFailure(X509_PemToDer(certPEM, certDER));
-    ReturnErrorOnFailure(GetSubjectNameBase64Str(certDER, subject));
-    ReturnErrorOnFailure(GetSKIDHexStr(certDER, keyId));
-
-    outSubject = std::string(subject.data(), subject.size());
-    outKeyId   = std::string(keyId.data(), keyId.size());
+    ReturnErrorOnFailure(GetSubjectNameBase64Str(certDER, outSubject));
+    ReturnErrorOnFailure(GetSKIDHexStr(certDER, outKeyId));
 
     return CHIP_NO_ERROR;
 }
@@ -159,8 +151,8 @@ bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revoke
 //   }
 // ]
 //
-bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
-                                                           const CharSpan & serialNumberHexStr)
+bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const std::string & akidHexStr, const std::string & issuerNameBase64Str,
+                                                           const std::string & serialNumberHexStr)
 {
     std::ifstream file(mDeviceAttestationRevocationSetPath.c_str());
     if (!file.is_open())
@@ -185,30 +177,26 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akid
         return false;
     }
 
-    std::string issuerName   = std::string(issuerNameBase64Str.data(), issuerNameBase64Str.size());
-    std::string serialNumber = std::string(serialNumberHexStr.data(), serialNumberHexStr.size());
-    std::string akid         = std::string(akidHexStr.data(), akidHexStr.size());
-
     // 6.2.4.2. Determining Revocation Status of an Entity
     for (const auto & revokedSet : jsonData)
     {
-        if (revokedSet["issuer_name"].asString() != issuerName)
+        if (revokedSet["issuer_name"].asString() != issuerNameBase64Str)
         {
             continue;
         }
-        if (revokedSet["issuer_subject_key_id"].asString() != akid)
+        if (revokedSet["issuer_subject_key_id"].asString() != akidHexStr)
         {
             continue;
         }
 
         // 4.a cross validate PAI with crl signer OR crl signer delegator
         // 4.b cross validate DAC with crl signer OR crl signer delegator
-        VerifyOrReturnValue(CrossValidateCert(revokedSet, akid, issuerName), false);
+        VerifyOrReturnValue(CrossValidateCert(revokedSet, akidHexStr, issuerNameBase64Str), false);
 
         // 4.c check if serial number is revoked
         for (const auto & revokedSerialNumber : revokedSet["revoked_serial_numbers"])
         {
-            if (revokedSerialNumber.asString() == serialNumber)
+            if (revokedSerialNumber.asString() == serialNumberHexStr)
             {
                 return true;
             }
@@ -217,7 +205,7 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akid
     return false;
 }
 
-CHIP_ERROR TestDACRevocationDelegateImpl::GetKeyIDHexStr(const ByteSpan & certDer, MutableCharSpan & outKeyIDHexStr,
+CHIP_ERROR TestDACRevocationDelegateImpl::GetKeyIDHexStr(const ByteSpan & certDer, std::string & outKeyIDHexStr,
                                                          KeyIdType keyIdType)
 {
     static_assert(kAuthorityKeyIdentifierLength == kSubjectKeyIdentifierLength, "AKID and SKID length mismatch");
@@ -242,17 +230,17 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetKeyIDHexStr(const ByteSpan & certDe
     return BytesToHexStr(keyId, outKeyIDHexStr);
 }
 
-CHIP_ERROR TestDACRevocationDelegateImpl::GetAKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outAKIDHexStr)
+CHIP_ERROR TestDACRevocationDelegateImpl::GetAKIDHexStr(const ByteSpan & certDer, std::string & outAKIDHexStr)
 {
     return GetKeyIDHexStr(certDer, outAKIDHexStr, KeyIdType::kAKID);
 }
 
-CHIP_ERROR TestDACRevocationDelegateImpl::GetSKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outSKIDHexStr)
+CHIP_ERROR TestDACRevocationDelegateImpl::GetSKIDHexStr(const ByteSpan & certDer, std::string & outSKIDHexStr)
 {
     return GetKeyIDHexStr(certDer, outSKIDHexStr, KeyIdType::kSKID);
 }
 
-CHIP_ERROR TestDACRevocationDelegateImpl::GetSerialNumberHexStr(const ByteSpan & certDer, MutableCharSpan & outSerialNumberHexStr)
+CHIP_ERROR TestDACRevocationDelegateImpl::GetSerialNumberHexStr(const ByteSpan & certDer, std::string & outSerialNumberHexStr)
 {
     uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength] = { 0 };
     MutableByteSpan serialNumber(serialNumberBuf);
@@ -261,7 +249,7 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetSerialNumberHexStr(const ByteSpan &
     return BytesToHexStr(serialNumber, outSerialNumberHexStr);
 }
 
-CHIP_ERROR TestDACRevocationDelegateImpl::GetRDNBase64Str(const ByteSpan & certDer, MutableCharSpan & outRDNBase64String,
+CHIP_ERROR TestDACRevocationDelegateImpl::GetRDNBase64Str(const ByteSpan & certDer, std::string & outRDNBase64String,
                                                           RDNType rdnType)
 {
     uint8_t rdnBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
@@ -281,21 +269,25 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetRDNBase64Str(const ByteSpan & certD
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    VerifyOrReturnError(outRDNBase64String.size() >= BASE64_ENCODED_LEN(rdn.size()), CHIP_ERROR_BUFFER_TOO_SMALL);
+    // calculate the b64 length needed
+    size_t b64LenNeeded = BASE64_ENCODED_LEN(rdn.size());
 
-    uint16_t encodedLen = Base64Encode(rdn.data(), static_cast<uint16_t>(rdn.size()), outRDNBase64String.data());
-    outRDNBase64String.reduce_size(encodedLen);
+    // Ensure string has enough capacity for base64 encoded data
+    outRDNBase64String.resize(b64LenNeeded);
+
+    uint16_t encodedLen = Base64Encode(rdn.data(), static_cast<uint16_t>(rdn.size()), &outRDNBase64String[0]);
+    outRDNBase64String.resize(encodedLen);
+
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestDACRevocationDelegateImpl::GetIssuerNameBase64Str(const ByteSpan & certDer,
-                                                                 MutableCharSpan & outIssuerNameBase64String)
+CHIP_ERROR TestDACRevocationDelegateImpl::GetIssuerNameBase64Str(const ByteSpan & certDer, std::string & outIssuerNameBase64String)
 {
     return GetRDNBase64Str(certDer, outIssuerNameBase64String, RDNType::kIssuer);
 }
 
 CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectNameBase64Str(const ByteSpan & certDer,
-                                                                  MutableCharSpan & outSubjectNameBase64String)
+                                                                  std::string & outSubjectNameBase64String)
 {
     return GetRDNBase64Str(certDer, outSubjectNameBase64String, RDNType::kSubject);
 }
@@ -303,13 +295,9 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectNameBase64Str(const ByteSpan
 // @param certDer Certificate, in DER format, to check for revocation
 bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDer)
 {
-    char issuerNameBuffer[kMaxIssuerBase64Len]                           = { 0 };
-    char serialNumberHexStrBuffer[2 * kMaxCertificateSerialNumberLength] = { 0 };
-    char akidHexStrBuffer[2 * kAuthorityKeyIdentifierLength]             = { 0 };
-
-    MutableCharSpan issuerName(issuerNameBuffer);
-    MutableCharSpan serialNumber(serialNumberHexStrBuffer);
-    MutableCharSpan akid(akidHexStrBuffer);
+    std::string serialNumber;
+    std::string akid;
+    std::string issuerName;
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetIssuerNameBase64Str(certDer, issuerName), false);
     ChipLogDetail(NotSpecified, "Issuer: %.*s", static_cast<int>(issuerName.size()), issuerName.data());

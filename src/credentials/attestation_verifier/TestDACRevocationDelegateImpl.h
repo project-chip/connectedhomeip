@@ -53,7 +53,6 @@ public:
     void ClearDeviceAttestationRevocationSetPath();
 
 private:
-    bool CrossValidateCert(const Json::Value & revokedSet, const std::string & akIdHexStr, const std::string & issuerNameBase64Str);
 
     enum class KeyIdType : uint8_t
     {
@@ -67,20 +66,22 @@ private:
         kSubject = 1,
     };
 
-    CHIP_ERROR GetKeyIDHexStr(const ByteSpan & certDer, MutableCharSpan & outKeyIDHexStr, KeyIdType keyIdType);
-    CHIP_ERROR GetAKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outAKIDHexStr);
-    CHIP_ERROR GetSKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outSKIDHexStr);
+    bool CrossValidateCert(const Json::Value & revokedSet, const std::string & akIdHexStr, const std::string & issuerNameBase64Str);
 
-    CHIP_ERROR GetSerialNumberHexStr(const ByteSpan & certDer, MutableCharSpan & outSerialNumberHexStr);
+    CHIP_ERROR GetKeyIDHexStr(const ByteSpan & certDer, std::string & outKeyIDHexStr, KeyIdType keyIdType);
+    CHIP_ERROR GetAKIDHexStr(const ByteSpan & certDer, std::string & outAKIDHexStr);
+    CHIP_ERROR GetSKIDHexStr(const ByteSpan & certDer, std::string & outSKIDHexStr);
 
-    CHIP_ERROR GetRDNBase64Str(const ByteSpan & certDer, MutableCharSpan & outRDNBase64String, RDNType rdnType);
-    CHIP_ERROR GetIssuerNameBase64Str(const ByteSpan & certDer, MutableCharSpan & outIssuerNameBase64String);
-    CHIP_ERROR GetSubjectNameBase64Str(const ByteSpan & certDer, MutableCharSpan & outSubjectNameBase64String);
+    CHIP_ERROR GetSerialNumberHexStr(const ByteSpan & certDer, std::string & outSerialNumberHexStr);
+
+    CHIP_ERROR GetRDNBase64Str(const ByteSpan & certDer, std::string & outRDNBase64String, RDNType rdnType);
+    CHIP_ERROR GetIssuerNameBase64Str(const ByteSpan & certDer, std::string & outIssuerNameBase64String);
+    CHIP_ERROR GetSubjectNameBase64Str(const ByteSpan & certDer, std::string & outSubjectNameBase64String);
 
     CHIP_ERROR GetSubjectAndKeyIdFromPEMCert(const std::string & certPEM, std::string & outSubject, std::string & outKeyId);
 
-    bool IsEntryInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
-                                const CharSpan & serialNumberHexStr);
+    bool IsEntryInRevocationSet(const std::string & akidHexStr, const std::string & issuerNameBase64Str,
+                                const std::string & serialNumberHexStr);
 
     bool IsCertificateRevoked(const ByteSpan & certDer);
 
