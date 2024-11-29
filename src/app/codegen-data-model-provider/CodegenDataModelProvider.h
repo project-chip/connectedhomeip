@@ -147,7 +147,6 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
                                                         chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
-    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
     /// attribute tree iteration
     EndpointId FirstEndpoint() override;
@@ -172,6 +171,8 @@ public:
 
     ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
     ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
+
+    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
 private:
     // Iteration is often done in a tight loop going through all values.
