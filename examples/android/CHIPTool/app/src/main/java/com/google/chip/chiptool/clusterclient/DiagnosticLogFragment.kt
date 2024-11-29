@@ -79,12 +79,14 @@ class DiagnosticLogFragment : Fragment() {
   inner class ChipDownloadLogCallback : DownloadLogCallback {
     override fun onError(fabricIndex: Int, nodeId: Long, errorCode: Long) {
       Log.d(TAG, "onError: $fabricIndex, ${nodeId.toULong()}, $errorCode")
+      showMessage("Downloading Failed")
       mDownloadFileOutputStream?.flush() ?: return
     }
 
     override fun onSuccess(fabricIndex: Int, nodeId: Long) {
       Log.d(TAG, "onSuccess: $fabricIndex, ${nodeId.toULong()}")
       mDownloadFileOutputStream?.flush() ?: return
+      showMessage("Downloading Completed")
       mDownloadFile?.let { showNotification(it) } ?: return
     }
 
