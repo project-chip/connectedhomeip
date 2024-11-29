@@ -35,8 +35,8 @@ namespace DataModel {
 
 enum class EndpointCompositionPattern : uint8_t
 {
-    kTreePattern       = 0x1,
-    kFullFamilyPattern = 0x2,
+    kTree       = 0x1,
+    kFullFamily = 0x2,
 };
 
 struct EndpointInfo
@@ -46,7 +46,7 @@ struct EndpointInfo
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
 
-    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamilyPattern)
+    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamily)
     {}
     explicit EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
 };
