@@ -317,7 +317,6 @@ unsigned FindNextDeviceTypeIndex(Span<const EmberAfDeviceType> types, const Data
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
-
 std::optional<DataModel::EndpointInfo> GetEndpointInfoAtIndex(uint16_t endpointIndex)
 {
     VerifyOrReturnValue(emberAfEndpointIndexIsEnabled(endpointIndex), std::nullopt);
