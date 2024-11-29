@@ -1087,7 +1087,7 @@ sl_status_t wfx_connect_to_ap(void)
  * @param[in] interface:
  * @param[in] addr : address
  *****************************************************************************/
-void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
+void GetMacAddress(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
 {
     sl_wfx_mac_address_t * mac;
 

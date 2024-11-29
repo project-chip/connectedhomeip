@@ -85,7 +85,7 @@ bool wfx_is_sta_mode_enabled(void)
 }
 
 /*********************************************************************
- * @fn  void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t *addr)
+ * @fn  void GetMacAddress(sl_wfx_interface_t interface, sl_wfx_mac_address_t *addr)
  * @brief
  *      get the wifi mac address
  * @param[in]  Interface:
@@ -93,7 +93,7 @@ bool wfx_is_sta_mode_enabled(void)
  * @return
  *       None
  ***********************************************************************/
-void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
+void GetMacAddress(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
 {
     VerifyOrReturn(addr != nullptr);
 #ifdef SL_WFX_CONFIG_SOFTAP

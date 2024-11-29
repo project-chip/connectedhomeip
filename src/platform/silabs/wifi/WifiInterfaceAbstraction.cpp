@@ -128,7 +128,7 @@ void sl_matter_wifi_task_started(void)
     evt.header.id     = to_underlying(WifiEvent::kStartUp);
     evt.header.length = sizeof evt;
     evt.body.status   = 0;
-    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &mac);
+    GetMacAddress(SL_WFX_STA_INTERFACE, &mac);
     memcpy(&evt.body.mac_addr[0], &mac.octet[0], kWifiMacAddressLength);
 
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);

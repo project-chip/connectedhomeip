@@ -216,11 +216,21 @@ void NotifyDisconnection(WifiDisconnectionReasons reason);
  */
 void NotifyConnection(sl_wfx_mac_address_t * ap);
 
+/**
+ * @brief Returns the provide interfaces MAC address
+ *        Valid buffer large enough for the MAC address must be provided to the function
+ *
+ * @param[in] interface SL_WFX_STA_INTERFACE or SL_WFX_SOFTAP_INTERFACE.
+ *                      If soft AP is not enabled, the interface is ignored and the function always returns the Station MAC
+ *                      address
+ * @param[out] addr     Interface MAC addres
+ */
+void GetMacAddress(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr);
+
 /* Function to update */
 
 sl_status_t wfx_wifi_start(void);
 void wfx_enable_sta_mode(void);
-void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr);
 void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig);
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig);
 bool wfx_is_sta_mode_enabled(void);

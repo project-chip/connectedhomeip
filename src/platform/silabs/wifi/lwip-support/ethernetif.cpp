@@ -90,7 +90,7 @@ static void low_level_init(struct netif * netif)
     /* Set netif MAC hardware address */
     sl_wfx_mac_address_t mac_addr;
 
-    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &mac_addr);
+    GetMacAddress(SL_WFX_STA_INTERFACE, &mac_addr);
 
     netif->hwaddr[0] = mac_addr.octet[0];
     netif->hwaddr[1] = mac_addr.octet[1];
