@@ -197,7 +197,17 @@ void AndroidLogDownloadFromNode::OnCommandFailure(void * context, CHIP_ERROR err
 void AndroidLogDownloadFromNode::FinishLogDownloadFromNode(CHIP_ERROR err)
 {
     CHIP_ERROR jniErr = CHIP_NO_ERROR;
-    JNIEnv * env      = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (mBdxReceiver != nullptr)
+    {
+        if (mTimeout > 0)
+        {
+            mBdxReceiver->CancelBDXTransferTimeout();
+        }
+        delete mBdxReceiver;
+        mBdxReceiver = nullptr;
+    }
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     JniLocalReferenceScope scope(env);
 
     if (err == CHIP_NO_ERROR)
@@ -212,16 +222,6 @@ void AndroidLogDownloadFromNode::FinishLogDownloadFromNode(CHIP_ERROR err)
         env->CallVoidMethod(mJavaCallback.ObjectRef(), onSuccessMethod, static_cast<jint>(mController->GetFabricIndex()),
                             static_cast<jlong>(mRemoteNodeId));
         return;
-    }
-
-    if (mBdxReceiver != nullptr)
-    {
-        if (mTimeout > 0)
-        {
-            mBdxReceiver->CancelBDXTransferTimeout();
-        }
-        delete mBdxReceiver;
-        mBdxReceiver = nullptr;
     }
 
     ChipLogError(Controller, "Log Download Failed : %" CHIP_ERROR_FORMAT, err.Format());
