@@ -42,41 +42,6 @@ CHIP_ERROR BytesToHexStr(const ByteSpan & bytes, std::string & outHexStr)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR X509_PemToDer(const std::string & pemCert, MutableByteSpan & derCert)
-{
-    std::string beginMarker = "-----BEGIN CERTIFICATE-----";
-    std::string endMarker   = "-----END CERTIFICATE-----";
-
-    std::size_t beginPos = pemCert.find(beginMarker);
-    VerifyOrReturnError(beginPos != std::string::npos, CHIP_ERROR_INVALID_ARGUMENT);
-
-    std::size_t endPos = pemCert.find(endMarker);
-    VerifyOrReturnError(endPos != std::string::npos, CHIP_ERROR_INVALID_ARGUMENT);
-
-    VerifyOrReturnError(beginPos < endPos, CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Extract content between markers
-    std::string plainB64Str = pemCert.substr(beginPos + beginMarker.length(), endPos - (beginPos + beginMarker.length()));
-
-    // Remove all newline characters '\n' and '\r'
-    plainB64Str.erase(std::remove(plainB64Str.begin(), plainB64Str.end(), '\n'), plainB64Str.end());
-    plainB64Str.erase(std::remove(plainB64Str.begin(), plainB64Str.end(), '\r'), plainB64Str.end());
-
-    VerifyOrReturnError(!plainB64Str.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Verify we have enough room to store the decoded certificate
-    size_t maxDecodeLen = BASE64_MAX_DECODED_LEN(plainB64Str.size());
-    VerifyOrReturnError(derCert.size() >= maxDecodeLen, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    // decode b64
-    uint16_t derLen = Base64Decode(plainB64Str.c_str(), static_cast<uint16_t>(plainB64Str.size()), derCert.data());
-    VerifyOrReturnError(derLen != UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
-
-    derCert.reduce_size(derLen);
-
-    return CHIP_NO_ERROR;
-}
-
 } // anonymous namespace
 
 CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationSetPath(std::string_view path)
@@ -92,43 +57,40 @@ void TestDACRevocationDelegateImpl::ClearDeviceAttestationRevocationSetPath()
     mDeviceAttestationRevocationSetPath = mDeviceAttestationRevocationSetPath.substr(0, 0);
 }
 
-// outSubject is subject encoded as base64 string
-// outKeyId is SKID encoded as hex string
-CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectAndKeyIdFromPEMCert(const std::string & certPEM, std::string & outSubject,
-                                                                        std::string & outKeyId)
-{
-    // buffers and spans for storing crl signer delegator OR crl signer cert info
-    uint8_t certDerBuf[kMax_x509_Certificate_Length] = { 0 };
-    MutableByteSpan certDER(certDerBuf);
-
-    ReturnLogErrorOnFailure(X509_PemToDer(certPEM, certDER));
-    ReturnErrorOnFailure(GetSubjectNameBase64Str(certDER, outSubject));
-    ReturnErrorOnFailure(GetSKIDHexStr(certDER, outKeyId));
-
-    return CHIP_NO_ERROR;
-}
-
 // Check if issuer and AKID matches with the crl signer OR crl signer delegator's subject and SKID
 bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revokedSet, const std::string & akidHexStr,
                                                       const std::string & issuerNameBase64Str)
 {
-    std::string certPEM;
+    std::string certBase64;
     [[maybe_unused]] std::string certType;
 
     if (revokedSet.isMember("crl_signer_delegator"))
     {
-        certPEM  = revokedSet["crl_signer_delegator"].asString();
+        certBase64 = revokedSet["crl_signer_delegator"].asString();
         certType = "CRL Signer delegator";
     }
     else
     {
-        certPEM  = revokedSet["crl_signer_cert"].asString();
+        certBase64 = revokedSet["crl_signer_cert"].asString();
         certType = "CRL Signer";
     }
 
-    std::string subject; // crl signer or crl signer delegator subject
-    std::string keyId;   // crl signer or crl signer delegator SKID
-    VerifyOrReturnValue(CHIP_NO_ERROR == GetSubjectAndKeyIdFromPEMCert(certPEM, subject, keyId), false);
+    uint8_t certDerBuf[kMax_x509_Certificate_Length] = { 0 };
+    MutableByteSpan certDER(certDerBuf);
+
+    // Verify we have enough room to store the decoded certificate
+    size_t maxDecodeLen = BASE64_MAX_DECODED_LEN(certBase64.size());
+    VerifyOrReturnValue(certDER.size() >= maxDecodeLen, false);
+
+    uint16_t derLen = Base64Decode(certBase64.c_str(), static_cast<uint16_t>(certBase64.size()), certDER.data());
+    VerifyOrReturnValue(derLen != UINT16_MAX, false);
+    certDER.reduce_size(derLen);
+
+    std::string subject;
+    std::string keyId;
+
+    VerifyOrReturnValue(CHIP_NO_ERROR == GetSubjectNameBase64Str(certDER, subject), false);
+    VerifyOrReturnValue(CHIP_NO_ERROR == GetSKIDHexStr(certDER, keyId), false);
 
     ChipLogDetail(NotSpecified, "%s: Subject: %s", certType.c_str(), subject.c_str());
     ChipLogDetail(NotSpecified, "%s: SKID: %s", certType.c_str(), keyId.c_str());
@@ -146,8 +108,8 @@ bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revoke
 //       "serial1 bytes as base64",
 //       "serial2 bytes as base64"
 //     ]
-//     "crl_signer_cert": "<PEM incoded CRL signer certificate>",
-//     "crl_signer_delegator": <PEM incoded CRL signer delegator certificate>,
+//     "crl_signer_cert": "<base64 encoded DER certificate>",
+//     "crl_signer_delegator": "<base64 encoded DER certificate>",
 //   }
 // ]
 //

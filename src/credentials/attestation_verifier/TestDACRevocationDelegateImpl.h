@@ -78,8 +78,6 @@ private:
     CHIP_ERROR GetIssuerNameBase64Str(const ByteSpan & certDer, std::string & outIssuerNameBase64String);
     CHIP_ERROR GetSubjectNameBase64Str(const ByteSpan & certDer, std::string & outSubjectNameBase64String);
 
-    CHIP_ERROR GetSubjectAndKeyIdFromPEMCert(const std::string & certPEM, std::string & outSubject, std::string & outKeyId);
-
     bool IsEntryInRevocationSet(const std::string & akidHexStr, const std::string & issuerNameBase64Str,
                                 const std::string & serialNumberHexStr);
 
