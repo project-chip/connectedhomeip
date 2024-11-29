@@ -133,7 +133,8 @@ class TC_OPCREDS_3_5(MatterBaseTest):
             node_id=self.dut_node_id,
             cluster=opcreds,
             attribute=opcreds.Attributes.TrustedRootCertificates)
-        asserts.assert_equal(rcac_original not in trusted_root_certificates, False, "RCAC should match one of the TrustedRootCertificates.")
+        asserts.assert_equal(rcac_original not in trusted_root_certificates, False,
+                             "RCAC should match one of the TrustedRootCertificates.")
 
         self.step(4)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
