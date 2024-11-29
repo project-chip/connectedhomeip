@@ -55,13 +55,25 @@ public:
 private:
     bool CrossValidateCert(const Json::Value & revokedSet, const std::string & akIdHexStr, const std::string & issuerNameBase64Str);
 
-    CHIP_ERROR GetKeyIDHexStr(const ByteSpan & certDer, MutableCharSpan & outKeyIDHexStr, bool isAKID);
+    enum class KeyIdType : uint8_t
+    {
+        kSKID = 0,
+        kAKID = 1,
+    };
+
+    enum class RDNType : uint8_t
+    {
+        kIssuer  = 0,
+        kSubject = 1,
+    };
+
+    CHIP_ERROR GetKeyIDHexStr(const ByteSpan & certDer, MutableCharSpan & outKeyIDHexStr, KeyIdType keyIdType);
     CHIP_ERROR GetAKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outAKIDHexStr);
     CHIP_ERROR GetSKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outSKIDHexStr);
 
     CHIP_ERROR GetSerialNumberHexStr(const ByteSpan & certDer, MutableCharSpan & outSerialNumberHexStr);
 
-    CHIP_ERROR GetRDNBase64Str(const ByteSpan & certDer, MutableCharSpan & outRDNBase64String, bool isIssuer);
+    CHIP_ERROR GetRDNBase64Str(const ByteSpan & certDer, MutableCharSpan & outRDNBase64String, RDNType rdnType);
     CHIP_ERROR GetIssuerNameBase64Str(const ByteSpan & certDer, MutableCharSpan & outIssuerNameBase64String);
     CHIP_ERROR GetSubjectNameBase64Str(const ByteSpan & certDer, MutableCharSpan & outSubjectNameBase64String);
 

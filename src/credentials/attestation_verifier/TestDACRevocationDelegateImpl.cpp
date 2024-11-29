@@ -217,20 +217,26 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akid
     return false;
 }
 
-CHIP_ERROR TestDACRevocationDelegateImpl::GetKeyIDHexStr(const ByteSpan & certDer, MutableCharSpan & outKeyIDHexStr, bool isAKID)
+CHIP_ERROR TestDACRevocationDelegateImpl::GetKeyIDHexStr(const ByteSpan & certDer, MutableCharSpan & outKeyIDHexStr,
+                                                         KeyIdType keyIdType)
 {
     static_assert(kAuthorityKeyIdentifierLength == kSubjectKeyIdentifierLength, "AKID and SKID length mismatch");
 
     uint8_t keyIdBuf[kAuthorityKeyIdentifierLength];
     MutableByteSpan keyId(keyIdBuf);
 
-    if (isAKID)
+    switch (keyIdType)
     {
+    case KeyIdType::kAKID:
         ReturnErrorOnFailure(ExtractAKIDFromX509Cert(certDer, keyId));
-    }
-    else
-    {
+        break;
+
+    case KeyIdType::kSKID:
         ReturnErrorOnFailure(ExtractSKIDFromX509Cert(certDer, keyId));
+        break;
+
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     return BytesToHexStr(keyId, outKeyIDHexStr);
@@ -238,12 +244,12 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetKeyIDHexStr(const ByteSpan & certDe
 
 CHIP_ERROR TestDACRevocationDelegateImpl::GetAKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outAKIDHexStr)
 {
-    return GetKeyIDHexStr(certDer, outAKIDHexStr, true);
+    return GetKeyIDHexStr(certDer, outAKIDHexStr, KeyIdType::kAKID);
 }
 
 CHIP_ERROR TestDACRevocationDelegateImpl::GetSKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outSKIDHexStr)
 {
-    return GetKeyIDHexStr(certDer, outSKIDHexStr, false /* isAKID */);
+    return GetKeyIDHexStr(certDer, outSKIDHexStr, KeyIdType::kSKID);
 }
 
 CHIP_ERROR TestDACRevocationDelegateImpl::GetSerialNumberHexStr(const ByteSpan & certDer, MutableCharSpan & outSerialNumberHexStr)
@@ -256,18 +262,23 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetSerialNumberHexStr(const ByteSpan &
 }
 
 CHIP_ERROR TestDACRevocationDelegateImpl::GetRDNBase64Str(const ByteSpan & certDer, MutableCharSpan & outRDNBase64String,
-                                                          bool isIssuer)
+                                                          RDNType rdnType)
 {
     uint8_t rdnBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
     MutableByteSpan rdn(rdnBuf);
 
-    if (isIssuer)
+    switch (rdnType)
     {
+    case RDNType::kIssuer:
         ReturnErrorOnFailure(ExtractIssuerFromX509Cert(certDer, rdn));
-    }
-    else
-    {
+        break;
+
+    case RDNType::kSubject:
         ReturnErrorOnFailure(ExtractSubjectFromX509Cert(certDer, rdn));
+        break;
+
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     VerifyOrReturnError(outRDNBase64String.size() >= BASE64_ENCODED_LEN(rdn.size()), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -280,13 +291,13 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetRDNBase64Str(const ByteSpan & certD
 CHIP_ERROR TestDACRevocationDelegateImpl::GetIssuerNameBase64Str(const ByteSpan & certDer,
                                                                  MutableCharSpan & outIssuerNameBase64String)
 {
-    return GetRDNBase64Str(certDer, outIssuerNameBase64String, true /* isIssuer */);
+    return GetRDNBase64Str(certDer, outIssuerNameBase64String, RDNType::kIssuer);
 }
 
 CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectNameBase64Str(const ByteSpan & certDer,
                                                                   MutableCharSpan & outSubjectNameBase64String)
 {
-    return GetRDNBase64Str(certDer, outSubjectNameBase64String, false /* isIssuer */);
+    return GetRDNBase64Str(certDer, outSubjectNameBase64String, RDNType::kSubject);
 }
 
 // @param certDer Certificate, in DER format, to check for revocation
