@@ -25,8 +25,8 @@
 #include "AndroidCommissioningWindowOpener.h"
 #include "AndroidCurrentFabricRemover.h"
 #include "AndroidDeviceControllerWrapper.h"
-#include "AndroidLogDownloadFromNode.h"
 #include "AndroidInteractionClient.h"
+#include "AndroidLogDownloadFromNode.h"
 #include <controller/java/ControllerConfig.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -2060,7 +2060,8 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
     return true;
 }
 
-JNI_METHOD(void, downloadLogFromNode)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint typeEnum, jint timeout, jobject downloadLogCallback)
+JNI_METHOD(void, downloadLogFromNode)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint typeEnum, jint timeout, jobject downloadLogCallback)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -2068,7 +2069,9 @@ JNI_METHOD(void, downloadLogFromNode)(JNIEnv * env, jobject self, jlong handle, 
 
     ChipLogProgress(Controller, "downloadLogFromNode() called with device ID and callback object");
 
-    err = AndroidLogDownloadFromNode::LogDownloadFromNode(wrapper->Controller(), static_cast<NodeId>(deviceId), static_cast<chip::app::Clusters::DiagnosticLogs::IntentEnum>(typeEnum), static_cast<uint16_t>(timeout), downloadLogCallback);
+    err = AndroidLogDownloadFromNode::LogDownloadFromNode(wrapper->Controller(), static_cast<NodeId>(deviceId),
+                                                          static_cast<chip::app::Clusters::DiagnosticLogs::IntentEnum>(typeEnum),
+                                                          static_cast<uint16_t>(timeout), downloadLogCallback);
 
     if (err != CHIP_NO_ERROR)
     {

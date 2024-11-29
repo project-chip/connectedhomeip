@@ -18,10 +18,10 @@
 
 #include "AndroidLogDownloadFromNode.h"
 
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <protocols/bdx/BdxUri.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <controller/CHIPDeviceControllerFactory.h>
+#include <protocols/bdx/BdxUri.h>
 
 using namespace chip::app::Clusters;
 
@@ -30,8 +30,9 @@ namespace Controller {
 
 // Max Length is below 8
 CharSpan toIntentCharSpan(DiagnosticLogs::IntentEnum intent)
-{    
-    switch (intent) {
+{
+    switch (intent)
+    {
     case DiagnosticLogs::IntentEnum::kEndUserSupport:
         return CharSpan::fromCharString("EndUser");
     case DiagnosticLogs::IntentEnum::kNetworkDiag:
@@ -43,16 +44,17 @@ CharSpan toIntentCharSpan(DiagnosticLogs::IntentEnum intent)
     }
 }
 
-AndroidLogDownloadFromNode::AndroidLogDownloadFromNode(chip::Controller::DeviceController * controller, NodeId remoteNodeId, DiagnosticLogs::IntentEnum intent, uint16_t timeout, jobject jCallbackObject)
- : mController(controller), mOnDeviceConnectedCallback(&OnDeviceConnectedFn, this),
-    mOnDeviceConnectionFailureCallback(&OnDeviceConnectionFailureFn, this),
-    mOnBdxTransferCallback(&OnBdxTransferCallback, this),
-    mOnBdxTransferSuccessCallback(&OnBdxTransferSuccessCallback, this),
+AndroidLogDownloadFromNode::AndroidLogDownloadFromNode(chip::Controller::DeviceController * controller, NodeId remoteNodeId,
+                                                       DiagnosticLogs::IntentEnum intent, uint16_t timeout,
+                                                       jobject jCallbackObject) :
+    mController(controller),
+    mOnDeviceConnectedCallback(&OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(&OnDeviceConnectionFailureFn, this),
+    mOnBdxTransferCallback(&OnBdxTransferCallback, this), mOnBdxTransferSuccessCallback(&OnBdxTransferSuccessCallback, this),
     mOnBdxTransferFailureCallback(&OnBdxTransferFailureCallback, this)
 {
     mRemoteNodeId = remoteNodeId;
-    mIntent = intent;
-    mTimeout = timeout;
+    mIntent       = intent;
+    mTimeout      = timeout;
 
     if (mJavaCallback.Init(jCallbackObject) != CHIP_NO_ERROR)
     {
@@ -61,9 +63,11 @@ AndroidLogDownloadFromNode::AndroidLogDownloadFromNode(chip::Controller::DeviceC
     }
 }
 
-CHIP_ERROR AndroidLogDownloadFromNode::LogDownloadFromNode(DeviceController * controller, NodeId remoteNodeId, DiagnosticLogs::IntentEnum intent, uint16_t timeout, jobject jcallback)
+CHIP_ERROR AndroidLogDownloadFromNode::LogDownloadFromNode(DeviceController * controller, NodeId remoteNodeId,
+                                                           DiagnosticLogs::IntentEnum intent, uint16_t timeout, jobject jcallback)
 {
-    VerifyOrReturnValue(controller != nullptr && jcallback != nullptr && remoteNodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnValue(controller != nullptr && jcallback != nullptr && remoteNodeId != kUndefinedNodeId,
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     auto * logDownload = new AndroidLogDownloadFromNode(controller, remoteNodeId, intent, timeout, jcallback);
     VerifyOrReturnValue(logDownload != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -84,10 +88,11 @@ CHIP_ERROR AndroidLogDownloadFromNode::GetConnectedDevice()
     return mController->GetConnectedDevice(mRemoteNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
-CHIP_ERROR AndroidLogDownloadFromNode::SendRetrieveLogsRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+CHIP_ERROR AndroidLogDownloadFromNode::SendRetrieveLogsRequest(Messaging::ExchangeManager & exchangeMgr,
+                                                               const SessionHandle & sessionHandle)
 {
     DiagnosticLogs::Commands::RetrieveLogsRequest::Type request;
-    request.intent = mIntent;
+    request.intent            = mIntent;
     request.requestedProtocol = DiagnosticLogs::TransferProtocolEnum::kBdx;
 
     CHIP_ERROR err = chip::bdx::MakeURI(mRemoteNodeId, toIntentCharSpan(mIntent), mFileDesignator);
@@ -97,7 +102,9 @@ CHIP_ERROR AndroidLogDownloadFromNode::SendRetrieveLogsRequest(Messaging::Exchan
         FinishLogDownloadFromNode(err);
     }
 
-    mBdxReceiver = new BdxDiagnosticLogsReceiver(&mOnBdxTransferCallback, &mOnBdxTransferSuccessCallback, &mOnBdxTransferFailureCallback, mController->GetFabricIndex(), mRemoteNodeId, mFileDesignator);
+    mBdxReceiver =
+        new BdxDiagnosticLogsReceiver(&mOnBdxTransferCallback, &mOnBdxTransferSuccessCallback, &mOnBdxTransferFailureCallback,
+                                      mController->GetFabricIndex(), mRemoteNodeId, mFileDesignator);
     VerifyOrReturnValue(mBdxReceiver != nullptr, CHIP_ERROR_NO_MEMORY);
 
     auto systemState = DeviceControllerFactory::GetInstance().GetSystemState();
@@ -107,7 +114,7 @@ CHIP_ERROR AndroidLogDownloadFromNode::SendRetrieveLogsRequest(Messaging::Exchan
     {
         mBdxReceiver->StartBDXTransferTimeout(mTimeout);
     }
-    
+
     request.transferFileDesignator = MakeOptional(mFileDesignator);
     ClusterBase cluster(exchangeMgr, sessionHandle, 0);
 
@@ -115,7 +122,7 @@ CHIP_ERROR AndroidLogDownloadFromNode::SendRetrieveLogsRequest(Messaging::Exchan
 }
 
 void AndroidLogDownloadFromNode::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                               const SessionHandle & sessionHandle)
+                                                     const SessionHandle & sessionHandle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto * self    = static_cast<AndroidLogDownloadFromNode *>(context);
@@ -139,7 +146,8 @@ void AndroidLogDownloadFromNode::OnDeviceConnectionFailureFn(void * context, con
     self->FinishLogDownloadFromNode(err);
 }
 
-void AndroidLogDownloadFromNode::OnResponseRetrieveLogs(void * context, const DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data)
+void AndroidLogDownloadFromNode::OnResponseRetrieveLogs(void * context,
+                                                        const DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data)
 {
     auto * self = static_cast<AndroidLogDownloadFromNode *>(context);
     VerifyOrReturn(self != nullptr,
@@ -189,7 +197,7 @@ void AndroidLogDownloadFromNode::OnCommandFailure(void * context, CHIP_ERROR err
 void AndroidLogDownloadFromNode::FinishLogDownloadFromNode(CHIP_ERROR err)
 {
     CHIP_ERROR jniErr = CHIP_NO_ERROR;
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env      = JniReferences::GetInstance().GetEnvForCurrentThread();
     JniLocalReferenceScope scope(env);
 
     if (err == CHIP_NO_ERROR)
@@ -201,7 +209,8 @@ void AndroidLogDownloadFromNode::FinishLogDownloadFromNode(CHIP_ERROR err)
 
         VerifyOrReturn(jniErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onSuccess method"));
 
-        env->CallVoidMethod(mJavaCallback.ObjectRef(), onSuccessMethod, static_cast<jint>(mController->GetFabricIndex()), static_cast<jlong>(mRemoteNodeId));
+        env->CallVoidMethod(mJavaCallback.ObjectRef(), onSuccessMethod, static_cast<jint>(mController->GetFabricIndex()),
+                            static_cast<jlong>(mRemoteNodeId));
         return;
     }
 
@@ -222,10 +231,12 @@ void AndroidLogDownloadFromNode::FinishLogDownloadFromNode(CHIP_ERROR err)
     jniErr = JniReferences::GetInstance().FindMethod(env, mJavaCallback.ObjectRef(), "onError", "(IJJ)V", &onErrorMethod);
     VerifyOrReturn(jniErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onError method"));
 
-    env->CallVoidMethod(mJavaCallback.ObjectRef(), onErrorMethod, static_cast<jint>(mController->GetFabricIndex()), static_cast<jlong>(mRemoteNodeId), static_cast<jlong>(err.AsInteger()));
+    env->CallVoidMethod(mJavaCallback.ObjectRef(), onErrorMethod, static_cast<jint>(mController->GetFabricIndex()),
+                        static_cast<jlong>(mRemoteNodeId), static_cast<jlong>(err.AsInteger()));
 }
 
-void AndroidLogDownloadFromNode::OnBdxTransferCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data, CHIP_ERROR *errInfoOnFailure)
+void AndroidLogDownloadFromNode::OnBdxTransferCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId,
+                                                       const chip::ByteSpan & data, CHIP_ERROR * errInfoOnFailure)
 {
     auto * self = static_cast<AndroidLogDownloadFromNode *>(context);
     VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Send command failure callback with null context. Ignoring"));
@@ -233,7 +244,8 @@ void AndroidLogDownloadFromNode::OnBdxTransferCallback(void * context, FabricInd
     self->OnTransferCallback(fabricIndex, remoteNodeId, data, errInfoOnFailure);
 }
 
-void AndroidLogDownloadFromNode::OnTransferCallback(FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data, CHIP_ERROR *errInfoOnFailure)
+void AndroidLogDownloadFromNode::OnTransferCallback(FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data,
+                                                    CHIP_ERROR * errInfoOnFailure)
 {
     VerifyOrReturn(mJavaCallback.HasValidObjectRef(), ChipLogError(Controller, "mJavaCallback is invalid"));
 
@@ -242,17 +254,17 @@ void AndroidLogDownloadFromNode::OnTransferCallback(FabricIndex fabricIndex, Nod
 
     jmethodID onTransferDataMethod;
     // Java method signature : boolean onTransferData(int fabricIndex, long nodeId, byte[] data)
-    *errInfoOnFailure = JniReferences::GetInstance().FindMethod(env, mJavaCallback.ObjectRef(), "onTransferData",
-                                                             "(IJ[B)Z", &onTransferDataMethod);
+    *errInfoOnFailure =
+        JniReferences::GetInstance().FindMethod(env, mJavaCallback.ObjectRef(), "onTransferData", "(IJ[B)Z", &onTransferDataMethod);
     VerifyOrReturn(*errInfoOnFailure == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onTransferData method"));
     chip::ByteArray dataByteArray(env, data);
 
-    jboolean ret = env->CallBooleanMethod(mJavaCallback.ObjectRef(), onTransferDataMethod, static_cast<jint>(fabricIndex), static_cast<jlong>(remoteNodeId), dataByteArray.jniValue());
+    jboolean ret = env->CallBooleanMethod(mJavaCallback.ObjectRef(), onTransferDataMethod, static_cast<jint>(fabricIndex),
+                                          static_cast<jlong>(remoteNodeId), dataByteArray.jniValue());
 
     if (ret != JNI_TRUE)
     {
-        ChipLogError(Controller, "Transfer will be rejected.")
-        *errInfoOnFailure = CHIP_ERROR_INTERNAL;
+        ChipLogError(Controller, "Transfer will be rejected.") * errInfoOnFailure = CHIP_ERROR_INTERNAL;
     }
 }
 
@@ -266,7 +278,8 @@ void AndroidLogDownloadFromNode::OnBdxTransferSuccessCallback(void * context, Fa
     self->FinishLogDownloadFromNode(CHIP_NO_ERROR);
 }
 
-void AndroidLogDownloadFromNode::OnBdxTransferFailureCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId, CHIP_ERROR status)
+void AndroidLogDownloadFromNode::OnBdxTransferFailureCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId,
+                                                              CHIP_ERROR status)
 {
     ChipLogProgress(Controller, "OnBdxTransferFailureCallback: %" CHIP_ERROR_FORMAT, status.Format());
 

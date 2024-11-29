@@ -883,7 +883,8 @@ public class ChipDeviceController {
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
   }
 
-  public boolean downloadLogFromNode(long deviceId, DiagnosticLogType type, int timeout, DownloadLogCallback callback) {
+  public boolean downloadLogFromNode(
+      long deviceId, DiagnosticLogType type, int timeout, DownloadLogCallback callback) {
     return downloadLogFromNode(deviceControllerPtr, deviceId, type.getValue(), timeout, callback);
   }
 
@@ -1731,7 +1732,12 @@ public class ChipDeviceController {
       @Nullable Long setupPinCode,
       OpenCommissioningCallback callback);
 
-  private native boolean downloadLogFromNode(long deviceControllerPtr, long deviceId, int typeEnum, long timeout, DownloadLogCallback callback);
+  private native boolean downloadLogFromNode(
+      long deviceControllerPtr,
+      long deviceId,
+      int typeEnum,
+      long timeout,
+      DownloadLogCallback callback);
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 

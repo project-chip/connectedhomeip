@@ -21,7 +21,8 @@ import com.google.chip.chiptool.databinding.DiagnosticLogFragmentBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class DiagnosticLogFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -87,18 +88,18 @@ class DiagnosticLogFragment : Fragment() {
       mDownloadFile?.let { showNotification(it) } ?: return
     }
 
-    override fun onTransferData(
-      fabricIndex: Int,
-      nodeId: Long,
-      data: ByteArray
-    ): Boolean {
+    override fun onTransferData(fabricIndex: Int, nodeId: Long, data: ByteArray): Boolean {
       Log.d(TAG, "onTransferData : ${data.size}")
       if (mDownloadFileOutputStream == null) {
         Log.d(TAG, "mDownloadFileOutputStream or mDownloadFile is null")
         return false
       }
+      return addData(mDownloadFileOutputStream!!, data)
+    }
+
+    private fun addData(outputStream: FileOutputStream, data: ByteArray): Boolean {
       try {
-        mDownloadFileOutputStream!!.write(data)
+        outputStream.write(data)
       } catch (e: IOException) {
         Log.d(TAG, "IOException", e)
         return false

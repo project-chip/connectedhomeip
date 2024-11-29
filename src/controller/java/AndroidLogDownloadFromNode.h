@@ -46,10 +46,13 @@ public:
      * @param[in] timeout Download log timeout value. If this value is 0, controller does not handle timeouts.
      * @param[in] callback The callback to call when Log Download data is received and when an error occurs
      */
-    static CHIP_ERROR LogDownloadFromNode(DeviceController * controller, NodeId remoteNodeId, app::Clusters::DiagnosticLogs::IntentEnum intent, uint16_t timeout, jobject jCallbackObject);
+    static CHIP_ERROR LogDownloadFromNode(DeviceController * controller, NodeId remoteNodeId,
+                                          app::Clusters::DiagnosticLogs::IntentEnum intent, uint16_t timeout,
+                                          jobject jCallbackObject);
 
 private:
-    AndroidLogDownloadFromNode(DeviceController * controller, NodeId remoteNodeId, app::Clusters::DiagnosticLogs::IntentEnum intent, uint16_t timeout, jobject javaCallback);
+    AndroidLogDownloadFromNode(DeviceController * controller, NodeId remoteNodeId, app::Clusters::DiagnosticLogs::IntentEnum intent,
+                               uint16_t timeout, jobject javaCallback);
 
     DeviceController * mController;
 
@@ -67,20 +70,23 @@ private:
     char mFileDesignatorBuffer[bdx::DiagnosticLogs::kMaxFileDesignatorLen];
     MutableCharSpan mFileDesignator = MutableCharSpan(mFileDesignatorBuffer, bdx::DiagnosticLogs::kMaxFileDesignatorLen);
 
-    BdxDiagnosticLogsReceiver *mBdxReceiver = nullptr;
-    
+    BdxDiagnosticLogsReceiver * mBdxReceiver = nullptr;
+
     CHIP_ERROR GetConnectedDevice();
     CHIP_ERROR SendRetrieveLogsRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
-    void OnTransferCallback(FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data, CHIP_ERROR *errInfoOnFailure);
+    void OnTransferCallback(FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data,
+                            CHIP_ERROR * errInfoOnFailure);
     void FinishLogDownloadFromNode(CHIP_ERROR err);
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
-    static void OnResponseRetrieveLogs(void * context, const app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
+    static void OnResponseRetrieveLogs(void * context,
+                                       const app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
     static void OnCommandFailure(void * context, CHIP_ERROR err);
 
-    static void OnBdxTransferCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data, CHIP_ERROR *errInfoOnFailure);
+    static void OnBdxTransferCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data,
+                                      CHIP_ERROR * errInfoOnFailure);
     static void OnBdxTransferSuccessCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId);
     static void OnBdxTransferFailureCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId, CHIP_ERROR status);
 };
