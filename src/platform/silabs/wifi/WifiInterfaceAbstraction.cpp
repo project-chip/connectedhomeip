@@ -93,7 +93,7 @@ void NotifyDisconnection(WifiDisconnectionReasons reason)
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
 
-void NotifyConnection(sl_wfx_mac_address_t * ap)
+void NotifyConnection(const MacAddress & ap)
 {
     sl_wfx_connect_ind_t evt = {};
     evt.header.id            = to_underlying(WifiEvent::kConnect);
@@ -101,7 +101,7 @@ void NotifyConnection(sl_wfx_mac_address_t * ap)
 #ifdef RS911X_WIFI
     evt.body.channel = wfx_rsi.ap_chan;
 #endif
-    memcpy(&evt.body.mac[0], &ap->octet[0], kWifiMacAddressLength);
+    std::copy(ap.begin(), ap.end(), evt.body.mac);
 
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
@@ -117,19 +117,25 @@ void NotifyConnection(sl_wfx_mac_address_t * ap)
  *************************************************************************************/
 void sl_matter_wifi_task_started(void)
 {
-    sl_wfx_startup_ind_t evt;
-    sl_wfx_mac_address_t mac;
+    sl_wfx_startup_ind_t evt = {};
 
     // Creating a timer which will be used to retry connection with AP
     sRetryTimer = osTimerNew(RetryConnectionTimerHandler, osTimerOnce, NULL, NULL);
     VerifyOrReturn(sRetryTimer != NULL);
 
-    memset(&evt, 0, sizeof(evt));
     evt.header.id     = to_underlying(WifiEvent::kStartUp);
     evt.header.length = sizeof evt;
     evt.body.status   = 0;
-    GetMacAddress(SL_WFX_STA_INTERFACE, &mac);
-    memcpy(&evt.body.mac_addr[0], &mac.octet[0], kWifiMacAddressLength);
+
+    // TODO : Remove workwound when sl_wfx_startup_ind_t is unified
+    //        Issue is same structure name but different contents
+#if WF200_WIFI
+    MutableByteSpan macSpan(evt.body.mac_addr[SL_WFX_STA_INTERFACE], kWifiMacAddressLength);
+#else
+    MutableByteSpan macSpan(evt.body.mac_addr, kWifiMacAddressLength);
+#endif // WF200_WIFI
+
+    GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
 
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }

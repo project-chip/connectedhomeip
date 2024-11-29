@@ -19,6 +19,7 @@
 #include <app/icd/server/ICDServerConfig.h>
 #include <cmsis_os2.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/Span.h>
 #include <platform/silabs/wifi/wfx_msgs.h>
 #include <sl_cmsis_os2_common.h>
 
@@ -40,7 +41,7 @@
 
 /* Updated constants */
 
-constexpr uint8_t kWifiMacAddressLength = 6;
+constexpr size_t kWifiMacAddressLength = 6;
 
 /* Defines to update */
 
@@ -57,7 +58,9 @@ constexpr uint8_t kWifiMacAddressLength = 6;
 #define WFX_MAX_SSID_LENGTH (32)
 #define MAX_JOIN_RETRIES_COUNT (5)
 
-/* Update Enums */
+/* Updated types */
+
+using MacAddress = std::array<uint8_t, kWifiMacAddressLength>;
 
 enum class WifiEvent : uint8_t
 {
@@ -170,11 +173,11 @@ typedef struct wfx_rsi_s
     size_t scan_ssid_length;
 #endif
 #ifdef SL_WFX_CONFIG_SOFTAP
-    sl_wfx_mac_address_t softap_mac;
+    MacAddress softap_mac;
 #endif
-    sl_wfx_mac_address_t sta_mac;
-    sl_wfx_mac_address_t ap_mac;   /* To which our STA is connected */
-    sl_wfx_mac_address_t ap_bssid; /* To which our STA is connected */
+    MacAddress sta_mac;
+    MacAddress ap_mac;   /* To which our STA is connected */
+    MacAddress ap_bssid; /* To which our STA is connected */
     uint16_t join_retries;
     uint8_t ip4_addr[4]; /* Not sure if this is enough */
 } WfxRsi_t;
@@ -214,7 +217,7 @@ void NotifyDisconnection(WifiDisconnectionReasons reason);
  *
  * @param[in] ap pointer to the structure that contains the MAC address of the AP
  */
-void NotifyConnection(sl_wfx_mac_address_t * ap);
+void NotifyConnection(const MacAddress & ap);
 
 /**
  * @brief Returns the provide interfaces MAC address
@@ -224,8 +227,12 @@ void NotifyConnection(sl_wfx_mac_address_t * ap);
  *                      If soft AP is not enabled, the interface is ignored and the function always returns the Station MAC
  *                      address
  * @param[out] addr     Interface MAC addres
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR on success
+ *                    CHIP_ERROR_BUFFER_TOO_SMALL if the provided ByteSpan size is too small
+ *
  */
-void GetMacAddress(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr);
+CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & addr);
 
 /* Function to update */
 

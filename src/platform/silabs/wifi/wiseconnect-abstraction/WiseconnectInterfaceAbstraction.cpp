@@ -37,6 +37,19 @@ constexpr osThreadAttr_t kWlanTaskAttr = { .name       = "wlan_rsi",
 
 } // namespace
 
+CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & address)
+{
+    VerifyOrReturnError(address.size() >= kWifiMacAddressLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+#ifdef SL_WFX_CONFIG_SOFTAP
+    chip::ByteSpan byteSpan((interface == SL_WFX_SOFTAP_INTERFACE) ? wfx_rsi.softap_mac : wfx_rsi.sta_mac);
+#else
+    chip::ByteSpan byteSpan(wfx_rsi.sta_mac);
+#endif
+
+    return CopySpanToMutableSpan(byteSpan, address);
+}
+
 /*********************************************************************
  * @fn  sl_status_t wfx_wifi_start(void)
  * @brief
@@ -82,25 +95,6 @@ void wfx_enable_sta_mode(void)
 bool wfx_is_sta_mode_enabled(void)
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationMode);
-}
-
-/*********************************************************************
- * @fn  void GetMacAddress(sl_wfx_interface_t interface, sl_wfx_mac_address_t *addr)
- * @brief
- *      get the wifi mac address
- * @param[in]  Interface:
- * @param[in]  addr : address
- * @return
- *       None
- ***********************************************************************/
-void GetMacAddress(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
-{
-    VerifyOrReturn(addr != nullptr);
-#ifdef SL_WFX_CONFIG_SOFTAP
-    *addr = (interface == SL_WFX_SOFTAP_INTERFACE) ? wfx_rsi.softap_mac : wfx_rsi.sta_mac;
-#else
-    *addr = wfx_rsi.sta_mac;
-#endif
 }
 
 /*********************************************************************

@@ -58,7 +58,7 @@ StaticEventGroup_t wfxEventGroup;
 
 EventGroupHandle_t sl_wfx_event_group;
 TaskHandle_t wfx_events_task_handle;
-static sl_wfx_mac_address_t ap_mac;
+static MacAddress ap_mac;
 static uint32_t sta_ip;
 static wfx_wifi_scan_result_t ap_info;
 
@@ -92,9 +92,6 @@ static wfx_wifi_scan_result_t ap_info;
 #define STA_IP_FAIL (0)
 #define WLAN_TASK_PRIORITY (1)
 
-/*****************************************************************************
- * macros
- ******************************************************************************/
 #define WE_ST_STARTED 1
 #define WE_ST_STA_CONN 2
 #define WE_ST_HW_STARTED 4
@@ -294,6 +291,19 @@ error_handler:
 }
 
 } // namespace
+
+CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, MutableByteSpan & address)
+{
+    VerifyOrReturnError(address.size() >= kWifiMacAddressLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+#ifdef SL_WFX_CONFIG_SOFTAP
+    chip::ByteSpan byteSpan((interface == SL_WFX_SOFTAP_INTERFACE) ? wifiContext.mac_addr_1.octet : wifiContext.mac_addr_0.octet);
+#else
+    chip::ByteSpan byteSpan(wifiContext.mac_addr_0.octet);
+#endif
+
+    return CopySpanToMutableSpan(byteSpan, address);
+}
 
 /***************************************************************************
  * @brief
@@ -518,7 +528,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
     {
     case WFM_STATUS_SUCCESS: {
         ChipLogProgress(DeviceLayer, "STA-Connected");
-        memcpy(&ap_mac.octet[0], mac, kWifiMacAddressLength);
+        memcpy(ap_mac.data(), mac, kWifiMacAddressLength);
         sl_wfx_context->state =
             static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) | static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
         xEventGroupSetBits(sl_wfx_event_group, SL_WFX_CONNECT);
@@ -695,7 +705,7 @@ static void wfx_events_task(void * p_arg)
                     if (!hasNotifiedWifiConnectivity)
                     {
                         ChipLogProgress(DeviceLayer, "will notify WiFi connectivity");
-                        NotifyConnection(&ap_mac);
+                        NotifyConnection(ap_mac);
                         hasNotifiedWifiConnectivity = true;
                     }
                 }
@@ -711,7 +721,7 @@ static void wfx_events_task(void * p_arg)
                     hasNotifiedIPV6 = true;
                     if (!hasNotifiedWifiConnectivity)
                     {
-                        NotifyConnection(&ap_mac);
+                        NotifyConnection(ap_mac);
                         hasNotifiedWifiConnectivity = true;
                     }
                 }
@@ -1079,27 +1089,6 @@ sl_status_t wfx_connect_to_ap(void)
                                       strlen(wifi_provision.passkey), NULL, IE_DATA_LENGTH);
 
     return result;
-}
-
-/****************************************************************************
- * @brief
- * get the wifi mac addresss
- * @param[in] interface:
- * @param[in] addr : address
- *****************************************************************************/
-void GetMacAddress(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
-{
-    sl_wfx_mac_address_t * mac;
-
-#ifdef SL_WFX_CONFIG_SOFTAP
-    mac = (interface == SL_WFX_SOFTAP_INTERFACE) ? &wifiContext.mac_addr_1 : &wifiContext.mac_addr_0;
-#else
-    mac = &wifiContext.mac_addr_0;
-#endif
-    *addr = *mac;
-    ChipLogDetail(DeviceLayer, "WLAN:Get WiFi Mac addr %02x:%02x:%02x:%02x:%02x:%02x", mac->octet[0], mac->octet[1], mac->octet[2],
-                  mac->octet[3], mac->octet[4], mac->octet[5]);
-    memcpy(&ap_info.bssid[0], &mac->octet[0], 6);
 }
 
 /****************************************************************************

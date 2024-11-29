@@ -154,7 +154,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
     uint8_t rssi;
     ap->security = wfx_rsi.sec.security;
     ap->chan     = wfx_rsi.ap_chan;
-    memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], kWifiMacAddressLength);
+    memcpy(&ap->bssid[0], wfx_rsi.ap_mac.data(), kWifiMacAddressLength);
     status = rsi_wlan_get(RSI_RSSI, &rssi, sizeof(rssi));
     if (status == RSI_SUCCESS)
     {
@@ -375,14 +375,14 @@ static int32_t sl_matter_wifi_init(void)
     /* initializes wlan radio parameters and WLAN supplicant parameters.
      */
     (void) rsi_wlan_radio_init(); /* Required so we can get MAC address */
-    if ((status = rsi_wlan_get(RSI_MAC_ADDRESS, &wfx_rsi.sta_mac.octet[0], RESP_BUFF_SIZE)) != RSI_SUCCESS)
+    if ((status = rsi_wlan_get(RSI_MAC_ADDRESS, wfx_rsi.sta_mac.data(), RESP_BUFF_SIZE)) != RSI_SUCCESS)
     {
         ChipLogError(DeviceLayer, "rsi_wlan_get(RSI_MAC_ADDRESS) failed: %ld", status);
         return status;
     }
 
-    ChipLogDetail(DeviceLayer, "MAC: %02x:%02x:%02x %02x:%02x:%02x", wfx_rsi.sta_mac.octet[0], wfx_rsi.sta_mac.octet[1],
-                  wfx_rsi.sta_mac.octet[2], wfx_rsi.sta_mac.octet[3], wfx_rsi.sta_mac.octet[4], wfx_rsi.sta_mac.octet[5]);
+    ChipLogDetail(DeviceLayer, "MAC: %02x:%02x:%02x %02x:%02x:%02x", wfx_rsi.sta_mac.at(0), wfx_rsi.sta_mac.at(1),
+                  wfx_rsi.sta_mac.at(2), wfx_rsi.sta_mac.at(3), wfx_rsi.sta_mac.at(4), wfx_rsi.sta_mac.at(5));
 
     // Create the message queue
     sWifiEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WifiPlatformEvent), NULL);
@@ -451,7 +451,7 @@ static void wfx_rsi_save_ap_info(void) // translation
     }
     wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
     wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
-    memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], kWifiMacAddressLength);
+    memcpy(wfx_rsi.ap_mac.data(), &rsp.scan_info->bssid[0], kWifiMacAddressLength);
 
     switch (rsp.scan_info->security_mode)
     {
@@ -563,7 +563,7 @@ void NotifyConnectivity(void)
 {
     if (!hasNotifiedWifiConnectivity)
     {
-        NotifyConnection(&wfx_rsi.ap_mac);
+        NotifyConnection(wfx_rsi.ap_mac);
         hasNotifiedWifiConnectivity = true;
     }
 }

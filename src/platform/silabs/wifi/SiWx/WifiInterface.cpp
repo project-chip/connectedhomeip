@@ -257,7 +257,7 @@ sl_status_t sl_wifi_siwx917_init(void)
     ChipLogDetail(DeviceLayer, "Firmware version is: %x%x.%d.%d.%d.%d.%d.%d", version.chip_id, version.rom_id, version.major,
                   version.minor, version.security_version, version.patch_num, version.customer_id, version.build_num);
 
-    status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, (sl_mac_address_t *) &wfx_rsi.sta_mac.octet[0]);
+    status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, reinterpret_cast<sl_mac_address_t *>(wfx_rsi.sta_mac.data()));
     VerifyOrReturnError(status == SL_STATUS_OK, status,
                         ChipLogError(DeviceLayer, "sl_wifi_get_mac_address failed: 0x%lx", static_cast<uint32_t>(status)));
 
@@ -300,7 +300,7 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
     {
         security        = static_cast<sl_wifi_security_t>(scan_result->scan_info[0].security_mode);
         wfx_rsi.ap_chan = scan_result->scan_info[0].rf_channel;
-        memcpy(&wfx_rsi.ap_mac.octet, scan_result->scan_info[0].bssid, kWifiMacAddressLength);
+        memcpy(wfx_rsi.ap_mac.data(), scan_result->scan_info[0].bssid, kWifiMacAddressLength);
     }
 
     osSemaphoreRelease(sScanCompleteSemaphore);
@@ -480,7 +480,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
     ap->security       = wfx_rsi.sec.security;
     ap->chan           = wfx_rsi.ap_chan;
     chip::Platform::CopyString(ap->ssid, ap->ssid_length, wfx_rsi.sec.ssid);
-    memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], kWifiMacAddressLength);
+    memcpy(&ap->bssid[0], wfx_rsi.ap_mac.data(), kWifiMacAddressLength);
     sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &rssi);
     ap->rssi = rssi;
     return status;
@@ -606,7 +606,7 @@ sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_
 void NotifyConnectivity(void)
 {
     VerifyOrReturn(!hasNotifiedWifiConnectivity);
-    NotifyConnection(&wfx_rsi.ap_mac);
+    NotifyConnection(wfx_rsi.ap_mac);
     hasNotifiedWifiConnectivity = true;
 }
 
