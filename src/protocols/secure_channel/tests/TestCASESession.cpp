@@ -708,7 +708,7 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
 
     // I wish we had "if constexpr" support here, so the compiler would know
     // resumptionIdLen is nonzero inside the block....
-    if (Params::resumptionIdLen != 0)
+    if constexpr (Params::resumptionIdLen != 0)
     {
         uint8_t resumptionId[Params::resumptionIdLen];
 
@@ -718,7 +718,7 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
             writer.Put(Params::NumToTag(Params::resumptionIdTag), ByteSpan(resumptionId, Params::resumptionIdLen)));
     }
 
-    if (Params::initiatorResumeMICLen != 0)
+    if constexpr (Params::initiatorResumeMICLen != 0)
     {
         uint8_t initiatorResumeMIC[Params::initiatorResumeMICLen];
         // to fix _FORTIFY_SOURCE issue, _FORTIFY_SOURCE=2 by default on Android
@@ -727,7 +727,7 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
                                         ByteSpan(initiatorResumeMIC, Params::initiatorResumeMICLen)));
     }
 
-    if (Params::includeStructEnd)
+    if constexpr (Params::includeStructEnd)
     {
         ReturnErrorOnFailure(writer.EndContainer(containerType));
     }
@@ -745,21 +745,14 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
                                                                                                                                    \
         TLV::ContiguousBufferTLVReader reader;                                                                                     \
         reader.Init(buf);                                                                                                          \
-                                                                                                                                   \
-        ByteSpan initiatorRandom;                                                                                                  \
-        uint16_t initiatorSessionId;                                                                                               \
-        ByteSpan destinationId;                                                                                                    \
-        ByteSpan initiatorEphPubKey;                                                                                               \
-        bool resumptionRequested;                                                                                                  \
-        ByteSpan resumptionId;                                                                                                     \
-        ByteSpan initiatorResumeMIC;                                                                                               \
+        CASESession::Sigma1Param parsedSigma1;                                                                                     \
         CASESession session;                                                                                                       \
-        EXPECT_EQ(session.ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey,              \
-                                      resumptionRequested, resumptionId, initiatorResumeMIC) == CHIP_NO_ERROR,                     \
-                  params::expectSuccess);                                                                                          \
+                                                                                                                                   \
+        EXPECT_EQ(session.ParseSigma1(reader, parsedSigma1) == CHIP_NO_ERROR, params::expectSuccess);                              \
         if (params::expectSuccess)                                                                                                 \
         {                                                                                                                          \
-            EXPECT_EQ(resumptionRequested, params::resumptionIdLen != 0 && params::initiatorResumeMICLen != 0);                    \
+            EXPECT_EQ(parsedSigma1.sessionResumptionRequested,                                                                     \
+                      params::resumptionIdLen != 0 && params::initiatorResumeMICLen != 0);                                         \
             /* Add other verification tests here as desired */                                                                     \
         }                                                                                                                          \
     } while (0)

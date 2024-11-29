@@ -44,6 +44,7 @@
 #include <protocols/secure_channel/SessionResumptionStorage.h>
 #include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 #include <transport/CryptoContext.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -117,6 +118,19 @@ public:
      */
     void SetGroupDataProvider(Credentials::GroupDataProvider * groupDataProvider) { mGroupDataProvider = groupDataProvider; }
 
+    struct Sigma1Param
+    {
+        ByteSpan initiatorRandom;
+        uint16_t initiatorSessionId;
+        ByteSpan destinationId;
+        ByteSpan initiatorEphPubKey;
+        bool sessionResumptionRequested = false;
+        bool InitiatorMRPParamsPresent  = false;
+        ByteSpan resumptionId;
+        ByteSpan initiatorResumeMICSpan;
+        uint8_t initiatorResume1MIC[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
+    };
+
     /**
      * Parse a sigma1 message.  This function will return success only if the
      * message passes schema checks.  Specifically:
@@ -135,9 +149,11 @@ public:
      * and the  resumptionID and initiatorResumeMIC outparams will be set to
      * valid values, or the resumptionRequested outparam will be set to false.
      */
-    CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ByteSpan & initiatorRandom, uint16_t & initiatorSessionId,
-                           ByteSpan & destinationId, ByteSpan & initiatorEphPubKey, bool & resumptionRequested,
-                           ByteSpan & resumptionId, ByteSpan & initiatorResumeMIC);
+    CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, Sigma1Param & OutputParseSigma1);
+
+    // TODO: Add message
+    // TODO: should i keep it as public? why is ParseSigma1 public?
+    CHIP_ERROR EncodeSigma1(System::PacketBufferHandle & msg, Sigma1Param & encodeSigma1);
 
     /**
      * @brief
