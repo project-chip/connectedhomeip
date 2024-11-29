@@ -24,7 +24,10 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/administrator-commissioning-server/administrator-commissioning-server.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -44,6 +47,12 @@ using namespace chip::app::Clusters::AdministratorCommissioning;
 using namespace chip::Protocols;
 using namespace chip::Crypto;
 using chip::Protocols::InteractionModel::Status;
+
+namespace {
+
+AdministratorCommissioningServer gAdministratorCommissioningServer(kRootEndpoint);
+
+} // namespace
 
 class AdministratorCommissioningAttrAccess : public AttributeAccessInterface
 {
@@ -80,9 +89,8 @@ CHIP_ERROR AdministratorCommissioningAttrAccess::Read(const ConcreteReadAttribut
     return CHIP_NO_ERROR;
 }
 
-bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Commands::OpenCommissioningWindow::DecodableType & commandData)
+bool HandleOpenCommissioningWindowCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                          const Commands::OpenCommissioningWindow::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("OpenCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
@@ -138,9 +146,8 @@ exit:
     return true;
 }
 
-bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
+bool HandleOpenBasicCommissioningWindowCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                               const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("OpenBasicCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
@@ -183,9 +190,8 @@ exit:
     return true;
 }
 
-bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Commands::RevokeCommissioning::DecodableType & commandData)
+bool HandleRevokeCommissioningCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                      const Commands::RevokeCommissioning::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");
     ChipLogProgress(Zcl, "Received command to close commissioning window");
@@ -209,5 +215,82 @@ bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
 void MatterAdministratorCommissioningPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Initiating Admin Commissioning cluster.");
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdministratorCommissioningServer);
     AttributeAccessInterfaceRegistry::Instance().Register(&gAdminCommissioningAttrAccess);
 }
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace AdministratorCommissioning {
+
+AdministratorCommissioningServer::AdministratorCommissioningServer(EndpointId endpointId) :
+    CommandHandlerInterface(MakeOptional(endpointId), Id)
+{}
+
+AdministratorCommissioningServer::~AdministratorCommissioningServer()
+{
+    Shutdown();
+}
+
+CHIP_ERROR AdministratorCommissioningServer::Init()
+{
+    return CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+}
+
+CHIP_ERROR AdministratorCommissioningServer::Shutdown()
+{
+    return CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+}
+
+void AdministratorCommissioningServer::InvokeCommand(HandlerContext & context)
+{
+    switch (context.mRequestPath.mCommandId)
+    {
+    case Commands::OpenCommissioningWindow::Id:
+        HandleCommand<Commands::OpenCommissioningWindow::DecodableType>(
+            context, [this](HandlerContext & context, const auto & commandData) { OpenCommissioningWindow(context, commandData); });
+        break;
+    case Commands::OpenBasicCommissioningWindow::Id:
+        HandleCommand<Commands::OpenBasicCommissioningWindow::DecodableType>(
+            context,
+            [this](HandlerContext & context, const auto & commandData) { OpenBasicCommissioningWindow(context, commandData); });
+        break;
+    case Commands::RevokeCommissioning::Id:
+        HandleCommand<Commands::RevokeCommissioning::DecodableType>(
+            context, [this](HandlerContext & context, const auto & commandData) { RevokeCommissioning(context, commandData); });
+        break;
+    }
+}
+
+void AdministratorCommissioningServer::OpenCommissioningWindow(HandlerContext & context,
+                                                               const Commands::OpenCommissioningWindow::DecodableType & commandData)
+{
+    if (!HandleOpenCommissioningWindowCommand(&context.mCommandHandler, context.mRequestPath, commandData))
+    {
+        context.SetCommandNotHandled();
+    }
+}
+
+void AdministratorCommissioningServer::OpenBasicCommissioningWindow(
+    CommandHandlerInterface::HandlerContext & context, const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
+{
+    if (!HandleOpenBasicCommissioningWindowCommand(&context.mCommandHandler, context.mRequestPath, commandData))
+    {
+        context.SetCommandNotHandled();
+    }
+}
+
+void AdministratorCommissioningServer::RevokeCommissioning(CommandHandlerInterface::HandlerContext & context,
+                                                           const Commands::RevokeCommissioning::DecodableType & commandData)
+{
+    if (!HandleRevokeCommissioningCommand(&context.mCommandHandler, context.mRequestPath, commandData))
+    {
+        context.SetCommandNotHandled();
+    }
+}
+
+} // namespace AdministratorCommissioning
+} // namespace Clusters
+} // namespace app
+} // namespace chip
