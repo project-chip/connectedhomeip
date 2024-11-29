@@ -119,19 +119,19 @@ where `device` can be one of the [Supported devices](#supported-devices).
 
 The application uses an NXP specific data model file:
 
-| path                          | description                             |
-| ----------------------------- | --------------------------------------- |
-| `zap-lit/lighting-on-off.zap` | Data model for On/Off Light device type |
+| path                      | description                             |
+| ------------------------- | --------------------------------------- |
+| `zap/lighting-on-off.zap` | Data model for On/Off Light device type |
 
 The data model can be changed by simply replacing the gn `deps` statement
 corresponding to data model target.
 
 ### Manufacturing data
 
-Use `chip_with_factory_data=1` in the gn build command to enable factory data.
+Use `nxp_use_factory_data=true` in the gn build command to enable factory data.
 
 For a full guide on manufacturing flow, please see
-[Guide for writing manufacturing data on NXP devices](../../../docs/guides/nxp/nxp_manufacturing_flow.md).
+[Guide for writing manufacturing data on NXP devices](../../../docs/platforms/nxp/nxp_manufacturing_flow.md).
 
 ## Flashing and debugging
 

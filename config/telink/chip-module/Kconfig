@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023 Project CHIP Authors
+#   Copyright (c) 2023-2024 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ config BOOTLOADER_MCUBOOT
 	select IMG_MANAGER
 	select STREAM_FLASH
 	select STREAM_FLASH_ERASE
+	select TELINK_W91_N22_MATTER_OTA_LAYOUT if BOARD_TLSR9118BDK40D
 
 config CHIP_OTA_REQUESTOR_BUFFER_SIZE
 	int "OTA Requestor image buffer size"
@@ -69,6 +70,27 @@ config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 config CHIP_OTA_IMAGE_BUILD
 	bool
 	default y if CHIP_OTA_REQUESTOR
+
+config SIGNED_OTA_IMAGE_FILE_NAME
+	string "Zephyr signed image file name"
+	default "zephyr.signed.lzma.signed.bin" if COMPRESS_LZMA
+	default "zephyr.signed.bin"
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Provides the file name of the generated Zephyr signed image.
+
+config TELINK_OTA_BUTTON_TEST
+	bool "Enable image update initiation via button press"
+	default n
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Merge the signed binary with the same version as the main into slot-1 of merged.hex.
+	  Pressing the button initiates a forced image update.
+
+config TELINK_OTA_PARTITION_ADDR
+	hex "image-1 partition address"
+	default $(dt_node_reg_addr_hex,$(dt_nodelabel_path,slot1_partition),0)
+	depends on TELINK_OTA_BUTTON_TEST
 
 config CHIP_ROTATING_DEVICE_ID
 	bool "Generate rotating device ID"
@@ -123,8 +145,13 @@ config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
 	default y
 	help
 	  Enables merging generated factory data with the build target zephyr.bin file.
-	  As a result, output file zephyr.bin will consist of all partitions including 
+	  As a result, output file merged.bin will consist of all partitions including 
 	  factory data.
+
+config TELINK_FACTORY_DATA_PARTITION_ADDR
+	hex "factory-data partition address"
+	default $(dt_node_reg_addr_hex,$(dt_nodelabel_path,factory_partition),0)
+	depends on CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
 
 # Use default certificates without generating or providing them
 config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
@@ -180,6 +207,7 @@ config CHIP_IPV4
 
 config CHIP_BUTTON_MANAGER_IRQ_MODE
 	bool "Use GPIO in an IRQ mode instead of polling the GPIO"
+	default y if BOARD_TLSR9118BDK40D
 	default PM
 	help
 	  Use GPIO in an IRQ mode to avoid button polling loop and extend the battery lifetime by waking up by GPIO event. 
@@ -218,6 +246,8 @@ config CHIP_ENABLE_POWER_ON_FACTORY_RESET
 
 config CHIP_TASK_STACK_SIZE
 	int
+	default 6192 if SOC_RISCV_TELINK_TL321X
+	default 5352 if PM
 	default 8192
 
 config CHIP_USE_MARS_SENSOR

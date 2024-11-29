@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2020-2024 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,15 +67,23 @@ for define in "${xcode_defines[@]}"; do
 done
 
 # Forward C/C++ flags (OTHER_C*FLAGS)
-declare -a target_cflags=()
 read -r -a target_cflags_c <<<"$OTHER_CFLAGS"
 read -r -a target_cflags_cc <<<"$OTHER_CPLUSPLUSFLAGS"
 
 # Handle target OS and arch
 declare target_arch=
 declare target_cpu=
-declare target_cflags=
+declare -a target_cflags=()
 declare current_arch="$(uname -m)"
+declare deployment_target="$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX"
+declare deployment_variant=
+if [[ "$IS_ZIPPERED" == YES ]]; then
+    if [[ "$CLANG_TARGET_TRIPLE_VARIANTS" != *-apple-* ]]; then
+        echo "Unable to determine target variant for zippered build" >&2
+        exit 1
+    fi
+    deployment_variant="${CLANG_TARGET_TRIPLE_VARIANTS/*-apple-/}"
+fi
 
 read -r -a archs <<<"$ARCHS"
 for arch in "${archs[@]}"; do
@@ -86,7 +94,8 @@ for arch in "${archs[@]}"; do
             *) target_cpu="$arch" ;;
         esac
     fi
-    target_cflags+=(-arch "$arch")
+    [[ "${#archs[@]}" -gt 1 ]] && target_cflags+=(-arch "$arch")
+    [[ -n "$deployment_variant" ]] && target_cflags+=(-target-variant "$arch-apple-$deployment_variant")
 done
 
 # Translate other options
@@ -94,6 +103,7 @@ done
 [[ $ENABLE_BITCODE == YES ]] && target_cflags+=("-flto")
 
 declare -a args=(
+    'import("//config/darwin/args.gni")'
     'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="boringssl"'
     'chip_build_controller_dynamic_server=false'
@@ -108,7 +118,7 @@ declare -a args=(
     'enable_fuzz_test_targets=false'
     "target_cpu=\"$target_cpu\""
     "mac_target_arch=\"$target_arch\""
-    "mac_deployment_target=\"$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX\""
+    "mac_deployment_target=\"$deployment_target\""
     "target_defines=$(format_gn_list "${target_defines[@]}")"
     "target_cflags=$(format_gn_list "${target_cflags[@]}")"
     "target_cflags_c=$(format_gn_list "${target_cflags_c[@]}")"
@@ -123,7 +133,6 @@ esac
 [[ $PLATFORM_FAMILY_NAME != macOS ]] && {
     args+=(
         'target_os="ios"'
-        'import("//config/ios/args.gni")'
     )
 }
 
@@ -175,6 +184,12 @@ esac
 [[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
     args+=(
         'enable_encoding_sentinel_enum_values=true'
+    )
+}
+
+[[ $CHIP_USE_NETWORK_FRAMEWORK == YES ]] && {
+    args+=(
+        'chip_system_config_use_network_framework=true'
     )
 }
 

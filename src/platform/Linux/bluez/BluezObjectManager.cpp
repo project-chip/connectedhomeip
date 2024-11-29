@@ -62,6 +62,11 @@ CHIP_ERROR BluezObjectManager::Init()
 
 void BluezObjectManager::Shutdown()
 {
+    // If the D-Bus connection or the object manager are not initialized,
+    // there is nothing to shutdown. This check prevents unnecessary call
+    // to the GLibMatterContextInvokeSync function.
+    VerifyOrReturn(mConnection || mObjectManager);
+
     // Run endpoint cleanup on the CHIPoBluez thread. This is necessary because the
     // cleanup function releases the D-Bus manager client object, which handles D-Bus
     // signals. Otherwise, we will face race condition when the D-Bus signal is in

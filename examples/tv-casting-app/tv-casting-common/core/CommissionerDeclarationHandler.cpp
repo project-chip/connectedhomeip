@@ -38,18 +38,24 @@ CommissionerDeclarationHandler * CommissionerDeclarationHandler::GetInstance()
     return sCommissionerDeclarationHandler_;
 }
 
-// TODO: In the following PRs. Implement setHandler() for CommissionerDeclaration messages and expose messages to higher layers for
-// Linux, Android and iOS.
 void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
     const chip::Transport::PeerAddress & source, chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
 {
-    ChipLogProgress(AppServer,
-                    "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(), calling CloseCommissioningWindow()");
-    // Close the commissioning window. Since we recived a CommissionerDeclaration message from the Commissioner, we know that
-    // commissioning via AccountLogin cluster failed. We will open a new commissioningWindow prior to sending the next
-    // IdentificationDeclaration Message to the Commissioner.
-    chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-    support::ChipDeviceEventHandler::SetUdcStatus(false);
+    ChipLogProgress(AppServer, "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage()");
+
+    // During UDC with CastingPlayer/Commissioner-Generated Passcode, the Commissioner responds with a CommissionerDeclaration
+    // message with CommissionerPasscode set to true. The CommissionerPasscode flag indicates that a Passcode is now displayed for
+    // the user by the CastingPlayer /Commissioner. With this CommissionerDeclaration message, we also know that commissioning via
+    // AccountLogin cluster has failed. Therefore, we close the commissioning window. We will open a new commissioning window prior
+    // to sending the next/2nd IdentificationDeclaration message to the Commissioner.
+    if (cd.GetCommissionerPasscode())
+    {
+        ChipLogProgress(AppServer,
+                        "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(), calling CloseCommissioningWindow()");
+        // Close the commissioning window.
+        chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        support::ChipDeviceEventHandler::SetUdcStatus(false);
+    }
 
     // Flag to indicate when the CastingPlayer/Commissioner user has decided to exit the commissioning process.
     if (cd.GetCancelPasscode())
@@ -57,6 +63,9 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
         ChipLogProgress(AppServer,
                         "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(), Got CancelPasscode parameter, "
                         "CastingPlayer/Commissioner user has decided to exit the commissioning attempt. Connection aborted.");
+        // Close the commissioning window.
+        chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        support::ChipDeviceEventHandler::SetUdcStatus(false);
         // Since the CastingPlayer/Commissioner user has decided to exit the commissioning process, we cancel the ongoing
         // connection attempt without notifying the CastingPlayer/Commissioner. Therefore the
         // shouldSendIdentificationDeclarationMessage flag in the internal StopConnecting() API call is set to false. The
@@ -65,12 +74,7 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
         // and user 2 might be controlling the CastingPlayer/Commissioner TV.
         CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
         // Avoid crashing if we recieve this CommissionerDeclaration message when targetCastingPlayer is nullptr.
-        if (targetCastingPlayer == nullptr)
-        {
-            ChipLogError(AppServer,
-                         "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() targetCastingPlayer is nullptr");
-        }
-        else
+        if (targetCastingPlayer != nullptr)
         {
             CHIP_ERROR err = targetCastingPlayer->StopConnecting(false);
             if (err != CHIP_NO_ERROR)
@@ -81,6 +85,11 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
                     "%" CHIP_ERROR_FORMAT,
                     err.Format());
             }
+        }
+        else
+        {
+            ChipLogError(AppServer,
+                         "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() targetCastingPlayer is nullptr");
         }
     }
 

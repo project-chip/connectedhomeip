@@ -51,7 +51,6 @@ add_library(
 )
 
 chip_configure_data_model(chip_main
-    INCLUDE_SERVER
     ZAP_FILE ${matter_example_path}/../devices/${SAMPLE_NAME}.zap
 )
 
@@ -67,6 +66,7 @@ target_include_directories(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
     ${chip_dir}/examples/all-clusters-app/ameba/main/include
     ${chip_dir}/examples/platform/ameba
+    ${chip_dir}/examples/platform/ameba/observer
     ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/

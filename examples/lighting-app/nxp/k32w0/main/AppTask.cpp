@@ -22,6 +22,7 @@
 #include <app/server/Server.h>
 #include <lib/core/ErrorStr.h>
 
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -43,7 +44,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <src/platform/nxp/common/legacy/OTAImageProcessorImpl.h>
+#include <src/platform/nxp/common/ota/OTAImageProcessorImpl.h>
 #endif
 
 #include "DefaultTestEventTriggerDelegate.h"
@@ -282,6 +283,7 @@ void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance();
 
     auto & infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
     infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);

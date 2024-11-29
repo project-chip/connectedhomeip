@@ -262,6 +262,7 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, CommissionN
         nodeData.supportsCommissionerGeneratedPasscode = Internal::GetCommissionerPasscode(val);
         break;
     default:
+        FillNodeDataFromTxt(key, val, static_cast<CommonResolutionData &>(nodeData));
         break;
     }
 }

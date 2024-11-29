@@ -16,6 +16,7 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
+from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
@@ -139,7 +140,8 @@ class NrfConnectBuilder(Builder):
                  runner,
                  app: NrfApp = NrfApp.LIGHT,
                  board: NrfBoard = NrfBoard.NRF52840DK,
-                 enable_rpcs: bool = False):
+                 enable_rpcs: bool = False,
+                 ):
         super(NrfConnectBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
@@ -189,16 +191,12 @@ class NrfConnectBuilder(Builder):
 
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
-            cmd = '''
-source "$ZEPHYR_BASE/zephyr-env.sh";
-export ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'''
-            if zephyr_sdk_dir:
-                cmd += f'''
-export ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'''
+            cmd = 'source "$ZEPHYR_BASE/zephyr-env.sh";\nexport ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'
 
-            cmd += '''
-west build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flags}
-        '''.format(
+            if zephyr_sdk_dir:
+                cmd += f'\nexport ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'
+
+            cmd += '\nwest build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flags}\n'.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
                 sourcedir=shlex.quote(os.path.join(
@@ -211,8 +209,12 @@ west build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flag
     def _build(self):
         logging.info('Compiling NrfConnect at %s', self.output_dir)
 
-        self._Execute(['ninja', '-C', self.output_dir],
-                      title='Building ' + self.identifier)
+        cmd = ['ninja', '-C', self.output_dir]
+
+        if self.ninja_jobs is not None:
+            cmd.append('-j' + str(self.ninja_jobs))
+
+        self._Execute(cmd, title='Building ' + self.identifier)
 
         if self.app == NrfApp.UNIT_TESTS:
             # Note: running zephyr/zephyr.elf has the same result except it creates

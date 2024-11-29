@@ -35,8 +35,8 @@ default_args = {
 
   # Required for pw_unit_test
   pw_sys_io_BACKEND = "$dir_pw_sys_io_stdio"
-  pw_assert_BACKEND = "$dir_pw_assert_log"
-  pw_log_BACKEND = "$dir_pw_log_basic"
+  pw_assert_BACKEND = "//src/pw_backends/assert"
+  pw_log_BACKEND = "//src/pw_backends/log"
 
   # TODO: Make sure only unit tests link against this
   pw_build_LINK_DEPS = [

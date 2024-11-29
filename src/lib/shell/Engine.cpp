@@ -86,6 +86,8 @@ CHIP_ERROR Engine::ExecCommand(int argc, char * argv[])
     CHIP_ERROR retval = CHIP_ERROR_INVALID_ARGUMENT;
 
     VerifyOrReturnError(argc > 0, retval);
+    VerifyOrReturnError(nullptr != argv, retval);
+
     // Find the command
     for (unsigned i = 0; i < _commandSetCount; i++)
     {

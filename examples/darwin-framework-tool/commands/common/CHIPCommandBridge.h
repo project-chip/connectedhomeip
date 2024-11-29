@@ -30,6 +30,7 @@
 inline constexpr char kIdentityAlpha[] = "alpha";
 inline constexpr char kIdentityBeta[] = "beta";
 inline constexpr char kIdentityGamma[] = "gamma";
+inline constexpr char kControllerIdPrefix[] = "8DCADB14-AF1F-45D0-B084-00000000000";
 
 class CHIPCommandBridge : public Command {
 public:
@@ -41,6 +42,8 @@ public:
             "Sets the commissioner node ID of the given "
             "commissioner-name. Interactive mode will only set a single commissioner on the inital command. "
             "The commissioner node ID will be persisted until a different one is specified.");
+        AddArgument("commissioner-shared-storage", 0, 1, &mCommissionerSharedStorage,
+            "Use a shared storage instance instead of individual storage for each commissioner. Default is false.");
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
             "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
             "directory.");
@@ -67,6 +70,8 @@ public:
 
     static OTAProviderDelegate * mOTADelegate;
 
+    static NSNumber * GetCommissionerFabricId(const char * identity);
+
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
     // stack. The rules for Run() are as follows:
@@ -87,12 +92,17 @@ protected:
 
     // This method returns the commissioner instance to be used for running the command.
     MTRDeviceController * CurrentCommissioner();
+    NSNumber * CurrentCommissionerFabricId();
 
     MTRDeviceController * GetCommissioner(const char * identity);
 
     // Returns the MTRBaseDevice for the specified node ID.
     // Will utilize an existing PASE connection if the device is being commissioned.
     MTRBaseDevice * BaseDeviceWithNodeId(chip::NodeId nodeId);
+
+    // Returns the MTRDevice for the specified node ID.
+    // Will utilize an existing PASE connection if the device is being commissioned.
+    MTRDevice * DeviceWithNodeId(chip::NodeId nodeId);
 
     // Will log the given string and given error (as progress if success, error
     // if failure).
@@ -118,6 +128,10 @@ protected:
 
     void RestartCommissioners();
 
+    void SuspendOrResumeCommissioners();
+
+    MTRDevice * GetLastUsedDevice();
+
 private:
     CHIP_ERROR InitializeCommissioner(
         std::string key, chip::FabricId fabricId, const chip::Credentials::AttestationTrustStore * trustStore);
@@ -130,6 +144,8 @@ private:
     void StopWaiting();
 
     CHIP_ERROR MaybeSetUpStack();
+    CHIP_ERROR SetUpStackWithSharedStorage(NSArray<NSData *> * productAttestationAuthorityCertificates);
+    CHIP_ERROR SetUpStackWithPerControllerStorage(NSArray<NSData *> * productAttestationAuthorityCertificates);
     void MaybeTearDownStack();
 
     CHIP_ERROR GetPAACertsFromFolder(NSArray<NSData *> * __autoreleasing * paaCertsResult);
@@ -140,6 +156,9 @@ private:
     // The current controller; the one the current command should be using.
     MTRDeviceController * mCurrentController;
 
+    static bool sUseSharedStorage;
+    chip::Optional<bool> mCommissionerSharedStorage;
+
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     chip::Optional<char *> mCommissionerName;
@@ -148,4 +167,5 @@ private:
     static dispatch_queue_t mOTAProviderCallbackQueue;
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<chip::VendorId> mCommissionerVendorId;
+    std::string mCurrentIdentity;
 };

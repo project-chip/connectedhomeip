@@ -83,10 +83,12 @@ struct AttributeEntry
     static const AttributeEntry kInvalid;
 };
 
+// Bitmask values for different Command qualities.
 enum class CommandQualityFlags : uint32_t
 {
     kFabricScoped = 0x0001,
     kTimed        = 0x0002, // `T` quality on commands
+    kLargeMessage = 0x0004, // `L` quality on commands
 };
 
 struct CommandInfo
@@ -103,6 +105,18 @@ struct CommandEntry
     bool IsValid() const { return path.HasValidIds(); }
 
     static const CommandEntry kInvalid;
+};
+
+/// Represents a device type that resides on an endpoint
+struct DeviceTypeEntry
+{
+    DeviceTypeId deviceTypeId;
+    uint8_t deviceTypeVersion;
+
+    bool operator==(const DeviceTypeEntry & other) const
+    {
+        return (deviceTypeId == other.deviceTypeId) && (deviceTypeVersion == other.deviceTypeVersion);
+    }
 };
 
 /// Provides metadata information for a data model
@@ -128,7 +142,13 @@ public:
 
     virtual EndpointId FirstEndpoint()                 = 0;
     virtual EndpointId NextEndpoint(EndpointId before) = 0;
+    virtual bool EndpointExists(EndpointId id);
 
+    // This iteration describes device types registered on an endpoint
+    virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;
+    virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
+
+    // This iteration will list all clusters on a given endpoint
     virtual ClusterEntry FirstCluster(EndpointId endpoint)                              = 0;
     virtual ClusterEntry NextCluster(const ConcreteClusterPath & before)                = 0;
     virtual std::optional<ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) = 0;

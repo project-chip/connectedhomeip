@@ -61,8 +61,9 @@ using namespace Clusters::Globals::Attributes;
 
 namespace {
 
-DataVersion dataVersion           = 0;
-const MockNodeConfig * mockConfig = nullptr;
+unsigned metadataStructureGeneration = 0;
+DataVersion dataVersion              = 0;
+const MockNodeConfig * mockConfig    = nullptr;
 
 const MockNodeConfig & DefaultMockNodeConfig()
 {
@@ -313,6 +314,40 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
     return &dataVersion;
 }
 
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpointId, CHIP_ERROR & err)
+{
+    auto endpoint = GetMockNodeConfig().endpointById(endpointId);
+
+    if (endpoint == nullptr)
+    {
+        return chip::Span<const EmberAfDeviceType>();
+    }
+
+    return endpoint->deviceTypes();
+}
+
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned index, CHIP_ERROR & err)
+{
+    if (index >= GetMockNodeConfig().endpoints.size())
+    {
+        return chip::Span<const EmberAfDeviceType>();
+    }
+
+    return GetMockNodeConfig().endpoints[index].deviceTypes();
+}
+
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                             AttributesChangedListener * listener)
+{
+    dataVersion++;
+    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
+}
+
+unsigned emberAfMetadataStructureGeneration()
+{
+    return metadataStructureGeneration;
+}
+
 namespace chip {
 namespace app {
 
@@ -367,6 +402,11 @@ void BumpVersion()
 DataVersion GetVersion()
 {
     return dataVersion;
+}
+
+void SetVersionTo(DataVersion version)
+{
+    dataVersion = version;
 }
 
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
@@ -460,12 +500,14 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
 
 void SetMockNodeConfig(const MockNodeConfig & config)
 {
+    metadataStructureGeneration++;
     mockConfig = &config;
 }
 
 /// Resets the mock attribute storage to the default configuration.
 void ResetMockNodeConfig()
 {
+    metadataStructureGeneration++;
     mockConfig = nullptr;
 }
 

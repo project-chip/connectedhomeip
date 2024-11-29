@@ -34,6 +34,18 @@ tests:
           Length of TransferFileDesignator is equal to 32 characters
           Length of TransferFileDesignator is greater than 32 characters
           To send a message that mismatches the current transfer mode
+          1. Execute the below commands in the interactive mode:
+           ./chip-tool interactive start
+          2. Before running the below steps ensure that  \tmp folder on the system does not contain the below files.
+             If they are present please delete these files:
+               TH_LOG_OK_NORMAL : "Length_1234567.txt"
+               TH_LOG_OK_FULL_LENGTH : "Length_123456789123456789123.txt"
+          3. Use the below command in the all-cluster-app for setting up the diagonistics logs.
+           ./chip-all-clusters-app --trace_decode 1 --end_user_support_log ~/tmp/end_user_support_log.txt --network_diagnostics_log ~/tmp/nw_log.txt --crash_log ~/tmp/crash_log.txt
+          The log file content can be set such that the file size can be as follows to obtain different status code from DUT:
+          1. end_user_support_log  > 1024 bytes
+          2. Make sure that nw_log.txt does not exist
+          3. crash_log < 1024 bytes
       disabled: true
 
     - label: "Step 1: Commission DUT to TH"
@@ -187,7 +199,7 @@ tests:
           TH_LOG_OK_NORMAL)"
       PICS: MCORE.BDX.Initiator
       verification: |
-          "diagnosticlogs retrieve-logs-request 0 1 1 0 --TransferFileDesignator Length_1234567.txt
+          diagnosticlogs retrieve-logs-request 0 1 1 0 --TransferFileDesignator Length_1234567.txt
 
           On TH(chip-tool), Verify that the DUT sends SendInit message with TransferFileDesignator field set to Length_1234567891234567891
           [1707967645.770994][10882:10885] CHIP:ATM: SendInit
@@ -219,7 +231,7 @@ tests:
           by setting Intent field to . NetworkDiag . CrashLogs"
       PICS: MCORE.BDX.Initiator
       verification: |
-          "diagnosticlogs retrieve-logs-request 0 0 1 0
+          diagnosticlogs retrieve-logs-request 0 0 1 0
 
           On TH(chip-tool), Verify that the DUT responds with Success(0) status code for the RetrieveLogsResponse command Verify that LogContent field contains at most 1024 bytes
 
@@ -254,7 +266,7 @@ tests:
           EndUserSupport, RequestedProtocol= BDX)"
       PICS: MCORE.BDX.Initiator
       verification: |
-          "diagnosticlogs retrieve-logs-request 0 1 1 0
+          diagnosticlogs retrieve-logs-request 0 1 1 0
 
           On TH(chip-tool), Verify that the DUT responds with INVALID_COMMAND for the RetrieveLogsRequest that was sent without TransferFileDesignator
 
@@ -290,7 +302,7 @@ tests:
           RequestedProtocol= BDX, TransferFileDesignator = TH_LOG_OK_NORMAL)"
       PICS: "!MCORE.BDX.Initiator"
       verification: |
-          "diagnosticlogs retrieve-logs-request 0 1 1 0 --TransferFileDesignator Length_1234567.txt
+          diagnosticlogs retrieve-logs-request 0 1 1 0 --TransferFileDesignator Length_1234567.txt
 
           On TH(chip-tool), Verify that the DUT responds with Exhausted(1)  status code for the RetrieveLogsResponse command with the  LogContent field containing at most 1024 bytes
 
@@ -300,13 +312,39 @@ tests:
       disabled: true
 
     - label:
+          "Step 11: TH sends RetrieveLogsRequest Command to DUT with Invalid
+          Intent : RetrieveLogsRequest(Intent = 3, RequestedProtocol= BDX,
+          TransferFileDesignator = TH_LOG_OK_NORMAL) Repeat this step with
+          RequestedProtocol as ResponsePayload"
+      verification: |
+          diagnosticlogs retrieve-logs-request 3 0 1 0 --TransferFileDesignator Length_1234567.txt
+
+          On TH(chip-tool), Verify that the DUT responds with INVALID_COMMAND for the RetrieveLogsRequest that was sent invalid Intent(3)
+
+          [1707901794.468552][36124:36127] CHIP:DMG:                                 StatusIB =
+          [1707901794.468560][36124:36127] CHIP:DMG:                                 {
+          [1707901794.468569][36124:36127] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
+          [1707901794.468576][36124:36127] CHIP:DMG:                                 },
+          [1707901794.468584][36124:36127] CHIP:DMG:
+          [1707901794.468591][36124:36127] CHIP:DMG:                         },
+
+          Repeat this step by setting RequestedProtocol as ResponsePayload :
+
+          diagnosticlogs retrieve-logs-request 3 1 1 0 --TransferFileDesignator Length_1234567.txt
+          On TH(chip-tool), Verify that the DUT responds with INVALID_COMMAND for the RetrieveLogsRequest that was sent invalid Intent(3)
+          [1707901794.468552][36124:36127] CHIP:DMG:                                 StatusIB =
+          [1707901794.468560][36124:36127] CHIP:DMG:                                 {
+          [1707901794.468569][36124:36127] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
+          [1707901794.468576][36124:36127] CHIP:DMG:                                 },
+      disabled: true
+
+    - label:
           "Step 12: TH sends RetrieveLogsRequest Command to DUT with Invalid
           RequestedProtocol : RetrieveLogsRequest(Intent =
           EndUserSupport,RequestedProtocol= 2, TransferFileDesignator =
           TH_LOG_OK_NORMAL)"
-      PICS: MCORE.BDX.Initiator
       verification: |
-          "diagnosticlogs retrieve-logs-request 0 2 1 0 --TransferFileDesignator Length_1234567.txt
+          diagnosticlogs retrieve-logs-request 0 2 1 0 --TransferFileDesignator Length_1234567.txt
 
           On TH(chip-tool), Verify that the DUT responds with INVALID_COMMAND for the RetrieveLogsRequest that was sent Invalid RequestedProtocol(2)
 
@@ -344,39 +382,14 @@ tests:
           TransferFileDesignator length : RetrieveLogsRequest(Intent =
           EndUserSupport,RequestedProtocol= BDX, TransferFileDesignator =
           TH_LOG_ERROR_EMPTY)"
+      PICS: MCORE.BDX.Initiator
       verification: |
-          "diagnosticlogs retrieve-logs-request 0 1 1 0 --TransferFileDesignator ''
-
-          [1707904517.151453][36678:36681] CHIP:DMG: ICR moving to [ResponseRe]
-          [1707904517.151489][36678:36681] CHIP:DMG: InvokeResponseMessage =
-          [1707904517.151501][36678:36681] CHIP:DMG: {
-          [1707904517.151511][36678:36681] CHIP:DMG:         suppressResponse = false,
-          [1707904517.151522][36678:36681] CHIP:DMG:         InvokeResponseIBs =
-          [1707904517.151541][36678:36681] CHIP:DMG:         [
-          [1707904517.151548][36678:36681] CHIP:DMG:                 InvokeResponseIB =
-          [1707904517.151565][36678:36681] CHIP:DMG:                 {
-          [1707904517.151573][36678:36681] CHIP:DMG:                         CommandStatusIB =
-          [1707904517.151582][36678:36681] CHIP:DMG:                         {
-          [1707904517.151590][36678:36681] CHIP:DMG:                                 CommandPathIB =
-          [1707904517.151599][36678:36681] CHIP:DMG:                                 {
-          [1707904517.151613][36678:36681] CHIP:DMG:                                         EndpointId = 0x0,
-          [1707904517.151627][36678:36681] CHIP:DMG:                                         ClusterId = 0x32,
-          [1707904517.151640][36678:36681] CHIP:DMG:                                         CommandId = 0x0,
-          [1707904517.151652][36678:36681] CHIP:DMG:                                 },
-          [1707904517.151670][36678:36681] CHIP:DMG:
-          [1707904517.151681][36678:36681] CHIP:DMG:                                 StatusIB =
-          [1707904517.151696][36678:36681] CHIP:DMG:                                 {
-          [1707904517.151708][36678:36681] CHIP:DMG:                                         status = 0x87 (CONSTRAINT_ERROR),
-          [1707904517.151720][36678:36681] CHIP:DMG:                                 },
-          [1707904517.151734][36678:36681] CHIP:DMG:
-          [1707904517.151745][36678:36681] CHIP:DMG:                         },
-          [1707904517.151763][36678:36681] CHIP:DMG:
-          [1707904517.151772][36678:36681] CHIP:DMG:                 },
-          [1707904517.151790][36678:36681] CHIP:DMG:
-          [1707904517.151798][36678:36681] CHIP:DMG:         ],
-          [1707904517.151816][36678:36681] CHIP:DMG:
-          [1707904517.151824][36678:36681] CHIP:DMG:         InteractionModelRevision = 11
-          [1707904517.151830][36678:36681] CHIP:DMG: },"
+          diagnosticlogs retrieve-logs-request 0 1 1 0 --TransferFileDesignator ''
+           On TH(chip-tool), Verify that DUT sends RetrieveLogsResponse command to TH with Denied(4) status code.
+          [1719990173.360981][8053:8056] CHIP:TOO:   RetrieveLogsResponse: {
+          [1719990173.361009][8053:8056] CHIP:TOO:     status: 4
+          [1719990173.361021][8053:8056] CHIP:TOO:     logContent:
+          [1719990173.361030][8053:8056] CHIP:TOO:    }
       disabled: true
 
     - label:
@@ -385,9 +398,9 @@ tests:
           EndUserSupport,RequestedProtocol= BDX, TransferFileDesignator =
           TH_LOG_BAD_LENGTH)"
       verification: |
-          "diagnosticlogs retrieve-logs-request 0 1 1 0 --TransferFileDesignator Length_1234567891234567891234567891212345.txt
+          diagnosticlogs retrieve-logs-request 0 1 1 0 --TransferFileDesignator Length_1234567891234567891234567891212345.txt
 
-          On TH(chip-tool), Verify that the DUT responds with CONSTRAINT_ERRORfor the RetrieveLogsRequest that was sent Invalid Invalid TransferFileDesignator length(> 32)
+          On TH(chip-tool), Verify that the DUT responds with CONSTRAINT_ERROR for the RetrieveLogsRequest that was sent Invalid Invalid TransferFileDesignator length(> 32)
 
           [1707904517.151453][36678:36681] CHIP:DMG: ICR moving to [ResponseRe]
           [1707904517.151489][36678:36681] CHIP:DMG: InvokeResponseMessage =

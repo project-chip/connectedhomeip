@@ -256,6 +256,25 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
 
 ```
 
+### FAQ
+
+#### What revision should the FuzzTest and Abseil submodules be for running `pw_fuzzer` with FuzzTest?
+
+-   Google FuzzTest is integrated into Matter using `pw_fuzzer`, which has
+    several dependencies. These dependencies are listed here:
+    [Step 0: Set up FuzzTest for your project](https://pigweed.dev/pw_fuzzer/guides/fuzztest.html#step-0-set-up-fuzztest-for-your-project).
+-   Matter integrates these dependencies as submodules, including Google
+    FuzzTest and Abseil.
+-   Since FuzzTest and Abseil only support the `bazel` and `CMake` build systems
+    and do not support GN, Pigweed maintainers use a script to generate GN files
+    for these dependencies.
+-   the revision of FuzzTest and Abseil submodules in Matter should match or at
+    least be as new as the specific version (SHA1) used when generating these GN
+    files.
+-   You can find the version used for the generated GN files here:
+    [FuzzTest Version](https://pigweed.dev/third_party/fuzztest/#version) and
+    [Abseil Version](https://pigweed.dev/third_party/abseil-cpp/#version).
+
 #### TO ADD:
 
 -   More Information on Test Fixtures (After issues are resolved)

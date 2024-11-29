@@ -281,14 +281,14 @@ void PlatformManagerImpl::_Shutdown()
 }
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
-CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData)
+void PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bridge)
 {
     // Because of TSAN false positives, we need to use a mutex to synchronize access to all members of
     // the GLibMatterContextInvokeData object (including constructor and destructor). This is a temporary
     // workaround until TSAN-enabled GLib will be used in our CI.
     std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
 
-    GLibMatterContextInvokeData invokeData{ func, userData };
+    GLibMatterContextInvokeData invokeData{ std::move(bridge) };
 
     lock.unlock();
 
@@ -300,15 +300,11 @@ CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(
             // XXX: Temporary workaround for TSAN false positives.
             std::unique_lock<std::mutex> lock_(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
 
-            auto mFunc     = data->mFunc;
-            auto mUserData = data->mFuncUserData;
-
             lock_.unlock();
-            auto result = mFunc(mUserData);
+            data->bridge();
             lock_.lock();
 
-            data->mDone       = true;
-            data->mFuncResult = result;
+            data->mDone = true;
             data->mDoneCond.notify_one();
 
             return G_SOURCE_REMOVE;
@@ -318,8 +314,6 @@ CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(
     lock.lock();
 
     invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
-
-    return invokeData.mFuncResult;
 }
 #endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 

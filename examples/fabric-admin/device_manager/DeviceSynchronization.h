@@ -22,11 +22,14 @@
 #include <app/ReadClient.h>
 #include <controller/CHIPDeviceController.h>
 #include <lib/core/DataModelTypes.h>
-
 #include <memory>
 
+#if defined(PW_RPC_ENABLED)
 #include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
+#endif
+
+namespace admin {
 
 /// Ensures that device data is synchronized to the remote fabric bridge.
 ///
@@ -92,6 +95,11 @@ private:
     // mController is expected to remain valid throughout the entire device synchronization process (i.e. when
     // mState != Idle).
     chip::Controller::DeviceController * mController = nullptr;
-    chip_rpc_SynchronizedDevice mCurrentDeviceData   = chip_rpc_SynchronizedDevice_init_default;
+    chip::NodeId mNodeId                             = chip::kUndefinedNodeId;
+#if defined(PW_RPC_ENABLED)
+    chip_rpc_SynchronizedDevice mCurrentDeviceData = chip_rpc_SynchronizedDevice_init_default;
+#endif
     UniqueIdGetter mUniqueIdGetter;
 };
+
+} // namespace admin

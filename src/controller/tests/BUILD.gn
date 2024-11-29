@@ -21,17 +21,27 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libControllerTests"
 
-  test_sources = [ "TestCommissionableNodeController.cpp" ]
+  test_sources = []
 
-  if (chip_device_platform != "mbed" && chip_device_platform != "efr32" &&
-      chip_device_platform != "esp32") {
-    test_sources += [ "TestServerCommandDispatch.cpp" ]
-    test_sources += [ "TestEventChunking.cpp" ]
-    test_sources += [ "TestEventCaching.cpp" ]
-    test_sources += [ "TestReadChunking.cpp" ]
-    test_sources += [ "TestWriteChunking.cpp" ]
-    test_sources += [ "TestEventNumberCaching.cpp" ]
-    test_sources += [ "TestCommissioningWindowOpener.cpp" ]
+  # Not supported on efr32.
+  if (chip_device_platform != "efr32") {
+    test_sources += [ "TestCommissionableNodeController.cpp" ]
+  }
+
+  if (chip_device_platform != "mbed" && chip_device_platform != "esp32") {
+    test_sources += [
+      "TestEventCaching.cpp",
+      "TestEventChunking.cpp",
+      "TestEventNumberCaching.cpp",
+      "TestReadChunking.cpp",
+      "TestServerCommandDispatch.cpp",
+      "TestWriteChunking.cpp",
+    ]
+
+    # Not supported on efr32.
+    if (chip_device_platform != "efr32") {
+      test_sources += [ "TestCommissioningWindowOpener.cpp" ]
+    }
   }
 
   cflags = [ "-Wconversion" ]

@@ -30,7 +30,6 @@ chip_with_lwip = false
 
 chip_enable_icd_server = true
 chip_enable_icd_lit = false
-icd_enforce_sit_slow_poll_limit = true
 chip_persist_subscriptions = true
 chip_subscription_timeout_resumption = true
 
@@ -38,6 +37,8 @@ is_debug = false
 
 chip_crypto = "platform"
 chip_openthread_ftd = false
-chip_with_ot_cli = 0
+nxp_enable_ot_cli = false
 
 chip_with_diag_logs_demo = true
+
+nxp_nvm_component = "nvs"

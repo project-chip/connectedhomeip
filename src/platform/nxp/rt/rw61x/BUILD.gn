@@ -1,5 +1,5 @@
 # Copyright (c) 2021 Project CHIP Authors
-# Copyright 2023 NXP
+# Copyright 2023-2024 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,12 +34,15 @@ source_set("nxp_ota") {
 }
 
 config("nxp_platform_config") {
-  defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"" ]
+  defines = [
+    "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"",
+    "CONFIG_BOOT_REASON_SDK_SUPPORT=1",
+  ]
   include_dirs = [
     ".",
     "../../common",
   ]
-  if (chip_with_factory_data == 1) {
+  if (nxp_use_factory_data) {
     include_dirs += [
       ".",
       "../../common/factory_data",
@@ -49,22 +52,24 @@ config("nxp_platform_config") {
       "CONFIG_CHIP_ENCRYPTED_FACTORY_DATA=1",
     ]
 
-    if (chip_enable_secure_dac_private_key_storage) {
-      assert(chip_enable_secure_dac_private_key_storage &&
-                 !chip_enable_secure_whole_factory_data,
-             "please select only one protection solution")
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
-    } else if (chip_enable_secure_whole_factory_data) {
-      assert(chip_enable_secure_whole_factory_data &&
-                 !chip_enable_secure_dac_private_key_storage,
+    if (nxp_enable_secure_whole_factory_data) {
+      assert(nxp_enable_secure_whole_factory_data &&
+                 !nxp_enable_secure_EL2GO_factory_data,
              "please select only one protection solution")
       defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.h\"" ]
+    } else if (nxp_enable_secure_EL2GO_factory_data) {
+      assert(!nxp_enable_secure_whole_factory_data &&
+                 nxp_enable_secure_EL2GO_factory_data,
+             "please select only one protection solution")
+      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEl2GoImpl.h\"" ]
     } else {
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"" ]
+      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
     }
   }
-  if (chip_enable_wifi && chip_enable_openthread) {
-    # Disable thread nwk commissioning instance on endpoint 0, when OTBR is enabled
+
+  # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if
+  if (chip_enable_wifi && chip_enable_openthread &&
+      !chip_enable_secondary_nwk_if) {
     defines += [ "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" ]
   }
 }
@@ -154,17 +159,32 @@ static_library("nxp_platform") {
 
   if (chip_enable_openthread) {
     sources += [
+      # Temporary fix, to be revert once PR #34662 is merged, build issue when using GN check argument
+      "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+      "../../../OpenThread/GenericThreadBorderRouterDelegate.cpp",
+      "../../../OpenThread/GenericThreadBorderRouterDelegate.h",
       "../../../OpenThread/OpenThreadUtils.cpp",
       "../../common/ThreadStackManagerImpl.cpp",
       "../../common/ThreadStackManagerImpl.h",
     ]
 
-    deps += [ "${chip_root}/third_party/openthread:openthread" ]
-    public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    deps += [ "${chip_root}/src/app/common:ids" ]
+
+    if (!nxp_build_matter_standalone_lib) {
+      deps += [ "${chip_root}/third_party/openthread:openthread" ]
+      public_deps +=
+          [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    }
 
     if (chip_mdns == "platform") {
       if (chip_enable_wifi) {
-        sources += [ "../../common/DnssdImpl.cpp" ]
+        sources += [
+          "../../../OpenThread/OpenThreadDnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.h",
+          "../../common/DnssdImpl.cpp",
+          "../../common/DnssdImplBr.cpp",
+          "../../common/DnssdImplBr.h",
+        ]
       } else {
         sources += [
           "../../../OpenThread/DnssdImpl.cpp",
@@ -176,25 +196,25 @@ static_library("nxp_platform") {
     }
   }
 
-  if (chip_with_factory_data == 1) {
+  if (nxp_use_factory_data) {
     sources += [
       "../../common/factory_data/FactoryDataProvider.cpp",
       "../../common/factory_data/FactoryDataProvider.h",
     ]
-    if (chip_enable_secure_dac_private_key_storage) {
-      sources += [
-        "FactoryDataProviderImpl.cpp",
-        "FactoryDataProviderImpl.h",
-      ]
-    } else if (chip_enable_secure_whole_factory_data) {
+    if (nxp_enable_secure_whole_factory_data) {
       sources += [
         "FactoryDataProviderEncImpl.cpp",
         "FactoryDataProviderEncImpl.h",
       ]
+    } else if (nxp_enable_secure_EL2GO_factory_data) {
+      sources += [
+        "FactoryDataProviderEl2GoImpl.cpp",
+        "FactoryDataProviderEl2GoImpl.h",
+      ]
     } else {
       sources += [
-        "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
-        "../../common/factory_data/FactoryDataProviderFwkImpl.h",
+        "FactoryDataProviderImpl.cpp",
+        "FactoryDataProviderImpl.h",
       ]
     }
 

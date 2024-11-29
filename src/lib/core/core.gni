@@ -50,9 +50,6 @@ declare_args() {
   # Enable pigweed tokenizer logging.
   chip_pw_tokenizer_logging = false
 
-  # Configure chip logging to output through pigweed logging.
-  chip_use_pw_logging = false
-
   # Enable logging of node Id in exchange context log messages.
   # Will cause increase in code size and is therefore disabled by default.
   chip_exchange_node_id_logging = false

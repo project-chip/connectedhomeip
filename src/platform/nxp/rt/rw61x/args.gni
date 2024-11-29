@@ -34,14 +34,16 @@ chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 
 chip_build_tests = false
 
-#This enables the EventList global attribute
-enable_eventlist_attribute = true
+# Disable TCP endpoint.
+chip_inet_config_enable_tcp_endpoint = false
 
 declare_args() {
   spinel_interface_rpmsg = true
 
   # if rw610_mbedtls_port_els_pkc is set to false software mbedtls is used instead
   rw610_mbedtls_port_els_pkc = true
+
+  chip_enable_secondary_nwk_if = false
 }
 
 # TODO : Enable the OTA Requestor by default.
