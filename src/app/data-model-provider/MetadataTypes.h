@@ -20,6 +20,7 @@
 #include <optional>
 
 #include <access/Privilege.h>
+#include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
