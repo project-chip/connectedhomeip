@@ -590,12 +590,11 @@ or
 bootstrap.sh should be used for for the first setup, activate.sh may be used for
 subsequent setups as it is faster.
 
-Next build the python wheels and create / activate a venv (called `pyenv` here,
-but any name may be used)
+Next build the python wheels and create / activate a venv
 
 ```
 ./scripts/build_python.sh -i out/python_env
-source pyenv/bin/activate
+source out/python_env/bin/activate
 ```
 
 ## Running tests
@@ -629,6 +628,12 @@ example DUT on the host and includes factory reset support
 
 ```shell
 ./scripts/tests/run_python_test.py --factory-reset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"
+```
+
+For example, to run TC-ACE-1.2 tests against the linux `chip-lighting-app`:
+
+```shell
+./scripts/tests/run_python_test.py --factory-reset --app ./out/linux-x64-light-no-ble/chip-lighting-app --app-args "--trace-to json:log" --script src/python_testing/TC_ACE_1_2.py --script-args "--commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00"
 ```
 
 # Running tests in CI

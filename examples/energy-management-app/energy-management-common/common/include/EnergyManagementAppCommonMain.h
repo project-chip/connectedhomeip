@@ -19,5 +19,21 @@
 #pragma once
 
 #include <DeviceEnergyManagementDelegateImpl.h>
+#include <DeviceEnergyManagementManager.h>
+#include <ElectricalPowerMeasurementDelegate.h>
+#include <PowerTopologyDelegate.h>
+#include <lib/core/CHIPError.h>
 
+// This app is configured by default with EP1 for EVSE and EP2 for WaterHeater, with only one endpoint
+// enabled. On linux, there's a command line argument (--application) to dynamically enable
+// "evse|water-heater", i.e. EP1 or EP2. On other platforms, it's a build time definition (#define).
+chip::EndpointId GetEnergyDeviceEndpointId();
+
+// The DEM Delegate is used for the TestEventTriggers
 chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate();
+
+void EvseApplicationInit();
+void EvseApplicationShutdown();
+
+void WaterHeaterApplicationInit();
+void WaterHeaterApplicationShutdown();

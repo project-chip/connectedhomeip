@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,18 +14,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace WaterHeaterManagement {
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
+#include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 
-void FullWhmApplicationInit();
-void FullWhmApplicationShutdown();
+class EventData
+{
+public:
+    chip::EventId eventId;
+};
 
-} // namespace WaterHeaterManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+class RefrigeratorAlarmEventData : public EventData
+{
+public:
+    chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap doorState;
+};
+
+CHIP_ERROR RegisterRefrigeratorEvents();
+void EventWorkerFunction(intptr_t context);

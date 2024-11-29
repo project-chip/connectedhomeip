@@ -22,7 +22,6 @@
 #include "em_gpio.h"
 #include "em_usart.h"
 #include "gpiointerrupt.h"
-#include "sl_board_configuration_SiWx917.h"
 #include "sl_constants.h"
 #include "sl_rsi_utility.h"
 #include "sl_si91x_host_interface.h"
@@ -30,7 +29,8 @@
 #include "sl_si91x_status.h"
 #include "sl_status.h"
 #include "sl_wifi_constants.h"
-#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
+#include <platform/silabs/wifi/SiWx/ncp/sl_board_configuration.h>
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #include <stdbool.h>
 #include <string.h>
 

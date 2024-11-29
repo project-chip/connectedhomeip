@@ -319,6 +319,7 @@ sl_status_t sl_wfx_host_reset_chip(void)
  *****************************************************************************/
 sl_status_t sl_wfx_host_wait_for_wake_up(void)
 {
+    xSemaphoreTake(wfx_wakeup_sem, pdMS_TO_TICKS(0));
     xSemaphoreTake(wfx_wakeup_sem, pdMS_TO_TICKS(3));
 
     return SL_STATUS_OK;
