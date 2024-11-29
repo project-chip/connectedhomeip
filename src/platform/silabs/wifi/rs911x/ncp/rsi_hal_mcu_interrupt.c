@@ -15,10 +15,7 @@
  *    limitations under the License.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "FreeRTOS.h"
 #include "dmadrv.h"
 #include "em_chip.h"
 #include "em_cmu.h"
@@ -27,25 +24,16 @@
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "em_usart.h"
-#include "gpiointerrupt.h"
-#include "sl_device_init_clocks.h"
-#include "sl_status.h"
-
-#include "FreeRTOS.h"
 #include "event_groups.h"
-#include "task.h"
-
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#include "sl_board_configuration.h"
-
-#include "sl_rsi_utility.h"
-#include "sl_si91x_host_interface.h"
-
-void gpio_interrupt(uint8_t interrupt_number);
-#else
+#include "gpiointerrupt.h"
 #include "rsi_board_configuration.h"
 #include "rsi_driver.h"
-#endif
+#include "sl_device_init_clocks.h"
+#include "sl_status.h"
+#include "task.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef void (*UserIntCallBack_t)(void);
 UserIntCallBack_t call_back, gpio_callback;
