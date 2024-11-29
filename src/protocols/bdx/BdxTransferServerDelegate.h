@@ -46,17 +46,7 @@ public:
      * @brief
      *  This method is invoked when a block is received.
      */
-    virtual CHIP_ERROR OnTransferData(BDXTransferProxy * transfer, const ByteSpan & data)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    virtual CHIP_ERROR OnTransferData(BDXTransferProxy * transfer, const ByteSpan & data, bool isEof)
-    {
-        (void) isEof;
-
-        return OnTransferData(transfer, data);
-    }
+    virtual CHIP_ERROR OnTransferData(BDXTransferProxy * transfer, const ByteSpan & data) = 0;
 };
 
 } // namespace bdx

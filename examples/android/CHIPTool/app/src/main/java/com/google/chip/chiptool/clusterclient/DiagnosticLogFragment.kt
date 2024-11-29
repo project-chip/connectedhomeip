@@ -18,10 +18,10 @@ import chip.devicecontroller.DownloadLogCallback
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.DiagnosticLogFragmentBinding
-import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import kotlinx.coroutines.*
 
 class DiagnosticLogFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -45,6 +45,8 @@ class DiagnosticLogFragment : Fragment() {
   private var mDownloadFile: File? = null
   private var mDownloadFileOutputStream: FileOutputStream? = null
 
+  private var mReceiveFileLen = 0U
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -59,7 +61,11 @@ class DiagnosticLogFragment : Fragment() {
     binding.getDiagnosticLogBtn.setOnClickListener { scope.launch { getDiagnosticLogClick() } }
 
     binding.diagnosticTypeSp.adapter =
-      ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, diagnosticLogTypeList)
+      ArrayAdapter(
+        requireContext(),
+        android.R.layout.simple_spinner_dropdown_item,
+        diagnosticLogTypeList
+      )
 
     return binding.root
   }
@@ -70,66 +76,90 @@ class DiagnosticLogFragment : Fragment() {
   }
 
   inner class ChipDownloadLogCallback : DownloadLogCallback {
-      override fun onError(fabricIndex: Int, nodeId: Long, errorCode: Long) {
-        Log.d(TAG, "onError: $fabricIndex, ${nodeId.toULong()}, $errorCode")
-      }
+    override fun onError(fabricIndex: Int, nodeId: Long, errorCode: Long) {
+      Log.d(TAG, "onError: $fabricIndex, ${nodeId.toULong()}, $errorCode")
+      mDownloadFileOutputStream?.flush() ?: return
+    }
 
-      override fun onTransferData(
-        fabricIndex: Int,
-        nodeId: Long,
-        data: ByteArray,
-        isEof: Boolean
-      ): Boolean {
-          Log.d(TAG, "onTransferData : ${data.size}, $isEof")
-        if (mDownloadFileOutputStream == null || mDownloadFile == null) {
-            Log.d(TAG, "mDownloadFileOutputStream or mDownloadFile is null")
-            return false
-        }
-        try {
-            mDownloadFileOutputStream!!.write(data)
-            if (isEof) {
-                mDownloadFileOutputStream!!.flush()
-                showNotification(mDownloadFile!!)
-            }
-        } catch (e: IOException) {
-            Log.d(TAG, "IOException", e)
-            return false
-        }
-        return true
+    override fun onSuccess(fabricIndex: Int, nodeId: Long) {
+      Log.d(TAG, "onSuccess: $fabricIndex, ${nodeId.toULong()}")
+      mDownloadFileOutputStream?.flush() ?: return
+      mDownloadFile?.let { showNotification(it) } ?: return
+    }
+
+    override fun onTransferData(
+      fabricIndex: Int,
+      nodeId: Long,
+      data: ByteArray
+    ): Boolean {
+      Log.d(TAG, "onTransferData : ${data.size}")
+      if (mDownloadFileOutputStream == null) {
+        Log.d(TAG, "mDownloadFileOutputStream or mDownloadFile is null")
+        return false
       }
+      try {
+        mDownloadFileOutputStream!!.write(data)
+      } catch (e: IOException) {
+        Log.d(TAG, "IOException", e)
+        return false
+      }
+      mReceiveFileLen += data.size.toUInt()
+      showMessage("Receive Data Size : $mReceiveFileLen")
+      return true
+    }
   }
 
   private fun getDiagnosticLogClick() {
-    mDownloadFile = createLogFile(deviceController.fabricIndex.toUInt(), addressUpdateFragment.deviceId.toULong(), diagnosticLogType)
+    mDownloadFile =
+      createLogFile(
+        deviceController.fabricIndex.toUInt(),
+        addressUpdateFragment.deviceId.toULong(),
+        diagnosticLogType
+      )
     mDownloadFileOutputStream = FileOutputStream(mDownloadFile)
-    deviceController.downloadLogFromNode(addressUpdateFragment.deviceId, diagnosticLogType, timeout, ChipDownloadLogCallback())
+    deviceController.downloadLogFromNode(
+      addressUpdateFragment.deviceId,
+      diagnosticLogType,
+      timeout,
+      ChipDownloadLogCallback()
+    )
   }
 
   private fun isExternalStorageWritable(): Boolean {
     return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
   }
 
-  private fun createLogFile(fabricIndex: UInt, nodeId: ULong, type:DiagnosticLogType) : File? {
+  private fun createLogFile(fabricIndex: UInt, nodeId: ULong, type: DiagnosticLogType): File? {
     if (!isExternalStorageWritable()) {
       return null
     }
     val now = System.currentTimeMillis()
     val fileName = "${type}_${fabricIndex}_${nodeId}_$now.txt"
+    mReceiveFileLen = 0U
     return File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
   }
 
   private fun showNotification(file: File) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(getFileUri(file), "text/plain")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
+    val intent =
+      Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(getFileUri(file), "text/plain")
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+      }
 
-      requireActivity().startActivity(intent)
-    }
+    requireActivity().startActivity(intent)
+  }
 
-    private fun getFileUri(file: File): Uri {
-        return FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.provider", file)
-    }
+  private fun getFileUri(file: File): Uri {
+    return FileProvider.getUriForFile(
+      requireContext(),
+      "${requireContext().packageName}.provider",
+      file
+    )
+  }
+
+  private fun showMessage(msg: String) {
+    requireActivity().runOnUiThread { binding.diagnosticLogTv.text = msg }
+  }
 
   companion object {
     private const val TAG = "DiagnosticLogFragment"

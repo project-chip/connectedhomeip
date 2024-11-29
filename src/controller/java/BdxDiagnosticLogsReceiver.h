@@ -26,7 +26,8 @@
 namespace chip {
 namespace Controller {
 
-typedef void (*OnBdxTransfer)(void * context, FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data, bool isEof, CHIP_ERROR *errInfoOnFailure);
+typedef void (*OnBdxTransfer)(void * context, FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data, CHIP_ERROR *errInfoOnFailure);
+typedef void (*OnBdxTransferSuccess)(void * context, FabricIndex fabricIndex, NodeId remoteNodeId);
 typedef void (*OnBdxTransferFailure)(void * context, FabricIndex fabricIndex, NodeId remoteNodeId, CHIP_ERROR status);
 
 constexpr uint32_t kMaxBDXReceiverURILen = 256;
@@ -34,14 +35,14 @@ constexpr uint32_t kMaxBDXReceiverURILen = 256;
 class BdxDiagnosticLogsReceiver : public chip::bdx::BDXTransferServerDelegate
 {
 public:
-    BdxDiagnosticLogsReceiver(Callback::Callback<OnBdxTransfer> * onTransfer, Callback::Callback<OnBdxTransferFailure> * onFailure, chip::FabricIndex fabricIndex, chip::NodeId nodeId, chip::CharSpan fileDesignator);
+    BdxDiagnosticLogsReceiver(Callback::Callback<OnBdxTransfer> * onTransfer, Callback::Callback<OnBdxTransferSuccess> * onSuccess, Callback::Callback<OnBdxTransferFailure> * onFailure, chip::FabricIndex fabricIndex, chip::NodeId nodeId, chip::CharSpan fileDesignator);
 
     ~BdxDiagnosticLogsReceiver() {}
 
     /////////// BdxDiagnosticLogsReceiver Interface /////////
     CHIP_ERROR OnTransferBegin(chip::bdx::BDXTransferProxy * transfer) override;
     CHIP_ERROR OnTransferEnd(chip::bdx::BDXTransferProxy * transfer, CHIP_ERROR error) override;
-    CHIP_ERROR OnTransferData(chip::bdx::BDXTransferProxy * transfer, const chip::ByteSpan & data, bool isEof) override;
+    CHIP_ERROR OnTransferData(chip::bdx::BDXTransferProxy * transfer, const chip::ByteSpan & data) override;
 
     CHIP_ERROR StartBDXTransferTimeout(uint16_t timeoutInSeconds);
     void CancelBDXTransferTimeout();
@@ -50,6 +51,7 @@ private:
     static void OnTransferTimeout(chip::System::Layer * layer, void * context);
     
     chip::Callback::Callback<OnBdxTransfer> * mOnBdxTransferCallback;
+    chip::Callback::Callback<OnBdxTransferSuccess> * mOnBdxTransferSuccessCallback;
     chip::Callback::Callback<OnBdxTransferFailure> * mOnBdxTransferFailureCallback;
 
     chip::FabricIndex mFabricIndex = kUndefinedFabricIndex;

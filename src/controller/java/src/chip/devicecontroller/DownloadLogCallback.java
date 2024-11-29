@@ -22,5 +22,7 @@ import javax.annotation.Nonnull;
 public interface DownloadLogCallback {
   public void onError(int fabricIndex, long nodeId, long errorCode);
 
-  public boolean onTransferData(int fabricIndex, long nodeId, @Nonnull byte[] data, boolean isEof);
+  public void onSuccess(int fabricIndex, long nodeId);
+
+  public boolean onTransferData(int fabricIndex, long nodeId, @Nonnull byte[] data);
 }

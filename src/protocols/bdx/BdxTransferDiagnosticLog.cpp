@@ -156,7 +156,7 @@ CHIP_ERROR BdxTransferDiagnosticLog::OnBlockReceived(TransferSession::OutputEven
     VerifyOrReturnError(nullptr != mDelegate, CHIP_ERROR_INCORRECT_STATE);
 
     ByteSpan blockData(event.blockdata.Data, event.blockdata.Length);
-    return mDelegate->OnTransferData(&mTransferProxy, blockData, event.blockdata.IsEof);
+    return mDelegate->OnTransferData(&mTransferProxy, blockData);
 }
 
 void BdxTransferDiagnosticLog::AbortTransferOnFailure(CHIP_ERROR error)

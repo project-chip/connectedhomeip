@@ -56,6 +56,7 @@ private:
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
     chip::Callback::Callback<OnBdxTransfer> mOnBdxTransferCallback;
+    chip::Callback::Callback<OnBdxTransferSuccess> mOnBdxTransferSuccessCallback;
     chip::Callback::Callback<OnBdxTransferFailure> mOnBdxTransferFailureCallback;
 
     chip::JniGlobalReference mJavaCallback;
@@ -70,7 +71,7 @@ private:
     
     CHIP_ERROR GetConnectedDevice();
     CHIP_ERROR SendRetrieveLogsRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
-    void OnTransferCallback(FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data, bool isEof, CHIP_ERROR *errInfoOnFailure);
+    void OnTransferCallback(FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data, CHIP_ERROR *errInfoOnFailure);
     void FinishLogDownloadFromNode(CHIP_ERROR err);
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
@@ -79,7 +80,8 @@ private:
     static void OnResponseRetrieveLogs(void * context, const app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
     static void OnCommandFailure(void * context, CHIP_ERROR err);
 
-    static void OnBdxTransferCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data, bool isEof, CHIP_ERROR *errInfoOnFailure);
+    static void OnBdxTransferCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data, CHIP_ERROR *errInfoOnFailure);
+    static void OnBdxTransferSuccessCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId);
     static void OnBdxTransferFailureCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId, CHIP_ERROR status);
 };
 

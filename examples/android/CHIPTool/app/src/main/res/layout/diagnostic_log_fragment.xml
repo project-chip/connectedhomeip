@@ -72,4 +72,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/timeoutTv"/>
 
+    <TextView
+        android:id="@+id/diagnosticLogTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minLines="4"
+        android:padding="16dp"
+        android:singleLine="false"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/getDiagnosticLogBtn" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

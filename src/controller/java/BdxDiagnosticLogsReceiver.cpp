@@ -25,9 +25,10 @@ namespace Controller {
 
 using namespace ::chip::DeviceLayer;
 
-BdxDiagnosticLogsReceiver::BdxDiagnosticLogsReceiver(Callback::Callback<OnBdxTransfer> * onTransfer, Callback::Callback<OnBdxTransferFailure> * onFailure, chip::FabricIndex fabricIndex, chip::NodeId nodeId, chip::CharSpan fileDesignator)
+BdxDiagnosticLogsReceiver::BdxDiagnosticLogsReceiver(Callback::Callback<OnBdxTransfer> * onTransfer, Callback::Callback<OnBdxTransferSuccess> * onSuccess, Callback::Callback<OnBdxTransferFailure> * onFailure, chip::FabricIndex fabricIndex, chip::NodeId nodeId, chip::CharSpan fileDesignator)
 {
     mOnBdxTransferCallback = onTransfer;
+    mOnBdxTransferSuccessCallback = onSuccess;
     mOnBdxTransferFailureCallback = onFailure;
 
     mFabricIndex = fabricIndex;
@@ -56,18 +57,28 @@ CHIP_ERROR BdxDiagnosticLogsReceiver::OnTransferBegin(chip::bdx::BDXTransferProx
 CHIP_ERROR BdxDiagnosticLogsReceiver::OnTransferEnd(chip::bdx::BDXTransferProxy * transfer, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "OnTransferEnd: %" CHIP_ERROR_FORMAT, error.Format());
+    chip::FabricIndex fabricIndex = transfer->GetFabricIndex();
+    chip::NodeId nodeId = transfer->GetPeerNodeId();
+    if (error == CHIP_NO_ERROR)
+    {
+        mOnBdxTransferSuccessCallback->mCall(mOnBdxTransferCallback->mContext, fabricIndex, nodeId);
+    }
+    else
+    {
+        mOnBdxTransferFailureCallback->mCall(mOnBdxTransferCallback->mContext, fabricIndex, nodeId, error);
+    }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BdxDiagnosticLogsReceiver::OnTransferData(chip::bdx::BDXTransferProxy * transfer, const chip::ByteSpan & data, bool isEof)
+CHIP_ERROR BdxDiagnosticLogsReceiver::OnTransferData(chip::bdx::BDXTransferProxy * transfer, const chip::ByteSpan & data)
 {
-    ChipLogProgress(Controller, "OnTransferData : %u", isEof);
+    ChipLogProgress(Controller, "OnTransferData");
     chip::FabricIndex fabricIndex = transfer->GetFabricIndex();
     chip::NodeId nodeId = transfer->GetPeerNodeId();
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mOnBdxTransferCallback->mCall(mOnBdxTransferCallback->mContext, fabricIndex, nodeId, data, isEof, &err);
+    mOnBdxTransferCallback->mCall(mOnBdxTransferCallback->mContext, fabricIndex, nodeId, data, &err);
 
     if (err == CHIP_NO_ERROR)
     {

@@ -22,15 +22,12 @@ import chip.devicecontroller.DiagnosticLogType
 import chip.devicecontroller.DownloadLogCallback
 import com.matter.controller.commands.common.CredentialsIssuer
 import com.matter.controller.commands.common.MatterCommand
-import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
-class DownloadLogCommand(
-  controller: ChipDeviceController,
-  credsIssuer: CredentialsIssuer?
-) : MatterCommand(controller, credsIssuer, "downloadLog") {
+class DownloadLogCommand(controller: ChipDeviceController, credsIssuer: CredentialsIssuer?) :
+  MatterCommand(controller, credsIssuer, "downloadLog") {
   private val nodeId: AtomicLong = AtomicLong()
   private val logType: StringBuffer = StringBuffer()
   private val timeout: AtomicInteger = AtomicInteger()
@@ -41,24 +38,36 @@ class DownloadLogCommand(
     addArgument("logType", logType, null, false)
     addArgument("timeout", 0, Int.MAX_VALUE, timeout, null, false)
   }
-  override fun runCommand() {
-    currentCommissioner().downloadLogFromNode(nodeId.toLong(), DiagnosticLogType.value(logType.toString()), timeout.toInt(), object: DownloadLogCallback {
-      override fun onError(fabricIndex: Int, nodeId: Long, errorCode: Long) {
-        println("error :")
-        println("FabricIndex : $fabricIndex, NodeID : $nodeId, errorCode : $errorCode")
-      }
 
-      override fun onTransferData(fabricIndex: Int, nodeId: Long, data: ByteArray, isEof: Boolean): Boolean {
-        buffer.append(String(data))
-        if (isEof) {
-          println()
-          println("FabricIndex : $fabricIndex, NodeID : $nodeId")
-          println(buffer.toString())
-          println("Log Download Finish!")
+  override fun runCommand() {
+    currentCommissioner()
+      .downloadLogFromNode(
+        nodeId.toLong(),
+        DiagnosticLogType.value(logType.toString()),
+        timeout.toInt(),
+        object : DownloadLogCallback {
+          override fun onError(fabricIndex: Int, nodeId: Long, errorCode: Long) {
+            println("error :")
+            println("FabricIndex : $fabricIndex, NodeID : $nodeId, errorCode : $errorCode")
+          }
+
+          override fun onTransferData(
+            fabricIndex: Int,
+            nodeId: Long,
+            data: ByteArray,
+            isEof: Boolean
+          ): Boolean {
+            buffer.append(String(data))
+            if (isEof) {
+              println()
+              println("FabricIndex : $fabricIndex, NodeID : $nodeId")
+              println(buffer.toString())
+              println("Log Download Finish!")
+            }
+            return true
+          }
         }
-        return true
-      }
-    })
+      )
     try {
       TimeUnit.SECONDS.sleep(timeout.toLong())
     } catch (e: InterruptedException) {
