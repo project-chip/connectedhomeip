@@ -133,11 +133,7 @@ class TC_OPCREDS_3_5(MatterBaseTest):
             node_id=self.dut_node_id,
             cluster=opcreds,
             attribute=opcreds.Attributes.TrustedRootCertificates)
-        if (len(trusted_root_certificates) >= 1):
-            trusted_root_original = trusted_root_certificates[-1]
-        else:
-            print("Unexpected error returned list is empty or has no entries")
-        asserts.assert_equal(trusted_root_original, rcac_original, "Returned RCAC does not match the TrustedRootCertificates.")
+        asserts.assert_equal(rcac_original not in trusted_root_certificates, False, "RCAC should match one of the TrustedRootCertificates.")
 
         self.step(4)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
