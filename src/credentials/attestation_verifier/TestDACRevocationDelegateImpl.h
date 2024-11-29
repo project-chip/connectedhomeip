@@ -53,7 +53,6 @@ public:
     void ClearDeviceAttestationRevocationSetPath();
 
 private:
-
     enum class KeyIdType : uint8_t
     {
         kSKID = 0,

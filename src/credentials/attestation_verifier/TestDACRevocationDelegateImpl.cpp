@@ -67,12 +67,12 @@ bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revoke
     if (revokedSet.isMember("crl_signer_delegator"))
     {
         certBase64 = revokedSet["crl_signer_delegator"].asString();
-        certType = "CRL Signer delegator";
+        certType   = "CRL Signer delegator";
     }
     else
     {
         certBase64 = revokedSet["crl_signer_cert"].asString();
-        certType = "CRL Signer";
+        certType   = "CRL Signer";
     }
 
     uint8_t certDerBuf[kMax_x509_Certificate_Length] = { 0 };
