@@ -20,15 +20,45 @@
 #include <optional>
 
 #include <access/Privilege.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 
 namespace chip {
 namespace app {
 namespace DataModel {
+
+enum class EndpointCompositionPattern : uint8_t
+{
+    kTreePattern       = 0x1,
+    kFullFamilyPattern = 0x2,
+};
+
+struct EndpointInfo
+{
+    // kInvalidEndpointId if there is no explicit parent endpoint (which means the parent is endpoint 0,
+    // for endpoints other than endpoint 0).
+    EndpointId parentId;
+    EndpointCompositionPattern compositionPattern;
+
+    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamilyPattern)
+    {}
+    explicit EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
+};
+
+struct EndpointEntry
+{
+    EndpointId id;
+    EndpointInfo info;
+
+    bool IsValid() const { return id != kInvalidEndpointId; }
+    static const EndpointEntry kInvalid;
+};
 
 enum class ClusterQualityFlags : uint32_t
 {
@@ -111,11 +141,11 @@ struct CommandEntry
 struct DeviceTypeEntry
 {
     DeviceTypeId deviceTypeId;
-    uint8_t deviceTypeVersion;
+    uint8_t deviceTypeRevision;
 
     bool operator==(const DeviceTypeEntry & other) const
     {
-        return (deviceTypeId == other.deviceTypeId) && (deviceTypeVersion == other.deviceTypeVersion);
+        return (deviceTypeId == other.deviceTypeId) && (deviceTypeRevision == other.deviceTypeRevision);
     }
 };
 
@@ -140,18 +170,31 @@ class ProviderMetadataTree
 public:
     virtual ~ProviderMetadataTree() = default;
 
-    virtual EndpointId FirstEndpoint()                 = 0;
-    virtual EndpointId NextEndpoint(EndpointId before) = 0;
+    // This iteration will list all the endpoints in the data model
+    virtual EndpointEntry FirstEndpoint()                              = 0;
+    virtual EndpointEntry NextEndpoint(EndpointId before)              = 0;
+    virtual std::optional<EndpointInfo> GetEndpointInfo(EndpointId id) = 0;
     virtual bool EndpointExists(EndpointId id);
 
     // This iteration describes device types registered on an endpoint
     virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;
     virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
 
-    // This iteration will list all clusters on a given endpoint
-    virtual ClusterEntry FirstCluster(EndpointId endpoint)                              = 0;
-    virtual ClusterEntry NextCluster(const ConcreteClusterPath & before)                = 0;
-    virtual std::optional<ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) = 0;
+    // This iteration describes semantic tags registered on an endpoint
+    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+    virtual std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint)                              = 0;
+    virtual std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) = 0;
+
+    // This iteration will list all server clusters on a given endpoint
+    virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
+    virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
+    virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
+
+    // This iteration will list all client clusters on a given endpoint
+    // As the client cluster is only a client without any attributes/commands,
+    // these functions only return the cluster path.
+    virtual ConcreteClusterPath FirstClientCluster(EndpointId endpoint)               = 0;
+    virtual ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) = 0;
 
     // Attribute iteration and accessors provide cluster-level access over
     // attributes

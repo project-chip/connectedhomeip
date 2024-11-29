@@ -96,6 +96,17 @@ constexpr uint8_t kDeviceTypeId2Version = 11;
 constexpr DeviceTypeId kDeviceTypeId3   = 3;
 constexpr uint8_t kDeviceTypeId3Version = 33;
 
+constexpr uint8_t kNamespaceID1 = 123;
+constexpr uint8_t kTag1         = 10;
+constexpr char kLabel1[]        = "Label1";
+
+constexpr uint8_t kNamespaceID2 = 254;
+constexpr uint8_t kTag2         = 22;
+constexpr char kLabel2[]        = "Label2";
+
+constexpr uint8_t kNamespaceID3 = 3;
+constexpr uint8_t kTag3         = 32;
+
 static_assert(kEndpointIdThatIsMissing != kInvalidEndpointId);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint1);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint2);
@@ -280,10 +291,16 @@ const MockNodeConfig gTestNodeConfig({
         MockClusterConfig(MockClusterId(2), {
             ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
         }),
+        MockClusterConfig(MockClusterId(3), {}, {}, {}, {}, BitMask<MockClusterSide>().Set(MockClusterSide::kClient)),
+        MockClusterConfig(MockClusterId(4), {}, {}, {}, {}, BitMask<MockClusterSide>().Set(MockClusterSide::kClient)),
     }, {
         { kDeviceTypeId1, kDeviceTypeId1Version},
         { kDeviceTypeId2, kDeviceTypeId2Version},
         { kDeviceTypeId3, kDeviceTypeId3Version},
+    },{
+        { MakeNullable(VendorId::TestVendor1), kNamespaceID1, kTag1, MakeOptional(MakeNullable(CharSpan::fromCharString(kLabel1)))},
+        { Nullable<VendorId>(), kNamespaceID2, kTag2, MakeOptional(MakeNullable(CharSpan::fromCharString(kLabel2)))},
+        { MakeNullable(VendorId::TestVendor3), kNamespaceID3, kTag3, NullOptional},
     }),
     MockEndpointConfig(kMockEndpoint2, {
         MockClusterConfig(MockClusterId(1), {
@@ -308,11 +325,14 @@ const MockNodeConfig gTestNodeConfig({
             },    /* attributes */
             {},   /* events */
             {11}, /* acceptedCommands */
-            {4, 6}   /* generatedCommands */
+            {4, 6},   /* generatedCommands */
+            BitMask<MockClusterSide>().Set(MockClusterSide::kClient).Set(MockClusterSide::kServer)
         ),
+        MockClusterConfig(MockClusterId(4), {}, {}, {}, {}, MockClusterSide::kClient),
     }, {
         { kDeviceTypeId2, kDeviceTypeId2Version},
-    }),
+    }, {},
+    EndpointComposition::kTree),
     MockEndpointConfig(kMockEndpoint3, {
         MockClusterConfig(MockClusterId(1), {
             ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
@@ -875,43 +895,109 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
     CodegenDataModelProviderWithContext model;
 
     // This iteration relies on the hard-coding that occurs when mock_ember is used
-    EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
+    EndpointEntry ep = model.FirstEndpoint();
+    EXPECT_EQ(ep.id, kMockEndpoint1);
+    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
+    ep = model.NextEndpoint(kMockEndpoint1);
+    EXPECT_EQ(ep.id, kMockEndpoint2);
+    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTreePattern);
+    ep = model.NextEndpoint(kMockEndpoint2);
+    EXPECT_EQ(ep.id, kMockEndpoint3);
+    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
+    ep = model.NextEndpoint(kMockEndpoint3);
+    EXPECT_EQ(ep.id, kInvalidEndpointId);
 
     /// Some out of order requests should work as well
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
-    EXPECT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
-    EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
-    EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
+    ep = model.NextEndpoint(kMockEndpoint2);
+    EXPECT_EQ(ep.id, kMockEndpoint3);
+    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
+    ep = model.NextEndpoint(kMockEndpoint2);
+    EXPECT_EQ(ep.id, kMockEndpoint3);
+    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
+    ep = model.NextEndpoint(kMockEndpoint1);
+    EXPECT_EQ(ep.id, kMockEndpoint2);
+    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTreePattern);
+    ep = model.NextEndpoint(kMockEndpoint1);
+    EXPECT_EQ(ep.id, kMockEndpoint2);
+    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTreePattern);
+    ep = model.NextEndpoint(kMockEndpoint2);
+    EXPECT_EQ(ep.id, kMockEndpoint3);
+    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
+    ep = model.NextEndpoint(kMockEndpoint1);
+    EXPECT_EQ(ep.id, kMockEndpoint2);
+    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTreePattern);
+    ep = model.NextEndpoint(kMockEndpoint3);
+    EXPECT_EQ(ep.id, kInvalidEndpointId);
+    ep = model.NextEndpoint(kMockEndpoint3);
+    EXPECT_EQ(ep.id, kInvalidEndpointId);
+    ep = model.FirstEndpoint();
+    EXPECT_EQ(ep.id, kMockEndpoint1);
+    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
+    ep = model.FirstEndpoint();
+    EXPECT_EQ(ep.id, kMockEndpoint1);
+    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
+    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamilyPattern);
 
     // invalid endpoiunts
-    EXPECT_EQ(model.NextEndpoint(kInvalidEndpointId), kInvalidEndpointId);
-    EXPECT_EQ(model.NextEndpoint(987u), kInvalidEndpointId);
+    ep = model.NextEndpoint(kInvalidEndpointId);
+    EXPECT_EQ(ep.id, kInvalidEndpointId);
+    ep = model.NextEndpoint(987u);
+    EXPECT_EQ(ep.id, kInvalidEndpointId);
 }
 
-TEST(TestCodegenModelViaMocks, IterateOverClusters)
+TEST(TestCodegenModelViaMocks, GetEndpointInfo)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    std::optional<EndpointInfo> info = model.GetEndpointInfo(kMockEndpoint1);
+    ASSERT_TRUE(info.has_value());
+    EXPECT_EQ(info->parentId, kInvalidEndpointId); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->compositionPattern,            // NOLINT(bugprone-unchecked-optional-access)
+              EndpointCompositionPattern::kFullFamilyPattern);
+    info = model.GetEndpointInfo(kMockEndpoint2);
+    ASSERT_TRUE(info.has_value());
+    EXPECT_EQ(info->parentId, kInvalidEndpointId); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->compositionPattern,            // NOLINT(bugprone-unchecked-optional-access)
+              EndpointCompositionPattern::kTreePattern);
+    info = model.GetEndpointInfo(kMockEndpoint3);
+    ASSERT_TRUE(info.has_value());
+    EXPECT_EQ(info->parentId, kInvalidEndpointId); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->compositionPattern,            // NOLINT(bugprone-unchecked-optional-access)
+              EndpointCompositionPattern::kFullFamilyPattern);
+
+    // invalid endpoiunts
+    info = model.GetEndpointInfo(kInvalidEndpointId);
+    EXPECT_FALSE(info.has_value());
+    info = model.GetEndpointInfo(987u);
+    EXPECT_FALSE(info.has_value());
+}
+
+TEST(TestCodegenModelViaMocks, IterateOverServerClusters)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
     chip::Test::ResetVersion();
 
-    EXPECT_FALSE(model.FirstCluster(kEndpointIdThatIsMissing).path.HasValidIds());
-    EXPECT_FALSE(model.FirstCluster(kInvalidEndpointId).path.HasValidIds());
-    EXPECT_FALSE(model.NextCluster(ConcreteClusterPath(kInvalidEndpointId, 123)).path.HasValidIds());
-    EXPECT_FALSE(model.NextCluster(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).path.HasValidIds());
-    EXPECT_FALSE(model.NextCluster(ConcreteClusterPath(kMockEndpoint1, 981u)).path.HasValidIds());
+    EXPECT_FALSE(model.FirstServerCluster(kEndpointIdThatIsMissing).path.HasValidIds());
+    EXPECT_FALSE(model.FirstServerCluster(kInvalidEndpointId).path.HasValidIds());
+    EXPECT_FALSE(model.NextServerCluster(ConcreteClusterPath(kInvalidEndpointId, 123)).path.HasValidIds());
+    EXPECT_FALSE(model.NextServerCluster(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).path.HasValidIds());
+    EXPECT_FALSE(model.NextServerCluster(ConcreteClusterPath(kMockEndpoint1, 981u)).path.HasValidIds());
 
     // mock endpoint 1 has 2 mock clusters: 1 and 2
-    ClusterEntry entry = model.FirstCluster(kMockEndpoint1);
+    ClusterEntry entry = model.FirstServerCluster(kMockEndpoint1);
     ASSERT_TRUE(entry.path.HasValidIds());
     EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint1);
     EXPECT_EQ(entry.path.mClusterId, MockClusterId(1));
@@ -920,31 +1006,31 @@ TEST(TestCodegenModelViaMocks, IterateOverClusters)
 
     chip::Test::BumpVersion();
 
-    entry = model.NextCluster(entry.path);
+    entry = model.NextServerCluster(entry.path);
     ASSERT_TRUE(entry.path.HasValidIds());
     EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint1);
     EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
     EXPECT_EQ(entry.info.dataVersion, 1u);
     EXPECT_EQ(entry.info.flags.Raw(), 0u);
 
-    entry = model.NextCluster(entry.path);
+    entry = model.NextServerCluster(entry.path);
     EXPECT_FALSE(entry.path.HasValidIds());
 
     // mock endpoint 3 has 4 mock clusters: 1 through 4
-    entry = model.FirstCluster(kMockEndpoint3);
+    entry = model.FirstServerCluster(kMockEndpoint3);
     for (uint16_t clusterId = 1; clusterId <= 4; clusterId++)
     {
         ASSERT_TRUE(entry.path.HasValidIds());
         EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint3);
         EXPECT_EQ(entry.path.mClusterId, MockClusterId(clusterId));
-        entry = model.NextCluster(entry.path);
+        entry = model.NextServerCluster(entry.path);
     }
     EXPECT_FALSE(entry.path.HasValidIds());
 
     // repeat calls should work
     for (int i = 0; i < 10; i++)
     {
-        entry = model.FirstCluster(kMockEndpoint1);
+        entry = model.FirstServerCluster(kMockEndpoint1);
         ASSERT_TRUE(entry.path.HasValidIds());
         EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint1);
         EXPECT_EQ(entry.path.mClusterId, MockClusterId(1));
@@ -952,14 +1038,14 @@ TEST(TestCodegenModelViaMocks, IterateOverClusters)
 
     for (int i = 0; i < 10; i++)
     {
-        ClusterEntry nextEntry = model.NextCluster(entry.path);
+        ClusterEntry nextEntry = model.NextServerCluster(entry.path);
         ASSERT_TRUE(nextEntry.path.HasValidIds());
         EXPECT_EQ(nextEntry.path.mEndpointId, kMockEndpoint1);
         EXPECT_EQ(nextEntry.path.mClusterId, MockClusterId(2));
     }
 }
 
-TEST(TestCodegenModelViaMocks, GetClusterInfo)
+TEST(TestCodegenModelViaMocks, GetServerClusterInfo)
 {
 
     UseMockNodeConfig config(gTestNodeConfig);
@@ -967,22 +1053,76 @@ TEST(TestCodegenModelViaMocks, GetClusterInfo)
 
     chip::Test::ResetVersion();
 
-    ASSERT_FALSE(model.GetClusterInfo(ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId)).has_value());
-    ASSERT_FALSE(model.GetClusterInfo(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).has_value());
-    ASSERT_FALSE(model.GetClusterInfo(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).has_value());
-    ASSERT_FALSE(model.GetClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).has_value());
+    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId)).has_value());
+    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).has_value());
+    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).has_value());
+    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).has_value());
 
     // now get the value
-    std::optional<ClusterInfo> info = model.GetClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
+    std::optional<ClusterInfo> info = model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
     ASSERT_TRUE(info.has_value());
     EXPECT_EQ(info->dataVersion, 0u); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->flags.Raw(), 0u); // NOLINT(bugprone-unchecked-optional-access)
 
     chip::Test::BumpVersion();
-    info = model.GetClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
+    info = model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
     ASSERT_TRUE(info.has_value());
     EXPECT_EQ(info->dataVersion, 1u); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->flags.Raw(), 0u); // NOLINT(bugprone-unchecked-optional-access)
+}
+
+TEST(TestCodegenModelViaMocks, IterateOverClientClusters)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    EXPECT_FALSE(model.FirstClientCluster(kEndpointIdThatIsMissing).HasValidIds());
+    EXPECT_FALSE(model.FirstClientCluster(kInvalidEndpointId).HasValidIds());
+    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kInvalidEndpointId, 123)).HasValidIds());
+    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).HasValidIds());
+    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kMockEndpoint1, 981u)).HasValidIds());
+
+    // mock endpoint 1 has 2 mock client clusters: 3 and 4
+    ConcreteClusterPath path = model.FirstClientCluster(kMockEndpoint1);
+    ASSERT_TRUE(path.HasValidIds());
+    EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
+    EXPECT_EQ(path.mClusterId, MockClusterId(3));
+
+    path = model.NextClientCluster(path);
+    ASSERT_TRUE(path.HasValidIds());
+    EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
+    EXPECT_EQ(path.mClusterId, MockClusterId(4));
+
+    path = model.NextClientCluster(path);
+    EXPECT_FALSE(path.HasValidIds());
+
+    // mock endpoint 2 has 1 mock client clusters: 3(has server side at the same time) and 4
+    path = model.FirstClientCluster(kMockEndpoint2);
+    for (uint16_t clusterId = 3; clusterId <= 4; clusterId++)
+    {
+        ASSERT_TRUE(path.HasValidIds());
+        EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
+        EXPECT_EQ(path.mClusterId, MockClusterId(clusterId));
+        path = model.NextClientCluster(path);
+    }
+    EXPECT_FALSE(path.HasValidIds());
+
+    // repeat calls should work
+    for (int i = 0; i < 10; i++)
+    {
+        path = model.FirstClientCluster(kMockEndpoint1);
+        ASSERT_TRUE(path.HasValidIds());
+        EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
+        EXPECT_EQ(path.mClusterId, MockClusterId(3));
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        ConcreteClusterPath nextPath = model.NextClientCluster(path);
+        ASSERT_TRUE(nextPath.HasValidIds());
+        EXPECT_EQ(nextPath.mEndpointId, kMockEndpoint1);
+        EXPECT_EQ(nextPath.mClusterId, MockClusterId(4));
+    }
 }
 
 TEST(TestCodegenModelViaMocks, IterateOverAttributes)
@@ -2569,15 +2709,15 @@ TEST(TestCodegenModelViaMocks, DeviceTypeIteration)
     // Mock endpoint 1 has 3 device types
     std::optional<DeviceTypeEntry> entry = model.FirstDeviceType(kMockEndpoint1);
     ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeVersion = kDeviceTypeId1Version }));
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeRevision = kDeviceTypeId1Version }));
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
     entry = model.NextDeviceType(kMockEndpoint1, *entry);
     ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeVersion = kDeviceTypeId2Version }));
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version }));
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
     entry = model.NextDeviceType(kMockEndpoint1, *entry);
     ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeVersion = kDeviceTypeId3Version }));
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeRevision = kDeviceTypeId3Version }));
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
     entry = model.NextDeviceType(kMockEndpoint1, *entry);
     ASSERT_FALSE(entry.has_value());
@@ -2585,23 +2725,80 @@ TEST(TestCodegenModelViaMocks, DeviceTypeIteration)
     // Mock endpoint 2 has 1 device types
     entry = model.FirstDeviceType(kMockEndpoint2);
     ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeVersion = kDeviceTypeId2Version }));
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version }));
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
     entry = model.NextDeviceType(kMockEndpoint2, *entry);
     ASSERT_FALSE(entry.has_value());
 
     // out of order query works
-    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeVersion = kDeviceTypeId2Version });
+    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version });
     entry = model.NextDeviceType(kMockEndpoint1, *entry);
     ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeVersion = kDeviceTypeId3Version }));
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeRevision = kDeviceTypeId3Version }));
 
     // invalid query fails
-    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeVersion = kDeviceTypeId1Version });
+    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeRevision = kDeviceTypeId1Version });
     entry = model.NextDeviceType(kMockEndpoint2, *entry);
     ASSERT_FALSE(entry.has_value());
 
     // empty endpoint works
     entry = model.FirstDeviceType(kMockEndpoint3);
     ASSERT_FALSE(entry.has_value());
+}
+
+TEST(TestCodegenModelViaMocks, SemanticTagIteration)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // Mock endpoint 1 has 3 semantic tags
+    std::optional<DataModel::Provider::SemanticTag> tag = model.GetFirstSemanticTag(kMockEndpoint1);
+    ASSERT_TRUE(tag.has_value());
+    EXPECT_EQ(tag->mfgCode, MakeNullable(VendorId::TestVendor1));         // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->namespaceID, kNamespaceID1);                           // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->tag, kTag1);                                           // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_TRUE(tag->label.HasValue() && (!tag->label.Value().IsNull())); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_TRUE(
+        tag->label.Value().Value().data_equal(CharSpan::fromCharString(kLabel1))); // NOLINT(bugprone-unchecked-optional-access)
+    tag = model.GetNextSemanticTag(kMockEndpoint1, *tag);                          // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_TRUE(tag.has_value());                                                  // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_TRUE(tag->mfgCode.IsNull());                                            // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->namespaceID, kNamespaceID2);                                    // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->tag, kTag2);                                                    // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_TRUE(tag->label.HasValue() && (!tag->label.Value().IsNull()));          // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_TRUE(
+        tag->label.Value().Value().data_equal(CharSpan::fromCharString(kLabel2))); // NOLINT(bugprone-unchecked-optional-access)
+    tag = model.GetNextSemanticTag(kMockEndpoint1, *tag);                          // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_TRUE(tag.has_value());                                                  // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->mfgCode, MakeNullable(VendorId::TestVendor3));                  // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->namespaceID, kNamespaceID3);                                    // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->tag, kTag3);                                                    // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_FALSE(tag->label.HasValue());                                           // NOLINT(bugprone-unchecked-optional-access)
+    tag = model.GetNextSemanticTag(kMockEndpoint1, *tag);                          // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_FALSE(tag.has_value());
+
+    // out of order query works
+    DataModel::Provider::SemanticTag existTag = {
+        .mfgCode     = MakeNullable(VendorId::TestVendor1),
+        .namespaceID = kNamespaceID1,
+        .tag         = kTag1,
+        .label       = MakeOptional(MakeNullable(CharSpan::fromCharString(kLabel1))),
+    };
+    tag = model.GetNextSemanticTag(kMockEndpoint1, existTag);
+    ASSERT_TRUE(tag.has_value());
+    EXPECT_TRUE(tag->mfgCode.IsNull());                                   // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->namespaceID, kNamespaceID2);                           // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->tag, kTag2);                                           // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_TRUE(tag->label.HasValue() && (!tag->label.Value().IsNull())); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_TRUE(
+        tag->label.Value().Value().data_equal(CharSpan::fromCharString(kLabel2))); // NOLINT(bugprone-unchecked-optional-access)
+
+    // invalid query fails
+    existTag.tag = kTag2;
+    tag          = model.GetNextSemanticTag(kMockEndpoint1, existTag);
+    ASSERT_FALSE(tag.has_value());
+
+    // empty endpoint works
+    tag = model.GetFirstSemanticTag(kMockEndpoint2);
+    ASSERT_FALSE(tag.has_value());
 }

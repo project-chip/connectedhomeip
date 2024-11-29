@@ -115,13 +115,13 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
     {
         if (mpAttributePath->mValue.HasWildcardClusterId())
         {
-            ClusterEntry entry = mDataModelProvider->FirstCluster(mOutputPath.mEndpointId);
+            ClusterEntry entry = mDataModelProvider->FirstServerCluster(mOutputPath.mEndpointId);
             return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
         }
 
         // only return a cluster if it is valid
         const ConcreteClusterPath clusterPath(mOutputPath.mEndpointId, mpAttributePath->mValue.mClusterId);
-        if (!mDataModelProvider->GetClusterInfo(clusterPath).has_value())
+        if (!mDataModelProvider->GetServerClusterInfo(clusterPath).has_value())
         {
             return std::nullopt;
         }
@@ -131,7 +131,7 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
 
     VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardClusterId(), std::nullopt);
 
-    ClusterEntry entry = mDataModelProvider->NextCluster(mOutputPath);
+    ClusterEntry entry = mDataModelProvider->NextServerCluster(mOutputPath);
     return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
 }
 
@@ -141,8 +141,8 @@ std::optional<ClusterId> AttributePathExpandIterator::NextEndpointId()
     {
         if (mpAttributePath->mValue.HasWildcardEndpointId())
         {
-            EndpointId id = mDataModelProvider->FirstEndpoint();
-            return (id != kInvalidEndpointId) ? std::make_optional(id) : std::nullopt;
+            EndpointEntry ep = mDataModelProvider->FirstEndpoint();
+            return (ep.id != kInvalidEndpointId) ? std::make_optional(ep.id) : std::nullopt;
         }
 
         return mpAttributePath->mValue.mEndpointId;
@@ -150,8 +150,8 @@ std::optional<ClusterId> AttributePathExpandIterator::NextEndpointId()
 
     VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
 
-    EndpointId id = mDataModelProvider->NextEndpoint(mOutputPath.mEndpointId);
-    return (id != kInvalidEndpointId) ? std::make_optional(id) : std::nullopt;
+    EndpointEntry ep = mDataModelProvider->NextEndpoint(mOutputPath.mEndpointId);
+    return (ep.id != kInvalidEndpointId) ? std::make_optional(ep.id) : std::nullopt;
 }
 
 void AttributePathExpandIterator::ResetCurrentCluster()

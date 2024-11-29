@@ -30,12 +30,14 @@ const ClusterEntry ClusterEntry::kInvalid{
     .info = ClusterInfo(0 /* version */), // version of invalid cluster entry does not matter
 };
 
+const EndpointEntry EndpointEntry::kInvalid{ .id = kInvalidEndpointId, .info = EndpointInfo(kInvalidEndpointId) };
+
 // A default implementation if just first/next exist
 bool ProviderMetadataTree::EndpointExists(EndpointId endpoint)
 {
-    for (EndpointId id = FirstEndpoint(); id != kInvalidEndpointId; id = NextEndpoint(id))
+    for (EndpointEntry ep = FirstEndpoint(); ep.IsValid(); ep = NextEndpoint(ep.id))
     {
-        if (id == endpoint)
+        if (ep.id == endpoint)
         {
             return true;
         }

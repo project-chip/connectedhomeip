@@ -149,17 +149,24 @@ public:
                                                         chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     /// attribute tree iteration
-    EndpointId FirstEndpoint() override;
-    EndpointId NextEndpoint(EndpointId before) override;
+    DataModel::EndpointEntry FirstEndpoint() override;
+    DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
+    std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
     bool EndpointExists(EndpointId endpoint) override;
 
     std::optional<DataModel::DeviceTypeEntry> FirstDeviceType(EndpointId endpoint) override;
     std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,
                                                              const DataModel::DeviceTypeEntry & previous) override;
 
-    DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
-    DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
-    std::optional<DataModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;
+    std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint) override;
+    std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) override;
+
+    DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
+    DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
+    std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;
+
+    ConcreteClusterPath FirstClientCluster(EndpointId endpoint) override;
+    ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) override;
 
     DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
@@ -175,10 +182,12 @@ public:
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
-    uint16_t mEndpointIterationHint   = 0;
-    unsigned mClusterIterationHint    = 0;
-    unsigned mAttributeIterationHint  = 0;
-    unsigned mDeviceTypeIterationHint = 0;
+    uint16_t mEndpointIterationHint      = 0;
+    unsigned mServerClusterIterationHint = 0;
+    unsigned mClientClusterIterationHint = 0;
+    unsigned mAttributeIterationHint     = 0;
+    unsigned mDeviceTypeIterationHint    = 0;
+    unsigned mSemanticTagIterationHint   = 0;
     EmberCommandListIterator mAcceptedCommandsIterator;
     EmberCommandListIterator mGeneratedCommandsIterator;
 
@@ -191,6 +200,13 @@ private:
 
         ClusterReference(const ConcreteClusterPath p, const EmberAfCluster * c) : path(p), cluster(c) {}
     };
+
+    enum class ClusterSide : uint8_t
+    {
+        kServer,
+        kClient,
+    };
+
     std::optional<ClusterReference> mPreviouslyFoundCluster;
     unsigned mEmberMetadataStructureGeneration = 0;
 
@@ -203,7 +219,8 @@ private:
     std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId id) const;
 
     /// Find the index of the given cluster id
-    std::optional<unsigned> TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id) const;
+    std::optional<unsigned> TryFindClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id,
+                                                ClusterSide clusterSide) const;
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(chip::EndpointId id) const;
