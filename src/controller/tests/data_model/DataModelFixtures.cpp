@@ -474,14 +474,19 @@ std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & 
     return std::nullopt; // handler status is set by the dispatch
 }
 
-EndpointId CustomDataModel::FirstEndpoint()
+DataModel::EndpointEntry CustomDataModel::FirstEndpoint()
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstEndpoint();
 }
 
-EndpointId CustomDataModel::NextEndpoint(EndpointId before)
+DataModel::EndpointEntry CustomDataModel::NextEndpoint(EndpointId before)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextEndpoint(before);
+}
+
+std::optional<DataModel::EndpointInfo> CustomDataModel::GetEndpointInfo(EndpointId endpoint)
+{
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpointInfo(endpoint);
 }
 
 std::optional<DataModel::DeviceTypeEntry> CustomDataModel::FirstDeviceType(EndpointId endpoint)
@@ -495,19 +500,40 @@ std::optional<DataModel::DeviceTypeEntry> CustomDataModel::NextDeviceType(Endpoi
     return std::nullopt;
 }
 
-ClusterEntry CustomDataModel::FirstCluster(EndpointId endpoint)
+std::optional<DataModel::Provider::SemanticTag> CustomDataModel::GetFirstSemanticTag(EndpointId endpoint)
 {
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstCluster(endpoint);
+    return std::nullopt;
 }
 
-ClusterEntry CustomDataModel::NextCluster(const ConcreteClusterPath & before)
+std::optional<DataModel::Provider::SemanticTag> CustomDataModel::GetNextSemanticTag(EndpointId endpoint,
+                                                                                    const SemanticTag & previous)
 {
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextCluster(before);
+    return std::nullopt;
 }
 
-std::optional<ClusterInfo> CustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
+ClusterEntry CustomDataModel::FirstServerCluster(EndpointId endpoint)
 {
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetClusterInfo(path);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstServerCluster(endpoint);
+}
+
+ClusterEntry CustomDataModel::NextServerCluster(const ConcreteClusterPath & before)
+{
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextServerCluster(before);
+}
+
+std::optional<ClusterInfo> CustomDataModel::GetServerClusterInfo(const ConcreteClusterPath & path)
+{
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetServerClusterInfo(path);
+}
+
+ConcreteClusterPath CustomDataModel::FirstClientCluster(EndpointId endpoint)
+{
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstClientCluster(endpoint);
+}
+
+ConcreteClusterPath CustomDataModel::NextClientCluster(const ConcreteClusterPath & before)
+{
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextClientCluster(before);
 }
 
 AttributeEntry CustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
