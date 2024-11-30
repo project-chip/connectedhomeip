@@ -34,7 +34,7 @@ namespace app {
 namespace DataModel {
 
 /// Represents various endpoint composition patters as defined in the spec
-/// as `9.2.1. Endpoint Composition patters`
+/// as `9.2.1. Endpoint Composition patterns`
 enum class EndpointCompositionPattern : uint8_t
 {
     // Tree pattern supports a general tree of endpoints. Commonly used for
