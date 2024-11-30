@@ -336,9 +336,6 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
     /******** INDICATION ********/
     case SL_WFX_STARTUP_IND_ID: {
         ChipLogProgress(DeviceLayer, "startup completed.");
-
-        // TODO: This is a workaround until we unify the Matter Data structures
-        event_payload->header.id = to_underlying(WifiEvent::kStartUp);
         HandleWFXSystemEvent(event_payload);
         break;
     }

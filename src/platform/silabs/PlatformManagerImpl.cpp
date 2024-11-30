@@ -155,6 +155,8 @@ void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData)
     case to_underlying(WifiEvent::kStartUp):
         memcpy(&event.Platform.WFXSystemEvent.data.startupEvent, eventData,
                sizeof(event.Platform.WFXSystemEvent.data.startupEvent));
+        // TODO: This is a workaround until we unify the Matter Data structures
+        event.Platform.WFXSystemEvent.data.startupEvent.header.id = to_underlying(WifiEvent::kStartUp);
         break;
 
     case to_underlying(WifiEvent::kConnect):
