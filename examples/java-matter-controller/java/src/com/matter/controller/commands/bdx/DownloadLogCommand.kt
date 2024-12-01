@@ -51,19 +51,15 @@ class DownloadLogCommand(controller: ChipDeviceController, credsIssuer: Credenti
             println("FabricIndex : $fabricIndex, NodeID : $nodeId, errorCode : $errorCode")
           }
 
-          override fun onTransferData(
-            fabricIndex: Int,
-            nodeId: Long,
-            data: ByteArray,
-            isEof: Boolean
-          ): Boolean {
+          override fun onSuccess(fabricIndex: Int, nodeId: Long) {
+            println()
+            println("FabricIndex : $fabricIndex, NodeID : $nodeId")
+            println(buffer.toString())
+            println("Log Download Finish!")
+          }
+
+          override fun onTransferData(fabricIndex: Int, nodeId: Long, data: ByteArray): Boolean {
             buffer.append(String(data))
-            if (isEof) {
-              println()
-              println("FabricIndex : $fabricIndex, NodeID : $nodeId")
-              println(buffer.toString())
-              println("Log Download Finish!")
-            }
             return true
           }
         }
