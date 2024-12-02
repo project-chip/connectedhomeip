@@ -80,11 +80,29 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
     default 616 if PM
 
 config HEAP_MEM_POOL_SIZE
-    default 256
+    default 1280
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
     default 20716 if SOC_RISCV_TELINK_TL321X || SOC_SERIES_RISCV_TELINK_B9X_RETENTION
     default 12288
+
+choice LIBC_IMPLEMENTATION
+	default NEWLIB_LIBC
+endchoice
+
+config MBEDTLS_ENTROPY_ENABLED
+    bool
+    default y
+
+config MBEDTLS_ZEPHYR_ENTROPY
+    bool
+    default y
+
+config MBEDTLS_CTR_DRBG_ENABLED
+	default y
+
+config MBEDTLS_CIPHER_AES_ENABLED
+	default y
 
 config NET_IPV6_MLD
     default n if PM

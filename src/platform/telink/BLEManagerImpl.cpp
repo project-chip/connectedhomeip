@@ -40,13 +40,25 @@
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/drivers/flash.h>
-#include <zephyr/random/rand32.h>
+#include <zephyr/random/random.h>
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 
 extern "C" {
-extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
+
+#ifdef CONFIG_BT_B9X
+
+extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t *bt_mac);
+/**
+ * @brief bt mac initialization
+ */
+__attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t *bt_mac)
+{
+	b9x_bt_blc_mac_init(bt_mac);
+}
+#endif
+
 }
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
