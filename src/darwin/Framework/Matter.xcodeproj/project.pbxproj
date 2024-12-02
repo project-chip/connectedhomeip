@@ -1946,6 +1946,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B20252A12459E34F00F97062 /* Build configuration list for PBXNativeTarget "Matter" */;
 			buildPhases = (
+				9B7838562CFE3AE600FB04C4 /* Acquire git revision info */,
 				0C40A67D246C9AC700885C81 /* Run GN Build (chip_xcode_build_connector) */,
 				B20252882459E34F00F97062 /* Headers */,
 				B20252892459E34F00F97062 /* Sources */,
@@ -2058,6 +2059,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "./chip_xcode_build_connector.sh\n";
+		};
+		9B7838562CFE3AE600FB04C4 /* Acquire git revision info */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Acquire git revision info";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "GIT_COMMIT_SHA=$(git rev-parse --short HEAD)\n\n# Create a temporary header file to hold the commit SHA\ntmp_header_path=\"${DERIVED_FILES_DIR}/git_commit_sha.h\"\ncat << EOF > \"$tmp_header_path\"\n#ifndef GIT_COMMIT_SHA_H\n#define GIT_COMMIT_SHA_H\n\n#define GIT_COMMIT_SHA \"${GIT_COMMIT_SHA}\"\n\n#endif /* GIT_COMMIT_SHA_H */\nEOF\n\necho \"git sha available in ${DERIVED_FILES_DIR}/git_commit_sha.h\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
