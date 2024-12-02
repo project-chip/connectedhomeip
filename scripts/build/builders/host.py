@@ -159,7 +159,7 @@ class HostApp(Enum):
         elif self == HostApp.ENERGY_MANAGEMENT:
             return 'energy-management-app/linux'
         elif self == HostApp.WATER_LEAK_DETECTOR:
-            return 'water-leak-detector/linux'
+            return 'water-leak-detector-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
