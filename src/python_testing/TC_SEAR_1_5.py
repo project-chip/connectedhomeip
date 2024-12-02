@@ -99,7 +99,7 @@ class TC_SEAR_1_5(MatterBaseTest):
 
     def TC_SEAR_1_5(self) -> list[str]:
         return ["SEAR.S", "SEAR.S.C02.Rsp"]
-        
+
     @async_test_body
     async def test_TC_SEAR_1_5(self):
         self.endpoint = self.get_endpoint()
