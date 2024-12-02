@@ -20,6 +20,8 @@ import glob
 import os
 import subprocess
 
+import yaml
+
 # Function to load --app argument environment variables from a file
 
 
@@ -36,11 +38,8 @@ def load_env_from_yaml(file_path):
     Args:
         file_path (str): The path to the YAML file containing the environment variables.
     """
-    with open(file_path, 'r') as file:
-        for line in file:
-            if line.strip():  # Skip empty lines
-                key, value = line.strip().split(': ', 1)
-                os.environ[key] = value
+    for key, value in yaml.full_load(open(file_path, 'r')).items():
+        os.environ[key] = value
 
 
 def main(search_directory, env_file):
@@ -53,38 +52,8 @@ def main(search_directory, env_file):
     # Define the base command to run tests
     base_command = os.path.join(chip_root, "scripts/tests/run_python_test.py")
 
-    # Define the test python script files and patterns to exclude
-    excluded_patterns = {
-        "MinimalRepresentation.py",  # Code/Test not being used or not shared code for any other tests
-        "TC_CNET_4_4.py",  # It has no CI execution block, is not executed in CI
-        "TC_DGGEN_3_2.py",  # src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test of this test
-        "TC_EEVSE_Utils.py",  # Shared code for TC_EEVSE, not a standalone test
-        "TC_EWATERHTRBase.py",  # Shared code for TC_EWATERHTR, not a standalone test
-        "TC_EnergyReporting_Utils.py",  # Shared code for TC_EEM and TC_EPM, not a standalone test
-        "TC_OpstateCommon.py",  # Shared code for TC_OPSTATE, not a standalone test
-        "TC_pics_checker.py",  # Currently isn't enabled because we don't have any examples with conformant PICS
-        "TC_TMP_2_1.py",  # src/python_testing/test_testing/test_TC_TMP_2_1.py is the Unit test of this test
-        "TC_OCC_3_1.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
-        "TC_OCC_3_2.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
-        "TestCommissioningTimeSync.py",  # Code/Test not being used or not shared code for any other tests
-        "TestConformanceSupport.py",  # Unit test - does not run against an app
-        "TestChoiceConformanceSupport.py",  # Unit test - does not run against an app
-        "TC_DEMTestBase.py",  # Shared code for TC_DEM, not a standalone test
-        "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app
-        "TestIdChecks.py",  # Unit test - does not run against an app
-        "TestSpecParsingDeviceType.py",  # Unit test - does not run against an app
-        "TestConformanceTest.py",  # Unit test - does not run against an app
-        "TestMatterTestingSupport.py",  # Unit test - does not run against an app
-        "TestSpecParsingSupport.py",  # Unit test - does not run against an app
-        "TestTimeSyncTrustedTimeSource.py",  # Unit test and shared code for scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py
-        "drlk_2_x_common.py",  # Shared code for TC_DRLK, not a standalone test
-        # Python code that runs all the python tests from src/python_testing (This code itself run via tests.yaml)
-        "execute_python_tests.py",
-        "hello_external_runner.py",  # Code/Test not being used or not shared code for any other tests
-        "hello_test.py",  # Is a template for tests
-        "test_plan_support.py",  # Shared code for TC_*, not a standalone test
-        "test_plan_table_generator.py",  # Code/Test not being used or not shared code for any other tests
-    }
+    metadata = yaml.full_load(open(os.path.join(chip_root, "src/python_testing/test_metadata.yaml")))
+    excluded_patterns = set([item["name"] for item in metadata["not_automated"]])
 
     # Get all .py files in the directory
     all_python_files = glob.glob(os.path.join(search_directory, "*.py"))

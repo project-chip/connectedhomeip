@@ -85,7 +85,7 @@ private:
     /// Takes into account internal mIsNullable.
     CHIP_ERROR DecodeSignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer);
 
-    /// Encodes the UNSIGNED integer into `writer`.
+    /// Encodes the given integer into `writer`.
     /// Takes into account internal mIsNullable.
     CHIP_ERROR EncodeInteger(chip::TLV::TLVWriter & writer, TLV::Tag tag, EndianReader & reader) const;
 

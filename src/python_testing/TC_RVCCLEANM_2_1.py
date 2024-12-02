@@ -88,7 +88,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
                             "PIXIT.RVCCLEANM.MODE_CHANGE_FAIL must be included on the command line in "
                             "the --int-arg flag as PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:<mode id>")
 
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.RVCCLEANM.MODE_CHANGE_OK']
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.RVCCLEANM.MODE_CHANGE_FAIL']
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")

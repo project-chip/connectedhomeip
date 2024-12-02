@@ -11,7 +11,7 @@ RUN set -x \
 
 # Setup Ameba
 ARG AMEBA_DIR=/opt/ameba
-ARG TAG_NAME=ameba_update_2024_03_22
+ARG TAG_NAME=ameba_update_2024_11_05
 RUN set -x \
     && apt-get update \
     && mkdir ${AMEBA_DIR} \

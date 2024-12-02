@@ -69,7 +69,7 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCRUNM_1_2(self):
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
 
         attributes = Clusters.RvcRunMode.Attributes
 

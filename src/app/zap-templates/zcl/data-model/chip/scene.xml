@@ -80,10 +80,16 @@ limitations under the License.
         <optionalConform/>
       </feature>
     </features>
-   
-    <attribute side="server" code="0x0000" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
-    <attribute side="server" code="0x0001" define="SCENE_TABLE_SIZE" type="int16u" min="16" default="16" writable="false" optional="false">SceneTableSize</attribute>
-    <attribute side="server" code="0x0002" define="FABRIC_SCENE_INFO" type="array" entryType="SceneInfoStruct" writable="false" optional="false">FabricSceneInfo</attribute>
+    <attribute side="server" code="0x0000" name="LastConfiguredBy" define="LAST_CONFIGURED_BY" type="node_id" isNullable="true" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="SceneTableSize" define="SCENE_TABLE_SIZE" type="int16u" min="16" default="16">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="FabricSceneInfo" define="FABRIC_SCENE_INFO" type="array" entryType="SceneInfoStruct">
+      <mandatoryConform/>
+    </attribute>
+    
     <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes add">
       <description>
         Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'
@@ -94,6 +100,7 @@ limitations under the License.
       <arg name="SceneName" type="char_string"/>
       <arg name="ExtensionFieldSets" type="ExtensionFieldSet" array="true"/>
       <access op="invoke" role="manage"/>
+      <mandatoryConform/>
     </command>
    
     <command source="client" code="0x01" name="ViewScene" response="ViewSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes view">
@@ -102,6 +109,7 @@ limitations under the License.
       </description>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="int8u"/>
+      <mandatoryConform/>
     </command>
    
     <command source="client" code="0x02" name="RemoveScene" response="RemoveSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes remove">
@@ -111,6 +119,7 @@ limitations under the License.
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="int8u"/>
       <access op="invoke" role="manage"/>
+      <mandatoryConform/>
     </command>
     
     <command source="client" code="0x03" name="RemoveAllScenes" response="RemoveAllScenesResponse" isFabricScoped="true" optional="false" cli="chip scenes rmall">
@@ -119,6 +128,7 @@ limitations under the License.
       </description>
       <arg name="GroupID" type="group_id"/>
       <access op="invoke" role="manage"/>
+      <mandatoryConform/>
     </command>
     
     <command source="client" code="0x04" name="StoreScene" response="StoreSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes store">
@@ -128,6 +138,7 @@ limitations under the License.
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="int8u"/>
       <access op="invoke" role="manage"/>
+      <mandatoryConform/>
     </command>
     
     <command source="client" code="0x05" name="RecallScene" isFabricScoped="true" optional="false" cli="chip scenes recall">
@@ -137,6 +148,7 @@ limitations under the License.
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="int8u"/>
       <arg name="TransitionTime" type="int32u" optional="true" isNullable="true"/>
+      <mandatoryConform/>
     </command>
    
     <command source="client" code="0x06" name="GetSceneMembership" response="GetSceneMembershipResponse" isFabricScoped="true" optional="false" cli="chip scenes get">
@@ -144,6 +156,7 @@ limitations under the License.
         Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group 
       </description>
       <arg name="GroupID" type="group_id"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x40" name="CopyScene" response="CopySceneResponse" isFabricScoped="true" optional="true" cli="chip scenes copy">
@@ -155,6 +168,7 @@ limitations under the License.
       <arg name="SceneIdentifierFrom" type="int8u"/>
       <arg name="GroupIdentifierTo" type="group_id"/>
       <arg name="SceneIdentifierTo" type="int8u"/>
+      <optionalConform/>
     </command>
     
     <command source="server" code="0x00" name="AddSceneResponse" optional="false" disableDefaultResponse="true">
@@ -164,6 +178,7 @@ limitations under the License.
       <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="int8u"/>
+      <mandatoryConform/>
     </command>
     
     <command source="server" code="0x01" name="ViewSceneResponse" optional="false" disableDefaultResponse="true">
@@ -176,6 +191,7 @@ limitations under the License.
       <arg name="TransitionTime" type="int32u" optional="true"/>
       <arg name="SceneName" type="char_string" optional="true"/>
       <arg name="ExtensionFieldSets" type="ExtensionFieldSet" array="true" optional="true"/>
+      <mandatoryConform/>
     </command>
     
     <command source="server" code="0x02" name="RemoveSceneResponse" optional="false" disableDefaultResponse="true">
@@ -185,6 +201,7 @@ limitations under the License.
       <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="int8u"/>
+      <mandatoryConform/>
     </command>
     
     <command source="server" code="0x03" name="RemoveAllScenesResponse" optional="false" disableDefaultResponse="true">
@@ -193,6 +210,7 @@ limitations under the License.
       </description>
       <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_id"/>
+      <mandatoryConform/>
     </command>
     
     <command source="server" code="0x04" name="StoreSceneResponse" optional="false" disableDefaultResponse="true">
@@ -202,6 +220,7 @@ limitations under the License.
       <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="int8u"/>
+      <mandatoryConform/>
     </command>
     
     <command source="server" code="0x06" name="GetSceneMembershipResponse" optional="false" disableDefaultResponse="true">
@@ -212,6 +231,7 @@ limitations under the License.
       <arg name="Capacity" type="int8u" isNullable="true"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneList" type="int8u" array="true" optional="true"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x40" name="CopySceneResponse" optional="true" disableDefaultResponse="true">
@@ -221,6 +241,9 @@ limitations under the License.
       <arg name="Status" type="status"/>
       <arg name="GroupIdentifierFrom" type="group_id"/>
       <arg name="SceneIdentifierFrom" type="int8u"/>
+      <mandatoryConform>
+        <command name="CopyScene"/>
+      </mandatoryConform>
     </command>
   </cluster>
 

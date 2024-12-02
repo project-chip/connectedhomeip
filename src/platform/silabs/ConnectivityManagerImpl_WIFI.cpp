@@ -40,7 +40,7 @@
 #endif
 
 #include "CHIPDevicePlatformConfig.h"
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -277,7 +277,7 @@ void ConnectivityManagerImpl::DriveStationState()
             (mWiFiStationMode != kWiFiStationMode_Enabled && !IsWiFiStationProvisioned()))
         {
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
-            serr = wfx_sta_discon();
+            serr = sl_matter_wifi_disconnect();
             if (serr != SL_STATUS_OK)
             {
                 ChipLogError(DeviceLayer, "wfx_wifi_disconnect() failed: %lx", serr);

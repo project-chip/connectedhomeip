@@ -360,6 +360,33 @@ class TestXmlParser(unittest.TestCase):
         )
         self.assertEqual(idl, Idl(global_structs=[struct]))
 
+    def testNameAttribute(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <cluster>
+                  <name>TestCluster</name>
+                  <code>20</code>
+
+                  <attribute side="server" code="0x0002" name="SubjectsPerAccessControlEntry" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="4" default="4">
+                     <mandatoryConform/>
+                   </attribute>
+              </cluster>
+            </configurator>
+        ''')
+        self.assertEqual(idl,
+                         Idl(clusters=[
+                             Cluster(name='TestCluster', code=20,
+                                     attributes=[
+                                         Attribute(
+                                             definition=Field(
+                                                 data_type=DataType(name='int16u', min_value=4),
+                                                 code=2,
+                                                 name='SubjectsPerAccessControlEntry',
+                                             ),
+                                             qualities=AttributeQuality.READABLE,
+                                             readacl=AccessPrivilege.VIEW,
+                                             writeacl=AccessPrivilege.OPERATE)])]))
+
     def testStruct(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
             <configurator>

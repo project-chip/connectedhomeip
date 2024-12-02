@@ -447,6 +447,7 @@ namespace DeviceLayer {
     MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredServices);
     [peripheral setDelegate:self];
     [peripheral discoverServices:nil];
+    [self stopScanning];
 }
 
 // End CBCentralManagerDelegate
@@ -734,7 +735,7 @@ namespace DeviceLayer {
         MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
         ChipLogProgress(Ble, "Connecting to cached device: %p", peripheral);
         [self connect:peripheral];
-        [self stopScanning];
+        // The cached peripheral might be obsolete, so continue scanning until didConnectPeripheral is triggered.
     } else {
         [self setupTimer:kScanningWithDiscriminatorTimeoutInSeconds];
     }

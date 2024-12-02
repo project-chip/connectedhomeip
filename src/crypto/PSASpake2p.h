@@ -89,15 +89,16 @@ public:
      * @param my_identity_len   The prover identity length.
      * @param peer_identity     The peer identity. May be NULL if identities are not established.
      * @param peer_identity_len The peer identity length.
-     * @param w0in              The input w0 (an output from the PBKDF).
-     * @param w0in_len          The input w0 length.
-     * @param w1in              The input w1 (an output from the PBKDF).
-     * @param w1in_len          The input w1 length.
+     * @param w0sin             The input w0s (an output from the PBKDF).
+     * @param w0sin_len         The input w0s length.
+     * @param w1sin             The input w1s (an output from the PBKDF).
+     * @param w1sin_len         The input w1s length.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                           size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in, size_t w1in_len);
+                           size_t peer_identity_len, const uint8_t * w0sin, size_t w0sin_len, const uint8_t * w1sin,
+                           size_t w1sin_len);
 
     /**
      * @brief Compute the first round of the protocol.

@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -22,6 +21,8 @@
 #include <app/util/attribute-storage.h>
 
 #include <string>
+
+namespace bridge {
 
 class BridgedDevice
 {
@@ -90,3 +91,5 @@ protected:
     BridgedAttributes mAttributes;
     AdminCommissioningAttributes mAdminCommissioningAttributes;
 };
+
+} // namespace bridge

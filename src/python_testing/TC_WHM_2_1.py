@@ -26,13 +26,13 @@
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
-#       --application evse
+#       --application water-heater
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --endpoint 1
+#       --endpoint 2
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -93,7 +93,7 @@ class TC_WHM_2_1(MatterBaseTest):
         ModeManual = 1
         # ModeTimed  = 2
 
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
 
         attributes = Clusters.WaterHeaterMode.Attributes
 
