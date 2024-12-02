@@ -71,6 +71,7 @@ def process_chip_app_output(line, is_stderr):
 def process_test_script_output(line, is_stderr):
     return process_chip_output(line, is_stderr, TAG_PROCESS_TEST)
 
+
 def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event):
     """Forward the content of a named pipe to a file-like object."""
     if not os.path.exists(path):
