@@ -181,6 +181,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             pathlib.Path(match.group("path")).unlink(missing_ok=True)
 
     app_process = None
+    app_stdin_forwarding_thread = None
     app_stdin_forwarding_stop_event = threading.Event()
     app_exit_code = 0
     app_pid = 0
@@ -202,9 +203,9 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_process.start(expected_output=app_ready_pattern, timeout=30)
         if app_stdin_pipe:
             logging.info("Forwarding stdin from '%s' to app", app_stdin_pipe)
-            forwarding_thread = threading.Thread(target=forward_fifo,
-                                                 args=(app_stdin_pipe, app_process.p.stdin, app_stdin_forwarding_stop_event))
-            forwarding_thread.start()
+            app_stdin_forwarding_thread = threading.Thread(
+                target=forward_fifo, args=(app_stdin_pipe, app_process.p.stdin, app_stdin_forwarding_stop_event))
+            app_stdin_forwarding_thread.start()
         else:
             app_process.p.stdin.close()
         app_pid = app_process.p.pid
@@ -238,10 +239,11 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     if app_process:
         logging.info("Stopping app with SIGTERM")
+        if app_stdin_forwarding_thread:
+            app_stdin_forwarding_stop_event.set()
+            app_stdin_forwarding_thread.join()
         app_process.terminate()
-        app_stdin_forwarding_stop_event.set()
         app_exit_code = app_process.returncode
-        forwarding_thread.join()
 
     # We expect both app and test script should exit with 0
     exit_code = test_script_exit_code or app_exit_code
