@@ -2484,19 +2484,6 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
                 ChipLogProgress(Controller, "NetworkCommissioning Features: has Ethernet. endpointid = %u", path.mEndpointId);
                 info.network.eth.endpoint = path.mEndpointId;
             }
-            else
-            {
-                ChipLogProgress(Controller, "NetworkCommissioning Features: no features.");
-                // TODO: Gross workaround for the empty feature map on all clusters. Remove.
-                if (info.network.thread.endpoint == kInvalidEndpointId)
-                {
-                    info.network.thread.endpoint = path.mEndpointId;
-                }
-                if (info.network.wifi.endpoint == kInvalidEndpointId)
-                {
-                    info.network.wifi.endpoint = path.mEndpointId;
-                }
-            }
         }
         return CHIP_NO_ERROR;
     });
