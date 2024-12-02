@@ -9,27 +9,27 @@
 
 		boot_partition: partition@0 {
 			label = "mcuboot";
-			reg = <0x00000000 0x13000>;
+			reg = <0x00000000 0xf000>;
 		};
-		slot0_partition: partition@13000 {
+		slot0_partition: partition@f000 {
 			label = "image-0";
-			reg = <0x13000 0xef000>;
+			reg = <0xf000 0xf1000>;
 		};
-		factory_partition: partition@102000 {
+		factory_partition: partition@100000 {
 			label = "factory-data";
-			reg = <0x102000 0x800>;
+			reg = <0x100000 0x800>;
 		};
-		factory_rfu_partition: partition@102800 {
+		factory_rfu_partition: partition@100800 {
 			label = "factory-data-rfu";
-			reg = <0x102800 0x800>;
+			reg = <0x100800 0x800>;
 		};
-		storage_partition: partition@103000 {
+		storage_partition: partition@101000 {
 			label = "storage";
-			reg = <0x103000 0xc000>;
+			reg = <0x101000 0xc000>;
 		};
-		slot1_partition: partition@10f000 {
+		slot1_partition: partition@10d000 {
 			label = "image-1";
-			reg = <0x10f000 0xef000>;
+			reg = <0x10d000 0xf1000>;
 		};
 		vendor_partition: partition@1fe000 {
 			label = "vendor-data";
