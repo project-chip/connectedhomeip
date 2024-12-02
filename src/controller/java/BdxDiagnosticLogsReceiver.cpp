@@ -42,6 +42,8 @@ BdxDiagnosticLogsReceiver::BdxDiagnosticLogsReceiver(Callback::Callback<OnBdxTra
 
 CHIP_ERROR BdxDiagnosticLogsReceiver::OnTransferBegin(chip::bdx::BDXTransferProxy * transfer)
 {
+    VerifyOrReturnError(transfer != nullptr, CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(Controller, "transfer is nullptr."));
+
     chip::CharSpan fileDesignator = transfer->GetFileDesignator();
     chip::FabricIndex fabricIndex = transfer->GetFabricIndex();
     chip::NodeId nodeId           = transfer->GetPeerNodeId();

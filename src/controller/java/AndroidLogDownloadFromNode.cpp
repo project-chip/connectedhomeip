@@ -250,6 +250,8 @@ void AndroidLogDownloadFromNode::OnTransferCallback(FabricIndex fabricIndex, Nod
     VerifyOrReturn(mJavaCallback.HasValidObjectRef(), ChipLogError(Controller, "mJavaCallback is invalid"));
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
     JniLocalReferenceScope scope(env);
 
     jmethodID onTransferDataMethod;

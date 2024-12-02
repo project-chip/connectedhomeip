@@ -54,7 +54,7 @@ private:
     AndroidLogDownloadFromNode(DeviceController * controller, NodeId remoteNodeId, app::Clusters::DiagnosticLogs::IntentEnum intent,
                                uint16_t timeout, jobject javaCallback);
 
-    DeviceController * mController;
+    DeviceController * mController = nullptr;
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
@@ -63,9 +63,9 @@ private:
     chip::Callback::Callback<OnBdxTransferFailure> mOnBdxTransferFailureCallback;
 
     chip::JniGlobalReference mJavaCallback;
-    NodeId mRemoteNodeId;
-    app::Clusters::DiagnosticLogs::IntentEnum mIntent;
-    uint16_t mTimeout;
+    NodeId mRemoteNodeId                              = chip::kUndefinedNodeId;
+    app::Clusters::DiagnosticLogs::IntentEnum mIntent = app::Clusters::DiagnosticLogs::IntentEnum::kUnknownEnumValue;
+    uint16_t mTimeout                                 = 0;
 
     char mFileDesignatorBuffer[bdx::DiagnosticLogs::kMaxFileDesignatorLen];
     MutableCharSpan mFileDesignator = MutableCharSpan(mFileDesignatorBuffer, bdx::DiagnosticLogs::kMaxFileDesignatorLen);
