@@ -47,7 +47,6 @@ import secrets
 import struct
 import tempfile
 import time
-from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
