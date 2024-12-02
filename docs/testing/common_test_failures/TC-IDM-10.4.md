@@ -58,5 +58,17 @@ Device minimal representation -  Shows the smallest set of optional elements tha
    <td>PICS `&lt;pics>` found in PICS list, but not on device
    </td>
   </tr>
+  <tr>
+   <td colspan="2"> File "/root/python_testing/spec_parsing_support.py", line 482, in build_xml_clusters
+    mask = clusters[descriptor_id].feature_map[code]
+   </td>
+   <td rowspan="2">
+     This test relies on data model XML files, and they were not found. These should be in a directory called data_model. If this was run from the docker directly, you need to mount the data_model directory correctly. Please see TH documentation.
+   </td>
+   </tr>
+   <tr>
+    <td colspan="2"> No data model files found in specified directory "directory_path"
+    </td>
+   </tr>
 </table>
 
