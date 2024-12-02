@@ -82,7 +82,7 @@ for an example of a simple fuzz test.
 -   Add to `${chip_root}/BUILD.gn`
 
     -   Add the Fuzzing Target in this part of the code :
-        [${chip_root}/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/b367512f519e5e109346e81a0d84fd85cd9192f7/BUILD.gn#L52)
+        [\${chip_root}/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/b367512f519e5e109346e81a0d84fd85cd9192f7/BUILD.gn#L52)
 
     -   Add Fuzzing Target like that
 
