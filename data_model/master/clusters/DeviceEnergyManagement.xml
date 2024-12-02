@@ -62,7 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
     <revision revision="3" summary="Updates to match cluster spec updates"/>
-    <revision revision="4" summary="Bug fixes found during PICS production"/>
+    <revision revision="4" summary="Updates to feature conformance. Corrected ForecastID type"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0098" name="Device Energy Management">
@@ -123,27 +123,27 @@ Davis, CA 95616, USA
     <number name="PowerAdjustCapability" type=""/>
     <enum name="AdjustmentCauseEnum">
       <item value="0" name="LocalOptimization" summary="The adjustment is to optimize the local energy usage">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
       <item value="1" name="GridOptimization" summary="The adjustment is to optimize the grid energy usage">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
     </enum>
     <enum name="CauseEnum">
       <item value="0" name="NormalCompletion" summary="The ESA completed the power adjustment as requested">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
       <item value="1" name="Offline" summary="The ESA was set to offline">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
       <item value="2" name="Fault" summary="The ESA has developed a fault could not complete the adjustment">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
       <item value="3" name="UserOptOut" summary="The user has disabled the ESA's flexibility capability">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
       <item value="4" name="Cancelled" summary="The adjustment was cancelled by a client">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
     </enum>
     <enum name="CostTypeEnum">
@@ -230,13 +230,13 @@ Davis, CA 95616, USA
     </enum>
     <enum name="ForecastUpdateReasonEnum">
       <item value="0" name="InternalOptimization" summary="The update was due to internal ESA device optimization">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
       <item value="1" name="LocalOptimization" summary="The update was due to local EMS optimization">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
       <item value="2" name="GridOptimization" summary="The update was due to grid optimization">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
     </enum>
     <enum name="OptOutStateEnum">
@@ -255,13 +255,13 @@ Davis, CA 95616, USA
     </enum>
     <enum name="PowerAdjustReasonEnum">
       <item value="0" name="NoAdjustment" summary="There is no Power Adjustment active">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
       <item value="1" name="LocalOptimizationAdjustment" summary="There is PowerAdjustment active due to local EMS optimization">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
       <item value="2" name="GridOptimizationAdjustment" summary="There is PowerAdjustment active due to local EMS optimization">
-        <optionalConform/>
+        <mandatoryConform/>
       </item>
     </enum>
     <struct name="ConstraintsStruct">
@@ -359,12 +359,14 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="MaxPower" type="power-mW" default="0">
         <mandatoryConform/>
+        <constraint type="min" value="MinPower"/>
       </field>
       <field id="2" name="MinDuration" type="elapsed-s" default="0">
         <mandatoryConform/>
       </field>
       <field id="3" name="MaxDuration" type="elapsed-s">
         <mandatoryConform/>
+        <constraint type="min" value="MinDuration"/>
       </field>
     </struct>
     <struct name="SlotAdjustmentStruct">
@@ -495,17 +497,18 @@ Davis, CA 95616, USA
     <attribute id="0x0004" name="AbsMaxPower" type="power-mW" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
+      <constraint type="min" value="AbsMinPower"/>
     </attribute>
     <attribute id="0x0005" name="PowerAdjustmentCapability" type="PowerAdjustCapabilityStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="PA"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0006" name="Forecast" type="ForecastStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <orTerm>
           <feature name="PFR"/>

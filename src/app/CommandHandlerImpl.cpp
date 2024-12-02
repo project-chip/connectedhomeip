@@ -18,10 +18,12 @@
 #include <app/CommandHandlerImpl.h>
 
 #include <access/AccessControl.h>
+#include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPConfig.h>
@@ -390,55 +392,17 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     {
-        Status commandExists = mpCallback->CommandExists(concretePath);
-        if (commandExists != Status::Success)
-        {
-            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
-                          ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
-                          concretePath.mEndpointId);
-            return FallibleAddStatus(concretePath, commandExists) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-        }
-    }
-
-    {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-        Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
-                                         .endpoint    = concretePath.mEndpointId,
-                                         .requestType = Access::RequestType::kCommandInvokeRequest,
-                                         .entityId    = concretePath.mCommandId };
-        Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
-        err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-        if (err != CHIP_NO_ERROR)
+        DataModel::InvokeRequest request;
+
+        request.path              = concretePath;
+        request.subjectDescriptor = &subjectDescriptor;
+        request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
+
+        Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
+        if (preCheckStatus != Status::Success)
         {
-            if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
-            {
-                return FallibleAddStatus(concretePath, Status::Failure) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-            }
-            // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
-            Status status = err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
-            return FallibleAddStatus(concretePath, status) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-        }
-    }
-
-    if (CommandNeedsTimedInvoke(concretePath.mClusterId, concretePath.mCommandId) && !IsTimedInvoke())
-    {
-        // TODO: when wildcard invokes are supported, discard a
-        // wildcard-expanded path instead of returning a status.
-        return FallibleAddStatus(concretePath, Status::NeedsTimedInteraction) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-    }
-
-    if (CommandIsFabricScoped(concretePath.mClusterId, concretePath.mCommandId))
-    {
-        // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
-        // a CommandStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code.
-
-        // Fabric-scoped commands are not allowed before a specific accessing fabric is available.
-        // This is mostly just during a PASE session before AddNOC.
-        if (GetAccessingFabricIndex() == kUndefinedFabricIndex)
-        {
-            // TODO: when wildcard invokes are supported, discard a
-            // wildcard-expanded path instead of returning a status.
-            return FallibleAddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+            return FallibleAddStatus(concretePath, preCheckStatus) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 
@@ -511,17 +475,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     }
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
 
-    // Per spec, we do the "is this a timed command?" check for every path, but
-    // since all paths that fail it just get silently discarded we can do it
-    // once up front and discard all the paths at once.  Ordering with respect
-    // to ACL and command presence checks does not matter, because the behavior
-    // is the same for all of them: ignore the path.
-    if (CommandNeedsTimedInvoke(clusterId, commandId))
-    {
-        // Group commands are never timed.
-        return Status::Success;
-    }
-
     // No check for `CommandIsFabricScoped` unlike in `ProcessCommandDataIB()` since group commands
     // always have an accessing fabric, by definition.
 
@@ -542,30 +495,22 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
 
-        if (mpCallback->CommandExists(concretePath) != Status::Success)
-        {
-            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
-                          ChipLogValueMEI(commandId), ChipLogValueMEI(clusterId), mapping.endpoint_id);
-
-            continue;
-        }
-
         {
             Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-            Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
-                                             .endpoint    = concretePath.mEndpointId,
-                                             .requestType = Access::RequestType::kCommandInvokeRequest,
-                                             .entityId    = concretePath.mCommandId };
-            Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
-            err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-            if (err != CHIP_NO_ERROR)
+            DataModel::InvokeRequest request;
+
+            request.path              = concretePath;
+            request.subjectDescriptor = &subjectDescriptor;
+            request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
+
+            Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
+            if (preCheckStatus != Status::Success)
             {
-                // NOTE: an expected error is CHIP_ERROR_ACCESS_DENIED, but there could be other unexpected errors;
-                // therefore, keep processing subsequent commands, and if any errors continue, those subsequent
-                // commands will likewise fail.
+                // Command failed for a specific path, but keep trying the rest of the paths.
                 continue;
             }
         }
+
         if ((err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
             TLV::TLVReader dataReader(commandDataReader);

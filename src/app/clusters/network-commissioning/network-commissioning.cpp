@@ -233,7 +233,7 @@ private:
 CHIP_ERROR ThreadScanResponseToTLV::LoadResponses(Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray,
                                                   Span<ThreadScanResponse> & validResponses) const
 {
-    VerifyOrReturnError(scanResponseArray.Alloc(chip::min(mNetworks->Count(), kMaxNetworksInScanResponse)), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(scanResponseArray.Alloc(std::min(mNetworks->Count(), kMaxNetworksInScanResponse)), CHIP_ERROR_NO_MEMORY);
 
     ThreadScanResponse scanResponse;
     size_t scanResponseArrayLength = 0;
@@ -336,6 +336,10 @@ CHIP_ERROR ThreadScanResponseToTLV::EncodeTo(TLV::TLVWriter & writer, TLV::Tag t
 
 } // namespace
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+Instance::NetworkInstanceList Instance::sInstances;
+#endif
+
 Instance::Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) :
     CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
     mEndpointId(aEndpointId), mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
@@ -365,11 +369,23 @@ CHIP_ERROR Instance::Init()
     mLastNetworkingStatusValue.SetNull();
     mLastConnectErrorValue.SetNull();
     mLastNetworkIDLen = 0;
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (!sInstances.Contains(this))
+    {
+        sInstances.PushBack(this);
+    }
+#endif
     return CHIP_NO_ERROR;
 }
 
 void Instance::Shutdown()
 {
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (sInstances.Contains(this))
+    {
+        sInstances.Remove(this);
+    }
+#endif
     mpBaseDriver->Shutdown();
 }
 
@@ -1031,6 +1047,16 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     mCurrentOperationBreadcrumb = req.breadcrumb;
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    // Per spec, lingering connections on any other interfaces need to be disconnected at this point.
+    for (auto & node : sInstances)
+    {
+        Instance * instance = static_cast<Instance *>(&node);
+        if (instance != this)
+        {
+            instance->DisconnectLingeringConnection();
+        }
+    }
+
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 #else
     // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
@@ -1149,6 +1175,29 @@ exit:
     }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+void Instance::DisconnectLingeringConnection()
+{
+    bool haveConnectedNetwork = false;
+    EnumerateAndRelease(mpBaseDriver->GetNetworks(), [&](const Network & network) {
+        if (network.connected)
+        {
+            haveConnectedNetwork = true;
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
+
+    // If none of the configured networks is `connected`, we may have a
+    // lingering connection to a different network that we need to disconnect.
+    // Note: The driver may or may not be actually connected
+    if (!haveConnectedNetwork)
+    {
+        LogErrorOnFailure(mpWirelessDriver->DisconnectFromNetwork());
+    }
+}
+#endif
 
 void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t interfaceStatus)
 {

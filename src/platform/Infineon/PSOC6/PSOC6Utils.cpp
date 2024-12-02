@@ -335,7 +335,7 @@ CHIP_ERROR PSOC6Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & net
     netInfo.NetworkId              = kWiFiStationNetworkId;
     netInfo.FieldPresent.NetworkId = true;
     memcpy(netInfo.WiFiSSID, stationConfig.sta.ssid,
-           min(strlen(reinterpret_cast<char *>(stationConfig.sta.ssid)) + 1, sizeof(netInfo.WiFiSSID)));
+           std::min(strlen(reinterpret_cast<char *>(stationConfig.sta.ssid)) + 1, sizeof(netInfo.WiFiSSID)));
 
     // Enforce that netInfo wifiSSID is null terminated
     netInfo.WiFiSSID[kMaxWiFiSSIDLength] = '\0';
@@ -343,7 +343,7 @@ CHIP_ERROR PSOC6Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & net
     if (includeCredentials)
     {
         static_assert(sizeof(netInfo.WiFiKey) < 255, "Our min might not fit in netInfo.WiFiKeyLen");
-        netInfo.WiFiKeyLen = static_cast<uint8_t>(min(strlen((char *) stationConfig.sta.password), sizeof(netInfo.WiFiKey)));
+        netInfo.WiFiKeyLen = static_cast<uint8_t>(std::min(strlen((char *) stationConfig.sta.password), sizeof(netInfo.WiFiKey)));
         memcpy(netInfo.WiFiKey, stationConfig.sta.password, netInfo.WiFiKeyLen);
     }
 
@@ -365,7 +365,7 @@ CHIP_ERROR PSOC6Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo
     SuccessOrExit(err);
 
     // Enforce that wifiSSID is null terminated before copying it
-    memcpy(wifiSSID, netInfo.WiFiSSID, min(netInfoSSIDLen + 1, sizeof(wifiSSID)));
+    memcpy(wifiSSID, netInfo.WiFiSSID, std::min(netInfoSSIDLen + 1, sizeof(wifiSSID)));
     if (netInfoSSIDLen + 1 < sizeof(wifiSSID))
     {
         wifiSSID[netInfoSSIDLen] = '\0';
@@ -505,16 +505,16 @@ void PSOC6Utils::populate_wifi_config_t(wifi_config_t * wifi_config, wifi_interf
     if (interface == WIFI_IF_STA || interface == WIFI_IF_STA_AP)
     {
         memset(&wifi_config->sta, 0, sizeof(wifi_config_sta_t));
-        memcpy(wifi_config->sta.ssid, ssid, chip::min(strlen((char *) ssid) + 1, sizeof(cy_wcm_ssid_t)));
-        memcpy(wifi_config->sta.password, password, chip::min(strlen((char *) password) + 1, sizeof(cy_wcm_ssid_t)));
+        memcpy(wifi_config->sta.ssid, ssid, std::min(strlen((char *) ssid) + 1, sizeof(cy_wcm_ssid_t)));
+        memcpy(wifi_config->sta.password, password, std::min(strlen((char *) password) + 1, sizeof(cy_wcm_ssid_t)));
         wifi_config->sta.security = security;
     }
 
     if (interface == WIFI_IF_AP || interface == WIFI_IF_STA_AP)
     {
         memset(&wifi_config->ap, 0, sizeof(wifi_config_ap_t));
-        memcpy(wifi_config->ap.ssid, ssid, chip::min(strlen((char *) ssid) + 1, sizeof(cy_wcm_ssid_t)));
-        memcpy(wifi_config->ap.password, password, chip::min(strlen((char *) password) + 1, sizeof(cy_wcm_ssid_t)));
+        memcpy(wifi_config->ap.ssid, ssid, std::min(strlen((char *) ssid) + 1, sizeof(cy_wcm_ssid_t)));
+        memcpy(wifi_config->ap.password, password, std::min(strlen((char *) password) + 1, sizeof(cy_wcm_ssid_t)));
         wifi_config->ap.security = security;
     }
 }

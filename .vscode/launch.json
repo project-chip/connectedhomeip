@@ -34,6 +34,25 @@
             "args": [],
             "cwd": "${workspaceFolder}"
         },
+
+        {
+            "name": "Run pw FuzzTest (Linux x64) UnitTest Mode",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/${input:outPWFuzzTestLinux}",
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "Run pw FuzzTest (Linux x64) Continuous Fuzzing Mode",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/${input:outPWFuzzTestLinux}",
+            "args": ["-fuzz=${input:fuzzTestName}"],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": ""
+        },
+
         {
             "name": "QRCode Tests",
             "type": "cppdbg",
@@ -420,6 +439,14 @@
         },
 
         {
+            "name": "Fabric Sync (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/debug/standalone/fabric-sync",
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
             "name": "OTA Requestor App (Linux)",
             "type": "lldb",
             "request": "launch",
@@ -518,6 +545,24 @@
             "args": {
                 "command": "find ${workspaceFolder}/out/linux-x64-*/tests -type f -executable |sort |sed 's$${workspaceFolder}/out/$$'",
                 "description": "Select the test to run"
+            }
+        },
+        {
+            "type": "command",
+            "id": "outPWFuzzTestLinux",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "find ${workspaceFolder}/out/linux-x64-*/chip_pw_fuzztest/tests -type f -executable |sort |sed 's$${workspaceFolder}/out/$$'",
+                "description": "Select the FuzzTest to run"
+            }
+        },
+        {
+            "id": "fuzzTestName",
+            "type": "command",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "./out/${input:outPWFuzzTestLinux} --list_fuzz_tests | grep 'Fuzz test:' | awk -F ': ' '{print $2}'",
+                "description": "Select the specific FuzzTest to fuzz continuously"
             }
         },
         {

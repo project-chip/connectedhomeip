@@ -37,9 +37,13 @@ AdvSendAdvert
 AE
 aef
 AES
+AFL
 AIDL
 algs
 alloc
+allocator
+allocators
+Ambrose
 Ameba
 amebad
 amebaiot
@@ -316,6 +320,7 @@ cryptographic
 CSA
 csg
 csrrequest
+cstdint
 csu
 csv
 ctl
@@ -340,6 +345,7 @@ datamodel
 DataModelRevision
 dataset
 datasets
+datastore
 DataVersion
 dbf
 DBG
@@ -438,6 +444,7 @@ DNSStubListener
 docbuild
 Dockerfile
 Dockerfiles
+docstrings
 Don'ts
 DoorLock
 DoorState
@@ -451,6 +458,7 @@ dpkg
 dropdown
 dryrun
 DS
+DSLS
 duplicative
 DUT
 DUTS
@@ -459,6 +467,7 @@ DV
 DVK
 dynload
 eabi
+EAF
 EB
 ECC
 ECD
@@ -549,6 +558,7 @@ feff
 ffaa
 ffeebaefa
 FFF
+FFFFFFFFFFFF0102
 fffe
 fffff
 Fi
@@ -560,15 +570,20 @@ FlowMeasurement
 FluorideConcentrationMeasurement
 focusable
 forkpty
+formatter
+formatters
 FOTA
 FreeRTOS
 FreeRTOSConfig
+FS
 fsl
 fstab
 fsync
 ftd
 fullclean
 fuzzer
+fuzzers
+fuzztest
 FW
 gbl
 gcloud
@@ -723,10 +738,12 @@ IPython
 ISCAN
 isHexString
 isLowerCase
+isort
 isUpperCase
 itemName
 iterable
 itsfoss
+IW
 JDK
 jinja
 JLink
@@ -855,6 +872,7 @@ MbedNewTarget
 mbedos
 mbedTarget
 mbedTLS
+MCORE
 mcu
 MCUboot
 mcumgr
@@ -868,6 +886,7 @@ MediaPlayback
 MediaTek
 MEI
 mem
+memcpy
 memdf
 MemMonitoring
 menuconfig
@@ -884,6 +903,7 @@ microcontroller
 microcontrollers
 MicroSD
 middleware
+MIMXRT
 minApplicableSoftwareVersion
 Minicom
 MinInterval
@@ -915,12 +935,14 @@ Multicast
 multilib
 Multiprotocol
 multithreaded
+Murata
 mutex
 mutexes
 mv
 MX
 mydir
 MyPASSWORD
+mypy
 MySSID
 NAMESERVER
 NAMESPACE
@@ -946,8 +968,6 @@ NitricOxideConcentrationMeasurement
 NitrogenDioxideConcentrationMeasurement
 nl
 nltest
-NLUnitTest
-NLUnitTests
 nmcli
 nmtui
 noc
@@ -999,6 +1019,7 @@ OpenThreadDemo
 openweave
 OperationalCredentials
 operationalDataset
+operationalstate
 opkg
 OPTIGA
 optionMask
@@ -1006,6 +1027,7 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+OSS
 OTA
 OTADownloader
 otaDownloadPath
@@ -1173,6 +1195,7 @@ rebase
 recommand
 recommanded
 recurse
+refrigeratoralarm
 regen
 registerAttributeAccessOverride
 RegisterCommandHandler
@@ -1430,6 +1453,7 @@ toJson
 tokenization
 tokenized
 tokenizer
+toml
 toolchain
 toolchains
 topologies
@@ -1443,6 +1467,8 @@ trackFree
 TransferSession
 transitionTime
 TransportMgrBase
+triaged
+triaging
 TriggerEffect
 TRNG
 trustm
@@ -1528,6 +1554,7 @@ virtualenv
 visualstudio
 vlatest
 VLEDs
+vm
 vn
 vnc
 vous
@@ -1594,6 +1621,7 @@ xFFF
 xFFFF
 xfffff
 xFFFFFFEFFFFFFFFF
+XMLPICSValidator
 xtensa
 xvzf
 xwayland
@@ -1620,3 +1648,5 @@ zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
+zsdk
+TBR

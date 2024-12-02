@@ -19,12 +19,27 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --featureSet 0x7e
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ENERGY_MANAGEMENT_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --enable-key 000102030405060708090a0b0c0d0e0f
+#       --featureSet 0x7e
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 """Define Matter test case TC_DEM_2_1."""
@@ -34,7 +49,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
@@ -128,7 +143,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
         asserts.assert_is_instance(abs_min_power, int)
 
         if not self.is_ci:
-            user_response = self.wait_for_user_input(prompt_msg=f"AbsMinPower is {abs_min_power/1000000.0} W - is this correct? Enter 'y' or 'n'",
+            user_response = self.wait_for_user_input(prompt_msg=f"AbsMinPower is {abs_min_power/1000.0} W - is this correct? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
@@ -143,7 +158,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
         asserts.assert_greater_equal(abs_max_power, abs_min_power)
 
         if not self.is_ci:
-            user_response = self.wait_for_user_input(prompt_msg=f"AbsMaxPower is {abs_max_power/1000000.0} W - is this correct? Enter 'y' or 'n'",
+            user_response = self.wait_for_user_input(prompt_msg=f"AbsMaxPower is {abs_max_power/1000.0} W - is this correct? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             asserts.assert_equal(user_response.lower(), "y")

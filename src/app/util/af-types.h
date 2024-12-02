@@ -32,6 +32,7 @@
 
 #include <app/util/attribute-metadata.h> // EmberAfAttributeMetadata
 
+#include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/DataModelTypes.h>
@@ -119,6 +120,8 @@ struct EmberAfCluster
     uint16_t eventCount;
 
     bool IsServer() const { return (mask & CLUSTER_MASK_SERVER) != 0; }
+
+    bool IsClient() const { return (mask & CLUSTER_MASK_CLIENT) != 0; }
 };
 
 /**
@@ -312,6 +315,16 @@ enum class MarkAttributeDirty
     // reporting needs to be triggered (e.g. because QuieterReportingAttribute
     // indicated that).
     kYes,
+};
+
+/// Notification object of a specific path being changed
+class AttributesChangedListener
+{
+public:
+    virtual ~AttributesChangedListener() = default;
+
+    /// Called when the set of attributes identified by AttributePathParams (which may contain wildcards) is to be considered dirty.
+    virtual void MarkDirty(const AttributePathParams & path) = 0;
 };
 
 } // namespace app

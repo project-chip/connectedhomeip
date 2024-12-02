@@ -43,7 +43,9 @@
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
-
+namespace Testing {
+class TestPASESession;
+}
 extern const char kSpake2pI2RSessionInfo[];
 extern const char kSpake2pR2ISessionInfo[];
 
@@ -99,6 +101,8 @@ public:
      *                            ownership of the exchangeCtxt to PASESession object. PASESession
      *                            will close the exchange on (successful/failed) handshake completion.
      * @param delegate            Callback object
+     *                            The delegate will be notified if and only if Pair() returns success. Errors occurring after Pair()
+     *                            returns success will be reported via the delegate.
      *
      * @return CHIP_ERROR      The result of initialization
      */
@@ -172,6 +176,7 @@ private:
         kInvalidKeyConfirmation = 0x00,
         kUnexpected             = 0xff,
     };
+    friend class Testing::TestPASESession;
 
     CHIP_ERROR Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 

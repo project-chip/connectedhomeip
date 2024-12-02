@@ -28,8 +28,8 @@ chip_monolithic_tests = false
 
 pw_sys_io_BACKEND = "$dir_pw_sys_io_stdio"
 
-pw_assert_BACKEND = "$dir_pw_assert_log"
-pw_log_BACKEND = "$dir_pw_log_basic"
+pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
+pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
 
 pw_unit_test_BACKEND = "$dir_pw_unit_test:light"
 

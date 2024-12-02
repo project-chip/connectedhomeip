@@ -26,7 +26,7 @@ config:
     nodeId: 0x12344321
     cluster: "Door Lock"
     endpoint: 1
-    PINCredentialData:
+    CredentialData:
         type: octet_string
         defaultValue: "123456"
     RFIDCredentialData:
@@ -44,55 +44,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Precondition: Create new user with default parameters"
-      command: "SetUser"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "OperationType"
-                value: 0
-              - name: "UserIndex"
-                value: 1
-              - name: "UserName"
-                value: "xxx"
-              - name: "UserUniqueID"
-                value: 6452
-              - name: "UserStatus"
-                value: 1
-              - name: "UserType"
-                value: 0
-              - name: "CredentialRule"
-                value: 0
-
-    - label: "Precondition: Read the user back and verify its fields"
-      command: "GetUser"
-      arguments:
-          values:
-              - name: "UserIndex"
-                value: 1
-      response:
-          values:
-              - name: "UserIndex"
-                value: 1
-              - name: "UserName"
-                value: "xxx"
-              - name: "UserUniqueID"
-                value: 6452
-              - name: "UserStatus"
-                value: 1
-              - name: "UserType"
-                value: 0
-              - name: "CredentialRule"
-                value: 0
-              - name: "Credentials"
-                value: []
-              - name: "CreatorFabricIndex"
-                value: 1
-              - name: "LastModifiedFabricIndex"
-                value: 1
-              - name: "NextUserIndex"
-                value: null
 
     - label:
           "Step 1a: TH reads NumberOfTotalUsersSupported and saves for future
@@ -141,7 +92,28 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Step 2a: TH sends Set Credential Command to DUT with type PIN"
+    - label: "Step 2a: TH sends SetUser Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+
+    - label: "Step 2b: TH sends Set Credential Command to DUT with type PIN"
       PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -152,7 +124,7 @@ tests:
               - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
               - name: "CredentialData"
-                value: PINCredentialData
+                value: CredentialData
               - name: "UserIndex"
                 value: 1
               - name: "UserStatus"

@@ -15,13 +15,15 @@
  *    limitations under the License.
  */
 
-#include "streamer.h"
+#include <ctype.h>
+#include <errno.h>
+#include <string.h>
+
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <ctype.h>
-#include <string.h>
+#include "streamer.h"
 
 using chip::FormatCHIPError;
 using chip::Platform::MemoryAlloc;
@@ -46,10 +48,26 @@ size_t ReadLine(char * buffer, size_t max)
             break;
         }
 
-        if (streamer_read(streamer_get(), buffer + line_sz, 1) != 1)
+        auto ret = streamer_read(streamer_get(), buffer + line_sz, 1);
+        if (ret == -1 && errno == EINTR)
         {
-            continue;
+            streamer_printf(streamer_get(), "^C\r\n");
+            // In case of EINTR (Ctrl-C) reset the buffer and start over.
+            buffer[line_sz = 0] = '\0';
+            break;
         }
+
+        // Stop the loop if the input stream is closed.
+        if (ret == 0)
+        {
+            if (line_sz > 0)
+                // Return current buffer if it is not empty.
+                buffer[line_sz++] = '\0';
+            break;
+        }
+
+        if (ret != 1)
+            continue;
 
         // Process character we just read.
         switch (buffer[line_sz])
@@ -188,7 +206,7 @@ void Engine::RunMainLoop()
 {
     streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);
 
-    while (true)
+    while (mRunning)
     {
         char * line = static_cast<char *>(Platform::MemoryAlloc(CHIP_SHELL_MAX_LINE_SIZE));
         if (ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE) == 0u)

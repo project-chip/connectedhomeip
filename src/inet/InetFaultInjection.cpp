@@ -23,8 +23,6 @@
 
 #include "InetFaultInjection.h"
 
-#include <nlassert.h>
-
 namespace chip {
 namespace Inet {
 namespace FaultInjection {

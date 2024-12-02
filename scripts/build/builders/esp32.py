@@ -16,6 +16,7 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
+from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
@@ -153,7 +154,7 @@ class Esp32Builder(Builder):
                  app: Esp32App = Esp32App.ALL_CLUSTERS,
                  enable_rpcs: bool = False,
                  enable_ipv4: bool = True,
-                 enable_insights_trace: bool = False
+                 enable_insights_trace: bool = False,
                  ):
         super(Esp32Builder, self).__init__(root, runner)
         self.board = board

@@ -32,13 +32,13 @@ sl_enable_test_event_trigger = true
 chip_enable_icd_server = true
 chip_subscription_timeout_resumption = false
 sl_use_subscription_syncing = true
-icd_enforce_sit_slow_poll_limit = true
 chip_icd_report_on_active_mode = true
 chip_enable_icd_lit = true
+chip_enable_icd_dsls = true
 
 # Openthread Configuration flags
-sl_ot_idle_interval_ms = 3600000  # 60mins Idle Polling Interval
-sl_ot_active_interval_ms = 1000  # 1000ms Active Polling Interval
+sl_transport_idle_interval_ms = 3600000  # 60mins Idle Polling Interval
+sl_transport_active_interval_ms = 1000  # 1000ms Active Polling Interval
 
 # ICD Matter Configuration flags
 sl_idle_mode_duration_s = 3600  # 60min Idle Mode Duration

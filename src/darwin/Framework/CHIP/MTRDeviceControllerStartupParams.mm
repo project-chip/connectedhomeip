@@ -18,6 +18,7 @@
 #import "MTRCertificates.h"
 #import "MTRConversion.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRP256KeypairBridge.h"
@@ -250,7 +251,13 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 @implementation MTRDeviceControllerAbstractParameters
 - (instancetype)_initInternal
 {
-    return [super init];
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _startSuspended = NO;
+
+    return self;
 }
 @end
 
@@ -332,6 +339,9 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 @end
 
 @implementation MTRDeviceControllerExternalCertificateParameters
+
+@dynamic rootCertificate;
+
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
                        uniqueIdentifier:(NSUUID *)uniqueIdentifier
@@ -587,7 +597,7 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
     return self;
 }
 
-- (instancetype)initForNewController:(MTRDeviceController *)controller
+- (instancetype)initForNewController:(MTRDeviceController_Concrete *)controller
                          fabricTable:(chip::FabricTable *)fabricTable
                             keystore:(chip::Crypto::OperationalKeystore *)keystore
                 advertiseOperational:(BOOL)advertiseOperational
