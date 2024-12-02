@@ -531,7 +531,7 @@ template("siwx917_sdk") {
     }
 
     if (sl_si91x_crypto_flavor == "tinycrypt") {
-      _mbedtls_root = "${mbedtls_root}/repo"
+      _mbedtls_root = "${efr32_sdk_root}/util/third_party/mbedtls"
 
       config("siwx917_tinycrypt_config") {
         defines = [
@@ -540,7 +540,7 @@ template("siwx917_sdk") {
         ]
 
         include_dirs = [
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
+          # mbedTLS headers
           "${_mbedtls_root}/include",
           "${_mbedtls_root}/library",
 
@@ -548,6 +548,9 @@ template("siwx917_sdk") {
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config",
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/preset",
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/inc",
+
+          # tinycrypt specific headers
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
         ]
       }
 
@@ -564,6 +567,7 @@ template("siwx917_sdk") {
           "${_mbedtls_root}/library/asn1write.c",
           "${_mbedtls_root}/library/base64.c",
           "${_mbedtls_root}/library/bignum.c",
+          "${_mbedtls_root}/library/bignum_core.c",
           "${_mbedtls_root}/library/ccm.c",
           "${_mbedtls_root}/library/cipher.c",
           "${_mbedtls_root}/library/cipher_wrap.c",
@@ -574,30 +578,34 @@ template("siwx917_sdk") {
           "${_mbedtls_root}/library/ecp.c",
           "${_mbedtls_root}/library/ecp_curves.c",
           "${_mbedtls_root}/library/entropy.c",
+          "${_mbedtls_root}/library/error.c",
           "${_mbedtls_root}/library/hkdf.c",
           "${_mbedtls_root}/library/hmac_drbg.c",
           "${_mbedtls_root}/library/md.c",
           "${_mbedtls_root}/library/pem.c",
           "${_mbedtls_root}/library/pkcs5.c",
           "${_mbedtls_root}/library/platform.c",
+          "${_mbedtls_root}/library/platform_util.c",
           "${_mbedtls_root}/library/sha256.c",
           "${_mbedtls_root}/library/sha512.c",
           "${_mbedtls_root}/library/version.c",
           "${_mbedtls_root}/library/x509_create.c",
 
+          # mbedtls + tinycrypt integration
+          "${_mbedtls_root}/library/oid.c",
+          "${_mbedtls_root}/library/pk.c",
+          "${_mbedtls_root}/library/pk_wrap.c",
+          "${_mbedtls_root}/library/pk_wrap.h",
+          "${_mbedtls_root}/library/pkparse.c",
+          "${_mbedtls_root}/library/pkwrite.c",
+          "${_mbedtls_root}/library/x509_crt.c",
+          "${_mbedtls_root}/library/x509write_csr.c",
+
           # tinycrypt
           "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc.c",
           "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dh.c",
           "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dsa.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/error.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/oid.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk_wrap.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkparse.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkwrite.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/platform_util.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509_crt.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509write_csr.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/tinycrypt_util.c",
         ]
 
         public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
