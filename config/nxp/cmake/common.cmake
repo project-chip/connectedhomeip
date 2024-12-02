@@ -44,9 +44,9 @@ matter_add_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_
 matter_add_gn_arg_bool  ("chip_automation_logging"                FALSE)
 matter_add_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MALLOC_SYS_HEAP)
 matter_add_gn_arg_bool  ("chip_enable_wifi"                       CONFIG_CHIP_WIFI)
+matter_add_gn_arg_bool  ("chip_enable_ethernet"                   CONFIG_CHIP_ETHERNET)
 matter_add_gn_arg_bool  ("chip_system_config_provide_statistics"  CONFIG_CHIP_STATISTICS)
 matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_ENABLE_ICD_SUPPORT)
-matter_add_gn_arg_bool  ("enable_eventlist_attribute"             TRUE)
 matter_add_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQUESTOR)
 
 if(CONFIG_DEBUG)

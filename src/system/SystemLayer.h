@@ -40,9 +40,10 @@
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#include <lib/support/IntrusiveList.h>
 #include <system/SocketEvents.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #include <dispatch/dispatch.h>
@@ -234,7 +235,7 @@ class LayerFreeRTOS : public Layer
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 class LayerSockets : public Layer
 {
@@ -243,6 +244,7 @@ public:
      * Initialize watching for events on a file descriptor.
      *
      * Returns an opaque token through @a tokenOut that must be passed to subsequent operations for this file descriptor.
+     * Multiple calls to start watching the same file descriptor will return the same token.
      * StopWatchingSocket() must be called before closing the file descriptor.
      */
     virtual CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut) = 0;
@@ -288,6 +290,44 @@ public:
     virtual SocketWatchToken InvalidSocketWatchToken() = 0;
 };
 
+class LayerSocketsLoop;
+
+/**
+ * EventLoopHandlers can be registered with a LayerSocketsLoop instance to enable
+ * participation of those handlers in the processing cycle of the event loop. This makes
+ * it possible to implement adapters that allow components utilizing a third-party event
+ * loop API to participate in the Matter event loop, instead of having to run an entirely
+ * separate event loop on another thread.
+ *
+ * Specifically, the `PrepareEvents` and `HandleEvents` methods of registered event loop
+ * handlers will be called from the LayerSocketsLoop methods of the same names.
+ *
+ * @see LayerSocketsLoop::PrepareEvents
+ * @see LayerSocketsLoop::HandleEvents
+ */
+class EventLoopHandler : public chip::IntrusiveListNodeBase<>
+{
+public:
+    virtual ~EventLoopHandler() {}
+
+    /**
+     * Prepares events and returns the next requested wake time.
+     */
+    virtual Clock::Timestamp PrepareEvents(Clock::Timestamp now) { return Clock::Timestamp::max(); }
+
+    /**
+     * Handles / dispatches pending events.
+     * Every call to this method will have been preceded by a call to `PrepareEvents`.
+     */
+    virtual void HandleEvents() = 0;
+
+private:
+    // mState is provided exclusively for use by the LayerSocketsLoop implementation
+    // sub-class and can be accessed by it via the LayerSocketsLoop::LoopHandlerState() helper.
+    friend class LayerSocketsLoop;
+    intptr_t mState = 0;
+};
+
 class LayerSocketsLoop : public LayerSockets
 {
 public:
@@ -298,6 +338,11 @@ public:
     virtual void HandleEvents()    = 0;
     virtual void EventLoopEnds()   = 0;
 
+#if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    virtual void AddLoopHandler(EventLoopHandler & handler)    = 0;
+    virtual void RemoveLoopHandler(EventLoopHandler & handler) = 0;
+#endif // !CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue) = 0;
     virtual dispatch_queue_t GetDispatchQueue()                   = 0;
@@ -305,9 +350,13 @@ public:
     virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) = 0;
     virtual struct ev_loop * GetLibEvLoop()                 = 0;
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
+
+protected:
+    // Expose EventLoopHandler.mState as a non-const reference to sub-classes
+    decltype(EventLoopHandler::mState) & LoopHandlerState(EventLoopHandler & handler) { return handler.mState; }
 };
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 } // namespace System
 } // namespace chip

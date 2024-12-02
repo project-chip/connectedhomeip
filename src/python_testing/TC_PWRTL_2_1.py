@@ -19,19 +19,25 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -45,36 +51,45 @@ class TC_PWRTL_2_1(MatterBaseTest):
 
         attributes = Clusters.PowerTopology.Attributes
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint(default=1)
+
+        powertop_attr_list = Clusters.Objects.PowerTopology.Attributes.AttributeList
+        powertop_cluster = Clusters.Objects.PowerTopology
+        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=powertop_cluster, attribute=powertop_attr_list)
+        avail_endpoints_attr_id = Clusters.Objects.PowerTopology.Attributes.ActiveEndpoints.attribute_id
+        act_endpoints_attr_id = Clusters.Objects.PowerTopology.Attributes.AvailableEndpoints.attribute_id
 
         self.print_step(1, "Commissioning, already done")
 
-        if not self.check_pics("PWRTL.S.A0000"):
-            logging.info("Test skipped because PICS PWRTL.S.A0000 is not set")
-            return
-
         self.print_step(2, "Read AvailableAttributes attribute")
-        available_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology, attribute=attributes.AvailableEndpoints)
+        if avail_endpoints_attr_id in attribute_list:
+            available_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology, attribute=attributes.AvailableEndpoints)
 
-        if available_endpoints == NullValue:
-            logging.info("AvailableEndpoints is null")
+            if available_endpoints == []:
+                logging.info("AvailableEndpoints is an empty list")
+            else:
+                logging.info("AvailableEndpoints: %s" % (available_endpoints))
+                asserts.assert_less_equal(len(available_endpoints), 20,
+                                          "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
+
         else:
-            logging.info("AvailableEndpoints: %s" % (available_endpoints))
-
-            asserts.assert_less_equal(len(available_endpoints), 21,
-                                      "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
-
-        if not self.check_pics("PWRTL.S.A0001"):
-            logging.info("Test skipped because PICS PWRTL.S.A0001 is not set")
-            return
+            self.mark_current_step_skipped()
 
         self.print_step(3, "Read ActiveEndpoints attribute")
-        active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology,  attribute=attributes.ActiveEndpoints)
-        logging.info("ActiveEndpoints: %s" % (active_endpoints))
 
-        if available_endpoints == NullValue:
-            asserts.assert_true(active_endpoints == NullValue,
-                                "ActiveEndpoints should be null when AvailableEndpoints is null: %s" % active_endpoints)
+        if act_endpoints_attr_id in attribute_list:
+            active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology,  attribute=attributes.ActiveEndpoints)
+            logging.info("ActiveEndpoints: %s" % (active_endpoints))
+            asserts.assert_less_equal(len(active_endpoints), 20,
+                                      "ActiveEndpoints length %d must be less than 21!" % len(active_endpoints))
+
+            if available_endpoints == []:
+                # Verify that ActiveEndpoints is a subset of AvailableEndpoints
+                asserts.assert_true(set(active_endpoints).issubset(set(available_endpoints)),
+                                    "ActiveEndpoints should be a subset of AvailableEndpoints")
+
+        else:
+            self.mark_current_step_skipped()
 
 
 if __name__ == "__main__":

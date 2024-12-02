@@ -22,6 +22,7 @@
 #include "CHIPDeviceManager.h"
 #include "ICDUtil.h"
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/operational-state-server/operational-state-cluster-objects.h>
 #include <app/util/attribute-storage.h>
 
 #include "static-supported-temperature-levels.h"
@@ -37,7 +38,14 @@ using namespace chip::Shell;
 using namespace chip;
 using namespace chip::app::Clusters;
 
+/*
+ * Enable temperature level delegate of temperature control cluster
+ */
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
+{
+    TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+}
 
 #ifdef ENABLE_CHIP_SHELL
 const static std::map<std::string, uint8_t> map_cmd_errstate{
@@ -78,8 +86,15 @@ static CHIP_ERROR cliOpState(int argc, char * argv[])
 
     if (map_cmd_opstate.find(argv[0]) != map_cmd_opstate.end())
     {
-        OperationalState::GetOperationalStateInstance()->SetOperationalState(map_cmd_opstate.at(argv[0]));
-        ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
+        auto error = OperationalState::GetOperationalStateInstance()->SetOperationalState(map_cmd_opstate.at(argv[0]));
+        ChipLogDetail(Shell, "OpSState : Set to %s state & CountdownTime", argv[0]);
+        if ((error == CHIP_NO_ERROR) &&
+            (map_cmd_opstate.at(argv[0]) == to_underlying(chip::app::Clusters::OperationalState::OperationalStateEnum::kRunning)))
+        {
+            chip::app::Clusters::OperationalState::GenericOperationalError err(
+                to_underlying(chip::app::Clusters::OperationalState::ErrorStateEnum::kNoError));
+            OperationalState::GetOperationalStateDelegate()->HandleStartStateCallback(err);
+        }
         if (!strcmp(argv[0], "error") && argc == 2)
         {
             OperationalState::Structs::ErrorStateStruct::Type err;
@@ -119,8 +134,6 @@ void LaundryWasherApp::AppTask::PreInitMatterStack()
 void LaundryWasherApp::AppTask::PostInitMatterStack()
 {
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
-
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void LaundryWasherApp::AppTask::AppMatter_RegisterCustomCliCommands()

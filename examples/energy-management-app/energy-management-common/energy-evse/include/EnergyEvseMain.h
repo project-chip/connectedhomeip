@@ -18,5 +18,18 @@
 
 #pragma once
 
-void EvseApplicationInit();
-void EvseApplicationShutdown();
+#include <DeviceEnergyManagementDelegateImpl.h>
+#include <DeviceEnergyManagementManager.h>
+#include <ElectricalPowerMeasurementDelegate.h>
+#include <PowerTopologyDelegate.h>
+#include <lib/core/CHIPError.h>
+
+CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId);
+CHIP_ERROR EnergyEvseShutdown();
+
+CHIP_ERROR EVSEManufacturerInit(chip::EndpointId powerSourceEndpointId,
+                                chip::app::Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance & epmInstance,
+                                chip::app::Clusters::PowerTopology::PowerTopologyInstance & ptInstance,
+                                chip::app::Clusters::DeviceEnergyManagementManager & demInstance,
+                                chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate & demDelegate);
+CHIP_ERROR EVSEManufacturerShutdown();

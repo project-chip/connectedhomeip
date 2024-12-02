@@ -158,10 +158,15 @@ static_library("inet") {
       "EndpointQueueFilter.h",
       "UDPEndPoint.cpp",
       "UDPEndPoint.h",
-      "UDPEndPointImpl${chip_system_config_inet}.cpp",
       "UDPEndPointImpl${chip_system_config_inet}.h",
       "UDPEndPointImpl.h",
     ]
+
+    if (chip_system_config_use_network_framework) {
+      sources += [ "UDPEndPointImpl${chip_system_config_inet}.mm" ]
+    } else {
+      sources += [ "UDPEndPointImpl${chip_system_config_inet}.cpp" ]
+    }
 
     if (chip_system_config_inet == "Sockets") {
       # TODO: dependency on this one is not clear as it is only ever
@@ -187,5 +192,7 @@ static_library("inet") {
   cflags = [ "-Wconversion" ]
   if (current_os == "nuttx") {
     cflags -= [ "-Wconversion" ]
+  } else if (chip_system_config_use_network_framework) {
+    cflags += [ "-fobjc-arc" ]
   }
 }

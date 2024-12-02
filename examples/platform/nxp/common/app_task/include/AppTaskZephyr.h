@@ -51,6 +51,8 @@ public:
      */
 #if defined(CONFIG_CHIP_WIFI)
     virtual chip::DeviceLayer::NetworkCommissioning::WiFiDriver * GetWifiDriverInstance(void) override;
+#elif defined(CONFIG_CHIP_ETHERNET)
+    virtual chip::DeviceLayer::NetworkCommissioning::EthernetDriver * GetEthernetDriverInstance(void) override;
 #endif
 
     /**

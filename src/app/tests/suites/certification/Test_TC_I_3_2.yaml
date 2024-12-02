@@ -70,15 +70,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 2: DUT issues an IdentifyQuery command to the Test Harness.
-          Note: IdentifyQuery is not supported by Matter."
-      PICS: I.C.C01.Tx
-      verification: |
-          IdentifyQuery is not supported by Matter
-      disabled: true
-
-    - label:
-          "Step 3: DUT issues an Identify command to the Test Harness, with the
+          "Step 2: DUT issues an Identify command to the Test Harness, with the
           IdentifyTime argument set to 0x0000 (Stop)."
       PICS: I.C.C00.Tx
       verification: |
@@ -116,7 +108,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 4: DUT sends a TriggerEffect command to the Test Harness, with
+          "Step 3: DUT sends a TriggerEffect command to the Test Harness, with
           any supported EffectIdentifier argument and EffectVariant set to 0."
       PICS: I.C.C40.Tx
       verification: |

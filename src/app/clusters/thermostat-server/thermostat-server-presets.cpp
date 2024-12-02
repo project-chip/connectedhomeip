@@ -38,16 +38,16 @@ namespace {
  * @return true If the preset is valid i.e the PresetHandle (if not null) fits within size constraints and the presetScenario enum
  *         value is valid. Otherwise, return false.
  */
-bool IsValidPresetEntry(const PresetStruct::Type & preset)
+bool IsValidPresetEntry(const PresetStructWithOwnedMembers & preset)
 {
     // Check that the preset handle is not too long.
-    if (!preset.presetHandle.IsNull() && preset.presetHandle.Value().size() > kPresetHandleSize)
+    if (!preset.GetPresetHandle().IsNull() && preset.GetPresetHandle().Value().size() > kPresetHandleSize)
     {
         return false;
     }
 
     // Ensure we have a valid PresetScenario.
-    return (preset.presetScenario != PresetScenarioEnum::kUnknownEnumValue);
+    return (preset.GetPresetScenario() != PresetScenarioEnum::kUnknownEnumValue);
 }
 
 /**
@@ -123,7 +123,7 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
  *
  * @return true if a matching entry was found in the  presets attribute list, false otherwise.
  */
-bool GetMatchingPresetInPresets(Delegate * delegate, const PresetStruct::Type & presetToMatch,
+bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<ByteSpan> & presetHandle,
                                 PresetStructWithOwnedMembers & matchingPreset)
 {
     VerifyOrReturnValue(delegate != nullptr, false);
@@ -143,7 +143,7 @@ bool GetMatchingPresetInPresets(Delegate * delegate, const PresetStruct::Type & 
         }
 
         // Note: presets coming from our delegate always have a handle.
-        if (presetToMatch.presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
+        if (presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
         {
             return true;
         }
@@ -152,69 +152,36 @@ bool GetMatchingPresetInPresets(Delegate * delegate, const PresetStruct::Type & 
 }
 
 /**
- * @brief Returns the length of the list of presets if the pending presets were to be applied. The size of the pending presets list
- *        calculated, after all the constraint checks are done, is the new size of the updated Presets attribute since the pending
- *        preset list is expected to have all existing presets with or without edits plus new presets.
- *        This is called before changes are actually applied.
+ * @brief Gets the maximum number of presets allowed for a given preset scenario.
  *
- * @param[in] delegate The delegate to use.
- *
- * @return count of the updated Presets attribute if the pending presets were applied to it. Return 0 for error cases.
+ * @param[in]  delegate The delegate to use.
+ * @param[in]  presetScenario The presetScenario to match with.
+ * @param[out] count The maximum number of presets for the specified presetScenario
+ * @return CHIP_NO_ERROR if the maximum number was determined, or an error if not
  */
-uint8_t CountNumberOfPendingPresets(Delegate * delegate)
+CHIP_ERROR MaximumPresetScenarioCount(Delegate * delegate, PresetScenarioEnum presetScenario, size_t & count)
 {
-    uint8_t numberOfPendingPresets = 0;
-
-    VerifyOrReturnValue(delegate != nullptr, 0);
-
-    for (uint8_t i = 0; true; i++)
-    {
-        PresetStructWithOwnedMembers pendingPreset;
-        CHIP_ERROR err = delegate->GetPendingPresetAtIndex(i, pendingPreset);
-
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            break;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "CountNumberOfPendingPresets: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
-                         err.Format());
-            return 0;
-        }
-        numberOfPendingPresets++;
-    }
-
-    return numberOfPendingPresets;
-}
-
-/**
- * @brief Checks if the presetScenario is present in the PresetTypes attribute.
- *
- * @param[in] delegate The delegate to use.
- * @param[in] presetScenario The presetScenario to match with.
- *
- * @return true if the presetScenario is found, false otherwise.
- */
-bool PresetScenarioExistsInPresetTypes(Delegate * delegate, PresetScenarioEnum presetScenario)
-{
-    VerifyOrReturnValue(delegate != nullptr, false);
-
+    count = 0;
     for (uint8_t i = 0; true; i++)
     {
         PresetTypeStruct::Type presetType;
         auto err = delegate->GetPresetTypeAtIndex(i, presetType);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            // We exhausted the list trying to find the preset scenario
+            return CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
-            return false;
+            return err;
         }
-
         if (presetType.presetScenario == presetScenario)
         {
-            return true;
+            count = presetType.numberOfPresets;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -351,53 +318,79 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
     return Status::Success;
 }
 
-CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * delegate, const PresetStruct::Type & preset)
+CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * delegate, const PresetStruct::Type & newPreset)
 {
+    PresetStructWithOwnedMembers preset = newPreset;
     if (!IsValidPresetEntry(preset))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    if (preset.presetHandle.IsNull())
+    if (preset.GetPresetHandle().IsNull())
     {
         if (IsBuiltIn(preset))
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
+        // Force to be false, if passed as null
+        preset.SetBuiltIn(false);
     }
     else
     {
-        auto & presetHandle = preset.presetHandle.Value();
-
         // Per spec we need to check that:
         // (a) There is an existing non-pending preset with this handle.
         PresetStructWithOwnedMembers matchingPreset;
-        if (!GetMatchingPresetInPresets(delegate, preset, matchingPreset))
+        if (!GetMatchingPresetInPresets(delegate, preset.GetPresetHandle().Value(), matchingPreset))
         {
             return CHIP_IM_GLOBAL_STATUS(NotFound);
         }
 
         // (b) There is no existing pending preset with this handle.
-        if (CountPresetsInPendingListWithPresetHandle(delegate, presetHandle) > 0)
+        if (CountPresetsInPendingListWithPresetHandle(delegate, preset.GetPresetHandle().Value()) > 0)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
 
+        const auto & presetBuiltIn         = preset.GetBuiltIn();
+        const auto & matchingPresetBuiltIn = matchingPreset.GetBuiltIn();
         // (c)/(d) The built-in fields do not have a mismatch.
-        // TODO: What's the story with nullability on the BuiltIn field?
-        if (!preset.builtIn.IsNull() && !matchingPreset.GetBuiltIn().IsNull() &&
-            preset.builtIn.Value() != matchingPreset.GetBuiltIn().Value())
+        if (presetBuiltIn.IsNull())
         {
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            if (matchingPresetBuiltIn.IsNull())
+            {
+                // This really shouldn't happen; internal presets should alway have built-in set
+                return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+            }
+            preset.SetBuiltIn(matchingPresetBuiltIn.Value());
+        }
+        else
+        {
+            if (matchingPresetBuiltIn.IsNull())
+            {
+                // This really shouldn't happen; internal presets should alway have built-in set
+                return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+            }
+            if (presetBuiltIn.Value() != matchingPresetBuiltIn.Value())
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
         }
     }
 
-    if (!PresetScenarioExistsInPresetTypes(delegate, preset.presetScenario))
+    size_t maximumPresetCount         = delegate->GetNumberOfPresets();
+    size_t maximumPresetScenarioCount = 0;
+    if (MaximumPresetScenarioCount(delegate, preset.GetPresetScenario(), maximumPresetScenarioCount) != CHIP_NO_ERROR)
     {
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+    }
+
+    if (maximumPresetScenarioCount == 0)
+    {
+        // This is not a supported preset scenario
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    if (preset.name.HasValue() && !PresetTypeSupportsNames(delegate, preset.presetScenario))
+    if (preset.GetName().HasValue() && !PresetTypeSupportsNames(delegate, preset.GetPresetScenario()))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -405,16 +398,42 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
     // Before adding this preset to the pending presets, if the expected length of the pending presets' list
     // exceeds the total number of presets supported, return RESOURCE_EXHAUSTED. Note that the preset has not been appended yet.
 
-    uint8_t numberOfPendingPresets = CountNumberOfPendingPresets(delegate);
-
-    // We will be adding one more preset, so reject if the length is already at max.
-    if (numberOfPendingPresets >= delegate->GetNumberOfPresets())
+    // We're going to append this preset, so let's assume a count as though it had already been inserted
+    size_t presetCount         = 1;
+    size_t presetScenarioCount = 1;
+    for (uint8_t i = 0; true; i++)
     {
+        PresetStructWithOwnedMembers otherPreset;
+        CHIP_ERROR err = delegate->GetPendingPresetAtIndex(i, otherPreset);
+
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            break;
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+        }
+        presetCount++;
+        if (preset.GetPresetScenario() == otherPreset.GetPresetScenario())
+        {
+            presetScenarioCount++;
+        }
+    }
+
+    if (presetCount > maximumPresetCount)
+    {
+        ChipLogError(Zcl, "Preset count exceeded %u: %u ", static_cast<unsigned>(maximumPresetCount),
+                     static_cast<unsigned>(presetCount));
         return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
     }
 
-    // TODO #34556 : Check if the number of presets for each presetScenario exceeds the max number of presets supported for that
-    // scenario. We plan to support only one preset for each presetScenario for our use cases so defer this for re-evaluation.
+    if (presetScenarioCount > maximumPresetScenarioCount)
+    {
+        ChipLogError(Zcl, "Preset scenario count exceeded %u: %u ", static_cast<unsigned>(maximumPresetScenarioCount),
+                     static_cast<unsigned>(presetScenarioCount));
+        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    }
 
     return delegate->AppendToPendingPresetList(preset);
 }

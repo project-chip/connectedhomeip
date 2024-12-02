@@ -27,8 +27,8 @@ tests:
     - label: "Precondition"
       verification: |
           - Commission DUT to TH
-          - A given fabric SHALL NOT consume more than half (rounded down towards 0) of the Scene Table entries (as indicated in the SceneTableSize attribute).
-          - MaxRemainingCapacity is SceneTableSize/2.
+          - The Scene Table capacity for a given fabric SHALL be less than half (rounded down towards 0) of the Scene Table entries (as indicated in the SceneTableSize attribute).
+          - MaxRemainingCapacity is (SceneTableSize-1)/2.
       disabled: true
 
     - label:
@@ -181,56 +181,56 @@ tests:
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
-          scenesmanagement subscribe fabric-scene-info 0 200 1 1
+          scenesmanagement subscribe fabric-scene-info 5 100 1 1
 
           Verify  the DUT sends a report data for FabricSceneInfo after the MinIntervalFloor time; store the RemainingCapacity field from this fabric’s entry reported in FabricSceneInfo into RemainingCapacity and is equals to (MaxRemainingCapacity) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
-          [1706764401.002841][4438:4440] CHIP:DMG: ReportDataMessage =
-          [1706764401.002862][4438:4440] CHIP:DMG: {
-          [1706764401.002879][4438:4440] CHIP:DMG:         SubscriptionId = 0x679cab48,
-          [1706764401.002891][4438:4440] CHIP:DMG:         AttributeReportIBs =
-          [1706764401.002916][4438:4440] CHIP:DMG:         [
-          [1706764401.002926][4438:4440] CHIP:DMG:                 AttributeReportIB =
-          [1706764401.002950][4438:4440] CHIP:DMG:                 {
-          [1706764401.002960][4438:4440] CHIP:DMG:                         AttributeDataIB =
-          [1706764401.002972][4438:4440] CHIP:DMG:                         {
-          [1706764401.002985][4438:4440] CHIP:DMG:                                 DataVersion = 0xec4c4ebe,
-          [1706764401.002996][4438:4440] CHIP:DMG:                                 AttributePathIB =
-          [1706764401.003008][4438:4440] CHIP:DMG:                                 {
-          [1706764401.003021][4438:4440] CHIP:DMG:                                         Endpoint = 0x1,
-          [1706764401.003035][4438:4440] CHIP:DMG:                                         Cluster = 0x62,
-          [1706764401.003048][4438:4440] CHIP:DMG:                                         Attribute = 0x0000_0002,
-          [1706764401.003059][4438:4440] CHIP:DMG:                                 }
-          [1706764401.003076][4438:4440] CHIP:DMG:
-          [1706764401.003088][4438:4440] CHIP:DMG:                                 Data = [
-          [1706764401.003105][4438:4440] CHIP:DMG:
-          [1706764401.003121][4438:4440] CHIP:DMG:                                         {
-          [1706764401.003136][4438:4440] CHIP:DMG:                                                 0x0 = 0,
-          [1706764401.003150][4438:4440] CHIP:DMG:                                                 0x1 = 1,
-          [1706764401.003162][4438:4440] CHIP:DMG:                                                 0x2 = 1,
-          [1706764401.003175][4438:4440] CHIP:DMG:                                                 0x3 = false,
-          [1706764401.003190][4438:4440] CHIP:DMG:                                                 0x4 = 7,
-          [1706764401.003203][4438:4440] CHIP:DMG:                                                 0xfe = 1,
-          [1706764401.003216][4438:4440] CHIP:DMG:                                         },
-          [1706764401.003229][4438:4440] CHIP:DMG:                                 ],
-          [1706764401.003239][4438:4440] CHIP:DMG:                         },
-          [1706764401.003260][4438:4440] CHIP:DMG:
-          [1706764401.003270][4438:4440] CHIP:DMG:                 },
-          [1706764401.003292][4438:4440] CHIP:DMG:
-          [1706764401.003301][4438:4440] CHIP:DMG:         ],
-          [1706764401.003324][4438:4440] CHIP:DMG:
-          [1706764401.003334][4438:4440] CHIP:DMG:         InteractionModelRevision = 11
-          [1706764401.003343][4438:4440] CHIP:DMG: }
-          [1706764401.003557][4438:4440] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 3964423870
-          [1706764401.003615][4438:4440] CHIP:TOO:   FabricSceneInfo: 1 entries
-          [1706764401.003676][4438:4440] CHIP:TOO:     [1]: {
-          [1706764401.003698][4438:4440] CHIP:TOO:       SceneCount: 0
-          [1706764401.003708][4438:4440] CHIP:TOO:       CurrentScene: 1
-          [1706764401.003718][4438:4440] CHIP:TOO:       CurrentGroup: 1
-          [1706764401.003728][4438:4440] CHIP:TOO:       SceneValid: FALSE
-          [1706764401.003740][4438:4440] CHIP:TOO:       RemainingCapacity: 7
-          [1706764401.003750][4438:4440] CHIP:TOO:       FabricIndex: 1
-          [1706764401.003761][4438:4440] CHIP:TOO:      }
+          [1720506229.849] [3777:3779] [DMG] ReportDataMessage =
+          [1720506229.849] [3777:3779] [DMG] {
+          [1720506229.849] [3777:3779] [DMG]         SubscriptionId = 0x5da2bd16,
+          [1720506229.849] [3777:3779] [DMG]         AttributeReportIBs =
+          [1720506229.849] [3777:3779] [DMG]         [
+          [1720506229.849] [3777:3779] [DMG]                 AttributeReportIB =
+          [1720506229.849] [3777:3779] [DMG]                 {
+          [1720506229.849] [3777:3779] [DMG]                         AttributeDataIB =
+          [1720506229.850] [3777:3779] [DMG]                         {
+          [1720506229.850] [3777:3779] [DMG]                                 DataVersion = 0xdcafe47f,
+          [1720506229.850] [3777:3779] [DMG]                                 AttributePathIB =
+          [1720506229.850] [3777:3779] [DMG]                                 {
+          [1720506229.850] [3777:3779] [DMG]                                         Endpoint = 0x1,
+          [1720506229.850] [3777:3779] [DMG]                                         Cluster = 0x62,
+          [1720506229.850] [3777:3779] [DMG]                                         Attribute = 0x0000_0002,
+          [1720506229.850] [3777:3779] [DMG]                                 }
+          [1720506229.850] [3777:3779] [DMG]
+          [1720506229.850] [3777:3779] [DMG]                                 Data = [
+          [1720506229.850] [3777:3779] [DMG]
+          [1720506229.850] [3777:3779] [DMG]                                         {
+          [1720506229.850] [3777:3779] [DMG]                                                 0x0 = 0 (unsigned),
+          [1720506229.850] [3777:3779] [DMG]                                                 0x1 = 0 (unsigned),
+          [1720506229.850] [3777:3779] [DMG]                                                 0x2 = 0 (unsigned),
+          [1720506229.850] [3777:3779] [DMG]                                                 0x3 = false,
+          [1720506229.850] [3777:3779] [DMG]                                                 0x4 = 7 (unsigned),
+          [1720506229.850] [3777:3779] [DMG]                                                 0xfe = 1 (unsigned),
+          [1720506229.850] [3777:3779] [DMG]                                         },
+          [1720506229.851] [3777:3779] [DMG]                                 ],
+          [1720506229.851] [3777:3779] [DMG]                         },
+          [1720506229.851] [3777:3779] [DMG]
+          [1720506229.851] [3777:3779] [DMG]                 },
+          [1720506229.851] [3777:3779] [DMG]
+          [1720506229.851] [3777:3779] [DMG]         ],
+          [1720506229.851] [3777:3779] [DMG]
+          [1720506229.851] [3777:3779] [DMG]         InteractionModelRevision = 11
+          [1720506229.851] [3777:3779] [DMG] }
+          [1720506229.851] [3777:3779] [TOO] Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 3702514815
+          [1720506229.851] [3777:3779] [TOO]   FabricSceneInfo: 1 entries
+          [1720506229.851] [3777:3779] [TOO]     [1]: {
+          [1720506229.852] [3777:3779] [TOO]       SceneCount: 0
+          [1720506229.852] [3777:3779] [TOO]       CurrentScene: 0
+          [1720506229.852] [3777:3779] [TOO]       CurrentGroup: 0
+          [1720506229.852] [3777:3779] [TOO]       SceneValid: FALSE
+          [1720506229.852] [3777:3779] [TOO]       RemainingCapacity: 7
+          [1720506229.852] [3777:3779] [TOO]       FabricIndex: 1
+          [1720506229.852] [3777:3779] [TOO]      }
       disabled: true
 
     - label:
@@ -275,52 +275,52 @@ tests:
       verification: |
           Verify that the DUT sends a report data for FabricSceneInfo after the MinIntervalFloor time; store the RemainingCapacity field from this fabric’s entry reported in FabricSceneInfo into RemainingCapacity and is equals to (MaxRemainingCapacity-1).
 
-          [1706764465.493922][4438:4440] CHIP:DMG: ReportDataMessage =
-          [1706764465.493926][4438:4440] CHIP:DMG: {
-          [1706764465.493928][4438:4440] CHIP:DMG:         SubscriptionId = 0xcd5a528f,
-          [1706764465.493931][4438:4440] CHIP:DMG:         AttributeReportIBs =
-          [1706764465.493937][4438:4440] CHIP:DMG:         [
-          [1706764465.493939][4438:4440] CHIP:DMG:                 AttributeReportIB =
-          [1706764465.493944][4438:4440] CHIP:DMG:                 {
-          [1706764465.493947][4438:4440] CHIP:DMG:                         AttributeDataIB =
-          [1706764465.493949][4438:4440] CHIP:DMG:                         {
-          [1706764465.493952][4438:4440] CHIP:DMG:                                 DataVersion = 0xec4c4ec0,
-          [1706764465.493955][4438:4440] CHIP:DMG:                                 AttributePathIB =
-          [1706764465.493958][4438:4440] CHIP:DMG:                                 {
-          [1706764465.493961][4438:4440] CHIP:DMG:                                         Endpoint = 0x1,
-          [1706764465.493963][4438:4440] CHIP:DMG:                                         Cluster = 0x62,
-          [1706764465.493966][4438:4440] CHIP:DMG:                                         Attribute = 0x0000_0002,
-          [1706764465.493969][4438:4440] CHIP:DMG:                                 }
-          [1706764465.493974][4438:4440] CHIP:DMG:
-          [1706764465.493979][4438:4440] CHIP:DMG:                                 Data = [
-          [1706764465.493985][4438:4440] CHIP:DMG:
-          [1706764465.493990][4438:4440] CHIP:DMG:                                         {
-          [1706764465.493997][4438:4440] CHIP:DMG:                                                 0x0 = 1,
-          [1706764465.494002][4438:4440] CHIP:DMG:                                                 0x1 = 1,
-          [1706764465.494007][4438:4440] CHIP:DMG:                                                 0x2 = 1,
-          [1706764465.494013][4438:4440] CHIP:DMG:                                                 0x3 = false,
-          [1706764465.494018][4438:4440] CHIP:DMG:                                                 0x4 = 6,
-          [1706764465.494023][4438:4440] CHIP:DMG:                                                 0xfe = 1,
-          [1706764465.494029][4438:4440] CHIP:DMG:                                         },
-          [1706764465.494034][4438:4440] CHIP:DMG:                                 ],
-          [1706764465.494038][4438:4440] CHIP:DMG:                         },
-          [1706764465.494047][4438:4440] CHIP:DMG:
-          [1706764465.494050][4438:4440] CHIP:DMG:                 },
-          [1706764465.494059][4438:4440] CHIP:DMG:
-          [1706764465.494062][4438:4440] CHIP:DMG:         ],
-          [1706764465.494070][4438:4440] CHIP:DMG:
-          [1706764465.494073][4438:4440] CHIP:DMG:         InteractionModelRevision = 11
-          [1706764465.494077][4438:4440] CHIP:DMG: }
-          [1706764465.494130][4438:4440] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 3964423872
-          [1706764465.494142][4438:4440] CHIP:TOO:   FabricSceneInfo: 1 entries
-          [1706764465.494152][4438:4440] CHIP:TOO:     [1]: {
-          [1706764465.494155][4438:4440] CHIP:TOO:       SceneCount: 1
-          [1706764465.494158][4438:4440] CHIP:TOO:       CurrentScene: 1
-          [1706764465.494161][4438:4440] CHIP:TOO:       CurrentGroup: 1
-          [1706764465.494164][4438:4440] CHIP:TOO:       SceneValid: FALSE
-          [1706764465.494167][4438:4440] CHIP:TOO:       RemainingCapacity: 6
-          [1706764465.494170][4438:4440] CHIP:TOO:       FabricIndex: 1
-          [1706764465.494174][4438:4440] CHIP:TOO:      }
+          [1720506650.012] [3835:3837] [DMG] ReportDataMessage =
+          [1720506650.012] [3835:3837] [DMG] {
+          [1720506650.012] [3835:3837] [DMG]         SubscriptionId = 0x8e3fb466,
+          [1720506650.012] [3835:3837] [DMG]         AttributeReportIBs =
+          [1720506650.012] [3835:3837] [DMG]         [
+          [1720506650.012] [3835:3837] [DMG]                 AttributeReportIB =
+          [1720506650.012] [3835:3837] [DMG]                 {
+          [1720506650.012] [3835:3837] [DMG]                         AttributeDataIB =
+          [1720506650.012] [3835:3837] [DMG]                         {
+          [1720506650.013] [3835:3837] [DMG]                                 DataVersion = 0xd2aec24e,
+          [1720506650.013] [3835:3837] [DMG]                                 AttributePathIB =
+          [1720506650.013] [3835:3837] [DMG]                                 {
+          [1720506650.013] [3835:3837] [DMG]                                         Endpoint = 0x1,
+          [1720506650.013] [3835:3837] [DMG]                                         Cluster = 0x62,
+          [1720506650.013] [3835:3837] [DMG]                                         Attribute = 0x0000_0002,
+          [1720506650.013] [3835:3837] [DMG]                                 }
+          [1720506650.013] [3835:3837] [DMG]
+          [1720506650.013] [3835:3837] [DMG]                                 Data = [
+          [1720506650.014] [3835:3837] [DMG]
+          [1720506650.014] [3835:3837] [DMG]                                         {
+          [1720506650.014] [3835:3837] [DMG]                                                 0x0 = 1 (unsigned),
+          [1720506650.014] [3835:3837] [DMG]                                                 0x1 = 0 (unsigned),
+          [1720506650.014] [3835:3837] [DMG]                                                 0x2 = 0 (unsigned),
+          [1720506650.014] [3835:3837] [DMG]                                                 0x3 = false,
+          [1720506650.014] [3835:3837] [DMG]                                                 0x4 = 6 (unsigned),
+          [1720506650.014] [3835:3837] [DMG]                                                 0xfe = 1 (unsigned),
+          [1720506650.014] [3835:3837] [DMG]                                         },
+          [1720506650.015] [3835:3837] [DMG]                                 ],
+          [1720506650.015] [3835:3837] [DMG]                         },
+          [1720506650.015] [3835:3837] [DMG]
+          [1720506650.015] [3835:3837] [DMG]                 },
+          [1720506650.015] [3835:3837] [DMG]
+          [1720506650.015] [3835:3837] [DMG]         ],
+          [1720506650.015] [3835:3837] [DMG]
+          [1720506650.015] [3835:3837] [DMG]         InteractionModelRevision = 11
+          [1720506650.015] [3835:3837] [DMG] }
+          [1720506650.016] [3835:3837] [TOO] Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 3534668366
+          [1720506650.016] [3835:3837] [TOO]   FabricSceneInfo: 1 entries
+          [1720506650.016] [3835:3837] [TOO]     [1]: {
+          [1720506650.016] [3835:3837] [TOO]       SceneCount: 1
+          [1720506650.016] [3835:3837] [TOO]       CurrentScene: 0
+          [1720506650.016] [3835:3837] [TOO]       CurrentGroup: 0
+          [1720506650.016] [3835:3837] [TOO]       SceneValid: FALSE
+          [1720506650.016] [3835:3837] [TOO]       RemainingCapacity: 6
+          [1720506650.016] [3835:3837] [TOO]       FabricIndex: 1
+          [1720506650.016] [3835:3837] [TOO]      }
       disabled: true
 
     - label:

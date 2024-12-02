@@ -20,10 +20,10 @@
 
 #import "MTRDeviceTestDelegate.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestKeys.h"
 #import "MTRTestResetCommissioneeHelper.h"
-#import "MTRTestServerAppRunner.h"
 #import "MTRTestStorage.h"
 
 // system dependencies
@@ -46,7 +46,7 @@
 
 #if ENABLE_OTA_TESTS
 
-static const uint16_t kPairingTimeoutInSeconds = 10;
+static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint16_t kTimeoutWithUpdateInSeconds = 60;
 static const uint64_t kDeviceId1 = 0x12341234;
@@ -80,7 +80,7 @@ static NSString * kUpdatedSoftwareVersionString_10 = @"10.0";
 - (MTRDevice *)commissionDeviceWithPayload:(NSString *)payloadString nodeID:(NSNumber *)nodeID;
 @end
 
-@interface MTROTARequestorAppRunner : MTRTestServerAppRunner
+@interface MTROTARequestorAppRunner : NSObject
 @property (nonatomic, copy) NSString * downloadFilePath;
 
 - (instancetype)initWithPayload:(NSString *)payload testcase:(MTROTAProviderTests *)testcase;
@@ -99,14 +99,15 @@ static NSString * kUpdatedSoftwareVersionString_10 = @"10.0";
 
 - (instancetype)initWithPayload:(NSString *)payload testcase:(MTROTAProviderTests *)testcase
 {
-    __auto_type * downloadFilePath = [NSString stringWithFormat:@"/tmp/chip-ota-requestor-downloaded-image%u", [MTRTestServerAppRunner nextUniqueIndex]];
+    __auto_type * downloadFilePath = [NSString stringWithFormat:@"/tmp/chip-ota-requestor-downloaded-image%u", [MTROTAProviderTests nextUniqueIndex]];
     __auto_type * extraArguments = @[
         @"--otaDownloadPath",
         downloadFilePath,
         @"--autoApplyImage",
     ];
 
-    if (!(self = [super initWithAppName:@"ota-requestor" arguments:extraArguments payload:payload testcase:testcase])) {
+    BOOL started = [testcase startAppWithName:@"ota-requestor" arguments:extraArguments payload:payload];
+    if (!started) {
         return nil;
     }
 

@@ -55,9 +55,10 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x050D" name="Device Energy Management" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x050D" name="Device Energy Management" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Updated description of when DEM Mode is to be included"/>
   </revisionHistory>
   <classification class="utility" scope="endpoint"/>
   <clusters>
@@ -66,11 +67,21 @@ Davis, CA 95616, USA
         <provisionalConform/>
         <mandatoryConform/>
       </otherwiseConform>
+      <features>
+        <feature code="" name="PowerAdjustment"/>
+        <feature code="" name="StartTimeAdjustment"/>
+        <feature code="" name="Pausable"/>
+        <feature code="" name="ForecastAdjustment"/>
+        <feature code="" name="ConstraintBasedAdjustment"/>
+      </features>
     </cluster>
     <cluster id="0x009F" name="Device Energy Management Mode" side="server">
       <otherwiseConform>
         <provisionalConform/>
-        <mandatoryConform/>
+        <mandatoryConform>
+          <attribute name="ControllableESA"/>
+        </mandatoryConform>
+        <optionalConform/>
       </otherwiseConform>
     </cluster>
   </clusters>

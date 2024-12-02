@@ -31,6 +31,7 @@
 #include <examples/platform/cc13x4_26x4/CC13X4_26X4DeviceAttestationCreds.h>
 
 #include <app/EventLogging.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 
@@ -55,6 +56,10 @@
 
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+#include "app/icd/server/ICDNotifier.h"
+#endif
 
 /* syscfg */
 #include <ti_drivers_config.h>
@@ -305,6 +310,7 @@ int AppTask::Init()
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance();
 
     chip::Server::GetInstance().Init(initParams);
 
@@ -460,6 +466,12 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
             {
                 PumpMgr().InitiateAction(0, PumpManager::START_ACTION);
             }
+        }
+        else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
+        {
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+            PlatformMgr().ScheduleWork([](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+#endif
         }
         break;
 
