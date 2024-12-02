@@ -85,7 +85,8 @@ def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event)
                     break
                 f_out.write(line)
                 f_out.flush()
-    os.unlink(path)
+    with contextlib.suppress(OSError):
+        os.unlink(path)
 
 
 @click.command()
@@ -240,6 +241,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_process.terminate()
         app_stdin_forwarding_stop_event.set()
         app_exit_code = app_process.returncode
+        forwarding_thread.join()
 
     # We expect both app and test script should exit with 0
     exit_code = test_script_exit_code or app_exit_code
