@@ -152,6 +152,7 @@ ReadHandler::~ReadHandler()
     auto * appCallback = mManagementCallback.GetAppCallback();
     if (mFlags.Has(ReadHandlerFlags::ActiveSubscription) && appCallback)
     {
+        mFlags.Clear(ReadHandlerFlags::ActiveSubscription);
         appCallback->OnSubscriptionTerminated(*this);
     }
 

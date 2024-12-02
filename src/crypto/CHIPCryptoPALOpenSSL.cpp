@@ -479,11 +479,13 @@ bool Hash_SHA256_stream::IsInitialized()
     EVP_MD_CTX * mdctx = to_inner_hash_evp_md_ctx(&mContext);
     VerifyOrReturnValue(mdctx != nullptr, false);
 
-// Verify that the EVP_MD_CTX is initialized to SHA256 (ensures that EVP_DigestInit_ex was called)
-#if CHIP_CRYPTO_BORINGSSL
+// Verify that the EVP_MD_CTX is initialized to SHA256 (ensures that EVP_DigestInit_ex was successfully called).
+// The legacy API EVP_MD_CTX_md() to check SHA256 initialization is deprecated in OpenSSL 3.0
+// and was replaced by EVP_MD_CTX_get0_md().
+// OpenSSL 1.1.1, which BoringSSL also uses at the time of this comment, does not support the newer replacement API.
+#if CHIP_CRYPTO_BORINGSSL || (defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x30000000L)
     return EVP_MD_CTX_md(mdctx) == _digestForType(DigestType::SHA256);
 #else
-    // EVP_MD_CTX_md() was Deprecated in OPENSSL 3.0; However, BoringSSL does not support EVP_MD_CTX_get0_md() yet
     return EVP_MD_CTX_get0_md(mdctx) == _digestForType(DigestType::SHA256);
 #endif
 }

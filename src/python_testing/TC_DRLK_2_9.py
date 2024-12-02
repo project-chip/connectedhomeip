@@ -379,7 +379,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.maxrfidcodelength = None
         self.minrfidcodelength = None
 
-        self.endpoint = self.user_params.get("endpoint", 1)
+        self.endpoint = self.get_endpoint(default=1)
         print("endpoint", self.endpoint)
 
         # Aliro Keys for setting Aliro configuration and credential

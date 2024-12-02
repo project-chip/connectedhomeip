@@ -31,7 +31,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
-#       --endpoint 1
+#       --endpoint 2
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -71,7 +71,7 @@ class TC_WHM_1_2(MatterBaseTest):
     @async_test_body
     async def test_TC_WHM_1_2(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint(default=1)
 
         attributes = Clusters.WaterHeaterMode.Attributes
 
