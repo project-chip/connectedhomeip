@@ -204,7 +204,8 @@ public:
     Timer * Create(Layer & systemLayer, System::Clock::Timestamp awakenTime, TimerCompleteCallback onComplete, void * appState)
     {
         Timer * timer = mTimerPool.CreateObject(systemLayer, awakenTime, onComplete, appState);
-        if (timer != nullptr) {
+        if (timer != nullptr)
+        {
             SYSTEM_STATS_INCREMENT(Stats::kSystemLayer_NumTimers);
         }
 
