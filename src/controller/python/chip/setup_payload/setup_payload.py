@@ -43,15 +43,15 @@ class SetupPayload:
         self.vendor_attribute_visitor = SetupPayload.VendorAttributeVisitor(
             AddVendorAttribute)
 
-    def GenerateQrCode(self, passcode:int, vendorId:int = 0xFFF1, productId:int = 0x8001, discriminator:int = 3840,
-                       customFlow:int = 0, capabilities:int = 4, version:int = 0) -> str:
+    def GenerateQrCode(self, passcode: int, vendorId: int = 0xFFF1, productId: int = 0x8001, discriminator: int = 3840,
+                       customFlow: int = 0, capabilities: int = 4, version: int = 0) -> str:
         buffer = create_string_buffer(256)
         self.chipLib.pychip_SetupPayload_GenerateQrCode(buffer, 256, passcode, vendorId, productId,
                                                         discriminator, customFlow, capabilities, version).raise_on_error()
         return buffer.value.decode()
 
-    def GenerateManualPairingCode(self, passcode:int, vendorId:int = 0xFFF1, productId:int = 0x8001, discriminator:int = 3840,
-                                  customFlow:int = 0, capabilities:int = 4, version:int = 0) -> str:
+    def GenerateManualPairingCode(self, passcode: int, vendorId: int = 0xFFF1, productId: int = 0x8001, discriminator: int = 3840,
+                                  customFlow: int = 0, capabilities: int = 4, version: int = 0) -> str:
         buffer = create_string_buffer(256)
         self.chipLib.pychip_SetupPayload_GenerateManualPairingCode(buffer, 256, passcode, vendorId, productId,
                                                                    discriminator, customFlow, capabilities, version).raise_on_error()
