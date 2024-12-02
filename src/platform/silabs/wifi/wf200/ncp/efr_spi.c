@@ -32,7 +32,7 @@
 #include "sl_wfx_host_api.h"
 #include "sl_wfx_task.h"
 #include "spidrv.h"
-#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -437,8 +437,6 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 #endif // SL_SPICTRL_MUX
     return SL_STATUS_OK;
 }
-#else
-#error still not working
 #endif // SL_LCDCTRL_MUX
 
 #if SL_UARTCTRL_MUX

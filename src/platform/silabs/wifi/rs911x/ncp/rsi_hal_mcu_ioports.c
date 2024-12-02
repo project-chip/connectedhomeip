@@ -15,10 +15,7 @@
  *    limitations under the License.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "FreeRTOS.h"
 #include "dmadrv.h"
 #include "em_chip.h"
 #include "em_cmu.h"
@@ -27,16 +24,17 @@
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "em_usart.h"
-#include "gpiointerrupt.h"
-#include "sl_device_init_clocks.h"
-#include "sl_status.h"
-
-#include "FreeRTOS.h"
 #include "event_groups.h"
-#include "task.h"
-
+#include "gpiointerrupt.h"
 #include "rsi_board_configuration.h"
 #include "rsi_driver.h"
+#include "sl_device_init_clocks.h"
+#include "sl_status.h"
+#include "task.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 /*===========================================================*/
 /**
  * @fn            void rsi_hal_config_gpio(uint8_t gpio_number,uint8_t mode,uint8_t value)

@@ -21,24 +21,16 @@
  * devices such as External Flash and LCD.
  * That can be extended to other families as well.
  */
-#ifndef SL_SI91X_NCP_UTILITY_H
-#define SL_SI91X_NCP_UTILITY_H
-
 #pragma once
+
 #include "FreeRTOS.h"
+#include "em_usart.h"
 #include "semphr.h"
 #include "silabs_utils.h"
-#include "sl_status.h"
-
-// TODO: This is a WF200 specific include. It is not clear why we need this in the 917 NCP files.
-#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
-
-#if defined(CHIP_9117)
-#include "em_usart.h"
-#include "sl_board_configuration_SiWx917.h"
 #include "sl_spidrv_exp_config.h"
-
-#endif // CHIP_9117
+#include "sl_status.h"
+#include <platform/silabs/wifi/SiWx/ncp/sl_board_configuration.h>
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 
 #define USART_INITSYNC_BAUDRATE 12500000
 
@@ -48,4 +40,3 @@ sl_status_t spi_board_init(void);
 
 extern uint32_t rx_ldma_channel;
 extern uint32_t tx_ldma_channel;
-#endif // SL_SI91X_NCP_UTILITY_H

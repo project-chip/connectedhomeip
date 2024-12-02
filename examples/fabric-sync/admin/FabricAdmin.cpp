@@ -35,15 +35,6 @@ FabricAdmin FabricAdmin::sInstance;
 app::DefaultICDClientStorage FabricAdmin::sICDClientStorage;
 app::CheckInHandler FabricAdmin::sCheckInHandler;
 
-FabricAdmin & FabricAdmin::Instance()
-{
-    if (!sInstance.mInitialized)
-    {
-        VerifyOrDie(sInstance.Init() == CHIP_NO_ERROR);
-    }
-    return sInstance;
-}
-
 CHIP_ERROR FabricAdmin::Init()
 {
     IcdManager::Instance().SetDelegate(&sInstance);
@@ -53,10 +44,12 @@ CHIP_ERROR FabricAdmin::Init()
     auto engine = chip::app::InteractionModelEngine::GetInstance();
     VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnLogErrorOnFailure(IcdManager::Instance().Init(&sICDClientStorage, engine));
-    ReturnLogErrorOnFailure(sCheckInHandler.Init(Controller::DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                                 &sICDClientStorage, &IcdManager::Instance(), engine));
 
-    mInitialized = true;
+    auto exchangeMgr = Controller::DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr();
+    VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnLogErrorOnFailure(sCheckInHandler.Init(exchangeMgr, &sICDClientStorage, &IcdManager::Instance(), engine));
+
+    ReturnLogErrorOnFailure(PairingManager::Instance().Init(GetDeviceCommissioner()));
 
     return CHIP_NO_ERROR;
 }

@@ -34,7 +34,7 @@
 #include "sl_status.h"
 #include "spidrv.h"
 #include "task.h"
-#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 
 #ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
