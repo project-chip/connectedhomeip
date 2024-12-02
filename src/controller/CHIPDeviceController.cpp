@@ -2211,7 +2211,13 @@ void DeviceCommissioner::OnDone(app::ReadClient * readClient)
 }
 
 namespace {
-// Helper for grouping attribute paths into read interactions
+// Helper for grouping attribute paths into read interactions in ContinueReadingCommissioningInfo()
+// below. The logic generates a sequence of calls to AddAttributePath(), stopping when the capacity
+// of the builder is exceeded. When creating subsequent read requests, the same sequence of calls
+// is generated again, but the builder will skip however many attributes were already read in
+// previous requests. This makes it easy to have logic that conditionally reads attributes, without
+// needing to write manual code to work out where subsequent reads need to resume -- the logic that
+// decides which attributes to read simply needs to be repeatable / deterministic.
 class ReadInteractionBuilder
 {
     static constexpr auto kCapacity = InteractionModelEngine::kMinSupportedPathsPerReadRequest;
