@@ -72,8 +72,8 @@ class TC_SEAR_1_6(MatterBaseTest):
         return progress
 
     def TC_SEAR_1_6(self) -> list[str]:
-        return ["SEAR.S", "SEAR.S.M.HAS_MANUAL_OPERATING_STATE_CONTROL"]
-
+        return ["SEAR.S", "SEAR.S.A0005", "SEAR.S.A0000", "SEAR.S.A0002", "SEAR.S.M.HAS_MANUAL_OPERATING_STATE_CONTROL"]
+    
     @async_test_body
     async def test_TC_SEAR_1_6(self):
         self.endpoint = self.matter_test_config.endpoint
