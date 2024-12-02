@@ -46,17 +46,12 @@
 #include <zephyr/sys/util.h>
 
 extern "C" {
-
-#ifdef CONFIG_BT_B9X
-
+#if defined(CONFIG_BT_B9X)
 extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t * bt_mac);
-/**
- * @brief bt mac initialization
- */
-__attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac)
-{
-    b9x_bt_blc_mac_init(bt_mac);
-}
+#elif defined(CONFIG_BT_TLX)
+extern __attribute__((noinline)) int tlx_bt_blc_mac_init(uint8_t * bt_mac);
+#elif defined(CONFIG_BT_W91)
+extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
 #endif
 }
 
@@ -128,7 +123,13 @@ CHIP_ERROR InitBLEMACAddress()
     int error = 0;
     bt_addr_le_t addr;
 
+#if defined(CONFIG_BT_B9X)
+    b9x_bt_blc_mac_init(addr.a.val);
+#elif defined(CONFIG_BT_TLX)
+    tlx_bt_blc_mac_init(addr.a.val);
+#elif defined(CONFIG_BT_W91)
     telink_bt_blc_mac_init(addr.a.val);
+#endif
 
     if (BT_ADDR_IS_STATIC(&addr.a)) // in case of Random static address, create a new id
     {
