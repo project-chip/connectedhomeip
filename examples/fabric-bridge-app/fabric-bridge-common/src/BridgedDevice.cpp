@@ -24,78 +24,33 @@
 #include <app/reporting/reporting.h>
 #include <platform/CHIPDeviceLayer.h>
 
-namespace {
-
-struct ActiveChangeEventWorkData
-{
-    chip::EndpointId mEndpointId;
-    uint32_t mPromisedActiveDuration;
-};
-
-struct ReportAttributeChangedWorkData
-{
-    chip::EndpointId mEndpointId;
-    bool mWindowChanged      = false;
-    bool mFabricIndexChanged = false;
-    bool mVendorChanged      = false;
-};
-
-void ActiveChangeEventWork(intptr_t arg)
-{
-    ActiveChangeEventWorkData * data = reinterpret_cast<ActiveChangeEventWorkData *>(arg);
-
-    chip::app::Clusters::BridgedDeviceBasicInformation::Events::ActiveChanged::Type event{};
-    event.promisedActiveDuration  = data->mPromisedActiveDuration;
-    chip::EventNumber eventNumber = 0;
-
-    CHIP_ERROR err = chip::app::LogEvent(event, data->mEndpointId, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(NotSpecified, "LogEvent for ActiveChanged failed %s", err.AsString());
-    }
-    chip::Platform::Delete(data);
-}
-
-void ReportAttributeChangedWork(intptr_t arg)
-{
-    ReportAttributeChangedWorkData * data = reinterpret_cast<ReportAttributeChangedWorkData *>(arg);
-
-    if (data->mWindowChanged)
-    {
-        MatterReportingAttributeChangeCallback(data->mEndpointId, chip::app::Clusters::AdministratorCommissioning::Id,
-                                               chip::app::Clusters::AdministratorCommissioning::Attributes::WindowStatus::Id);
-    }
-    if (data->mFabricIndexChanged)
-    {
-        MatterReportingAttributeChangeCallback(data->mEndpointId, chip::app::Clusters::AdministratorCommissioning::Id,
-                                               chip::app::Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::Id);
-    }
-    if (data->mVendorChanged)
-    {
-        MatterReportingAttributeChangeCallback(data->mEndpointId, chip::app::Clusters::AdministratorCommissioning::Id,
-                                               chip::app::Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id);
-    }
-    chip::Platform::Delete(data);
-}
-
-} // namespace
-
+using namespace chip;
 using namespace chip::app::Clusters::Actions;
 
-BridgedDevice::BridgedDevice(chip::NodeId nodeId)
+namespace bridge {
+
+BridgedDevice::BridgedDevice(ScopedNodeId scopedNodeId)
 {
-    mReachable  = false;
-    mNodeId     = nodeId;
-    mEndpointId = chip::kInvalidEndpointId;
+    mReachable    = false;
+    mScopedNodeId = scopedNodeId;
+    mEndpointId   = kInvalidEndpointId;
 }
 
 void BridgedDevice::LogActiveChangeEvent(uint32_t promisedActiveDurationMs)
 {
-    ActiveChangeEventWorkData * workdata = chip::Platform::New<ActiveChangeEventWorkData>();
-    workdata->mEndpointId                = mEndpointId;
-    workdata->mPromisedActiveDuration    = promisedActiveDurationMs;
+    EndpointId endpointId = mEndpointId;
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(ActiveChangeEventWork, reinterpret_cast<intptr_t>(workdata));
+    DeviceLayer::SystemLayer().ScheduleLambda([endpointId, promisedActiveDurationMs]() {
+        app::Clusters::BridgedDeviceBasicInformation::Events::ActiveChanged::Type event{};
+        event.promisedActiveDuration = promisedActiveDurationMs;
+        EventNumber eventNumber      = 0;
+
+        CHIP_ERROR err = app::LogEvent(event, endpointId, eventNumber);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NotSpecified, "LogEvent for ActiveChanged failed %s", err.AsString());
+        }
+    });
 }
 
 void BridgedDevice::SetReachable(bool reachable)
@@ -112,17 +67,56 @@ void BridgedDevice::SetReachable(bool reachable)
     }
 }
 
+void BridgedDevice::ReachableChanged(bool reachable)
+{
+    EndpointId endpointId = mEndpointId;
+    bool reachableChanged = (mReachable != reachable);
+    if (reachableChanged)
+    {
+        SetReachable(reachable);
+        DeviceLayer::SystemLayer().ScheduleLambda([endpointId]() {
+            MatterReportingAttributeChangeCallback(endpointId, app::Clusters::BridgedDeviceBasicInformation::Id,
+                                                   app::Clusters::BridgedDeviceBasicInformation::Attributes::Reachable::Id);
+
+            app::Clusters::BridgedDeviceBasicInformation::Events::ReachableChanged::Type event{};
+            EventNumber eventNumber = 0;
+
+            CHIP_ERROR err = app::LogEvent(event, endpointId, eventNumber);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogProgress(NotSpecified, "LogEvent for ActiveChanged failed %s", err.AsString());
+            }
+        });
+    }
+}
+
 void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttributes & aAdminCommissioningAttributes)
 {
-    ReportAttributeChangedWorkData * workdata = chip::Platform::New<ReportAttributeChangedWorkData>();
-
-    workdata->mEndpointId = mEndpointId;
-    workdata->mWindowChanged =
+    EndpointId endpointId = mEndpointId;
+    bool windowChanged =
         (aAdminCommissioningAttributes.commissioningWindowStatus != mAdminCommissioningAttributes.commissioningWindowStatus);
-    workdata->mFabricIndexChanged =
-        (aAdminCommissioningAttributes.openerFabricIndex != mAdminCommissioningAttributes.openerFabricIndex);
-    workdata->mVendorChanged = (aAdminCommissioningAttributes.openerVendorId != mAdminCommissioningAttributes.openerVendorId);
+    bool fabricIndexChanged = (aAdminCommissioningAttributes.openerFabricIndex != mAdminCommissioningAttributes.openerFabricIndex);
+    bool vendorChanged      = (aAdminCommissioningAttributes.openerVendorId != mAdminCommissioningAttributes.openerVendorId);
 
     mAdminCommissioningAttributes = aAdminCommissioningAttributes;
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(ReportAttributeChangedWork, reinterpret_cast<intptr_t>(workdata));
+
+    DeviceLayer::SystemLayer().ScheduleLambda([endpointId, windowChanged, fabricIndexChanged, vendorChanged]() {
+        if (windowChanged)
+        {
+            MatterReportingAttributeChangeCallback(endpointId, app::Clusters::AdministratorCommissioning::Id,
+                                                   app::Clusters::AdministratorCommissioning::Attributes::WindowStatus::Id);
+        }
+        if (fabricIndexChanged)
+        {
+            MatterReportingAttributeChangeCallback(endpointId, app::Clusters::AdministratorCommissioning::Id,
+                                                   app::Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::Id);
+        }
+        if (vendorChanged)
+        {
+            MatterReportingAttributeChangeCallback(endpointId, app::Clusters::AdministratorCommissioning::Id,
+                                                   app::Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id);
+        }
+    });
 }
+
+} // namespace bridge

@@ -154,12 +154,24 @@ source_set("thread-border-router-management-test-srcs") {
   ]
 }
 
+source_set("ecosystem-information-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.cpp",
+    "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 source_set("app-test-stubs") {
   sources = [
     "test-ember-api.cpp",
     "test-ember-api.h",
 
-    # The overrides in these files are overrides from ember-compatibility-functions
+    # The overrides in these files are overrides from ember generated code
     # and the data model interface is NOT aware of such functionality
     #
     # TODO: ideally tests should have been written via mock ember, however mock ember did
@@ -168,8 +180,6 @@ source_set("app-test-stubs") {
     "test-interaction-model-api.cpp",
     "test-interaction-model-api.h",
   ]
-
-  public_configs = [ "${chip_root}/src/lib/support/pw_log_chip:config" ]
 
   public_deps = [
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
@@ -188,12 +198,12 @@ chip_test_suite("tests") {
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
     "TestAttributePathParams.cpp",
-    "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
+    "TestCheckInHandler.cpp",
     "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -201,6 +211,7 @@ chip_test_suite("tests") {
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
     "TestDefaultThreadNetworkDirectoryStorage.cpp",
+    "TestEcosystemInformationCluster.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
@@ -228,6 +239,7 @@ chip_test_suite("tests") {
   public_deps = [
     ":app-test-stubs",
     ":binding-test-srcs",
+    ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":power-cluster-test-srcs",
@@ -236,6 +248,8 @@ chip_test_suite("tests") {
     "${chip_root}/src/app",
     "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
@@ -291,10 +305,9 @@ chip_test_suite("tests") {
     test_sources += [ "TestClusterStateCache.cpp" ]
   }
 
-  # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available, so
-  # TestEventLogging.cpp would be testing the same thing as
-  # TestEventLoggingNoUTCTime, but it's not set up to deal with the timestamps
-  # being that low.
+  # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available,
+  # so TestEventLogging.cpp would be testing the same thing as TestEventLoggingNoUTCTime,
+  # but it's not set up to deal with the timestamps being that low.
   if (chip_device_platform != "nrfconnect" &&
       chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]

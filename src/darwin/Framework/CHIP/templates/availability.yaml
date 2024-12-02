@@ -9682,8 +9682,12 @@
                   - Presets
                   - MatterScheduleConfiguration
 
-- release: "Future"
-  versions: "future"
+- release: "6C44AB2F-2F6B-4B57-B523-5CD89584986F"
+  versions:
+      iOS: "18.2"
+      macOS: "15.2"
+      watchOS: "11.2"
+      tvOS: "18.2"
   introduced:
       enums:
           ColorControl:
@@ -9742,6 +9746,73 @@
                   - UpdateDirection
                   - UpdateTime
                   - UpdateStartHue
+      device types:
+          - AirQualitySensor
+          - AirPurifier
+          - Aggregator
+          - BasicVideoPlayer
+          - BridgedNode
+          - CastingVideoClient
+          - CastingVideoPlayer
+          - ColorDimmerSwitch
+          - ColorTemperatureLight
+          - ContactSensor
+          - ContentApp
+          - ControlBridge
+          - CookSurface
+          - Cooktop
+          - DeviceEnergyManagement
+          - DimmableLight
+          - DimmablePlugInUnit
+          - DimmerSwitch
+          - Dishwasher
+          - DoorLock
+          - DoorLockController
+          - ElectricalSensor
+          - EVSE
+          - ExtendedColorLight
+          - ExtractorHood
+          - Fan
+          - FlowSensor
+          - GenericSwitch
+          - HeatingCoolingUnit
+          - HumiditySensor
+          - LaundryDryer
+          - LaundryWasher
+          - LightSensor
+          - MicrowaveOven
+          - ModeSelect
+          - NetworkInfrastructureManager
+          - OccupancySensor
+          - OnOffLight
+          - OnOffLightSwitch
+          - OnOffPlugInUnit
+          - OnOffSensor
+          - OTAProvider
+          - OTARequestor
+          - Oven
+          - PressureSensor
+          - PowerSource
+          - Pump
+          - PumpController
+          - RainSensor
+          - Refrigerator
+          - RoboticVacuumCleaner
+          - RoomAirConditioner
+          - RootNode
+          - SecondaryNetworkInterface
+          - SmokeCOAlarm
+          - Speaker
+          - TemperatureControlledCabinet
+          - TemperatureSensor
+          - Thermostat
+          - ThreadBorderRouter
+          - VideoRemoteControl
+          - WaterFreezeDetector
+          - WaterLeakDetector
+          - WaterValve
+          - WindowCovering
+          - WindowCoveringController
   provisional:
       clusters:
           # Targeting 1.4
@@ -9753,6 +9824,12 @@
           - WaterHeaterManagement
           - WaterHeaterMode
           - WiFiNetworkManagement
+          # Targeting Camera enablement
+          - CameraAVStreamManagement
+          - Chime
+          - WebRTCTransportProvider
+          - WebRTCTransportRequestor
+          - ZoneManagement
       attributes:
           AccessControl:
               # Targeting 1.4
@@ -9767,6 +9844,7 @@
               - TCMinRequiredVersion
               - TCAcknowledgements
               - TCAcknowledgementsRequired
+              - TCUpdateDeadline
           OccupancySensing:
               # Targeting 1.4
               - HoldTime
@@ -9778,6 +9856,8 @@
               - GlobalStruct
               - NullableGlobalEnum
               - NullableGlobalStruct
+              - ReadFailureCode
+              - FailureInt32U
       commands:
           AccessControl:
               # Targeting 1.4
@@ -9801,6 +9881,10 @@
               - GlobalEchoResponse
               - StringEchoRequest
               - StringEchoResponse
+      command fields:
+          DoorLock:
+              GetCredentialStatusResponse:
+                  - credentialData
       structs:
           AccessControl:
               # Targeting 1.4
@@ -9849,6 +9933,8 @@
               - LandmarkTag
               - PositionTag
               - RelativePositionTag
+              # Targeting Camera enablement
+              - ThreeLevelAutoEnum
       enum values:
           ApplicationLauncher:
               StatusEnum:
@@ -9862,6 +9948,44 @@
                   - RequiredTCNotAccepted
                   - TCAcknowledgementsNotReceived
                   - TCMinVersionNotMet
+          RVCCleanMode:
+              # Not clear whether these will stay in the XML
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Vacation
+          RVCOperationalState:
+              # Not clear whether these will stay in the XML
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
+          RVCRunMode:
+              # Not clear whether these will stay in the XML
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Vacation
       bitmaps:
           AccessControl:
               # Targeting 1.4
@@ -9937,6 +10061,11 @@
               - ColorCapabilities
               - ColorLoopUpdateFlags
   removed:
+      clusters:
+          - BarrierControl
+          - BinaryInputBasic
+          - ElectricalMeasurement
+          - OnOffSwitchConfiguration
       enum values:
           ColorControl:
               # Don't expose the new value names on the old enum names
@@ -9952,3 +10081,12 @@
                   - ColorLoop
                   - XY
                   - ColorTemperature
+
+- release: "Future"
+  versions: "future"
+  provisional:
+      device types:
+          - BatteryStorage
+          - HeatPump
+          - SolarPower
+          - WaterHeater

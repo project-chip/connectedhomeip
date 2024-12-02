@@ -45,6 +45,8 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
+namespace bridge {
+
 namespace {
 
 constexpr uint8_t kMaxRetries      = 10;
@@ -57,6 +59,8 @@ constexpr int kSoftwareVersionSize = 64;
 
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 constexpr int kDescriptorAttributeArraySize = 254;
+
+#define ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION (1u)
 
 // ENDPOINT DEFINITIONS:
 // =================================================================================
@@ -125,6 +129,7 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(AdministratorCommissioningAttrs)
   DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::WindowStatus::Id, ENUM8, 1, 0),
   DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::AdminFabricIndex::Id, FABRIC_IDX, 1, 0),
   DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::AdminVendorId::Id, VENDOR_ID, 2, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::ClusterRevision::Id, INT16U, ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION, 0),
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 // clang-format on
 
@@ -171,9 +176,6 @@ const EmberAfDeviceType sBridgedDeviceTypes[] = { { DEVICE_TYPE_BRIDGED_NODE, DE
 
 } // namespace
 
-// Define the static member
-BridgedDeviceManager BridgedDeviceManager::sInstance;
-
 void BridgedDeviceManager::Init()
 {
     mFirstDynamicEndpointId = static_cast<chip::EndpointId>(
@@ -217,8 +219,9 @@ std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
                 emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
             if (err == CHIP_NO_ERROR)
             {
-                ChipLogProgress(NotSpecified, "Added device with nodeId=0x" ChipLogFormatX64 " to dynamic endpoint %d (index=%d)",
-                                ChipLogValueX64(dev->GetNodeId()), mCurrentEndpointId, index);
+                ChipLogProgress(NotSpecified, "Added device with Id=[%d:0x" ChipLogFormatX64 "] to dynamic endpoint %d (index=%d)",
+                                dev->GetScopedNodeId().GetFabricIndex(), ChipLogValueX64(dev->GetScopedNodeId().GetNodeId()),
+                                mCurrentEndpointId, index);
                 mDevices[index] = std::move(dev);
                 return index;
             }
@@ -311,11 +314,11 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByUniqueId(const std::string & id
     return nullptr;
 }
 
-BridgedDevice * BridgedDeviceManager::GetDeviceByNodeId(chip::NodeId nodeId) const
+BridgedDevice * BridgedDeviceManager::GetDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId) const
 {
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
-        if (mDevices[index] && mDevices[index]->GetNodeId() == nodeId)
+        if (mDevices[index] && mDevices[index]->GetScopedNodeId() == scopedNodeId)
         {
             return mDevices[index].get();
         }
@@ -323,19 +326,21 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByNodeId(chip::NodeId nodeId) con
     return nullptr;
 }
 
-std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByNodeId(chip::NodeId nodeId)
+std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId)
 {
     for (unsigned index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
-        if (mDevices[index] && mDevices[index]->GetNodeId() == nodeId)
+        if (mDevices[index] && mDevices[index]->GetScopedNodeId() == scopedNodeId)
         {
             DeviceLayer::StackLock lock;
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
             mDevices[index] = nullptr;
-            ChipLogProgress(NotSpecified, "Removed device with NodeId=0x" ChipLogFormatX64 " from dynamic endpoint %d (index=%d)",
-                            ChipLogValueX64(nodeId), ep, index);
+            ChipLogProgress(NotSpecified, "Removed device with Id=[%d:0x" ChipLogFormatX64 "] from dynamic endpoint %d (index=%d)",
+                            scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()), ep, index);
             return index;
         }
     }
     return std::nullopt;
 }
+
+} // namespace bridge

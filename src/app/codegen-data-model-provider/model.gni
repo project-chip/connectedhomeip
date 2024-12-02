@@ -29,6 +29,8 @@ codegen_data_model_SOURCES = [
   "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider.h",
   "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider_Read.cpp",
   "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider_Write.cpp",
+  "${chip_root}/src/app/codegen-data-model-provider/EmberAttributeDataBuffer.cpp",
+  "${chip_root}/src/app/codegen-data-model-provider/EmberAttributeDataBuffer.h",
   "${chip_root}/src/app/codegen-data-model-provider/EmberMetadata.cpp",
   "${chip_root}/src/app/codegen-data-model-provider/EmberMetadata.h",
   "${chip_root}/src/app/codegen-data-model-provider/Instance.cpp",

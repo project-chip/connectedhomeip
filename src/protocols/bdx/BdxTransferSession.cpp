@@ -134,6 +134,11 @@ void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp c
     mPendingOutput = OutputEventType::kNone;
 }
 
+void TransferSession::GetNextAction(OutputEvent & event)
+{
+    PollOutput(event, System::SystemClock().GetMonotonicTimestamp());
+}
+
 CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitData & initData, System::Clock::Timeout timeout)
 {
     VerifyOrReturnError(mState == TransferState::kUnitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -554,8 +559,8 @@ void TransferSession::HandleTransferInit(MessageType msgType, System::PacketBuff
     VerifyOrReturn(err == CHIP_NO_ERROR, PrepareStatusReport(StatusCode::kBadMessageContents));
 
     ResolveTransferControlOptions(transferInit.TransferCtlOptions);
-    mTransferVersion      = ::chip::min(kBdxVersion, transferInit.Version);
-    mTransferMaxBlockSize = ::chip::min(mMaxSupportedBlockSize, transferInit.MaxBlockSize);
+    mTransferVersion      = std::min(kBdxVersion, transferInit.Version);
+    mTransferMaxBlockSize = std::min(mMaxSupportedBlockSize, transferInit.MaxBlockSize);
 
     // Accept for now, they may be changed or rejected by the peer if this is a ReceiveInit
     mStartOffset    = transferInit.StartOffset;
@@ -911,6 +916,11 @@ bool TransferSession::IsTransferLengthDefinite() const
 }
 
 const char * TransferSession::OutputEvent::ToString(OutputEventType outputEventType)
+{
+    return TypeToString(outputEventType);
+}
+
+const char * TransferSession::OutputEvent::TypeToString(OutputEventType outputEventType)
 {
     switch (outputEventType)
     {

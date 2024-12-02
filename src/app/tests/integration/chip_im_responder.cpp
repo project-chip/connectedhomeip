@@ -25,6 +25,7 @@
  */
 
 #include "MockEvents.h"
+#include "common.h"
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
@@ -69,35 +70,20 @@ public:
 
 } // namespace
 
-Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
-{
-    // The Mock cluster catalog -- only have one command on one cluster on one endpoint.
-    using Protocols::InteractionModel::Status;
-
-    if (aCommandPath.mEndpointId != kTestEndpointId)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-
-    if (aCommandPath.mClusterId != kTestClusterId)
-    {
-        return Status::UnsupportedCluster;
-    }
-
-    if (aCommandPath.mCommandId != kTestCommandId)
-    {
-        return Status::UnsupportedCommand;
-    }
-
-    return Status::Success;
-}
+// TODO:
+//   The overrides here do NOT provide a consistent data model view:
+//   This should be overriden with a Mock data model if using direct ember and
+//   CodegenDataModel OR a custom DataModel::Provider should be written
+//
+//   We cannot just say "every attribut exist, every device on every endpoint exists,
+//   every data version compare is the same etc.".
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
 {
     static bool statusCodeFlipper = false;
 
-    if (ServerClusterCommandExists(aRequestCommandPath) != Protocols::InteractionModel::Status::Success)
+    if (aRequestCommandPath != ConcreteCommandPath(kTestEndpointId, kTestClusterId, kTestCommandId))
     {
         return;
     }
@@ -127,49 +113,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
         apCommandObj->AddResponse(path, kTestCommandId, testData);
     }
     statusCodeFlipper = !statusCodeFlipper;
-}
-
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeEncodeState * apEncoderState)
-{
-    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0).Encode(kTestFieldValue1);
-}
-
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return true;
-}
-
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
-{
-    // Note: This test does not make use of the real attribute metadata.
-    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint32_t(0)) };
-    return &stub;
-}
-
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ConcreteDataAttributePath attributePath(2, 3, 4);
-    err = apWriteHandler->AddStatus(attributePath, Protocols::InteractionModel::Status::Success);
-    return err;
-}
-
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    return true;
-}
-
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-{
-    return false;
 }
 
 } // namespace app

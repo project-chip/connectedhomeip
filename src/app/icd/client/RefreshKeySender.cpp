@@ -80,13 +80,14 @@ CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager
     registerClientCommand.checkInNodeID    = mICDClientInfo.check_in_node.GetNodeId();
     registerClientCommand.monitoredSubject = mICDClientInfo.monitored_subject;
     registerClientCommand.key              = mNewKey.Span();
+    registerClientCommand.clientType       = mICDClientInfo.client_type;
     return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, endpointId, registerClientCommand, onSuccess, onFailure);
 }
 
 CHIP_ERROR RefreshKeySender::EstablishSessionToPeer()
 {
     ChipLogProgress(ICD, "Trying to establish a CASE session for re-registering an ICD client");
-    auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
+    auto * caseSessionManager = mpImEngine->GetCASESessionManager();
     VerifyOrReturnError(caseSessionManager != nullptr, CHIP_ERROR_INVALID_CASE_PARAMETER);
     caseSessionManager->FindOrEstablishSession(mICDClientInfo.peer_node, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     return CHIP_NO_ERROR;

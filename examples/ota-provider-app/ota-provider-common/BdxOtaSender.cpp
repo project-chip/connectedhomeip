@@ -124,16 +124,24 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
 
         break;
     }
-    case TransferSession::OutputEventType::kQueryReceived: {
+    case TransferSession::OutputEventType::kQueryReceived:
+    case TransferSession::OutputEventType::kQueryWithSkipReceived: {
         TransferSession::BlockData blockData;
         uint16_t blockSize   = mTransfer.GetTransferBlockSize();
         uint16_t bytesToRead = blockSize;
+        uint64_t bytesToSkip = 0;
+
+        if (event.EventType == TransferSession::OutputEventType::kQueryWithSkipReceived)
+        {
+            bytesToSkip = event.bytesToSkip.BytesToSkip;
+        }
+        uint64_t seekOffset = mNumBytesSent + bytesToSkip;
 
         // TODO: This should be a utility function in TransferSession
-        if (mTransfer.GetTransferLength() > 0 && mNumBytesSent + blockSize > mTransfer.GetTransferLength())
+        if ((mTransfer.GetTransferLength() > 0) && ((seekOffset + blockSize) > mTransfer.GetTransferLength()))
         {
             // cast should be safe because of condition above
-            bytesToRead = static_cast<uint16_t>(mTransfer.GetTransferLength() - mNumBytesSent);
+            bytesToRead = static_cast<uint16_t>(mTransfer.GetTransferLength() - seekOffset);
         }
 
         chip::System::PacketBufferHandle blockBuf = chip::System::PacketBufferHandle::New(bytesToRead);
@@ -152,7 +160,13 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             return;
         }
 
-        otaFile.seekg(mNumBytesSent);
+        if (seekOffset > static_cast<uint64_t>(std::numeric_limits<std::streamoff>::max()))
+        {
+            ChipLogError(BDX, "Seek offset too large");
+            mTransfer.AbortTransfer(StatusCode::kLengthTooLarge);
+            return;
+        }
+        otaFile.seekg(static_cast<std::streamoff>(seekOffset));
         otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
         if (!(otaFile.good() || otaFile.eof()))
         {
@@ -164,8 +178,8 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         blockData.Data   = blockBuf->Start();
         blockData.Length = static_cast<size_t>(otaFile.gcount());
         blockData.IsEof  = (blockData.Length < blockSize) ||
-            (mNumBytesSent + static_cast<uint64_t>(blockData.Length) == mTransfer.GetTransferLength() || (otaFile.peek() == EOF));
-        mNumBytesSent = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
+            (seekOffset + static_cast<uint64_t>(blockData.Length) == mTransfer.GetTransferLength() || (otaFile.peek() == EOF));
+        mNumBytesSent = static_cast<uint32_t>(seekOffset + blockData.Length);
         otaFile.close();
 
         err = mTransfer.PrepareBlock(blockData);
@@ -180,7 +194,6 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         break;
     case TransferSession::OutputEventType::kAckEOFReceived:
         ChipLogDetail(BDX, "Transfer completed, got AckEOF");
-        mStopPolling = true; // Stop polling the TransferSession only after receiving BlockAckEOF
         Reset();
         break;
     case TransferSession::OutputEventType::kStatusReceived:
@@ -212,7 +225,7 @@ void BdxOtaSender::Reset()
 {
     mFabricIndex.ClearValue();
     mNodeId.ClearValue();
-    Responder::ResetTransfer();
+    ResetTransfer();
     if (mExchangeCtx != nullptr)
     {
         mExchangeCtx->Close();

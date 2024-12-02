@@ -22,7 +22,6 @@
 #ifdef MATTER_DM_PLUGIN_MEDIA_PLAYBACK_SERVER
 #include "MediaPlaybackManager.h"
 
-using namespace std;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;

@@ -122,6 +122,7 @@ public:
 
     bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subject) { return mHasActiveSubscription; };
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subject) { return mHasPersistedSubscription; };
+    bool FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex) { return false; };
 
 private:
     bool mHasActiveSubscription    = false;
@@ -694,6 +695,64 @@ TEST_F(TestICDManager, TestICDMStayActive)
     // confirm the promised time is 20000 since the device is already planing to stay active longer than the requested time
     EXPECT_EQ(stayActivePromisedMs, 20000UL);
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+/**
+ * @brief Test verifies the logic of the ICDManager related to DSLS (Dynamic SIT LIT Support)
+ */
+TEST_F(TestICDManager, TestICDMDSLS)
+{
+    typedef ICDListener::ICDManagementEvents ICDMEvent;
+    ICDNotifier notifier = ICDNotifier::GetInstance();
+
+    // Set FeatureMap
+    // Configures CIP, UAT, LITS and DSLS to 1
+    mICDManager.SetTestFeatureMapValue(0x0F);
+
+    // Check ICDManager starts in SIT mode if no entries are present
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::SIT);
+
+    // Create table with one fabric
+    ICDMonitoringTable table1(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
+
+    // Add an entry to the fabric
+    ICDMonitoringEntry entry1(&(mKeystore));
+    entry1.checkInNodeID    = kClientNodeId11;
+    entry1.monitoredSubject = kClientNodeId12;
+    EXPECT_EQ(CHIP_NO_ERROR, entry1.SetKey(ByteSpan(kKeyBuffer1a)));
+    EXPECT_EQ(CHIP_NO_ERROR, table1.Set(0, entry1));
+
+    // Trigger register event after first entry was added
+    notifier.NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
+
+    // Check ICDManager is now in the LIT operating mode
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::LIT);
+
+    // Simulate SIT Mode Request - device must switch to SIT mode even if there is a client registered
+    notifier.NotifySITModeRequestNotification();
+
+    // Check ICDManager is now in the SIT operating mode
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::SIT);
+
+    // Advance time so active mode interval expires.
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration() + 1_ms32);
+
+    // Check ICDManager is still in the SIT operating mode
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::SIT);
+
+    // Withdraw SIT mode
+    notifier.NotifySITModeRequestWithdrawal();
+
+    // Check ICDManager is now in the LIT operating mode
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::LIT);
+
+    // Advance time so active mode interval expires.
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration() + 1_ms32);
+
+    // Check ICDManager is still in the LIT operating mode
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::LIT);
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS

@@ -83,6 +83,8 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-fan-control-manager.cpp
     ${CHEF}/common/chef-laundry-washer-controls-delegate-impl.cpp
     ${CHEF}/common/chef-laundry-washer-mode.cpp
+    ${CHEF}/common/chef-dishwasher-alarm-delegate-impl.cpp
+    ${CHEF}/common/chef-dishwasher-mode-delegate-impl.cpp
     ${CHEF}/common/chef-operational-state-delegate-impl.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
@@ -95,9 +97,11 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/low-power/LowPowerManager.cpp
     ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
     ${CHEF}/common/clusters/media-playback/MediaPlaybackManager.cpp
+    ${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.cpp
     ${CHEF}/common/clusters/resource-monitoring/chef-resource-monitoring-delegates.cpp
     ${CHEF}/common/clusters/switch/SwitchEventHandler.cpp
     ${CHEF}/common/clusters/switch/SwitchManager.cpp
+    ${CHEF}/common/clusters/temperature-control/static-supported-temperature-levels.cpp
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
     ${CHEF}/common/stubs.cpp
@@ -106,7 +110,6 @@ target_sources(app PRIVATE
 
 message(STATUS ${CHEF}/devices/${CONFIG_CHEF_DEVICE_TYPE}.zap)
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${CHEF}/devices/${CONFIG_CHEF_DEVICE_TYPE}.zap
 )
 

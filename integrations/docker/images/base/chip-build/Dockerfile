@@ -123,14 +123,6 @@ RUN set -x \
     ruff \
     && : # last line
 
-#TODO Issue #35280: this is only added as a workaround to bloaty build failures, remove it once bloaty fixes issue
-# Clone and install abseil-cpp
-RUN git clone https://github.com/abseil/abseil-cpp.git /tmp/abseil-cpp \
-    && cd /tmp/abseil-cpp \
-    && cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local \
-    && cmake --build build --target install \
-    && rm -rf /tmp/abseil-cpp
-
 # Install bloat comparison tools
 RUN set -x \
     && git clone https://github.com/google/bloaty.git \

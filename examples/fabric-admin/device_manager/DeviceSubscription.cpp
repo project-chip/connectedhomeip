@@ -17,7 +17,10 @@
  */
 
 #include "DeviceSubscription.h"
+
+#if defined(PW_RPC_ENABLED)
 #include "rpc/RpcClient.h"
+#endif
 
 #include <app/InteractionModelEngine.h>
 #include <app/server/Server.h>
@@ -29,6 +32,8 @@
 using namespace ::chip;
 using namespace ::chip::app;
 using chip::app::ReadClient;
+
+namespace admin {
 
 namespace {
 
@@ -61,11 +66,14 @@ void DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path,
         CHIP_ERROR err = data->Get(windowStatus);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(NotSpecified, "Failed to read WindowStatus"));
         VerifyOrReturn(windowStatus != Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kUnknownEnumValue);
+#if defined(PW_RPC_ENABLED)
         mCurrentAdministratorCommissioningAttributes.window_status = static_cast<uint32_t>(windowStatus);
-        mChangeDetected                                            = true;
+#endif
+        mChangeDetected = true;
         break;
     }
     case Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::Id: {
+#if defined(PW_RPC_ENABLED)
         FabricIndex fabricIndex;
         CHIP_ERROR err                                                       = data->Get(fabricIndex);
         mCurrentAdministratorCommissioningAttributes.has_opener_fabric_index = err == CHIP_NO_ERROR;
@@ -73,17 +81,20 @@ void DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path,
         {
             mCurrentAdministratorCommissioningAttributes.opener_fabric_index = static_cast<uint32_t>(fabricIndex);
         }
+#endif
         mChangeDetected = true;
         break;
     }
     case Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id: {
-        chip::VendorId vendorId;
+#if defined(PW_RPC_ENABLED)
+        VendorId vendorId;
         CHIP_ERROR err                                                    = data->Get(vendorId);
         mCurrentAdministratorCommissioningAttributes.has_opener_vendor_id = err == CHIP_NO_ERROR;
         if (mCurrentAdministratorCommissioningAttributes.has_opener_vendor_id)
         {
             mCurrentAdministratorCommissioningAttributes.opener_vendor_id = static_cast<uint32_t>(vendorId);
         }
+#endif
         mChangeDetected = true;
         break;
     }
@@ -100,7 +111,7 @@ void DeviceSubscription::OnReportEnd()
 #if defined(PW_RPC_ENABLED)
         AdminCommissioningAttributeChanged(mCurrentAdministratorCommissioningAttributes);
 #else
-        ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
+        ChipLogError(NotSpecified, "Cannot forward Administrator Commissioning Attribute to fabric bridge: RPC not enabled");
 #endif
         mChangeDetected = false;
     }
@@ -108,16 +119,38 @@ void DeviceSubscription::OnReportEnd()
 
 void DeviceSubscription::OnDone(ReadClient * apReadClient)
 {
-    // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
+    // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
+    // DeviceSubscription.
+    MoveToState(State::AwaitingDestruction);
+    mOnDoneCallback(mScopedNodeId);
 }
 
 void DeviceSubscription::OnError(CHIP_ERROR error)
 {
+#if defined(PW_RPC_ENABLED)
+    if (error == CHIP_ERROR_TIMEOUT && mState == State::SubscriptionStarted)
+    {
+        chip_rpc_ReachabilityChanged reachabilityChanged;
+        reachabilityChanged.has_id       = true;
+        reachabilityChanged.id           = mCurrentAdministratorCommissioningAttributes.id;
+        reachabilityChanged.reachability = false;
+        DeviceReachableChanged(reachabilityChanged);
+    }
+#endif
     ChipLogProgress(NotSpecified, "Error subscribing: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
 void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
+    if (mState == State::Stopping)
+    {
+        // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
+        // DeviceSubscription.
+        MoveToState(State::AwaitingDestruction);
+        mOnDoneCallback(mScopedNodeId);
+        return;
+    }
+    VerifyOrDie(mState == State::Connecting);
     mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
                                            *this /* callback */, ReadClient::InteractionType::Subscribe);
     VerifyOrDie(mClient);
@@ -136,25 +169,119 @@ void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to issue subscription to AdministratorCommissioning data");
-        // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
+        // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
+        // DeviceSubscription.
+        MoveToState(State::AwaitingDestruction);
+        mOnDoneCallback(mScopedNodeId);
+        return;
     }
+    MoveToState(State::SubscriptionStarted);
+}
+
+void DeviceSubscription::MoveToState(const State aTargetState)
+{
+    mState = aTargetState;
+    ChipLogDetail(NotSpecified, "DeviceSubscription moving to [%10.10s]", GetStateStr());
+}
+
+const char * DeviceSubscription::GetStateStr() const
+{
+    switch (mState)
+    {
+    case State::Idle:
+        return "Idle";
+
+    case State::Connecting:
+        return "Connecting";
+
+    case State::Stopping:
+        return "Stopping";
+
+    case State::SubscriptionStarted:
+        return "SubscriptionStarted";
+
+    case State::AwaitingDestruction:
+        return "AwaitingDestruction";
+    }
+    return "N/A";
 }
 
 void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
-    ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
+    VerifyOrDie(mState == State::Connecting || mState == State::Stopping);
+    ChipLogError(NotSpecified, "DeviceSubscription failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+#if defined(PW_RPC_ENABLED)
+    if (mState == State::Connecting)
+    {
+        chip_rpc_ReachabilityChanged reachabilityChanged;
+        reachabilityChanged.has_id       = true;
+        reachabilityChanged.id           = mCurrentAdministratorCommissioningAttributes.id;
+        reachabilityChanged.reachability = false;
+        DeviceReachableChanged(reachabilityChanged);
+    }
+#endif
+
+    // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
+    // DeviceSubscription.
+    MoveToState(State::AwaitingDestruction);
+    mOnDoneCallback(mScopedNodeId);
 }
 
-void DeviceSubscription::StartSubscription(Controller::DeviceController & controller, NodeId nodeId)
+CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback, Controller::DeviceController & controller,
+                                                 ScopedNodeId scopedNodeId)
 {
-    VerifyOrDie(!mSubscriptionStarted);
+    assertChipStackLockedByCurrentThread();
+    VerifyOrDie(mState == State::Idle);
+    VerifyOrReturnError(controller.GetFabricIndex() == scopedNodeId.GetFabricIndex(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    mCurrentAdministratorCommissioningAttributes         = chip_rpc_AdministratorCommissioningChanged_init_default;
-    mCurrentAdministratorCommissioningAttributes.node_id = nodeId;
+    mScopedNodeId = scopedNodeId;
+
+#if defined(PW_RPC_ENABLED)
+    mCurrentAdministratorCommissioningAttributes                 = chip_rpc_AdministratorCommissioningChanged_init_default;
+    mCurrentAdministratorCommissioningAttributes.has_id          = true;
+    mCurrentAdministratorCommissioningAttributes.id.node_id      = scopedNodeId.GetNodeId();
+    mCurrentAdministratorCommissioningAttributes.id.fabric_index = scopedNodeId.GetFabricIndex();
     mCurrentAdministratorCommissioningAttributes.window_status =
         static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
-    mSubscriptionStarted = true;
+#endif
 
-    controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    mOnDoneCallback = onDoneCallback;
+    MoveToState(State::Connecting);
+    CHIP_ERROR err =
+        controller.GetConnectedDevice(scopedNodeId.GetNodeId(), &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    if (err != CHIP_NO_ERROR)
+    {
+        MoveToState(State::Idle);
+    }
+    return err;
 }
+
+void DeviceSubscription::StopSubscription()
+{
+    assertChipStackLockedByCurrentThread();
+    VerifyOrDie(mState != State::Idle);
+    // Something is seriously wrong if we die on the line below
+    VerifyOrDie(mState != State::AwaitingDestruction);
+
+    if (mState == State::Stopping)
+    {
+        // Stop is called again while we are still waiting on connected callbacks
+        return;
+    }
+
+    if (mState == State::Connecting)
+    {
+        MoveToState(State::Stopping);
+        return;
+    }
+
+    // By calling reset on our ReadClient we terminate the subscription.
+    VerifyOrDie(mClient);
+    mClient.reset();
+    // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
+    // DeviceSubscription.
+    MoveToState(State::AwaitingDestruction);
+    mOnDoneCallback(mScopedNodeId);
+}
+
+} // namespace admin

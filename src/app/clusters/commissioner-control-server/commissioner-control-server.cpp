@@ -132,10 +132,11 @@ CommissionerControlServer::SetSupportedDeviceCategoriesValue(EndpointId endpoint
 }
 
 CHIP_ERROR
-CommissionerControlServer::GenerateCommissioningRequestResultEvent(const Events::CommissioningRequestResult::Type & result)
+CommissionerControlServer::GenerateCommissioningRequestResultEvent(EndpointId endpoint,
+                                                                   const Events::CommissioningRequestResult::Type & result)
 {
     EventNumber eventNumber;
-    CHIP_ERROR error = LogEvent(result, kRootEndpointId, eventNumber);
+    CHIP_ERROR error = LogEvent(result, endpoint, eventNumber);
     if (CHIP_NO_ERROR != error)
     {
         ChipLogError(Zcl, "CommissionerControl: Unable to emit CommissioningRequestResult event: %" CHIP_ERROR_FORMAT,
@@ -170,9 +171,9 @@ bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
     }
 
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto requestId   = commandData.requestId;
-    auto vendorId    = commandData.vendorId;
-    auto productId   = commandData.productId;
+    auto requestId   = commandData.requestID;
+    auto vendorId    = commandData.vendorID;
+    auto productId   = commandData.productID;
 
     // The label assigned from commandData need to be stored in CommissionerControl::Delegate which ensure that the backing buffer
     // of it has a valid lifespan during fabric sync setup process.
@@ -232,7 +233,7 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
         return true;
     }
 
-    auto requestId = commandData.requestId;
+    auto requestId = commandData.requestID;
 
     auto commissioningWindowParams = std::make_unique<Clusters::CommissionerControl::CommissioningWindowParams>();
 

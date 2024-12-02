@@ -87,6 +87,11 @@ public:
     void HandleEvents() override;
     void EventLoopEnds() override {}
 
+#if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    void AddLoopHandler(EventLoopHandler & handler) override;
+    void RemoveLoopHandler(EventLoopHandler & handler) override;
+#endif // !CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
     dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
@@ -135,6 +140,10 @@ protected:
     TimerList mExpiredTimers;
     timeval mNextTimeout;
 
+#if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    IntrusiveList<EventLoopHandler> mLoopHandlers;
+#endif
+
     // Members for select loop
     struct SelectSets
     {
@@ -149,7 +158,7 @@ protected:
     int mSelectResult;
 
     ObjectLifeCycle mLayerState;
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     WakeEvent mWakeEvent;
 #endif
 

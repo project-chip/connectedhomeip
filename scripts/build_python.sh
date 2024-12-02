@@ -175,22 +175,6 @@ tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode
 
 gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_crypto=\"boringssl\""
 
-function ninja_target() {
-    # Print the ninja target required to build a gn label.
-    local GN_LABEL="$1"
-    local NINJA_TARGET="$(gn ls "$OUTPUT_ROOT" --as=output "$GN_LABEL")"
-    echo "$NINJA_TARGET"
-}
-
-function wheel_output_dir() {
-    # Print the wheel output directory for a pw_python_package or
-    # pw_python_distribution. The label must end in "._build_wheel".
-    local GN_LABEL="$1"
-    local NINJA_TARGET="$(ninja_target "$GN_LABEL")"
-    local WHEEL_DIR="$OUTPUT_ROOT"/"$(dirname "$NINJA_TARGET")/$(basename -s .stamp "$NINJA_TARGET")"
-    echo "$WHEEL_DIR"
-}
-
 # Compile Python wheels
 ninja -C "$OUTPUT_ROOT" python_wheels
 
@@ -198,7 +182,12 @@ ninja -C "$OUTPUT_ROOT" python_wheels
 WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 
 # Add the matter_testing_infrastructure wheel
-WHEEL+=("$OUTPUT_ROOT"/python/obj/src/python_testing/matter_testing_infrastructure/metadata_parser._build_wheel/metadata_parser-*.whl)
+WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing*.whl)
+
+if [ "$install_pytest_requirements" = "yes" ]; then
+    # Add the matter_yamltests_distribution wheel
+    WHEEL+=("$OUTPUT_ROOT"/obj/scripts/matter_yamltests_distribution._build_wheel/matter_yamltests-*.whl)
+fi
 
 if [ -n "$extra_packages" ]; then
     WHEEL+=("$extra_packages")
@@ -217,18 +206,11 @@ if [ -n "$install_virtual_env" ]; then
     fi
 
     source "$ENVIRONMENT_ROOT"/bin/activate
-    "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-    "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${WHEEL[@]}"
+    "$ENVIRONMENT_ROOT"/bin/python -m ensurepip --upgrade
+    "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade "${WHEEL[@]}"
 
     if [ "$install_pytest_requirements" = "yes" ]; then
-        YAMLTESTS_GN_LABEL="//scripts:matter_yamltests_distribution._build_wheel"
-        # Add wheels from pw_python_package or pw_python_distribution templates.
-        YAMLTEST_WHEEL=(
-            "$(ls -tr "$(wheel_output_dir "$YAMLTESTS_GN_LABEL")"/*.whl | head -n 1)"
-        )
-
         echo_blue "Installing python test dependencies ..."
-        "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${YAMLTEST_WHEEL[@]}"
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/tests/requirements.txt"
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
     fi

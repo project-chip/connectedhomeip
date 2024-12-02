@@ -20,8 +20,8 @@ declare_args() {
   # Use the lwIP library.
   chip_system_config_use_lwip = chip_with_lwip && current_os == "freertos"
 
-  # Use BSD/POSIX socket API.
-  chip_system_config_use_sockets = current_os != "freertos"
+  # Use Network.framework API
+  chip_system_config_use_network_framework = false
 
   # Mutex implementation: posix, freertos, none.
   chip_system_config_locking = ""
@@ -37,12 +37,20 @@ declare_args() {
 }
 
 declare_args() {
+  # Use BSD/POSIX socket API.
+  chip_system_config_use_sockets =
+      current_os != "freertos" && !chip_system_config_use_network_framework
+}
+
+declare_args() {
   # do not use libev by default
   chip_system_config_use_libev = false
 
   # use the dispatch library on darwin targets
-  chip_system_config_use_dispatch = chip_system_config_use_sockets &&
-                                    (current_os == "mac" || current_os == "ios")
+  chip_system_config_use_dispatch =
+      (chip_system_config_use_sockets ||
+       chip_system_config_use_network_framework) &&
+      (current_os == "mac" || current_os == "ios")
 }
 
 declare_args() {
@@ -71,6 +79,10 @@ if (chip_system_config_locking == "") {
   }
 }
 
+if (target_os == "mac" || target_os == "ios") {
+  chip_system_config_clock = "gettimeofday"
+}
+
 assert(
     chip_system_config_locking == "posix" ||
         chip_system_config_locking == "freertos" ||
@@ -79,6 +91,10 @@ assert(
         chip_system_config_locking == "cmsis-rtos" ||
         chip_system_config_locking == "zephyr",
     "Please select a valid mutex implementation: posix, freertos, mbed, cmsis-rtos, zephyr, none")
+
+assert(
+    !chip_system_config_use_dispatch || chip_system_config_locking == "none",
+    "When chip_system_config_use_dispatch is true, chip_system_config_locking must be 'none'")
 
 assert(
     chip_system_config_clock == "clock_gettime" ||

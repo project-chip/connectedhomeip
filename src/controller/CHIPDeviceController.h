@@ -204,6 +204,16 @@ public:
         return nullptr;
     }
 
+    CASESessionManager * CASESessionMgr()
+    {
+        if (mSystemState)
+        {
+            return mSystemState->CASESessionMgr();
+        }
+
+        return nullptr;
+    }
+
     Messaging::ExchangeManager * ExchangeMgr()
     {
         if (mSystemState != nullptr)
@@ -979,8 +989,6 @@ private:
     static void
     OnICDManagementStayActiveResponse(void * context,
                                       const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data);
-
-    static void OnInterfaceEnableWriteSuccessResponse(void * context);
 
     /**
      * @brief

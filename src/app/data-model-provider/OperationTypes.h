@@ -19,6 +19,7 @@
 #include <access/SubjectDescriptor.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 
 #include <cstdint>
@@ -54,7 +55,17 @@ struct OperationRequest
     ///  - operationFlags.Has(OperationFlags::kInternal) MUST NOT have this set
     ///
     /// NOTE: once kInternal flag is removed, this will become non-optional
-    std::optional<chip::Access::SubjectDescriptor> subjectDescriptor;
+    const chip::Access::SubjectDescriptor * subjectDescriptor = nullptr;
+
+    /// Accessing fabric index is the subjectDescriptor fabric index (if any).
+    /// This is a readability convenience function.
+    ///
+    /// Returns kUndefinedFabricIndex if no subject descriptor is available
+    FabricIndex GetAccessingFabricIndex() const
+    {
+        VerifyOrReturnValue(subjectDescriptor != nullptr, kUndefinedFabricIndex);
+        return subjectDescriptor->fabricIndex;
+    }
 };
 
 enum class ReadFlags : uint32_t
@@ -70,15 +81,24 @@ struct ReadAttributeRequest : OperationRequest
 
 enum class WriteFlags : uint32_t
 {
-    kTimed     = 0x0001, // Write is a timed write (i.e. a Timed Request Action preceeded it)
-    kListBegin = 0x0002, // This is the FIRST list of data elements
-    kListEnd   = 0x0004, // This is the LAST list element to write
+    kTimed = 0x0001, // Write is a timed write (i.e. a Timed Request Action preceeded it)
 };
 
 struct WriteAttributeRequest : OperationRequest
 {
     ConcreteDataAttributePath path; // NOTE: this also contains LIST operation options (i.e. "data" path type)
     BitFlags<WriteFlags> writeFlags;
+
+    // The path of the previous successful write in the same write transaction, if any.
+    //
+    // In particular this means that a write to this path has succeeded before (i.e. it passed required ACL checks).
+    // The intent for this is to allow short-cutting ACL checks when ACL is in progress of being updated:
+    //   - During write chunking, list writes can be of the form "reset list" followed by "append item by item"
+    //   - When ACL is updating, a reset to empty would result in the entire ACL being deny and the "append"
+    //     would fail.
+    // callers are expected to keep track of a `previousSuccessPath` whenever a write succeeds (otherwise ACL
+    // checks may fail)
+    std::optional<ConcreteAttributePath> previousSuccessPath;
 };
 
 enum class InvokeFlags : uint32_t

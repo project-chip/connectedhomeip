@@ -68,6 +68,7 @@ Davis, CA 95616, USA
              add sensitivity setting (via co-located BooleanStateConfiguration cluster on same endpoint);
              add new attribute for tuning the sensor's reporting;
              add event OccupancyChanged;
+             add `N` quality for HoldTime and other timing attributes;
              describe how to accommodate legacy clients"/>
   </revisionHistory>
   <clusterIds>
@@ -134,11 +135,12 @@ Davis, CA 95616, USA
     <struct name="HoldTimeLimitsStruct">
       <field id="0" name="HoldTimeMin" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="HoldTimeMax"/>
+        <constraint type="min" value="1"/>
       </field>
       <field id="1" name="HoldTimeMax" type="uint16">
         <mandatoryConform/>
         <constraint type="min" value="HoldTimeMin"/>
+        <constraint type="min" value="10"/>
       </field>
       <field id="2" name="HoldTimeDefault" type="uint16">
         <mandatoryConform/>
@@ -171,8 +173,9 @@ Davis, CA 95616, USA
       </otherwiseConform>
       <constraint type="between" from="0" to="7"/>
     </attribute>
-    <attribute id="0x0003" name="HoldTime" type="uint16">
+    <attribute id="0x0003" name="HoldTime" type="min 1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
@@ -185,6 +188,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0010" name="PIROccupiedToUnoccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <optionalConform>
           <andTerm>
@@ -210,6 +214,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0011" name="PIRUnoccupiedToOccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>
@@ -257,6 +262,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0012" name="PIRUnoccupiedToOccupiedThreshold" type="uint8" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>
@@ -305,6 +311,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0020" name="UltrasonicOccupiedToUnoccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <optionalConform>
           <andTerm>
@@ -317,6 +324,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0021" name="UltrasonicUnoccupiedToOccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>
@@ -336,6 +344,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0022" name="UltrasonicUnoccupiedToOccupiedThreshold" type="uint8" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>
@@ -356,6 +365,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0030" name="PhysicalContactOccupiedToUnoccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <optionalConform>
           <andTerm>
@@ -368,6 +378,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0031" name="PhysicalContactUnoccupiedToOccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>
@@ -387,6 +398,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0032" name="PhysicalContactUnoccupiedToOccupiedThreshold" type="uint8" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>

@@ -112,7 +112,6 @@
         "Test_TC_OTCCM_3_3"
     ],
     "LaundryDryerControl": ["Test_TC_DRYERCTRL_2_1"],
-
     "MediaControl": [
         "Test_TC_LOWPOWER_2_1",
         "Test_TC_KEYPADINPUT_3_2",
@@ -149,6 +148,7 @@
         "Test_TC_OO_2_1",
         "Test_TC_OO_2_2",
         "Test_TC_OO_2_4",
+        "Test_TC_OO_2_6",
         "Test_TC_OO_2_7"
     ],
     "PowerSource": ["Test_TC_PS_2_1"],

@@ -20,26 +20,38 @@
 #include <app/ReadClient.h>
 #include <controller/CHIPDeviceController.h>
 #include <lib/core/DataModelTypes.h>
-
 #include <memory>
 
+#if defined(PW_RPC_ENABLED)
 #include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
+#endif
+
+namespace admin {
+
+class DeviceSubscriptionManager;
 
 /// Attribute subscription to attributes that are important to keep track and send to fabric-bridge
 /// via RPC when change has been identified.
 ///
 /// An instance of DeviceSubscription is intended to be used only once. Once a DeviceSubscription is
-/// terminal, either from an error or from subscriptions getting shut down, we expect the instance
+/// terminated, either from an error or from subscriptions getting shut down, we expect the instance
 /// to be deleted. Any new subscription should instantiate another instance of DeviceSubscription.
 class DeviceSubscription : public chip::app::ReadClient::Callback
 {
 public:
+    using OnDoneCallback = std::function<void(chip::ScopedNodeId)>;
+
     DeviceSubscription();
 
-    /// Usually called after we have added a synchronized device to fabric-bridge to monitor
-    /// for any changes that need to be propgated to fabric-bridge.
-    void StartSubscription(chip::Controller::DeviceController & controller, chip::NodeId nodeId);
+    CHIP_ERROR StartSubscription(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller,
+                                 chip::ScopedNodeId nodeId);
+
+    /// This will trigger stopping the subscription. Once subscription is stopped the OnDoneCallback
+    /// provided in StartSubscription will be called to indicate that subscription have been terminated.
+    ///
+    /// Must only be called after StartSubscription was successfully called.
+    void StopSubscription();
 
     ///////////////////////////////////////////////////////////////
     // ReadClient::Callback implementation
@@ -57,14 +69,32 @@ public:
     void OnDeviceConnectionFailure(const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
 private:
+    enum class State : uint8_t
+    {
+        Idle,                ///< Default state that the object starts out in, where no work has commenced
+        Connecting,          ///< We are waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks to be called
+        Stopping,            ///< We are waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks so we can terminate
+        SubscriptionStarted, ///< We have started a subscription.
+        AwaitingDestruction, ///< The object has completed its work and is awaiting destruction.
+    };
+
+    void MoveToState(const State aTargetState);
+    const char * GetStateStr() const;
+
+    chip::ScopedNodeId mScopedNodeId;
+
+    OnDoneCallback mOnDoneCallback;
     std::unique_ptr<chip::app::ReadClient> mClient;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
+#if defined(PW_RPC_ENABLED)
     chip_rpc_AdministratorCommissioningChanged mCurrentAdministratorCommissioningAttributes;
+#endif
+
     bool mChangeDetected = false;
-    // Ensures that DeviceSubscription starts a subscription only once.  If instance of
-    // DeviceSubscription  can be reused, the class documentation should be updated accordingly.
-    bool mSubscriptionStarted = false;
+    State mState         = State::Idle;
 };
+
+} // namespace admin

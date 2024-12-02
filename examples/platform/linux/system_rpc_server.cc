@@ -56,11 +56,6 @@ void set_socket_port(uint16_t new_socket_port)
 
 void Init()
 {
-    log_basic::SetOutput([](std::string_view log) {
-        std::fprintf(stderr, "%.*s\n", static_cast<int>(log.size()), log.data());
-        hdlc::WriteUIFrame(1, as_bytes(span(log)), socket_stream).IgnoreError(); // TODO(pwbug/387): Handle Status properly
-    });
-
     PW_LOG_INFO("Starting pw_rpc server on port %d", socket_port);
     PW_CHECK_OK(server_socket.Listen(socket_port));
     auto accept_result = server_socket.Accept();
@@ -92,9 +87,18 @@ Status Start()
                 // remote to connect.
                 socket_stream.Close();
                 server_socket.Close();
-                PW_CHECK_OK(server_socket.Listen(socket_port));
+                Status status = server_socket.Listen(socket_port);
+                if (!status.ok())
+                {
+                    PW_LOG_ERROR("Listen failed. Exiting RPC Server loop");
+                    return status;
+                }
                 auto accept_result = server_socket.Accept();
-                PW_CHECK_OK(accept_result.status());
+                if (!accept_result.status().ok())
+                {
+                    PW_LOG_ERROR("Accept failed. Exiting RPC Server loop");
+                    return accept_result.status();
+                }
                 socket_stream = *std::move(accept_result);
             }
             continue;
