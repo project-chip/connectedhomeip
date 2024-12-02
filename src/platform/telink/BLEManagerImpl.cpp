@@ -49,16 +49,15 @@ extern "C" {
 
 #ifdef CONFIG_BT_B9X
 
-extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t *bt_mac);
+extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t * bt_mac);
 /**
  * @brief bt mac initialization
  */
-__attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t *bt_mac)
+__attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac)
 {
-	b9x_bt_blc_mac_init(bt_mac);
+    b9x_bt_blc_mac_init(bt_mac);
 }
 #endif
-
 }
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
