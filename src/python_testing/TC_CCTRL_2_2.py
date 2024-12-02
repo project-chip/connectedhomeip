@@ -40,6 +40,7 @@
 #   run2:
 #     app: ${FABRIC_SYNC_APP}
 #     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
