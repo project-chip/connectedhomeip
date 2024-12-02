@@ -33,8 +33,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
 set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
 
-set(CHIP_DATA_MODEL_INTERFACE "disabled" CACHE STRING "Data model interface option to use: enabled or disabled")
-
 if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
     list(APPEND CHIP_REQUIRE_COMPONENTS mdns)
 endif()
@@ -65,12 +63,6 @@ macro(chip_gn_arg_bool arg boolean)
         string(APPEND chip_gn_args "${arg} = false\n")
     endif()
 endmacro()
-
-if ("${CHIP_DATA_MODEL_INTERFACE}" STREQUAL "enabled")
-    chip_gn_arg_append("chip_use_data_model_interface" "\"enabled\"")
-else()
-    chip_gn_arg_append("chip_use_data_model_interface" "\"disabled\"")
-endif()
 
 # ESP-IDF lets user set software version string by two ways:
 # 1. Project's CMakeLists.txt file and 2. Config option
@@ -318,6 +310,10 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
 endif()
 
+if (CONFIG_CHIP_DEVICE_ENABLE_DYNAMIC_SERVER)
+    chip_gn_arg_append("chip_build_controller_dynamic_server" "true")
+endif()
+
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 
@@ -393,7 +389,6 @@ externalproject_add(
     BUILD_COMMAND           ninja "esp32"
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${chip_libraries}
-    WORKING_DIRECTORY       ${CMAKE_CURRENT_LIST_DIR}
     DEPENDS                 args_gn
     BUILD_ALWAYS            1
 )
@@ -435,7 +430,15 @@ if(CONFIG_BT_ENABLED)
     if((target_name STREQUAL "esp32h2") OR (target_name STREQUAL "esp32c2") OR (target_name STREQUAL "esp32c6"))
         idf_component_get_property(bt_dir bt COMPONENT_DIR)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a")
+        if (EXISTS ${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a)
+            list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a")
+        elseif(EXISTS ${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/${target_name}/libble_app.a)
+            list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/${target_name}/libble_app.a")
+	else()
+            message(WARNING "There is no libble_app.a in the given path")
+        endif()
+    elseif(target_name STREQUAL "esp32p4")
+        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
     else()
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
     endif()
@@ -514,11 +517,13 @@ endif()
 idf_component_get_property(lwip_lib lwip COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${lwip_lib}>)
 
+if ("${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}" VERSION_GREATER_EQUAL "5.3" OR CONFIG_ESP32_WIFI_ENABLED)
+    idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)
+endif()
 
 if (CONFIG_ESP32_WIFI_ENABLED)
-    idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
     idf_component_get_property(esp_wifi_dir esp_wifi COMPONENT_DIR)
-    list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)
     if (CONFIG_IDF_TARGET_ESP32C2)
         set(blobs core net80211 pp)
     else()
@@ -544,6 +549,7 @@ list(APPEND chip_libraries $<TARGET_FILE:${esp_netif_lib}>)
 idf_component_get_property(esp_hw_support_lib esp_hw_support COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${esp_hw_support_lib}>)
 
+if (NOT CONFIG_IDF_TARGET_ESP32P4)
 idf_component_get_property(esp_phy_lib esp_phy COMPONENT_LIB)
 idf_component_get_property(esp_phy_dir esp_phy COMPONENT_DIR)
 list(APPEND chip_libraries $<TARGET_FILE:${esp_phy_lib}>)
@@ -558,8 +564,12 @@ endif()
 foreach(phy_blob ${phy_blobs})
     list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
 endforeach()
+endif()
 
-set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos esp_timer)
+set(components_to_link esp_event hal esp_system soc efuse vfs driver freertos esp_timer)
+if (NOT CONFIG_IDF_TARGET_ESP32P4)
+list(APPEND components_to_link esp_coex)
+endif()
 idf_build_get_property(build_components BUILD_COMPONENTS)
 foreach(component ${components_to_link})
     # Some of the components are not present in IDF v4.x

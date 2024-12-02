@@ -218,7 +218,7 @@ thermostat application for now.
     (ble-wifi) :
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt11170$ gn gen --args="chip_enable_wifi=true iwx12_transceiver=true chip_config_network_layer_ble=true chip_enable_ble=true chip_enable_openthread=true chip_enable_matter_cli=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt11170$ gn gen --args="chip_enable_wifi=true iwx12_transceiver=true chip_config_network_layer_ble=true chip_enable_ble=true chip_enable_openthread=true nxp_enable_matter_cli=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1170$ ninja -C out/debug
 ```
 
@@ -238,13 +238,13 @@ Optional GN options that can be added when building an application:
     on the on the thermostat application for now.
 -   To enable the
     [matter CLI](#testing-the-all-clusters-application-with-matter-cli-enabled),
-    the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
+    the argument `nxp_enable_matter_cli=true` must be added to the _gn gen_
     command.
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
-    specific flash area the argument `chip_with_factory_data=1` must be added to
-    the _gn gen_ command. For more information, see
+    specific flash area the argument `nxp_use_factory_data=true` must be added
+    to the _gn gen_ command. For more information, see
     [Guide for writing manufacturing data on NXP devices](../../../../../docs/platforms/nxp/nxp_manufacturing_flow.md)
 -   To build the application with the OTA Requestor enabled, the arguments
     `chip_enable_ota_requestor=true no_mcuboot=false` must be added to the _gn

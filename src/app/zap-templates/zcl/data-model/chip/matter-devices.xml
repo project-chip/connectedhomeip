@@ -40,7 +40,6 @@ limitations under the License.
         <clusters lockOthers="true">
             <include cluster="Access Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>ACL</requireAttribute>
-                <requireAttribute>EXTENSION</requireAttribute>
             </include>
             <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DATA_MODEL_REVISION</requireAttribute>
@@ -204,7 +203,7 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Bridged Device Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Bridged Device Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>REACHABLE</requireAttribute>
             </include>
             <include cluster="Power Source Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
@@ -293,7 +292,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -394,7 +392,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -492,7 +489,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -609,7 +605,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -742,7 +737,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -836,7 +830,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -2076,7 +2069,7 @@ limitations under the License.
             <include cluster="Smoke CO Alarm" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Carbon Monoxide" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Carbon Monoxide Concentration Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
@@ -2162,7 +2155,7 @@ limitations under the License.
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
-     <deviceType>
+    <deviceType>
         <name>MA-oven</name>
         <domain>CHIP</domain>
         <typeName>Oven</typeName>
@@ -2258,7 +2251,7 @@ limitations under the License.
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
-        <deviceType>
+    <deviceType>
         <name>MA-laundry-dryer</name>
         <domain>CHIP</domain>
         <typeName>Laundry Dryer</typeName>
@@ -2451,7 +2444,6 @@ limitations under the License.
             <include cluster="Thread Border Router Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
-
     <deviceType>
         <name>MA-all-clusters-app</name>
         <domain>CHIP</domain>
@@ -2670,7 +2662,7 @@ limitations under the License.
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
-        <deviceType>
+    <deviceType>
         <name>Energy EVSE</name>
         <domain>CHIP</domain>
         <typeName>EVSE</typeName>
@@ -2689,13 +2681,128 @@ limitations under the License.
         <name>Device Energy Management</name>
         <domain>CHIP</domain>
         <typeName>Device Energy Management</typeName>
-        <class>Simple</class>
+        <class>Utility</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x050D</deviceId>
+        <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Device Energy Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Device Energy Management Mode" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-waterheater</name>
+        <domain>CHIP</domain>
+        <typeName>Water Heater</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x050F</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CONTROL_SEQUENCE_OF_OPERATION</requireAttribute>
+                <requireAttribute>LOCAL_TEMPERATURE</requireAttribute>
+                <requireAttribute>SYSTEM_MODE</requireAttribute>
+                <requireCommand>SetpointRaiseLower</requireCommand>
+            </include>
+            <include cluster="Water Heater Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>BOOST_STATE</requireAttribute>
+                <requireAttribute>HEATER_TYPES</requireAttribute>
+                <requireAttribute>HEAT_DEMAND</requireAttribute>
+                <requireEvent>BoostEnded</requireEvent>
+                <requireEvent>BoostStarted</requireEvent>
+                <requireCommand>Boost</requireCommand>
+                <requireCommand>CancelBoost</requireCommand>
+            </include>
+            <include cluster="Water Heater Mode" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CURRENT_MODE</requireAttribute>
+                <requireAttribute>SUPPORTED_MODES</requireAttribute>
+                <requireCommand>ChangeToMode</requireCommand>
+                <requireCommand>ChangeToModeResponse</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-heatpump</name>
+        <domain>CHIP</domain>
+        <typeName>Heat Pump</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0309</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Thermostat" client="true" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>CONTROL_SEQUENCE_OF_OPERATION</requireAttribute>
+                <requireAttribute>LOCAL_TEMPERATURE</requireAttribute>
+                <requireAttribute>SYSTEM_MODE</requireAttribute>
+                <requireCommand>SetpointRaiseLower</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-solarpower</name>
+        <domain>CHIP</domain>
+        <typeName>Solar Power</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0017</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-batterystorage</name>
+        <domain>CHIP</domain>
+        <typeName>Battery Storage</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0018</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
         </clusters>
     </deviceType>
 </configurator>

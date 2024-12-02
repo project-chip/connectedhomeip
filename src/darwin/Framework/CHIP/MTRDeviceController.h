@@ -68,7 +68,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * If true, the controller has been suspended via `suspend` and not resumed yet.
  */
-@property (readonly, nonatomic, getter=isSuspended) BOOL suspended MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic, getter=isSuspended) BOOL suspended MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 /**
  * The ID assigned to this controller at creation time.
@@ -98,12 +98,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Then a PASE session will be established with the device, unless an error
  * occurs.  MTRDeviceControllerDelegate will be notified as follows:
  *
- * * Discovery fails: onStatusUpdate with MTRCommissioningStatusFailed.
+ * * Discovery fails: controller:statusUpdate: with MTRCommissioningStatusFailed.
  *
- * * Discovery succeeds but commissioning session setup fails: onPairingComplete
- *   with an error.
+ * * Commissioning session setup fails:
+ *   controller:commissioningSessionEstablishmentDone: with non-nil error.
  *
- * * Commissioning session setup succeeds: onPairingComplete with no error.
+ * * Commissioning session setup succeeds:
+ *   controller:commissioningSessionEstablishmentDone: with nil error.
  *
  * Once a commissioning session is set up, getDeviceBeingCommissioned
  * can be used to get an MTRBaseDevice and discover what sort of network
@@ -132,11 +133,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Then a PASE session will be established with the device, unless an error
  * occurs.  MTRDeviceControllerDelegate will be notified as follows:
  *
- * * Invalid connection information: onStatusUpdate with MTRCommissioningStatusFailed.
+ * * Invalid connection information: controller:statusUpdate: with MTRCommissioningStatusFailed.
  *
- * * Commissioning session setup fails: onPairingComplete with an error.
+ * * Commissioning session setup fails:
+ *   controller:commissioningSessionEstablishmentDone: with non-nil error.
  *
- * * Commissioning session setup succeeds: onPairingComplete with no error.
+ * * Commissioning session setup succeeds:
+ *   controller:commissioningSessionEstablishmentDone: with nil error.
  *
  * Once a commissioning session is set up, getDeviceBeingCommissioned
  * can be used to get an MTRBaseDevice and discover what sort of network
@@ -210,14 +213,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * @param[in] queue The queue on which the callbacks will be delivered
  */
 - (void)addDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate
-                              queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
+                              queue:(dispatch_queue_t)queue MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 /**
  * Removes a Delegate from the device controller
  *
  * @param[in] delegate The delegate to be removed
  */
-- (void)removeDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate MTR_NEWLY_AVAILABLE;
+- (void)removeDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 /**
  * Start scanning for commissionable devices.
@@ -289,7 +292,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * Suspending an already-suspended controller has no effect.
  */
-- (void)suspend MTR_NEWLY_AVAILABLE;
+- (void)suspend MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 /**
  * Resume the controller.  This has no effect if the controller is not
@@ -298,7 +301,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * A resume following any number of suspend calls will resume the controller;
  * there does not need to be a resume call to match every suspend call.
  */
-- (void)resume MTR_NEWLY_AVAILABLE;
+- (void)resume MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 /**
  * Shut down the controller. Calls to shutdown after the first one are NO-OPs.

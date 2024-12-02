@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -26,6 +25,8 @@
 
 using namespace chip;
 using namespace chip::app::Clusters::Actions;
+
+namespace bridge {
 
 BridgedDevice::BridgedDevice(ScopedNodeId scopedNodeId)
 {
@@ -116,3 +117,5 @@ void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttr
         }
     });
 }
+
+} // namespace bridge

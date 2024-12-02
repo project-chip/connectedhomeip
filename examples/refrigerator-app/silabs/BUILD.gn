@@ -18,7 +18,7 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/silabs_executable.gni")
+import("${silabs_sdk_build_root}/silabs_executable.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -38,7 +38,7 @@ if (wifi_soc) {
   import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
   examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 } else {
-  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+  import("${silabs_sdk_build_root}/efr32_sdk.gni")
   examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 }
 
@@ -142,6 +142,10 @@ silabs_executable("refrigerator_app") {
     "src/ZclCallbacks.cpp",
     "src/refrigerator-and-temperature-controlled-cabinet-mode.cpp",
   ]
+
+  if (chip_build_libshell) {
+    sources += [ "src/EventHandlerLibShell.cpp" ]
+  }
 
   if (use_temp_sensor) {
     sources += [
