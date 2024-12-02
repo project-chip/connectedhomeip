@@ -770,7 +770,7 @@ CHIP_ERROR CASESession::SendSigma1()
     System::PacketBufferHandle msg_R1;
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
 
-    Sigma1Param encodeSigma1Params;
+    EncodeSigma1Param encodeSigma1Params;
 
     // Lookup fabric info.
     const auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
@@ -784,9 +784,11 @@ CHIP_ERROR CASESession::SendSigma1()
     mEphemeralKey = mFabricsTable->AllocateEphemeralKeypairForCASE();
     VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_NO_MEMORY);
     ReturnErrorOnFailure(mEphemeralKey->Initialize(ECPKeyTarget::ECDH));
+    encodeSigma1Params.pEphPubKey = &mEphemeralKey->Pubkey();
 
     // Fill in the random value
     ReturnErrorOnFailure(DRBG_get_bytes(mInitiatorRandom, sizeof(mInitiatorRandom)));
+    encodeSigma1Params.initiatorRandom = ByteSpan(mInitiatorRandom);
 
     // Generate a Destination Identifier based on the node we are attempting to reach
     {
@@ -800,15 +802,15 @@ CHIP_ERROR CASESession::SendSigma1()
         Credentials::P256PublicKeySpan rootPubKeySpan{ rootPubKey.ConstBytes() };
 
         MutableByteSpan destinationIdSpan(destinationIdentifier);
-        ReturnErrorOnFailure(GenerateCaseDestinationId(ByteSpan(mIPK), ByteSpan(mInitiatorRandom), rootPubKeySpan, fabricId,
+        ReturnErrorOnFailure(GenerateCaseDestinationId(ByteSpan(mIPK), encodeSigma1Params.initiatorRandom, rootPubKeySpan, fabricId,
                                                        mPeerNodeId, destinationIdSpan));
         encodeSigma1Params.destinationId = destinationIdSpan;
     }
 
     VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    encodeSigma1Params.initiatorMrpConfig = &mLocalMRPConfig.Value();
 
     // Try to find persistent session, and resume it.
-    bool resuming = false;
     if (mSessionResumptionStorage != nullptr)
     {
         CHIP_ERROR err = mSessionResumptionStorage->FindByScopedNodeId(fabricInfo->GetScopedNodeIdForNode(mPeerNodeId),
@@ -817,14 +819,13 @@ CHIP_ERROR CASESession::SendSigma1()
         {
             // Found valid resumption state, try to resume the session.
 
+            encodeSigma1Params.resumptionId = mResumeResumptionId;
             MutableByteSpan resumeMICSpan(encodeSigma1Params.initiatorResume1MIC);
-            ReturnErrorOnFailure(GenerateSigmaResumeMIC(ByteSpan(mInitiatorRandom), ByteSpan(mResumeResumptionId),
+            ReturnErrorOnFailure(GenerateSigmaResumeMIC(encodeSigma1Params.initiatorRandom, encodeSigma1Params.resumptionId,
                                                         ByteSpan(kKDFS1RKeyInfo), ByteSpan(kResume1MIC_Nonce), resumeMICSpan));
 
             encodeSigma1Params.initiatorResumeMICSpan     = resumeMICSpan;
             encodeSigma1Params.sessionResumptionRequested = true;
-
-            resuming = true;
         }
     }
 
@@ -837,7 +838,7 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(mExchangeCtxt.Value()->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma1, std::move(msg_R1),
                                                             SendFlags(SendMessageFlags::kExpectResponse)));
 
-    if (resuming)
+    if (encodeSigma1Params.sessionResumptionRequested)
     {
         mState = State::kSentSigma1Resume;
 
@@ -861,17 +862,19 @@ CHIP_ERROR CASESession::SendSigma1()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, Sigma1Param & inputParams)
+CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, EncodeSigma1Param & input)
 {
 
     MATTER_TRACE_SCOPE("EncodeSigma1", "CASESession");
 
-    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize,          // initiatorRandom
-                                                  sizeof(uint16_t),                     // initiatorSessionId,
-                                                  kSHA256_Hash_Length,                  // destinationId
-                                                  kP256_PublicKey_Length,               // InitiatorEphPubKey,
-                                                  SessionParameters::kEstimatedTLVSize, // initiatorSessionParams
-                                                  SessionResumptionStorage::kResumptionIdSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize,                 // initiatorRandom
+                                                  sizeof(uint16_t),                            // initiatorSessionId,
+                                                  kSHA256_Hash_Length,                         // destinationId
+                                                  kP256_PublicKey_Length,                      // InitiatorEphPubKey,
+                                                  SessionParameters::kEstimatedTLVSize,        // initiatorSessionParams
+                                                  SessionResumptionStorage::kResumptionIdSize, // resumptionId
+                                                  CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES            // initiatorResumeMIC
+    );
 
     msg = System::PacketBufferHandle::New(data_len);
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -881,24 +884,21 @@ CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, Sigma1Par
 
     tlvWriter.Init(std::move(msg));
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-    // TODO Pass this in the struct?
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kInitiatorRandomTag), ByteSpan(mInitiatorRandom)));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kInitiatorSessionIdTag), inputParams.initiatorSessionId));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kInitiatorRandomTag), input.initiatorRandom));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kInitiatorSessionIdTag), input.initiatorSessionId));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kDestinationIdTag), input.destinationId));
 
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kDestinationIdTag), inputParams.destinationId));
+    VerifyOrReturnError(input.pEphPubKey != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(kInitiatorPubKeyTag), *input.pEphPubKey,
+                                            static_cast<uint32_t>(input.pEphPubKey->Length())));
 
-    // TODO Pass this in the struct?
-    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(kInitiatorPubKeyTag), mEphemeralKey->Pubkey(),
-                                            static_cast<uint32_t>(mEphemeralKey->Pubkey().Length())));
+    VerifyOrReturnError(input.initiatorMrpConfig != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(kInitiatorMRPParamsTag), *input.initiatorMrpConfig, tlvWriter));
 
-    // TODO is it redudunt?
-    VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(kInitiatorMRPParamsTag), mLocalMRPConfig.Value(), tlvWriter));
-
-    if (inputParams.sessionResumptionRequested)
+    if (input.sessionResumptionRequested)
     {
-        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kResumptionIDTag), mResumeResumptionId));
-        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kResume1MICTag), inputParams.initiatorResumeMICSpan));
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kResumptionIDTag), input.resumptionId));
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kResume1MICTag), input.initiatorResumeMICSpan));
     }
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
@@ -1003,7 +1003,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
 
-    Sigma1Param parsedSigma1;
+    ParseSigma1Param parsedSigma1;
 
     SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ msg->Start(), msg->DataLength() }));
 
@@ -1016,11 +1016,8 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
 
     VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    // TODO: Added by Amine, taken from inside ParseSigma1
-    // This was removed to remove the non-parsing parts from ParseSigma1, decoupling it from higher levels
-    // TODO: Should i change it?
-    // Set the recieved MRP parameters included with Sigma1
-    if (parsedSigma1.InitiatorMRPParamsPresent == true)
+    // Set the MRP parameters provided in the Sigma1 message
+    if (parsedSigma1.InitiatorMRPParamsPresent)
     {
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
@@ -2191,7 +2188,7 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
     return err;
 }
 
-CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, Sigma1Param & output)
+CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParseSigma1Param & output)
 {
     using namespace TLV;
 

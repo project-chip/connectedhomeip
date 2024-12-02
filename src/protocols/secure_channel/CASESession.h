@@ -51,6 +51,10 @@
 
 namespace chip {
 
+namespace Testing {
+class FuzzCASESession;
+}
+
 // TODO: temporary derive from Messaging::UnsolicitedMessageHandler, actually the CASEServer should be the umh, it will be fixed
 // when implementing concurrent CASE session.
 class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler,
@@ -118,18 +122,34 @@ public:
      */
     void SetGroupDataProvider(Credentials::GroupDataProvider * groupDataProvider) { mGroupDataProvider = groupDataProvider; }
 
+    // This struct is only serves as a base struct for EncodeSigma1 and ParseSigma1
     struct Sigma1Param
     {
         ByteSpan initiatorRandom;
         uint16_t initiatorSessionId;
         ByteSpan destinationId;
-        ByteSpan initiatorEphPubKey;
         bool sessionResumptionRequested = false;
-        bool InitiatorMRPParamsPresent  = false;
         ByteSpan resumptionId;
         ByteSpan initiatorResumeMICSpan;
+    };
+
+    struct EncodeSigma1Param : Sigma1Param
+    {
+        const Crypto::P256PublicKey * pEphPubKey;
+        const ReliableMessageProtocolConfig * initiatorMrpConfig;
         uint8_t initiatorResume1MIC[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
     };
+
+    struct ParseSigma1Param : Sigma1Param
+    {
+        ByteSpan initiatorEphPubKey;
+        bool InitiatorMRPParamsPresent = false;
+    };
+
+    /*
+     * TLV Encodes a Sigma1 message into the payload handled by msg
+     */
+    CHIP_ERROR EncodeSigma1(System::PacketBufferHandle & msg, EncodeSigma1Param & InputEncodeSigma1);
 
     /**
      * Parse a sigma1 message.  This function will return success only if the
@@ -149,11 +169,8 @@ public:
      * and the  resumptionID and initiatorResumeMIC outparams will be set to
      * valid values, or the resumptionRequested outparam will be set to false.
      */
-    CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, Sigma1Param & OutputParseSigma1);
-
-    // TODO: Add message
-    // TODO: should i keep it as public? why is ParseSigma1 public?
-    CHIP_ERROR EncodeSigma1(System::PacketBufferHandle & msg, Sigma1Param & encodeSigma1);
+    CHIP_ERROR
+    ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParseSigma1Param & OutputParseSigma1);
 
     /**
      * @brief
@@ -229,6 +246,7 @@ public:
 
 private:
     friend class TestCASESession;
+    friend class Testing::FuzzCASESession;
 
     using AutoReleaseSessionKey = Crypto::AutoReleaseSymmetricKey<Crypto::Aes128KeyHandle>;
 

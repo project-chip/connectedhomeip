@@ -745,7 +745,7 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
                                                                                                                                    \
         TLV::ContiguousBufferTLVReader reader;                                                                                     \
         reader.Init(buf);                                                                                                          \
-        CASESession::Sigma1Param parsedSigma1;                                                                                     \
+        CASESession::ParseSigma1Param parsedSigma1;                                                                                \
         CASESession session;                                                                                                       \
                                                                                                                                    \
         EXPECT_EQ(session.ParseSigma1(reader, parsedSigma1) == CHIP_NO_ERROR, params::expectSuccess);                              \
