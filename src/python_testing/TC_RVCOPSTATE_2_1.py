@@ -85,7 +85,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCOPSTATE_2_1(self):
-      if self.matter_test_config.endpoint is None or self.matter_test_config.endpoint == 0:
+        if self.matter_test_config.endpoint is None or self.matter_test_config.endpoint == 0:
             asserts.fail("--endpoint must be set and not set to 0 for this test to run correctly.")
         self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
