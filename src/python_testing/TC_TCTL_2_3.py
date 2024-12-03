@@ -73,7 +73,7 @@ class TC_TCTL_2_3(MatterBaseTest):
 
         # Step 3: Read SupportedTemperatureLevels attribute
         self.step(3)
-        if self.check_pics("TCTL.S.A0004"):  # SupportedTemperatureLevels attribute
+        if self.check_pics("TCTL.S.A0005"):  # SupportedTemperatureLevels attribute
             supported_temps = await self.default_controller.ReadAttribute(
                 nodeid=self.dut_node_id,
                 attributes=[(1, Clusters.TemperatureControl.Attributes.SupportedTemperatureLevels)]
