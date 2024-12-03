@@ -4714,14 +4714,6 @@
           ]
         },
         {
-          "name": "Binding",
-          "code": 30,
-          "mfgCode": null,
-          "define": "BINDING_CLUSTER",
-          "side": "client",
-          "enabled": 1
-        },
-        {
           "name": "Actions",
           "code": 37,
           "mfgCode": null,
