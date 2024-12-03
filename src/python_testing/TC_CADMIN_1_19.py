@@ -111,7 +111,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
             self.current_step_index = 4
 
             self.step("4a")
-            params = await self.openCommissioningWindow(dev_ctrl=self.th1, timeout=self.max_window_duration, node_id=self.dut_node_id)
+            params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=self.max_window_duration, node_id=self.dut_node_id)
 
             self.step("4b")
             fids_ca_dir[fid] = self.certificate_authority_manager.NewCertificateAuthority()
@@ -128,7 +128,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         asserts.assert_equal(current_fabrics, max_fabrics, "Expected number of fabrics not correct")
 
         self.step(6)
-        params = await self.openCommissioningWindow(dev_ctrl=self.th1, node_id=self.dut_node_id)
+        params = await self.open_commissioning_window(dev_ctrl=self.th1, node_id=self.dut_node_id)
 
         self.step(7)
         # TH creates a controller on a new fabric and attempts to commission DUT_CE using that controller
