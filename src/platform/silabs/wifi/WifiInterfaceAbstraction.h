@@ -64,13 +64,13 @@ using MacAddress = std::array<uint8_t, kWifiMacAddressLength>;
 
 enum class WifiEvent : uint8_t
 {
-    kStartUp      = 1,
-    kConnect      = 2,
-    kDisconnect   = 3,
-    kScanComplete = 4,
-    kGotIPv4      = 5,
-    kGotIPv6      = 6,
-    kLostIP       = 7,
+    kStartUp      = 0,
+    kConnect      = 1,
+    kDisconnect   = 2,
+    kScanComplete = 3,
+    kGotIPv4      = 4,
+    kGotIPv6      = 5,
+    kLostIP       = 6,
 };
 
 enum class WifiState : uint16_t

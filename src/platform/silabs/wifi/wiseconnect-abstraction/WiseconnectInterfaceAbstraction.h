@@ -25,15 +25,15 @@
 
 enum class WifiPlatformEvent : uint8_t
 {
-    kStationConnect    = 1,
-    kStationDisconnect = 2,
-    kAPStart           = 3,
-    kAPStop            = 4,
-    kScan              = 5, /* This combines the scan start and scan result events  */
-    kStationStartJoin  = 6,
-    kStationDoDhcp     = 7,
-    kStationDhcpDone   = 8,
-    kStationDhcpPoll   = 9,
+    kStationConnect    = 0,
+    kStationDisconnect = 1,
+    kAPStart           = 2,
+    kAPStop            = 3,
+    kScan              = 4, /* This combines the scan start and scan result events  */
+    kStationStartJoin  = 5,
+    kStationDoDhcp     = 6,
+    kStationDhcpDone   = 7,
+    kStationDhcpPoll   = 8,
 };
 
 void sl_matter_wifi_task(void * arg);
