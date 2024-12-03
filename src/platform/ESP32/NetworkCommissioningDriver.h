@@ -36,8 +36,14 @@ BitFlags<WiFiSecurityBitmap> ConvertSecurityType(wifi_auth_mode_t authMode);
 class ESPScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
+    ESPScanResponseIterator() {}
+#else
     ESPScanResponseIterator(const size_t size, const wifi_ap_record_t * scanResults) : mSize(size), mpScanResults(scanResults) {}
+#endif
+
     size_t Count() override { return mSize; }
+
     bool Next(WiFiScanResponse & item) override
     {
         if (mIternum >= mSize)
@@ -58,11 +64,38 @@ public:
         mIternum++;
         return true;
     }
-    void Release() override {}
+
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
+    void Add(wifi_ap_record_t * record)
+    {
+        size_t newCapacity = mSize + 1;
+        wifi_ap_record_t * newMemory =
+            static_cast<wifi_ap_record_t *>(Platform::MemoryRealloc(mpScanResults, newCapacity * sizeof(wifi_ap_record_t)));
+        VerifyOrReturn(newMemory);
+        mpScanResults = newMemory;
+        memcpy(&mpScanResults[mSize], record, sizeof(wifi_ap_record_t));
+        mSize = newCapacity;
+    }
+#endif
+
+    void Release() override
+    {
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
+        Platform::MemoryFree(mpScanResults);
+        mpScanResults = nullptr;
+        mSize         = 0;
+#endif
+        mIternum = 0;
+    }
 
 private:
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
+    wifi_ap_record_t * mpScanResults = nullptr;
+    size_t mSize                     = 0;
+#else
     const size_t mSize;
     const wifi_ap_record_t * mpScanResults;
+#endif
     size_t mIternum = 0;
 };
 
