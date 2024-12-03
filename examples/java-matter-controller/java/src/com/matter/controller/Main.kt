@@ -87,6 +87,7 @@ private fun getBdxCommands(
 ): List<Command> {
   return listOf(
     DownloadLogCommand(controller, credentialsIssuer),
+    PairOnNetworkLongDownloadLogCommand(controller, credentialsIssuer),
   )
 }
 

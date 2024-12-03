@@ -19,10 +19,31 @@ package chip.devicecontroller;
 
 import javax.annotation.Nonnull;
 
+/** An interface for receiving download log response. */
 public interface DownloadLogCallback {
+  /**
+   * OnError will be called when the log download fails.
+   *
+   * @param fabricIndex The fabric index of to which the node belongs
+   * @param nodeId The Node ID of the target device.
+   * @param errorCode Error code on attestation failure.
+   */
   public void onError(int fabricIndex, long nodeId, long errorCode);
 
+  /**
+   * onSuccess will be called when the log download is complete.
+   *
+   * @param fabricIndex The fabric index of to which the node belongs
+   * @param nodeId The Node ID of the target device.
+   */
   public void onSuccess(int fabricIndex, long nodeId);
 
+  /**
+   * onTransferData will be called when data is being received.
+   *
+   * @param fabricIndex The fabric index of to which the node belongs
+   * @param nodeId The Node ID of the target device.
+   * @param data Received log data.
+   */
   public boolean onTransferData(int fabricIndex, long nodeId, @Nonnull byte[] data);
 }

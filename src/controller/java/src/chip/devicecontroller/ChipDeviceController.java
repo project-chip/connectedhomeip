@@ -883,6 +883,15 @@ public class ChipDeviceController {
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
   }
 
+  /**
+   * This function is used for downloading logs from the device.
+   *
+   * @param deviceId The 64-bit node ID of the device.
+   * @param type The log type being downloaded. See detailed in {@link DiagnosticLogType}.
+   * @param timeout This function sets the timeout. If set to 0, there will be no timeout.
+   * @param callback The callback is registered to convey the status during log downloads. See
+   *     detailed in {@link DownloadLogCallback}.
+   */
   public boolean downloadLogFromNode(
       long deviceId, DiagnosticLogType type, int timeout, DownloadLogCallback callback) {
     return downloadLogFromNode(deviceControllerPtr, deviceId, type.getValue(), timeout, callback);
