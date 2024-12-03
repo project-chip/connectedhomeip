@@ -591,7 +591,6 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
             except Exception as e:
                 logging.error(f"Error parsing XML file {xml}: {e}")
 
-
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
     # Descriptor - TagList feature - this feature is mandated when the duplicate condition holds for the endpoint. It is tested in DESC-2.2
