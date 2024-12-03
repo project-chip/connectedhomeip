@@ -250,7 +250,6 @@ int BridgedDeviceManager::RemoveDeviceEndpoint(BridgedDevice * dev)
     {
         if (mDevices[index].get() == dev)
         {
-            DeviceLayer::StackLock lock;
             // Silence complaints about unused ep when progress logging
             // disabled.
             [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
@@ -332,7 +331,6 @@ std::optional<uint16_t> BridgedDeviceManager::RemoveDeviceByScopedNodeId(chip::S
     {
         if (mDevices[index] && mDevices[index]->GetScopedNodeId() == scopedNodeId)
         {
-            DeviceLayer::StackLock lock;
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
             mDevices[index] = nullptr;
             ChipLogProgress(NotSpecified, "Removed device with Id=[%d:0x" ChipLogFormatX64 "] from dynamic endpoint %d (index=%d)",
