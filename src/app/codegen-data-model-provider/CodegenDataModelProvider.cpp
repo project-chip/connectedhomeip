@@ -321,11 +321,11 @@ std::optional<DataModel::EndpointInfo> GetEndpointInfoAtIndex(uint16_t endpointI
     EndpointId parent = emberAfParentEndpointFromIndex(endpointIndex);
     if (GetCompositionForEndpointIndex(endpointIndex) == EndpointComposition::kFullFamily)
     {
-        return DataModel::EndpointInfo(parent, DataModel::EndpointCompositionPattern::kFullFamilyPattern);
+        return DataModel::EndpointInfo(parent, DataModel::EndpointCompositionPattern::kFullFamily);
     }
     if (GetCompositionForEndpointIndex(endpointIndex) == EndpointComposition::kTree)
     {
-        return DataModel::EndpointInfo(parent, DataModel::EndpointCompositionPattern::kTreePattern);
+        return DataModel::EndpointInfo(parent, DataModel::EndpointCompositionPattern::kTree);
     }
     return std::nullopt;
 }
