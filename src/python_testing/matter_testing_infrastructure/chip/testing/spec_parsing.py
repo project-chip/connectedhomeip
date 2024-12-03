@@ -553,7 +553,7 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
 
         return data_model_root / version / data_model_level
     else:
-        # If it's a custom directory, return it directly
+        # If it's a custom directory, returns directly
         return pathlib.Path(data_model_directory)
 
 
