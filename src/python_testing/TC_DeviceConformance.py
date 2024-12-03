@@ -273,7 +273,6 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         return success, problems
 
-
     def check_device_type_revisions(self) -> tuple[bool, list[ProblemNotice]]:
         success = True
         problems = []
@@ -299,9 +298,9 @@ class DeviceConformanceTests(BasicCompositionTests):
                 actual_revision = device_type.revision
                 if expected_revision != actual_revision:
                     location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id)
-                    record_error(location, f"Expected Device type revision for device type {device_type_id} {self.xml_device_types[device_type_id].name} on endpoint {endpoint_id} does not match revision on DUT. Expected: {expected_revision} DUT: {actual_revision}")
+                    record_error(
+                        location, f"Expected Device type revision for device type {device_type_id} {self.xml_device_types[device_type_id].name} on endpoint {endpoint_id} does not match revision on DUT. Expected: {expected_revision} DUT: {actual_revision}")
         return success, problems
-
 
     def check_device_type(self, fail_on_extra_clusters: bool = True, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
