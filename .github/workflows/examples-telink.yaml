@@ -298,8 +298,6 @@ jobs:
             - name: Build example Telink (B91 Mars) Temperature Measurement App with OTA
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
-              # TODO: remove continue-on-error
-              continue-on-error: true
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-temperature-measurement-mars-ota' build"

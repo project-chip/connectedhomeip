@@ -26,7 +26,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/core/CHIPError.h>
 
-#if defined(CONFIG_CHIP_USE_MARS_SENSOR) && defined(CONFIG_WS2812_STRIP) && !defined(CONFIG_PM)
+#if defined(CONFIG_CHIP_USE_MARS_SENSOR) && defined(CONFIG_WS2812_STRIP_GPIO_TELINK) && !defined(CONFIG_PM)
 #define USE_COLOR_TEMPERATURE_LIGHT
 #endif
 
