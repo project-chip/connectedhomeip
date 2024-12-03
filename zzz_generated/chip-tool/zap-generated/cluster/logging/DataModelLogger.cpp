@@ -19484,7 +19484,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     default:
         break;
     }
-    ChipLogProgress(chipTool, "  Don't know how to log atribute value");
+    ChipLogProgress(chipTool, "  Don't know how to log attribute value");
     return CHIP_NO_ERROR;
 }
 
