@@ -38,20 +38,45 @@ using namespace chip::app::Clusters::FanControl::Attributes;
 using Protocols::InteractionModel::Status;
 
 namespace {
-class ChefFanControlManager : public AttributeAccessInterface, public Delegate
+class ChefFanControlManager : public Delegate
 {
 public:
-    ChefFanControlManager(EndpointId aEndpointId) :
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), FanControl::Id), Delegate(aEndpointId)
-    {}
+    ChefFanControlManager(EndpointId aEndpointId) : Delegate(aEndpointId) {}
 
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    void Init();
+    void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
+    DataModel::Nullable<uint8_t> GetSpeedSetting();
+    DataModel::Nullable<Percent> GetPercentSetting();
 
 private:
-    Nullable<uint8_t> mPercentSetting{};
-    Nullable<uint8_t> mSpeedSetting{};
+    uint8_t mPercentCurrent = 0;
+    uint8_t mSpeedCurrent   = 0;
+
+    // Fan Mode Limits
+    struct Range
+    {
+        bool Contains(int value) const { return value >= low && value <= high; }
+        int Low() const { return low; }
+        int High() const { return high; }
+
+        int low;
+        int high;
+    };
+    static constexpr Range kFanModeLowSpeedRange    = { 1, 3 };
+    static constexpr Range kFanModeMediumSpeedRange = { 4, 7 };
+    static constexpr Range kFanModeHighSpeedRange   = { 8, 10 };
+
+    static_assert(kFanModeLowSpeedRange.low <= kFanModeLowSpeedRange.high);
+    static_assert(kFanModeLowSpeedRange.high + 1 == kFanModeMediumSpeedRange.low);
+    static_assert(kFanModeMediumSpeedRange.high + 1 == kFanModeHighSpeedRange.low);
+    static_assert(kFanModeHighSpeedRange.low <= kFanModeHighSpeedRange.high);
+
+    void FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode);
+    void SetSpeedCurrent(uint8_t aNewSpeedCurrent);
+    void SetPercentCurrent(uint8_t aNewPercentCurrent);
+    void SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting);
+    static FanControl::FanModeEnum SpeedToFanMode(uint8_t speed);
 };
 
 static std::unique_ptr<ChefFanControlManager> mFanControlManager;
@@ -99,98 +124,199 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
     return SpeedSetting::Set(mEndpoint, newSpeedSetting);
 }
 
-CHIP_ERROR ChefFanControlManager::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
 {
-    VerifyOrDie(aPath.mClusterId == FanControl::Id);
-    VerifyOrDie(aPath.mEndpointId == mEndpoint);
-
-    switch (aPath.mAttributeId)
+    ChipLogProgress(NotSpecified, "ChefFanControlManager::HandleFanControlAttributeChange");
+    switch (attributeId)
     {
-    case SpeedSetting::Id: {
-        Nullable<uint8_t> newSpeedSetting;
-        ReturnErrorOnFailure(aDecoder.Decode(newSpeedSetting));
-
-        // Ensure new speed is in bounds
+    case FanControl::Attributes::PercentSetting::Id: {
+        ChipLogProgress(NotSpecified, "ChefFanControlManager::HandleFanControlAttributeChange  PercentSetting");
+        DataModel::Nullable<Percent> percentSetting;
+        if (!NumericAttributeTraits<Percent>::IsNullValue(*value))
         {
-            uint8_t maxSpeedSetting                    = 0;
-            Protocols::InteractionModel::Status status = SpeedMax::Get(mEndpoint, &maxSpeedSetting);
-            VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_IM_GLOBAL_STATUS(Failure));
-
-            if (!newSpeedSetting.IsNull() && newSpeedSetting.Value() > maxSpeedSetting)
-            {
-                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-            }
+            percentSetting.SetNonNull(NumericAttributeTraits<Percent>::StorageToWorking(*value));
+        }
+        else
+        {
+            percentSetting.SetNull();
         }
 
-        // Only act on changed.
-        if (newSpeedSetting != mSpeedSetting)
-        {
-            mSpeedSetting = newSpeedSetting;
-
-            // Mark both the setting AND the current dirty, since the current always
-            // tracks the target for our product.
-            MatterReportingAttributeChangeCallback(mEndpoint, FanControl::Id, Attributes::SpeedSetting::Id);
-            MatterReportingAttributeChangeCallback(mEndpoint, FanControl::Id, Attributes::SpeedCurrent::Id);
-        }
-
-        break;
-    }
-    case PercentSetting::Id: {
-        Nullable<uint8_t> newPercentSetting;
-        ReturnErrorOnFailure(aDecoder.Decode(newPercentSetting));
-
-        // Ensure new speed in percent is valid.
-        if (!newPercentSetting.IsNull() && newPercentSetting.Value() > 100)
-        {
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-        }
-
-        // Only act on changed.
-        if (newPercentSetting != mPercentSetting)
-        {
-            mPercentSetting = newPercentSetting;
-
-            // Mark both the setting AND the current dirty, since the current always
-            // tracks the target for our product.
-            MatterReportingAttributeChangeCallback(mEndpoint, FanControl::Id, Attributes::PercentSetting::Id);
-            MatterReportingAttributeChangeCallback(mEndpoint, FanControl::Id, Attributes::PercentCurrent::Id);
-        }
-
-        break;
-    }
-    default:
+        // The cluster code in fan-control-server.cpp is the only one allowed to set PercentSetting to null.
+        // This happens as a consequence of setting the FanMode to kAuto. In auto mode, percentCurrent should continue to report the
+        // real fan speed percentage. In this example, we set PercentCurrent to 0 here as we don't have a real value for the Fan
+        // speed or a FanAutoMode simulator.
+        // When not Null, SpeedCurrent tracks SpeedSetting's value.
+        SetPercentCurrent(percentSetting.ValueOr(0));
         break;
     }
 
-    // Fall through goes to attribute store legacy handling.
-    return CHIP_NO_ERROR;
+    case FanControl::Attributes::SpeedSetting::Id: {
+        ChipLogProgress(NotSpecified, "ChefFanControlManager::HandleFanControlAttributeChange  SpeedSetting");
+        DataModel::Nullable<uint8_t> speedSetting;
+        if (!NumericAttributeTraits<uint8_t>::IsNullValue(*value))
+        {
+            speedSetting.SetNonNull(NumericAttributeTraits<uint8_t>::StorageToWorking(*value));
+        }
+        else
+        {
+            speedSetting.SetNull();
+        }
+
+        // The cluster code in fan-control-server.cpp is the only one allowed to set speedSetting to null.
+        // This happens as a consequence of setting the FanMode to kAuto. In auto mode, speedCurrent should continue to report the
+        // real fan speed. In this example, we set SpeedCurrent to 0 here as we don't have a real value for the Fan speed or a
+        // FanAutoMode simulator.
+        // When not Null, SpeedCurrent tracks SpeedSetting's value.
+        SetSpeedCurrent(speedSetting.ValueOr(0));
+        // Determine if the speed change should also change the fan mode
+        FanControl::Attributes::FanMode::Set(mEndpoint, SpeedToFanMode(mSpeedCurrent));
+        break;
+    }
+
+    case FanControl::Attributes::FanMode::Id: {
+        ChipLogProgress(NotSpecified, "ChefFanControlManager::HandleFanControlAttributeChange  FanMode");
+
+        static_assert(sizeof(FanControl::FanModeEnum) == 1);
+        FanControl::FanModeEnum fanMode = static_cast<FanControl::FanModeEnum>(*value);
+        FanModeWriteCallback(fanMode);
+        break;
+    }
+
+    default: {
+        break;
+    }
+    }
 }
 
-CHIP_ERROR ChefFanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+FanControl::FanModeEnum ChefFanControlManager::SpeedToFanMode(uint8_t speed)
 {
-    VerifyOrDie(aPath.mClusterId == FanControl::Id);
-    VerifyOrDie(aPath.mEndpointId == mEndpoint);
-
-    switch (aPath.mAttributeId)
+    if (speed == 0)
     {
-    case PercentCurrent::Id: {
-        // Current percents always tracks setting immediately in our implementation.
-        return aEncoder.Encode(mPercentSetting.ValueOr(0));
+        return FanControl::FanModeEnum::kOff;
     }
-    case PercentSetting::Id: {
-        return aEncoder.Encode(mPercentSetting);
+    if (kFanModeLowSpeedRange.Contains(speed))
+    {
+        return FanControl::FanModeEnum::kLow;
     }
-    case SpeedCurrent::Id: {
-        // Current speed always tracks setting immediately in our implementation.
-        return aEncoder.Encode(mSpeedSetting.ValueOr(0));
+    if (kFanModeMediumSpeedRange.Contains(speed))
+    {
+        return FanControl::FanModeEnum::kMedium;
     }
-    case SpeedSetting::Id: {
-        return aEncoder.Encode(mSpeedSetting);
+    return FanControl::FanModeEnum::kHigh;
+}
+
+void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
+{
+    ChipLogDetail(NotSpecified, "ChefFanControlManager::SetPercentCurrent: %d", aNewPercentCurrent);
+    mPercentCurrent = aNewPercentCurrent;
+    Status status   = FanControl::Attributes::PercentCurrent::Set(mEndpoint, mPercentCurrent);
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "ChefFanControlManager::SetPercentCurrent: failed to set PercentCurrent attribute: %d",
+                     to_underlying(status));
     }
-    default:
+}
+
+void ChefFanControlManager::SetSpeedCurrent(uint8_t aNewSpeedCurrent)
+{
+    mSpeedCurrent = aNewSpeedCurrent;
+    Status status = FanControl::Attributes::SpeedCurrent::Set(mEndpoint, aNewSpeedCurrent);
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: failed to set SpeedCurrent attribute: %d",
+                     to_underlying(status));
+    }
+}
+
+void ChefFanControlManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode)
+{
+    ChipLogDetail(NotSpecified, "ChefFanControlManager::FanModeWriteCallback: %d", to_underlying(aNewFanMode));
+    switch (aNewFanMode)
+    {
+    case FanControl::FanModeEnum::kOff: {
+        DataModel::Nullable<uint8_t> speedSetting(0);
+        SetSpeedSetting(speedSetting);
         break;
     }
-    return CHIP_NO_ERROR;
+    case FanControl::FanModeEnum::kLow: {
+        if (!kFanModeLowSpeedRange.Contains(mSpeedCurrent))
+        {
+            DataModel::Nullable<uint8_t> speedSetting(kFanModeLowSpeedRange.Low());
+            SetSpeedSetting(speedSetting);
+        }
+        break;
+    }
+    case FanControl::FanModeEnum::kMedium: {
+        if (!kFanModeMediumSpeedRange.Contains(mSpeedCurrent))
+        {
+            DataModel::Nullable<uint8_t> speedSetting(kFanModeMediumSpeedRange.Low());
+            SetSpeedSetting(speedSetting);
+        }
+        break;
+    }
+    case FanControl::FanModeEnum::kOn:
+    case FanControl::FanModeEnum::kHigh: {
+        if (!kFanModeHighSpeedRange.Contains(mSpeedCurrent))
+        {
+            DataModel::Nullable<uint8_t> speedSetting(kFanModeHighSpeedRange.Low());
+            SetSpeedSetting(speedSetting);
+        }
+        break;
+    }
+    case FanControl::FanModeEnum::kSmart:
+    case FanControl::FanModeEnum::kAuto: {
+        ChipLogProgress(NotSpecified, "ChefFanControlManager::FanModeWriteCallback: Auto");
+        break;
+    }
+    case FanControl::FanModeEnum::kUnknownEnumValue: {
+        ChipLogProgress(NotSpecified, "ChefFanControlManager::FanModeWriteCallback: Unknown");
+        break;
+    }
+    }
+}
+
+void ChefFanControlManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting)
+{
+    Status status = FanControl::Attributes::SpeedSetting::Set(mEndpoint, aNewSpeedSetting);
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",
+                     to_underlying(status));
+    }
+}
+
+void ChefFanControlManager::Init()
+{
+    SetPercentCurrent(GetPercentSetting().ValueOr(0));
+    SetSpeedCurrent(GetSpeedSetting().ValueOr(0));
+}
+
+DataModel::Nullable<Percent> ChefFanControlManager::GetPercentSetting()
+{
+    DataModel::Nullable<Percent> percentSetting;
+    Status status = FanControl::Attributes::PercentSetting::Get(mEndpoint, percentSetting);
+
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "ChefFanControlManager::GetPercentSetting: failed to get PercentSetting attribute: %d",
+                     to_underlying(status));
+    }
+
+    return percentSetting;
+}
+
+DataModel::Nullable<uint8_t> ChefFanControlManager::GetSpeedSetting()
+{
+    DataModel::Nullable<uint8_t> speedSetting;
+    Status status = FanControl::Attributes::SpeedSetting::Get(mEndpoint, speedSetting);
+
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "ChefFanControlManager::GetSpeedSetting: failed to get SpeedSetting attribute: %d",
+                     to_underlying(status));
+    }
+
+    return speedSetting;
 }
 
 } // anonymous namespace
@@ -199,6 +325,11 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrDie(!mFanControlManager);
     mFanControlManager = std::make_unique<ChefFanControlManager>(endpoint);
-    AttributeAccessInterfaceRegistry::Instance().Register(mFanControlManager.get());
     FanControl::SetDefaultDelegate(endpoint, mFanControlManager.get());
+    mFanControlManager->Init();
+}
+
+void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
+{
+    mFanControlManager->HandleFanControlAttributeChange(attributeId, type, size, value);
 }

@@ -288,6 +288,7 @@ TEST_F(TestEventChunking, TestEventChunking)
 
     // Initialize the ember side server logic
     CodegenDataModelProviderInstance()->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -355,6 +356,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
 
     // Initialize the ember side server logic
     CodegenDataModelProviderInstance()->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -432,6 +434,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndLargeAttributesChunking)
 
     // Initialize the ember side server logic
     CodegenDataModelProviderInstance()->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.

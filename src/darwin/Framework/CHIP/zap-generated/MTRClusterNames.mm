@@ -7688,8 +7688,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Zones";
             break;
 
-        case MTRAttributeIDTypeClusterZoneManagementAttributeTimeControlID:
-            result = @"TimeControl";
+        case MTRAttributeIDTypeClusterZoneManagementAttributeTriggersID:
+            result = @"Triggers";
             break;
 
         case MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID:
@@ -7781,14 +7781,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHDRModeEnabledID:
             result = @"HDRModeEnabled";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentVideoCodecsID:
-            result = @"CurrentVideoCodecs";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentSnapshotConfigID:
-            result = @"CurrentSnapshotConfig";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID:

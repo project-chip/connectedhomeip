@@ -4148,8 +4148,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedZoneSources";
         case chip::app::Clusters::ZoneManagement::Attributes::Zones::Id:
             return "Zones";
-        case chip::app::Clusters::ZoneManagement::Attributes::TimeControl::Id:
-            return "TimeControl";
+        case chip::app::Clusters::ZoneManagement::Attributes::Triggers::Id:
+            return "Triggers";
         case chip::app::Clusters::ZoneManagement::Attributes::Sensitivity::Id:
             return "Sensitivity";
         case chip::app::Clusters::ZoneManagement::Attributes::GeneratedCommandList::Id:
@@ -4197,10 +4197,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentFrameRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::HDRModeEnabled::Id:
             return "HDRModeEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentVideoCodecs::Id:
-            return "CurrentVideoCodecs";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentSnapshotConfig::Id:
-            return "CurrentSnapshotConfig";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::FabricsUsingCamera::Id:
             return "FabricsUsingCamera";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedVideoStreams::Id:
