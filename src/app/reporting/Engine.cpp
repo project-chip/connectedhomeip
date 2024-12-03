@@ -51,7 +51,7 @@ using Protocols::InteractionModel::Status;
 
 Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
 {
-    if (!model->GetClusterInfo(eventPath).has_value())
+    if (!model->GetServerClusterInfo(eventPath).has_value())
     {
         return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
     }
@@ -148,7 +148,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     readRequest.path              = path;
 
     DataVersion version = 0;
-    if (std::optional<DataModel::ClusterInfo> clusterInfo = dataModel->GetClusterInfo(path); clusterInfo.has_value())
+    if (std::optional<DataModel::ClusterInfo> clusterInfo = dataModel->GetServerClusterInfo(path); clusterInfo.has_value())
     {
         version = clusterInfo->dataVersion;
     }
@@ -208,7 +208,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
 bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
 {
-    std::optional<DataModel::ClusterInfo> info = dataModel->GetClusterInfo(path);
+    std::optional<DataModel::ClusterInfo> info = dataModel->GetServerClusterInfo(path);
     if (!info.has_value())
     {
         return false;
