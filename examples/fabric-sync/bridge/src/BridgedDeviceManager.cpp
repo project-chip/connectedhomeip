@@ -245,12 +245,13 @@ std::optional<uint16_t> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
 
 int BridgedDeviceManager::RemoveDeviceEndpoint(BridgedDevice * dev)
 {
+    assertChipStackLockedByCurrentThread();
+
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (mDevices[index].get() == dev)
         {
-            DeviceLayer::StackLock lock;
             // Silence complaints about unused ep when progress logging
             // disabled.
             [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
@@ -266,6 +267,8 @@ int BridgedDeviceManager::RemoveDeviceEndpoint(BridgedDevice * dev)
 
 BridgedDevice * BridgedDeviceManager::GetDevice(chip::EndpointId endpointId) const
 {
+    assertChipStackLockedByCurrentThread();
+
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
         if (mDevices[index] && mDevices[index]->GetEndpointId() == endpointId)
@@ -304,6 +307,8 @@ std::string BridgedDeviceManager::GenerateUniqueId()
 
 BridgedDevice * BridgedDeviceManager::GetDeviceByUniqueId(const std::string & id)
 {
+    assertChipStackLockedByCurrentThread();
+
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
         if (mDevices[index] && mDevices[index]->GetBridgedAttributes().uniqueId == id)
@@ -316,6 +321,8 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByUniqueId(const std::string & id
 
 BridgedDevice * BridgedDeviceManager::GetDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId) const
 {
+    assertChipStackLockedByCurrentThread();
+
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
         if (mDevices[index] && mDevices[index]->GetScopedNodeId() == scopedNodeId)
@@ -328,11 +335,12 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByScopedNodeId(chip::ScopedNodeId
 
 std::optional<uint16_t> BridgedDeviceManager::RemoveDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId)
 {
+    assertChipStackLockedByCurrentThread();
+
     for (uint16_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
         if (mDevices[index] && mDevices[index]->GetScopedNodeId() == scopedNodeId)
         {
-            DeviceLayer::StackLock lock;
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
             mDevices[index] = nullptr;
             ChipLogProgress(NotSpecified, "Removed device with Id=[%d:0x" ChipLogFormatX64 "] from dynamic endpoint %d (index=%d)",
