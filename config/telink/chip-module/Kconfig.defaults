@@ -148,8 +148,7 @@ config BT_BUF_ACL_TX_SIZE
     default 107 if SOC_RISCV_TELINK_TL321X
     default 251
 
-
-#ifdef CONFIG_SOC_RISCV_TELINK_TL321X
+if SOC_RISCV_TELINK_TL321X
 
 config BT_BUF_EVT_RX_COUNT
     default 4
@@ -161,8 +160,7 @@ config BT_GATT_CACHING
     bool
     default n
 
-
-#endif
+endif # SOC_RISCV_TELINK_TL321X
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X
