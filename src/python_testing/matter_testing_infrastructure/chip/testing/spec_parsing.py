@@ -539,7 +539,7 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     """
     data_model_root = _get_data_model_root()
 
-    # Build path based on the version and data model level
+    # If it's a prebuilt directory, build the path based on the version and data model level
     if isinstance(data_model_directory, PrebuiltDataModelDirectory):
         version_map = {
             PrebuiltDataModelDirectory.k1_3: '1.3',
@@ -558,8 +558,15 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
 
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlCluster], list[ProblemNotice]]:
-    # Get the data model directory path inside the package
-    dir = get_data_model_directory(data_model_directory, 'clusters')
+    """
+    Build XML clusters from the specified data model directory.
+    This function supports both pre-built locations (via `PrebuiltDataModelDirectory`) and full paths (strings).
+    """
+    # If a pre-built directory is provided, resolve the full path
+    if isinstance(data_model_directory, PrebuiltDataModelDirectory):
+        data_model_directory = get_data_model_directory(data_model_directory, 'clusters')
+
+    dir = pathlib.Path(data_model_directory)
 
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
@@ -583,6 +590,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
                 add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
             except Exception as e:
                 logging.error(f"Error parsing XML file {xml}: {e}")
+
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
