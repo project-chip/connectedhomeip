@@ -235,7 +235,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             }
             else
 #endif
-            if (esp_netif_get_mac(ifa, ifp->MacAddress) == ESP_OK)
+                if (esp_netif_get_mac(ifa, ifp->MacAddress) == ESP_OK)
             {
                 // For Wi-Fi or Ethernet interface, the MAC address size should be 6
                 addressSize = 6;
