@@ -80,7 +80,7 @@ class PairOnNetworkLongDownloadLogCommand(
       .downloadLogFromNode(
         getNodeId(),
         DiagnosticLogType.value(logType.toString()),
-        (getTimeoutMillis() / 1000).toInt(),
+        (getTimeoutMillis() / MS_TO_SEC).toInt(),
         InternalDownloadLogCallback()
       )
     logger.log(Level.INFO, "Waiting response : ${getTimeoutMillis()}")
@@ -91,5 +91,6 @@ class PairOnNetworkLongDownloadLogCommand(
     private val logger = Logger.getLogger(PairOnNetworkLongDownloadLogCommand::class.java.name)
 
     private const val MATTER_PORT = 5540
+    private const val MS_TO_SEC = 1000
   }
 }
