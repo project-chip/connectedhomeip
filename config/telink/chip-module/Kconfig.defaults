@@ -201,13 +201,9 @@ endif # SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 endif # BT
 
-# Board retention config
-# Cut down the ram cost by matter's change,it can keep ramcode (driver).
-# No need load the ramcode every time in thread mode (retention mode).
-# If the ram is not enough , can change it back , initial setting is n.
 if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
 config SOC_SERIES_RISCV_TELINK_B9X_NON_RETENTION_RAM_CODE
-    default n if PM
+    default y if PM
 
 config TELINK_B9X_MATTER_RETENTION_LAYOUT
     default y if PM
@@ -347,7 +343,7 @@ config CHIP_WIFI
 	select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
 	select NET_IPV6_NBR_CACHE
 	select NET_STATISTICS_USER_API
-    imply MBEDTLS_ENTROPY_C
+	imply MBEDTLS_ENTROPY_C
 
 if CHIP_WIFI
 

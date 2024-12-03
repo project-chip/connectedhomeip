@@ -19,7 +19,6 @@ on:
         branches:
             - master
             - 'v*-branch'
-            - update_zephyr_3.7
     pull_request:
     merge_group:
 

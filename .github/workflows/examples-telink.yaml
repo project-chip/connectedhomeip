@@ -19,7 +19,6 @@ on:
         branches:
             - master
             - 'v*-branch'
-            - update_zephyr_3.7
     pull_request:
     merge_group:
 
@@ -77,8 +76,6 @@ jobs:
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
-              # TODO: remove continue-on-error
-              continue-on-error: true
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-air-quality-sensor' build"
@@ -133,8 +130,6 @@ jobs:
 
             - name: Build example Telink (B92 retention) Contact Sensor App
               # Run test for master and all PRs
-              # TODO: remove continue-on-error
-              continue-on-error: true
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-contact-sensor' build"
@@ -282,8 +277,6 @@ jobs:
             - name: Build example Telink (B92 retention) Smoke CO Alarm App
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
-              # TODO: remove continue-on-error
-              continue-on-error: true
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-smoke-co-alarm' build"
