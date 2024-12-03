@@ -331,6 +331,8 @@
 		99C65E10267282F1003402F6 /* MTRControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 99C65E0F267282F1003402F6 /* MTRControllerTests.m */; };
 		99D466E12798936D0089A18F /* MTRCommissioningParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 99D466E02798936D0089A18F /* MTRCommissioningParameters.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9B0484F52C701154006C2D5F /* MTRDeviceController_Concrete.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B0484F42C701154006C2D5F /* MTRDeviceController_Concrete.h */; };
+		9B1728F02CFE573C00825030 /* MTRFrameworkDiagnostics.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B1728EF2CFE573600825030 /* MTRFrameworkDiagnostics.h */; };
+		9B1728F22CFE574600825030 /* MTRFrameworkDiagnostics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B1728F12CFE574000825030 /* MTRFrameworkDiagnostics.mm */; };
 		9B231B042C62EF650030EB37 /* (null) in Headers */ = {isa = PBXBuildFile; };
 		9B231B052C62EF650030EB37 /* MTRDeviceController_Concrete.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B231B032C62EF650030EB37 /* MTRDeviceController_Concrete.mm */; };
 		9B5CCB592C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B5CCB582C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h */; };
@@ -811,6 +813,8 @@
 		99C65E0F267282F1003402F6 /* MTRControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRControllerTests.m; sourceTree = "<group>"; };
 		99D466E02798936D0089A18F /* MTRCommissioningParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommissioningParameters.h; sourceTree = "<group>"; };
 		9B0484F42C701154006C2D5F /* MTRDeviceController_Concrete.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceController_Concrete.h; sourceTree = "<group>"; };
+		9B1728EF2CFE573600825030 /* MTRFrameworkDiagnostics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRFrameworkDiagnostics.h; sourceTree = "<group>"; };
+		9B1728F12CFE574000825030 /* MTRFrameworkDiagnostics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRFrameworkDiagnostics.mm; sourceTree = "<group>"; };
 		9B231B032C62EF650030EB37 /* MTRDeviceController_Concrete.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceController_Concrete.mm; sourceTree = "<group>"; };
 		9B5CCB582C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceController_XPC_Internal.h; sourceTree = "<group>"; };
 		9B5CCB5A2C6EC890009DD99B /* MTRDevice_XPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDevice_XPC.h; sourceTree = "<group>"; };
@@ -1514,6 +1518,8 @@
 				754F3DF327FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h */,
 				515C1C6E284F9FFB00A48F0C /* MTRFramework.h */,
 				515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */,
+				9B1728EF2CFE573600825030 /* MTRFrameworkDiagnostics.h */,
+				9B1728F12CFE574000825030 /* MTRFrameworkDiagnostics.mm */,
 				998F286C26D55E10001846C6 /* MTRKeypair.h */,
 				3DECCB6F2934AC1C00585AEC /* MTRLogging.h */,
 				991DC08A247704DC00C13860 /* MTRLogging_Internal.h */,
@@ -1844,6 +1850,7 @@
 				5178E6822AE098520069DF72 /* MTRCommissionableBrowserResult_Internal.h in Headers */,
 				516415FD2B6ACA8300D5CE11 /* MTRServerAccessControl.h in Headers */,
 				3CF134AB289D8DF70017A19E /* MTRDeviceAttestationInfo.h in Headers */,
+				9B1728F02CFE573C00825030 /* MTRFrameworkDiagnostics.h in Headers */,
 				B2E0D7B2245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h in Headers */,
 				5109E9C02CCAD64F0006884B /* MTRDeviceDataValidation.h in Headers */,
 				3CF134A7289D8ADA0017A19E /* MTRCSRInfo.h in Headers */,
@@ -1946,6 +1953,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B20252A12459E34F00F97062 /* Build configuration list for PBXNativeTarget "Matter" */;
 			buildPhases = (
+				9B7838562CFE3AE600FB04C4 /* Acquire git revision info */,
 				0C40A67D246C9AC700885C81 /* Run GN Build (chip_xcode_build_connector) */,
 				B20252882459E34F00F97062 /* Headers */,
 				B20252892459E34F00F97062 /* Sources */,
@@ -2058,6 +2066,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "./chip_xcode_build_connector.sh\n";
+		};
+		9B7838562CFE3AE600FB04C4 /* Acquire git revision info */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Acquire git revision info";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/git_commit_sha.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "GIT_COMMIT_SHA=$(git rev-parse --short HEAD)\n\n# Create a temporary header file to hold the commit SHA\ntmp_header_path=\"${DERIVED_FILES_DIR}/git_commit_sha.h\"\ncat << EOF > \"$tmp_header_path\"\n#ifndef GIT_COMMIT_SHA_H\n#define GIT_COMMIT_SHA_H\n\n#define GIT_COMMIT_SHA \"${GIT_COMMIT_SHA}\"\n\n#endif /* GIT_COMMIT_SHA_H */\nEOF\n\necho \"git sha available in ${DERIVED_FILES_DIR}/git_commit_sha.h\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2198,6 +2225,7 @@
 				AF5F90FF2878D351005503FA /* MTROTAProviderDelegateBridge.mm in Sources */,
 				516415FF2B6B132200D5CE11 /* DataModelHandler.cpp in Sources */,
 				75139A6F2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.mm in Sources */,
+				9B1728F22CFE574600825030 /* MTRFrameworkDiagnostics.mm in Sources */,
 				51E95DFC2A78443C00A434F0 /* MTRSessionResumptionStorageBridge.mm in Sources */,
 				7534F12828BFF20300390851 /* MTRDeviceAttestationDelegate.mm in Sources */,
 				B4C8E6B72B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm in Sources */,
