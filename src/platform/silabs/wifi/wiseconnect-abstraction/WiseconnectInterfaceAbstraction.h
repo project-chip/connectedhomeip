@@ -29,7 +29,7 @@ enum class WifiPlatformEvent : uint8_t
     kStationDisconnect = 2,
     kAPStart           = 3,
     kAPStop            = 4,
-    kScan              = 5, /* This is used as scan result and start */
+    kScan              = 5, /* This combines the scan start and scan result events  */
     kStationStartJoin  = 6,
     kStationDoDhcp     = 7,
     kStationDhcpDone   = 8,
