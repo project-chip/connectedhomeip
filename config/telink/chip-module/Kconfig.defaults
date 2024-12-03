@@ -86,20 +86,6 @@ config COMMON_LIBC_MALLOC_ARENA_SIZE
     default 20716 if SOC_RISCV_TELINK_TL321X || SOC_SERIES_RISCV_TELINK_B9X_RETENTION
     default 12288
 
-config MBEDTLS_ENTROPY_ENABLED
-    bool
-    default y
-
-config MBEDTLS_ZEPHYR_ENTROPY
-    bool
-    default y
-
-config MBEDTLS_CTR_DRBG_ENABLED
-	default y
-
-config MBEDTLS_CIPHER_AES_ENABLED
-	default y
-
 config NET_IPV6_MLD
     default n if PM
     default y
@@ -363,6 +349,7 @@ config CHIP_WIFI
 	select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
 	select NET_IPV6_NBR_CACHE
 	select NET_STATISTICS_USER_API
+    imply MBEDTLS_ENTROPY_C
 
 if CHIP_WIFI
 
@@ -437,6 +424,9 @@ config MBEDTLS_USER_CONFIG_ENABLE
 
 config MBEDTLS_USER_CONFIG_FILE
     default "telink-mbedtls-config.h"
+
+config MBEDTLS_CIPHER_AES_ENABLED
+	default y
 
 config MBEDTLS_CIPHER_CCM_ENABLED
 	default y

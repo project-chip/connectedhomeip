@@ -37,6 +37,11 @@
 #define MBEDTLS_X509_CREATE_C
 #define MBEDTLS_X509_CSR_WRITE_C
 
+#ifdef CONFIG_WIFI
+#define MBEDTLS_OID_C
+#define MBEDTLS_PK_PARSE_C
+#endif /* CONFIG_WIFI */
+
 #undef MBEDTLS_ERROR_C
 
 #endif /* MBEDTLS_TSLR9_CONF_H */
