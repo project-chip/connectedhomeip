@@ -570,7 +570,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
         data_model_directory = get_data_model_directory(data_model_directory, 'clusters')
 
     # Use importlib.resources to access the data model root directory
-    data_model_root = pkg_resources.files(chip.testing) / 'data_model'
+    data_model_root = _get_data_model_root()  # Get the correct path
 
     # We can now use pkg_resources to list XML files inside the data_model directory
     xml_files = []
