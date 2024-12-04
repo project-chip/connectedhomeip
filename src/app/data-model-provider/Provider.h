@@ -30,6 +30,7 @@
 #include <app/data-model-provider/Context.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <app/util/af-types.h>
 
 namespace chip {
 namespace app {
@@ -96,6 +97,23 @@ public:
     ///     convenience to make writing Invoke calls easier.
     virtual std::optional<ActionReturnStatus> Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                      CommandHandler * handler) = 0;
+
+    // Handle Attribute Change
+    ///
+    /// Marks a specific attribute as having changed.
+    ///
+    ///   - endpoint The endpoint ID of the attribute.
+    ///   - clusterId The cluster ID of the attribute.
+    ///   - attributeId The attribute ID to mark as changed.
+    ///   - listener The listener responsible for marking the attribute as dirty.
+    void HandleAttributeChange(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                               AttributesChangedListener * listener) = 0;
+
+    /// Marks all attributes on the specified endpoint as having changed.
+    ///
+    ///   - endpoint The endpoint ID whose attributes are to be marked as changed.
+    ///   - listener The listener responsible for marking the endpoint as dirty.
+    void HandleAttributeChange(EndpointId endpoint, AttributesChangedListener * listener) = 0;
 
 private:
     InteractionModelContext mContext = { nullptr };

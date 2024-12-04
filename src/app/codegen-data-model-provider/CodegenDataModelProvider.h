@@ -148,6 +148,17 @@ public:
     std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
                                                         chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
+    void HandleAttributeChange(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                               chip::app::AttributesChangedListener * listener) override
+    {
+        emberAfAttributeChanged(endpoint, clusterId, attributeId, listener);
+    }
+
+    void HandleAttributeChange(chip::EndpointId endpoint, chip::app::AttributesChangedListener * listener) override
+    {
+        emberAfEndpointChanged(endpoint, listener);
+    }    
+
     /// attribute tree iteration
     DataModel::EndpointEntry FirstEndpoint() override;
     DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
