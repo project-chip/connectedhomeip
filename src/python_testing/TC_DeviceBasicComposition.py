@@ -27,6 +27,7 @@
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --bool-arg ci_only_linux_ota_exception_disallowed_for_certification:True
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -34,13 +35,21 @@
 #   run2:
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: --storage-path admin_storage.json --manual-code 10054912339
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --bool-arg ci_only_linux_ota_exception_disallowed_for_certification:True
 #     factory-reset: true
 #     quiet: true
 #   run3:
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --qr-code MT:-24J0Q1212-10648G00
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --bool-arg ci_only_linux_ota_exception_disallowed_for_certification:True
 #     factory-reset: true
 #     quiet: true
 #   run4:
@@ -50,6 +59,8 @@
 #       --storage-path admin_storage.json
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --bool-arg ci_only_linux_ota_exception_disallowed_for_certification:True
 #     factory-reset: true
 #     quiet: true
 #   run5:
@@ -59,6 +70,8 @@
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
 #       --commissioning-method on-network
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --bool-arg ci_only_linux_ota_exception_disallowed_for_certification:True
 #     factory-reset: true
 #     quiet: true
 #   run6:
@@ -68,6 +81,8 @@
 #       --storage-path admin_storage.json
 #       --qr-code MT:-24J0Q1212-10648G00
 #       --commissioning-method on-network
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --bool-arg ci_only_linux_ota_exception_disallowed_for_certification:True
 #     factory-reset: true
 #     quiet: true
 #   run7:
@@ -78,12 +93,17 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --commissioning-method on-network
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --bool-arg ci_only_linux_ota_exception_disallowed_for_certification:True
 #     factory-reset: true
 #     quiet: true
 #   run8:
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: --storage-path admin_storage.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --bool-arg ci_only_linux_ota_exception_disallowed_for_certification:True
 #     factory-reset: false
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -95,6 +115,7 @@
 # Run 5: Tests CASE connection using manual code (12.1 only)
 # Run 6: Tests CASE connection using QR code (12.1 only)
 # Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
+# Run 8: Tests CASE connection on a device that has already been commissioned (run7)
 
 import logging
 from dataclasses import dataclass
@@ -625,6 +646,17 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def test_TC_IDM_10_7(self):
         success = True
+        skip_ota_requestor_command = self.user_params.get("ci_only_linux_ota_exception_disallowed_for_certification", False)
+        # Skip checking the arm failsafe. This absolutely gets tested elsewhere, and if we randomly change this while
+        # connected over PASE, bad things happen. Also skip sending the commissioning complete command for similar reasons
+        skipped_checks = [Clusters.GeneralCommissioning.Commands.ArmFailSafe,
+                          Clusters.GeneralCommissioning.Commands.CommissioningComplete]
+        if skip_ota_requestor_command:
+            asserts.assert_true(
+                self.is_pics_sdk_ci_only, "The ci_only_linux_ota_exception_disallowed_for_certification is only allowed for use in the CI and is disallowed for certification.")
+            # https://github.com/project-chip/connectedhomeip/issues/36716
+            # Workaround for the above issue - do not check OTA requestor in CI
+            skipped_checks.extend([Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider])
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
                 # We've tested the command ranges in IDM-10.1, test only the standard commands that match spec
@@ -633,7 +665,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                     id)) and id in chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id].keys()]
                 for command_id in standard_command_ids:
                     # Send the command to the device, ensure we don't get back unsupported command
-                    cmd = chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][command_id]()
+                    cmd_class = chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][command_id]
+                    cmd = cmd_class()
+                    if cmd_class in skipped_checks:
+                        logging.warn(f"Skipping check for cmd {cmd_class}")
+                        continue
+                    logging.info(f"Testing command {cmd_class} ")
                     try:
                         await self.send_single_cmd(cmd=cmd, endpoint=endpoint_id)
                     except InteractionModelError as e:
