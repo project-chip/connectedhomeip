@@ -105,8 +105,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
             return CHIP_NO_ERROR;
         });
     }
-    else if (endpointInfo.has_value() &&
-             endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kFullFamilyPattern)
+    else if (endpointInfo.has_value() && endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily)
     {
         err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
             auto endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstEndpoint();
@@ -134,7 +133,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
             return CHIP_NO_ERROR;
         });
     }
-    else if (endpointInfo.has_value() && endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kTreePattern)
+    else if (endpointInfo.has_value() && endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kTree)
     {
         err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
             auto endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstEndpoint();

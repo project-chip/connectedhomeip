@@ -822,6 +822,27 @@ class ProblemNotice:
 
 
 @dataclass
+class SetupParameters:
+    passcode: int
+    vendor_id: int = 0xFFF1
+    product_id: int = 0x8001
+    discriminator: int = 3840
+    custom_flow: int = 0
+    capabilities: int = 0b0100
+    version: int = 0
+
+    @property
+    def qr_code(self):
+        return SetupPayload().GenerateQrCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                             self.custom_flow, self.capabilities, self.version)
+
+    @property
+    def manual_code(self):
+        return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                                        self.custom_flow, self.capabilities, self.version)
+
+
+@dataclass
 class SetupPayloadInfo:
     filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
     filter_value: int = 0
@@ -1141,8 +1162,12 @@ class MatterBaseTest(base_test.BaseTestClass):
     def is_pics_sdk_ci_only(self) -> bool:
         return self.check_pics('PICS_SDK_CI_ONLY')
 
-    async def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int, timeout: int = 900) -> CustomCommissioningParameters:
+    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if node_id is None:
+            node_id = self.dut_node_id
         try:
             commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=timeout, iteration=1000,
                                                                           discriminator=rnd_discriminator, option=1)
@@ -1166,7 +1191,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            #endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
             endpoint = self.get_endpoint()
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
@@ -1199,7 +1223,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            #endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
             endpoint = self.get_endpoint()
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
@@ -1248,7 +1271,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            #endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
             endpoint = self.get_endpoint()
 
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
@@ -1842,7 +1864,6 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = [] if args.tests is None else args.tests
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
-    #config.endpoint = args.endpoint
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
 
