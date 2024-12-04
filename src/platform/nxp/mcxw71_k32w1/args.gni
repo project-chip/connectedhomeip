@@ -16,17 +16,6 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
-declare_args() {
-  chip_with_ot_cli = 0
-  chip_with_low_power = 0
-
-  # The key storage solution. Developers can select between "littlefs", "nvs"
-  # and the older "fwk_nvm".
-  chip_key_storage = "nvs"
-
-  chip_use_plain_dac_key = false
-}
-
 openthread_root =
     "//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread"
 nxp_platform = "mcxw71_k32w1"

@@ -106,8 +106,6 @@ using namespace chip::Tracing::DarwinFramework;
 @property (nonatomic, readonly, nullable) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (nonatomic, readonly, nullable) NSMutableArray<MTRServerEndpoint *> * serverEndpoints;
 
-@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
-
 @property (nonatomic, readonly) MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration;
 
 // Whether we should be advertising our operational identity when we are not suspended.
@@ -1621,12 +1619,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)operationalInstanceAdded:(NSNumber *)nodeID
 {
-    // Don't use deviceForNodeID here, because we don't want to create the
-    // device if it does not already exist.
-    os_unfair_lock_lock(self.deviceMapLock);
-    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
-    os_unfair_lock_unlock(self.deviceMapLock);
-
+    // If we don't have an existing MTRDevice for this node ID, that's fine;
+    // nothing to do.
+    MTRDevice * device = [self _deviceForNodeID:nodeID createIfNeeded:NO];
     if (device == nil) {
         return;
     }

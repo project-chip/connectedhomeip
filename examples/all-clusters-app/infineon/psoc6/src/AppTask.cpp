@@ -25,6 +25,7 @@
 #include "LEDWidget.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -129,6 +130,7 @@ static void InitServer(intptr_t context)
     // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
     chip::Server::GetInstance().Init(initParams);
 
     // We only have network commissioning on endpoint 0.

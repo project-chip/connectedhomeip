@@ -189,7 +189,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             filter=self.th_icd_server_discriminator)
 
         logging.info("Commissioning of ICD to fabric two (DUT)")
-        params = await self.openCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.icd_nodeid)
+        params = await self.open_commissioning_window(dev_ctrl=self.default_controller, node_id=self.icd_nodeid)
 
         if not self.is_pics_sdk_ci_only:
             self._ask_for_vendor_commissioning_ux_operation(

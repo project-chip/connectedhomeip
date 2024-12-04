@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -44,6 +43,8 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
+
+namespace bridge {
 
 namespace {
 
@@ -174,9 +175,6 @@ const EmberAfDeviceType sBridgedDeviceTypes[] = { { DEVICE_TYPE_BRIDGED_NODE, DE
 
 } // namespace
 
-// Define the static member
-BridgedDeviceManager BridgedDeviceManager::sInstance;
-
 void BridgedDeviceManager::Init()
 {
     mFirstDynamicEndpointId = static_cast<chip::EndpointId>(
@@ -184,7 +182,7 @@ void BridgedDeviceManager::Init()
     mCurrentEndpointId = mFirstDynamicEndpointId;
 }
 
-std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
+std::optional<uint16_t> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
                                                                 chip::EndpointId parentEndpointId)
 {
     EmberAfEndpointType * ep = dev->IsIcd() ? &sIcdBridgedNodeEndpoint : &sBridgedNodeEndpoint;
@@ -193,6 +191,8 @@ std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
 
     // TODO: this shares data version among different clusters, which seems incorrect
     const chip::Span<chip::DataVersion> & dataVersionStorage = Span<DataVersion>(sBridgedNodeDataVersions);
+
+    assertChipStackLockedByCurrentThread();
 
     if (dev->GetBridgedAttributes().uniqueId.empty())
     {
@@ -204,7 +204,7 @@ std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
         return std::nullopt;
     }
 
-    for (unsigned index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; index++)
+    for (uint16_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; index++)
     {
         if (mDevices[index])
         {
@@ -213,7 +213,6 @@ std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
 
         for (int retryCount = 0; retryCount < kMaxRetries; retryCount++)
         {
-            DeviceLayer::StackLock lock;
             dev->SetEndpointId(mCurrentEndpointId);
             dev->SetParentEndpointId(parentEndpointId);
             CHIP_ERROR err =
@@ -246,12 +245,13 @@ std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
 
 int BridgedDeviceManager::RemoveDeviceEndpoint(BridgedDevice * dev)
 {
+    assertChipStackLockedByCurrentThread();
+
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (mDevices[index].get() == dev)
         {
-            DeviceLayer::StackLock lock;
             // Silence complaints about unused ep when progress logging
             // disabled.
             [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
@@ -267,6 +267,8 @@ int BridgedDeviceManager::RemoveDeviceEndpoint(BridgedDevice * dev)
 
 BridgedDevice * BridgedDeviceManager::GetDevice(chip::EndpointId endpointId) const
 {
+    assertChipStackLockedByCurrentThread();
+
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
         if (mDevices[index] && mDevices[index]->GetEndpointId() == endpointId)
@@ -305,6 +307,8 @@ std::string BridgedDeviceManager::GenerateUniqueId()
 
 BridgedDevice * BridgedDeviceManager::GetDeviceByUniqueId(const std::string & id)
 {
+    assertChipStackLockedByCurrentThread();
+
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
         if (mDevices[index] && mDevices[index]->GetBridgedAttributes().uniqueId == id)
@@ -317,6 +321,8 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByUniqueId(const std::string & id
 
 BridgedDevice * BridgedDeviceManager::GetDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId) const
 {
+    assertChipStackLockedByCurrentThread();
+
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
         if (mDevices[index] && mDevices[index]->GetScopedNodeId() == scopedNodeId)
@@ -327,13 +333,14 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByScopedNodeId(chip::ScopedNodeId
     return nullptr;
 }
 
-std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId)
+std::optional<uint16_t> BridgedDeviceManager::RemoveDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId)
 {
-    for (unsigned index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
+    assertChipStackLockedByCurrentThread();
+
+    for (uint16_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
         if (mDevices[index] && mDevices[index]->GetScopedNodeId() == scopedNodeId)
         {
-            DeviceLayer::StackLock lock;
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
             mDevices[index] = nullptr;
             ChipLogProgress(NotSpecified, "Removed device with Id=[%d:0x" ChipLogFormatX64 "] from dynamic endpoint %d (index=%d)",
@@ -343,3 +350,5 @@ std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByScopedNodeId(chip::S
     }
     return std::nullopt;
 }
+
+} // namespace bridge

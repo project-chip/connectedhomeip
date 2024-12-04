@@ -22,12 +22,14 @@
 
 #include "ResetMRPParametersCommand.h"
 #include "SetMRPParametersCommand.h"
+#include "SetUpDeviceCommand.h"
 
 void registerCommandsConfiguration(Commands & commands)
 {
     const char * clusterName = "Configuration";
 
     commands_list clusterCommands = {
+        make_unique<SetUpDeviceCommand>(),
         make_unique<SetMRPParametersCommand>(),
         make_unique<ResetMRPParametersCommand>(),
     };

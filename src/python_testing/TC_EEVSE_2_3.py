@@ -194,8 +194,10 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
             f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight%60)}"
             f" Expected target_time = {target_time}")
 
-        target_time_delta = target_time - \
-            datetime(2000, 1, 1, 0, 0, 0, 0).astimezone(timezone.utc)
+        matter_base_time = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
+
+        target_time_delta = target_time - matter_base_time
+
         expected_target_time_epoch_s = int(target_time_delta.total_seconds())
         return expected_target_time_epoch_s
 
@@ -209,7 +211,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         events_callback = EventChangeCallback(Clusters.EnergyEvse)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
-                                    self.matter_test_config.endpoint)
+                                    self.get_endpoint())
 
         self.step("2")
         await self.check_test_event_triggers_enabled()
