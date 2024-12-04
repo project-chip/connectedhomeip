@@ -27,7 +27,7 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace CameraAVStreamMgmt {
+namespace CameraAvStreamManagement {
 
 using VideoStreamStruct       = Structs::VideoStreamStruct::Type;
 using AudioStreamStruct       = Structs::AudioStreamStruct::Type;
@@ -42,8 +42,10 @@ constexpr uint8_t kMaxSpeakerLevel          = 254;
 constexpr uint8_t kMaxMicrophoneLevel       = 254;
 constexpr uint16_t kMaxImageRotationDegrees = 359;
 
+class CameraAVStreamMgmtServer;
+
 /** @brief
- *  Defines methods for implementing application-specific logic for the CameraAVStreamMgmt Cluster.
+ *  Defines methods for implementing application-specific logic for the CameraAvStreamManagement Cluster.
  */
 class CameraAVStreamMgmtDelegate
 {
@@ -55,18 +57,23 @@ public:
     /**
      *   @brief Handle Command Delegate for Video stream allocation.
      */
-    virtual Protocols::InteractionModel::Status VideoStreamAllocate(StreamTypeEnum streamType, VideoCodecEnum videoCodec,
+    virtual Protocols::InteractionModel::Status VideoStreamAllocate(StreamTypeEnum streamType,
+                                                                    CameraAvStreamManagement::VideoCodecEnum videoCodec,
                                                                     const uint16_t minFrameRate, const uint16_t maxFrameRate,
                                                                     VideoResolutionStruct minResolution,
                                                                     VideoResolutionStruct maxResolution, const uint32_t minBitRate,
                                                                     const uint32_t maxBitRate, const uint16_t minFragmentLen,
-                                                                    const uint16_t maxFragmentLen) = 0;
+                                                                    const uint16_t maxFragmentLen,
+                                                                    bool waterMarkEnabled,
+                                                                    bool osdEnabled) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream modification.
      */
     virtual Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID,
-                                                                  VideoResolutionStruct videoResolution) = 0;
+                                                                  Optional<VideoResolutionStruct> videoResolution,
+                                                                  bool waterMarkEnabled,
+                                                                  bool osdEnabled) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream deallocation.
@@ -103,6 +110,11 @@ public:
      */
     virtual Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID, VideoResolutionStruct videoResolution) = 0;
 
+    /**
+     *   @brief Handle Command Delegate for SetStreamPriorities.
+     */
+    virtual Protocols::InteractionModel::Status SetStreamPriorities(const DataModel::DecodableList<StreamTypeEnum>  streamPriorities) = 0;
+
     // Get attribute methods for list index items
 
     virtual uint8_t GetMaxConcurrentVideoEncoders() = 0;
@@ -124,19 +136,18 @@ public:
     virtual CHIP_ERROR GetRateDistortionTradeOffPointByIndex(uint8_t, Structs::RateDistortionTradeOffPointsStruct::Type &) = 0;
     virtual CHIP_ERROR EndRateDistortionTradeOffPointsRead()                                                               = 0;
 
-    virtual CHIP_ERROR StartSupportedSnapshotParamsRead()                                                             = 0;
-    virtual CHIP_ERROR GetSupportedSnapshotParamByIndex(uint8_t, Structs::RateDistortionTradeOffPointsStruct::Type &) = 0;
-    virtual CHIP_ERROR EndSupportedSnapshotParamsRead()                                                               = 0;
+    virtual CHIP_ERROR StartSupportedSnapshotParamsRead()                                               = 0;
+    virtual CHIP_ERROR GetSupportedSnapshotParamByIndex(uint8_t, Structs::SnapshotParamsStruct::Type &) = 0;
+    virtual CHIP_ERROR EndSupportedSnapshotParamsRead()                                                 = 0;
 
-    virtual CHIP_ERROR StartFabricsUsingCameraRead()                           = 0;
-    virtual CHIP_ERROR GetFabricUsingCameraByIndex(uint8_t, chip::FabricIndex) = 0;
-    virtual CHIP_ERROR EndFabricsUsingCameraRead()                             = 0;
+    virtual CHIP_ERROR StartFabricsUsingCameraRead()                             = 0;
+    virtual CHIP_ERROR GetFabricUsingCameraByIndex(uint8_t, chip::FabricIndex &) = 0;
+    virtual CHIP_ERROR EndFabricsUsingCameraRead()                               = 0;
 
-    virtual CHIP_ERROR StartRankedVideoStreamPrioritiesListRead                           = 0;
-    virtual CHIP_ERROR GetRankedVideoStreamPrioritiesListByIndex(uint8_t, StreamTypeEnum) = 0;
-    virtual CHIP_ERROR EndRankedVideoStreamPrioritiesListRead                             = 0;
+    virtual CHIP_ERROR StartRankedVideoStreamPrioritiesListRead()                           = 0;
+    virtual CHIP_ERROR GetRankedVideoStreamPrioritiesListByIndex(uint8_t, StreamTypeEnum &) = 0;
+    virtual CHIP_ERROR EndRankedVideoStreamPrioritiesListRead()                             = 0;
 
-    virtual CHIP_ERROR SetStreamPriorities(DataModel::List<const StreamTypeEnum> streamPriorities) = 0;
 
 protected:
     friend class CameraAVStreamMgmtServer;
@@ -182,13 +193,15 @@ public:
      * @param aClusterId The ID of the Microwave Oven Control cluster to be instantiated.
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
      */
-    CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
-                             BitMask<CameraAVStreamMgmt::Feature> aFeature, OptionalAttributes aOptionalAttrs,
-                             uint8_t aMaxConVideoEncoders, uint32_t aMaxEncodedPixelRate,
-                             VideoSensorParamsStruct aVideoSensorParams, bool aNightVisionCapable,
-                             VideoResolutionStruct minViewPort, uint32_t aMaxContentBufferSize,
-                             AudioCapabilitiesStruct aMicCapabilities, AudioCapabilitiesStruct aSpkrCapabilities,
-                             TwoWayTalkSupportTypeEnum aTwoWayTalkSupport, uint32_t aMaxNetworkBandwidth);
+   CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId,
+                            ClusterId aClusterId, BitMask<Feature> aFeature,
+                            OptionalAttributes aOptionalAttrs, uint8_t aMaxConcurrentVideoEncoders,
+                            uint32_t aMaxEncodedPixelRate,
+                            const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
+                            const VideoResolutionStruct & aMinViewPort, uint32_t aMaxContentBufferSize,
+                            const AudioCapabilitiesStruct & aMicrophoneCapabilities,
+                            const AudioCapabilitiesStruct & aSpkrCapabilities,
+                            TwoWayTalkSupportTypeEnum aTwoWayTalkSupport, uint32_t aMaxNetworkBandwidth);
 
     ~CameraAVStreamMgmtServer() override;
 
@@ -251,7 +264,9 @@ public:
 
     Protocols::InteractionModel::Status SetLocalSnapshotRecordingEnabled(bool aLocalVideoRecordingEnabled);
 
-    Protocols::InteractionModel::Status SetStatusLightBrightness(ThreeLevelAutoEnum aStatusLightBrightness);
+    Protocols::InteractionModel::Status SetStatusLightEnabled(bool aStatusLightEnabled);
+
+    Protocols::InteractionModel::Status SetStatusLightBrightness(Globals::ThreeLevelAutoEnum aStatusLightBrightness);
 
     EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
@@ -269,9 +284,9 @@ private:
     const bool mNightVisionCapable;
     const VideoResolutionStruct mMinViewPort;
     const uint32_t mMaxContentBufferSize;
-    const AudioCapabilities mMicrophoneCapabilities;
-    const AudioCapabilities mSpeakerCapabilities;
-    const TwoWayTalkSupportEnumType mTwoWayTalkSupport;
+    const AudioCapabilitiesStruct mMicrophoneCapabilities;
+    const AudioCapabilitiesStruct mSpeakerCapabilities;
+    const TwoWayTalkSupportTypeEnum mTwoWayTalkSupport;
     const uint32_t mMaxNetworkBandwidth;
 
     uint16_t mCurrentFrameRate;
@@ -281,7 +296,7 @@ private:
     bool mHardPrivacyModeOn                = false;
     TriStateAutoEnum mNightVision;
     TriStateAutoEnum mNightVisionIllum;
-    ViewPortStruct mViewport;
+    ViewportStruct mViewport;
     bool mSpeakerMuted = false;
     uint8_t mSpeakerVolumeLevel;
     uint8_t mSpeakerMaxLevel = kMaxSpeakerLevel;
@@ -297,13 +312,7 @@ private:
     bool mLocalVideoRecordingEnabled    = false;
     bool mLocalSnapshotRecordingEnabled = false;
     bool mStatusLightEnabled            = false;
-    ThreeLevelAutoEnum mStatusLightBrightness;
-
-    Structs::VideoSensorParamsStruct::Type mVideoSensorParams;
-    CHIP_ERROR SetVideoSensorParams(const Structs::VideoSensorParamsStruct::Type & videoSensorParams)
-    {
-        mVideoSensorParams = videoSensorParams;
-    }
+    Globals::ThreeLevelAutoEnum mStatusLightBrightness;
 
     /**
      * IM-level implementation of read
@@ -342,20 +351,22 @@ private:
 
     void HandleVideoStreamModify(HandlerContext & ctx, const Commands::VideoStreamModify::DecodableType & req);
 
-    void HandleVideoStreamDeallocate(HandlerContext & ctx, const Commands::VideoStreamModify::DecodableType & req);
+    void HandleVideoStreamDeallocate(HandlerContext & ctx, const Commands::VideoStreamDeallocate::DecodableType & req);
 
-    void HandleAudioStreamAllocate(HandlerContext & ctx, const Commands::VideoStreamAllocate::DecodableType & req);
+    void HandleAudioStreamAllocate(HandlerContext & ctx, const Commands::AudioStreamAllocate::DecodableType & req);
 
-    void HandleAudioStreamDeallocate(HandlerContext & ctx, const Commands::VideoStreamModify::DecodableType & req);
+    void HandleAudioStreamDeallocate(HandlerContext & ctx, const Commands::AudioStreamDeallocate::DecodableType & req);
 
-    void HandleSnapshotStreamAllocate(HandlerContext & ctx, const Commands::VideoStreamAllocate::DecodableType & req);
+    void HandleSnapshotStreamAllocate(HandlerContext & ctx, const Commands::SnapshotStreamAllocate::DecodableType & req);
 
-    void HandleSnapshotStreamDeallocate(HandlerContext & ctx, const Commands::VideoStreamModify::DecodableType & req);
+    void HandleSnapshotStreamDeallocate(HandlerContext & ctx, const Commands::SnapshotStreamDeallocate::DecodableType & req);
 
-    void HandleCaptureSnapshot(HandlerContext & ctx, const Commands::VideoStreamModify::DecodableType & req);
+    void HandleSetStreamPriorities(HandlerContext & ctx, const Commands::SetStreamPriorities::DecodableType & req);
+
+    void HandleCaptureSnapshot(HandlerContext & ctx, const Commands::CaptureSnapshot::DecodableType & req);
 };
 
-} // namespace CameraAVStreamMgmt
+} // namespace CameraAvStreamManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
