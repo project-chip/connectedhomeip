@@ -523,7 +523,7 @@ class DataModelLevel(str, Enum):
 def _get_data_model_root() -> pathlib.Path:
     """Attempts to find the 'data_model' directory inside the 'chip.testing' package."""
     # Access the 'chip.testing' package using importlib.resources
-    package_dir = pkg_resources.files(chip.testing)
+    package_dir = pkg_resources.files('chip.testing')
 
     # Construct the path to the 'data_model' directory inside the package
     data_model_root = package_dir / 'data_model'
