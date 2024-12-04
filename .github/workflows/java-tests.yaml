@@ -236,6 +236,17 @@ jobs:
                      --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
                      --factoryreset \
                   '
+            - name: Run Pairing Onnetwork and get diagnostic log Test
+              run: |
+                  scripts/run_in_python_env.sh out/venv \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1 --crash_log ./crashLog.log --end_user_support_log ./enduser.log --network_diagnostics_log ./network.log" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "bdx" \
+                     --tool-args "onnetwork-long-downloadLog --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000 --logType CrashLogs --fileName ./crashLog.log" \
+                     --factoryreset \
+                  '
             - name: Run Pairing Onnetwork Test
               run: |
                   scripts/run_in_python_env.sh out/venv \
