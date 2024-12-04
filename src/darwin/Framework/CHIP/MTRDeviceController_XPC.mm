@@ -487,7 +487,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
             continue;
         }
 
-        auto * device = static_cast<MTRDevice_XPC *>([self deviceForNodeID:nodeID]);
+        auto * device = static_cast<MTRDevice_XPC *>([self _deviceForNodeID:nodeID createIfNeeded:NO]);
         [device device:nodeID internalStateUpdated:deviceInternalState];
     }
 }
