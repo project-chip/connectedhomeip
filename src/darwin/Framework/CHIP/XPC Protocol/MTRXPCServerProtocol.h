@@ -21,10 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDsKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerContextKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
-MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey MTR_NEWLY_AVAILABLE;
-MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey MTR_NEWLY_AVAILABLE;
-MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey MTR_NEWLY_AVAILABLE;
-MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
 MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>
