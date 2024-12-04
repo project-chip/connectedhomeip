@@ -231,6 +231,7 @@ exceptions:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Argument.kt"
     TooGenericExceptionThrown:
         excludes:
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/bdx/DownloadLogCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.kt"
             - "**/src/controller/java/generated/java/**/*"
     ThrowingExceptionsWithoutMessageOrCause:
