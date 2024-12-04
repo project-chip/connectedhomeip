@@ -1836,8 +1836,6 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     mDataModelProvider = model;
     if (mDataModelProvider != nullptr)
     {
-        mDataModelProvider->Init();
-
         DataModel::InteractionModelContext context;
 
         context.eventsGenerator         = &EventManagement::GetInstance();

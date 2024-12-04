@@ -47,8 +47,6 @@ class Provider : public ProviderMetadataTree
 public:
     virtual ~Provider() = default;
 
-    virtual void Init() = 0;
-
     // `context` pointers  will be guaranteed valid until Shutdown is called()
     virtual CHIP_ERROR Startup(InteractionModelContext context)
     {

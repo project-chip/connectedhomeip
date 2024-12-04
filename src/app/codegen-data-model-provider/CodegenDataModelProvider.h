@@ -21,6 +21,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/Context.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/af-types.h>
 
@@ -126,13 +127,6 @@ private:
     };
 
 public:
-    void Init() override
-    {
-        // Call the Ember-specific InitDataModelHandler
-        InitDataModelHandler();
-        ChipLogProgress(AppServer, "CodegenDataModelHandler initialized.");
-    }
-
     /// clears out internal caching. Especially useful in unit tests,
     /// where path caching does not really apply (the same path may result in different outcomes)
     void Reset()
@@ -143,6 +137,17 @@ public:
     }
 
     /// Generic model implementations
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override
+    {
+        // Call the base class's Startup method to ensure base initialization
+        ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+
+        // Call the Ember-specific InitDataModelHandler
+        InitDataModelHandler();
+
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR Shutdown() override
     {
         Reset();
