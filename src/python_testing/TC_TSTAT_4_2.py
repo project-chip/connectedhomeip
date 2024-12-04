@@ -452,7 +452,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 5 since there were no built-in presets")
 
         self.step("6")
-        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             notBuiltInPresets = list(preset for preset in current_presets if preset.builtIn is False)
             if len(notBuiltInPresets) > 0:
