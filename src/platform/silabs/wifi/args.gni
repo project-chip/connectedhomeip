@@ -28,6 +28,7 @@ mbedtls_target = "${silabs_sdk_build_root}:silabs_sdk"
 # default to platform crypto implementation but allow commandline override
 if (chip_crypto == "") {
   chip_crypto = "platform"
+  chip_crypto_keystore = "psa"
 }
 
 # Transitional CommissionableDataProvider not used anymore
