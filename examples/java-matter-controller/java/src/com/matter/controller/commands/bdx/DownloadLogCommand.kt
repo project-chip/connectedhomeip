@@ -44,7 +44,7 @@ class DownloadLogCommand(controller: ChipDeviceController, credsIssuer: Credenti
       .downloadLogFromNode(
         nodeId.toLong(),
         DiagnosticLogType.value(logType.toString()),
-        timeout.toInt(),
+        timeout.toLong(),
         object : DownloadLogCallback {
           override fun onError(fabricIndex: Int, nodeId: Long, errorCode: Long) {
             println("error :")

@@ -80,7 +80,7 @@ class PairOnNetworkLongDownloadLogCommand(
       .downloadLogFromNode(
         getNodeId(),
         DiagnosticLogType.value(logType.toString()),
-        (getTimeoutMillis() / MS_TO_SEC).toInt(),
+        (getTimeoutMillis() / MS_TO_SEC).toLong(),
         InternalDownloadLogCallback()
       )
     logger.log(Level.INFO, "Waiting response : ${getTimeoutMillis()}")
