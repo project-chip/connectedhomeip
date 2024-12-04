@@ -219,6 +219,7 @@ executable("darwin-framework-tool") {
     "commands/common/RemoteDataModelLogger.h",
     "commands/common/RemoteDataModelLogger.mm",
     "commands/common/xpc/DeviceControllerServer.mm",
+    "commands/common/xpc/XPCServer.mm",
     "commands/common/xpc/XPCServerRegistry.mm",
     "commands/configuration/Commands.h",
     "commands/configuration/ResetMRPParametersCommand.h",
