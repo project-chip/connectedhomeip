@@ -86,6 +86,17 @@
 #     script-args: --storage-path admin_storage.json
 #     factory-reset: false
 #     quiet: true
+#   run9:
+#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 # Run 1: runs through all tests
@@ -95,6 +106,8 @@
 # Run 5: Tests CASE connection using manual code (12.1 only)
 # Run 6: Tests CASE connection using QR code (12.1 only)
 # Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
+# Run 8: Tests reusing storage from run7 (i.e. factory-reset=false)
+# Run 9: Tests against lighting-app-data-mode-no-unique-id
 
 import logging
 from dataclasses import dataclass
