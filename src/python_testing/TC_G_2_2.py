@@ -39,17 +39,18 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_G_2_2(MatterBaseTest):
     def desc_TC_G_2_2(self):
         return "Commands - AddGroup, ViewGroup, RemoveGroup, RemoveAllGroups [DUT-Server]"
-    
+
     def steps_TC_G_2_2(self):
         return [TestStep(1, "Comissioning, already done", is_commissioning=True),
-                TestStep(2, "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT on EP0 using a key that is pre-installed on the TH. GroupKeySet fields are as follows:")] 
-    
+                TestStep(2, "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT on EP0 using a key that is pre-installed on the TH. GroupKeySet fields are as follows:")]
+
     @async_test_body
     async def test_TC_G_2_2(self):
-        #Pre-Conditions: Comissioning
+        # Pre-Conditions: Comissioning
         self.step(1)
 
         self.step(2)
@@ -64,10 +65,10 @@ class TC_G_2_2(MatterBaseTest):
             epochStartTime1=1110001,
             epochKey2="0123456789abcdef".encode(),
             epochStartTime2=1110002)
-        
+
         cmd = Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey)
-        resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
-        print(resp)
+        resp = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
