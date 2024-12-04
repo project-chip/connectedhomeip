@@ -273,7 +273,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                              "Failure status returned from arm failsafe")
 
         self.step(22)
-        resp = await self.openCommissioningWindow(self.default_controller, self.dut_node_id)
+        resp = await self.open_commissioning_window()
 
         self.step(23)
         await self.default_controller.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=self.dut_node_id)
