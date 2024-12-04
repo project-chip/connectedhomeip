@@ -557,7 +557,7 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
 
     else:
         # If it's a custom directory, return it directly
-        return pathlib.PosixPath(data_model_directory)     
+        return pathlib.PosixPath(data_model_directory)
 
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlCluster], list[ProblemNotice]]:
@@ -598,7 +598,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
                 root = tree.getroot()
                 add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
             except Exception as e:
-                logging.error(f"Error parsing XML file {xml}: {e}")                
+                logging.error(f"Error parsing XML file {xml}: {e}")
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
