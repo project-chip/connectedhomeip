@@ -216,9 +216,11 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
         memcpy(mScanSsidBuffer, ssid.data(), ssid.size());
         mScanSsidBuffer[ssid.size()] = 0; // indicate the end of ssid string
         mScanParams.ssids[0]         = mScanSsidBuffer;
-        mScanParams.ssids[1]         = nullptr; // indicate the end of ssids list
-        scanParams                   = &mScanParams;
-        scanParamsSize               = sizeof(*scanParams);
+#if (CONFIG_WIFI_MGMT_SCAN_SSID_FILT_MAX > 1)
+        mScanParams.ssids[1] = nullptr; // indicate the end of ssids list
+#endif
+        scanParams     = &mScanParams;
+        scanParamsSize = sizeof(*scanParams);
     }
     if (0 != net_mgmt(NET_REQUEST_WIFI_SCAN, mNetIf, scanParams, scanParamsSize))
     {
