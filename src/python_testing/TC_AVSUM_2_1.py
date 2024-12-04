@@ -49,7 +49,7 @@ from mobly import asserts
 
 class TC_AVSUM_2_1(MatterBaseTest):
     async def read_avsum_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.CameraAVSettingsUserLevelManagement
+        cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_AVSUM_2_1(self) -> str:
@@ -79,7 +79,7 @@ class TC_AVSUM_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_AVSUM_2_1(self):
         endpoint = self.matter_test_config.endpoint
-        cluster = Clusters.Objects.CameraAVSettingsUserLevelManagement
+        cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
 
         self.step(1)  # Already done, immediately go to step 2
