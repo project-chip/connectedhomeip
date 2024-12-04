@@ -84,7 +84,6 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
 
         # Read the SpinSpeeds attributes
         self.step(2)
-        logger.info("Doing Step 2")
         list_speed_speeds = await self.read_single_attribute_check_success(endpoint=endpoint,
                                                                            cluster=Clusters.Objects.LaundryWasherControls,
                                                                            attribute=Clusters.LaundryWasherControls.Attributes.SpinSpeeds)
@@ -94,7 +93,6 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
 
         # Read the SpinSpeedCurrent attribute
         self.step(3)
-        logger.info("Doing Step 3")
         spin_speed_current = await self.read_single_attribute_check_success(endpoint=endpoint,
                                                                             cluster=Clusters.Objects.LaundryWasherControls,
                                                                             attribute=Clusters.LaundryWasherControls.Attributes.SpinSpeedCurrent)
@@ -103,7 +101,6 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
 
         # Write a valid SpinSpeedCurrent value
         self.step(4)
-        logger.info("Doing Step 4")
         requested_speed = random.randint(0, numSpinSpeeds - 1)
         result = await self.default_controller.WriteAttribute(self.dut_node_id,
                                                               [(endpoint, Clusters.LaundryWasherControls.Attributes.SpinSpeedCurrent(requested_speed))])
@@ -111,7 +108,6 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
 
         # Read SpinSpeedCurrent value and verify that was changed.
         self.step(5)
-        logger.info("Doing Step 5")
         current_value = await self.read_single_attribute_check_success(endpoint=endpoint,
                                                                        cluster=Clusters.Objects.LaundryWasherControls,
                                                                        attribute=Clusters.LaundryWasherControls.Attributes.SpinSpeedCurrent)
@@ -119,7 +115,6 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
 
         # Try to write an invalid value (outside supported range)
         self.step(6)
-        logger.info("Doing Step 6")
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.LaundryWasherControls.Attributes.SpinSpeedCurrent(numSpinSpeeds))])
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "Trying to write an invalid value should return ConstraintError")
