@@ -38,8 +38,7 @@ CHIP_ERROR BytesToHexStr(const ByteSpan & bytes, std::string & outHexStr)
     outHexStr.resize(hexLength);
 
     Encoding::HexFlags flags = Encoding::HexFlags::kUppercase;
-    ReturnErrorOnFailure(BytesToHex(bytes.data(), bytes.size(), &outHexStr[0], hexLength, flags));
-    return CHIP_NO_ERROR;
+    return BytesToHex(bytes.data(), bytes.size(), &outHexStr[0], hexLength, flags);
 }
 
 } // anonymous namespace
