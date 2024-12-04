@@ -205,7 +205,7 @@ def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
     return datetime.fromtimestamp(seconds, timezone.utc) + timedelta(milliseconds=millis)
 
 
-def compare_time(received: int, offset: timedelta = timedelta(), utc: typing.Optional[int] = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
+def compare_time(received: int, offset: timedelta = timedelta(), utc: Optional[int] = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
     if utc is None:
         utc = utc_time_in_matter_epoch()
 
@@ -976,7 +976,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         steps = self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
-    def get_defined_test_steps(self, test: str) -> typing.Optional[list[TestStep]]:
+    def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
         steps_name = f'steps_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, steps_name)
@@ -996,7 +996,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         pics = self._get_defined_pics(test)
         return [] if pics is None else pics
 
-    def _get_defined_pics(self, test: str) -> typing.Optional[list[str]]:
+    def _get_defined_pics(self, test: str) -> Optional[list[str]]:
         steps_name = f'pics_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, steps_name)
@@ -1185,7 +1185,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
-            dev_ctrl: typing.Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: typing.Optional[int] = None, endpoint: typing.Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -1216,7 +1216,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_expect_error(
             self, cluster: object, attribute: object,
-            error: Status, dev_ctrl: typing.Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: typing.Optional[int] = None, endpoint: typing.Optional[int] = None,
+            error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -1241,7 +1241,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: object, endpoint_id: typing.Optional[int] = None, expect_success: bool = True) -> Status:
+    async def write_single_attribute(self, attribute_value: object, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
         """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
 
         If `endpoint_id` is None, the default DUT endpoint for the test is selected.
@@ -1263,7 +1263,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
-            dev_ctrl: typing.Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: typing.Optional[int] = None, endpoint: typing.Optional[int] = None,
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             timedRequestTimeoutMs: typing.Union[None, int] = None,
             payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
