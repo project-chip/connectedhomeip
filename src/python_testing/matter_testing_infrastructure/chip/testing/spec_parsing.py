@@ -17,6 +17,7 @@
 
 import glob
 import logging
+import importlib.resources as pkg_resources
 import pathlib
 import typing
 import xml.etree.ElementTree as ElementTree
@@ -519,16 +520,17 @@ class DataModelLevel(str, Enum):
     kDeviceType = 'device_types'
 
 
-def _get_data_model_root() -> pathlib.PosixPath:
+def _get_data_model_root() -> pathlib.Path:
     """Attempts to find the 'data_model' directory inside the 'chip.testing' package."""
-    # Locate the directory where the 'chip.testing' module is located
-    package_dir = pathlib.Path(chip.testing.__file__).parent
+    # Access the 'chip.testing' package using importlib.resources
+    package_dir = pkg_resources.files(chip.testing)
 
-    # Construct the path to the 'data_model' directory (assuming this structure)
+    # Construct the path to the 'data_model' directory inside the package
     data_model_root = package_dir / 'data_model'
 
+    # Check if the 'data_model' directory exists
     if not data_model_root.exists():
-        raise FileNotFoundError(f"Data model directory not found in the package at {data_model_root}.")
+        raise FileNotFoundError(f"Data model directory not found in the package at {data_model_root}")
 
     return data_model_root
 
@@ -552,44 +554,51 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
             raise ValueError(f"Unsupported data model directory: {data_model_directory}")
 
         return data_model_root / version / data_model_level
+
     else:
-        # If it's a custom directory, returns directly
-        return pathlib.Path(data_model_directory)
+        # If it's a custom directory, return it directly
+        return pathlib.PosixPath(data_model_directory)     
 
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlCluster], list[ProblemNotice]]:
     """
     Build XML clusters from the specified data model directory.
-    This function supports both pre-built locations (via `PrebuiltDataModelDirectory`) and full paths (strings).
+    This function supports both pre-built locations (via PrebuiltDataModelDirectory) and full paths (strings).
     """
     # If a pre-built directory is provided, resolve the full path
     if isinstance(data_model_directory, PrebuiltDataModelDirectory):
         data_model_directory = get_data_model_directory(data_model_directory, 'clusters')
 
-    dir = pathlib.Path(data_model_directory)
+    # Use importlib.resources to access the data model root directory
+    data_model_root = pkg_resources.files(chip.testing) / 'data_model'
 
+    # We can now use pkg_resources to list XML files inside the data_model directory
+    xml_files = []
+
+    # Recursively find all XML files in the 'data_model' directory
+    for xml in pkg_resources.contents(data_model_root):
+        if xml.endswith('.xml'):
+            xml_files.append(pathlib.Path(xml))  # Create Path objects for XML files
+
+    if not xml_files:
+        raise SpecParsingException(f'No XML files found in the specified package directory {data_model_root}')
+
+    # Now we can parse each XML file found inside the package
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
     ids_by_name: dict[str, int] = {}
     problems: list[ProblemNotice] = []
 
-    # Use pathlib.Path to list all XML files in the data model directory
-    xml_files = [f for f in dir.glob('**/*.xml')]  # Recursively find all .xml files
-
-    if not xml_files:
-        raise SpecParsingException(f'No XML files found in the specified package directory {dir}')
-
-    # Parse each XML file found inside the package
     for xml in xml_files:
         logging.info(f'Parsing file {xml}')
-        # Open and parse each XML file from the directory
+        # Open and parse each XML file
         with xml.open('r') as file:
             try:
                 tree = ElementTree.parse(file)
                 root = tree.getroot()
                 add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
             except Exception as e:
-                logging.error(f"Error parsing XML file {xml}: {e}")
+                logging.error(f"Error parsing XML file {xml}: {e}")                
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
