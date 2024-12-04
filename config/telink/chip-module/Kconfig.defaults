@@ -179,21 +179,30 @@ config BT_DEVICE_NAME_GATT_WRITABLE
 if SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 config TL_BLE_CTRL_THREAD_STACK_SIZE
+    int
     default 648
 
 config TL_BLE_CTRL_MASTER_MAX_NUM
+    int
     default 0
 
 config TL_BLE_CTRL_SLAVE_MAX_NUM
+    int
     default 1
 
 config TL_BLE_CTRL_RF_POWER
+    int
     default 3 if PM 
     default 8 if BT_TLX
     default 9
 
 choice TL_BLE_CTRL_MAC_TYPE
+    prompt "MAC address type"
     default TL_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
+
+config TL_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
+    bool "Random Static MAC Address"
+
 endchoice
 
 endif # SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
