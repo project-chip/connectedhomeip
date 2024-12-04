@@ -638,7 +638,7 @@ same Matter network.
 To perform the unicast binding process, complete the following steps:
 
 1.  Build the CHIP Tool according to the steps from the
-    [CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md#building-and-running-the-chip-tool).
+    [CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md#building-from-source).
 2.  Go to the CHIP Tool build directory.
 3.  Add an ACL to the development kit that is programmed with the
     [Lighting Application Example](../../lighting-app/nrfconnect/README.md) by
@@ -650,7 +650,7 @@ To perform the unicast binding process, complete the following steps:
 
     -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
         is an ACL for the communication with the CHIP Tool.
-    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
+    -   `{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
         is an ACL for binding (cluster no. 6 is the On/Off cluster and the
         cluster no. 8 is the Level Control cluster).
 
@@ -690,7 +690,7 @@ same Matter network.
 To perform the unicast binding process, complete the following steps:
 
 1.  Build the CHIP Tool according to the steps from the
-    [CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md#building-and-running-the-chip-tool).
+    [CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md#building-from-source).
 2.  Go to the CHIP Tool build directory.
 
 3.  Add the light switch device to the multicast group by running the following

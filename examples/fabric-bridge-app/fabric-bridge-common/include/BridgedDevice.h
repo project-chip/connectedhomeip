@@ -23,6 +23,8 @@
 
 #include <string>
 
+namespace bridge {
+
 class BridgedDevice
 {
 public:
@@ -90,3 +92,5 @@ protected:
     BridgedAttributes mAttributes;
     AdminCommissioningAttributes mAdminCommissioningAttributes;
 };
+
+} // namespace bridge

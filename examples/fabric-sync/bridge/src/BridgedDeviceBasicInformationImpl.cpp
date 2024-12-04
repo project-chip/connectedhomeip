@@ -29,12 +29,14 @@ using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
 
+namespace bridge {
+
 CHIP_ERROR BridgedDeviceBasicInformationImpl::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)
 {
     // Registration is done for the bridged device basic information only
     VerifyOrDie(path.mClusterId == app::Clusters::BridgedDeviceBasicInformation::Id);
 
-    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(path.mEndpointId);
+    BridgedDevice * dev = BridgedDeviceManager::Instance().GetDevice(path.mEndpointId);
     VerifyOrReturnError(dev != nullptr, CHIP_ERROR_NOT_FOUND);
 
     switch (path.mAttributeId)
@@ -91,7 +93,7 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Write(const ConcreteDataAttributeP
 {
     VerifyOrDie(path.mClusterId == app::Clusters::BridgedDeviceBasicInformation::Id);
 
-    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(path.mEndpointId);
+    BridgedDevice * dev = BridgedDeviceManager::Instance().GetDevice(path.mEndpointId);
     VerifyOrReturnError(dev != nullptr, CHIP_ERROR_NOT_FOUND);
 
     if (!dev->IsReachable())
@@ -105,3 +107,5 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Write(const ConcreteDataAttributeP
 
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
+
+} // namespace bridge

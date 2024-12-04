@@ -45,6 +45,8 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
+namespace bridge {
+
 namespace {
 
 constexpr uint8_t kMaxRetries      = 10;
@@ -173,9 +175,6 @@ DataVersion sBridgedNodeDataVersions[ArraySize(bridgedNodeClusters)];
 const EmberAfDeviceType sBridgedDeviceTypes[] = { { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
 } // namespace
-
-// Define the static member
-BridgedDeviceManager BridgedDeviceManager::sInstance;
 
 void BridgedDeviceManager::Init()
 {
@@ -343,3 +342,5 @@ std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByScopedNodeId(chip::S
     }
     return std::nullopt;
 }
+
+} // namespace bridge

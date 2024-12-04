@@ -205,6 +205,10 @@
         "Bridged Device Basic Information": [
             "ProductAppearance"
         ],
+        "Chime": [
+            "ActiveChimeID",
+            "Enabled"
+        ],
         "Descriptor": [
             "ClusterRevision",
             "FeatureMap"
@@ -306,7 +310,8 @@
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric"
+            "ClientsSupportedPerFabric",
+            "MaximumCheckInBackOff"
         ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
@@ -744,7 +749,6 @@
             "MinViewport",
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
-            "CurrentSnapshotConfig",
             "Viewport"
         ],
         "Camera AV Settings User Level Management": [

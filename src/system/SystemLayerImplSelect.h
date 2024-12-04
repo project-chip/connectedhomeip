@@ -158,7 +158,7 @@ protected:
     int mSelectResult;
 
     ObjectLifeCycle mLayerState;
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     WakeEvent mWakeEvent;
 #endif
 

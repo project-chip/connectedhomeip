@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+import lzma
 import os
 import subprocess
 import sys
@@ -58,6 +59,45 @@ def merge_binaries(input_file1, input_file2, output_file, offset):
 # Obtain build configuration
 build_conf = BuildConfiguration(os.path.join(os.getcwd(), os.pardir))
 
+
+def compress_lzma_firmware(input_file, output_file):
+    # Read the input firmware binary
+    with open(input_file, 'rb') as f:
+        firmware_data = f.read()  # Read the rest of the file from the offset
+
+    # Define the properties
+    lc = 1  # Literal context bits
+    lp = 2  # Literal position bits
+    pb = 0  # Position bits
+    dict_size = build_conf['CONFIG_COMPRESS_LZMA_DICTIONARY_SIZE']  # dictionary size
+
+    # Create the LZMA compressor using the specified parameters
+    compressor = lzma.LZMACompressor(
+        format=lzma.FORMAT_RAW,  # Use raw format to match with `lzma_raw_decoder()` in C
+        filters=[
+            {
+                "id": lzma.FILTER_LZMA1,  # Use LZMA1 filter for compatibility
+                "dict_size": dict_size,   # Set dictionary size
+                "lc": lc,                 # Literal context bits
+                "lp": lp,                 # Literal position bits
+                "pb": pb,                 # Position bits
+                "mode": lzma.MODE_NORMAL,  # Normal compression mode
+                "mf": lzma.MF_BT4,        # Match finder algorithm
+                "depth": 0                # Default match finder depth
+            }
+        ]
+    )
+
+    # Compress the firmware data
+    compressed_data = compressor.compress(firmware_data) + compressor.flush()
+
+    # Write the compressed binary to output file
+    with open(output_file, 'wb') as f:
+        f.write(compressed_data)
+
+    print(f"Compressed {input_file} -> {output_file} (size reduced from {len(firmware_data)} to {len(compressed_data)} bytes)")
+
+
 # Clean up merged.bin from previous build
 if os.path.exists('merged.bin'):
     os.remove('merged.bin')
@@ -83,7 +123,7 @@ if build_conf.getboolean('CONFIG_SOC_SERIES_RISCV_TELINK_W91'):
             '--slot-size', str(build_conf['CONFIG_FLASH_LOAD_SIZE']),
             '--key', os.path.join(ZEPHYR_BASE, '../', build_conf['CONFIG_MCUBOOT_SIGNATURE_KEY_FILE']),
             'merged.bin',
-            'zephyr.signed.bin'
+            build_conf['CONFIG_SIGNED_OTA_IMAGE_FILE_NAME']
         ]
         try:
             subprocess.run(sign_command, check=True)
@@ -94,6 +134,31 @@ if build_conf.getboolean('CONFIG_SOC_SERIES_RISCV_TELINK_W91'):
 # Merge MCUBoot binary if configured
 if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
     merge_binaries('mcuboot.bin', 'zephyr.signed.bin', 'merged.bin', build_conf['CONFIG_FLASH_LOAD_OFFSET'])
+    if build_conf.getboolean('CONFIG_COMPRESS_LZMA'):
+        compress_lzma_firmware('zephyr.signed.bin', 'zephyr.signed.lzma.bin')
+
+        sign_command = [
+            'python3',
+            os.path.join(ZEPHYR_BASE, '../bootloader/mcuboot/scripts/imgtool.py'),
+            'sign',
+            '--version', '0.0.0+0',
+            '--align', '1',
+            '--header-size', str(build_conf['CONFIG_ROM_START_OFFSET']),
+            '--slot-size', str(build_conf['CONFIG_FLASH_LOAD_SIZE']),
+            '--key', os.path.join(ZEPHYR_BASE, '../', build_conf['CONFIG_MCUBOOT_SIGNATURE_KEY_FILE']),
+            '--pad-header',
+            'zephyr.signed.lzma.bin',
+            build_conf['CONFIG_SIGNED_OTA_IMAGE_FILE_NAME']
+        ]
+
+        try:
+            subprocess.run(sign_command, check=True)
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(f"Error signing the image: {e}")
+
+    if build_conf.getboolean('CONFIG_TELINK_OTA_BUTTON_TEST'):
+        merge_binaries('merged.bin', build_conf['CONFIG_SIGNED_OTA_IMAGE_FILE_NAME'],
+                       'merged.bin', build_conf['CONFIG_TELINK_OTA_PARTITION_ADDR'])
 
 # Merge Factory Data binary if configured
 if build_conf.getboolean('CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE'):

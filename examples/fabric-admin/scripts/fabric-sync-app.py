@@ -32,6 +32,7 @@ async def forward_f(prefix: bytes, f_in: asyncio.StreamReader,
 
     This function can optionally feed received lines to a callback function.
     """
+
     while line := await f_in.readline():
         if cb is not None:
             cb(line)

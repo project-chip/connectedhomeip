@@ -54,9 +54,7 @@ using namespace Crypto;
 using namespace Messaging;
 using namespace Protocols::SecureChannel;
 
-const char kSpake2pContext[]        = "CHIP PAKE V1 Commissioning";
-const char kSpake2pI2RSessionInfo[] = "Commissioning I2R Key";
-const char kSpake2pR2ISessionInfo[] = "Commissioning R2I Key";
+const char kSpake2pContext[] = "CHIP PAKE V1 Commissioning";
 
 // Amounts of time to allow for server-side processing of messages.
 //
@@ -232,7 +230,15 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        // If a failure happens before we have placed the incoming exchange into `mExchangeCtxt`, we need to make
+        // sure to close the exchange to fulfill our API contract.
+        if (!mExchangeCtxt.HasValue())
+        {
+            exchangeCtxt->Close();
+        }
         Clear();
+        ChipLogError(SecureChannel, "Failed during PASE session pairing request: %" CHIP_ERROR_FORMAT, err.Format());
+        MATTER_TRACE_COUNTER("PASEFail");
     }
     return err;
 }

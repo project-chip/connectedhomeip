@@ -5565,7 +5565,7 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
     case Attributes::Zones::Id: {
         return YES;
     }
-    case Attributes::TimeControl::Id: {
+    case Attributes::Triggers::Id: {
         return YES;
     }
     case Attributes::Sensitivity::Id: {
@@ -5613,7 +5613,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::RateDistortionTradeOffPoints::Id: {
         return YES;
     }
-    case Attributes::MaxPreRollBufferSize::Id: {
+    case Attributes::MaxContentBufferSize::Id: {
         return YES;
     }
     case Attributes::MicrophoneCapabilities::Id: {
@@ -5635,12 +5635,6 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
         return YES;
     }
     case Attributes::HDRModeEnabled::Id: {
-        return YES;
-    }
-    case Attributes::CurrentVideoCodecs::Id: {
-        return YES;
-    }
-    case Attributes::CurrentSnapshotConfig::Id: {
         return YES;
     }
     case Attributes::FabricsUsingCamera::Id: {
@@ -5671,15 +5665,6 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
         return YES;
     }
     case Attributes::NightVisionIllum::Id: {
-        return YES;
-    }
-    case Attributes::AWBEnabled::Id: {
-        return YES;
-    }
-    case Attributes::AutoShutterSpeedEnabled::Id: {
-        return YES;
-    }
-    case Attributes::AutoISOEnabled::Id: {
         return YES;
     }
     case Attributes::Viewport::Id: {
@@ -5731,9 +5716,6 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
         return YES;
     }
     case Attributes::StatusLightBrightness::Id: {
-        return YES;
-    }
-    case Attributes::DepthSensorStatus::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

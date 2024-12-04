@@ -55,7 +55,7 @@ class GnBuilder(Builder):
     def generate(self):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
-            '--export-compile-commands',
+            '--add-export-compile-commands=*',
             '--root=%s' % self.root
         ]
 

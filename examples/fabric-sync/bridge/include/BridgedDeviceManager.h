@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -24,10 +23,18 @@
 
 #include <memory>
 
+namespace bridge {
+
 class BridgedDeviceManager
 {
 public:
     BridgedDeviceManager() = default;
+
+    static BridgedDeviceManager & Instance()
+    {
+        static BridgedDeviceManager instance;
+        return instance;
+    }
 
     /**
      * @brief Initializes the BridgedDeviceManager.
@@ -52,9 +59,9 @@ public:
      *
      * @param dev A pointer to the device to be added.
      * @param parentEndpointId The parent endpoint ID. Defaults to an invalid endpoint ID.
-     * @return int The index of the dynamic endpoint if successful, nullopt otherwise
+     * @return uint16_t The index of the dynamic endpoint if successful, nullopt otherwise
      */
-    std::optional<unsigned> AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
+    std::optional<uint16_t> AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
                                               chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
 
     /**
@@ -100,9 +107,9 @@ public:
      * found, it removes the dynamic endpoint.
      *
      * @param scopedNodeId The ScopedNodeId of the device to be removed.
-     * @return unsigned of the index of the removed dynamic endpoint if successful, nullopt otherwise.
+     * @return uint16_t of the index of the removed dynamic endpoint if successful, nullopt otherwise.
      */
-    std::optional<unsigned> RemoveDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId);
+    std::optional<uint16_t> RemoveDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId);
 
     /**
      * Finds the device with the given unique id (if any)
@@ -110,27 +117,14 @@ public:
     BridgedDevice * GetDeviceByUniqueId(const std::string & id);
 
 private:
-    friend BridgedDeviceManager & BridgeDeviceMgr();
-
     /**
      * Creates a new unique ID that is not used by any other mDevice
      */
     std::string GenerateUniqueId();
-
-    static BridgedDeviceManager sInstance;
 
     chip::EndpointId mCurrentEndpointId;
     chip::EndpointId mFirstDynamicEndpointId;
     std::unique_ptr<BridgedDevice> mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
 };
 
-/**
- * Returns the public interface of the BridgedDeviceManager singleton object.
- *
- * Applications should use this to access features of the BridgedDeviceManager
- * object.
- */
-inline BridgedDeviceManager & BridgeDeviceMgr()
-{
-    return BridgedDeviceManager::sInstance;
-}
+} // namespace bridge

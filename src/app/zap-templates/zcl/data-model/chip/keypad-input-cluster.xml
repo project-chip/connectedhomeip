@@ -40,11 +40,13 @@ limitations under the License.
     <command source="client" code="0x00" name="SendKey" response="SendKeyResponse" optional="false">
       <description>Upon receipt, this SHALL process a keycode as input to the media device.</description>
       <arg name="KeyCode" type="CECKeyCodeEnum"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x01" name="SendKeyResponse" optional="false">
       <description>This command SHALL be generated in response to a SendKey Request command.</description>
       <arg name="Status" type="StatusEnum"/>
+      <mandatoryConform/>
     </command>
 
   </cluster>

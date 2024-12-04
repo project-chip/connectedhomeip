@@ -7691,8 +7691,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Zones";
             break;
 
-        case MTRAttributeIDTypeClusterZoneManagementAttributeTimeControlID:
-            result = @"TimeControl";
+        case MTRAttributeIDTypeClusterZoneManagementAttributeTriggersID:
+            result = @"Triggers";
             break;
 
         case MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID:
@@ -7754,8 +7754,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"RateDistortionTradeOffPoints";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxPreRollBufferSizeID:
-            result = @"MaxPreRollBufferSize";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxContentBufferSizeID:
+            result = @"MaxContentBufferSize";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMicrophoneCapabilitiesID:
@@ -7784,14 +7784,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHDRModeEnabledID:
             result = @"HDRModeEnabled";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentVideoCodecsID:
-            result = @"CurrentVideoCodecs";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentSnapshotConfigID:
-            result = @"CurrentSnapshotConfig";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID:
@@ -7832,18 +7824,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeNightVisionIllumID:
             result = @"NightVisionIllum";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAWBEnabledID:
-            result = @"AWBEnabled";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAutoShutterSpeedEnabledID:
-            result = @"AutoShutterSpeedEnabled";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAutoISOEnabledID:
-            result = @"AutoISOEnabled";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeViewportID:
@@ -7912,10 +7892,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeStatusLightBrightnessID:
             result = @"StatusLightBrightness";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeDepthSensorStatusID:
-            result = @"DepthSensorStatus";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeGeneratedCommandListID:
@@ -10900,22 +10876,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotID:
             result = @"CaptureSnapshot";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetViewportID:
-            result = @"SetViewport";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageRotationID:
-            result = @"SetImageRotation";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageFlipHorizontalID:
-            result = @"SetImageFlipHorizontal";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageFlipVerticalID:
-            result = @"SetImageFlipVertical";
             break;
 
         default:
