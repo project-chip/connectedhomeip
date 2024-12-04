@@ -36,7 +36,6 @@ public:
 
     CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) override
     {
-
         return StorageDelegateWrapper::ReadValue(
             DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
     }
