@@ -109,7 +109,7 @@ from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObje
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds, attribute_id_type,
-                                               cluster_id_type, command_id_type)
+                                               cluster_id_type, command_id_type, is_standard_command_id)
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
                                          async_test_body, default_matter_test_main)
 from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
@@ -619,25 +619,32 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not success:
             self.fail_current_test("At least one attribute string was not valid UTF-8")
 
-    def test_all_event_strings_valid(self):
-        asserts.skip("TODO: Validate every string in the read events is valid UTF-8 and has no nulls")
-
     def test_all_schema_scalars(self):
         asserts.skip("TODO: Validate all int/uint are in range of the schema (or null if nullable) for known attributes")
 
-    def test_all_commands_reported_are_executable(self):
-        asserts.skip("TODO: Validate all commands reported in AcceptedCommandList are actually executable")
-
-    def test_dump_all_pics_for_all_endpoints(self):
-        asserts.skip("TODO: Make a test that generates the basic PICS list for each endpoint based on actually reported contents")
-
-    def test_all_schema_mandatory_elements_present(self):
-        asserts.skip(
-            "TODO: Make a test that ensures every known cluster has the mandatory elements present (commands, attributes) based on features")
-
-    def test_all_endpoints_have_valid_composition(self):
-        asserts.skip(
-            "TODO: Make a test that verifies each endpoint has valid set of device types, and that the device type conformance is respected for each")
+    @async_test_body
+    async def test_TC_IDM_10_7(self):
+        success = True
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                # We've tested the command ranges in IDM-10.1, test only the standard commands that match spec
+                command_ids = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID]
+                standard_command_ids = [id for id in command_ids if is_standard_command_id(command_id_type(
+                    id)) and id in chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id].keys()]
+                for command_id in standard_command_ids:
+                    # Send the command to the device, ensure we don't get back unsupported command
+                    cmd = chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][command_id]()
+                    try:
+                        await self.send_single_cmd(cmd=cmd, endpoint=endpoint_id)
+                    except InteractionModelError as e:
+                        # Errors are fine, as long as the returned error isn't UNSUPPORTED_COMMAND
+                        if e.status == Status.UnsupportedCommand:
+                            location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem="Unsupported command listed in accepted commands list")
+                            success = False
+        if not success:
+            self.fail_current_test("One or listed commands is not implemented on the DUT")
 
     def test_TC_SM_1_2(self):
         self.print_step(1, "Wildcard read of device - already done")

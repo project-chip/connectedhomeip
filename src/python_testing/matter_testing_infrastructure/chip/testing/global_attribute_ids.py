@@ -171,6 +171,10 @@ def command_id_type(id: int) -> CommandIdType:
     return CommandIdType.kInvalid
 
 
+def is_standard_command_id(id_type: CommandIdType):
+    return id_type in [CommandIdType.kScopedNonGlobal, CommandIdType.kScopedNonGlobal]
+
+
 def is_valid_command_id(id_type: CommandIdType, allow_test: bool = False):
     valid = [CommandIdType.kStandardGlobal, CommandIdType.kScopedNonGlobal, CommandIdType.kManufacturer]
     if allow_test:
