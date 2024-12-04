@@ -26,8 +26,9 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -129,11 +130,11 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             asserts.fail(f"The path {th_fsa_bridge_path} does not exist")
 
         # Get the path to the TH_SERVER_NO_UID app from the user params.
-        th_server_app = self.user_params.get("th_server_no_uid_app_path", None)
-        if not th_server_app:
+        th_server_no_uid_app = self.user_params.get("th_server_no_uid_app_path", None)
+        if not th_server_no_uid_app:
             asserts.fail("This test requires a TH_SERVER_NO_UID app. Specify app path with --string-arg th_server_no_uid_app_path:<path_to_app>")
-        if not os.path.exists(th_server_app):
-            asserts.fail(f"The path {th_server_app} does not exist")
+        if not os.path.exists(th_server_no_uid_app):
+            asserts.fail(f"The path {th_server_no_uid_app} does not exist")
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
@@ -171,7 +172,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
         # Start the TH_SERVER_NO_UID app.
         self.th_server = AppServerSubprocess(
-            th_server_app,
+            th_server_no_uid_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
