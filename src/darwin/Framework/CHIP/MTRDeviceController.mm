@@ -371,7 +371,7 @@ using namespace chip::Tracing::DarwinFramework;
     return [[MTRDevice alloc] initForSubclassesWithNodeID:nodeID controller:self];
 }
 
-- (MTRDevice *)_deviceForNodeID:(NSNumber *)nodeID createIfNeeded:(BOOL)createIfNeeded
+- (MTRDevice * _Nullable)_deviceForNodeID:(NSNumber *)nodeID createIfNeeded:(BOOL)createIfNeeded
 {
     std::lock_guard lock(*self.deviceMapLock);
     MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];

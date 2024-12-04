@@ -36,6 +36,7 @@ from typing import Any, Optional
 import chip.native
 from chip.native import PyChipError
 
+from .bdx import Bdx
 from .clusters import Attribute as ClusterAttribute
 from .clusters import Command as ClusterCommand
 from .exceptions import ChipStackError, ChipStackException, DeviceError
@@ -175,6 +176,7 @@ class ChipStack(object):
         im.InitIMDelegate()
         ClusterAttribute.Init()
         ClusterCommand.Init()
+        Bdx.Init()
 
         builtins.chipStack = self
 

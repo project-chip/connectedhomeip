@@ -29,6 +29,7 @@ openthread_external_mbedtls = mbedtls_target
 # default to platform crypto implementation but allow commandline override
 if (chip_crypto == "") {
   chip_crypto = "platform"
+  chip_crypto_keystore = "psa"
 }
 
 chip_device_platform = "efr32"

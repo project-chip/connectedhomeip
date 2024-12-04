@@ -262,7 +262,7 @@ void DeviceSynchronizer::GetUniqueId()
     }
     else
     {
-        ChipLogDetail(NotSpecified, "Failed to get UniqueId from remote Fabric Sync Aggregator")
+        ChipLogDetail(NotSpecified, "Failed to get UniqueId from remote Fabric Sync Aggregator");
     }
 }
 

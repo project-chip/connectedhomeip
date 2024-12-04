@@ -126,7 +126,9 @@ CHIP_ERROR SilabsPlatform::Init(void)
 
 CHIP_ERROR SilabsPlatform::FlashInit()
 {
-#if defined(_SILICON_LABS_32B_SERIES_2)
+#if defined(SL_TRUSTZONE_NONSECURE)
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#elif defined(_SILICON_LABS_32B_SERIES_2)
     MSC_Init();
 #elif defined(_SILICON_LABS_32B_SERIES_3)
     sl_status_t status;
@@ -140,7 +142,9 @@ CHIP_ERROR SilabsPlatform::FlashInit()
 
 CHIP_ERROR SilabsPlatform::FlashErasePage(uint32_t addr)
 {
-#if defined(_SILICON_LABS_32B_SERIES_2)
+#if defined(SL_TRUSTZONE_NONSECURE)
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#elif defined(_SILICON_LABS_32B_SERIES_2)
     MSC_ErasePage((uint32_t *) addr);
 #elif defined(_SILICON_LABS_32B_SERIES_3)
     sl_status_t status;
@@ -158,7 +162,9 @@ CHIP_ERROR SilabsPlatform::FlashErasePage(uint32_t addr)
 
 CHIP_ERROR SilabsPlatform::FlashWritePage(uint32_t addr, const uint8_t * data, size_t size)
 {
-#if defined(_SILICON_LABS_32B_SERIES_2)
+#if defined(SL_TRUSTZONE_NONSECURE)
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#elif defined(_SILICON_LABS_32B_SERIES_2)
     MSC_WriteWord((uint32_t *) addr, data, size);
 #elif defined(_SILICON_LABS_32B_SERIES_3)
     sl_status_t status;

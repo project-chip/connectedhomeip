@@ -335,7 +335,7 @@ class TC_SwitchTests(MatterBaseTest):
     async def test_TC_SWTCH_2_2(self):
         post_prompt_settle_delay_seconds = 10.0
         cluster = Clusters.Switch
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
 
         # Step 1: Commissioning - already done
         self.step(1)
@@ -452,7 +452,7 @@ class TC_SwitchTests(MatterBaseTest):
         has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress) != 0
         has_as_feature = (feature_map & cluster.Bitmaps.Feature.kActionSwitch) != 0
 
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
 
         self.step(2)
         event_listener = EventChangeCallback(cluster)
@@ -524,7 +524,7 @@ class TC_SwitchTests(MatterBaseTest):
         switch_pressed_position = self._default_pressed_position
         post_prompt_settle_delay_seconds = 10.0
 
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
         cluster = Clusters.Objects.Switch
 
         # Step 1: Commission DUT - already done
@@ -704,7 +704,7 @@ class TC_SwitchTests(MatterBaseTest):
         has_msr_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchRelease)
         multi_press_max = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.MultiPressMax)
 
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
         pressed_position = self._default_pressed_position
 
         self.step(2)
@@ -882,7 +882,7 @@ class TC_SwitchTests(MatterBaseTest):
         has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress)
         multi_press_max = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.MultiPressMax)
 
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
         pressed_position = self._default_pressed_position
 
         self.step(2)
