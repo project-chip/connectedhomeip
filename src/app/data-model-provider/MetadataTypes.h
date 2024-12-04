@@ -33,10 +33,20 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+/// Represents various endpoint composition patters as defined in the spec
+/// as `9.2.1. Endpoint Composition patterns`
 enum class EndpointCompositionPattern : uint8_t
 {
-    kTreePattern       = 0x1,
-    kFullFamilyPattern = 0x2,
+    // Tree pattern supports a general tree of endpoints. Commonly used for
+    // device types that support physical device composition (e.g. Refrigerator)
+    kTree = 0x1,
+
+    // A full-family pattern is a list fo all descendant endpoints, with no
+    // imposed hierarchy.
+    //
+    // For example the Root Node and Aggregator device types use the full-familiy
+    // pattern, as defined in their device type specification
+    kFullFamily = 0x2,
 };
 
 struct EndpointInfo
@@ -46,9 +56,8 @@ struct EndpointInfo
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
 
-    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamilyPattern)
-    {}
-    explicit EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
+    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamily) {}
+    EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
 };
 
 struct EndpointEntry

@@ -170,7 +170,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Failure, "Incorrect error returned")
 
         self.step(6)
-        params = await self.openCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
+        params = await self.open_commissioning_window(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
         self.step(7)
         pase_nodeid = self.dut_node_id + 1
         await self.default_controller.FindOrEstablishPASESession(setupCode=params.commissioningParameters.setupQRCode, nodeid=pase_nodeid)

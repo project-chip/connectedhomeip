@@ -69,6 +69,8 @@ tests:
       attribute: "PercentSetting"
       arguments:
           value: null
+      response:
+          error: INVALID_IN_STATE
 
     - label: "Read back percent setting"
       command: "readAttribute"
@@ -105,6 +107,8 @@ tests:
       attribute: "SpeedSetting"
       arguments:
           value: null
+      response:
+          error: INVALID_IN_STATE
 
     - label: "Read back speed setting"
       command: "readAttribute"

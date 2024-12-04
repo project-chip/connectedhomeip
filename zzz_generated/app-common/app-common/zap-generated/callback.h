@@ -6907,18 +6907,6 @@ bool emberAfWebRTCTransportRequestorClusterEndCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportRequestor::Commands::End::DecodableType & commandData);
 /**
- * @brief Commissioner Control Cluster RequestCommissioningApproval Command callback (from client)
- */
-bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissionerControl::Commands::RequestCommissioningApproval::DecodableType & commandData);
-/**
- * @brief Commissioner Control Cluster CommissionNode Command callback (from client)
- */
-bool emberAfCommissionerControlClusterCommissionNodeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissionerControl::Commands::CommissionNode::DecodableType & commandData);
-/**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */
 bool emberAfUnitTestingClusterTestCallback(chip::app::CommandHandler * commandObj,
