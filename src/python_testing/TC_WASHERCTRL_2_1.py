@@ -88,6 +88,7 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
                                                                            cluster=Clusters.Objects.LaundryWasherControls,
                                                                            attribute=Clusters.LaundryWasherControls.Attributes.SpinSpeeds)
 
+        asserts.assert_true(isinstance(list_speed_speeds, list), "Returned value was not a list")
         numSpinSpeeds = len(list_speed_speeds)
         asserts.assert_less_equal(numSpinSpeeds, MAX_SPIN_SPEEDS, "List of SpinSpeeds larger than maximum allowed")
 
@@ -97,7 +98,7 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
                                                                             cluster=Clusters.Objects.LaundryWasherControls,
                                                                             attribute=Clusters.LaundryWasherControls.Attributes.SpinSpeedCurrent)
         asserts.assert_true(isinstance(spin_speed_current, int), "SpinSpeedCurrent has an invalid value")
-        asserts.assert_true(0 <= spin_speed_current <= (numSpinSpeeds - 1), 0, "SpinSpeedCurrent outside valid range")
+        asserts.assert_true(0 <= spin_speed_current <= (numSpinSpeeds - 1), "SpinSpeedCurrent outside valid range")
 
         # Write a valid SpinSpeedCurrent value
         self.step(4)
