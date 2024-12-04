@@ -174,7 +174,8 @@ source_set("efr32-common") {
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      sl_uart_log_output) {
     sources += [ "${silabs_common_plat_dir}/uart.cpp" ]
   }
 
