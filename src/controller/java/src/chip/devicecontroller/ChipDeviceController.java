@@ -893,7 +893,7 @@ public class ChipDeviceController {
    *     detailed in {@link DownloadLogCallback}.
    */
   public boolean downloadLogFromNode(
-      long deviceId, DiagnosticLogType type, int timeout, DownloadLogCallback callback) {
+      long deviceId, DiagnosticLogType type, long timeout, DownloadLogCallback callback) {
     return downloadLogFromNode(deviceControllerPtr, deviceId, type.getValue(), timeout, callback);
   }
 

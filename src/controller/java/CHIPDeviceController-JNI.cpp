@@ -2061,11 +2061,13 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
 }
 
 JNI_METHOD(void, downloadLogFromNode)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint typeEnum, jint timeout, jobject downloadLogCallback)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint typeEnum, jlong timeout, jobject downloadLogCallback)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrReturn(wrapper != nullptr,
+                   ChipLogError(Controller, "AndroidDeviceControllerWrapper::FromJNIHandle in downloadLogFromNode fails!"));
 
     ChipLogProgress(Controller, "downloadLogFromNode() called with device ID and callback object");
 

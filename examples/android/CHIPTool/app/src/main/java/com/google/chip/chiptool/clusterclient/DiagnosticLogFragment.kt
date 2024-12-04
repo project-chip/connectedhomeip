@@ -36,8 +36,8 @@ class DiagnosticLogFragment : Fragment() {
   private val binding
     get() = _binding!!
 
-  private val timeout: Int
-    get() = binding.timeoutEd.text.toString().toUIntOrNull()?.toInt() ?: 0
+  private val timeout: Long
+    get() = binding.timeoutEd.text.toString().toULongOrNull()?.toLong() ?: 0L
 
   private val diagnosticLogTypeList = DiagnosticLogType.values()
   private val diagnosticLogType: DiagnosticLogType
