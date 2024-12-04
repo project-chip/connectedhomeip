@@ -27,7 +27,6 @@ from enum import Enum, auto
 from typing import Callable, Optional, Union
 
 import chip.clusters as Clusters
-import chip.testing
 import chip.testing.conformance as conformance_support
 from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
                                       ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
