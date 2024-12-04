@@ -822,6 +822,27 @@ class ProblemNotice:
 
 
 @dataclass
+class SetupParameters:
+    passcode: int
+    vendor_id: int = 0xFFF1
+    product_id: int = 0x8001
+    discriminator: int = 3840
+    custom_flow: int = 0
+    capabilities: int = 0b0100
+    version: int = 0
+
+    @property
+    def qr_code(self):
+        return SetupPayload().GenerateQrCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                             self.custom_flow, self.capabilities, self.version)
+
+    @property
+    def manual_code(self):
+        return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                                        self.custom_flow, self.capabilities, self.version)
+
+
+@dataclass
 class SetupPayloadInfo:
     filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
     filter_value: int = 0
