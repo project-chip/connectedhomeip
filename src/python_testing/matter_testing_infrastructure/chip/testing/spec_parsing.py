@@ -584,13 +584,17 @@ def build_xml_clusters(data_model_directory: Union[str] = 'k1_4') -> tuple[dict[
     if not xml_files:
         raise FileNotFoundError(f'No XML files found in the specified package directory {dir}')
 
-    # Parse each XML file found inside the package
     for xml in xml_files:
         logging.info(f'Parsing file {xml}')
         try:
             # Open the resource file using pkg_resources and parse it
-            with pkg_resources.open_text(pkg_resources.files(pkg_resources.import_module('chip.testing')).joinpath('data_model').joinpath(data_model_directory), xml) as file:
-                tree = ElementTree.parse(file)
+            with pkg_resources.open_text(
+                pkg_resources.files(pkg_resources.import_module('chip.testing'))
+                .joinpath('data_model')
+                .joinpath(data_model_directory), xml
+            ) as file:
+                # Directly parse the XML file without assigning it to 'tree'
+                ElementTree.parse(file)  # Parse the file to process it
         except Exception as e:
             logging.error(f"Error parsing XML file {xml}: {e}")
 
