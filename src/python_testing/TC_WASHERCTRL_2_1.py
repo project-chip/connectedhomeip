@@ -103,9 +103,8 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
         # Write a valid SpinSpeedCurrent value
         self.step(4)
         requested_speed = random.randint(0, numSpinSpeeds - 1)
-        result = await self.default_controller.WriteAttribute(self.dut_node_id,
-                                                              [(endpoint, Clusters.LaundryWasherControls.Attributes.SpinSpeedCurrent(requested_speed))])
-        asserts.assert_equal(result[0].Status, Status.Success, "Failed to write SpinSpeed value")
+        result = await self.write_single_attribute(attribute_value=Clusters.LaundryWasherControls.Attributes.SpinSpeedCurrent(requested_speed),
+                                                   endpoint_id=endpoint)
 
         # Read SpinSpeedCurrent value and verify that was changed.
         self.step(5)
