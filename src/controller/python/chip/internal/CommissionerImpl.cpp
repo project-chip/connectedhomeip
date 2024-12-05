@@ -132,7 +132,8 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         // TODO: add option to pass in custom PAA Trust Store path to the python controller app
         const chip::Credentials::AttestationTrustStore * testingRootStore =
             GetTestFileAttestationTrustStore("./credentials/development/paa-root-certs");
-        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+        chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+        chip::Credentials::SetDeviceAttestationVerifier(dacVerifier);
 
         factoryParams.fabricIndependentStorage = &gServerStorage;
         factoryParams.sessionKeystore          = &gSessionKeystore;
@@ -184,6 +185,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             commissionerParams.controllerRCAC                 = rcacSpan;
             commissionerParams.controllerICAC                 = icacSpan;
             commissionerParams.controllerNOC                  = nocSpan;
+            commissionerParams.deviceAttestationVerifier      = dacVerifier;
 
             SuccessOrExit(err = DeviceControllerFactory::GetInstance().Init(factoryParams));
             SuccessOrExit(err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *result));
