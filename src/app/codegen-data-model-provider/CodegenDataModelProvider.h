@@ -95,7 +95,7 @@ private:
 /// Given that this relies on global data at link time, there generally can be
 /// only one CodegenDataModelProvider per application (you can create more instances,
 /// however they would share the exact same underlying data and storage).
-class CodegenDataModelProvider : public DataModel::Provider
+class CodegenDataModelProvider : public chip::app::DataModel::Provider
 {
 private:
     /// Ember commands are stored as a `CommandId *` pointer that is either null (i.e. no commands)
@@ -137,16 +137,7 @@ public:
     }
 
     /// Generic model implementations
-    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override
-    {
-        // Call the base class's Startup method to ensure base initialization
-        ReturnErrorOnFailure(DataModel::Provider::Startup(context));
-
-        // Call the Ember-specific InitDataModelHandler
-        InitDataModelHandler();
-
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
 
     CHIP_ERROR Shutdown() override
     {
@@ -158,8 +149,8 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
-    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                                        CommandHandler * handler) override;
+    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
+                                                        chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     /// attribute tree iteration
     DataModel::EndpointEntry FirstEndpoint() override;
@@ -229,15 +220,16 @@ private:
     const EmberAfCluster * FindServerCluster(const ConcreteClusterPath & path);
 
     /// Find the index of the given attribute id
-    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, AttributeId id) const;
+    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId id) const;
 
     /// Find the index of the given cluster id
-    std::optional<unsigned> TryFindClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id, ClusterSide clusterSide) const;
+    std::optional<unsigned> TryFindClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id,
+                                                ClusterSide clusterSide) const;
 
     /// Find the index of the given endpoint id
-    std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
+    std::optional<unsigned> TryFindEndpointIndex(chip::EndpointId id) const;
 
-    using CommandListGetter = const CommandId *(const EmberAfCluster &);
+    using CommandListGetter = const chip::CommandId *(const EmberAfCluster &);
 
     CommandId FindCommand(const ConcreteCommandPath & path, detail::EnumeratorCommandFinder & handlerFinder,
                           detail::EnumeratorCommandFinder::Operation operation,

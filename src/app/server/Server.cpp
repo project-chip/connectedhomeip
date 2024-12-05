@@ -97,8 +97,8 @@ Server Server::sServer;
 static uint8_t sInfoEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE];
 static uint8_t sDebugEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE];
 static uint8_t sCritEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE];
-static PersistedCounter<EventNumber> sGlobalEventIdCounter;
-static app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
+static ::chip::PersistedCounter<chip::EventNumber> sGlobalEventIdCounter;
+static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
@@ -135,8 +135,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     VerifyOrExit(initParams.dataModelProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // TODO(16969): Remove Platform::MemoryInit() call from Server class, it belongs to outer code
-    Platform::MemoryInit();
+    // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
+    chip::Platform::MemoryInit();
 
     // Initialize PersistentStorageDelegate-based storage
     mDeviceStorage                 = initParams.persistentStorageDelegate;
@@ -156,11 +156,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT)
-    VerifyOrDie(audit::ExecutePersistentStorageApiAudit(*mDeviceStorage));
+    VerifyOrDie(chip::audit::ExecutePersistentStorageApiAudit(*mDeviceStorage));
 #endif
 
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
-    VerifyOrDie(audit::ExecutePersistentStorageLoadTestAudit(*mDeviceStorage));
+    VerifyOrDie(chip::audit::ExecutePersistentStorageLoadTestAudit(*mDeviceStorage));
 #endif
 
     // Set up attribute persistence before we try to bring up the data model
@@ -277,7 +277,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
-    Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
+    chip::Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
@@ -286,15 +286,15 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 
     {
-        app::LogStorageResources logStorageResources[] = {
-            { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), app::PriorityLevel::Debug },
-            { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), app::PriorityLevel::Info },
-            { &sCritEventBuffer[0], sizeof(sCritEventBuffer), app::PriorityLevel::Critical }
+        ::chip::app::LogStorageResources logStorageResources[] = {
+            { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), ::chip::app::PriorityLevel::Debug },
+            { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), ::chip::app::PriorityLevel::Info },
+            { &sCritEventBuffer[0], sizeof(sCritEventBuffer), ::chip::app::PriorityLevel::Critical }
         };
 
-        app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                 &logStorageResources[0], &sGlobalEventIdCounter,
-                                                 std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
+        chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
+                                                       &logStorageResources[0], &sGlobalEventIdCounter,
+                                                       std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
@@ -326,7 +326,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if CONFIG_NETWORK_LAYER_BLE
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
-        DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
 #endif
     }
     else
@@ -367,8 +367,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
-    err = app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler, &mCASESessionManager,
-                                                           mSubscriptionResumptionStorage);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler,
+                                                                 &mCASESessionManager, mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -389,7 +389,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         .SetFabricTable(&GetFabricTable())
         .SetSymmetricKeyStore(mSessionKeystore)
         .SetExchangeManager(&mExchangeMgr)
-        .SetSubscriptionsInfoProvider(app::InteractionModelEngine::GetInstance())
+        .SetSubscriptionsInfoProvider(chip::app::InteractionModelEngine::GetInstance())
         .SetICDCheckInBackOffStrategy(initParams.icdCheckInBackOffStrategy);
 
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
@@ -448,7 +448,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT // support UDC port for commissioner declaration msgs
-    mUdcTransportMgr = Platform::New<UdcTransportMgr>();
+    mUdcTransportMgr = chip::Platform::New<UdcTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv6)
                                                     .SetListenPort(static_cast<uint16_t>(mCdcListenPort))
@@ -460,7 +460,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif // INET_CONFIG_ENABLE_IPV4
                                                     ));
 
-    gUDCClient = Platform::New<Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient>();
+    gUDCClient = chip::Platform::New<Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient>();
     mUdcTransportMgr->SetSessionManager(gUDCClient);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
@@ -616,23 +616,23 @@ void Server::Shutdown()
     app::DnssdServer::Instance().SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
-    Dnssd::ServiceAdvertiser::Instance().Shutdown();
+    chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (mUdcTransportMgr != nullptr)
     {
-        Platform::Delete(mUdcTransportMgr);
+        chip::Platform::Delete(mUdcTransportMgr);
         mUdcTransportMgr = nullptr;
     }
     if (gUDCClient != nullptr)
     {
-        Platform::Delete(gUDCClient);
+        chip::Platform::Delete(gUDCClient);
         gUDCClient = nullptr;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-    Dnssd::Resolver::Instance().Shutdown();
-    app::InteractionModelEngine::GetInstance()->Shutdown();
+    chip::Dnssd::Resolver::Instance().Shutdown();
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::InteractionModelEngine::GetInstance()->SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -659,15 +659,15 @@ void Server::Shutdown()
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();
-    // TODO(16969): Remove Platform::MemoryInit() call from Server class, it belongs to outer code
-    Platform::MemoryShutdown();
+    // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
+    chip::Platform::MemoryShutdown();
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 // NOTE: UDC client is located in Server.cpp because it really only makes sense
 // to send UDC from a Matter device. The UDC message payload needs to include the device's
 // randomly generated service name.
-CHIP_ERROR Server::SendUserDirectedCommissioningRequest(Transport::PeerAddress commissioner,
+CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner,
                                                         Protocols::UserDirectedCommissioning::IdentificationDeclaration & id)
 {
     ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest()");
@@ -678,7 +678,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(Transport::PeerAddress c
     if (strlen(id.GetInstanceName()) == 0)
     {
         ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest() Instance Name not known");
-        char nameBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1];
+        char nameBuffer[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
         err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
         if (err != CHIP_NO_ERROR)
         {
@@ -720,9 +720,9 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(Transport::PeerAddress c
 
     if (strlen(id.GetDeviceName()) == 0)
     {
-        char deviceName[Dnssd::kKeyDeviceNameMaxLength + 1] = {};
-        if (!DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() ||
-            DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) != CHIP_NO_ERROR)
+        char deviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 1] = {};
+        if (!chip::DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() ||
+            chip::DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) != CHIP_NO_ERROR)
         {
             ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest() Device Name not known");
         }
@@ -736,13 +736,13 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(Transport::PeerAddress c
     if (id.GetRotatingIdLength() == 0)
     {
         AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
-        uint8_t rotatingDeviceIdUniqueId[DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+        uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
         MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
         ReturnErrorOnFailure(
-            DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan));
+            chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan));
         ReturnErrorOnFailure(
-            DeviceLayer::ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter));
+            chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter));
         additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
 
         uint8_t rotatingDeviceIdInternalBuffer[RotatingDeviceId::kMaxLength];
@@ -777,7 +777,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(Transport::PeerAddress c
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 void Server::ResumeSubscriptions()
 {
-    CHIP_ERROR err = app::InteractionModelEngine::GetInstance()->ResumeSubscriptions();
+    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->ResumeSubscriptions();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Error when trying to resume subscriptions : %" CHIP_ERROR_FORMAT, err.Format());
