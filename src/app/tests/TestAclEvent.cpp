@@ -42,6 +42,9 @@
 #include <messaging/Flags.h>
 #include <protocols/interaction_model/Constants.h>
 
+// Mock function for linking
+void InitDataModelHandler() {}
+
 namespace {
 using namespace chip;
 using namespace chip::Access;

@@ -43,6 +43,9 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 
+// Mock function for linking
+void InitDataModelHandler() {}
+
 namespace chip {
 
 constexpr ClusterId kTestClusterId        = 6;

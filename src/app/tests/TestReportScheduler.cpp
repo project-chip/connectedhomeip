@@ -25,6 +25,10 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
+
+// Mock function for linking
+void InitDataModelHandler() {}
+
 namespace {
 
 class NullReadHandlerCallback : public chip::app::ReadHandler::ManagementCallback

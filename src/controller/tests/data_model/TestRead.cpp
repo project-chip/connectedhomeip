@@ -46,6 +46,9 @@ using namespace chip::app::DataModelTests;
 using namespace chip::Protocols;
 using namespace chip::Test;
 
+// Mock function for linking
+void InitDataModelHandler() {}
+
 namespace {
 
 const MockNodeConfig & TestMockNodeConfig()
