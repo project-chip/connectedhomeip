@@ -75,6 +75,9 @@ using namespace chip::app::Clusters::Globals::Attributes;
 
 using chip::Protocols::InteractionModel::Status;
 
+// Mock function for linking
+void InitDataModelHandler() {}
+
 namespace {
 
 constexpr AttributeId kAttributeIdReadOnly   = 0x3001;

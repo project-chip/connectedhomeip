@@ -21,9 +21,8 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
-#include <app/data-model-provider/Context.h>
-#include <app/util/DataModelHandler.h>
 #include <app/util/af-types.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 namespace app {
@@ -127,6 +126,8 @@ private:
     };
 
 public:
+    void InitDataModel() override;
+
     /// clears out internal caching. Especially useful in unit tests,
     /// where path caching does not really apply (the same path may result in different outcomes)
     void Reset()
@@ -136,14 +137,17 @@ public:
         mPreviouslyFoundCluster = std::nullopt;
     }
 
-    /// Generic model implementations
-    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
+    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
+    PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
 
+    /// Generic model implementations
     CHIP_ERROR Shutdown() override
     {
         Reset();
         return CHIP_NO_ERROR;
     }
+
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -183,6 +187,8 @@ public:
     ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
     ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
 
+    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
+
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
@@ -213,6 +219,9 @@ private:
 
     std::optional<ClusterReference> mPreviouslyFoundCluster;
     unsigned mEmberMetadataStructureGeneration = 0;
+
+    // Ember requires a persistence provider, so we make sure we can always have something
+    PersistentStorageDelegate * mPersistentStorageDelegate = nullptr;
 
     /// Finds the specified ember cluster
     ///

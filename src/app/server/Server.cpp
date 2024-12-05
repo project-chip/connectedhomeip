@@ -23,6 +23,7 @@
 #include <app/AppConfig.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
@@ -130,7 +131,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     if (initParams.dataModelProvider == nullptr)
     {
         ChipLogError(AppServer, "Application Server requires a `initParams.dataModelProvider` value.");
-        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance()`");
+        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance(...)`");
     }
 
     VerifyOrExit(initParams.dataModelProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -166,7 +167,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // Set up attribute persistence before we try to bring up the data model
     // handler.
     SuccessOrExit(err = mAttributePersister.Init(mDeviceStorage));
-    SetAttributePersistenceProvider(&mAttributePersister);
     SetSafeAttributePersistenceProvider(&mAttributePersister);
 
     // SetDataModelProvider() actually initializes/starts the provider.  We need
@@ -175,7 +175,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // 1) Provider initialization (under SetDataModelProvider) happens after
     //    SetSafeAttributePersistenceProvider, since the provider can then use
     //    the safe persistence provider to implement and initialize its own attribute persistence logic.
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
+    // 2) For now, provider initialization happens before InitDataModelHandler(), which depends
+    //    on atttribute persistence being already set up before it runs.  Longer-term, the logic from
+    //    InitDataModelHandler should just move into the codegen provider.
+    chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
     {
         FabricTable::InitParams fabricTableInitParams;
@@ -297,6 +300,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                        std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+
+    // This initializes clusters, so should come after lower level initialization.
+    app::InteractionModelEngine::GetInstance()->GetDataModelProvider()->InitDataModel();
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);
@@ -658,7 +664,7 @@ void Server::Shutdown()
     }
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-    mAttributePersister.Shutdown();
+
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }

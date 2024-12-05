@@ -232,6 +232,10 @@
 
     <string name="unpair_device_btn_text">Unpair</string>
 
+    <string name="diagnostic_log_btn_text">Get Diagnostic Log</string>
+    <string name="diagnostic_log_type_title_text">Log Type</string>
+    <string name="diagnostic_log_timeout_title_text">Timeout(Sec)</string>
+
     <string name="group_setting_btn_text">Group Setting</string>
     <string name="group_setting_group_text">Group :</string>
     <string name="group_setting_key_text">Key :</string>

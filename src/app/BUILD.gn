@@ -388,11 +388,28 @@ source_set("command-handler-impl") {
   ]
 }
 
+source_set("storage-wrapper") {
+  sources = [
+    "StorageDelegateWrapper.cpp",
+    "StorageDelegateWrapper.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 source_set("attribute-persistence") {
-  sources = [ "SafeAttributePersistenceProvider.h" ]
+  sources = [
+    "DefaultSafeAttributePersistenceProvider.h",
+    "SafeAttributePersistenceProvider.cpp",
+    "SafeAttributePersistenceProvider.h",
+  ]
 
   public_deps = [
     ":paths",
+    ":storage-wrapper",
     "${chip_root}/src/app/data-model:nullable",
     "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/support",
