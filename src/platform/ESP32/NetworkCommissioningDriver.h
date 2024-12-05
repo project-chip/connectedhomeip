@@ -34,10 +34,10 @@ inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 30;
 BitFlags<WiFiSecurityBitmap> ConvertSecurityType(wifi_auth_mode_t authMode);
 
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
-class ESPScanResponseIteratorV2 : public Iterator<WiFiScanResponse>
+class ESPScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    ESPScanResponseIteratorV2(const size_t size) : mSize(size) {}
+    ESPScanResponseIterator(const size_t size) : mSize(size) {}
     size_t Count() override { return mSize; }
 
     bool Next(WiFiScanResponse & item) override

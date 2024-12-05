@@ -389,11 +389,12 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
 
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
     if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_number]() {
-            ESPScanResponseIteratorV2 iter(ap_number);
+            ESPScanResponseIterator iter(ap_number);
             if (GetInstance().mpScanCallback)
             {
                 GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
                 GetInstance().mpScanCallback = nullptr;
+                iter.Release();
             }
             else
             {
