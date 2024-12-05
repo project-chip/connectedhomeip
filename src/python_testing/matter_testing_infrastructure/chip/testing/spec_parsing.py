@@ -84,6 +84,7 @@ class XmlCommand:
     id: int
     name: str
     conformance: Callable[[uint], ConformanceDecision]
+    privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
 
 @dataclass
@@ -418,7 +419,8 @@ class ClusterParser:
                 continue
             code = int(element.attrib['id'], 0)
             conformance = self.parse_conformance(conformance_xml)
-            commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance))
+            _, _, privilege = self.parse_access(element, access_xml, conformance)
+            commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance, privilege=privilege))
         return commands
 
     def parse_commands(self, command_type: CommandType) -> dict[uint, XmlCommand]:
@@ -432,7 +434,8 @@ class ClusterParser:
                 continue
             if code in commands:
                 conformance = or_operation([conformance, commands[code].conformance])
-            commands[code] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance)
+            _, _, privilege = self.parse_access(element, access_xml, conformance)
+            commands[code] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance, privilege=privilege)
         return commands
 
     def parse_events(self) -> dict[uint, XmlAttribute]:
@@ -642,9 +645,9 @@ def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirec
         conformance = or_operation([conformance_support.attribute(presents_id, presets_name),
                                    conformance_support.attribute(schedules_id, schedules_name)])
         clusters[Clusters.Thermostat.id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
-            id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance)
+            id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate)
         clusters[Clusters.Thermostat.id].generated_commands[atomic_response_cmd_id] = XmlCommand(
-            id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance)
+            id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate)
         clusters[Clusters.Thermostat.id].command_map[atomic_request_name] = atomic_request_cmd_id
         clusters[Clusters.Thermostat.id].command_map[atomic_response_name] = atomic_response_cmd_id
 
