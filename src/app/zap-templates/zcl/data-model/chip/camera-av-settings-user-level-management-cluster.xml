@@ -21,7 +21,7 @@ Parameters: in-progress
 Git: 1.4-267-gc3d95b5c9
 -->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
-  <domain name="General"/>
+  <domain name="Cameras"/>
   <struct name="MPTZPresetStruct" apiMaturity="provisional">
     <cluster code="0x0552"/>
     <item fieldId="0" name="PresetID" type="int8u"/>
