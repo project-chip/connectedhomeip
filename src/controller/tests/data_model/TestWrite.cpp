@@ -40,9 +40,6 @@ using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::app::DataModelTests;
 using namespace chip::Protocols;
 
-// Mock function for linking
-void InitDataModelHandler() {}
-
 namespace {
 
 class SingleWriteCallback : public WriteClient::Callback

@@ -41,9 +41,6 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-// Mock function for linking
-void InitDataModelHandler() {}
-
 namespace {
 
 class NullReadHandlerCallback : public chip::app::ReadHandler::ManagementCallback

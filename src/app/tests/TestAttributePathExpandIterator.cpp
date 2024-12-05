@@ -36,9 +36,6 @@ using namespace chip;
 using namespace chip::Test;
 using namespace chip::app;
 
-// Mock function for linking
-void InitDataModelHandler() {}
-
 namespace {
 
 using P = app::ConcreteAttributePath;

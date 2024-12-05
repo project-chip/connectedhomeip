@@ -37,9 +37,6 @@
 #include <messaging/Flags.h>
 #include <pw_unit_test/framework.h>
 
-// Mock function for linking
-void InitDataModelHandler() {}
-
 namespace {
 
 constexpr chip::DataVersion kAcceptedDataVersion = 5;

@@ -53,9 +53,6 @@
 
 using namespace chip::Protocols;
 
-// Mock function for linking
-void InitDataModelHandler() {}
-
 namespace {
 
 void CheckForInvalidAction(chip::Test::MessageCapturer & messageLog)

@@ -43,9 +43,6 @@
 #include <protocols/interaction_model/Constants.h>
 #include <pw_unit_test/framework.h>
 
-// Mock function for linking
-void InitDataModelHandler() {}
-
 namespace {
 uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
