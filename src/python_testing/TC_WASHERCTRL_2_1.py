@@ -115,9 +115,9 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
 
         # Try to write an invalid value (outside supported range)
         self.step(6)
-        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.LaundryWasherControls.Attributes.SpinSpeedCurrent(numSpinSpeeds))])
-        asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                             "Trying to write an invalid value should return ConstraintError")
+        result = await self.write_single_attribute(attribute_value=Clusters.LaundryWasherControls.Attributes.SpinSpeedCurrent(numSpinSpeeds),
+                                                   endpoint_id=endpoint, expect_success=False)
+        asserts.assert_equal(result, Status.ConstraintError, "Trying to write an invalid value should return ConstraintError")
 
 
 if __name__ == "__main__":
