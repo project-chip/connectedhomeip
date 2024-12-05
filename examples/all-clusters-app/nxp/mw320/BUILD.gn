@@ -64,6 +64,7 @@ mw320_executable("shell_mw320") {
   ]
 
   deps = [
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/src/platform/logging:default",
   ]

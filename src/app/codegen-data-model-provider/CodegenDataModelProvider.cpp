@@ -30,6 +30,8 @@
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <app/util/persistence/AttributePersistenceProvider.h>
+#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -405,7 +407,38 @@ std::optional<unsigned> FindNextSemanticTagIndex(EndpointId endpoint, const Data
     return std::nullopt;
 }
 
+DefaultAttributePersistenceProvider gDefaultAttributePersistence;
+
 } // namespace
+
+CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
+{
+    ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+
+    // Ember NVM requires have a data model provider. attempt to create one if one is not available
+    //
+    // It is not a critical failure to not have one, however if one is not set up, ember NVM operations
+    // will error out with a `persistence not available`.
+    if (GetAttributePersistenceProvider() == nullptr)
+    {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogProgress(DataManagement, "Ember attribute persistence requires setting up");
+#endif
+        if (mPersistentStorageDelegate != nullptr)
+        {
+            ReturnErrorOnFailure(gDefaultAttributePersistence.Init(mPersistentStorageDelegate));
+            SetAttributePersistenceProvider(&gDefaultAttributePersistence);
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        }
+        else
+        {
+            ChipLogError(DataManagement, "No storage delegate available, will not set up attribute persistence.");
+#endif
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 std::optional<CommandId> CodegenDataModelProvider::EmberCommandListIterator::First(const CommandId * list)
 {
