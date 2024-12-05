@@ -528,7 +528,7 @@ def _get_data_model_root() -> pathlib.PosixPath:
         data_model_root = package / 'data_model'
     except FileNotFoundError:
         raise FileNotFoundError(f"Data model directory not found in the package at {data_model_root}")
-    
+
     return data_model_root
 
 
@@ -568,18 +568,19 @@ def build_xml_clusters(data_model_directory: Union[str] = 'k1_4') -> tuple[dict[
     # Convert the resolved directory path into a resource path using pkg_resources
     dir = pathlib.Path(data_model_directory)
 
-    clusters = {} 
+    clusters = {}
     pure_base_clusters = {}
     ids_by_name = {}
     problems = []
 
     # Use pkg_resources to list all XML files in the data model directory
     try:
-        xml_files = [f for f in pkg_resources.contents(pkg_resources.files(pkg_resources.import_module('chip.testing')).joinpath('data_model').joinpath(data_model_directory)).splitlines() if f.endswith('.xml')]
+        xml_files = [f for f in pkg_resources.contents(pkg_resources.files(pkg_resources.import_module(
+            'chip.testing')).joinpath('data_model').joinpath(data_model_directory)).splitlines() if f.endswith('.xml')]
     except Exception as e:
         logging.error(f"Error accessing XML files in {data_model_directory}: {e}")
         return clusters, problems
-    
+
     if not xml_files:
         raise FileNotFoundError(f'No XML files found in the specified package directory {dir}')
 
