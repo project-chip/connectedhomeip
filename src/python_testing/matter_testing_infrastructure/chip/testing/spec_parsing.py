@@ -591,7 +591,6 @@ def build_xml_clusters(data_model_directory: Union[str] = 'k1_4') -> tuple[dict[
             # Open the resource file using pkg_resources and parse it
             with pkg_resources.open_text(pkg_resources.files(pkg_resources.import_module('chip.testing')).joinpath('data_model').joinpath(data_model_directory), xml) as file:
                 tree = ElementTree.parse(file)
-                root = tree.getroot()
         except Exception as e:
             logging.error(f"Error parsing XML file {xml}: {e}")
 
