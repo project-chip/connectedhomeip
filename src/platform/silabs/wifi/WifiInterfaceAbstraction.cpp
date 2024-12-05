@@ -21,6 +21,7 @@
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #include <stdbool.h>
@@ -35,7 +36,7 @@ using namespace chip::DeviceLayer;
 
 // TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
 //       As such we can't depend on the platform here as well
-extern void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData);
+extern void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData);
 
 namespace {
 
@@ -61,6 +62,52 @@ void RetryConnectionTimerHandler(void * arg)
 
 } // namespace
 
+/* Updated functions */
+
+void NotifyIPv6Change(bool gotIPv6Addr)
+{
+    sl_wfx_generic_message_t eventData = {};
+    eventData.header.id                = gotIPv6Addr ? to_underlying(WifiEvent::kGotIPv6) : to_underlying(WifiEvent::kLostIP);
+    eventData.header.length            = sizeof(eventData.header);
+
+    HandleWFXSystemEvent(&eventData);
+}
+
+void NotifyIPv4Change(bool gotIPv4Addr)
+{
+    sl_wfx_generic_message_t eventData;
+
+    memset(&eventData, 0, sizeof(eventData));
+    eventData.header.id     = gotIPv4Addr ? to_underlying(WifiEvent::kGotIPv4) : to_underlying(WifiEvent::kLostIP);
+    eventData.header.length = sizeof(eventData.header);
+    HandleWFXSystemEvent(&eventData);
+}
+
+void NotifyDisconnection(WifiDisconnectionReasons reason)
+{
+    sl_wfx_disconnect_ind_t evt = {};
+    evt.header.id               = to_underlying(WifiEvent::kDisconnect);
+    evt.header.length           = sizeof evt;
+    evt.body.reason             = to_underlying(reason);
+
+    HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
+}
+
+void NotifyConnection(const MacAddress & ap)
+{
+    sl_wfx_connect_ind_t evt = {};
+    evt.header.id            = to_underlying(WifiEvent::kConnect);
+    evt.header.length        = sizeof evt;
+#ifdef RS911X_WIFI
+    evt.body.channel = wfx_rsi.ap_chan;
+#endif
+    std::copy(ap.begin(), ap.end(), evt.body.mac);
+
+    HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
+}
+
+/* Function to update */
+
 /***********************************************************************************
  * @fn  sl_matter_wifi_task_started(void)
  * @brief
@@ -70,100 +117,27 @@ void RetryConnectionTimerHandler(void * arg)
  *************************************************************************************/
 void sl_matter_wifi_task_started(void)
 {
-    sl_wfx_startup_ind_t evt;
-    sl_wfx_mac_address_t mac;
+    sl_wfx_startup_ind_t evt = {};
 
     // Creating a timer which will be used to retry connection with AP
     sRetryTimer = osTimerNew(RetryConnectionTimerHandler, osTimerOnce, NULL, NULL);
     VerifyOrReturn(sRetryTimer != NULL);
 
-    memset(&evt, 0, sizeof(evt));
-    evt.header.id     = SL_WFX_STARTUP_IND_ID;
+    evt.header.id     = to_underlying(WifiEvent::kStartUp);
     evt.header.length = sizeof evt;
     evt.body.status   = 0;
-    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &mac);
-    memcpy(&evt.body.mac_addr[0], &mac.octet[0], MAC_ADDRESS_FIRST_OCTET);
 
-    HandleWFXSystemEvent(WIFI_EVENT, (sl_wfx_generic_message_t *) &evt);
-}
+    // TODO : Remove workwound when sl_wfx_startup_ind_t is unified
+    //        Issue is same structure name but different contents
+#if WF200_WIFI
+    MutableByteSpan macSpan(evt.body.mac_addr[SL_WFX_STA_INTERFACE], kWifiMacAddressLength);
+#else
+    MutableByteSpan macSpan(evt.body.mac_addr, kWifiMacAddressLength);
+#endif // WF200_WIFI
 
-/***********************************************************************************
- * @fn  void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t *ap)
- * @brief
- * For now we are not notifying anything other than AP Mac -
- * Other stuff such as DTIM etc. may be required for later
- * @param[in] status:
- * @param[in] ap: access point
- * @return None
- *************************************************************************************/
-void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
-{
-    sl_wfx_connect_ind_t evt;
+    GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
 
-    VerifyOrReturn(status == SUCCESS_STATUS);
-
-    memset(&evt, 0, sizeof(evt));
-    evt.header.id     = SL_WFX_CONNECT_IND_ID;
-    evt.header.length = sizeof evt;
-
-#ifdef RS911X_WIFI
-    evt.body.channel = wfx_rsi.ap_chan;
-#endif
-    memcpy(&evt.body.mac[0], &ap->octet[0], MAC_ADDRESS_FIRST_OCTET);
-
-    HandleWFXSystemEvent(WIFI_EVENT, (sl_wfx_generic_message_t *) &evt);
-}
-
-/**************************************************************************************
- * @fn  void wfx_disconnected_notify(int32_t status)
- * @brief
- *    notification of disconnection
- * @param[in] status:
- * @return None
- *************************************************************************************/
-void wfx_disconnected_notify(int32_t status)
-{
-    sl_wfx_disconnect_ind_t evt;
-
-    memset(&evt, 0, sizeof(evt));
-    evt.header.id     = SL_WFX_DISCONNECT_IND_ID;
-    evt.header.length = sizeof evt;
-    evt.body.reason   = status;
-    HandleWFXSystemEvent(WIFI_EVENT, (sl_wfx_generic_message_t *) &evt);
-}
-
-/**************************************************************************************
- * @fn  void wfx_ipv6_notify(int got_ip)
- * @brief
- *      notification of ipv6
- * @param[in]  got_ip:
- * @return None
- *************************************************************************************/
-void wfx_ipv6_notify(int got_ip)
-{
-    sl_wfx_generic_message_t eventData;
-
-    memset(&eventData, 0, sizeof(eventData));
-    eventData.header.id     = got_ip ? IP_EVENT_GOT_IP6 : IP_EVENT_STA_LOST_IP;
-    eventData.header.length = sizeof(eventData.header);
-    HandleWFXSystemEvent(IP_EVENT, &eventData);
-}
-
-/**************************************************************************************
- * @fn   void wfx_ip_changed_notify(int got_ip)
- * @brief
- *      notification of ip change
- * @param[in]  got_ip:
- * @return None
- *************************************************************************************/
-void wfx_ip_changed_notify(int got_ip)
-{
-    sl_wfx_generic_message_t eventData;
-
-    memset(&eventData, 0, sizeof(eventData));
-    eventData.header.id     = got_ip ? IP_EVENT_STA_GOT_IP : IP_EVENT_STA_LOST_IP;
-    eventData.header.length = sizeof(eventData.header);
-    HandleWFXSystemEvent(IP_EVENT, &eventData);
+    HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
 
 /**************************************************************************************

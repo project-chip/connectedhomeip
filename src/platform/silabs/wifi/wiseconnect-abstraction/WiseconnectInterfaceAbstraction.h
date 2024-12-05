@@ -22,15 +22,21 @@
 #include <sl_cmsis_os2_common.h>
 
 #define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP */
-#define GET_IPV6_SUCCESS (1)
 
-extern WfxRsi_t wfx_rsi;
+enum class WifiPlatformEvent : uint8_t
+{
+    kStationConnect    = 0,
+    kStationDisconnect = 1,
+    kAPStart           = 2,
+    kAPStop            = 3,
+    kScan              = 4, /* This combines the scan start and scan result events  */
+    kStationStartJoin  = 5,
+    kStationDoDhcp     = 6,
+    kStationDhcpDone   = 7,
+    kStationDhcpPoll   = 8,
+};
 
 void sl_matter_wifi_task(void * arg);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-void wfx_ip_changed_notify(int got_ip);
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
@@ -44,4 +50,4 @@ sl_status_t sl_matter_wifi_platform_init(void);
  *
  * @param[in] event Event to process.
  */
-void sl_matter_wifi_post_event(WifiEvent event);
+void sl_matter_wifi_post_event(WifiPlatformEvent event);
