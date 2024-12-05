@@ -194,6 +194,73 @@ constexpr uint8_t kWfxQueueSize = 10;
 // TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 constexpr uint16_t kWifiScanTimeoutTicks = 10000;
 
+/**
+ * @brief Network Scan callback when the device receive a scan operation from the controller.
+ *        This callback is used whe the Network Commission Driver send a ScanNetworks command.
+ *
+ *        If the scan network was requested for a specific SSID - wfx_rsi.scan_ssid had a valid value,
+ *        the callback will only forward that specific networks information.
+ *        If no ssid is provided, wfx_rsi.scan_ssid is a nullptr, we return the information of all scanned networks.
+ */
+sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * result, uint32_t result_length, void * arg)
+{
+    SL_WIFI_ARGS_CHECK_NULL_POINTER(result);
+    VerifyOrReturnError(wfx_rsi.scan_cb != nullptr, SL_STATUS_INVALID_HANDLE);
+
+    uint32_t nbreResults = result->scan_count;
+    chip::ByteSpan requestedSsidSpan(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length);
+
+    for (uint32_t i = 0; i < nbreResults; i++)
+    {
+        wfx_wifi_scan_result_t currentScanResult = { 0 };
+
+        // Lenght excludes null-character
+        size_t scannedSsidLenght = strnlen(reinterpret_cast<char *>(result->scan_info[i].ssid), WFX_MAX_SSID_LENGTH);
+        chip::ByteSpan scannedSsidSpan(result->scan_info[i].ssid, scannedSsidLenght);
+
+        currentScanResult.ssid_length = scannedSsidLenght;
+        chip::MutableByteSpan currentScanSsid(currentScanResult.ssid, currentScanResult.ssid_length);
+
+        // Copy the scanned SSID to the current scan ssid buffer that will be forwarded to the callback
+        chip::CopySpanToMutableSpan(scannedSsidSpan, currentScanSsid);
+
+        chip::ByteSpan inBssid(result->scan_info[i].bssid, kWifiMacAddressLength);
+        chip::MutableByteSpan outBssid(currentScanResult.bssid, kWifiMacAddressLength);
+        chip::CopySpanToMutableSpan(inBssid, outBssid);
+
+        // TODO: We should revisit this to make sure we are setting the correct values
+        currentScanResult.security = static_cast<wfx_sec_t>(result->scan_info[i].security_mode);
+        currentScanResult.rssi     = (-1) * result->scan_info[i].rssi_val; // The returned value is positive - we need to flip it
+        currentScanResult.chan     = result->scan_info[i].rf_channel;
+
+        // if user has provided ssid, check if the current scan result ssid matches the user provided ssid
+        if (!requestedSsidSpan.empty())
+        {
+            if (requestedSsidSpan.data_equal(currentScanSsid))
+            {
+                wfx_rsi.scan_cb(&currentScanResult);
+            }
+        }
+        else // No ssid was provide - forward all results
+        {
+            wfx_rsi.scan_cb(&currentScanResult);
+        }
+    }
+
+    // cleanup and return
+    wfx_rsi.dev_state.Clear(WifiState::kScanStarted);
+    wfx_rsi.scan_cb(nullptr);
+    wfx_rsi.scan_cb = nullptr;
+    if (wfx_rsi.scan_ssid)
+    {
+        chip::Platform::MemoryFree(wfx_rsi.scan_ssid);
+        wfx_rsi.scan_ssid = nullptr;
+    }
+    osSemaphoreRelease(sScanCompleteSemaphore);
+
+    return SL_STATUS_OK;
+}
+
 void DHCPTimerEventHandler(void * arg)
 {
     WifiPlatformEvent event = WifiPlatformEvent::kStationDhcpPoll;
@@ -474,16 +541,21 @@ sl_status_t sl_matter_wifi_platform_init(void)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
-    sl_status_t status = SL_STATUS_OK;
-    int32_t rssi       = 0;
-    ap->ssid_length    = wfx_rsi.sec.ssid_length;
-    ap->security       = wfx_rsi.sec.security;
-    ap->chan           = wfx_rsi.ap_chan;
-    chip::Platform::CopyString(ap->ssid, ap->ssid_length, wfx_rsi.sec.ssid);
+    int32_t rssi    = 0;
+    ap->ssid_length = wfx_rsi.sec.ssid_length;
+    ap->security    = wfx_rsi.sec.security;
+    ap->chan        = wfx_rsi.ap_chan;
+
+    chip::MutableByteSpan output(ap->ssid, ap->ssid_length);
+    // Cast is a workaround until the wfx_rsi structure is refactored
+    chip::ByteSpan ssid(reinterpret_cast<uint8_t *>(wfx_rsi.sec.ssid), wfx_rsi.sec.ssid_length);
+    chip::CopySpanToMutableSpan(ssid, output);
+
     memcpy(&ap->bssid[0], wfx_rsi.ap_mac.data(), kWifiMacAddressLength);
     sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &rssi);
     ap->rssi = rssi;
-    return status;
+
+    return SL_STATUS_OK;
 }
 
 /******************************************************************
@@ -545,59 +617,6 @@ int32_t wfx_rsi_reset_count(void)
 int32_t sl_wifi_platform_disconnect(void)
 {
     return sl_net_down((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE);
-}
-
-sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
-{
-    SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
-    VerifyOrReturnError(wfx_rsi.scan_cb != nullptr, SL_STATUS_INVALID_HANDLE);
-
-    wfx_wifi_scan_result_t cur_scan_result;
-    for (int idx = 0; idx < (int) scan_result->scan_count; idx++)
-    {
-        memset(&cur_scan_result, 0, sizeof(cur_scan_result));
-
-        cur_scan_result.ssid_length = strnlen((char *) scan_result->scan_info[idx].ssid,
-                                              std::min<size_t>(sizeof(scan_result->scan_info[idx].ssid), WFX_MAX_SSID_LENGTH));
-        chip::Platform::CopyString(cur_scan_result.ssid, cur_scan_result.ssid_length, (char *) scan_result->scan_info[idx].ssid);
-
-        // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
-        if (wfx_rsi.scan_ssid != nullptr &&
-            (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, std::min(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
-             0))
-        {
-            continue;
-        }
-        cur_scan_result.security = static_cast<wfx_sec_t>(scan_result->scan_info[idx].security_mode);
-        cur_scan_result.rssi     = (-1) * scan_result->scan_info[idx].rssi_val;
-        memcpy(cur_scan_result.bssid, scan_result->scan_info[idx].bssid, kWifiMacAddressLength);
-        wfx_rsi.scan_cb(&cur_scan_result);
-
-        // if user has not provided the ssid, then call the callback for each scan result
-        if (wfx_rsi.scan_ssid == nullptr)
-        {
-            continue;
-        }
-        break;
-    }
-
-    // cleanup and return
-    wfx_rsi.dev_state.Clear(WifiState::kScanStarted);
-    wfx_rsi.scan_cb((wfx_wifi_scan_result_t *) 0);
-    wfx_rsi.scan_cb = nullptr;
-    if (wfx_rsi.scan_ssid)
-    {
-        chip::Platform::MemoryFree(wfx_rsi.scan_ssid);
-        wfx_rsi.scan_ssid = nullptr;
-    }
-    return SL_STATUS_OK;
-}
-
-sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t * result, uint32_t result_length, void * arg)
-{
-    show_scan_results(result); // To do Check error
-    osSemaphoreRelease(sScanCompleteSemaphore);
-    return SL_STATUS_OK;
 }
 
 /// NotifyConnectivity
@@ -716,17 +735,22 @@ void ProcessEvent(WifiPlatformEvent event)
         if (!(wfx_rsi.dev_state.Has(WifiState::kScanStarted)))
         {
             ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kScan");
-            sl_wifi_scan_configuration_t wifi_scan_configuration;
-            memset(&wifi_scan_configuration, 0, sizeof(wifi_scan_configuration));
+            sl_status_t status = SL_STATUS_OK;
 
-            // TODO: Add scan logic
+            sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
+            if (wfx_rsi.dev_state.Has(WifiState::kStationConnected))
+            {
+                /* Terminate with end of scan which is no ap sent back */
+                wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
+                wifi_scan_configuration.periodic_scan_interval = kAdvScanPeriodicity;
+            }
+
             sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = { 0 };
-            int32_t status;
-            advanced_scan_configuration.active_channel_time  = kAdvActiveScanDuration;
-            advanced_scan_configuration.passive_channel_time = kAdvPassiveScanDuration;
-            advanced_scan_configuration.trigger_level        = kAdvScanThreshold;
-            advanced_scan_configuration.trigger_level_change = kAdvRssiToleranceThreshold;
-            advanced_scan_configuration.enable_multi_probe   = kAdvMultiProbe;
+            advanced_scan_configuration.active_channel_time                   = kAdvActiveScanDuration;
+            advanced_scan_configuration.passive_channel_time                  = kAdvPassiveScanDuration;
+            advanced_scan_configuration.trigger_level                         = kAdvScanThreshold;
+            advanced_scan_configuration.trigger_level_change                  = kAdvRssiToleranceThreshold;
+            advanced_scan_configuration.enable_multi_probe                    = kAdvMultiProbe;
             status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
             if (SL_STATUS_OK != status)
             {
@@ -735,21 +759,22 @@ void ProcessEvent(WifiPlatformEvent event)
                 return;
             }
 
-            if (wfx_rsi.dev_state.Has(WifiState::kStationConnected))
-            {
-                /* Terminate with end of scan which is no ap sent back */
-                wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
-                wifi_scan_configuration.periodic_scan_interval = kAdvScanPeriodicity;
-            }
-            else
-            {
-                wifi_scan_configuration = default_wifi_scan_configuration;
-            }
-            sl_wifi_set_scan_callback(bg_scan_callback_handler, nullptr);
+            sl_wifi_set_scan_callback(BackgroundScanCallback, nullptr);
             wfx_rsi.dev_state.Set(WifiState::kScanStarted);
 
+            // If an ssid was not provided, we need to call the scan API with nullptr to scan all Wi-Fi networks
+            sl_wifi_ssid_t ssid      = { 0 };
+            sl_wifi_ssid_t * ssidPtr = nullptr;
+
+            if (wfx_rsi.scan_ssid != nullptr)
+            {
+                ssid.length = wfx_rsi.scan_ssid_length;
+                memcpy(ssid.value, wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length);
+                ssidPtr = &ssid;
+            }
+
             osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
-            status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, nullptr, &wifi_scan_configuration);
+            status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, ssidPtr, &wifi_scan_configuration);
             if (SL_STATUS_IN_PROGRESS == status)
             {
                 osSemaphoreAcquire(sScanCompleteSemaphore, kWifiScanTimeoutTicks);
@@ -839,7 +864,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[0] = (ip) & 0xFF;
     wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
     wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;

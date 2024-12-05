@@ -267,17 +267,8 @@ bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     bool scanStarted = false;
     ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks");
-    if (!ssid.empty()) // ssid is given, only scan this network
-    {
-        char cSsid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = {};
-        memcpy(cSsid, ssid.data(), ssid.size());
-        scanStarted = wfx_start_scan(cSsid, OnScanWiFiNetworkDone);
-    }
-    else // scan all networks
-    {
-        scanStarted = wfx_start_scan(nullptr, OnScanWiFiNetworkDone);
-    }
-    return scanStarted;
+
+    return StartNetworkScan(ssid, OnScanWiFiNetworkDone) == CHIP_NO_ERROR;
 }
 
 void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
@@ -309,7 +300,7 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
         scanResponse.security.Set(GetInstance().ConvertSecuritytype(aScanResult->security));
         scanResponse.channel = aScanResult->chan;
         scanResponse.rssi    = aScanResult->rssi;
-        scanResponse.ssidLen = strnlen(aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        scanResponse.ssidLen = aScanResult->ssid_length;
         memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
         memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
 
