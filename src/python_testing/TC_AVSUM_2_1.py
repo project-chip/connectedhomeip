@@ -98,12 +98,16 @@ class TC_AVSUM_2_1(MatterBaseTest):
 
         attribute_list = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
+        if not(has_feature_mpan | has_feature_mtilt | has_feature_mzoom):
+            logging.info("One of MPAN, MTILT, or MZOOM is mandatory")
+            self.skip_all_remaining_steps(3)
+
         if has_feature_mpan | has_feature_mtilt | has_feature_mzoom:
             asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list, "MPTZPosition attribute is mandatory if MPAN or MTILT or MZOOM")
             mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.MptzPosition)
 
-        self.step(3)
         if has_feature_mpresets:
+            self.step(3)
             asserts.assert_in(attributes.MaxPresets.attribute_id, attribute_list,
                           "MaxPresets attribute is a mandatory attribute if MPRESETS.")
 
@@ -116,7 +120,8 @@ class TC_AVSUM_2_1(MatterBaseTest):
             mptz_presets_bitmap_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.MptzPresets)
         else:
             logging.info("MPRESETS Feature not supported. Test steps skipped")
-            self.mark_current_step_skipped()
+            self.skip_step(3)
+            self.skip_step(4)
 
         self.step(5)
         if has_feature_dptz:
