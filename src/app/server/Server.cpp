@@ -34,6 +34,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/Global.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/support/CodeUtils.h>
@@ -91,15 +92,15 @@ chip::Access::DynamicProviderDeviceTypeResolver sDeviceTypeResolver([] {
 
 namespace chip {
 
-Server Server::sServer;
+Global<Server> Server::sServer;
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_NUM_EVENT_LOGGING_BUFFERS 3
-static uint8_t sInfoEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE];
-static uint8_t sDebugEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE];
-static uint8_t sCritEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE];
-static ::chip::PersistedCounter<chip::EventNumber> sGlobalEventIdCounter;
-static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
+static Global<uint8_t[CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE]> sInfoEventBuffer;
+static Global<uint8_t[CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE]> sDebugEventBuffer;
+static Global<uint8_t[CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE]> sCritEventBuffer;
+static Global<::chip::PersistedCounter<chip::EventNumber>> sGlobalEventIdCounter;
+static Global<::chip::app::CircularEventBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS]> sLoggingBuffer;
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
@@ -285,19 +286,19 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
-    err = sGlobalEventIdCounter.Init(mDeviceStorage, DefaultStorageKeyAllocator::IMEventNumber(),
-                                     CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH);
+    err = sGlobalEventIdCounter->Init(mDeviceStorage, DefaultStorageKeyAllocator::IMEventNumber(),
+                                      CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH);
     SuccessOrExit(err);
 
     {
         ::chip::app::LogStorageResources logStorageResources[] = {
-            { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), ::chip::app::PriorityLevel::Debug },
-            { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), ::chip::app::PriorityLevel::Info },
-            { &sCritEventBuffer[0], sizeof(sCritEventBuffer), ::chip::app::PriorityLevel::Critical }
+            { sDebugEventBuffer.get(), CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE, ::chip::app::PriorityLevel::Debug },
+            { sInfoEventBuffer.get(), CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE, ::chip::app::PriorityLevel::Info },
+            { sCritEventBuffer.get(), CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE, ::chip::app::PriorityLevel::Critical }
         };
 
-        chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                       &logStorageResources[0], &sGlobalEventIdCounter,
+        chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, sLoggingBuffer.get(),
+                                                       &logStorageResources[0], &sGlobalEventIdCounter.get(),
                                                        std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
@@ -794,23 +795,22 @@ void Server::ResumeSubscriptions()
 
 Credentials::IgnoreCertificateValidityPeriodPolicy Server::sDefaultCertValidityPolicy;
 
-KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
-PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
-Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
-Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
-app::DefaultTimerDelegate CommonCaseDeviceServerInitParams::sTimerDelegate;
-app::reporting::ReportSchedulerImpl
-    CommonCaseDeviceServerInitParams::sReportScheduler(&CommonCaseDeviceServerInitParams::sTimerDelegate);
+Global<KvsPersistentStorageDelegate> CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
+Global<PersistentStorageOperationalKeystore> CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
+Global<Credentials::PersistentStorageOpCertStore> CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
+Global<Credentials::GroupDataProviderImpl> CommonCaseDeviceServerInitParams::sGroupDataProvider;
+Global<app::DefaultTimerDelegate> CommonCaseDeviceServerInitParams::sTimerDelegate;
+Global<app::reporting::ReportSchedulerImpl> CommonCaseDeviceServerInitParams::sReportScheduler;
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
+Global<SimpleSessionResumptionStorage> CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
 #endif
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-app::SimpleSubscriptionResumptionStorage CommonCaseDeviceServerInitParams::sSubscriptionResumptionStorage;
+Global<app::SimpleSubscriptionResumptionStorage> CommonCaseDeviceServerInitParams::sSubscriptionResumptionStorage;
 #endif
-app::DefaultAclStorage CommonCaseDeviceServerInitParams::sAclStorage;
-Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystore;
+Global<app::DefaultAclStorage> CommonCaseDeviceServerInitParams::sAclStorage;
+Global<Crypto::DefaultSessionKeystore> CommonCaseDeviceServerInitParams::sSessionKeystore;
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-app::DefaultICDCheckInBackOffStrategy CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
+Global<app::DefaultICDCheckInBackOffStrategy> CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
 #endif
 
 } // namespace chip

@@ -24,7 +24,7 @@
 
 namespace chip {
 
-BindingTable BindingTable::sInstance;
+Global<BindingTable> BindingTable::sInstance;
 
 BindingTable::BindingTable()
 {

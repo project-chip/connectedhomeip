@@ -62,7 +62,8 @@ class ReportSchedulerImpl : public ReportScheduler
 public:
     using Timeout = System::Clock::Timeout;
 
-    ReportSchedulerImpl(TimerDelegate * aTimerDelegate);
+    ReportSchedulerImpl() = default;
+    ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportScheduler(aTimerDelegate) {}
     ~ReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
     // ICDStateObserver
