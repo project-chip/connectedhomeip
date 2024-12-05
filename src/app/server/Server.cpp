@@ -23,6 +23,7 @@
 #include <app/AppConfig.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
@@ -131,7 +132,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     if (initParams.dataModelProvider == nullptr)
     {
         ChipLogError(AppServer, "Application Server requires a `initParams.dataModelProvider` value.");
-        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance()`");
+        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance(...)`");
     }
 
     VerifyOrExit(initParams.dataModelProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -167,7 +168,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // Set up attribute persistence before we try to bring up the data model
     // handler.
     SuccessOrExit(err = mAttributePersister.Init(mDeviceStorage));
-    SetAttributePersistenceProvider(&mAttributePersister);
     SetSafeAttributePersistenceProvider(&mAttributePersister);
 
     // SetDataModelProvider() actually initializes/starts the provider.  We need
@@ -665,7 +665,7 @@ void Server::Shutdown()
     }
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-    mAttributePersister.Shutdown();
+
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }

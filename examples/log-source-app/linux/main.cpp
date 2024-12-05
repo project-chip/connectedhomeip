@@ -106,7 +106,7 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config

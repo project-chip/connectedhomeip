@@ -22,6 +22,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/util/af-types.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 namespace app {
@@ -134,12 +135,17 @@ public:
         mPreviouslyFoundCluster = std::nullopt;
     }
 
+    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
+    PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
+
     /// Generic model implementations
     CHIP_ERROR Shutdown() override
     {
         Reset();
         return CHIP_NO_ERROR;
     }
+
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -211,6 +217,9 @@ private:
 
     std::optional<ClusterReference> mPreviouslyFoundCluster;
     unsigned mEmberMetadataStructureGeneration = 0;
+
+    // Ember requires a persistence provider, so we make sure we can always have something
+    PersistentStorageDelegate * mPersistentStorageDelegate = nullptr;
 
     /// Finds the specified ember cluster
     ///

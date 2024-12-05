@@ -261,6 +261,14 @@
 		5AE6D4E427A99041001F2493 /* MTRDeviceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6D4E327A99041001F2493 /* MTRDeviceTests.m */; };
 		75139A6F2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.mm in Sources */ = {isa = PBXBuildFile; fileRef = 75139A6E2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.mm */; };
 		75139A702B7FE68C00E3A919 /* MTRDeviceControllerLocalTestStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 75139A6D2B7FE5D600E3A919 /* MTRDeviceControllerLocalTestStorage.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		7534D1782CF8CDDF00F64654 /* AttributePersistenceProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7534D1772CF8CDDF00F64654 /* AttributePersistenceProvider.cpp */; };
+		7534D1792CF8CDDF00F64654 /* AttributePersistenceProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 7534D1762CF8CDDF00F64654 /* AttributePersistenceProvider.h */; };
+		7534D17A2CF8CDDF00F64654 /* AttributePersistenceProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7534D1772CF8CDDF00F64654 /* AttributePersistenceProvider.cpp */; };
+		7534D17B2CF8CDDF00F64654 /* AttributePersistenceProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 7534D1762CF8CDDF00F64654 /* AttributePersistenceProvider.h */; };
+		7534D17E2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 7534D17C2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h */; };
+		7534D17F2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7534D17D2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp */; };
+		7534D1802CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7534D17D2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp */; };
+		7534D1812CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 7534D17C2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h */; };
 		7534F12828BFF20300390851 /* MTRDeviceAttestationDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7534F12628BFF20300390851 /* MTRDeviceAttestationDelegate.mm */; };
 		7534F12928BFF20300390851 /* MTRDeviceAttestationDelegate_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7534F12728BFF20300390851 /* MTRDeviceAttestationDelegate_Internal.h */; };
 		754784652BFE65CB0089C372 /* MTRDeviceStorageBehaviorConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 754784642BFE65CB0089C372 /* MTRDeviceStorageBehaviorConfiguration.mm */; };
@@ -751,6 +759,10 @@
 		75139A6C2B7FE19100E3A919 /* MTRTestDeclarations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRTestDeclarations.h; sourceTree = "<group>"; };
 		75139A6D2B7FE5D600E3A919 /* MTRDeviceControllerLocalTestStorage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerLocalTestStorage.h; sourceTree = "<group>"; };
 		75139A6E2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceControllerLocalTestStorage.mm; sourceTree = "<group>"; };
+		7534D1762CF8CDDF00F64654 /* AttributePersistenceProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AttributePersistenceProvider.h; path = ../../app/util/persistence/AttributePersistenceProvider.h; sourceTree = "<group>"; };
+		7534D1772CF8CDDF00F64654 /* AttributePersistenceProvider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = AttributePersistenceProvider.cpp; path = ../../app/util/persistence/AttributePersistenceProvider.cpp; sourceTree = "<group>"; };
+		7534D17C2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DefaultAttributePersistenceProvider.h; path = ../../app/util/persistence/DefaultAttributePersistenceProvider.h; sourceTree = "<group>"; };
+		7534D17D2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DefaultAttributePersistenceProvider.cpp; path = ../../app/util/persistence/DefaultAttributePersistenceProvider.cpp; sourceTree = "<group>"; };
 		7534F12628BFF20300390851 /* MTRDeviceAttestationDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceAttestationDelegate.mm; sourceTree = "<group>"; };
 		7534F12728BFF20300390851 /* MTRDeviceAttestationDelegate_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceAttestationDelegate_Internal.h; sourceTree = "<group>"; };
 		754784632BFE65B70089C372 /* MTRDeviceStorageBehaviorConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceStorageBehaviorConfiguration.h; sourceTree = "<group>"; };
@@ -1172,6 +1184,7 @@
 		1E857311265519DE0050A4D9 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				7534D1822CF8CE2C00F64654 /* persistence */,
 				7521D2932CBECE3F00218E16 /* codegen-data-model-provider */,
 				75A202E72BA8DBB700A771DD /* reporting */,
 				5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */,
@@ -1347,6 +1360,17 @@
 				7592BCF22CBEE98C00EB74A0 /* Instance.cpp */,
 			);
 			path = "codegen-data-model-provider";
+			sourceTree = "<group>";
+		};
+		7534D1822CF8CE2C00F64654 /* persistence */ = {
+			isa = PBXGroup;
+			children = (
+				7534D17C2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h */,
+				7534D17D2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp */,
+				7534D1762CF8CDDF00F64654 /* AttributePersistenceProvider.h */,
+				7534D1772CF8CDDF00F64654 /* AttributePersistenceProvider.cpp */,
+			);
+			path = persistence;
 			sourceTree = "<group>";
 		};
 		75A202E72BA8DBB700A771DD /* reporting */ = {
@@ -1766,6 +1790,7 @@
 				B43B39EC2CB859A5006AA284 /* DumpMemoryGraphCommand.h in Headers */,
 				B43B39ED2CB859A5006AA284 /* Commands.h in Headers */,
 				B43B39EE2CB859A5006AA284 /* LeaksTool.h in Headers */,
+				7534D17E2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h in Headers */,
 				037C3DBD2991BD5000B7EEE2 /* OTAProviderDelegate.h in Headers */,
 				B4FCD5702B603A6300832859 /* Commands.h in Headers */,
 				037C3DB02991BD4F00B7EEE2 /* Commands.h in Headers */,
@@ -1778,6 +1803,7 @@
 				037C3DCC2991BD5100B7EEE2 /* MTRError_Utils.h in Headers */,
 				7592BD002CBEE98C00EB74A0 /* Instance.h in Headers */,
 				7592BD012CBEE98C00EB74A0 /* EmberMetadata.h in Headers */,
+				7534D17B2CF8CDDF00F64654 /* AttributePersistenceProvider.h in Headers */,
 				7592BD022CBEE98C00EB74A0 /* CodegenDataModelProvider.h in Headers */,
 				037C3DAD2991BD4F00B7EEE2 /* PairingCommandBridge.h in Headers */,
 				037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */,
@@ -1831,8 +1857,10 @@
 				7534F12928BFF20300390851 /* MTRDeviceAttestationDelegate_Internal.h in Headers */,
 				D4772A46285AE98400383630 /* MTRClusterConstants.h in Headers */,
 				3DA1A3552ABAB3B4004F0BB9 /* MTRAsyncWorkQueue.h in Headers */,
+				7534D1792CF8CDDF00F64654 /* AttributePersistenceProvider.h in Headers */,
 				B289D4212639C0D300D4E314 /* MTROnboardingPayloadParser.h in Headers */,
 				513DDB862761F69300DAA01A /* MTRAttributeTLVValueDecoder_Internal.h in Headers */,
+				7534D1812CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h in Headers */,
 				2CB7163F252F731E0026E2BB /* MTRDeviceControllerDelegate.h in Headers */,
 				88EBF8CE27FABDD500686BC1 /* MTRDeviceAttestationDelegate.h in Headers */,
 				2C222AD0255C620600E446B9 /* MTRBaseDevice.h in Headers */,
@@ -2154,6 +2182,7 @@
 				0395469F2991DFC5006D42A8 /* json_reader.cpp in Sources */,
 				514C79F42B62ED5500DD6D7B /* attribute-storage.cpp in Sources */,
 				0395469E2991DFC5006D42A8 /* json_writer.cpp in Sources */,
+				7534D17F2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp in Sources */,
 				03FB93E02A46200A0048CB35 /* DiscoverCommissionablesCommand.mm in Sources */,
 				516411332B6BF77700E67C05 /* MTRServerAccessControl.mm in Sources */,
 				037C3DD52991C2E200B7EEE2 /* CHIPCommandBridge.mm in Sources */,
@@ -2179,6 +2208,7 @@
 				512431292BA0C8BF000BC136 /* ResetMRPParametersCommand.mm in Sources */,
 				037C3DB32991BD5000B7EEE2 /* OpenCommissioningWindowCommand.mm in Sources */,
 				037C3DAE2991BD4F00B7EEE2 /* PairingCommandBridge.mm in Sources */,
+				7534D17A2CF8CDDF00F64654 /* AttributePersistenceProvider.cpp in Sources */,
 				514C79FD2B62F94C00DD6D7B /* ota-provider.cpp in Sources */,
 				037C3DCA2991BD5100B7EEE2 /* CHIPCommandStorageDelegate.mm in Sources */,
 				037C3DCF2991BD5200B7EEE2 /* MTRError.mm in Sources */,
@@ -2263,6 +2293,7 @@
 				9B231B052C62EF650030EB37 /* MTRDeviceController_Concrete.mm in Sources */,
 				5ACDDD7D27CD16D200EFD68A /* MTRClusterStateCacheContainer.mm in Sources */,
 				75B3269E2BCDB9EA00E17C4E /* MTRDeviceConnectivityMonitor.mm in Sources */,
+				7534D1802CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp in Sources */,
 				9B5CCB5C2C6EC890009DD99B /* MTRDevice_XPC.mm in Sources */,
 				513DDB8A2761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm in Sources */,
 				5117DD3829A931AE00FFA1AA /* MTROperationalBrowser.mm in Sources */,
@@ -2277,6 +2308,7 @@
 				3CF134AD289D8E570017A19E /* MTRDeviceAttestationInfo.mm in Sources */,
 				2C1B027A2641DB4E00780EF1 /* MTROperationalCredentialsDelegate.mm in Sources */,
 				754784652BFE65CB0089C372 /* MTRDeviceStorageBehaviorConfiguration.mm in Sources */,
+				7534D1782CF8CDDF00F64654 /* AttributePersistenceProvider.cpp in Sources */,
 				7560FD1C27FBBD3F005E85B3 /* MTREventTLVValueDecoder.mm in Sources */,
 				5178E67E2AE098210069DF72 /* MTRCommandTimedCheck.mm in Sources */,
 				7596A84928762783004DAE0E /* MTRAsyncCallbackWorkQueue.mm in Sources */,
