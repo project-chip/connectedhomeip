@@ -839,7 +839,7 @@ private:
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
-    uint8_t mReadCommissioningInfoProgress = 0;
+    uint8_t mReadCommissioningInfoProgress = 0; // see ContinueReadingCommissioningInfo()
 
     bool mRunCommissioningAfterConnection = false;
     Internal::InvokeCancelFn mInvokeCancelFn;
