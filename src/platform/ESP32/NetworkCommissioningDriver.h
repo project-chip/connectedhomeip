@@ -33,45 +33,11 @@ inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 30;
 
 BitFlags<WiFiSecurityBitmap> ConvertSecurityType(wifi_auth_mode_t authMode);
 
-class ESPScanResponseIterator : public Iterator<WiFiScanResponse>
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
+class ESPScanResponseIteratorV2 : public Iterator<WiFiScanResponse>
 {
 public:
-    ESPScanResponseIterator(const size_t size, const wifi_ap_record_t * scanResults) : mSize(size), mpScanResults(scanResults) {}
-    size_t Count() override { return mSize; }
-
-    bool Next(WiFiScanResponse & item) override
-    {
-        if (mIternum >= mSize)
-        {
-            return false;
-        }
-
-        item.security = ConvertSecurityType(mpScanResults[mIternum].authmode);
-        static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "SSID length might not fit in item.ssidLen");
-        item.ssidLen = static_cast<uint8_t>(
-            strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
-        item.channel  = mpScanResults[mIternum].primary;
-        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = mpScanResults[mIternum].rssi;
-        memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
-        memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
-
-        mIternum++;
-        return true;
-    }
-
-    void Release() override {}
-
-private:
-    const size_t mSize;
-    const wifi_ap_record_t * mpScanResults;
-    size_t mIternum = 0;
-};
-
-class ESPScanResponseIterator2 : public Iterator<WiFiScanResponse>
-{
-public:
-    ESPScanResponseIterator2(const size_t size ) : mSize(size) {}
+    ESPScanResponseIteratorV2(const size_t size) : mSize(size) {}
     size_t Count() override { return mSize; }
 
     bool Next(WiFiScanResponse & item) override
@@ -98,14 +64,46 @@ public:
         return true;
     }
 
-    void Release() override {
-        esp_wifi_clear_ap_list();
-    }
+    void Release() override { esp_wifi_clear_ap_list(); }
 
 private:
     const size_t mSize;
     size_t mIternum = 0;
 };
+#else
+class ESPScanResponseIterator : public Iterator<WiFiScanResponse>
+{
+public:
+    ESPScanResponseIterator(const size_t size, const wifi_ap_record_t * scanResults) : mSize(size), mpScanResults(scanResults) {}
+    size_t Count() override { return mSize; }
+    bool Next(WiFiScanResponse & item) override
+    {
+        if (mIternum >= mSize)
+        {
+            return false;
+        }
+
+        item.security = ConvertSecurityType(mpScanResults[mIternum].authmode);
+        static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "SSID length might not fit in item.ssidLen");
+        item.ssidLen = static_cast<uint8_t>(
+            strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
+        item.channel  = mpScanResults[mIternum].primary;
+        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+        item.rssi     = mpScanResults[mIternum].rssi;
+        memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
+        memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
+
+        mIternum++;
+        return true;
+    }
+    void Release() override {}
+
+private:
+    const size_t mSize;
+    const wifi_ap_record_t * mpScanResults;
+    size_t mIternum = 0;
+};
+#endif
 
 class ESPWiFiDriver final : public WiFiDriver
 {
