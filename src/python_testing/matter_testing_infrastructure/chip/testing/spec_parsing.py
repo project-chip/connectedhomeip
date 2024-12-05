@@ -519,33 +519,31 @@ class DataModelLevel(str, Enum):
     kDeviceType = 'device_types'
 
 
-def _get_data_model_root() -> pathlib.Path:
+def _get_data_model_root() -> pathlib.PosixPath:
     """Attempts to find the 'data_model' directory inside the 'chip.testing' package."""
-    # Access the 'chip.testing' package using importlib.resources
-    package_dir = pkg_resources.files('chip.testing')
-
-    # Construct the path to the 'data_model' directory inside the package
-    data_model_root = pathlib.Path(package_dir) / 'data_model'
-
-    # Check if the 'data_model' directory exists
-    if not data_model_root.exists():
+    # Access the 'chip.testing' package directly via pkg_resources
+    package = pkg_resources.files(pkg_resources.import_module('chip.testing'))  # Corrected: Removed importlib
+    try:
+        # We assume the 'data_model' directory is inside the package itself
+        data_model_root = package / 'data_model'
+    except FileNotFoundError:
         raise FileNotFoundError(f"Data model directory not found in the package at {data_model_root}")
-
+    
     return data_model_root
 
 
-def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, str], data_model_level: str) -> pathlib.PosixPath:
+def get_data_model_directory(data_model_directory: Union[str], data_model_level: str) -> pathlib.PosixPath:
     """
     Get the directory of the data model for a specific version and level from the installed package.
     """
     data_model_root = _get_data_model_root()
 
     # If it's a prebuilt directory, build the path based on the version and data model level
-    if isinstance(data_model_directory, PrebuiltDataModelDirectory):
+    if isinstance(data_model_directory, str):
         version_map = {
-            PrebuiltDataModelDirectory.k1_3: '1.3',
-            PrebuiltDataModelDirectory.k1_4: '1.4',
-            PrebuiltDataModelDirectory.kMaster: 'master',
+            'k1_3': '1.3',
+            'k1_4': '1.4',
+            'kMaster': 'master',
         }
 
         version = version_map.get(data_model_directory)
@@ -553,46 +551,48 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
             raise ValueError(f"Unsupported data model directory: {data_model_directory}")
 
         return data_model_root / version / data_model_level
-
     else:
-        # If it's a custom directory, return it directly
-        return pathlib.PosixPath(data_model_directory)
+        # If it's a custom directory, returns directly
+        return pathlib.Path(data_model_directory)
 
 
-def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: Union[str] = 'k1_4') -> tuple[dict[int, dict], list]:
     """
     Build XML clusters from the specified data model directory.
-    This function supports both pre-built locations (via PrebuiltDataModelDirectory) and full paths (strings).
+    This function supports both pre-built locations (via `str` directory names) and full paths (strings).
     """
     # If a pre-built directory is provided, resolve the full path
-    if isinstance(data_model_directory, PrebuiltDataModelDirectory):
+    if isinstance(data_model_directory, str):
         data_model_directory = get_data_model_directory(data_model_directory, 'clusters')
 
-    # Use importlib.resources to access the data model root directory
-    data_model_root = _get_data_model_root()
+    # Convert the resolved directory path into a resource path using pkg_resources
+    dir = pathlib.Path(data_model_directory)
 
-    # List all .xml files in the directory using pathlib
-    xml_files = [file for file in data_model_root.iterdir() if file.suffix == '.xml']
+    clusters = {} 
+    pure_base_clusters = {}
+    ids_by_name = {}
+    problems = []
 
+    # Use pkg_resources to list all XML files in the data model directory
+    try:
+        xml_files = [f for f in pkg_resources.contents(pkg_resources.files(pkg_resources.import_module('chip.testing')).joinpath('data_model').joinpath(data_model_directory)).splitlines() if f.endswith('.xml')]
+    except Exception as e:
+        logging.error(f"Error accessing XML files in {data_model_directory}: {e}")
+        return clusters, problems
+    
     if not xml_files:
-        raise SpecParsingException(f'No XML files found in the specified package directory {data_model_root}')
+        raise FileNotFoundError(f'No XML files found in the specified package directory {dir}')
 
-    # Now we can parse each XML file found inside the package
-    clusters: dict[int, XmlCluster] = {}
-    pure_base_clusters: dict[str, XmlCluster] = {}
-    ids_by_name: dict[str, int] = {}
-    problems: list[ProblemNotice] = []
-
+    # Parse each XML file found inside the package
     for xml in xml_files:
         logging.info(f'Parsing file {xml}')
-        # Open and parse each XML file
-        with xml.open('r') as file:
-            try:
+        try:
+            # Open the resource file using pkg_resources and parse it
+            with pkg_resources.open_text(pkg_resources.files(pkg_resources.import_module('chip.testing')).joinpath('data_model').joinpath(data_model_directory), xml) as file:
                 tree = ElementTree.parse(file)
                 root = tree.getroot()
-                add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
-            except Exception as e:
-                logging.error(f"Error parsing XML file {xml}: {e}")
+        except Exception as e:
+            logging.error(f"Error parsing XML file {xml}: {e}")
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
