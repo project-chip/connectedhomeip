@@ -113,8 +113,6 @@ class CustomDataModel : public DataModel::Provider
 public:
     static CustomDataModel & Instance();
 
-    void InitDataModel() override {}
-
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

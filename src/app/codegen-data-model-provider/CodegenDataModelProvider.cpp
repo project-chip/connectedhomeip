@@ -412,13 +412,6 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 } // namespace
 
-void CodegenDataModelProvider::InitDataModel()
-{
-    // Call the Ember-specific InitDataModelHandler
-    InitDataModelHandler();
-    ChipLogProgress(AppServer, "CodegenDataModelHandler initialized.");
-}
-
 CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
 {
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
@@ -512,6 +505,17 @@ bool CodegenDataModelProvider::EmberCommandListIterator::Exists(const CommandId 
     }
 
     return (*mCurrentHint == toCheck);
+}
+
+CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
+{
+    // Call the base class's Startup method to ensure base initialization
+    ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+
+    // Call the Ember-specific InitDataModelHandler
+    InitDataModelHandler();
+
+    return CHIP_NO_ERROR;
 }
 
 std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(const DataModel::InvokeRequest & request,
