@@ -525,7 +525,7 @@ def _get_data_model_root() -> pathlib.Path:
     package_dir = pkg_resources.files('chip.testing')
 
     # Construct the path to the 'data_model' directory inside the package
-    data_model_root = package_dir / 'data_model'
+    data_model_root = pathlib.Path(package_dir) / 'data_model'
 
     # Check if the 'data_model' directory exists
     if not data_model_root.exists():
@@ -569,15 +569,10 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, s
         data_model_directory = get_data_model_directory(data_model_directory, 'clusters')
 
     # Use importlib.resources to access the data model root directory
-    data_model_root = _get_data_model_root()  # Get the correct path
+    data_model_root = _get_data_model_root()
 
-    # We can now use pkg_resources to list XML files inside the data_model directory
-    xml_files = []
-
-    # Recursively find all XML files in the 'data_model' directory
-    for xml in pkg_resources.contents(data_model_root):
-        if xml.endswith('.xml'):
-            xml_files.append(pathlib.Path(xml))  # Create Path objects for XML files
+    # List all .xml files in the directory using pathlib
+    xml_files = [file for file in data_model_root.iterdir() if file.suffix == '.xml']
 
     if not xml_files:
         raise SpecParsingException(f'No XML files found in the specified package directory {data_model_root}')
