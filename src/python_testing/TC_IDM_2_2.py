@@ -249,7 +249,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         for endpoint in read_request:
             for cluster in read_request[endpoint]:
-                if endpoint != 1: # Endpoint 1 seems an issue with ModeSelect (ServerList has an extra 4293984257)
+                if endpoint != 1 or cluster != Clusters.ModeSelect: # Endpoint 1 seems an issue with ModeSelect (ServerList has an extra 4293984257)
                     returned_attrs = sorted([x.attribute_id for x in read_request[endpoint][cluster].keys() if x != Clusters.Attribute.DataVersion])
                     attr_list = sorted([x for x in read_request[endpoint][cluster][cluster.Attributes.AttributeList] if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
                     asserts.assert_equal(returned_attrs, attr_list, f"Mismatch for {cluster} at endpoint {endpoint}")
