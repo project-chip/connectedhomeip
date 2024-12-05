@@ -31,13 +31,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.interaction_model import Status
 from mobly import asserts
-
-logger = logging.getLogger(__name__)
 
 
 class Test_TC_FLABEL_2_1(MatterBaseTest):
@@ -64,27 +61,22 @@ class Test_TC_FLABEL_2_1(MatterBaseTest):
             attribute=Clusters.Objects.FixedLabel.Attributes.LabelList
         )
         asserts.assert_true(isinstance(initial_labels, list), "LabelList should be a list type")
-        logger.info(f"Initial LabelList: {initial_labels}")
 
         # Step 3: Attempt to write LabelList (should fail)
         self.step(3)
-        test_label = [Clusters.Objects.FixedLabel.Structs.LabelStruct(
-            label="Test_Label",
-            value="Test_Value"
-        )]
-        logger.info(f"Attempting to write LabelList: {test_label}")
+        test_label = Clusters.Objects.FixedLabel.Attributes.LabelList(
+            [Clusters.Objects.FixedLabel.Structs.LabelStruct(
+                label="Test_Label",
+                value="Test_Value"
+            )]
+        )
 
-        try:
-            result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(1, Clusters.Objects.FixedLabel.Attributes.LabelList(test_label))]
-            )
-            logger.info(f"Write result: {result}")
-            logger.info(f"Write status: {result[0]}")
-            asserts.assert_equal(result[0].Status, Status.UnsupportedWrite, "Expected UNSUPPORTED_WRITE status")
-        except Exception as e:
-            logger.error(f"Unexpected error during write: {str(e)}")
-            asserts.fail(f"Unexpected error during write: {str(e)}")
+        # Use write_single_attribute with expect_success=False since we expect it to fail
+        write_status = await self.write_single_attribute(
+            attribute_value=test_label,
+            expect_success=False
+        )
+        asserts.assert_equal(write_status, Status.UnsupportedWrite, "Expected UNSUPPORTED_WRITE status")
 
         # Step 4: Verify LabelList hasn't changed
         self.step(4)
@@ -92,8 +84,6 @@ class Test_TC_FLABEL_2_1(MatterBaseTest):
             cluster=Clusters.Objects.FixedLabel,
             attribute=Clusters.Objects.FixedLabel.Attributes.LabelList
         )
-        logger.info(f"Final LabelList: {final_labels}")
-
         asserts.assert_equal(initial_labels, final_labels,
                              "LabelList should remain unchanged after write attempt")
 
