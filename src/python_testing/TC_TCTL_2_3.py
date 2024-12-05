@@ -63,32 +63,29 @@ class TC_TCTL_2_3(MatterBaseTest):
         # Step 2: Read SelectedTemperatureLevel attribute
         self.step(2)
         if self.check_pics("TCTL.S.A0004"):  # SelectedTemperatureLevel attribute
-            selected_temp = await self.default_controller.ReadAttribute(
-                nodeid=self.dut_node_id,
-                attributes=[(1, Clusters.TemperatureControl.Attributes.SelectedTemperatureLevel)]
+            selected_temp = await self.read_single_attribute_check_success(
+                cluster=Clusters.Objects.TemperatureControl,
+                attribute=Clusters.TemperatureControl.Attributes.SelectedTemperatureLevel
             )
-        temp_level = selected_temp[1][Clusters.TemperatureControl][Clusters.TemperatureControl.Attributes.SelectedTemperatureLevel]
-        asserts.assert_true(0 <= temp_level <= 31,
-                            f"SelectedTemperatureLevel {temp_level} is out of range [0-31]")
+            asserts.assert_true(0 <= selected_temp <= 31,
+                                f"SelectedTemperatureLevel {selected_temp} is out of range [0-31]")
 
         # Step 3: Read SupportedTemperatureLevels attribute
         self.step(3)
         if self.check_pics("TCTL.S.A0005"):  # SupportedTemperatureLevels attribute
-            supported_temps = await self.default_controller.ReadAttribute(
-                nodeid=self.dut_node_id,
-                attributes=[(1, Clusters.TemperatureControl.Attributes.SupportedTemperatureLevels)]
+            supported_temps = await self.read_single_attribute_check_success(
+                cluster=Clusters.Objects.TemperatureControl,
+                attribute=Clusters.TemperatureControl.Attributes.SupportedTemperatureLevels
             )
+            asserts.assert_true(isinstance(supported_temps, list),
+                                "SupportedTemperatureLevels should be a list")
+            asserts.assert_true(len(supported_temps) <= 32,
+                                f"SupportedTemperatureLevels list length {len(supported_temps)} exceeds maximum of 32")
 
-        temp_levels = supported_temps[1][Clusters.TemperatureControl][Clusters.TemperatureControl.Attributes.SupportedTemperatureLevels]
-        asserts.assert_true(isinstance(temp_levels, list),
-                            "SupportedTemperatureLevels should be a list")
-        asserts.assert_true(len(temp_levels) <= 32,
-                            f"SupportedTemperatureLevels list length {len(temp_levels)} exceeds maximum of 32")
-
-        # Verify string lengths
-        for level in temp_levels:
-            asserts.assert_true(isinstance(level, str),
-                                f"Temperature level {level} is not a string")
+            # Verify string lengths
+            for level in supported_temps:
+                asserts.assert_true(isinstance(level, str),
+                                    f"Temperature level {level} is not a string")
             asserts.assert_true(len(level) <= 16,
                                 f"Temperature level string '{level}' exceeds maximum length of 16")
 
