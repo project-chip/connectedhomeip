@@ -325,8 +325,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
     *threadMetricsOut = head;
 
     return CHIP_NO_ERROR;
-#endif
+#else
     return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
