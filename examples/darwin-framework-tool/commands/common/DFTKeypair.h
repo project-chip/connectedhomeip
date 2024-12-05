@@ -17,15 +17,15 @@
  */
 
 #import <Matter/Matter.h>
-#include <crypto/CHIPCryptoPAL.h>
 
-@interface CHIPToolKeypair : NSObject <MTRKeypair>
-- (BOOL)initialize;
-- (NSData *)signMessageECDSA_RAW:(NSData *)message;
+NS_ASSUME_NONNULL_BEGIN
+
+@interface DFTKeypair : NSObject <MTRKeypair>
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)createKeypairWithStorage:(id)storage error:(NSError * _Nullable __autoreleasing *)error;
+- (NSData *)signMessageECDSA_DER:(NSData *)message;
 - (SecKeyRef)copyPublicKey;
-- (CHIP_ERROR)Serialize:(chip::Crypto::P256SerializedKeypair &)output;
-- (CHIP_ERROR)Deserialize:(chip::Crypto::P256SerializedKeypair &)input;
-- (CHIP_ERROR)createOrLoadKeys:(id)storage;
 - (NSData *)getIPK;
-
 @end
+
+NS_ASSUME_NONNULL_END
