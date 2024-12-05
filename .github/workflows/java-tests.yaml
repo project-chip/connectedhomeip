@@ -191,18 +191,19 @@ jobs:
                      --tool-args "already-discovered --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
                      --factoryreset \
                   '
-            # Disabled due to failure: https://github.com/project-chip/connectedhomeip/issues/27361
-            # - name: Run Pairing Address-PaseOnly Test
-            #   run: |
-            #      scripts/run_in_python_env.sh out/venv \
-            #       './scripts/tests/run_java_test.py \
-            #          --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-            #          --app-args "--discriminator 3840 --interface-id -1" \
-            #          --tool-path out/linux-x64-java-matter-controller \
-            #          --tool-cluster "pairing" \
-            #          --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
-            #          --factoryreset \
-            #       '
+            - name: Run Pairing Address-PaseOnly Test
+              # Disabled due to failure: https://github.com/project-chip/connectedhomeip/issues/27361
+              if: false
+              run: |
+                 scripts/run_in_python_env.sh out/venv \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "pairing" \
+                     --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
+                     --factoryreset \
+                  '
             - name: Run Pairing SetupQRCode Test
               run: |
                   scripts/run_in_python_env.sh out/venv \
@@ -237,6 +238,9 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Onnetwork and get diagnostic log Test
+              # TODO: test below is disabled because it seems flaky (crashes on pool not being empty on app exit)
+              #       See: https://github.com/project-chip/connectedhomeip/issues/36734
+              if: false
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
