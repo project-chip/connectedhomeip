@@ -106,12 +106,12 @@ using detail::EnumeratorCommandFinder;
 
 namespace {
 
-const chip::CommandId * AcceptedCommands(const EmberAfCluster & cluster)
+const CommandId * AcceptedCommands(const EmberAfCluster & cluster)
 {
     return cluster.acceptedCommandList;
 }
 
-const chip::CommandId * GeneratedCommands(const EmberAfCluster & cluster)
+const CommandId * GeneratedCommands(const EmberAfCluster & cluster)
 {
     return cluster.generatedCommandList;
 }
