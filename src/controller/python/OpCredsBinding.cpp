@@ -490,7 +490,8 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
 
     // Initialize device attestation verifier
     const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    chip::Credentials::DeviceAttestationVerifier * dacVerifier        = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+    SetDeviceAttestationVerifier(dacVerifier);
 
     chip::Crypto::P256Keypair ephemeralKey;
     chip::Crypto::P256Keypair * controllerKeyPair;
@@ -544,6 +545,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     initParams.controllerVendorId                   = adminVendorId;
     initParams.permitMultiControllerFabrics         = true;
     initParams.hasExternallyOwnedOperationalKeypair = operationalKey != nullptr;
+    initParams.deviceAttestationVerifier            = dacVerifier;
 
     if (useTestCommissioner)
     {
