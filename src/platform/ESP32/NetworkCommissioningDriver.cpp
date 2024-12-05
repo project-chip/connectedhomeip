@@ -36,9 +36,6 @@ namespace {
 constexpr char kWiFiSSIDKeyName[]        = "wifi-ssid";
 constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 static uint8_t WiFiSSIDStr[DeviceLayer::Internal::kMaxWiFiSSIDLength];
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
-ESPScanResponseIterator iter;
-#endif
 } // namespace
 
 BitFlags<WiFiSecurityBitmap> ConvertSecurityType(wifi_auth_mode_t authMode)
@@ -390,20 +387,9 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         return;
     }
 
-    // Since this is the dynamic memory allocation, restrict it to a configured limit
-    ap_number = std::min(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_MAX_SCAN_NETWORKS_RESULTS), ap_number);
-
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
-    wifi_ap_record_t ap_record;
-    while (ap_number--)
-    {
-        if (esp_wifi_scan_get_ap_record(&ap_record) == ESP_OK)
-        {
-            iter.Add(&ap_record);
-        }
-    }
-
-    if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([]() mutable {
+    if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_number]() {
+            ESPScanResponseIterator2 iter(ap_number);
             if (GetInstance().mpScanCallback)
             {
                 GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
@@ -423,6 +409,9 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         mpScanCallback = nullptr;
     }
 #else
+    // Since this is the dynamic memory allocation, restrict it to a configured limit
+    ap_number = std::min(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_MAX_SCAN_NETWORKS_RESULTS), ap_number);
+
     std::unique_ptr<wifi_ap_record_t[]> ap_buffer_ptr(new wifi_ap_record_t[ap_number]);
     if (ap_buffer_ptr == NULL)
     {
