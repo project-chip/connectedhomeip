@@ -107,12 +107,12 @@ using detail::EnumeratorCommandFinder;
 
 namespace {
 
-const chip::CommandId * AcceptedCommands(const EmberAfCluster & cluster)
+const CommandId * AcceptedCommands(const EmberAfCluster & cluster)
 {
     return cluster.acceptedCommandList;
 }
 
-const chip::CommandId * GeneratedCommands(const EmberAfCluster & cluster)
+const CommandId * GeneratedCommands(const EmberAfCluster & cluster)
 {
     return cluster.generatedCommandList;
 }
@@ -438,6 +438,9 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
         }
     }
 
+    // Call the Ember-specific InitDataModelHandler
+    InitDataModelHandler();    
+
     return CHIP_NO_ERROR;
 }
 
@@ -505,17 +508,6 @@ bool CodegenDataModelProvider::EmberCommandListIterator::Exists(const CommandId 
     }
 
     return (*mCurrentHint == toCheck);
-}
-
-CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
-{
-    // Call the base class's Startup method to ensure base initialization
-    ReturnErrorOnFailure(DataModel::Provider::Startup(context));
-
-    // Call the Ember-specific InitDataModelHandler
-    InitDataModelHandler();
-
-    return CHIP_NO_ERROR;
 }
 
 std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(const DataModel::InvokeRequest & request,
