@@ -2671,7 +2671,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     NSMutableDictionary<NSNumber *, XCTestExpectation *> * subscriptionExpectations = [NSMutableDictionary dictionary];
     for (NSNumber * deviceID in orderedDeviceIDs) {
-        NSString *expectationDescription = [NSString stringWithFormat:@"Subscription 1 has been set up %@", deviceID];
+        NSString * expectationDescription = [NSString stringWithFormat:@"Subscription 1 has been set up %@", deviceID];
         subscriptionExpectations[deviceID] = [self expectationWithDescription:expectationDescription];
     }
 

@@ -1456,12 +1456,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             std::lock_guard lock(self->_lock);
             [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
         }
-                                               errorHandler:^(NSError * _Nonnull error) {
-            // If controller is not running, clear work item from the subscription queue
-            MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
-            std::lock_guard lock(self->_lock);
-            [self _clearSubscriptionPoolWork];
-        }];
+            errorHandler:^(NSError * _Nonnull error) {
+                // If controller is not running, clear work item from the subscription queue
+                MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
+                std::lock_guard lock(self->_lock);
+                [self _clearSubscriptionPoolWork];
+            }];
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(secondsToWait * NSEC_PER_SEC);
