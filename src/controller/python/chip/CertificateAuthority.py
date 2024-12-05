@@ -34,6 +34,7 @@ LOGGER = logging.getLogger(__name__)
 # By default, let's set certificate validity to 10 years.
 CERTIFICATE_VALIDITY_PERIOD_SEC = int(timedelta(days=10*365).total_seconds())
 
+
 class CertificateAuthority:
     '''  This represents an operational Root Certificate Authority (CA) with a root key key pair with associated
          public key (i.e "Root PK") . This manages a set of FabricAdmin objects, each administering a fabric identified
