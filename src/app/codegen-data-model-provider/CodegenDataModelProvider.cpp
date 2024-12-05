@@ -439,7 +439,7 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     }
 
     // Call the Ember-specific InitDataModelHandler
-    InitDataModelHandler();    
+    InitDataModelHandler();
 
     return CHIP_NO_ERROR;
 }
