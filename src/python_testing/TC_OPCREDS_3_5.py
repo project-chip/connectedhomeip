@@ -38,6 +38,7 @@
 import random
 
 import chip.clusters as Clusters
+from datetime import timedelta
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
@@ -107,10 +108,10 @@ class TC_OPCREDS_3_5(MatterBaseTest):
         self.step(1)
 
         # Start with 10 years for cert validity
-        original_cert_validity = 365*24*60*60*10
+        original_cert_validity = int(timedelta(days=10*365).total_seconds())
         # We're going to force the use of maximally generated certs because this forces the ICAC to be re-generated each time
         th1_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority(
-            certificateValidityPeriod=original_cert_validity, maximizeCertChains=True)
+            certificateValidityPeriodSec=original_cert_validity, maximizeCertChains=True)
         th1_fabric_admin = th1_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
         th1_controller_node_id = self.matter_test_config.controller_node_id+1
         th1 = th1_fabric_admin.NewController(nodeId=th1_controller_node_id)
@@ -147,8 +148,8 @@ class TC_OPCREDS_3_5(MatterBaseTest):
         csr_update1 = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
 
         self.step(6)
-        new_cert_validity = 365*24*60*60*9
-        th1_certificate_authority.certificateValidityPeriod = new_cert_validity
+        new_cert_validity = int(timedelta(days=9*365).total_seconds())
+        th1_certificate_authority.certificateValidityPeriodSec = new_cert_validity
         update1_cert_chain = await th1.IssueNOCChain(csr_update1, self.dut_node_id)
         asserts.assert_not_equal(original_cert_chain.nocBytes, update1_cert_chain.nocBytes,
                                  "Generated matching NOC despite validity changes")
@@ -192,8 +193,8 @@ class TC_OPCREDS_3_5(MatterBaseTest):
         csr_update2 = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
 
         self.step(13)
-        new_cert_validity = 365*24*60*60*8
-        th1_certificate_authority.certificateValidityPeriod = new_cert_validity
+        new_cert_validity = int(timedelta(days=8*365).total_seconds())
+        th1_certificate_authority.certificateValidityPeriodSec = new_cert_validity
         update2_cert_chain = await th1.IssueNOCChain(csr_update2, self.dut_node_id)
         asserts.assert_not_equal(update2_cert_chain.nocBytes, update1_cert_chain.nocBytes,
                                  "Generated matching NOC despite validity changes")

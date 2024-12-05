@@ -21,6 +21,7 @@ from __future__ import annotations
 import ctypes
 import logging
 from ctypes import c_void_p
+from datetime import timedelta
 from typing import List, Optional
 
 import chip.exceptions
@@ -30,6 +31,8 @@ from chip.storage import PersistentStorage
 
 LOGGER = logging.getLogger(__name__)
 
+# By default, let's set certificate validity to 10 years.
+CERTIFICATE_VALIDITY_PERIOD_SEC = int(timedelta(days=10*365).total_seconds())
 
 class CertificateAuthority:
     '''  This represents an operational Root Certificate Authority (CA) with a root key key pair with associated
@@ -85,8 +88,7 @@ class CertificateAuthority:
 
         self._persistentStorage = persistentStorage
         self._maximizeCertChains = False
-        # By default, let's set validity to 10 years
-        self._certificateValidityPeriod = 365 * 24 * 60 * 60 * 10
+        self._certificateValidityPeriodSec = CERTIFICATE_VALIDITY_PERIOD_SEC
 
         self._closure = self._chipStack.Call(
             lambda: self._Handle().pychip_OpCreds_InitializeDelegate(
@@ -195,8 +197,8 @@ class CertificateAuthority:
         return self._maximizeCertChains
 
     @property
-    def certificateValidityPeriod(self) -> int:
-        return self._certificateValidityPeriod
+    def certificateValidityPeriodSec(self) -> int:
+        return self._certificateValidityPeriodSec
 
     @maximizeCertChains.setter
     def maximizeCertChains(self, enabled: bool):
@@ -206,8 +208,8 @@ class CertificateAuthority:
 
         self._maximizeCertChains = enabled
 
-    @certificateValidityPeriod.setter
-    def certificateValidityPeriod(self, validity: int):
+    @certificateValidityPeriodSec.setter
+    def certificateValidityPeriodSec(self, validity: int):
         if validity < 0:
             raise ValueError("Validity period must be a non-negative integer")
 
@@ -215,7 +217,7 @@ class CertificateAuthority:
             lambda: self._Handle().pychip_OpCreds_SetCertificateValidityPeriod(ctypes.c_void_p(self._closure), ctypes.c_uint32(validity))
         ).raise_on_error()
 
-        self._certificateValidityPeriod = validity
+        self._certificateValidityPeriodSec = validity
 
     def __del__(self):
         self.Shutdown()
@@ -278,7 +280,7 @@ class CertificateAuthorityManager:
             ca = self.NewCertificateAuthority(int(caIndex))
             ca.LoadFabricAdminsFromStorage()
 
-    def NewCertificateAuthority(self, caIndex: Optional[int] = None, maximizeCertChains: bool = False, certificateValidityPeriod: Optional[int] = None):
+    def NewCertificateAuthority(self, caIndex: Optional[int] = None, maximizeCertChains: bool = False, certificateValidityPeriodSec: Optional[int] = None):
         ''' Creates a new CertificateAuthority instance with the provided CA Index and the PersistentStorage
             instance previously setup in the constructor.
 
@@ -302,13 +304,12 @@ class CertificateAuthorityManager:
             caList[str(caIndex)] = []
             self._persistentStorage.SetReplKey(key='caList', value=caList)
 
-        if (certificateValidityPeriod is None):
-            # By default, let's set validity to 10 years
-            certificateValidityPeriod = 365 * 24 * 60 * 60 * 10
+        if certificateValidityPeriodSec is None:
+            certificateValidityPeriodSec = CERTIFICATE_VALIDITY_PERIOD_SEC
 
         ca = CertificateAuthority(chipStack=self._chipStack, caIndex=caIndex, persistentStorage=self._persistentStorage)
         ca.maximizeCertChains = maximizeCertChains
-        ca.certificateValidityPeriod = certificateValidityPeriod
+        ca.certificateValidityPeriodSec = certificateValidityPeriodSec
         self._activeCaList.append(ca)
 
         return ca
