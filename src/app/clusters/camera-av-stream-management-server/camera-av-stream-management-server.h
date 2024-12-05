@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -41,6 +42,9 @@ using ViewportStruct          = Structs::ViewportStruct::Type;
 constexpr uint8_t kMaxSpeakerLevel          = 254;
 constexpr uint8_t kMaxMicrophoneLevel       = 254;
 constexpr uint16_t kMaxImageRotationDegrees = 359;
+
+constexpr size_t kViewportStructMaxSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t) * 4);
 
 class CameraAVStreamMgmtServer;
 
@@ -195,7 +199,9 @@ public:
      */
    CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId,
                             ClusterId aClusterId, BitMask<Feature> aFeature,
-                            OptionalAttributes aOptionalAttrs, uint8_t aMaxConcurrentVideoEncoders,
+                            OptionalAttributes aOptionalAttrs,
+                            PersistentStorageDelegate & aPersistentStorage,
+                            uint8_t aMaxConcurrentVideoEncoders,
                             uint32_t aMaxEncodedPixelRate,
                             const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
                             const VideoResolutionStruct & aMinViewPort, uint32_t aMaxContentBufferSize,
@@ -276,6 +282,7 @@ private:
     ClusterId mClusterId;
     BitMask<Feature> mFeature;
     BitMask<OptionalAttributes> mOptionalAttrs;
+    PersistentStorageDelegate * mPersistentStorage = nullptr;
 
     // Attributes with F quality
     const uint8_t mMaxConcurrentVideoEncoders;
@@ -341,6 +348,10 @@ private:
     CHIP_ERROR ReadAndEncodeAllocatedSnapshotStreams(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     CHIP_ERROR ReadAndEncodeRankedVideoStreamPrioritiesList(const AttributeValueEncoder::ListEncodeHelper & encoder);
+
+    CHIP_ERROR StoreViewport(const ViewportStruct & viewport);
+    CHIP_ERROR ClearViewport();
+    CHIP_ERROR LoadViewport(ViewportStruct & viewport);
 
     /**
      * @brief Inherited from CommandHandlerInterface

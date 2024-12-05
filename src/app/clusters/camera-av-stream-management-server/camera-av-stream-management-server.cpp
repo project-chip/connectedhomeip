@@ -26,6 +26,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
@@ -44,7 +45,9 @@ namespace CameraAvStreamManagement {
 
 CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId,
                                                    ClusterId aClusterId, BitMask<Feature> aFeature,
-                                                   OptionalAttributes aOptionalAttrs, uint8_t aMaxConcurrentVideoEncoders,
+                                                   OptionalAttributes aOptionalAttrs,
+                                                   PersistentStorageDelegate & aPersistentStorage,
+                                                   uint8_t aMaxConcurrentVideoEncoders,
                                                    uint32_t aMaxEncodedPixelRate,
                                                    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
                                                    const VideoResolutionStruct & aMinViewPort, uint32_t aMaxContentBufferSize,
@@ -53,7 +56,7 @@ CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & 
                                                    TwoWayTalkSupportTypeEnum aTwoWayTalkSupport, uint32_t aMaxNetworkBandwidth) :
     CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
     AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(aClusterId), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs),
+    mClusterId(aClusterId), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs), mPersistentStorage(&aPersistentStorage),
     mMaxConcurrentVideoEncoders(aMaxConcurrentVideoEncoders), mMaxEncodedPixelRate(aMaxEncodedPixelRate),
     mVideoSensorParams(aVideoSensorParams), mNightVisionCapable(aNightVisionCapable), mMinViewPort(aMinViewPort),
     mMaxContentBufferSize(aMaxContentBufferSize), mMicrophoneCapabilities(aMicrophoneCapabilities),
@@ -828,9 +831,7 @@ Status CameraAVStreamMgmtServer::SetViewport(const ViewportStruct & aViewport)
 {
     mViewport = aViewport;
 
-    TODO: Persist struct field
-    //ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::Viewport::Id);
-    //GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mViewport);
+    StoreViewport(mViewport);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1167,9 +1168,7 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
 
     // Load Viewport
     ViewportStruct viewport;
-    // TODO : Read persisted struct value
-    //err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-    //    ConcreteAttributePath(mEndpointId, mClusterId, Attributes::Viewport::Id), viewport);
+    err = LoadViewport(viewport);
     if (err == CHIP_NO_ERROR)
     {
         mViewport = viewport;
@@ -1358,6 +1357,43 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
         ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the StatusLightBrightness from the KVS. Defaulting to %d",
                       to_underlying(mStatusLightBrightness));
     }
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const ViewportStruct & viewport)
+{
+    uint8_t buffer[kViewportStructMaxSerializedSize];
+    TLV::TLVWriter writer;
+
+    writer.Init(buffer);
+    ReturnErrorOnFailure(viewport.Encode(writer, TLV::AnonymousTag()));
+
+    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::CameraAVStreamMgmtViewport().KeyName(), buffer,
+                                               static_cast<uint16_t>(writer.GetLengthWritten()));
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::ClearViewport()
+{
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::LoadViewport(ViewportStruct & viewport)
+{
+    uint8_t buffer[kViewportStructMaxSerializedSize];
+    MutableByteSpan bufferSpan(buffer);
+    uint16_t size = static_cast<uint16_t>(bufferSpan.size());
+
+    ReturnErrorOnFailure(mPersistentStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::CameraAVStreamMgmtViewport().KeyName(),
+                                                             bufferSpan.data(), size));
+    bufferSpan.reduce_size(size);
+
+    TLV::TLVReader reader;
+
+    reader.Init(bufferSpan);
+    ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
+    ReturnErrorOnFailure(viewport.Decode(reader));
+
+    return CHIP_NO_ERROR;
 }
 
 // CommandHandlerInterface
