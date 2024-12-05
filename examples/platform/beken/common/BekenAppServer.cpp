@@ -39,7 +39,7 @@ void BekenAppServer::Init(AppDelegate * sAppDelegate)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     if (sAppDelegate != nullptr)
     {
         initParams.appDelegate = sAppDelegate;

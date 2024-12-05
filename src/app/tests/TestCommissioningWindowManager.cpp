@@ -114,7 +114,7 @@ public:
         static chip::SimpleTestEventTriggerDelegate sSimpleTestEventTriggerDelegate;
         initParams.testEventTriggerDelegate = &sSimpleTestEventTriggerDelegate;
         (void) initParams.InitializeStaticResourcesBeforeServerInit();
-        initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+        initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
         // Use whatever server port the kernel decides to give us.
         initParams.operationalServicePort = 0;
 

@@ -159,7 +159,7 @@ static void InitServer(intptr_t context)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     static AmebaObserver sAmebaObserver;
     initParams.appDelegate = &sAmebaObserver;

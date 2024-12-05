@@ -217,7 +217,7 @@ void CYW30739MatterConfig::InitApp(void)
     // Create initParams with SDK example defaults here
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider        = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider        = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     sExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     SetDeviceInfoProvider(&sExampleDeviceInfoProvider);

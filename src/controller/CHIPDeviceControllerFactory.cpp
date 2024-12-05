@@ -135,7 +135,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     if (params.dataModelProvider == nullptr)
     {
         ChipLogError(AppServer, "Device Controller Factory requires a `dataModelProvider` value.");
-        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance()`");
+        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance(...)`");
     }
 
     VerifyOrReturnError(params.dataModelProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

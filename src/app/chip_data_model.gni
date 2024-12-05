@@ -457,11 +457,14 @@ template("chip_data_model") {
       }
     }
 
+    deps += [ "${chip_root}/src/app:attribute-persistence" ]
+
     public_deps += [
       ":${_data_model_name}_codegen",
       ":${_data_model_name}_zapgen",
       "${chip_root}/src/access",
       "${chip_root}/src/app",
+      "${chip_root}/src/app:attribute-persistence",
       "${chip_root}/src/app/cluster-building-blocks",
       "${chip_root}/src/app/common:attribute-type",
       "${chip_root}/src/app/common:cluster-objects",

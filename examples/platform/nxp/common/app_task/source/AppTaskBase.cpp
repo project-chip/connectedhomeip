@@ -186,7 +186,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_NET_L2_OPENTHREAD
     // Init ZCL Data Model and start server

@@ -40,4 +40,5 @@ codegen_data_model_PUBLIC_DEPS = [
   "${chip_root}/src/app/common:attribute-type",
   "${chip_root}/src/app/data-model-provider",
   "${chip_root}/src/app/codegen-data-model-provider:instance-header",
+  "${chip_root}/src/app/util/persistence",
 ]

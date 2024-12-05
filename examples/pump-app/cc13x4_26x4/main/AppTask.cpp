@@ -310,7 +310,7 @@ int AppTask::Init()
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     chip::Server::GetInstance().Init(initParams);
 

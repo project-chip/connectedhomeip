@@ -108,7 +108,7 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     chip::Server::GetInstance().Init(initParams);
 
     // We only have network commissioning on endpoint 0.

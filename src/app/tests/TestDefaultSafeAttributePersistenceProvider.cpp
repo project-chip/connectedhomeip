@@ -17,7 +17,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <pw_unit_test/framework.h>
@@ -30,7 +30,7 @@ const ConcreteAttributePath TestConcretePath = ConcreteAttributePath(1, 1, 1);
 
 namespace {
 
-class TestAttributePersistenceProvider : public ::testing::Test
+class TestDefaultSafeAttributePersistenceProvider : public ::testing::Test
 {
 public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -40,10 +40,10 @@ public:
 /**
  * Tests the storage and retrival of data from the KVS as ByteSpan
  */
-TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalByteSpans)
+TEST_F(TestDefaultSafeAttributePersistenceProvider, TestStorageAndRetrivalByteSpans)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    DefaultSafeAttributePersistenceProvider persistenceProvider;
 
     // Init
     ChipError err = persistenceProvider.Init(&storageDelegate);
@@ -66,9 +66,6 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalByteSpans)
     err = persistenceProvider.SafeReadValue(TestConcretePath, valueReadBack2);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(valueReadBack2.data_equal(value));
-
-    // Finishing
-    persistenceProvider.Shutdown();
 }
 
 /**
@@ -77,7 +74,7 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalByteSpans)
  * @param testValue The test value to store and retrieve
  */
 template <typename T>
-void testHelperStorageAndRetrivalScalarValues(DefaultAttributePersistenceProvider & persistenceProvider, T testValue)
+void testHelperStorageAndRetrivalScalarValues(DefaultSafeAttributePersistenceProvider & persistenceProvider, T testValue)
 {
     CHIP_ERROR err = persistenceProvider.WriteScalarValue(TestConcretePath, testValue);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -95,7 +92,7 @@ void testHelperStorageAndRetrivalScalarValues(DefaultAttributePersistenceProvide
  * @param testValue The test value to store and retrieve
  */
 template <typename T>
-void testHelperStorageAndRetrivalScalarValues(DefaultAttributePersistenceProvider & persistenceProvider,
+void testHelperStorageAndRetrivalScalarValues(DefaultSafeAttributePersistenceProvider & persistenceProvider,
                                               DataModel::Nullable<T> testValue)
 {
     CHIP_ERROR err = persistenceProvider.WriteScalarValue(TestConcretePath, testValue);
@@ -111,10 +108,10 @@ void testHelperStorageAndRetrivalScalarValues(DefaultAttributePersistenceProvide
 /**
  * Tests the storage and retrival of data from the KVS of types  bool, uint8_t, uint16_t, uint32_t, uint64_t.
  */
-TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalScalarValues)
+TEST_F(TestDefaultSafeAttributePersistenceProvider, TestStorageAndRetrivalScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    DefaultSafeAttributePersistenceProvider persistenceProvider;
 
     // Init
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
@@ -144,18 +141,15 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalScalarValues)
     testHelperStorageAndRetrivalScalarValues(persistenceProvider, uint64_t(0));
     testHelperStorageAndRetrivalScalarValues(persistenceProvider, uint64_t(0x0100000001));
     testHelperStorageAndRetrivalScalarValues(persistenceProvider, uint64_t(0xffffffffffffffff));
-
-    // Finishing
-    persistenceProvider.Shutdown();
 }
 
 /**
  * Tests the storage and retrival of data from the KVS of types  int8_t, int16_t, int32_t, int64_t.
  */
-TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedScalarValues)
+TEST_F(TestDefaultSafeAttributePersistenceProvider, TestStorageAndRetrivalSignedScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    DefaultSafeAttributePersistenceProvider persistenceProvider;
 
     // Init
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
@@ -180,18 +174,15 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedScalarValue
     testHelperStorageAndRetrivalScalarValues(persistenceProvider, int64_t(0));
     testHelperStorageAndRetrivalScalarValues(persistenceProvider, int64_t(0x7fffffffffffffff));
     testHelperStorageAndRetrivalScalarValues(persistenceProvider, int64_t(0x8000000000000000));
-
-    // Finishing
-    persistenceProvider.Shutdown();
 }
 
 /**
  * Tests the storage and retrival of data from the KVS of DataModel::Nullable types bool, uint8_t, uint16_t, uint32_t, uint64_t.
  */
-TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalNullableScalarValues)
+TEST_F(TestDefaultSafeAttributePersistenceProvider, TestStorageAndRetrivalNullableScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    DefaultSafeAttributePersistenceProvider persistenceProvider;
 
     // Init
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
@@ -236,18 +227,15 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalNullableScalarVal
     auto nullVal64 = DataModel::Nullable<uint64_t>();
     nullVal64.SetNull();
     testHelperStorageAndRetrivalScalarValues(persistenceProvider, nullVal64);
-
-    // Finishing
-    persistenceProvider.Shutdown();
 }
 
 /**
  * Tests the storage and retrival of data from the KVS of DataModel::Nullable types int8_t, int16_t, int32_t, int64_t.
  */
-TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedNullableScalarValues)
+TEST_F(TestDefaultSafeAttributePersistenceProvider, TestStorageAndRetrivalSignedNullableScalarValues)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    DefaultSafeAttributePersistenceProvider persistenceProvider;
 
     // Init
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
@@ -284,18 +272,15 @@ TEST_F(TestAttributePersistenceProvider, TestStorageAndRetrivalSignedNullableSca
     auto nullVal64 = DataModel::Nullable<int64_t>();
     nullVal64.SetNull();
     testHelperStorageAndRetrivalScalarValues(persistenceProvider, nullVal64);
-
-    // Finishing
-    persistenceProvider.Shutdown();
 }
 
 /**
  * Test that the correct error is given when trying to read a value with a buffer that's too small.
  */
-TEST_F(TestAttributePersistenceProvider, TestBufferTooSmallErrors)
+TEST_F(TestDefaultSafeAttributePersistenceProvider, TestBufferTooSmallErrors)
 {
     TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
+    DefaultSafeAttributePersistenceProvider persistenceProvider;
 
     // Init
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
@@ -346,9 +331,6 @@ TEST_F(TestAttributePersistenceProvider, TestBufferTooSmallErrors)
     uint64_t valueReadBack64;
     err = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack64);
     EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    // Finishing
-    persistenceProvider.Shutdown();
 }
 
 } // anonymous namespace

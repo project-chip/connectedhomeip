@@ -302,7 +302,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider        = CodegenDataModelProviderInstance();
+    initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.appDelegate              = &sCallbacks;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));

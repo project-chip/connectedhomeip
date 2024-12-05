@@ -101,7 +101,7 @@ CHIP_ERROR MatterInitializer::Init_Matter_Server(void)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Server::GetInstance().Init(initParams);

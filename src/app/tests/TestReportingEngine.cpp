@@ -209,7 +209,8 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(&readRequestbuf), CHIP_NO_ERROR);
     app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
-                                 app::reporting::GetDefaultReportScheduler(), CodegenDataModelProviderInstance());
+                                 app::reporting::GetDefaultReportScheduler(),
+                                 CodegenDataModelProviderInstance(nullptr /* delegate */));
     readHandler.OnInitialRequest(std::move(readRequestbuf));
 
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),

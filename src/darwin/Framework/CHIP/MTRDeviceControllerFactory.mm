@@ -399,7 +399,7 @@ MTR_DIRECT_MEMBERS
             params.opCertStore = _opCertStore;
             params.certificateValidityPolicy = &_certificateValidityPolicy;
             params.sessionResumptionStorage = _sessionResumptionStorage;
-            params.dataModelProvider = app::CodegenDataModelProviderInstance();
+            params.dataModelProvider = app::CodegenDataModelProviderInstance(_persistentStorageDelegate);
             SuccessOrExit(err = _controllerFactory->Init(params));
         }
 
