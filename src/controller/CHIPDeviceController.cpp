@@ -2259,7 +2259,7 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
 {
     VerifyOrDie(mCommissioningStage == CommissioningStage::kReadCommissioningInfo);
 
-    // mReadCommissioningInfoProgress starts at 0 and counts the number of attributes we have read.
+    // mReadCommissioningInfoProgress starts at 0 and counts the number of paths we have read.
     // A marker value is used to indicate that there are no further attributes to read.
     static constexpr auto kReadProgressNoFurtherAttributes = std::numeric_limits<decltype(mReadCommissioningInfoProgress)>::max();
     if (mReadCommissioningInfoProgress == kReadProgressNoFurtherAttributes)
