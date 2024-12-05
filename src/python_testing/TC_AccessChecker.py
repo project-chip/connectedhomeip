@@ -23,10 +23,10 @@ from enum import Enum, auto
 from typing import Optional
 
 import chip.clusters as Clusters
-from chip.interaction_model import Status
+from chip.interaction_model import Status, InteractionModelError
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, TestStep, async_test_body,
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep, async_test_body,
                                          default_matter_test_main)
 from chip.testing.spec_parsing import XmlCluster, build_xml_clusters
 from chip.tlv import uint
@@ -35,6 +35,7 @@ from chip.tlv import uint
 class AccessTestType(Enum):
     READ = auto()
     WRITE = auto()
+    INVOKE = auto()
 
 
 def step_number_with_privilege(step: int, substep: str, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum) -> str:
@@ -63,6 +64,15 @@ def checkable_attributes(cluster_id, cluster, xml_cluster) -> list[uint]:
         ''' Returns true if this is a non-manufacturer specific attribute that has information in the XML and has python codegen data'''
         return attribute_id <= 0xFFFF and attribute_id in xml_cluster.attributes and attribute_id in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
     return [x for x in all_attrs if known_cluster_attribute(x)]
+
+
+def checkable_commands(cluster_id, cluster, xml_cluster) -> list[uint]:
+    all_cmds = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST]
+
+    def known_cluster_cmds(command_id) -> bool:
+        ''' Returns true if this is a non-manufacturer specific command that has information in the XML and has python codegen data'''
+        return command_id <= 0xFFFF and command_id in xml_cluster.accepted_commands and command_id in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]
+    return [x for x in all_cmds if known_cluster_cmds(x)]
 
 
 class AccessChecker(MatterBaseTest, BasicCompositionTests):
@@ -147,6 +157,33 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                                       problem="Unknown attribute")
                     self.success = False
                     continue
+
+    async def _maybe_run_command_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, device_cluster_data, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
+        """ Runs a command only if the required cluster privilege is HIGHER than the specified privilege. In this way,
+            no commands are actually run on the device, which means there are no side effects. However, we can differentiate
+            ACL rejections from commands being unsupported.
+        """
+        for command_id in checkable_commands(cluster_id, device_cluster_data, xml_cluster):
+            spec_requires = xml_cluster.accepted_commands[command_id].privilege
+            command = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][command_id]
+            location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
+            name = f"Command test - privilege {privilege}"
+            if operation_allowed(spec_requires, privilege):
+                # In this test, we're only checking that the disallowed commands are rejected so that there are
+                # no side effects. Commands are checked with admin privilege in their cluster tests. The error that
+                # may be let through here is if the spec requires operate and the implementation requires admin.
+                continue
+            try:
+                await self.send_single_cmd(cmd=command(), dev_ctrl=self.TH2, endpoint=endpoint_id)
+                # If this was successful, that's an error
+                self.record_error(test_name=name, location=location,
+                                  problem=f"Unexpected success sending command {command} with privilege {privilege}")
+                self.success = False
+            except InteractionModelError as e:
+                if e.status != Status.UnsupportedAccess:
+                    self.record_error(test_name=name, location=location,
+                                      problem=f'Unexpected error sending command {command} with privilege {privilege} - expected UNSUPPORTED_ACCESS, got {e.status}')
+                    self.success = False
 
     async def _run_read_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, device_cluster_data, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
         # TODO: This assumes all attributes are readable. Which they are currently. But we don't have a general way to mark otherwise.
@@ -248,6 +285,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                         await self._run_read_access_test_for_cluster_privilege(endpoint_id, cluster_id, device_cluster_data, xml_cluster, privilege)
                     elif test_type == AccessTestType.WRITE:
                         await self._run_write_access_test_for_cluster_privilege(endpoint_id, cluster_id, device_cluster_data, xml_cluster, privilege, wildcard_read)
+                    elif test_type == AccessTestType.INVOKE:
+                        await self._maybe_run_command_access_test_for_cluster_privilege(endpoint_id, cluster_id, device_cluster_data, xml_cluster, privilege)
                     else:
                         self.fail_current_test("Unsupported test type")
         if not self.success:

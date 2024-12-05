@@ -647,6 +647,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
     async def test_TC_IDM_10_7(self):
         success = True
         skip_ota_requestor_command = self.user_params.get("ci_only_linux_ota_exception_disallowed_for_certification", False)
+        acl_original = await self.read_single_attribute_check_success(cluster=Clusters.AccessControl, attribute=Clusters.AccessControl.Attributes.Acl, endpoint=0)
+        acl_admin = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister)
+        remaining_view =
         # Skip checking the arm failsafe. This absolutely gets tested elsewhere, and if we randomly change this while
         # connected over PASE, bad things happen. Also skip sending the commissioning complete command for similar reasons
         skipped_checks = [Clusters.GeneralCommissioning.Commands.ArmFailSafe,
