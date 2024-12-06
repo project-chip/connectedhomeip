@@ -16,6 +16,7 @@
 #
 
 import glob
+import importlib
 import importlib.resources as pkg_resources
 import logging
 import pathlib
@@ -519,19 +520,6 @@ class DataModelLevel(str, Enum):
     kDeviceType = 'device_types'
 
 
-def _get_data_model_root() -> pathlib.PosixPath:
-    """Attempts to find the 'data_model' directory inside the 'chip.testing' package."""
-    # Access the 'chip.testing' package directly via pkg_resources
-    package = pkg_resources.files(pkg_resources.import_module('chip.testing'))  # Corrected: Removed importlib
-    try:
-        # We assume the 'data_model' directory is inside the package itself
-        data_model_root = package / 'data_model'
-    except FileNotFoundError:
-        raise FileNotFoundError(f"Data model directory not found in the package at {data_model_root}")
-
-    return data_model_root
-
-
 def get_data_model_directory(data_model_directory: Union[str], data_model_level: str) -> pathlib.PosixPath:
     """
     Get the directory of the data model for a specific version and level from the installed package.
@@ -552,11 +540,11 @@ def get_data_model_directory(data_model_directory: Union[str], data_model_level:
 
         return data_model_root / version / data_model_level
     else:
-        # If it's a custom directory, returns directly
+        # If it's a custom directory, return directly
         return pathlib.Path(data_model_directory)
 
 
-def build_xml_clusters(data_model_directory: Union[str] = 'k1_4') -> tuple[dict[int, dict], list]:
+def build_xml_clusters(data_model_directory: Union[str] = 'k1_4') -> typing.Tuple[dict[int, dict], list]:
     """
     Build XML clusters from the specified data model directory.
     This function supports both pre-built locations (via `str` directory names) and full paths (strings).
@@ -575,7 +563,7 @@ def build_xml_clusters(data_model_directory: Union[str] = 'k1_4') -> tuple[dict[
 
     # Use pkg_resources to list all XML files in the data model directory
     try:
-        xml_files = [f for f in pkg_resources.contents(pkg_resources.files(pkg_resources.import_module(
+        xml_files = [f for f in pkg_resources.contents(pkg_resources.files(importlib.import_module(
             'chip.testing')).joinpath('data_model').joinpath(data_model_directory)).splitlines() if f.endswith('.xml')]
     except Exception as e:
         logging.error(f"Error accessing XML files in {data_model_directory}: {e}")
@@ -589,7 +577,7 @@ def build_xml_clusters(data_model_directory: Union[str] = 'k1_4') -> tuple[dict[
         try:
             # Open the resource file using pkg_resources and parse it
             with pkg_resources.open_text(
-                pkg_resources.files(pkg_resources.import_module('chip.testing'))
+                pkg_resources.files(importlib.import_module('chip.testing'))
                 .joinpath('data_model')
                 .joinpath(data_model_directory), xml
             ) as file:
