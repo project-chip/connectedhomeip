@@ -157,13 +157,11 @@ public:
             {
 
                 auto nocChain = report.Get<chip::Controller::NocChain>().rcac;
-                MutableByteSpan rcacSpan(const_cast<uint8_t *>(nocChain.data()), nocChain.size());
-                chip::ByteSpan rcacByteSpan(rcacSpan.data(), rcacSpan.size());
 
                 // Convert RCAC to CHIP cert format to be deciphered by TLV later in python3
                 std::vector<uint8_t> chipRcac(Credentials::kMaxCHIPCertLength);
                 MutableByteSpan chipRcacSpan(chipRcac.data(), chipRcac.size());
-                chip::Credentials::ConvertX509CertToChipCert(rcacByteSpan, chipRcacSpan);
+                chip::Credentials::ConvertX509CertToChipCert(nocChain, chipRcacSpan);
 
                 mCHIPRCACData.assign(chipRcacSpan.data(), chipRcacSpan.data() + chipRcacSpan.size());
 
