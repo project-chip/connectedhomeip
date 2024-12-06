@@ -122,6 +122,20 @@ TEST(TestFluentTreeObject, TestFunctionality)
 
     EXPECT_EQ(tree.Value(), &wrapper); // value getting to start matches
 
+    // search first items
+    {
+        size_t hint1 = 0;
+        auto ep   = tree.First<ByEndpoint>(hint1);
+
+        size_t hint2 = 0;
+        auto cl   = ep.First<ByServerCluster>(hint2);
+
+
+        ASSERT_NE(cl.Value(), nullptr);
+        EXPECT_EQ(cl.Value()->id, 100u);
+        EXPECT_STREQ(cl.Value()->name, "one hundred");
+    }
+
     // one level search, with hint
     {
         size_t hint = 0;
@@ -168,7 +182,7 @@ TEST(TestFluentTreeObject, TestFunctionality)
 
         // null value preserves the failure
         size_t clusterHint = 0;
-        auto sub_item = next.Find<ByServerCluster>(123, clusterHint);
+        auto sub_item      = next.Find<ByServerCluster>(123, clusterHint);
         EXPECT_EQ(sub_item.Value(), nullptr);
     }
 }
