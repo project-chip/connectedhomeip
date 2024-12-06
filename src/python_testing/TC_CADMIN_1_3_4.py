@@ -140,7 +140,7 @@ class TC_CADMIN(MatterBaseTest):
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
         self.step("3a")
-        #params = await self.openCommissioningWindow(dev_ctrl=self.th1, node_id=self.dut_node_id)
+        # params = await self.openCommissioningWindow(dev_ctrl=self.th1, node_id=self.dut_node_id)
         params = await self.th1.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=1234, option=1)
         self.print_step("TH1 params", params)
 
@@ -233,7 +233,7 @@ class TC_CADMIN(MatterBaseTest):
         self.step(12)
         # TH_CR2 opens a commissioning window on DUT_CE using ECM
         self.discriminator = random.randint(0, 4095)
-        #params2 = await self.openCommissioningWindow(dev_ctrl=self.th2, node_id=self.dut_node_id)
+        # params2 = await self.openCommissioningWindow(dev_ctrl=self.th2, node_id=self.dut_node_id)
         params2 = await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=1234, option=1)
 
         self.step(13)
