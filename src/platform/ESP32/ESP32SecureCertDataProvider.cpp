@@ -21,8 +21,8 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/span.h>
 #include <platform/ESP32/ESP32SecureCertDataProvider.h>
 
 namespace chip {

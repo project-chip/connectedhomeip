@@ -16,6 +16,10 @@
  */
 
 #include "FabricAdmin.h"
+#include <AppMain.h>
+#include <CommissionerMain.h>
+#include <bridge/include/FabricBridge.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 
 using namespace ::chip;
 
@@ -28,14 +32,26 @@ constexpr uint32_t kCommissionPrepareTimeMs = 500;
 } // namespace
 
 FabricAdmin FabricAdmin::sInstance;
+app::DefaultICDClientStorage FabricAdmin::sICDClientStorage;
+app::CheckInHandler FabricAdmin::sCheckInHandler;
 
-FabricAdmin & FabricAdmin::Instance()
+CHIP_ERROR FabricAdmin::Init()
 {
-    if (!sInstance.mInitialized)
-    {
-        sInstance.Init();
-    }
-    return sInstance;
+    IcdManager::Instance().SetDelegate(&sInstance);
+
+    ReturnLogErrorOnFailure(sICDClientStorage.Init(GetPersistentStorageDelegate(), GetSessionKeystore()));
+
+    auto engine = chip::app::InteractionModelEngine::GetInstance();
+    VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnLogErrorOnFailure(IcdManager::Instance().Init(&sICDClientStorage, engine));
+
+    auto exchangeMgr = Controller::DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr();
+    VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnLogErrorOnFailure(sCheckInHandler.Init(exchangeMgr, &sICDClientStorage, &IcdManager::Instance(), engine));
+
+    ReturnLogErrorOnFailure(PairingManager::Instance().Init(GetDeviceCommissioner()));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FabricAdmin::OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams params, FabricIndex fabricIndex)
@@ -93,7 +109,13 @@ FabricAdmin::CommissionRemoteBridge(Controller::CommissioningWindowPasscodeParam
         usleep(kCommissionPrepareTimeMs * 1000);
 
         PairingManager::Instance().SetPairingDelegate(this);
-        DeviceManager::Instance().PairRemoteDevice(mNodeId, code.c_str());
+        err = PairingManager::Instance().PairDeviceWithCode(mNodeId, code.c_str());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified,
+                         "Failed to commission remote bridge device: Node ID " ChipLogFormatX64 " with error: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(mNodeId), err.Format());
+        }
     }
     else
     {
@@ -114,6 +136,46 @@ CHIP_ERROR FabricAdmin::KeepActive(ScopedNodeId scopedNodeId, uint32_t stayActiv
 
     DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
+}
+
+void FabricAdmin::OnCheckInCompleted(const app::ICDClientInfo & clientInfo)
+{
+    // Accessing mPendingCheckIn should only be done while holding ChipStackLock
+    assertChipStackLockedByCurrentThread();
+    ScopedNodeId scopedNodeId = clientInfo.peer_node;
+    auto it                   = mPendingCheckIn.find(scopedNodeId);
+    VerifyOrReturn(it != mPendingCheckIn.end());
+
+    KeepActiveDataForCheckIn checkInData = it->second;
+    // Removed from pending map as check-in from this node has occured and we will handle the pending KeepActive
+    // request.
+    mPendingCheckIn.erase(scopedNodeId);
+
+    auto timeNow = System::SystemClock().GetMonotonicTimestamp();
+    if (timeNow > checkInData.mRequestExpiryTimestamp)
+    {
+        ChipLogError(NotSpecified,
+                     "ICD check-in for device we have been waiting, came after KeepActive expiry. Request dropped for ID: "
+                     "[%d:0x " ChipLogFormatX64 "]",
+                     scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()));
+        return;
+    }
+
+    // TODO https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/10448. Spec does
+    // not define what to do if we fail to send the StayActiveRequest. We are assuming that any
+    // further attempts to send a StayActiveRequest will result in a similar failure. Because
+    // there is no mechanism for us to communicate with the client that sent out the KeepActive
+    // command that there was a failure, we simply fail silently. After spec issue is
+    // addressed, we can implement what spec defines here.
+    auto onDone = [=](uint32_t promisedActiveDuration) {
+        bridge::FabricBridge::Instance().ActiveChanged(scopedNodeId, promisedActiveDuration);
+    };
+    CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(checkInData.mStayActiveDurationMs, clientInfo.peer_node,
+                                                             app::InteractionModelEngine::GetInstance(), onDone);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to send StayActive command %s", err.AsString());
+    }
 }
 
 void FabricAdmin::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)

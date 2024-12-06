@@ -221,7 +221,7 @@ private:
         request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
         request.subjectDescriptor = &subjectDescriptor;
 
-        std::optional<app::DataModel::ClusterInfo> info = provider->GetClusterInfo(path);
+        std::optional<app::DataModel::ClusterInfo> info = provider->GetServerClusterInfo(path);
         if (!info.has_value())
         {
             return ::pw::Status::NotFound();
