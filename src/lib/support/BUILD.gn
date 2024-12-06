@@ -209,6 +209,7 @@ static_library("support") {
     "FileDescriptor.h",
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
+    "FluentTreeObject.h",
     "Fold.h",
     "FunctionTraits.h",
     "IniEscaping.cpp",

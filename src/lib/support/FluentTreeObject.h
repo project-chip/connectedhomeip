@@ -1,0 +1,138 @@
+/*
+ *    Copyright (c) 2024 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#pragma once
+
+#include <lib/support/Span.h>
+
+#include <cstddef>
+#include <optional>
+
+namespace chip {
+
+/// represents a wrapper around a type `T` that contains internal
+/// `Span<...>` values of other sub-types. It allows searching within the container sub-spans
+/// to create new containers.
+///
+/// Use case is that we very often search within a tree, like "find-endpoint" + "find-cluster" + "find-attribute"
+/// and we generally only care if "does the last element exist or not"
+///
+/// General usage is for fluent-searching for things like:
+///
+///    FluentTreeObject container(somePointer);
+///
+///    const AcceptedCommandData * value =
+///           container
+///              .Find<ByEndpoint>(path.mEndpointId, mEndpointIndexHint)
+///              .Find<ByServerCluster>(path.mClusterId, mServerClusterHint)
+///              .Find<ByAcceptedCommand>(path.mCommandId, mAcceptedCommandHint)
+///              .Value();
+///
+/// Where a `ByFoo` structure looks like:
+///
+///    struct ByFoo {
+///      using Key  = int;                   // the KEY inside a type                                                                                       │    │                                                                                                                    │
+///      using Type = SomeContainerStruct;  // the values for a sub-search                                                                        │    │                                                                                                                    │
+///      static Span<Type> GetSpan(Data & data) { /* return ... */ }                             │    │                                                                                                                    │
+///      static bool HasKey(const Key & id, const Type & instance) { /* return "instance has key id" */ }
+///    }
+///
+///    Where we define:
+///       - how to get a "span of sub-elements" for an object (`GetSpan`)
+///       - how to determine if a given sub-element has the "correct key"
+template <typename T>
+class FluentTreeObject
+{
+public:
+    explicit FluentTreeObject(T * value) : mValue(value) {}
+
+    /// Returns NULLPTR if such an element does not exist or non-null valid value if the element exists
+    T * Value() const { return mValue; }
+
+    // Get the first element of `TYPE`
+    template <typename TYPE>
+    FluentTreeObject<typename TYPE::Type> First(size_t & indexHint)
+    {
+        // if no value, searching more also yields no value
+        VerifyOrReturnValue(mValue != nullptr, FluentTreeObject<typename TYPE::Type>(nullptr));
+
+        Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
+        VerifyOrReturnValue(!value_span.empty(), FluentTreeObject<typename TYPE::Type>(nullptr));
+
+        // found it, save the hint
+        indexHint = 0;
+        return FluentTreeObject<typename TYPE::Type>(&value_span[0]);
+    }
+
+    // Find the value for type EXACTLY type
+    template <typename TYPE>
+    FluentTreeObject<typename TYPE::Type> Find(typename TYPE::Key key, size_t & indexHint)
+    {
+        VerifyOrReturnValue(mValue != nullptr, FluentTreeObject<typename TYPE::Type>(nullptr));
+
+        Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
+        std::optional<size_t> idx            = FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey);
+
+        VerifyOrReturnValue(idx.has_value(), FluentTreeObject<typename TYPE::Type>(nullptr));
+        return FluentTreeObject<typename TYPE::Type>(&value_span[*idx]);
+    }
+
+    template <typename TYPE>
+    FluentTreeObject<typename TYPE::Type> Next(typename TYPE::Key key, size_t & indexHint)
+    {
+        VerifyOrReturnValue(mValue != nullptr, FluentTreeObject<typename TYPE::Type>(nullptr));
+
+        Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
+        std::optional<size_t> idx            = FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey);
+
+        VerifyOrReturnValue(idx.has_value() && ((*idx + 1) < value_span.size()), FluentTreeObject<typename TYPE::Type>(nullptr));
+
+        indexHint = *idx + 1;
+        return FluentTreeObject<typename TYPE::Type>(&value_span[*idx + 1]);
+    }
+
+private:
+    T * mValue = nullptr; // underlying value, NULL if such a value does not exist
+
+    /// Search for the index where `needle` inside `haystack`
+    ///
+    /// using `haystackValueMatchesNeedle` to find if a given haystack value matches the given needle
+    template <typename N, typename H>
+    static std::optional<size_t> FindIndexUsingHint(const N & needle, Span<H> haystack, size_t & hint,
+                                                    bool (*haystackValueMatchesNeedle)(const N &,
+                                                                                       const typename std::remove_const<H>::type &))
+    {
+        if (hint < haystack.size())
+        {
+            if (haystackValueMatchesNeedle(needle, haystack[hint]))
+            {
+                return hint;
+            }
+        }
+
+        for (size_t i = 0; i < haystack.size(); i++)
+        {
+            if (haystackValueMatchesNeedle(needle, haystack[i]))
+            {
+                hint = i;
+                return i;
+            }
+        }
+
+        return std::nullopt;
+    }
+};
+
+} // namespace chip
