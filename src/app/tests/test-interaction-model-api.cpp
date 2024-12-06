@@ -60,6 +60,14 @@ private:
     AttributeValueDecoder & mDecoder;
 };
 
+class TestProviderChangeListener : public DataModel::ProviderChangeListener
+{
+public:
+    explicit TestProviderChangeListener() {}
+
+    void MarkDirty(const AttributePathParams & path) override {}
+};
+
 // strong defintion in TestCommandInteraction.cpp
 __attribute__((weak)) void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath,
                                                         chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
@@ -147,6 +155,12 @@ std::optional<ActionReturnStatus> TestImCustomDataModel::Invoke(const InvokeRequ
                                                                 chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     return std::make_optional<ActionReturnStatus>(CHIP_ERROR_NOT_IMPLEMENTED);
+}
+
+ProviderChangeListener & TestImCustomDataModel::GetAttributeChangeReporter()
+{
+    static TestProviderChangeListener changeListener;
+    return changeListener;
 }
 
 DataModel::EndpointEntry TestImCustomDataModel::FirstEndpoint()

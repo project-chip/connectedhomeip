@@ -80,6 +80,17 @@ private:
     }
 };
 
+class DefaultProviderChangeListener : public DataModel::ProviderChangeListener
+{
+public:
+    explicit DefaultProviderChangeListener(DataModel::Provider & provider) : mProvider(provider) {}
+
+    void MarkDirty(const AttributePathParams & path) override;
+
+private:
+    DataModel::Provider & mProvider;
+};
+
 } // namespace detail
 
 /// An implementation of `InteractionModel::Model` that relies on code-generation
@@ -126,6 +137,8 @@ private:
     };
 
 public:
+    CodegenDataModelProvider() : mChangeListener(*this) {}
+
     /// clears out internal caching. Especially useful in unit tests,
     /// where path caching does not really apply (the same path may result in different outcomes)
     void Reset()
@@ -185,7 +198,7 @@ public:
     ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
     ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
 
-    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
+    DataModel::ProviderChangeListener & GetAttributeChangeReporter() override { return mChangeListener; }
 
 private:
     // Iteration is often done in a tight loop going through all values.
@@ -220,6 +233,8 @@ private:
 
     // Ember requires a persistence provider, so we make sure we can always have something
     PersistentStorageDelegate * mPersistentStorageDelegate = nullptr;
+
+    detail::DefaultProviderChangeListener mChangeListener;
 
     /// Finds the specified ember cluster
     ///
