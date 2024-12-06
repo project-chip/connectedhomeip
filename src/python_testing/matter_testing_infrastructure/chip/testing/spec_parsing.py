@@ -532,6 +532,7 @@ def _get_data_model_root() -> pathlib.PosixPath:
 
     return data_model_root
 
+
 def get_data_model_directory(data_model_directory: Union[str, pathlib.Path], data_model_level: str) -> pathlib.PosixPath:
     """
     Get the directory of the data model for a specific version and level from the installed package.
