@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020-2022 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright 2023-2024 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,6 +44,9 @@ public:
                            uint32_t * contentAddr = NULL);
     CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
 
+    CHIP_ERROR SetAes128Key(const uint8_t * keyAes128);
+    CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
+
 private:
     struct Header
     {
@@ -54,6 +57,9 @@ private:
     uint8_t factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE];
     Header mHeader;
 
+    const uint8_t * pAesKey    = nullptr;
+    EncryptionMode encryptMode = encrypt_ecb;
+
     /* TLV offset */
     static constexpr uint32_t kLengthOffset = 1;
     static constexpr uint32_t kValueOffset  = 3;
@@ -61,6 +67,7 @@ private:
     CHIP_ERROR ReplaceWithBlob(uint8_t * data, uint8_t * blob, size_t blobLen, uint32_t offset);
     CHIP_ERROR ELS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset);
     CHIP_ERROR ELS_ConvertDacKey();
+    CHIP_ERROR DecryptAes128Ecb(uint8_t * dest, uint8_t * source, const uint8_t * aes128Key);
 
     CHIP_ERROR ReadAndCheckFactoryDataInFlash(void);
 };

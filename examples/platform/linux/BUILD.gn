@@ -74,8 +74,6 @@ source_set("app-main") {
     "AppMain.h",
     "CommissionableInit.cpp",
     "CommissionableInit.h",
-    "CommissionerMain.cpp",
-    "CommissionerMain.h",
     "LinuxCommissionableDataProvider.cpp",
     "LinuxCommissionableDataProvider.h",
     "NamedPipeCommands.cpp",
@@ -90,13 +88,13 @@ source_set("app-main") {
 
   public_deps = [
     ":boolean-state-configuration-test-event-trigger",
+    ":commissioner-main",
     ":device-energy-management-test-event-trigger",
     ":energy-evse-test-event-trigger",
     ":energy-reporting-test-event-trigger",
     ":smco-test-event-trigger",
     ":water-heater-management-test-event-trigger",
-    "${chip_root}/src/controller:controller",
-    "${chip_root}/src/controller:gen_check_chip_controller_headers",
+    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
   ]
@@ -163,10 +161,12 @@ source_set("commissioner-main") {
 
   public_deps = [
     "${chip_root}/src/controller:controller",
-    "${chip_root}/src/controller:gen_check_chip_controller_headers",
     "${chip_root}/src/lib",
   ]
-  deps = [ "${chip_root}/src/app/server" ]
+  deps = [
+    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
+    "${chip_root}/src/app/server",
+  ]
 
   if (chip_enable_transport_trace) {
     deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]

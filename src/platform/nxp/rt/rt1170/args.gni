@@ -32,6 +32,9 @@ chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 
 chip_build_tests = false
 
+# Disable TCP endpoint.
+chip_inet_config_enable_tcp_endpoint = false
+
 #This enables the EventList global attribute
 enable_eventlist_attribute = true
 

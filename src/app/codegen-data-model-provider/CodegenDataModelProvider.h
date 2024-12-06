@@ -16,12 +16,13 @@
  */
 #pragma once
 
-#include "app/ConcreteCommandPath.h"
 #include <app/data-model-provider/Provider.h>
 
 #include <app/CommandHandlerInterface.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/util/af-types.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 namespace app {
@@ -93,7 +94,7 @@ private:
 /// Given that this relies on global data at link time, there generally can be
 /// only one CodegenDataModelProvider per application (you can create more instances,
 /// however they would share the exact same underlying data and storage).
-class CodegenDataModelProvider : public chip::app::DataModel::Provider
+class CodegenDataModelProvider : public DataModel::Provider
 {
 private:
     /// Ember commands are stored as a `CommandId *` pointer that is either null (i.e. no commands)
@@ -134,6 +135,9 @@ public:
         mPreviouslyFoundCluster = std::nullopt;
     }
 
+    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
+    PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
+
     /// Generic model implementations
     CHIP_ERROR Shutdown() override
     {
@@ -141,25 +145,34 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
-    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
-                                                        chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                        CommandHandler * handler) override;
 
     /// attribute tree iteration
-    EndpointId FirstEndpoint() override;
-    EndpointId NextEndpoint(EndpointId before) override;
+    DataModel::EndpointEntry FirstEndpoint() override;
+    DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
+    std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
     bool EndpointExists(EndpointId endpoint) override;
 
     std::optional<DataModel::DeviceTypeEntry> FirstDeviceType(EndpointId endpoint) override;
     std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,
                                                              const DataModel::DeviceTypeEntry & previous) override;
 
-    DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
-    DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
-    std::optional<DataModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;
+    std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint) override;
+    std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) override;
+
+    DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
+    DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
+    std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;
+
+    ConcreteClusterPath FirstClientCluster(EndpointId endpoint) override;
+    ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) override;
 
     DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
@@ -172,13 +185,17 @@ public:
     ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
     ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
 
+    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
+
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
-    uint16_t mEndpointIterationHint   = 0;
-    unsigned mClusterIterationHint    = 0;
-    unsigned mAttributeIterationHint  = 0;
-    unsigned mDeviceTypeIterationHint = 0;
+    uint16_t mEndpointIterationHint      = 0;
+    unsigned mServerClusterIterationHint = 0;
+    unsigned mClientClusterIterationHint = 0;
+    unsigned mAttributeIterationHint     = 0;
+    unsigned mDeviceTypeIterationHint    = 0;
+    unsigned mSemanticTagIterationHint   = 0;
     EmberCommandListIterator mAcceptedCommandsIterator;
     EmberCommandListIterator mGeneratedCommandsIterator;
 
@@ -191,8 +208,18 @@ private:
 
         ClusterReference(const ConcreteClusterPath p, const EmberAfCluster * c) : path(p), cluster(c) {}
     };
+
+    enum class ClusterSide : uint8_t
+    {
+        kServer,
+        kClient,
+    };
+
     std::optional<ClusterReference> mPreviouslyFoundCluster;
     unsigned mEmberMetadataStructureGeneration = 0;
+
+    // Ember requires a persistence provider, so we make sure we can always have something
+    PersistentStorageDelegate * mPersistentStorageDelegate = nullptr;
 
     /// Finds the specified ember cluster
     ///
@@ -200,15 +227,15 @@ private:
     const EmberAfCluster * FindServerCluster(const ConcreteClusterPath & path);
 
     /// Find the index of the given attribute id
-    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId id) const;
+    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, AttributeId id) const;
 
     /// Find the index of the given cluster id
-    std::optional<unsigned> TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id) const;
+    std::optional<unsigned> TryFindClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id, ClusterSide clusterSide) const;
 
     /// Find the index of the given endpoint id
-    std::optional<unsigned> TryFindEndpointIndex(chip::EndpointId id) const;
+    std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
 
-    using CommandListGetter = const chip::CommandId *(const EmberAfCluster &);
+    using CommandListGetter = const CommandId *(const EmberAfCluster &);
 
     CommandId FindCommand(const ConcreteCommandPath & path, detail::EnumeratorCommandFinder & handlerFinder,
                           detail::EnumeratorCommandFinder::Operation operation,

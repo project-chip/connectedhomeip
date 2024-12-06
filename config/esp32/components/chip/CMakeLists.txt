@@ -389,7 +389,6 @@ externalproject_add(
     BUILD_COMMAND           ninja "esp32"
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${chip_libraries}
-    WORKING_DIRECTORY       ${CMAKE_CURRENT_LIST_DIR}
     DEPENDS                 args_gn
     BUILD_ALWAYS            1
 )
@@ -431,7 +430,13 @@ if(CONFIG_BT_ENABLED)
     if((target_name STREQUAL "esp32h2") OR (target_name STREQUAL "esp32c2") OR (target_name STREQUAL "esp32c6"))
         idf_component_get_property(bt_dir bt COMPONENT_DIR)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a")
+        if (EXISTS ${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a)
+            list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a")
+        elseif(EXISTS ${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/${target_name}/libble_app.a)
+            list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/${target_name}/libble_app.a")
+	else()
+            message(WARNING "There is no libble_app.a in the given path")
+        endif()
     elseif(target_name STREQUAL "esp32p4")
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
     else()
