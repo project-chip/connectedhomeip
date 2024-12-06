@@ -113,10 +113,11 @@ struct DeviceListWrapper
     explicit DeviceListWrapper(Span<const EmberAfDeviceType> types) : deviceTypes(types) {}
 };
 
+/// Search by device type within a `DeviceListWrapper` which just wraps a span of EmberAfDeviceType
 struct ByDeviceType
 {
-    using Key  = DataModel::DeviceTypeEntry;       // the KEY inside a type │    │ │
-    using Type = const EmberAfDeviceType; // the values for a sub-search │    │ │
+    using Key  = DataModel::DeviceTypeEntry;
+    using Type = const EmberAfDeviceType;
     static Span<Type> GetSpan(DeviceListWrapper & data) { return data.deviceTypes; }
     static bool HasKey(const Key & id, const Type & instance)
     {
