@@ -49,9 +49,9 @@ namespace chip {
 ///      static bool HasKey(const Key & id, const Type & instance) { /* return "instance has key id" */ }
 ///    }
 ///
-///    Where we define:
-///       - how to get a "span of sub-elements" for an object (`GetSpan`)
-///       - how to determine if a given sub-element has the "correct key"
+/// Where we define:
+///    - how to get a "span of sub-elements" for an object (`GetSpan`)
+///    - how to determine if a given sub-element has the "correct key"
 template <typename T>
 class FluentTreeObject
 {
