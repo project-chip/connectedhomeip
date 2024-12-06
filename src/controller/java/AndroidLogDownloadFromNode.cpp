@@ -217,22 +217,27 @@ void AndroidLogDownloadFromNode::FinishLogDownloadFromNode(CHIP_ERROR err)
         // Java method signature : boolean onSuccess(int fabricIndex, long nodeId)
         jniErr = JniReferences::GetInstance().FindMethod(env, mJavaCallback.ObjectRef(), "onSuccess", "(IJ)V", &onSuccessMethod);
 
-        VerifyOrReturn(jniErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onSuccess method"));
+        VerifyOrExit(jniErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onSuccess method"));
 
         env->CallVoidMethod(mJavaCallback.ObjectRef(), onSuccessMethod, static_cast<jint>(mController->GetFabricIndex()),
                             static_cast<jlong>(mRemoteNodeId));
-        return;
+    }
+    else
+    {
+        ChipLogError(Controller, "Log Download Failed : %" CHIP_ERROR_FORMAT, err.Format());
+
+        jmethodID onErrorMethod;
+        // Java method signature : void onError(int fabricIndex, long nodeId, long errorCode)
+        jniErr = JniReferences::GetInstance().FindMethod(env, mJavaCallback.ObjectRef(), "onError", "(IJJ)V", &onErrorMethod);
+        VerifyOrExit(jniErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onError method"));
+
+        env->CallVoidMethod(mJavaCallback.ObjectRef(), onErrorMethod, static_cast<jint>(mController->GetFabricIndex()),
+                            static_cast<jlong>(mRemoteNodeId), static_cast<jlong>(err.AsInteger()));
     }
 
-    ChipLogError(Controller, "Log Download Failed : %" CHIP_ERROR_FORMAT, err.Format());
-
-    jmethodID onErrorMethod;
-    // Java method signature : void onError(int fabricIndex, long nodeId, long errorCode)
-    jniErr = JniReferences::GetInstance().FindMethod(env, mJavaCallback.ObjectRef(), "onError", "(IJJ)V", &onErrorMethod);
-    VerifyOrReturn(jniErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onError method"));
-
-    env->CallVoidMethod(mJavaCallback.ObjectRef(), onErrorMethod, static_cast<jint>(mController->GetFabricIndex()),
-                        static_cast<jlong>(mRemoteNodeId), static_cast<jlong>(err.AsInteger()));
+exit:
+    // Finish this function, this object will be deleted.
+    delete this;
 }
 
 void AndroidLogDownloadFromNode::OnBdxTransferCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId,

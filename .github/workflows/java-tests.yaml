@@ -260,9 +260,6 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Onnetwork and get diagnostic log Test
-              # TODO: test below is disabled because it seems flaky (crashes on pool not being empty on app exit)
-              #       See: https://github.com/project-chip/connectedhomeip/issues/36734
-              if: false
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
