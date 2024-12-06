@@ -47,8 +47,8 @@ public:
      * effectively resetting their acceptance status in the persistent storage.
      *
      * @retval CHIP_NO_ERROR if the record was successfully deleted.
-     * @retval CHIP_ERROR_INTERNAL if there was an error deleting the record from storage.
      * @retval CHIP_ERROR_UNINITIALIZED if the storage delegate is not properly initialized.
+     * @retval CHIP_ERROR_* for other errors.
      */
     virtual CHIP_ERROR Delete() = 0;
 
@@ -61,8 +61,8 @@ public:
      * @param[out] outTermsAndConditions The retrieved terms and conditions, if any exist.
      *
      * @retval CHIP_NO_ERROR if the terms were successfully retrieved.
-     * @retval CHIP_ERROR_INTERNAL if an error occurred while retrieving from persistent storage.
      * @retval CHIP_ERROR_UNINITIALIZED if the storage delegate is not properly initialized.
+     * @retval CHIP_ERROR_* for other errors.
      */
     virtual CHIP_ERROR Get(Optional<TermsAndConditions> & outTermsAndConditions) = 0;
 
@@ -75,8 +75,8 @@ public:
      * @param[in] inTermsAndConditions The terms and conditions to be saved.
      *
      * @retval CHIP_NO_ERROR if the terms were successfully stored.
-     * @retval CHIP_ERROR_INTERNAL if there was an error during the storage operation.
      * @retval CHIP_ERROR_UNINITIALIZED if the storage delegate is not properly initialized.
+     * @retval CHIP_ERROR_* for other errors.
      */
     virtual CHIP_ERROR Set(const TermsAndConditions & inTermsAndConditions) = 0;
 };

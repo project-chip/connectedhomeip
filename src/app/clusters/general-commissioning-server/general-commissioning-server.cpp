@@ -49,6 +49,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralCommissioning;
 using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 using namespace chip::DeviceLayer;
+using chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum;
 using Transport::SecureSession;
 using Transport::Session;
 
@@ -107,16 +108,8 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
         TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
-        if (nullptr == termsAndConditionsProvider)
-        {
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-
-        CHIP_ERROR err = termsAndConditionsProvider->GetAcceptance(outTermsAndConditions);
-        if (CHIP_NO_ERROR != err)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
+        VerifyOrReturnError(nullptr != termsAndConditionsProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(termsAndConditionsProvider->GetAcceptance(outTermsAndConditions));
 
         return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
     }
@@ -124,16 +117,8 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
         TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
-        if (nullptr == termsAndConditionsProvider)
-        {
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-
-        CHIP_ERROR err = termsAndConditionsProvider->GetRequirements(outTermsAndConditions);
-        if (CHIP_NO_ERROR != err)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
+        VerifyOrReturnError(nullptr != termsAndConditionsProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(termsAndConditionsProvider->GetRequirements(outTermsAndConditions));
 
         return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
     }
@@ -141,16 +126,8 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
         TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
-        if (nullptr == termsAndConditionsProvider)
-        {
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-
-        CHIP_ERROR err = termsAndConditionsProvider->GetAcceptance(outTermsAndConditions);
-        if (CHIP_NO_ERROR != err)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
+        VerifyOrReturnError(nullptr != termsAndConditionsProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(termsAndConditionsProvider->GetAcceptance(outTermsAndConditions));
 
         return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetValue());
     }
@@ -159,22 +136,10 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
         Optional<TermsAndConditions> outTermsAndConditions;
         TermsAndConditionsState termsAndConditionsState;
 
-        if (nullptr == termsAndConditionsProvider)
-        {
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
+        VerifyOrReturnError(nullptr != termsAndConditionsProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        CHIP_ERROR err = termsAndConditionsProvider->GetAcceptance(outTermsAndConditions);
-        if (CHIP_NO_ERROR != err)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
-
-        err = termsAndConditionsProvider->CheckAcceptance(outTermsAndConditions, termsAndConditionsState);
-        if (CHIP_NO_ERROR != err)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
+        ReturnErrorOnFailure(termsAndConditionsProvider->GetAcceptance(outTermsAndConditions));
+        ReturnErrorOnFailure(termsAndConditionsProvider->CheckAcceptance(outTermsAndConditions, termsAndConditionsState));
 
         bool setTermsAndConditionsCallRequiredBeforeCommissioningCompleteSuccess =
             termsAndConditionsState != TermsAndConditionsState::OK;
@@ -184,16 +149,8 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
         TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
         Optional<uint32_t> outUpdateAcceptanceDeadline;
 
-        if (nullptr == termsAndConditionsProvider)
-        {
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-
-        CHIP_ERROR err = termsAndConditionsProvider->GetUpdateAcceptanceDeadline(outUpdateAcceptanceDeadline);
-        if (CHIP_NO_ERROR != err)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
+        VerifyOrReturnError(nullptr != termsAndConditionsProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(termsAndConditionsProvider->GetUpdateAcceptanceDeadline(outUpdateAcceptanceDeadline));
 
         if (!outUpdateAcceptanceDeadline.HasValue())
         {
@@ -258,40 +215,31 @@ CommissioningErrorEnum CheckTermsAndConditionsAcknowledgementsState(TermsAndCond
 {
     TermsAndConditionsState termsAndConditionsState;
 
-    CHIP_ERROR err = termsAndConditionsProvider->CheckAcceptance(acceptedTermsAndConditions, termsAndConditionsState);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(FailSafe, "GeneralCommissioning: Failed to verify terms and conditions acceptance: %" CHIP_ERROR_FORMAT,
-                     err.Format());
-        return chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum::kRequiredTCNotAccepted;
-    }
+    VerifyOrReturnValue(CHIP_NO_ERROR ==
+                            termsAndConditionsProvider->CheckAcceptance(acceptedTermsAndConditions, termsAndConditionsState),
+                        CommissioningErrorEnum::kRequiredTCNotAccepted);
 
     switch (termsAndConditionsState)
     {
     case TermsAndConditionsState::OK:
-        return chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum::kOk;
+        return CommissioningErrorEnum::kOk;
     case TermsAndConditionsState::TC_ACKNOWLEDGEMENTS_NOT_RECEIVED:
-        return chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
+        return CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
     case TermsAndConditionsState::TC_MIN_VERSION_NOT_MET:
-        return chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum::kTCMinVersionNotMet;
+        return CommissioningErrorEnum::kTCMinVersionNotMet;
     case TermsAndConditionsState::REQUIRED_TC_NOT_ACCEPTED:
-        return chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum::kRequiredTCNotAccepted;
+        return CommissioningErrorEnum::kRequiredTCNotAccepted;
     }
 
-    return chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum::kOk;
+    return CommissioningErrorEnum::kOk;
 }
 
 CommissioningErrorEnum CheckTermsAndConditionsAcknowledgements(TermsAndConditionsProvider * const termsAndConditionsProvider)
 {
     Optional<TermsAndConditions> acceptedTermsAndConditions;
 
-    CHIP_ERROR err = termsAndConditionsProvider->GetAcceptance(acceptedTermsAndConditions);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(FailSafe, "GeneralCommissioning: Failed to get terms and conditions acceptance: %" CHIP_ERROR_FORMAT,
-                     err.Format());
-        return chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
-    }
+    VerifyOrReturnValue(CHIP_NO_ERROR == termsAndConditionsProvider->GetAcceptance(acceptedTermsAndConditions),
+                        CommissioningErrorEnum::kTCAcknowledgementsNotReceived);
 
     return CheckTermsAndConditionsAcknowledgementsState(termsAndConditionsProvider, acceptedTermsAndConditions);
 }
@@ -306,15 +254,13 @@ void NotifyTermsAndConditionsAttributesChange(TermsAndConditionsProvider * const
         if (currentTermsAndConditionsAcceptance.ValueOr(TermsAndConditions(0, 0)).GetVersion() !=
             updatedTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion())
         {
-            MatterReportingAttributeChangeCallback(endpoint, GeneralCommissioning::Id,
-                                                   GeneralCommissioning::Attributes::TCAcceptedVersion::Id);
+            MatterReportingAttributeChangeCallback(endpoint, GeneralCommissioning::Id, Attributes::TCAcceptedVersion::Id);
         }
 
         if (currentTermsAndConditionsAcceptance.ValueOr(TermsAndConditions(0, 0)).GetValue() !=
             updatedTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetValue())
         {
-            MatterReportingAttributeChangeCallback(endpoint, GeneralCommissioning::Id,
-                                                   GeneralCommissioning::Attributes::TCAcknowledgements::Id);
+            MatterReportingAttributeChangeCallback(endpoint, GeneralCommissioning::Id, Attributes::TCAcknowledgements::Id);
         }
 
         CommissioningErrorEnum previousState =
@@ -324,8 +270,7 @@ void NotifyTermsAndConditionsAttributesChange(TermsAndConditionsProvider * const
 
         if (previousState != updatedState)
         {
-            MatterReportingAttributeChangeCallback(endpoint, GeneralCommissioning::Id,
-                                                   GeneralCommissioning::Attributes::TCAcknowledgementsRequired::Id);
+            MatterReportingAttributeChangeCallback(endpoint, GeneralCommissioning::Id, Attributes::TCAcknowledgementsRequired::Id);
         }
     }
 }
@@ -547,7 +492,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 
 bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData)
+    const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData)
 {
 #if CHIP_CONFIG_TC_REQUIRED
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");

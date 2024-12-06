@@ -74,8 +74,8 @@ public:
      * why they are invalid (e.g., version mismatch or required terms not accepted).
      *
      * @retval CHIP_NO_ERROR if the terms are successfully validated.
-     * @retval CHIP_ERROR_INTERNAL if there was an error during the operation.
      * @retval CHIP_ERROR_UNINITIALIZED if the module has not been initialized.
+     * @retval CHIP_ERROR_* for other errors.
      */
     virtual CHIP_ERROR CheckAcceptance(const Optional<TermsAndConditions> & inTermsAndConditions,
                                        TermsAndConditionsState & outState) const = 0;
@@ -87,8 +87,8 @@ public:
      * status in a permanent location and clears the temporary in-memory acceptance state after committing.
      *
      * @retval CHIP_NO_ERROR if the terms were successfully persisted.
-     * @retval CHIP_ERROR_INTERNAL if there was an error during the operation.
      * @retval CHIP_ERROR_UNINITIALIZED if the module has not been initialized.
+     * @retval CHIP_ERROR_* for other errors.
      */
     virtual CHIP_ERROR CommitAcceptance() = 0;
 
@@ -102,8 +102,8 @@ public:
      * @param[out] outTermsAndConditions The current accepted terms and conditions, if any.
      *
      * @retval CHIP_NO_ERROR if the terms were successfully retrieved or no terms were found.
-     * @retval CHIP_ERROR_INTERNAL if there was an error during the operation.
      * @retval CHIP_ERROR_UNINITIALIZED if the module has not been initialized.
+     * @retval CHIP_ERROR_* for other errors.
      */
     virtual CHIP_ERROR GetAcceptance(Optional<TermsAndConditions> & outTermsAndConditions) const = 0;
 
@@ -116,8 +116,8 @@ public:
      * @param[out] outTermsAndConditions The required terms and conditions.
      *
      * @retval CHIP_NO_ERROR if the required terms were successfully retrieved.
-     * @retval CHIP_ERROR_INTERNAL if there was an error during the operation.
      * @retval CHIP_ERROR_UNINITIALIZED if the module has not been initialized.
+     * @retval CHIP_ERROR_* for other errors.
      */
     virtual CHIP_ERROR GetRequirements(Optional<TermsAndConditions> & outTermsAndConditions) const = 0;
 
@@ -131,8 +131,8 @@ public:
      *                                         Returns empty Optional if no deadline is set.
      *
      * @retval CHIP_NO_ERROR if the deadline was successfully retrieved or no deadline was found.
-     * @retval CHIP_ERROR_INTERNAL if there was an error during the operation.
      * @retval CHIP_ERROR_UNINITIALIZED if the module has not been initialized.
+     * @retval CHIP_ERROR_* for other errors.
      */
     virtual CHIP_ERROR GetUpdateAcceptanceDeadline(Optional<uint32_t> & outUpdateAcceptanceDeadline) const = 0;
 
@@ -144,8 +144,8 @@ public:
      * through this method.
      *
      * @retval CHIP_NO_ERROR if the terms were successfully reset.
-     * @retval CHIP_ERROR_INTERNAL if there was an error during the operation.
      * @retval CHIP_ERROR_UNINITIALIZED if the module has not been initialized.
+     * @retval CHIP_ERROR_* for other errors.
      */
     virtual CHIP_ERROR ResetAcceptance() = 0;
 
@@ -156,8 +156,8 @@ public:
      * not affect the persisted state stored in storage.
      *
      * @retval CHIP_NO_ERROR if the in-memory acceptance state was successfully cleared.
-     * @retval CHIP_ERROR_INTERNAL if there was an error during the operation.
      * @retval CHIP_ERROR_UNINITIALIZED if the module has not been initialized.
+     * @retval CHIP_ERROR_* for other errors.
      */
     virtual CHIP_ERROR RevertAcceptance() = 0;
 
@@ -170,9 +170,9 @@ public:
      * @param[in] inTermsAndConditions The terms and conditions to be accepted temporarily.
      *
      * @retval CHIP_NO_ERROR if the terms were successfully stored in-memory.
-     * @retval CHIP_ERROR_INTERNAL if there was an error during the operation.
      * @retval CHIP_ERROR_INVALID_ARGUMENT if the provided terms and conditions are invalid.
      * @retval CHIP_ERROR_UNINITIALIZED if the module has not been initialized.
+     * @retval CHIP_ERROR_* for other errors.
      */
     virtual CHIP_ERROR SetAcceptance(const Optional<TermsAndConditions> & inTermsAndConditions) = 0;
 };
