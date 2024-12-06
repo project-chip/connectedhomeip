@@ -21,5 +21,7 @@ package matter.onboardingpayload
 enum class DiscoveryCapability(val bitIndex: Int) {
   SOFT_AP(0),
   BLE(1),
-  ON_NETWORK(2)
+  ON_NETWORK(2),
+  WIFI_PAF(3),
+  NFC(4)          /* Indicates if NFC-based Commissioning is supported */
 }
