@@ -344,6 +344,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             return CHIP_NO_ERROR;
         }
         state->mReceived.Consume(kPacketSizeBytes);
+        VerifyOrReturnError(!state->mReceived.IsNull(), CHIP_ERROR_MESSAGE_INCOMPLETE);
         ReturnErrorOnFailure(ProcessSingleMessage(peerAddress, state, messageSize));
     }
 
