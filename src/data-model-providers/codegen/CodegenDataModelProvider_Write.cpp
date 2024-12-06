@@ -21,8 +21,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
-#include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
-#include <data-model-providers/codegen/EmberMetadata.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
@@ -35,6 +33,8 @@
 #include <app/util/ember-io-storage.h>
 #include <app/util/ember-strings.h>
 #include <app/util/odd-sized-integers.h>
+#include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
+#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 

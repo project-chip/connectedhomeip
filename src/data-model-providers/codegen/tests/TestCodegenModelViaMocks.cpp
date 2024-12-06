@@ -34,7 +34,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/StringBuilderAdapters.h>
@@ -51,6 +50,7 @@
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
 #include <app/util/odd-sized-integers.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
