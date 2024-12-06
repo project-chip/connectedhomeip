@@ -42,10 +42,10 @@ namespace chip {
 /// Where a `ByFoo` structure looks like:
 ///
 ///    struct ByFoo {
-///      using Key  = int;                   // the KEY inside a type │    │ │ using Type = SomeContainerStruct;  // the values for
-///      a sub-search                                                                        │    │ │ static Span<Type> GetSpan(Data
-///      & data) { /* return ... */ }                             │    │ │ static bool HasKey(const Key & id, const Type & instance)
-///      { /* return "instance has key id" */ }
+///      using Key  = int;                  // the KEY inside a type
+///      using Type = SomeContainerStruct;  // the values for a sub-search
+///      static Span<Type> GetSpan(Data & data) { /* return ... */ }
+///      static bool HasKey(const Key & id, const Type & instance) { /* return "instance has key id" */ }
 ///    }
 ///
 /// Where we define:
