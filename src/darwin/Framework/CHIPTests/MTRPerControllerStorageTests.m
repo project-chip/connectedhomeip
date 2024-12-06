@@ -2641,7 +2641,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
 
-    NSArray<NSNumber *> * orderedDeviceIDs = @[ @(101), @(102), @(103), @(104), @(105) ];
+    NSArray<NSNumber *> * orderedDeviceIDs = [deviceOnboardingPayloads allKeys];
 
     // Commission 5 devices
     for (NSNumber * deviceID in orderedDeviceIDs) {
@@ -2669,21 +2669,16 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     // Set up expectations and delegates
 
-    NSDictionary<NSNumber *, XCTestExpectation *> * subscriptionExpectations = @{
-        @(101) : [self expectationWithDescription:@"Subscription 1 has been set up"],
-        @(102) : [self expectationWithDescription:@"Subscription 2 has been set up"],
-        @(103) : [self expectationWithDescription:@"Subscription 3 has been set up"],
-        @(104) : [self expectationWithDescription:@"Subscription 4 has been set up"],
-        @(105) : [self expectationWithDescription:@"Subscription 5 has been set up"],
-    };
+    NSMutableDictionary<NSNumber *, XCTestExpectation *> * subscriptionExpectations = [NSMutableDictionary dictionary];
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        NSString * expectationDescription = [NSString stringWithFormat:@"Subscription 1 has been set up %@", deviceID];
+        subscriptionExpectations[deviceID] = [self expectationWithDescription:expectationDescription];
+    }
 
-    NSDictionary<NSNumber *, MTRDeviceTestDelegate *> * deviceDelegates = @{
-        @(101) : [[MTRDeviceTestDelegate alloc] init],
-        @(102) : [[MTRDeviceTestDelegate alloc] init],
-        @(103) : [[MTRDeviceTestDelegate alloc] init],
-        @(104) : [[MTRDeviceTestDelegate alloc] init],
-        @(105) : [[MTRDeviceTestDelegate alloc] init],
-    };
+    NSMutableDictionary<NSNumber *, MTRDeviceTestDelegate *> * deviceDelegates = [NSMutableDictionary dictionary];
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        deviceDelegates[deviceID] = [[MTRDeviceTestDelegate alloc] init];
+    }
 
     // Test with counters
     __block os_unfair_lock counterLock = OS_UNFAIR_LOCK_INIT;
@@ -2784,6 +2779,74 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     [self doTestSubscriptionPoolWithSize:1 deviceOnboardingPayloads:deviceOnboardingPayloads];
     [self doTestSubscriptionPoolWithSize:2 deviceOnboardingPayloads:deviceOnboardingPayloads];
+}
+
+- (void)testSubscriptionPoolManyDevices
+{
+    // QRCodes generated for discriminators 1111~1150 and passcodes 1001~1050
+    NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
+        @(101) : @"MT:00000I9K17U0D900000",
+        @(102) : @"MT:0000000000BED900000",
+        @(103) : @"MT:000008C801TRD900000",
+        @(104) : @"MT:00000GOG0293E900000",
+        @(105) : @"MT:00000O-O03RGE900000",
+        @(106) : @"MT:00000WAX047UE900000",
+        @(107) : @"MT:000002N315P5F900000",
+        @(108) : @"MT:00000AZB165JF900000",
+        @(109) : @"MT:00000I9K17NWF900000",
+        @(110) : @"MT:000000000048G900000",
+        @(111) : @"MT:000008C801MLG900000",
+        @(112) : @"MT:00000GOG022ZG900000",
+        @(113) : @"MT:00000O-O03KAH900000",
+        @(114) : @"MT:00000WAX040OH900000",
+        @(115) : @"MT:000002N315I.H900000",
+        @(116) : @"MT:00000AZB16-CI900000",
+        @(117) : @"MT:00000I9K17GQI900000",
+        @(118) : @"MT:0000000000Z1J900000",
+        @(119) : @"MT:000008C801FFJ900000",
+        @(120) : @"MT:00000GOG02XSJ900000",
+        @(121) : @"MT:00000O-O03D4K900000",
+        @(122) : @"MT:00000WAX04VHK900000",
+        @(123) : @"MT:000002N315BVK900000",
+        @(124) : @"MT:00000AZB16T6L900000",
+        @(125) : @"MT:00000I9K179KL900000",
+        @(126) : @"MT:0000000000SXL900000",
+        @(127) : @"MT:000008C80189M900000",
+        @(128) : @"MT:00000GOG02QMM900000",
+        @(129) : @"MT:00000O-O036-M900000",
+        @(130) : @"MT:00000WAX04OBN900000",
+        @(131) : @"MT:000002N3154PN900000",
+        @(132) : @"MT:00000AZB16M0O900000",
+        @(133) : @"MT:00000I9K172EO900000",
+        @(134) : @"MT:0000000000LRO900000",
+        @(135) : @"MT:000008C80113P900000",
+        @(136) : @"MT:00000GOG02JGP900000",
+        @(137) : @"MT:00000O-O03.TP900000",
+        @(138) : @"MT:00000WAX04H5Q900000",
+        @(139) : @"MT:000002N315ZIQ900000",
+        @(140) : @"MT:00000AZB16FWQ900000",
+        @(141) : @"MT:00000I9K17X7R900000",
+        @(142) : @"MT:0000000000ELR900000",
+        @(143) : @"MT:000008C801WYR900000",
+        @(144) : @"MT:00000GOG02CAS900000",
+        @(145) : @"MT:00000O-O03UNS900000",
+        @(146) : @"MT:00000WAX04A.S900000",
+        @(147) : @"MT:000002N315SCT900000",
+        @(148) : @"MT:00000AZB168QT900000",
+        @(149) : @"MT:00000I9K17Q1U900000",
+        @(150) : @"MT:00000000007FU900000",
+    };
+
+    // Start our helper apps.
+    __auto_type * sortedKeys = [[deviceOnboardingPayloads allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    for (NSNumber * deviceID in sortedKeys) {
+        BOOL started = [self startAppWithName:@"all-clusters"
+                                    arguments:@[]
+                                      payload:deviceOnboardingPayloads[deviceID]];
+        XCTAssertTrue(started);
+    }
+
+    [self doTestSubscriptionPoolWithSize:3 deviceOnboardingPayloads:deviceOnboardingPayloads];
 }
 
 - (MTRDevice *)getMTRDevice:(NSNumber *)deviceID
