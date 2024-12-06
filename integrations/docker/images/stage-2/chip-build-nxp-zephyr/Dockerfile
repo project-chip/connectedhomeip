@@ -10,8 +10,11 @@ RUN set -x \
 
 WORKDIR /opt/nxp-zephyr
 RUN set -x \
+    && wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz \
+    && tar xvf zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz \
+    && rm -rf zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz \
+    && zephyr-sdk-0.17.0/setup.sh -t arm-zephyr-eabi \
     && pip3 install --break-system-packages -U --no-cache-dir west \
-    && west sdk install -t arm-zephyr-eabi --install-dir /opt/nxp-zephyr --version 0.17.0 \
     && west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v4.0.0 \
     && cd zephyrproject \
     && west update -o=--depth=1 -n \
