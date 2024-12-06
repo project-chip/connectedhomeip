@@ -2260,32 +2260,36 @@ class ChipDeviceController(ChipDeviceControllerBase):
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
             )
 
-            # If RCAC data is needed, await the result
+            res = await asyncio.futures.wrap_future(ctx.future)
+
+            # If RCAC data is wanted, attempt to pull the result
             if get_rcac:
-                try:
-                    sleep(60)
-                    rcac_data_ptr = POINTER(c_uint8)()
-                    rcac_size = c_size_t()
-
-                    # Call the C++ function to get the RCAC data
-                    self._dmLib.pychip_GetCommissioningRCACData(byref(rcac_data_ptr), byref(rcac_size))
-
-                    # Check if data is available
-                    if rcac_size.value > 0:
-                        # Convert the data to a Python bytes object
-                        rcac_data = cast(rcac_data_ptr, POINTER(c_uint8 * rcac_size.value)).contents
-                        rcac_bytes = bytes(rcac_data)
-                    else:
-                        raise Exception("RCAC data is empty")
-
-                except Exception as e:
-                    LOGGER.error(f"Error during RCAC data fetching: {e}")
-
-                LOGGER.info(f"Commissioning RCAC Data: {rcac_bytes}")
-                return (await asyncio.futures.wrap_future(ctx.future), rcac_bytes)
+                rcac_bytes = self.get_rcac()
+                return (res, rcac_bytes)
 
             else:
-                return await asyncio.futures.wrap_future(ctx.future)
+                return res
+
+    def get_rcac(self):
+        try:
+            rcac_data_ptr = POINTER(c_uint8)()
+            rcac_size = c_size_t()
+
+            # Call the C++ function to get the RCAC data
+            self._dmLib.pychip_GetCommissioningRCACData(byref(rcac_data_ptr), byref(rcac_size))
+
+            # Check if data is available
+            if rcac_size.value > 0:
+                # Convert the data to a Python bytes object
+                rcac_data = cast(rcac_data_ptr, POINTER(c_uint8 * rcac_size.value)).contents
+                rcac_bytes = bytes(rcac_data)
+            else:
+                raise Exception("RCAC data is empty")
+
+        except Exception as e:
+            LOGGER.error(f"Error during RCAC data fetching: {e}")
+
+        return rcac_bytes
 
     async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
         ''' Commission with the given nodeid from the setupPayload.

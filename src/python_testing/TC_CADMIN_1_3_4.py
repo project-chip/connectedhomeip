@@ -186,8 +186,6 @@ class TC_CADMIN(MatterBaseTest):
 
         # Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device.
         await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
-        # th2_cam_rcac = TLVReader(base64.b64decode(
-        #    self.certificate_authority_manager.activeCaList[1]._persistentStorage._jsonData["sdk-config"]["f/2/r"])).get()["Any"][9]
 
         if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded:
             asserts.fail("public keys from fabric and certs for TH1 are not the same")
@@ -367,7 +365,6 @@ class TC_CADMIN(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
-
 
 if __name__ == "__main__":
     default_matter_test_main()
