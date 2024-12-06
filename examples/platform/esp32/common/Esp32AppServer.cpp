@@ -152,7 +152,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     if (sAppDelegate != nullptr)
     {
         initParams.appDelegate = sAppDelegate;

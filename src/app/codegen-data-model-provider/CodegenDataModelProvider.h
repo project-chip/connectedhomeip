@@ -22,6 +22,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/util/af-types.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 namespace app {
@@ -134,12 +135,17 @@ public:
         mPreviouslyFoundCluster = std::nullopt;
     }
 
+    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
+    PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
+
     /// Generic model implementations
     CHIP_ERROR Shutdown() override
     {
         Reset();
         return CHIP_NO_ERROR;
     }
+
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -179,6 +185,8 @@ public:
     ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
     ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
 
+    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
+
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
@@ -209,6 +217,9 @@ private:
 
     std::optional<ClusterReference> mPreviouslyFoundCluster;
     unsigned mEmberMetadataStructureGeneration = 0;
+
+    // Ember requires a persistence provider, so we make sure we can always have something
+    PersistentStorageDelegate * mPersistentStorageDelegate = nullptr;
 
     /// Finds the specified ember cluster
     ///
