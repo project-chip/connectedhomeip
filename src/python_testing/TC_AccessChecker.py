@@ -353,6 +353,33 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     async def test_TC_ACE_2_2(self):
         await self.run_access_test(AccessTestType.WRITE)
 
+    def steps_TC_ACE_2_3(self):
+        steps = [TestStep("precondition", "DUT is commissioned", is_commissioning=True),
+                 TestStep(1, "TH_commissioner performs a wildcard read"),
+                 TestStep(2, "TH_commissioner reads the ACL attribute"),
+                 TestStep(3, "Repeat steps 3a and 3b for each permission level")]
+        enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        for p in privilege_enum:
+            steps.append(TestStep(step_number_with_privilege(3, 'a', p),
+                         "TH_commissioner gives TH_second_commissioner the specified privilege"))
+            steps.append(TestStep(step_number_with_privilege(3, 'b', p),
+                         """For each standard command on each standard cluster on each endpoint,
+                         TH_second_controller checks the permission requirements for that command.
+                         If the permission required for the command is HIGHER than the permission level being tested,
+                         TH_second_controller sends the command to the DUT using default values.
+                         Regardless of the command contents, the DUT should return an access error since access must be checked
+                         before the command is processed. Receipt of an UNSUPPORTED_COMMAND error is a conformance failure.""",
+                                  "DUT returns UNSUPPORTED_ACCESS error"))
+        return steps
+
+    def desc_TC_ACE_2_3(self):
+        return "[TC-ACE-2.3] Command Privilege Enforcement - [DUT as Server]"
+
+    @async_test_body
+    async def test_TC_ACE_2_3(self):
+        await self.run_access_test(AccessTestType.INVOKE)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
