@@ -366,5 +366,6 @@ class TC_CADMIN(MatterBaseTest):
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
