@@ -10,10 +10,8 @@
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  distributed under the License is distributed on an "AS IS" BASIS, *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
 #include "DefaultTermsAndConditionsProvider.h"
@@ -26,20 +24,12 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 
-#define VerifyNoErrorOrReturnValue(expr, code, ...) VerifyOrReturnValue(CHIP_NO_ERROR == expr, code, ##__VA_ARGS__)
-#define VerifyNoErrorOrReturnInternal(expr, ...) VerifyNoErrorOrReturnValue(expr, CHIP_ERROR_INTERNAL, ##__VA_ARGS__)
-#define VerifyOrReturnInvalidArgument(expr, ...) VerifyOrReturnValue(expr, CHIP_ERROR_INVALID_ARGUMENT, ##__VA_ARGS__)
-#define VerifyOrReturnUninitialized(expr, ...) VerifyOrReturnValue(expr, CHIP_ERROR_UNINITIALIZED, ##__VA_ARGS__)
-#define VerifyOrReturnInternal(expr, ...) VerifyOrReturnValue(expr, CHIP_ERROR_INTERNAL, ##__VA_ARGS__)
-#define VerifyNotNullOrReturnInvalidArgument(expr, ...)                                                                            \
-    VerifyOrReturnValue(nullptr != expr, CHIP_ERROR_INVALID_ARGUMENT, ##__VA_ARGS__)
-#define VerifyNotNullOrReturnUninitialized(expr, ...) VerifyOrReturnValue(nullptr != expr, CHIP_ERROR_UNINITIALIZED, ##__VA_ARGS__)
-
 namespace {
 constexpr chip::TLV::Tag kSerializationVersionTag            = chip::TLV::ContextTag(1);
 constexpr chip::TLV::Tag kAcceptedAcknowledgementsTag        = chip::TLV::ContextTag(2);
 constexpr chip::TLV::Tag kAcceptedAcknowledgementsVersionTag = chip::TLV::ContextTag(3);
-constexpr uint8_t kSerializationVersion                      = 1;
+constexpr uint8_t kSerializationSchemaMinimumVersion         = 1;
+constexpr uint8_t kSerializationSchemaCurrentVersion         = 1;
 
 constexpr size_t kEstimatedTlvBufferSize = chip::TLV::EstimateStructOverhead(sizeof(uint8_t),  // SerializationVersion
                                                                              sizeof(uint16_t), // AcceptedAcknowledgements
@@ -50,7 +40,7 @@ constexpr size_t kEstimatedTlvBufferSize = chip::TLV::EstimateStructOverhead(siz
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Init(PersistentStorageDelegate * const inPersistentStorageDelegate)
 {
-    VerifyNotNullOrReturnInvalidArgument(inPersistentStorageDelegate);
+    VerifyOrReturnValue(nullptr != inPersistentStorageDelegate, CHIP_ERROR_INVALID_ARGUMENT);
 
     mStorageDelegate = inPersistentStorageDelegate;
 
@@ -59,17 +49,17 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Init(PersistentS
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Delete()
 {
-    VerifyNotNullOrReturnUninitialized(mStorageDelegate);
+    VerifyOrReturnValue(nullptr != mStorageDelegate, CHIP_ERROR_UNINITIALIZED);
 
     const chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::TermsAndConditionsAcceptance();
-    VerifyNoErrorOrReturnInternal(mStorageDelegate->SyncDeleteKeyValue(kStorageKey.KeyName()));
+    VerifyOrReturnValue(CHIP_NO_ERROR == mStorageDelegate->SyncDeleteKeyValue(kStorageKey.KeyName()), CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Get(Optional<TermsAndConditions> & outTermsAndConditions)
 {
-    VerifyNotNullOrReturnUninitialized(mStorageDelegate);
+    VerifyOrReturnValue(nullptr != mStorageDelegate, CHIP_ERROR_UNINITIALIZED);
 
     uint8_t serializationVersion     = 0;
     uint16_t acknowledgements        = 0;
@@ -89,26 +79,35 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Get(Optional<Ter
         return CHIP_NO_ERROR;
     }
 
-    VerifyNoErrorOrReturnInternal(err);
+    VerifyOrReturnValue(CHIP_NO_ERROR == err, CHIP_ERROR_INTERNAL);
 
     tlvReader.Init(buffer, bufferSize);
-    VerifyNoErrorOrReturnInternal(tlvReader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag()));
-    VerifyNoErrorOrReturnInternal(tlvReader.EnterContainer(tlvContainer));
-    VerifyNoErrorOrReturnInternal(tlvReader.Next(kSerializationVersionTag));
-    VerifyNoErrorOrReturnInternal(tlvReader.Get(serializationVersion));
-    VerifyNoErrorOrReturnInternal(tlvReader.Next(kAcceptedAcknowledgementsTag));
-    VerifyNoErrorOrReturnInternal(tlvReader.Get(acknowledgements));
-    VerifyNoErrorOrReturnInternal(tlvReader.Next(kAcceptedAcknowledgementsVersionTag));
-    VerifyNoErrorOrReturnInternal(tlvReader.Get(acknowledgementsVersion));
-    VerifyNoErrorOrReturnInternal(tlvReader.ExitContainer(tlvContainer));
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvReader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag()),
+                        CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvReader.EnterContainer(tlvContainer), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvReader.Next(kSerializationVersionTag), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvReader.Get(serializationVersion), CHIP_ERROR_INTERNAL);
 
-    // Only v1 serialization format is supported
-    VerifyOrReturnInternal(kSerializationVersion == serializationVersion);
+    if (serializationVersion < kSerializationSchemaMinimumVersion)
+    {
+        ChipLogError(AppServer, "The terms and conditions datastore schema (%hhu) is newer than oldest compatible schema (%hhu)",
+                     serializationVersion, kSerializationSchemaMinimumVersion);
+        return CHIP_ERROR_INTERNAL;
+    }
 
-    outTermsAndConditions = Optional<TermsAndConditions>(TermsAndConditions{
-        .value   = acknowledgements,
-        .version = acknowledgementsVersion,
-    });
+    if (serializationVersion != kSerializationSchemaCurrentVersion)
+    {
+        ChipLogDetail(AppServer, "The terms and conditions datastore schema (%hhu) differs from current schema (%hhu)",
+                      serializationVersion, kSerializationSchemaCurrentVersion);
+    }
+
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvReader.Next(kAcceptedAcknowledgementsTag), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvReader.Get(acknowledgements), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvReader.Next(kAcceptedAcknowledgementsVersionTag), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvReader.Get(acknowledgementsVersion), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvReader.ExitContainer(tlvContainer), CHIP_ERROR_INTERNAL);
+
+    outTermsAndConditions = Optional<TermsAndConditions>(TermsAndConditions(acknowledgements, acknowledgementsVersion));
 
     return CHIP_NO_ERROR;
 }
@@ -119,23 +118,26 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Set(const TermsA
     chip::TLV::TLVWriter tlvWriter;
     chip::TLV::TLVType tlvContainer;
 
-    VerifyNotNullOrReturnUninitialized(mStorageDelegate);
+    VerifyOrReturnValue(nullptr != mStorageDelegate, CHIP_ERROR_UNINITIALIZED);
 
-    tlvWriter.Init(buffer, sizeof(buffer));
-    VerifyNoErrorOrReturnInternal(tlvWriter.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, tlvContainer));
-    VerifyNoErrorOrReturnInternal(tlvWriter.Put(kSerializationVersionTag, kSerializationVersion));
-    VerifyNoErrorOrReturnInternal(tlvWriter.Put(kAcceptedAcknowledgementsTag, inTermsAndConditions.value));
-    VerifyNoErrorOrReturnInternal(tlvWriter.Put(kAcceptedAcknowledgementsVersionTag, inTermsAndConditions.version));
-    VerifyNoErrorOrReturnInternal(tlvWriter.EndContainer(tlvContainer));
-    VerifyNoErrorOrReturnInternal(tlvWriter.Finalize());
-
-    uint32_t lengthWritten = tlvWriter.GetLengthWritten();
-    VerifyOrReturnInternal(CanCastTo<uint16_t>(lengthWritten));
-    VerifyOrReturnInternal(lengthWritten <= kEstimatedTlvBufferSize);
+    tlvWriter.Init(buffer);
+    VerifyOrReturnValue(CHIP_NO_ERROR ==
+                            tlvWriter.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, tlvContainer),
+                        CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvWriter.Put(kSerializationVersionTag, kSerializationSchemaCurrentVersion),
+                        CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvWriter.Put(kAcceptedAcknowledgementsTag, inTermsAndConditions.GetValue()),
+                        CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvWriter.Put(kAcceptedAcknowledgementsVersionTag, inTermsAndConditions.GetVersion()),
+                        CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvWriter.EndContainer(tlvContainer), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(CHIP_NO_ERROR == tlvWriter.Finalize(), CHIP_ERROR_INTERNAL);
 
     const chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::TermsAndConditionsAcceptance();
-    VerifyNoErrorOrReturnInternal(
-        mStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), buffer, static_cast<uint16_t>(lengthWritten)));
+    VerifyOrReturnValue(
+        CHIP_NO_ERROR ==
+            mStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), buffer, static_cast<uint16_t>(tlvWriter.GetLengthWritten())),
+        CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
@@ -144,7 +146,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::Init(
     TermsAndConditionsStorageDelegate * const inStorageDelegate,
     const chip::Optional<chip::app::TermsAndConditions> & inRequiredTermsAndConditions)
 {
-    VerifyNotNullOrReturnInvalidArgument(inStorageDelegate);
+    VerifyOrReturnValue(nullptr != inStorageDelegate, CHIP_ERROR_INVALID_ARGUMENT);
 
     mTermsAndConditionsStorageDelegate = inStorageDelegate;
     mRequiredAcknowledgements          = inRequiredTermsAndConditions;
@@ -155,7 +157,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::Init(
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::CheckAcceptance(const Optional<TermsAndConditions> & inTermsAndConditions,
                                                                          TermsAndConditionsState & outState) const
 {
-    VerifyNotNullOrReturnInvalidArgument(mTermsAndConditionsStorageDelegate);
+    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_INVALID_ARGUMENT);
 
     // No validation checks required if no required terms and conditions
     if (!mRequiredAcknowledgements.HasValue())
@@ -177,31 +179,32 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::CheckAcceptance(const O
     const TermsAndConditions termsAndConditionsToCheck  = inTermsAndConditions.Value();
 
     // Validate the accepted version first...
-    if (requiredTermsAndConditions.version > termsAndConditionsToCheck.version)
+    if (requiredTermsAndConditions.GetVersion() > termsAndConditionsToCheck.GetVersion())
     {
         ChipLogError(AppServer, "Minimum terms and conditions version, 0x%04x, has not been accepted",
-                     requiredTermsAndConditions.version);
+                     requiredTermsAndConditions.GetVersion());
         outState = TermsAndConditionsState::TC_MIN_VERSION_NOT_MET;
         return CHIP_NO_ERROR;
     }
 
     // Validate the accepted bits second...
-    if (requiredTermsAndConditions.value != (requiredTermsAndConditions.value & termsAndConditionsToCheck.value))
+    if (requiredTermsAndConditions.GetValue() != (requiredTermsAndConditions.GetValue() & termsAndConditionsToCheck.GetValue()))
     {
-        ChipLogError(AppServer, "Required terms and conditions, 0x%04x, have not been accepted", requiredTermsAndConditions.value);
+        ChipLogError(AppServer, "Required terms and conditions, 0x%04x, have not been accepted",
+                     requiredTermsAndConditions.GetValue());
         outState = TermsAndConditionsState::REQUIRED_TC_NOT_ACCEPTED;
         return CHIP_NO_ERROR;
     }
 
     // All validation check succeeded...
-    ChipLogProgress(AppServer, "Required terms and conditions, 0x%04x, have been accepted", requiredTermsAndConditions.value);
+    ChipLogProgress(AppServer, "Required terms and conditions, 0x%04x, have been accepted", requiredTermsAndConditions.GetValue());
     outState = TermsAndConditionsState::OK;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::CommitAcceptance()
 {
-    VerifyNotNullOrReturnUninitialized(mTermsAndConditionsStorageDelegate);
+    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
 
     if (!mTemporalAcceptance.HasValue())
     {
@@ -223,7 +226,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::CommitAcceptance()
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetAcceptance(Optional<TermsAndConditions> & outTermsAndConditions) const
 {
-    VerifyNotNullOrReturnUninitialized(mTermsAndConditionsStorageDelegate);
+    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
 
     // Return the in-memory acceptance state
     if (mTemporalAcceptance.HasValue())
@@ -252,22 +255,31 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetAcceptance(Optional<
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetRequirements(Optional<TermsAndConditions> & outTermsAndConditions) const
 {
-    VerifyNotNullOrReturnUninitialized(mTermsAndConditionsStorageDelegate);
+    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
 
     outTermsAndConditions = mRequiredAcknowledgements;
 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+chip::app::DefaultTermsAndConditionsProvider::GetUpdateAcceptanceDeadline(Optional<uint32_t> & outUpdateAcceptanceDeadline) const
+{
+    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
+
+    outUpdateAcceptanceDeadline = Optional<uint32_t>();
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::ResetAcceptance()
 {
-    VerifyNotNullOrReturnUninitialized(mTermsAndConditionsStorageDelegate);
+    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
 
     CHIP_ERROR err = mTermsAndConditionsStorageDelegate->Delete();
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(AppServer, "Failed storage delegate Delete(): %" CHIP_ERROR_FORMAT, err.Format());
-        return CHIP_ERROR_INTERNAL;
     }
 
     return RevertAcceptance();
@@ -275,7 +287,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::ResetAcceptance()
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::RevertAcceptance()
 {
-    VerifyNotNullOrReturnUninitialized(mTermsAndConditionsStorageDelegate);
+    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
 
     mTemporalAcceptance.ClearValue();
 
@@ -284,7 +296,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::RevertAcceptance()
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::SetAcceptance(const Optional<TermsAndConditions> & inTermsAndConditions)
 {
-    VerifyNotNullOrReturnUninitialized(mTermsAndConditionsStorageDelegate);
+    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
 
     TermsAndConditionsState termsAndConditionsState = TermsAndConditionsState::OK;
 

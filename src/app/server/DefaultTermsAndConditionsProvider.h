@@ -121,9 +121,10 @@ public:
      * @brief Initializes the TermsAndConditionsProvider.
      *
      * @param[in] inStorageDelegate Storage delegate dependency.
+     * @param[in] inRequiredTermsAndConditions The required terms and conditions that must be met.
      */
     CHIP_ERROR Init(TermsAndConditionsStorageDelegate * const inStorageDelegate,
-                    const chip::Optional<chip::app::TermsAndConditions> & inRequiredTermsAndConditions);
+                    const Optional<TermsAndConditions> & inRequiredTermsAndConditions);
 
     CHIP_ERROR CheckAcceptance(const Optional<TermsAndConditions> & inTermsAndConditions,
                                TermsAndConditionsState & outState) const override;
@@ -133,6 +134,8 @@ public:
     CHIP_ERROR GetAcceptance(Optional<TermsAndConditions> & outTermsAndConditions) const override;
 
     CHIP_ERROR GetRequirements(Optional<TermsAndConditions> & outTermsAndConditions) const override;
+
+    CHIP_ERROR GetUpdateAcceptanceDeadline(Optional<uint32_t> & outUpdateAcceptanceDeadline) const override;
 
     CHIP_ERROR ResetAcceptance() override;
 

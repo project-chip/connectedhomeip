@@ -64,10 +64,8 @@ TEST(DefaultTermsAndConditionsProvider, TestInitSuccess)
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     chip::app::DefaultTermsAndConditionsProvider defaultTermsAndConditionsProvider;
-    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
     err = defaultTermsAndConditionsProvider.Init(&defaultTermsAndConditionsStorageDelegate, requiredTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 }
@@ -102,10 +100,8 @@ TEST(DefaultTermsAndConditionsProvider, TestNeverAcceptanceGetAcceptanceSuccess)
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     chip::app::DefaultTermsAndConditionsProvider defaultTermsAndConditionsProvider;
-    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 0b1111'1111'1111'1111,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(0b1111'1111'1111'1111, 1));
     err = defaultTermsAndConditionsProvider.Init(&defaultTermsAndConditionsStorageDelegate, requiredTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
@@ -125,17 +121,13 @@ TEST(DefaultTermsAndConditionsProvider, TestTermsAcceptedPersistsSuccess)
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     chip::app::DefaultTermsAndConditionsProvider defaultTermsAndConditionsProvider;
-    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
     err = defaultTermsAndConditionsProvider.Init(&defaultTermsAndConditionsStorageDelegate, requiredTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
-    chip::Optional<chip::app::TermsAndConditions> newTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> newTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
 
     err = defaultTermsAndConditionsProvider.SetAcceptance(newTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
@@ -143,14 +135,14 @@ TEST(DefaultTermsAndConditionsProvider, TestTermsAcceptedPersistsSuccess)
     chip::Optional<chip::app::TermsAndConditions> outTermsAndConditions;
     err = defaultTermsAndConditionsProvider.GetAcceptance(outTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
-    EXPECT_EQ(1, outTermsAndConditions.Value().value);
-    EXPECT_EQ(1, outTermsAndConditions.Value().version);
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetVersion());
 
     err = defaultTermsAndConditionsProvider.CommitAcceptance();
     err = defaultTermsAndConditionsProvider.GetAcceptance(outTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
-    EXPECT_EQ(1, outTermsAndConditions.Value().value);
-    EXPECT_EQ(1, outTermsAndConditions.Value().version);
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetVersion());
 
     chip::app::DefaultTermsAndConditionsProvider anotherTncProvider;
     err = anotherTncProvider.Init(&defaultTermsAndConditionsStorageDelegate, requiredTermsAndConditions);
@@ -158,8 +150,8 @@ TEST(DefaultTermsAndConditionsProvider, TestTermsAcceptedPersistsSuccess)
 
     err = anotherTncProvider.GetAcceptance(outTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
-    EXPECT_EQ(1, outTermsAndConditions.Value().value);
-    EXPECT_EQ(1, outTermsAndConditions.Value().version);
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetVersion());
 }
 
 TEST(DefaultTermsAndConditionsProvider, TestTermsRequiredGetRequirementsSuccess)
@@ -172,18 +164,16 @@ TEST(DefaultTermsAndConditionsProvider, TestTermsRequiredGetRequirementsSuccess)
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     chip::app::DefaultTermsAndConditionsProvider defaultTermsAndConditionsProvider;
-    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
     err = defaultTermsAndConditionsProvider.Init(&defaultTermsAndConditionsStorageDelegate, requiredTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     chip::Optional<chip::app::TermsAndConditions> outTermsAndConditions;
     err = defaultTermsAndConditionsProvider.GetRequirements(outTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
-    EXPECT_EQ(1, outTermsAndConditions.Value().value);
-    EXPECT_EQ(1, outTermsAndConditions.Value().version);
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetVersion());
 }
 
 TEST(DefaultTermsAndConditionsProvider, TestSetAcceptanceGetAcceptanceSuccess)
@@ -196,25 +186,21 @@ TEST(DefaultTermsAndConditionsProvider, TestSetAcceptanceGetAcceptanceSuccess)
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     chip::app::DefaultTermsAndConditionsProvider defaultTermsAndConditionsProvider;
-    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
     err = defaultTermsAndConditionsProvider.Init(&defaultTermsAndConditionsStorageDelegate, requiredTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
-    chip::Optional<chip::app::TermsAndConditions> acceptedTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> acceptedTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
     err = defaultTermsAndConditionsProvider.SetAcceptance(acceptedTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     chip::Optional<chip::app::TermsAndConditions> outTermsAndConditions;
     err = defaultTermsAndConditionsProvider.GetRequirements(outTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
-    EXPECT_EQ(1, outTermsAndConditions.Value().value);
-    EXPECT_EQ(1, outTermsAndConditions.Value().version);
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetVersion());
 }
 
 TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceGetAcceptanceSuccess)
@@ -227,25 +213,21 @@ TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceGetAcceptanceSuccess
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     chip::app::DefaultTermsAndConditionsProvider defaultTermsAndConditionsProvider;
-    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
     err = defaultTermsAndConditionsProvider.Init(&defaultTermsAndConditionsStorageDelegate, requiredTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
-    chip::Optional<chip::app::TermsAndConditions> acceptedTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> acceptedTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
     err = defaultTermsAndConditionsProvider.SetAcceptance(acceptedTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     chip::Optional<chip::app::TermsAndConditions> outTermsAndConditions;
     err = defaultTermsAndConditionsProvider.GetRequirements(outTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
-    EXPECT_EQ(1, outTermsAndConditions.Value().value);
-    EXPECT_EQ(1, outTermsAndConditions.Value().version);
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(1, outTermsAndConditions.Value().GetVersion());
 
     err = defaultTermsAndConditionsProvider.RevertAcceptance();
     EXPECT_EQ(CHIP_NO_ERROR, err);
@@ -266,25 +248,21 @@ TEST(DefaultTermsAndConditionsProvider, TestAcceptanceRequiredTermsMissingFailur
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     chip::app::DefaultTermsAndConditionsProvider defaultTermsAndConditionsProvider;
-    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
     err = defaultTermsAndConditionsProvider.Init(&defaultTermsAndConditionsStorageDelegate, requiredTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
-    chip::Optional<chip::app::TermsAndConditions> acceptedTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> acceptedTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
     err = defaultTermsAndConditionsProvider.SetAcceptance(acceptedTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     chip::Optional<chip::app::TermsAndConditions> outAcknowledgementTermsAndConditions;
     err = defaultTermsAndConditionsProvider.GetAcceptance(outAcknowledgementTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
-    EXPECT_EQ(1, outAcknowledgementTermsAndConditions.Value().value);
-    EXPECT_EQ(1, outAcknowledgementTermsAndConditions.Value().version);
+    EXPECT_EQ(1, outAcknowledgementTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(1, outAcknowledgementTermsAndConditions.Value().GetVersion());
 
     err = defaultTermsAndConditionsProvider.RevertAcceptance();
     EXPECT_EQ(CHIP_NO_ERROR, err);
@@ -292,8 +270,8 @@ TEST(DefaultTermsAndConditionsProvider, TestAcceptanceRequiredTermsMissingFailur
     chip::Optional<chip::app::TermsAndConditions> outRequiredTermsAndConditions;
     err = defaultTermsAndConditionsProvider.GetRequirements(outRequiredTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
-    EXPECT_EQ(1, outRequiredTermsAndConditions.Value().value);
-    EXPECT_EQ(1, outRequiredTermsAndConditions.Value().version);
+    EXPECT_EQ(1, outRequiredTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(1, outRequiredTermsAndConditions.Value().GetVersion());
 }
 
 TEST(DefaultTermsAndConditionsProvider, TestAcceptanceCommitCheckSetRevertCheckExpectCommitValue)
@@ -307,18 +285,14 @@ TEST(DefaultTermsAndConditionsProvider, TestAcceptanceCommitCheckSetRevertCheckE
 
     // Initialize unit under test
     chip::app::DefaultTermsAndConditionsProvider defaultTermsAndConditionsProvider;
-    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
     err = defaultTermsAndConditionsProvider.Init(&defaultTermsAndConditionsStorageDelegate, requiredTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     // Set acceptance
-    chip::Optional<chip::app::TermsAndConditions> acceptedTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 0b1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> acceptedTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(0b1, 1));
     err = defaultTermsAndConditionsProvider.SetAcceptance(acceptedTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
@@ -331,14 +305,12 @@ TEST(DefaultTermsAndConditionsProvider, TestAcceptanceCommitCheckSetRevertCheckE
     err = defaultTermsAndConditionsProvider.GetAcceptance(outTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
     EXPECT_TRUE(outTermsAndConditions.HasValue());
-    EXPECT_EQ(outTermsAndConditions.Value().value, acceptedTermsAndConditions.Value().value);
-    EXPECT_EQ(outTermsAndConditions.Value().version, acceptedTermsAndConditions.Value().version);
+    EXPECT_EQ(outTermsAndConditions.Value().GetValue(), acceptedTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(outTermsAndConditions.Value().GetVersion(), acceptedTermsAndConditions.Value().GetVersion());
 
     // Set updated value
-    chip::Optional<chip::app::TermsAndConditions> updatedTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 0b11,
-        .version = 2,
-    });
+    chip::Optional<chip::app::TermsAndConditions> updatedTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(0b11, 2));
     err = defaultTermsAndConditionsProvider.SetAcceptance(updatedTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
@@ -346,8 +318,8 @@ TEST(DefaultTermsAndConditionsProvider, TestAcceptanceCommitCheckSetRevertCheckE
     err = defaultTermsAndConditionsProvider.GetAcceptance(outTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
     EXPECT_TRUE(outTermsAndConditions.HasValue());
-    EXPECT_EQ(outTermsAndConditions.Value().value, updatedTermsAndConditions.Value().value);
-    EXPECT_EQ(outTermsAndConditions.Value().version, updatedTermsAndConditions.Value().version);
+    EXPECT_EQ(outTermsAndConditions.Value().GetValue(), updatedTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(outTermsAndConditions.Value().GetVersion(), updatedTermsAndConditions.Value().GetVersion());
 
     // Revert updated value
     err = defaultTermsAndConditionsProvider.RevertAcceptance();
@@ -357,8 +329,8 @@ TEST(DefaultTermsAndConditionsProvider, TestAcceptanceCommitCheckSetRevertCheckE
     err = defaultTermsAndConditionsProvider.GetAcceptance(outTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
     EXPECT_TRUE(outTermsAndConditions.HasValue());
-    EXPECT_EQ(outTermsAndConditions.Value().value, acceptedTermsAndConditions.Value().value);
-    EXPECT_EQ(outTermsAndConditions.Value().version, acceptedTermsAndConditions.Value().version);
+    EXPECT_EQ(outTermsAndConditions.Value().GetValue(), acceptedTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(outTermsAndConditions.Value().GetVersion(), acceptedTermsAndConditions.Value().GetVersion());
 }
 
 TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceWhileMissing)
@@ -369,10 +341,8 @@ TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceWhileMissing)
     chip::app::DefaultTermsAndConditionsStorageDelegate defaultTermsAndConditionsStorageDelegate;
     chip::app::DefaultTermsAndConditionsProvider defaultTermsAndConditionsProvider;
 
-    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 1,
-        .version = 1,
-    });
+    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
 
     chip::Optional<chip::app::TermsAndConditions> outTermsAndConditions;
 
@@ -403,14 +373,10 @@ TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceWhenPreviouslyAccept
     CHIP_ERROR err;
 
     // Initialize unit under test [Conditions previously accepted]
-    chip::Optional<chip::app::TermsAndConditions> initialTermsAndConditions  = chip::Optional<chip::app::TermsAndConditions>({
-         .value   = 1,
-         .version = 1,
-    });
-    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 0b11,
-        .version = 2,
-    });
+    chip::Optional<chip::app::TermsAndConditions> initialTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
+    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(0b11, 2));
     TestTermsAndConditionsStorageDelegate testTermsAndConditionsStorageDelegate(initialTermsAndConditions);
     chip::app::DefaultTermsAndConditionsProvider defaultTermsAndConditionsProvider;
     err = defaultTermsAndConditionsProvider.Init(&testTermsAndConditionsStorageDelegate, requiredTermsAndConditions);
@@ -428,8 +394,8 @@ TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceWhenPreviouslyAccept
     err = defaultTermsAndConditionsProvider.GetAcceptance(outTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
     EXPECT_TRUE(outTermsAndConditions.HasValue());
-    EXPECT_EQ(outTermsAndConditions.Value().value, 1);
-    EXPECT_EQ(outTermsAndConditions.Value().version, 1);
+    EXPECT_EQ(outTermsAndConditions.Value().GetValue(), 1);
+    EXPECT_EQ(outTermsAndConditions.Value().GetVersion(), 1);
 }
 
 TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceWhenPreviouslyAcceptedThenUpdatedUnderFailsafe)
@@ -438,27 +404,19 @@ TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceWhenPreviouslyAccept
 
     // Initialize unit under test dependency
     chip::Optional<chip::app::TermsAndConditions> initiallyAcceptedTermsAndConditions =
-        chip::Optional<chip::app::TermsAndConditions>({
-            .value   = 1,
-            .version = 1,
-        });
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(1, 1));
     TestTermsAndConditionsStorageDelegate testTermsAndConditionsStorageDelegate(initiallyAcceptedTermsAndConditions);
 
     // Initialize unit under test [Conditions previously accepted]
-    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions = chip::Optional<chip::app::TermsAndConditions>({
-        .value   = 0b11,
-        .version = 2,
-    });
+    chip::Optional<chip::app::TermsAndConditions> requiredTermsAndConditions =
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(0b11, 2));
     chip::app::DefaultTermsAndConditionsProvider defaultTermsAndConditionsProvider;
     err = defaultTermsAndConditionsProvider.Init(&testTermsAndConditionsStorageDelegate, requiredTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     // [Fail-safe started] Acceptance updated.
     chip::Optional<chip::app::TermsAndConditions> updatedAcceptedTermsAndConditions =
-        chip::Optional<chip::app::TermsAndConditions>({
-            .value   = 0b111,
-            .version = 3,
-        });
+        chip::Optional<chip::app::TermsAndConditions>(chip::app::TermsAndConditions(0b111, 3));
     err = defaultTermsAndConditionsProvider.SetAcceptance(updatedAcceptedTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
@@ -472,6 +430,6 @@ TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceWhenPreviouslyAccept
     err = defaultTermsAndConditionsProvider.GetAcceptance(outTermsAndConditions);
     EXPECT_EQ(CHIP_NO_ERROR, err);
     EXPECT_TRUE(outTermsAndConditions.HasValue());
-    EXPECT_EQ(outTermsAndConditions.Value().value, initiallyAcceptedTermsAndConditions.Value().value);
-    EXPECT_EQ(outTermsAndConditions.Value().version, initiallyAcceptedTermsAndConditions.Value().version);
+    EXPECT_EQ(outTermsAndConditions.Value().GetValue(), initiallyAcceptedTermsAndConditions.Value().GetValue());
+    EXPECT_EQ(outTermsAndConditions.Value().GetVersion(), initiallyAcceptedTermsAndConditions.Value().GetVersion());
 }

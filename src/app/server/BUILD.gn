@@ -47,6 +47,7 @@ static_library("server") {
     "OnboardingCodesUtil.h",
     "Server.cpp",
     "Server.h",
+    "TermsAndConditionsManager.h",
     "TermsAndConditionsProvider.h",
   ]
 

@@ -26,12 +26,6 @@
 namespace chip {
 namespace app {
 
-typedef struct sTermsAndConditions
-{
-    uint16_t value;
-    uint16_t version;
-} TermsAndConditions;
-
 typedef enum eTermsAndConditionsState
 {
     OK                               = 0,
@@ -39,6 +33,22 @@ typedef enum eTermsAndConditionsState
     TC_MIN_VERSION_NOT_MET           = 2,
     REQUIRED_TC_NOT_ACCEPTED         = 3,
 } TermsAndConditionsState;
+
+class TermsAndConditions
+{
+public:
+    TermsAndConditions(uint16_t inValue, uint16_t inVersion) : value(inValue), version(inValue) {}
+
+    bool operator==(const TermsAndConditions & other) const { return value == other.value && version == other.version; }
+    bool operator!=(const TermsAndConditions & other) const { return !(*this == other); }
+
+    uint16_t GetValue() const { return value; }
+    uint16_t GetVersion() const { return version; }
+
+private:
+    const uint16_t value;
+    const uint16_t version;
+};
 
 /**
  * @brief Data access layer for handling the required terms and conditions and managing user acceptance status.
@@ -110,6 +120,21 @@ public:
      * @retval CHIP_ERROR_UNINITIALIZED if the module has not been initialized.
      */
     virtual CHIP_ERROR GetRequirements(Optional<TermsAndConditions> & outTermsAndConditions) const = 0;
+
+    /**
+     * @brief Retrieves the deadline for accepting updated terms and conditions.
+     *
+     * This method retrieves the deadline by which the user must accept updated terms and conditions.
+     * If no deadline is set, it returns an empty `Optional`.
+     *
+     * @param[out] outUpdateAcceptanceDeadline The deadline (in seconds) by which updated terms must be accepted.
+     *                                         Returns empty Optional if no deadline is set.
+     *
+     * @retval CHIP_NO_ERROR if the deadline was successfully retrieved or no deadline was found.
+     * @retval CHIP_ERROR_INTERNAL if there was an error during the operation.
+     * @retval CHIP_ERROR_UNINITIALIZED if the module has not been initialized.
+     */
+    virtual CHIP_ERROR GetUpdateAcceptanceDeadline(Optional<uint32_t> & outUpdateAcceptanceDeadline) const = 0;
 
     /**
      * @brief Resets the persisted acceptance status.
