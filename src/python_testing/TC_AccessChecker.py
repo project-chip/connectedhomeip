@@ -25,8 +25,8 @@ from typing import Optional
 import chip.clusters as Clusters
 from chip.interaction_model import Status, InteractionModelError
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep, async_test_body,
+from chip.testing.global_attribute_ids import GlobalAttributeIds, attribute_id_type, cluster_id_type, command_id_type, is_standard_attribute_id, is_standard_command_id
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, ClusterPathLocation, MatterBaseTest, TestStep, async_test_body,
                                          default_matter_test_main)
 from chip.testing.spec_parsing import XmlCluster, build_xml_clusters
 from chip.tlv import uint
@@ -62,7 +62,7 @@ def checkable_attributes(cluster_id, cluster, xml_cluster) -> list[uint]:
 
     def known_cluster_attribute(attribute_id) -> bool:
         ''' Returns true if this is a non-manufacturer specific attribute that has information in the XML and has python codegen data'''
-        return attribute_id <= 0xFFFF and attribute_id in xml_cluster.attributes and attribute_id in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
+        return is_standard_attribute_id(attribute_id) and attribute_id in xml_cluster.attributes and attribute_id in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
     return [x for x in all_attrs if known_cluster_attribute(x)]
 
 
@@ -119,7 +119,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     def _record_errors(self):
         ''' Checks through all the endpoints and records all the spec warnings in one go so we don't get repeats'''
         all_clusters = set()
-        attrs: dict[uint, set()] = {}
+        attrs: dict[uint, set] = {}
+        cmds: dict[uint, set] = {}
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             all_clusters |= set(endpoint.keys())
@@ -127,12 +128,16 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 # Find all the attributes for this cluster across all endpoint
                 if cluster_id not in attrs:
                     attrs[cluster_id] = set()
+                if cluster_id not in cmds:
+                    cmds[cluster_id] = set()
                 # discard MEI attributes as we do not have access information for them.
                 attrs[cluster_id].update(
-                    set([id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if id <= 0xFFFF]))
+                    set([id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if is_standard_attribute_id(id)]))
+                cmds[cluster_id].update(
+                    set([id for id in device_cluster_data[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if is_standard_command_id(id)]))
 
         # Remove MEI clusters - we don't have information available to check these.
-        all_clusters = [id for id in all_clusters if id <= 0x7FFF]
+        all_clusters = [id for id in all_clusters if cluster_id_type(id) == ClusterIdType.kStandard]
         for cluster_id in all_clusters:
             location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
             if cluster_id not in self.xml_clusters:
@@ -148,13 +153,25 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             xml_cluster = self.xml_clusters[cluster_id]
             for attribute_id in attrs[cluster_id]:
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
-                if attribute_id not in xml_cluster.attributes:
+                if attribute_id not in xml_cluster.attributes.keys():
                     self.record_warning(test_name="Access Checker", location=location,
                                         problem="Cluster attribute not found in spec XML")
                     continue
                 if attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
                     self.record_error(test_name="Access Checker", location=location,
                                       problem="Unknown attribute")
+                    self.success = False
+                    continue
+            # Check that we have information for all the required commands
+            for command_id in cmds[cluster_id]:
+                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
+                if command_id not in xml_cluster.accepted_commands.keys():
+                    self.record_warning(test_name="Access Checker", location=location.
+                                        problem="Cluster command not found in spec XML")
+                    continue
+                if command_id not in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]:
+                    self._record_error(test_name="Access Checker", location=location,
+                                       problem="Unknown command")
                     self.success = False
                     continue
 
@@ -277,7 +294,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             self.step(step_number_with_privilege(check_step, 'b', privilege))
             for endpoint_id, endpoint in self.endpoints_tlv.items():
                 for cluster_id, device_cluster_data in endpoint.items():
-                    if cluster_id > 0x7FFF or cluster_id not in self.xml_clusters or cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
+                    if cluster_id_type(cluster_id) != ClusterIdType.kStandard or cluster_id not in self.xml_clusters or cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
                         # These cases have already been recorded by the _record_errors function
                         continue
                     xml_cluster = self.xml_clusters[cluster_id]
