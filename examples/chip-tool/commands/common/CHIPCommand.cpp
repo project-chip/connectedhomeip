@@ -18,7 +18,7 @@
 
 #include "CHIPCommand.h"
 
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <commands/icd/ICDCommand.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>

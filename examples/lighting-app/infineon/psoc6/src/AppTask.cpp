@@ -40,7 +40,7 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <platform/Infineon/PSOC6/NetworkCommissioningDriver.h>
 
 /* OTA related includes */

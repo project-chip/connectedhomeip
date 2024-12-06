@@ -26,7 +26,7 @@
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>

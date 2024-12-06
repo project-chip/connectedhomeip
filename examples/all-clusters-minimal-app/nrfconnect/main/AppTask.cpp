@@ -22,7 +22,7 @@
 #include "LEDUtil.h"
 #include "binding-handler.h"
 
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 

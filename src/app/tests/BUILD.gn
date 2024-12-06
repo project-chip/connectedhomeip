@@ -248,7 +248,7 @@ chip_test_suite("tests") {
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app:attribute-persistence",
-    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/icd/client:handler",

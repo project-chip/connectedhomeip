@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-#include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
+#include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/MessageDef/AttributeDataIB.h>

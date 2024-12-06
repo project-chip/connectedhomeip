@@ -20,7 +20,7 @@
 
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
 #include <credentials/DeviceAttestationCredsProvider.h>

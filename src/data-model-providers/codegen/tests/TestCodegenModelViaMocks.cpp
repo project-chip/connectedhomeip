@@ -17,8 +17,8 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/codegen-data-model-provider/tests/EmberInvokeOverride.h>
-#include <app/codegen-data-model-provider/tests/EmberReadWriteOverride.h>
+#include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
+#include <data-model-providers/codegen/tests/EmberReadWriteOverride.h>
 
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
@@ -34,7 +34,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
-#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/StringBuilderAdapters.h>

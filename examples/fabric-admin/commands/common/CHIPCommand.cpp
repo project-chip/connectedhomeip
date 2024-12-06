@@ -20,7 +20,7 @@
 
 #include "IcdManager.h"
 
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <device_manager/PairingManager.h>

@@ -35,7 +35,7 @@
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <lib/core/CHIPError.h>

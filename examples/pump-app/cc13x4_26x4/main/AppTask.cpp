@@ -31,7 +31,7 @@
 #include <examples/platform/cc13x4_26x4/CC13X4_26X4DeviceAttestationCreds.h>
 
 #include <app/EventLogging.h>
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 
