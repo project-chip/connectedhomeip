@@ -17,7 +17,6 @@
 
 #include <lib/support/Span.h>
 
-#include <cstddef>
 #include <optional>
 
 namespace chip {
@@ -43,10 +42,10 @@ namespace chip {
 /// Where a `ByFoo` structure looks like:
 ///
 ///    struct ByFoo {
-///      using Key  = int;                   // the KEY inside a type                                                                                       │    │                                                                                                                    │
-///      using Type = SomeContainerStruct;  // the values for a sub-search                                                                        │    │                                                                                                                    │
-///      static Span<Type> GetSpan(Data & data) { /* return ... */ }                             │    │                                                                                                                    │
-///      static bool HasKey(const Key & id, const Type & instance) { /* return "instance has key id" */ }
+///      using Key  = int;                   // the KEY inside a type │    │ │ using Type = SomeContainerStruct;  // the values for
+///      a sub-search                                                                        │    │ │ static Span<Type> GetSpan(Data
+///      & data) { /* return ... */ }                             │    │ │ static bool HasKey(const Key & id, const Type & instance)
+///      { /* return "instance has key id" */ }
 ///    }
 ///
 /// Where we define:
@@ -63,7 +62,7 @@ public:
 
     // Get the first element of `TYPE`
     template <typename TYPE>
-    FluentTreeObject<typename TYPE::Type> First(size_t & indexHint)
+    FluentTreeObject<typename TYPE::Type> First(unsigned & indexHint)
     {
         // if no value, searching more also yields no value
         VerifyOrReturnValue(mValue != nullptr, FluentTreeObject<typename TYPE::Type>(nullptr));
@@ -78,24 +77,24 @@ public:
 
     // Find the value for type EXACTLY type
     template <typename TYPE>
-    FluentTreeObject<typename TYPE::Type> Find(typename TYPE::Key key, size_t & indexHint)
+    FluentTreeObject<typename TYPE::Type> Find(typename TYPE::Key key, unsigned & indexHint)
     {
         VerifyOrReturnValue(mValue != nullptr, FluentTreeObject<typename TYPE::Type>(nullptr));
 
         Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
-        std::optional<size_t> idx            = FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey);
+        std::optional<unsigned> idx          = FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey);
 
         VerifyOrReturnValue(idx.has_value(), FluentTreeObject<typename TYPE::Type>(nullptr));
         return FluentTreeObject<typename TYPE::Type>(&value_span[*idx]);
     }
 
     template <typename TYPE>
-    FluentTreeObject<typename TYPE::Type> Next(typename TYPE::Key key, size_t & indexHint)
+    FluentTreeObject<typename TYPE::Type> Next(typename TYPE::Key key, unsigned & indexHint)
     {
         VerifyOrReturnValue(mValue != nullptr, FluentTreeObject<typename TYPE::Type>(nullptr));
 
         Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
-        std::optional<size_t> idx            = FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey);
+        std::optional<unsigned> idx          = FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey);
 
         VerifyOrReturnValue(idx.has_value() && ((*idx + 1) < value_span.size()), FluentTreeObject<typename TYPE::Type>(nullptr));
 
@@ -110,9 +109,9 @@ private:
     ///
     /// using `haystackValueMatchesNeedle` to find if a given haystack value matches the given needle
     template <typename N, typename H>
-    static std::optional<size_t> FindIndexUsingHint(const N & needle, Span<H> haystack, size_t & hint,
-                                                    bool (*haystackValueMatchesNeedle)(const N &,
-                                                                                       const typename std::remove_const<H>::type &))
+    static std::optional<unsigned>
+    FindIndexUsingHint(const N & needle, Span<H> haystack, unsigned & hint,
+                       bool (*haystackValueMatchesNeedle)(const N &, const typename std::remove_const<H>::type &))
     {
         if (hint < haystack.size())
         {
@@ -122,7 +121,7 @@ private:
             }
         }
 
-        for (size_t i = 0; i < haystack.size(); i++)
+        for (unsigned i = 0; i < haystack.size(); i++)
         {
             if (haystackValueMatchesNeedle(needle, haystack[i]))
             {

@@ -124,10 +124,10 @@ TEST(TestFluentTreeObject, TestFunctionality)
 
     // search first items
     {
-        size_t hint1 = 0;
+        unsigned hint1 = 0;
         auto ep   = tree.First<ByEndpoint>(hint1);
 
-        size_t hint2 = 0;
+        unsigned hint2 = 0;
         auto cl   = ep.First<ByServerCluster>(hint2);
 
 
@@ -138,7 +138,7 @@ TEST(TestFluentTreeObject, TestFunctionality)
 
     // one level search, with hint
     {
-        size_t hint = 0;
+        unsigned hint = 0;
         ASSERT_NE(tree.Find<ByEndpoint>(123, hint).Value(), nullptr);
         ASSERT_STREQ(tree.Find<ByEndpoint>(123, hint).Value()->name, "foo");
         EXPECT_EQ(hint, 0u);
@@ -162,7 +162,7 @@ TEST(TestFluentTreeObject, TestFunctionality)
 
     // searches for "next"
     {
-        size_t hint = 0;
+        unsigned hint = 0;
         auto next   = tree.Next<ByEndpoint>(123, hint);
 
         ASSERT_NE(next.Value(), nullptr);
@@ -181,7 +181,7 @@ TEST(TestFluentTreeObject, TestFunctionality)
         EXPECT_EQ(next.Value(), nullptr);
 
         // null value preserves the failure
-        size_t clusterHint = 0;
+        unsigned clusterHint = 0;
         auto sub_item      = next.Find<ByServerCluster>(123, clusterHint);
         EXPECT_EQ(sub_item.Value(), nullptr);
     }

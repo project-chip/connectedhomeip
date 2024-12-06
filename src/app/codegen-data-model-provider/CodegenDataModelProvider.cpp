@@ -35,6 +35,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/FluentTreeObject.h>
 
 #include <optional>
 #include <variant>
@@ -105,6 +106,23 @@ std::optional<CommandId> EnumeratorCommandFinder::FindCommandId(Operation operat
 using detail::EnumeratorCommandFinder;
 
 namespace {
+
+struct DeviceListWrapper
+{
+    Span<const EmberAfDeviceType> deviceTypes;
+    explicit DeviceListWrapper(Span<const EmberAfDeviceType> types) : deviceTypes(types) {}
+};
+
+struct ByDeviceType
+{
+    using Key  = DataModel::DeviceTypeEntry;       // the KEY inside a type │    │ │
+    using Type = const EmberAfDeviceType; // the values for a sub-search │    │ │
+    static Span<Type> GetSpan(DeviceListWrapper & data) { return data.deviceTypes; }
+    static bool HasKey(const Key & id, const Type & instance)
+    {
+        return (instance.deviceId == id.deviceTypeId) && (instance.deviceVersion == id.deviceTypeRevision);
+    }
+};
 
 const CommandId * AcceptedCommands(const EmberAfCluster & cluster)
 {
@@ -276,43 +294,6 @@ DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & ot
     entry.deviceTypeRevision = other.deviceVersion;
 
     return entry;
-}
-
-// Explicitly compare for identical entries. note that types are different,
-// so you must do `a == b` and the `b == a` will not work.
-bool operator==(const DataModel::DeviceTypeEntry & a, const EmberAfDeviceType & b)
-{
-    return (a.deviceTypeId == b.deviceId) && (a.deviceTypeRevision == b.deviceVersion);
-}
-
-/// Find the `index` where one of the following holds:
-///    - types[index - 1] == previous OR
-///    - index == types.size()  // i.e. not found or there is no next
-///
-/// hintWherePreviousMayBe represents a search hint where previous may exist.
-unsigned FindNextDeviceTypeIndex(Span<const EmberAfDeviceType> types, const DataModel::DeviceTypeEntry & previous,
-                                 unsigned hintWherePreviousMayBe)
-{
-    if (hintWherePreviousMayBe < types.size())
-    {
-        // this is a valid hint ... see if we are lucky
-        if (previous == types[hintWherePreviousMayBe])
-        {
-            return hintWherePreviousMayBe + 1; // return the next index
-        }
-    }
-
-    // hint was not useful. We have to do a full search
-    for (unsigned idx = 0; idx < types.size(); idx++)
-    {
-        if (previous == types[idx])
-        {
-            return idx + 1;
-        }
-    }
-
-    // cast should be safe as we know we do not have that many types
-    return static_cast<unsigned>(types.size());
 }
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
@@ -892,17 +873,13 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceT
         return std::nullopt;
     }
 
-    CHIP_ERROR err                            = CHIP_NO_ERROR;
-    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DeviceListWrapper wrapper(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
+    FluentTreeObject<DeviceListWrapper> tree(&wrapper);
 
-    if (deviceTypes.empty())
-    {
-        return std::nullopt;
-    }
+    const EmberAfDeviceType * entry = tree.First<ByDeviceType>(mDeviceTypeIterationHint).Value();
 
-    // we start at the beginning
-    mDeviceTypeIterationHint = 0;
-    return DeviceTypeEntryFromEmber(deviceTypes[0]);
+    return entry == nullptr ? std::nullopt : std::make_optional(DeviceTypeEntryFromEmber(*entry));
 }
 
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
@@ -917,18 +894,12 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
         return std::nullopt;
     }
 
-    CHIP_ERROR err                            = CHIP_NO_ERROR;
-    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DeviceListWrapper wrapper(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
+    FluentTreeObject<DeviceListWrapper> tree(&wrapper);
 
-    unsigned idx = FindNextDeviceTypeIndex(deviceTypes, previous, mDeviceTypeIterationHint);
-
-    if (idx >= deviceTypes.size())
-    {
-        return std::nullopt;
-    }
-
-    mDeviceTypeIterationHint = idx;
-    return DeviceTypeEntryFromEmber(deviceTypes[idx]);
+    const EmberAfDeviceType * entry = tree.Next<ByDeviceType>(previous, mDeviceTypeIterationHint).Value();
+    return entry == nullptr ? std::nullopt : std::make_optional(DeviceTypeEntryFromEmber(*entry));
 }
 
 std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetFirstSemanticTag(EndpointId endpoint)
