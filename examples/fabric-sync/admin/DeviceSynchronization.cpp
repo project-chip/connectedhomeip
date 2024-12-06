@@ -81,58 +81,65 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
         return;
     }
 
+    char attribStringBuffer[kBasicInformationAttributeBufSize];
+    uint32_t attribUInt32Value;
+
     switch (path.mAttributeId)
     {
-    case Clusters::BasicInformation::Attributes::UniqueID::Id: {
-        char uniqueIdBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(uniqueIdBuffer, sizeof(uniqueIdBuffer)), "UniqueId"))
+    case Clusters::BasicInformation::Attributes::UniqueID::Id:
+        if (SuccessOrLog(data->GetString(attribStringBuffer, sizeof(attribStringBuffer)), "UniqueId"))
         {
-            mCurrentDeviceData.uniqueId = std::string(uniqueIdBuffer);
+            mCurrentDeviceData.uniqueId = std::string(attribStringBuffer);
         }
-    }
-    break;
-    case Clusters::BasicInformation::Attributes::VendorName::Id: {
-        char vendorNameBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(vendorNameBuffer, sizeof(vendorNameBuffer)), "VendorName"))
+        break;
+    case Clusters::BasicInformation::Attributes::VendorID::Id:
+        if (SuccessOrLog(data->Get(attribUInt32Value), "VendorID"))
         {
-            mCurrentDeviceData.vendorName = std::string(vendorNameBuffer);
+            mCurrentDeviceData.vendorId = static_cast<chip::VendorId>(attribUInt32Value);
         }
-    }
-    break;
-    case Clusters::BasicInformation::Attributes::ProductName::Id: {
-        char productNameBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(productNameBuffer, sizeof(productNameBuffer)), "ProductName"))
+        break;
+    case Clusters::BasicInformation::Attributes::VendorName::Id:
+        if (SuccessOrLog(data->GetString(attribStringBuffer, sizeof(attribStringBuffer)), "VendorName"))
         {
-            mCurrentDeviceData.productName = std::string(productNameBuffer);
+            mCurrentDeviceData.vendorName = std::string(attribStringBuffer);
         }
-    }
-    break;
-    case Clusters::BasicInformation::Attributes::NodeLabel::Id: {
-        char nodeLabelBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(nodeLabelBuffer, sizeof(nodeLabelBuffer)), "NodeLabel"))
+        break;
+    case Clusters::BasicInformation::Attributes::ProductID::Id:
+        if (SuccessOrLog(data->Get(attribUInt32Value), "ProductID"))
         {
-            mCurrentDeviceData.nodeLabel = std::string(nodeLabelBuffer);
+            mCurrentDeviceData.productId = attribUInt32Value;
         }
-    }
-    break;
-    case Clusters::BasicInformation::Attributes::HardwareVersionString::Id: {
-        char hardwareVersionStringBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(hardwareVersionStringBuffer, sizeof(hardwareVersionStringBuffer)),
-                         "HardwareVersionString"))
+        break;
+    case Clusters::BasicInformation::Attributes::ProductName::Id:
+        if (SuccessOrLog(data->GetString(attribStringBuffer, sizeof(attribStringBuffer)), "ProductName"))
         {
-            mCurrentDeviceData.hardwareVersionString = std::string(hardwareVersionStringBuffer);
+            mCurrentDeviceData.productName = std::string(attribStringBuffer);
         }
-    }
-    break;
-    case Clusters::BasicInformation::Attributes::SoftwareVersionString::Id: {
-        char softwareVersionStringBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(softwareVersionStringBuffer, sizeof(softwareVersionStringBuffer)),
-                         "SoftwareVersionString"))
+        break;
+    case Clusters::BasicInformation::Attributes::NodeLabel::Id:
+        if (SuccessOrLog(data->GetString(attribStringBuffer, sizeof(attribStringBuffer)), "NodeLabel"))
         {
-            mCurrentDeviceData.softwareVersionString = std::string(softwareVersionStringBuffer);
+            mCurrentDeviceData.nodeLabel = std::string(attribStringBuffer);
         }
-    }
-    break;
+        break;
+    case Clusters::BasicInformation::Attributes::HardwareVersionString::Id:
+        if (SuccessOrLog(data->GetString(attribStringBuffer, sizeof(attribStringBuffer)), "HardwareVersionString"))
+        {
+            mCurrentDeviceData.hardwareVersionString = std::string(attribStringBuffer);
+        }
+        break;
+    case Clusters::BasicInformation::Attributes::SoftwareVersion::Id:
+        if (SuccessOrLog(data->Get(attribUInt32Value), "SoftwareVersion"))
+        {
+            mCurrentDeviceData.softwareVersion = attribUInt32Value;
+        }
+        break;
+    case Clusters::BasicInformation::Attributes::SoftwareVersionString::Id:
+        if (SuccessOrLog(data->GetString(attribStringBuffer, sizeof(attribStringBuffer)), "SoftwareVersionString"))
+        {
+            mCurrentDeviceData.softwareVersionString = std::string(attribStringBuffer);
+        }
+        break;
     default:
         break;
     }
