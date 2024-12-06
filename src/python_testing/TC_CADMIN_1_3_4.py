@@ -140,7 +140,9 @@ class TC_CADMIN(MatterBaseTest):
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
         self.step("3a")
-        params = await self.openCommissioningWindow(dev_ctrl=self.th1, node_id=self.dut_node_id)
+        #params = await self.openCommissioningWindow(dev_ctrl=self.th1, node_id=self.dut_node_id)
+        params = await self.th1.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=1234, option=1)
+        self.print_step("TH1 params", params)
 
         self.step("3b")
         services = await self.get_txt_record()
@@ -159,8 +161,8 @@ class TC_CADMIN(MatterBaseTest):
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
         _, rcac = await self.th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator, get_rcac=True)
+            nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234, get_rcac=True)
 
         th2_rcac_decoded = TLVReader(rcac).get()["Any"][9]
 
@@ -231,14 +233,15 @@ class TC_CADMIN(MatterBaseTest):
         self.step(12)
         # TH_CR2 opens a commissioning window on DUT_CE using ECM
         self.discriminator = random.randint(0, 4095)
-        params2 = await self.openCommissioningWindow(dev_ctrl=self.th2, node_id=self.dut_node_id)
+        #params2 = await self.openCommissioningWindow(dev_ctrl=self.th2, node_id=self.dut_node_id)
+        params2 = await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=1234, option=1)
 
         self.step(13)
         # TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12
         try:
             await self.th1.CommissionOnNetwork(
-                nodeId=self.dut_node_id, setupPinCode=params2.commissioningParameters.setupPinCode,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params2.randomDiscriminator)
+                nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
         except ChipStackError as e:
             asserts.assert_equal(e.err,  0x0000007E,
                                  "Expected to return Trying to add NOC for fabric that already exists")
