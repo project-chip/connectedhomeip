@@ -532,8 +532,7 @@ def _get_data_model_root() -> pathlib.PosixPath:
 
     return data_model_root
 
-
-def get_data_model_directory(data_model_directory: Union[str], data_model_level: str) -> pathlib.PosixPath:
+def get_data_model_directory(data_model_directory: Union[str, pathlib.Path], data_model_level: str) -> pathlib.PosixPath:
     """
     Get the directory of the data model for a specific version and level from the installed package.
     """
@@ -553,46 +552,50 @@ def get_data_model_directory(data_model_directory: Union[str], data_model_level:
 
         return data_model_root / version / data_model_level
     else:
-        # If it's a custom directory, return directly
+        # If it's a custom directory (path-like object), return directly
         return pathlib.Path(data_model_directory)
 
 
-def build_xml_clusters(data_model_directory: Union[str] = 'k1_4') -> typing.Tuple[dict[int, dict], list]:
+def build_xml_clusters(data_model_directory: Union[str, pathlib.Path] = 'k1_4') -> typing.Tuple[dict[int, dict], list]:
     """
     Build XML clusters from the specified data model directory.
-    This function supports both pre-built locations (via `str` directory names) and full paths (strings).
+    This function supports both pre-built locations (via `str` directory names) and full paths (strings or pathlib.Path).
     """
     # If a pre-built directory is provided, resolve the full path
     if isinstance(data_model_directory, str):
         data_model_directory = get_data_model_directory(data_model_directory, 'clusters')
 
-    # Convert the resolved directory path into a resource path using pkg_resources
-    dir = pathlib.Path(data_model_directory)
+    # Ensure that data_model_directory is a pathlib.Path object
+    dir_path = pathlib.Path(data_model_directory)
 
     clusters = {}
     pure_base_clusters = {}
     ids_by_name = {}
     problems = []
 
-    # Use pkg_resources to list all XML files in the data model directory
+    # Use importlib.resources to list all XML files in the data model directory
     try:
-        xml_files = [f for f in pkg_resources.contents(pkg_resources.files(importlib.import_module(
-            'chip.testing')).joinpath('data_model').joinpath(data_model_directory)).splitlines() if f.endswith('.xml')]
+        # List the contents of the data_model directory using importlib.resources
+        xml_files = [
+            f for f in pkg_resources.contents(pkg_resources.files(importlib.import_module(
+                'chip.testing')).joinpath('data_model').joinpath(dir_path.name))
+            if f.endswith('.xml')
+        ]
     except Exception as e:
         logging.error(f"Error accessing XML files in {data_model_directory}: {e}")
         return clusters, problems
 
     if not xml_files:
-        raise FileNotFoundError(f'No XML files found in the specified package directory {dir}')
+        raise FileNotFoundError(f'No XML files found in the specified package directory {dir_path}')
 
     for xml in xml_files:
         logging.info(f'Parsing file {xml}')
         try:
-            # Open the resource file using pkg_resources and parse it
+            # Open the resource file using importlib.resources and parse it
             with pkg_resources.open_text(
                 pkg_resources.files(importlib.import_module('chip.testing'))
                 .joinpath('data_model')
-                .joinpath(data_model_directory), xml
+                .joinpath(dir_path.name), xml
             ) as file:
                 # Directly parse the XML file without assigning it to 'tree'
                 ElementTree.parse(file)  # Parse the file to process it
