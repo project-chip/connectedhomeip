@@ -50,6 +50,7 @@
 
 #import <os/lock.h>
 
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/CHIPCert.h>
@@ -398,6 +399,7 @@ MTR_DIRECT_MEMBERS
             params.opCertStore = _opCertStore;
             params.certificateValidityPolicy = &_certificateValidityPolicy;
             params.sessionResumptionStorage = _sessionResumptionStorage;
+            params.dataModelProvider = app::CodegenDataModelProviderInstance(_persistentStorageDelegate);
             SuccessOrExit(err = _controllerFactory->Init(params));
         }
 
@@ -819,24 +821,7 @@ MTR_DIRECT_MEMBERS
     } else {
         // No root certificate means the nocSigner is using the root keys, because
         // consumers must provide a root certificate whenever an ICA is used.
-        SecKeyRef publicKey = NULL;
-
-        if ([params.nocSigner respondsToSelector:@selector(copyPublicKey)]) {
-            publicKey = [params.nocSigner copyPublicKey];
-        } else {
-            publicKey = [params.nocSigner publicKey];
-            if (publicKey) {
-                CFRetain(publicKey);
-            }
-        }
-
-        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(publicKey, &pubKey);
-
-        if (publicKey != NULL) {
-            CFRelease(publicKey);
-            publicKey = NULL;
-        }
-
+        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromMTRKeypair(params.nocSigner, &pubKey);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Can't extract public key from MTRKeypair: %s", ErrorStr(err));
             return NO;

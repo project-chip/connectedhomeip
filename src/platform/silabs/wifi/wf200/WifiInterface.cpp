@@ -26,15 +26,16 @@
 #include "sl_wfx_cmd_api.h"
 #include "sl_wfx_constants.h"
 #include "task.h"
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #include <platform/silabs/wifi/lwip-support/dhcp_client.h>
 #include <platform/silabs/wifi/lwip-support/ethernetif.h>
-#include <platform/silabs/wifi/wf200/platform/sl_wfx_board.h>
-#include <platform/silabs/wifi/wf200/platform/sl_wfx_host.h>
-#include <platform/silabs/wifi/wf200/platform/sl_wfx_task.h>
+#include <platform/silabs/wifi/wf200/ncp/sl_wfx_board.h>
+#include <platform/silabs/wifi/wf200/ncp/sl_wfx_host.h>
+#include <platform/silabs/wifi/wf200/ncp/sl_wfx_task.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,7 +45,7 @@ using namespace ::chip::DeviceLayer;
 
 // TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
 //       As such we can't depend on the platform here as well
-extern void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData);
+extern void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData);
 
 /* wfxRsi Task will use as its stack */
 StackType_t wfxEventTaskStack[1024] = { 0 };
@@ -57,7 +58,7 @@ StaticEventGroup_t wfxEventGroup;
 
 EventGroupHandle_t sl_wfx_event_group;
 TaskHandle_t wfx_events_task_handle;
-static sl_wfx_mac_address_t ap_mac;
+static MacAddress ap_mac;
 static uint32_t sta_ip;
 static wfx_wifi_scan_result_t ap_info;
 
@@ -91,9 +92,6 @@ static wfx_wifi_scan_result_t ap_info;
 #define STA_IP_FAIL (0)
 #define WLAN_TASK_PRIORITY (1)
 
-/*****************************************************************************
- * macros
- ******************************************************************************/
 #define WE_ST_STARTED 1
 #define WE_ST_STA_CONN 2
 #define WE_ST_HW_STARTED 4
@@ -224,16 +222,6 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 
 sl_wfx_get_counters_cnf_t * counters;
 
-/****************************************************************************
- * @brief
- *      get the wifi state
- * @return returns wificonetext state
- *****************************************************************************/
-sl_wfx_state_t wfx_get_wifi_state(void)
-{
-    return wifiContext.state;
-}
-
 sl_status_t get_all_counters(void)
 {
     sl_status_t result;
@@ -304,6 +292,19 @@ error_handler:
 
 } // namespace
 
+CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, MutableByteSpan & address)
+{
+    VerifyOrReturnError(address.size() >= kWifiMacAddressLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+#ifdef SL_WFX_CONFIG_SOFTAP
+    chip::ByteSpan byteSpan((interface == SL_WFX_SOFTAP_INTERFACE) ? wifiContext.mac_addr_1.octet : wifiContext.mac_addr_0.octet);
+#else
+    chip::ByteSpan byteSpan(wifiContext.mac_addr_0.octet);
+#endif
+
+    return CopySpanToMutableSpan(byteSpan, address);
+}
+
 /***************************************************************************
  * @brief
  * Creates WFX events processing task.
@@ -328,14 +329,14 @@ static void wfx_events_task_start(void)
  * @returns Returns SL_STATUS_OK if successful,
  *SL_STATUS_FAIL otherwise
  *****************************************************************************/
-sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
+extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
 {
     switch (event_payload->header.id)
     {
     /******** INDICATION ********/
     case SL_WFX_STARTUP_IND_ID: {
         ChipLogProgress(DeviceLayer, "startup completed.");
-        HandleWFXSystemEvent(WIFI_EVENT, event_payload);
+        HandleWFXSystemEvent(event_payload);
         break;
     }
     case SL_WFX_CONNECT_IND_ID: {
@@ -489,7 +490,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
         }
         ap->scan.chan = scan_result->channel;
         ap->scan.rssi = scan_result->rcpi;
-        memcpy(&ap->scan.bssid[0], &scan_result->mac[0], BSSID_LEN);
+        memcpy(&ap->scan.bssid[0], &scan_result->mac[0], kWifiMacAddressLength);
         scan_count++;
     }
 }
@@ -524,7 +525,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
     {
     case WFM_STATUS_SUCCESS: {
         ChipLogProgress(DeviceLayer, "STA-Connected");
-        memcpy(&ap_mac.octet[0], mac, MAC_ADDRESS_FIRST_OCTET);
+        memcpy(ap_mac.data(), mac, kWifiMacAddressLength);
         sl_wfx_context->state =
             static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) | static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
         xEventGroupSetBits(sl_wfx_event_group, SL_WFX_CONNECT);
@@ -701,23 +702,23 @@ static void wfx_events_task(void * p_arg)
                     if (!hasNotifiedWifiConnectivity)
                     {
                         ChipLogProgress(DeviceLayer, "will notify WiFi connectivity");
-                        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &ap_mac);
+                        NotifyConnection(ap_mac);
                         hasNotifiedWifiConnectivity = true;
                     }
                 }
                 else if (dhcp_state == DHCP_OFF)
                 {
-                    wfx_ip_changed_notify(IP_STATUS_FAIL);
+                    NotifyIPv4Change(false);
                     hasNotifiedIPV4 = false;
                 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
                 if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
                 {
-                    wfx_ipv6_notify(1);
+                    NotifyIPv6Change(true);
                     hasNotifiedIPV6 = true;
                     if (!hasNotifiedWifiConnectivity)
                     {
-                        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &ap_mac);
+                        NotifyConnection(ap_mac);
                         hasNotifiedWifiConnectivity = true;
                     }
                 }
@@ -728,10 +729,10 @@ static void wfx_events_task(void * p_arg)
         if (flags & SL_WFX_CONNECT)
         {
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-            wfx_ip_changed_notify(IP_STATUS_FAIL);
+            NotifyIPv4Change(false);
             hasNotifiedIPV4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
-            wfx_ipv6_notify(GET_IPV6_FAIL);
+            NotifyIPv6Change(false);
             hasNotifiedIPV6             = false;
             hasNotifiedWifiConnectivity = false;
             ChipLogProgress(DeviceLayer, "connected to AP");
@@ -739,24 +740,24 @@ static void wfx_events_task(void * p_arg)
             retryJoin = 0;
             wfx_lwip_set_sta_link_up();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-            if (!(wfx_get_wifi_state() & SL_WFX_AP_INTERFACE_UP))
+            if (!(wifiContext.state & SL_WFX_AP_INTERFACE_UP))
             {
                 // Enable the power save
                 ChipLogProgress(DeviceLayer, "WF200 going to DTIM based sleep");
                 sl_wfx_set_power_mode(WFM_PM_MODE_DTIM, WFM_PM_POLL_FAST_PS, BEACON_1, 0 /*timeout*/);
                 sl_wfx_enable_device_power_save();
             }
-#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         }
 
         if (flags & SL_WFX_DISCONNECT)
         {
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-            wfx_ip_changed_notify(IP_STATUS_FAIL);
+            NotifyIPv4Change(false);
             hasNotifiedIPV4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
-            wfx_ipv6_notify(GET_IPV6_FAIL);
+            NotifyIPv6Change(false);
             hasNotifiedIPV6             = false;
             hasNotifiedWifiConnectivity = false;
             wifi_extra &= ~WE_ST_STA_CONN;
@@ -1089,27 +1090,6 @@ sl_status_t wfx_connect_to_ap(void)
 
 /****************************************************************************
  * @brief
- * get the wifi mac addresss
- * @param[in] interface:
- * @param[in] addr : address
- *****************************************************************************/
-void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
-{
-    sl_wfx_mac_address_t * mac;
-
-#ifdef SL_WFX_CONFIG_SOFTAP
-    mac = (interface == SL_WFX_SOFTAP_INTERFACE) ? &wifiContext.mac_addr_1 : &wifiContext.mac_addr_0;
-#else
-    mac = &wifiContext.mac_addr_0;
-#endif
-    *addr = *mac;
-    ChipLogDetail(DeviceLayer, "WLAN:Get WiFi Mac addr %02x:%02x:%02x:%02x:%02x:%02x", mac->octet[0], mac->octet[1], mac->octet[2],
-                  mac->octet[3], mac->octet[4], mac->octet[5]);
-    memcpy(&ap_info.bssid[0], &mac->octet[0], 6);
-}
-
-/****************************************************************************
- * @brief
  *     function called when driver have ipv4 address
  * @param[in]  which_if:
  * @return returns false if sucessful,
@@ -1226,7 +1206,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", ip4_addr[0], ip4_addr[1], ip4_addr[2], ip4_addr[3]);
     sta_ip = ip;
 
-    wfx_ip_changed_notify(IP_STATUS_SUCCESS);
+    NotifyIPv4Change(true);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 

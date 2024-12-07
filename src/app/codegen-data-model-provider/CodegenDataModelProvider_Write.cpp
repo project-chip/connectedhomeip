@@ -190,7 +190,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     if (request.path.mDataVersion.HasValue())
     {
-        std::optional<DataModel::ClusterInfo> clusterInfo = GetClusterInfo(request.path);
+        std::optional<DataModel::ClusterInfo> clusterInfo = GetServerClusterInfo(request.path);
         if (!clusterInfo.has_value())
         {
             ChipLogError(DataManagement, "Unable to get cluster info for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
@@ -259,6 +259,22 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     }
 
     return CHIP_NO_ERROR;
+}
+
+void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
+{
+    ContextAttributesChangeListener change_listener(CurrentContext());
+    if (path.mClusterId != kInvalidClusterId)
+    {
+        emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, &change_listener);
+    }
+    else
+    {
+        // When the path has wildcard cluster Id, call the emberAfEndpointChanged to mark attributes on the given endpoint
+        // as having changing, but do NOT increase/alter any cluster data versions, as this happens when a bridged endpoint is
+        // added or removed from a bridge and the cluster data is not changed during the process.
+        emberAfEndpointChanged(path.mEndpointId, &change_listener);
+    }
 }
 
 } // namespace app

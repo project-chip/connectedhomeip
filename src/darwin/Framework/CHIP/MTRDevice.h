@@ -114,14 +114,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * A non-nil value if the vendor identifier has been determined from the device, nil if unknown.
  */
-@property (nonatomic, readonly, nullable, copy) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, nullable, copy) NSNumber * vendorID MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
 /**
  * The Product Identifier associated with the device.
  *
  * A non-nil value if the product identifier has been determined from the device, nil if unknown.
  */
-@property (nonatomic, readonly, nullable, copy) NSNumber * productID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, nullable, copy) NSNumber * productID MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
 /**
  * Network commissioning features supported by the device.
@@ -362,7 +362,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (MTRAttributeValueWaiter *)waitForAttributeValues:(NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)values
                                             timeout:(NSTimeInterval)timeout
                                               queue:(dispatch_queue_t)queue
-                                         completion:(void (^)(NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+                                         completion:(void (^)(NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
 @end
 

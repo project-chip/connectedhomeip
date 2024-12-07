@@ -246,7 +246,8 @@ config CHIP_ENABLE_POWER_ON_FACTORY_RESET
 
 config CHIP_TASK_STACK_SIZE
 	int
-	default 4864 if PM
+	default 6192 if SOC_RISCV_TELINK_TL321X
+	default 5352 if PM
 	default 8192
 
 config CHIP_USE_MARS_SENSOR
