@@ -696,8 +696,9 @@ const AttestationTrustStore * GetTestAttestationTrustStore()
     return &gTestAttestationTrustStore.get();
 }
 
-DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore,
-                                                  DeviceAttestationRevocationDelegate * revocationDelegate)
+DeviceAttestationVerifier *
+GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore,
+                      DeviceAttestationVerifier::DeviceAttestationRevocationDelegate * revocationDelegate)
 {
     static DefaultDACVerifier defaultDACVerifier{ paaRootStore, revocationDelegate };
 

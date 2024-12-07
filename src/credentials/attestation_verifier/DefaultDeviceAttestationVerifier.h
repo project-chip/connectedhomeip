@@ -122,8 +122,9 @@ const AttestationTrustStore * GetTestAttestationTrustStore();
  *          process lifetime.  In particular, after the first call it's not
  *          possible to change which AttestationTrustStore is used by this verifier.
  */
-DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore,
-                                                  DeviceAttestationRevocationDelegate * revocationDelegate = nullptr);
+DeviceAttestationVerifier *
+GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore,
+                      DeviceAttestationVerifier::DeviceAttestationRevocationDelegate * revocationDelegate = nullptr);
 
 } // namespace Credentials
 } // namespace chip

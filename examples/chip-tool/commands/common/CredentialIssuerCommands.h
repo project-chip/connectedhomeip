@@ -61,9 +61,9 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
-                                              const chip::Credentials::AttestationTrustStore * trustStore,
-                                              chip::Credentials::DeviceAttestationRevocationDelegate * revocationDelegate) = 0;
+    virtual CHIP_ERROR SetupDeviceAttestation(
+        chip::Controller::SetupParams & setupParams, const chip::Credentials::AttestationTrustStore * trustStore,
+        chip::Credentials::DeviceAttestationVerifier::DeviceAttestationRevocationDelegate * revocationDelegate) = 0;
 
     /**
      * @brief Add a list of additional non-default CD verifying keys (by certificate)

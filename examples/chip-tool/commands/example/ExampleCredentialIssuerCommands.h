@@ -33,9 +33,9 @@ public:
     {
         return mOpCredsIssuer.Initialize(storage);
     }
-    CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
-                                      const chip::Credentials::AttestationTrustStore * trustStore,
-                                      chip::Credentials::DeviceAttestationRevocationDelegate * revocationDelegate) override
+    CHIP_ERROR SetupDeviceAttestation(
+        chip::Controller::SetupParams & setupParams, const chip::Credentials::AttestationTrustStore * trustStore,
+        chip::Credentials::DeviceAttestationVerifier::DeviceAttestationRevocationDelegate * revocationDelegate) override
     {
         chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 

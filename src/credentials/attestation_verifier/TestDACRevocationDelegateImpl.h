@@ -26,7 +26,7 @@
 namespace chip {
 namespace Credentials {
 
-class TestDACRevocationDelegateImpl : public DeviceAttestationRevocationDelegate
+class TestDACRevocationDelegateImpl : public DeviceAttestationVerifier::DeviceAttestationRevocationDelegate
 {
 public:
     TestDACRevocationDelegateImpl()  = default;

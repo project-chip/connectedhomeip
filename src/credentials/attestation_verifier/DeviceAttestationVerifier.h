@@ -334,6 +334,28 @@ public:
                                                          AttestationVerificationResult result);
 
     /**
+     * @brief Interface for checking the device attestation revocation status
+     *
+     */
+    class DeviceAttestationRevocationDelegate
+    {
+    public:
+        DeviceAttestationRevocationDelegate()          = default;
+        virtual ~DeviceAttestationRevocationDelegate() = default;
+
+        /**
+         * @brief Verify whether or not the given DAC chain is revoked.
+         *
+         * @param[in] info All of the information required to check for revoked DAC chain.
+         * @param[in] onCompletion Callback handler to provide Attestation Information Verification result to the caller of
+         *                         CheckForRevokedDACChain().
+         */
+        virtual void CheckForRevokedDACChain(
+            const DeviceAttestationVerifier::AttestationInfo & info,
+            Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> * onCompletion) = 0;
+    };
+
+    /**
      * @brief Verify an attestation information payload against a DAC/PAI chain.
      *
      * @param[in] info All of the information required to verify the attestation.
@@ -417,28 +439,6 @@ protected:
     // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
     // always supported development keys.
     bool mEnableCdTestKeySupport = true;
-};
-
-/**
- * @brief Interface for checking the device attestation revocation status
- *
- */
-class DeviceAttestationRevocationDelegate
-{
-public:
-    DeviceAttestationRevocationDelegate()          = default;
-    virtual ~DeviceAttestationRevocationDelegate() = default;
-
-    /**
-     * @brief Verify whether or not the given DAC chain is revoked.
-     *
-     * @param[in] info All of the information required to check for revoked DAC chain.
-     * @param[in] onCompletion Callback handler to provide Attestation Information Verification result to the caller of
-     *                         CheckForRevokedDACChain().
-     */
-    virtual void
-    CheckForRevokedDACChain(const DeviceAttestationVerifier::AttestationInfo & info,
-                            Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> * onCompletion) = 0;
 };
 
 /**
