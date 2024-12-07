@@ -160,9 +160,10 @@ class TC_CADMIN(MatterBaseTest):
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-        _, rcac = await self.th2.CommissionOnNetwork(
+        await self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234, get_rcac=True)
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
+        rcac = self.th2.get_rcac()
 
         th2_rcac_decoded = TLVReader(rcac).get()["Any"][9]
 
@@ -324,9 +325,10 @@ class TC_CADMIN(MatterBaseTest):
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-        _, rcac = await self.th2.CommissionOnNetwork(
+        await self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=setupPayloadInfo[0].passcode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=setupPayloadInfo[0].filter_value, get_rcac=True)
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=setupPayloadInfo[0].filter_value)
+        rcac = self.th2.get_rcac()
 
         th2_rcac_decoded = TLVReader(rcac).get()["Any"][9]
 

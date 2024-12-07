@@ -2224,7 +2224,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
                                   filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,
-                                  discoveryTimeoutMsec: int = 30000, get_rcac: bool = False) -> int:
+                                  discoveryTimeoutMsec: int = 30000) -> int:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
         Supported filters are:
@@ -2259,15 +2259,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
             )
 
-            res = await asyncio.futures.wrap_future(ctx.future)
-
-            # If RCAC data is wanted, attempt to pull the result
-            if get_rcac:
-                rcac_bytes = self.get_rcac()
-                return (res, rcac_bytes)
-
-            else:
-                return res
+            return await asyncio.futures.wrap_future(ctx.future)
 
     def get_rcac(self):
         try:
