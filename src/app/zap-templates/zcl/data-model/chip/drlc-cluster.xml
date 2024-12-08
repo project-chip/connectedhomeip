@@ -199,38 +199,30 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="LOAD_CONTROL_PROGRAMS" type="array" entryType="LoadControlProgramStruct">
-      <description>LoadControlPrograms</description>
+    <attribute side="server" code="0x0000" name="LoadControlPrograms" define="LOAD_CONTROL_PROGRAMS" type="array" entryType="LoadControlProgramStruct">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="NUMBER_OF_LOAD_CONTROL_PROGRAMS" type="int8u" min="5" default="5">
-      <description>NumberOfLoadControlPrograms</description>
+    <attribute side="server" code="0x0001" name="NumberOfLoadControlPrograms" define="NUMBER_OF_LOAD_CONTROL_PROGRAMS" type="int8u" min="5" default="5">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0002" define="LOAD_CONTROL_EVENTS" type="array" entryType="LoadControlEventStruct">
-      <description>Events</description>
+    <attribute side="server" code="0x0002" name="Events" define="LOAD_CONTROL_EVENTS" type="array" entryType="LoadControlEventStruct">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0003" define="LOAD_CONTROL_ACTIVE_EVENTS" type="array" entryType="LoadControlEventStruct">
-      <description>ActiveEvents</description>
+    <attribute side="server" code="0x0003" name="ActiveEvents" define="LOAD_CONTROL_ACTIVE_EVENTS" type="array" entryType="LoadControlEventStruct">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0004" define="NUMBER_OF_EVENTS_PER_PROGRAM" type="int8u" min="10" default="10">
-      <description>NumberOfEventsPerProgram</description>
+    <attribute side="server" code="0x0004" name="NumberOfEventsPerProgram" define="NUMBER_OF_EVENTS_PER_PROGRAM" type="int8u" min="10" default="10">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0005" define="NUMBER_OF_TRANSITIONS" type="int8u" min="3" default="3">
-      <description>NumberOfTransitions</description>
+    <attribute side="server" code="0x0005" name="NumberOfTransitions" define="NUMBER_OF_TRANSITIONS" type="int8u" min="3" default="3">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0006" define="DEFAULT_RANDOM_START" type="int8u" max="0x3C" default="0x1E" writable="true">
-      <description>DefaultRandomStart</description>
+    <attribute side="server" code="0x0006" name="DefaultRandomStart" define="DEFAULT_RANDOM_START" type="int8u" max="0x3C" default="0x1E" writable="true">
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0007" define="DEFAULT_RANDOM_DURATION" type="int8u" min="0" max="0x3C" default="0" writable="true">
-      <description>DefaultRandomDuration</description>
+    <attribute side="server" code="0x0007" name="DefaultRandomDuration" define="DEFAULT_RANDOM_DURATION" type="int8u" min="0" max="0x3C" default="0" writable="true">
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
       <mandatoryConform/>

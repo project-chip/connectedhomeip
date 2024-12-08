@@ -46,65 +46,52 @@ limitations under the License.
     </features>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="EXPRESSED_STATE" type="ExpressedStateEnum">
-      <description>ExpressedState</description>
+    <attribute side="server" code="0x0000" name="ExpressedState" define="EXPRESSED_STATE" type="ExpressedStateEnum">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="SMOKE_STATE" type="AlarmStateEnum" optional="true">
-      <description>SmokeState</description>
+    <attribute side="server" code="0x0001" name="SmokeState" define="SMOKE_STATE" type="AlarmStateEnum" optional="true">
       <mandatoryConform>
         <feature name="SMOKE"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0002" define="CO_STATE" type="AlarmStateEnum" optional="true">
-      <description>COState</description>
+    <attribute side="server" code="0x0002" name="COState" define="CO_STATE" type="AlarmStateEnum" optional="true">
       <mandatoryConform>
         <feature name="CO"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0003" define="BATTERY_ALERT" type="AlarmStateEnum">
-      <description>BatteryAlert</description>
+    <attribute side="server" code="0x0003" name="BatteryAlert" define="BATTERY_ALERT" type="AlarmStateEnum">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0004" define="DEVICE_MUTED" type="MuteStateEnum" optional="true">
-      <description>DeviceMuted</description>
+    <attribute side="server" code="0x0004" name="DeviceMuted" define="DEVICE_MUTED" type="MuteStateEnum" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0005" define="TEST_IN_PROGRESS" type="boolean">
-      <description>TestInProgress</description>
+    <attribute side="server" code="0x0005" name="TestInProgress" define="TEST_IN_PROGRESS" type="boolean">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0006" define="HARDWARE_FAULTALERT" type="boolean">
-      <description>HardwareFaultAlert</description>
+    <attribute side="server" code="0x0006" name="HardwareFaultAlert" define="HARDWARE_FAULTALERT" type="boolean">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0007" define="END_OF_SERVICEALERT" type="EndOfServiceEnum">
-      <description>EndOfServiceAlert</description>
+    <attribute side="server" code="0x0007" name="EndOfServiceAlert" define="END_OF_SERVICEALERT" type="EndOfServiceEnum">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0008" define="INTERCONNECT_SMOKE_ALARM" type="AlarmStateEnum" optional="true">
-      <description>InterconnectSmokeAlarm</description>
+    <attribute side="server" code="0x0008" name="InterconnectSmokeAlarm" define="INTERCONNECT_SMOKE_ALARM" type="AlarmStateEnum" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0009" define="INTERCONNECT_CO_ALARM" type="AlarmStateEnum" optional="true">
-      <description>InterconnectCOAlarm</description>
+    <attribute side="server" code="0x0009" name="InterconnectCOAlarm" define="INTERCONNECT_CO_ALARM" type="AlarmStateEnum" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x000A" define="CONTAMINATION_STATE" type="ContaminationStateEnum" optional="true">
-      <description>ContaminationState</description>
+    <attribute side="server" code="0x000A" name="ContaminationState" define="CONTAMINATION_STATE" type="ContaminationStateEnum" optional="true">
       <optionalConform>
         <feature name="SMOKE"/>
       </optionalConform>
     </attribute>
-    <attribute side="server" code="0x000B" define="SENSITIVITY_LEVEL" type="SensitivityEnum" min="0" max="2" writable="true" optional="true">
-      <description>SmokeSensitivityLevel</description>
+    <attribute side="server" code="0x000B" name="SmokeSensitivityLevel" define="SENSITIVITY_LEVEL" type="SensitivityEnum" min="0" max="2" writable="true" optional="true">
       <access op="write" role="manage"/>
       <optionalConform>
         <feature name="SMOKE"/>
       </optionalConform>
     </attribute>
-    <attribute side="server" code="0x000C" define="EXPIRY_DATE" type="epoch_s" optional="true">
-      <description>ExpiryDate</description>
+    <attribute side="server" code="0x000C" name="ExpiryDate" define="EXPIRY_DATE" type="epoch_s" optional="true">
       <optionalConform/>
     </attribute>
     

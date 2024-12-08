@@ -40,8 +40,7 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="NameSupportBitmap" min="0x00" max="0x80">
-      <description>NameSupport</description>
+    <attribute side="server" code="0x0000" name="NameSupport" define="GROUP_NAME_SUPPORT" type="NameSupportBitmap" min="0x00" max="0x80">
       <mandatoryConform/>
     </attribute>
     

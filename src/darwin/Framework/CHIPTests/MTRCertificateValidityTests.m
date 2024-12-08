@@ -259,10 +259,13 @@ static BOOL sNeedsStackShutdown = YES;
 
     __auto_type * controllerOperationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(controllerOperationalKeys);
+    __auto_type * controllerPublicKey = controllerOperationalKeys.copyPublicKey;
+    XCTAssert(controllerPublicKey != NULL);
+    CFAutorelease(controllerPublicKey);
 
     __auto_type * controllerOperationalCert =
         [certificateIssuer issueOperationalCertificateForNode:@(kControllerId)
-                                         operationalPublicKey:controllerOperationalKeys.publicKey];
+                                         operationalPublicKey:controllerPublicKey];
     XCTAssertNotNil(controllerOperationalCert);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:certificateIssuer.rootKey.ipk

@@ -106,40 +106,33 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x00" define="IDLE_MODE_DURATION" type="int32u" min="1" max="64800" default="1">
-      <description>IdleModeDuration</description>
+    <attribute side="server" code="0x00" name="IdleModeDuration" define="IDLE_MODE_DURATION" type="int32u" min="1" max="64800" default="1">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x01" define="ACTIVE_MODE_DURATION" type="int32u" default="300">
-      <description>ActiveModeDuration</description>
+    <attribute side="server" code="0x01" name="ActiveModeDuration" define="ACTIVE_MODE_DURATION" type="int32u" default="300">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="int16u" default="300">
-      <description>ActiveModeThreshold</description>
+    <attribute side="server" code="0x02" name="ActiveModeThreshold" define="ACTIVE_MODE_THRESHOLD" type="int16u" default="300">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="array" entryType="MonitoringRegistrationStruct" optional="true">
-      <description>RegisteredClients</description>
+    <attribute side="server" code="0x03" name="RegisteredClients" define="REGISTERED_CLIENTS" type="array" entryType="MonitoringRegistrationStruct" optional="true">
       <access op="read" privilege="administer"/>
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x04" define="ICD_COUNTER" type="int32u" default="0" optional="true">
-      <description>ICDCounter</description>
+    <attribute side="server" code="0x04" name="ICDCounter" define="ICD_COUNTER" type="int32u" default="0" optional="true">
       <access op="read" privilege="administer"/>
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x05" define="CLIENTS_SUPPORTED_PER_FABRIC" type="int16u" min="1" default="1" optional="true">
-      <description>ClientsSupportedPerFabric</description>
+    <attribute side="server" code="0x05" name="ClientsSupportedPerFabric" define="CLIENTS_SUPPORTED_PER_FABRIC" type="int16u" min="1" default="1" optional="true">
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x06" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" optional="true" apiMaturity="provisional">
-      <description>UserActiveModeTriggerHint</description>
+    <attribute side="server" code="0x06" name="UserActiveModeTriggerHint" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" optional="true" apiMaturity="provisional">
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
@@ -147,12 +140,10 @@ limitations under the License.
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x07" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" optional="true" apiMaturity="provisional">
-      <description>UserActiveModeTriggerInstruction</description>
+    <attribute side="server" code="0x07" name="UserActiveModeTriggerInstruction" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" optional="true" apiMaturity="provisional">
       <provisionalConform/>
     </attribute>
-    <attribute side="server" code="0x08" define="OPERATING_MODE" type="OperatingModeEnum" default="0" optional="true" apiMaturity="provisional">
-      <description>OperatingMode</description>
+    <attribute side="server" code="0x08" name="OperatingMode" define="OPERATING_MODE" type="OperatingModeEnum" default="0" optional="true" apiMaturity="provisional">
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
@@ -160,8 +151,7 @@ limitations under the License.
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x09" define="MAXIMUM_CHECK_IN_BACK_OFF" type="int32u" default="1" max="64800" optional="true" apiMaturity="provisional">
-      <description>MaximumCheckInBackOff</description>
+    <attribute side="server" code="0x09" name="MaximumCheckInBackOff" define="MAXIMUM_CHECK_IN_BACK_OFF" type="int32u" default="1" max="64800" optional="true" apiMaturity="provisional">
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>

@@ -96,31 +96,25 @@ limitations under the License.
     </features>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="SupportedAreas" type="array" entryType="AreaStruct">
-      <description>SupportedAreas</description>
+    <attribute side="server" code="0x0000" name="SupportedAreas" define="SupportedAreas" type="array" entryType="AreaStruct">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="SupportedMaps" type="array" entryType="MapStruct" optional="true">
-      <description>SupportedMaps</description>
+    <attribute side="server" code="0x0001" name="SupportedMaps" define="SupportedMaps" type="array" entryType="MapStruct" optional="true">
       <mandatoryConform>
         <feature name="MAPS"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0002" define="SelectedAreas" type="array" entryType="int32u">
-      <description>SelectedAreas</description>
+    <attribute side="server" code="0x0002" name="SelectedAreas" define="SelectedAreas" type="array" entryType="int32u">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0003" define="CurrentArea" type="int32u" isNullable="true" optional="true">
-      <description>CurrentArea</description>
+    <attribute side="server" code="0x0003" name="CurrentArea" define="CurrentArea" type="int32u" isNullable="true" optional="true">     
     </attribute>
-    <attribute side="server" code="0x0004" define="EstimatedEndTime" type="epoch_s" isNullable="true" optional="true">
-      <description>EstimatedEndTime</description>
+    <attribute side="server" code="0x0004" name="EstimatedEndTime" define="EstimatedEndTime" type="epoch_s" isNullable="true" optional="true">
       <optionalConform>
         <attribute name="CurrentArea"/>
       </optionalConform>
     </attribute>
-    <attribute side="server" code="0x0005" define="Progress" type="array" entryType="ProgressStruct" optional="true">
-      <description>Progress</description>
+    <attribute side="server" code="0x0005" name="Progress" define="Progress" type="array" entryType="ProgressStruct" optional="true">
       <mandatoryConform>
         <feature name="PROG"/>
       </mandatoryConform>

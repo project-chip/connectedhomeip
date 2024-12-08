@@ -187,7 +187,6 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
     {
         app::DataModel::DecodableList<ByteSpan> v;
         EXPECT_EQ(app::DataModel::Decode(*apData, v), CHIP_NO_ERROR);
-        auto it          = v.begin();
         size_t arraySize = 0;
         EXPECT_EQ(v.ComputeSize(&arraySize), CHIP_NO_ERROR);
         EXPECT_EQ(arraySize, 4u);
@@ -288,7 +287,8 @@ TEST_F(TestEventChunking, TestEventChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance()->Shutdown();
+    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -355,7 +355,8 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance()->Shutdown();
+    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -432,7 +433,8 @@ TEST_F(TestEventChunking, TestMixedEventsAndLargeAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance()->Shutdown();
+    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.

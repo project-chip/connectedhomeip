@@ -100,11 +100,11 @@ if (chip_build_tests) {
     }
 
     if (chip_device_platform != "efr32") {
-      tests += [ "${chip_root}/src/app/tests" ]
-
-      # Disabled for EFR32 because _open is not implemented.
-      # https://github.com/project-chip/connectedhomeip/issues/35624
       tests += [
+        "${chip_root}/src/app/tests",
+
+        # Disabled for EFR32 because _open is not implemented.
+        # https://github.com/project-chip/connectedhomeip/issues/35624
         "${chip_root}/src/credentials/tests",
         "${chip_root}/src/lib/support/tests",
       ]

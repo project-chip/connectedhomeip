@@ -92,42 +92,33 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x00" define="NETWORK_INTERFACES" type="array" entryType="NetworkInterface" length="8">
-      <description>NetworkInterfaces</description>
+    <attribute side="server" code="0x00" name="NetworkInterfaces" define="NETWORK_INTERFACES" type="array" entryType="NetworkInterface" length="8">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x01" define="REBOOT_COUNT" type="int16u">
-      <description>RebootCount</description>
+    <attribute side="server" code="0x01" name="RebootCount" define="REBOOT_COUNT" type="int16u">
       <mandatoryConform/>
     </attribute>
     <!-- ***NOTE***: UpTime attribute is mandatory starting at Rev >= 2, but because of backwards compatibility, has to be optional here.
          The device type config and cert tests (TC-DGGEN-1.1/2.1) ensure that it is present. -->
-    <attribute side="server" code="0x02" define="UP_TIME" type="int64u" optional="true">
-      <description>UpTime</description>
+    <attribute side="server" code="0x02" name="UpTime" define="UP_TIME" type="int64u" optional="true">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x03" define="TOTAL_OPERATIONAL_HOURS" type="int32u" optional="true">
-      <description>TotalOperationalHours</description>
+    <attribute side="server" code="0x03" name="TotalOperationalHours" define="TOTAL_OPERATIONAL_HOURS" type="int32u" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x04" define="BOOT_REASONS" type="BootReasonEnum" optional="true">
-      <description>BootReason</description>
+    <attribute side="server" code="0x04" name="BootReason" define="BOOT_REASONS" type="BootReasonEnum" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="array" entryType="HardwareFaultEnum" optional="true">
-      <description>ActiveHardwareFaults</description>
+    <attribute side="server" code="0x05" name="ActiveHardwareFaults" define="ACTIVE_HARDWARE_FAULTS" type="array" entryType="HardwareFaultEnum" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="array" entryType="RadioFaultEnum" optional="true">
-      <description>ActiveRadioFaults</description>
+    <attribute side="server" code="0x06" name="ActiveRadioFaults" define="ACTIVE_RADIO_FAULTS" type="array" entryType="RadioFaultEnum" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="array" entryType="NetworkFaultEnum" optional="true">
-      <description>ActiveNetworkFaults</description>
+    <attribute side="server" code="0x07" name="ActiveNetworkFaults" define="ACTIVE_NETWORK_FAULTS" type="array" entryType="NetworkFaultEnum" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x08" define="TEST_EVENT_TRIGGERS_ENABLED" type="boolean">
-      <description>TestEventTriggersEnabled</description>
+    <attribute side="server" code="0x08" name="TestEventTriggersEnabled" define="TEST_EVENT_TRIGGERS_ENABLED" type="boolean">
       <mandatoryConform/>
     </attribute>
     <!--

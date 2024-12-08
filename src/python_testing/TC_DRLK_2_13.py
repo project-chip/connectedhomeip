@@ -368,7 +368,7 @@ class TC_DRLK_2_13(MatterBaseTest):
         self.groupIdentifier = bytes.fromhex("89d085fc302ca53e279bfcdecdf3c4ad")
         self.groupResolvingKey = bytes.fromhex("89d0859bfcdecdf3c4adfc302ca53e27")
         self.common_cluster_endpoint = 0
-        self.app_cluster_endpoint = self.matter_test_config.endpoint
+        self.app_cluster_endpoint = self.get_endpoint(default=1)
         self.alirouser = "AliroUser"
         self.alirocredentialissuerkey = bytes.fromhex(
             "047a4c882d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")

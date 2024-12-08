@@ -58,12 +58,10 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
       </feature>
     </features>
     <!-- Base data types -->
-    <attribute side="server" code="0x0000" define="SUPPORTED_MODES" type="array" entryType="ModeOptionStruct" length="255" minLength="2">
-      <description>SupportedModes</description>
+    <attribute side="server" code="0x0000" name="SupportedModes" define="SUPPORTED_MODES" type="array" entryType="ModeOptionStruct" length="255" minLength="2">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_MODE" type="int8u">
-      <description>CurrentMode</description>
+    <attribute side="server" code="0x0001" name="CurrentMode" define="CURRENT_MODE" type="int8u">
       <mandatoryConform/>
     </attribute>
     <!-- Commands -->

@@ -22,8 +22,9 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -42,16 +43,17 @@ import hashlib
 import logging
 import os
 import queue
+import random
 import secrets
 import struct
 import tempfile
 import time
-from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
+                                         type_matches)
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
@@ -67,14 +69,6 @@ def _generate_verifier(passcode: int, salt: bytes, iterations: int) -> bytes:
     L = NIST256p.generator * w1
 
     return w0.to_bytes(NIST256p.baselen, byteorder='big') + L.to_bytes('uncompressed')
-
-
-@dataclass
-class _SetupParameters:
-    setup_qr_code: str
-    manual_code: int
-    discriminator: int
-    passcode: int
 
 
 class TC_MCORE_FS_1_5(MatterBaseTest):
@@ -106,11 +100,8 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
 
         self.th_server_port = th_server_port
-        # These are default testing values.
-        self.th_server_setup_params = _SetupParameters(
-            setup_qr_code="MT:-24J0AFN00KA0648G00",
-            manual_code=34970112332,
-            discriminator=3840,
+        self.th_server_setup_params = SetupParameters(
+            discriminator=random.randint(0, 4095),
             passcode=20202021)
 
         # Start the TH_SERVER app.
@@ -137,12 +128,12 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: _SetupParameters):
+    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: SetupParameters):
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the ICD device using the following parameters:\n"
             f"- discriminator: {setup_params.discriminator}\n"
             f"- setupPinCode: {setup_params.passcode}\n"
-            f"- setupQRCode: {setup_params.setup_qr_code}\n"
+            f"- setupQRCode: {setup_params.qr_code}\n"
             f"- setupManualCode: {setup_params.manual_code}\n"
             f"If using FabricSync Admin test app, you may type:\n"
             f">>> pairing onnetwork 111 {setup_params.passcode}")
@@ -212,7 +203,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         time_remaining = report_waiting_timeout_delay_sec
 
         parts_list_endpoint_count_from_step_1 = len(step_1_dut_parts_list)
-        step_3_dut_parts_list = None
+        step_3_dut_parts_list = []
         while time_remaining > 0:
             try:
                 item = parts_list_queue.get(block=True, timeout=time_remaining)
@@ -304,16 +295,20 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
                 endpoint, attribute, value = item['endpoint'], item['attribute'], item['value']
 
                 # Record arrival of an expected subscription change when seen
-                if endpoint == newly_added_endpoint and attribute == Clusters.AdministratorCommissioning.Attributes.WindowStatus:
+                if endpoint == newly_added_endpoint and attribute == cadmin_attr.WindowStatus:
+                    if value != th_server_direct_cadmin[cadmin_attr.WindowStatus]:
+                        logging.info("Window status is %r, waiting for %r", value,
+                                     th_server_direct_cadmin[cadmin_attr.WindowStatus])
+                        continue
                     cadmin_sub_new_data = True
                     break
-
             except queue.Empty:
                 # No error, we update timeouts and keep going
                 pass
-
-            elapsed = time.time() - start_time
-            time_remaining = report_waiting_timeout_delay_sec - elapsed
+            finally:
+                # each iteration will alter timing
+                elapsed = time.time() - start_time
+                time_remaining = report_waiting_timeout_delay_sec - elapsed
 
         asserts.assert_true(cadmin_sub_new_data,
                             "Timed out waiting for DUT to reflect AdministratorCommissioning attributes for bridged device")

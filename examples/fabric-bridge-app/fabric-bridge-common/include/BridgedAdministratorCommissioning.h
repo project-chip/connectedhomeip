@@ -20,6 +20,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 
+namespace bridge {
+
 /**
  * @brief CADMIN cluster implementation for handling attribute interactions of bridged device endpoints.
  *
@@ -56,3 +58,5 @@ private:
     // to reflect this change.
     chip::app::AttributeAccessInterface * mOriginalAttributeInterface = nullptr;
 };
+
+} // namespace bridge

@@ -31,7 +31,7 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
 #endif
 
 namespace chip {
@@ -290,10 +290,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    sl_status_t status = wfx_sta_discon();
+    sl_status_t status = sl_matter_wifi_disconnect();
     if (status != SL_STATUS_OK)
     {
-        ChipLogError(DeviceLayer, "wfx_sta_discon() failed: %lx", status);
+        ChipLogError(DeviceLayer, "sl_matter_wifi_disconnect() failed: %lx", status);
     }
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
     wfx_clear_wifi_provision();
@@ -313,11 +313,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 #ifdef SL_WIFI
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    sl_wfx_mac_address_t macaddr;
-    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
-    memcpy(buf, &macaddr.octet[0], sizeof(macaddr.octet));
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    return CHIP_NO_ERROR;
+    MutableByteSpan byteSpan(buf, kPrimaryMACAddressLength);
+    return GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
 }
 #endif
 

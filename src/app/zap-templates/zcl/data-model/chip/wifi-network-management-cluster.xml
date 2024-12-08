@@ -30,12 +30,10 @@ limitations under the License.
         <!-- cluster revision -->
         <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-        <attribute side="server" code="0x0000" define="SSID" type="octet_string" length="32" writable="false" isNullable="true" optional="false">
-            <description>SSID</description>
+        <attribute side="server" code="0x0000" name="SSID" define="SSID" type="octet_string" length="32" writable="false" isNullable="true" optional="false">
             <mandatoryConform/>
         </attribute>
-        <attribute side="server" code="0x0001" define="PASSPHRASE_SURROGATE" type="int64u" writable="false" isNullable="true" optional="false">
-            <description>PassphraseSurrogate</description>
+        <attribute side="server" code="0x0001" name="PassphraseSurrogate" define="PASSPHRASE_SURROGATE" type="int64u" writable="false" isNullable="true" optional="false">
             <access op="read" privilege="manage"/>
             <mandatoryConform/>
         </attribute>

@@ -52,12 +52,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="4"/>
     
-    <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="int16u" writable="true" default="0x0">
-      <description>IdentifyTime</description>
+    <attribute side="server" code="0x0000" name="IdentifyTime" define="IDENTIFY_TIME" type="int16u" writable="true" default="0x0">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="IDENTIFY_TYPE" type="IdentifyTypeEnum" default="0x00">
-      <description>IdentifyType</description>
+    <attribute side="server" code="0x0001" name="IdentifyType" define="IDENTIFY_TYPE" type="IdentifyTypeEnum" default="0x00">
       <mandatoryConform/>
     </attribute>
     

@@ -80,16 +80,13 @@ limitations under the License.
         <optionalConform/>
       </feature>
     </features>
-    <attribute side="server" code="0x0000" define="LAST_CONFIGURED_BY" type="node_id" isNullable="true" optional="true">
-      <description>LastConfiguredBy</description>
+    <attribute side="server" code="0x0000" name="LastConfiguredBy" define="LAST_CONFIGURED_BY" type="node_id" isNullable="true" optional="true">
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0001" define="SCENE_TABLE_SIZE" type="int16u" min="16" default="16">
-      <description>SceneTableSize</description>
+    <attribute side="server" code="0x0001" name="SceneTableSize" define="SCENE_TABLE_SIZE" type="int16u" min="16" default="16">
       <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0002" define="FABRIC_SCENE_INFO" type="array" entryType="SceneInfoStruct">
-      <description>FabricSceneInfo</description>
+    <attribute side="server" code="0x0002" name="FabricSceneInfo" define="FABRIC_SCENE_INFO" type="array" entryType="SceneInfoStruct">
       <mandatoryConform/>
     </attribute>
     

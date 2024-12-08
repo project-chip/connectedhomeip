@@ -70,19 +70,16 @@ endfunction()
 #
 function(chip_configure_data_model APP_TARGET)
     set(SCOPE PRIVATE)
-    set(ADD_EMBER_INTERFACE_FILES TRUE)
-    cmake_parse_arguments(ARG "SKIP_EMBER_INTERFACE" "SCOPE;ZAP_FILE;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
+    cmake_parse_arguments(ARG "" "SCOPE;ZAP_FILE;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
 
     if(ARG_SCOPE)
         set(SCOPE ${ARG_SCOPE})
     endif()
 
-    if(ARG_SKIP_EMBER_INTERFACE)
-        set(ADD_EMBER_INTERFACE_FILES FALSE)
-    endif()
-
     # CMAKE data model auto-includes the server side implementation
     target_sources(${APP_TARGET} ${SCOPE}
+        ${CHIP_APP_BASE_DIR}/SafeAttributePersistenceProvider.cpp
+        ${CHIP_APP_BASE_DIR}/StorageDelegateWrapper.cpp
         ${CHIP_APP_BASE_DIR}/server/AclStorage.cpp
         ${CHIP_APP_BASE_DIR}/server/DefaultAclStorage.cpp
         ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
@@ -169,14 +166,10 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/generic-callback-stubs.cpp
         ${CHIP_APP_BASE_DIR}/util/privilege-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/util.cpp
+        ${CHIP_APP_BASE_DIR}/util/persistence/AttributePersistenceProvider.cpp
+        ${CHIP_APP_BASE_DIR}/util/persistence/DefaultAttributePersistenceProvider.cpp
         ${CODEGEN_DATA_MODEL_SOURCES}
         ${APP_GEN_FILES}
         ${APP_TEMPLATES_GEN_FILES}
     )
-
-    if(ADD_EMBER_INTERFACE_FILES)
-        target_sources(${APP_TARGET} ${SCOPE}
-           ${CHIP_APP_BASE_DIR}/util/ember-compatibility-functions.cpp
-        )
-    endif()
 endfunction()

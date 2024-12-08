@@ -18,7 +18,7 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/silabs_executable.gni")
+import("${silabs_sdk_build_root}/silabs_executable.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -38,7 +38,7 @@ if (wifi_soc) {
   import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
   examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 } else {
-  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+  import("${silabs_sdk_build_root}/efr32_sdk.gni")
   examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 }
 
@@ -166,6 +166,7 @@ silabs_executable("energy-management-app") {
   }
 
   sources = [
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyManagementAppCommonMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
@@ -183,7 +184,6 @@ silabs_executable("energy-management-app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/EnergyReportingEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/FakeReadings.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WaterHeaterMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmInstance.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmMain.cpp",
@@ -195,6 +195,7 @@ silabs_executable("energy-management-app") {
 
   deps = [
     ":sdk",
+    "${chip_root}/src/app:attribute-persistence",
     app_data_model,
   ]
 

@@ -6853,30 +6853,6 @@ bool emberAfCameraAvStreamManagementClusterCaptureSnapshotCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::DecodableType & commandData);
 /**
- * @brief Camera AV Stream Management Cluster SetViewport Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSetViewportCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetViewport::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SetImageRotation Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSetImageRotationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageRotation::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SetImageFlipHorizontal Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSetImageFlipHorizontalCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipHorizontal::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SetImageFlipVertical Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSetImageFlipVerticalCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipVertical::DecodableType & commandData);
-/**
  * @brief WebRTC Transport Provider Cluster SolicitOffer Command callback (from client)
  */
 bool emberAfWebRTCTransportProviderClusterSolicitOfferCallback(
@@ -6930,24 +6906,6 @@ bool emberAfWebRTCTransportRequestorClusterICECandidateCallback(
 bool emberAfWebRTCTransportRequestorClusterEndCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportRequestor::Commands::End::DecodableType & commandData);
-/**
- * @brief Chime Cluster PlayChimeSound Command callback (from client)
- */
-bool emberAfChimeClusterPlayChimeSoundCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Chime::Commands::PlayChimeSound::DecodableType & commandData);
-/**
- * @brief Commissioner Control Cluster RequestCommissioningApproval Command callback (from client)
- */
-bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissionerControl::Commands::RequestCommissioningApproval::DecodableType & commandData);
-/**
- * @brief Commissioner Control Cluster CommissionNode Command callback (from client)
- */
-bool emberAfCommissionerControlClusterCommissionNodeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissionerControl::Commands::CommissionNode::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */

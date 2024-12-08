@@ -41,20 +41,17 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="CHANNEL_LIST" type="array" entryType="ChannelInfoStruct" length="254" optional="true">
-      <description>ChannelList</description>
+    <attribute side="server" code="0x0000" name="ChannelList" define="CHANNEL_LIST" type="array" entryType="ChannelInfoStruct" length="254" optional="true">
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0001" define="CHANNEL_LINEUP" type="LineupInfoStruct" isNullable="true" optional="true">
-      <description>Lineup</description>
+    <attribute side="server" code="0x0001" name="Lineup" define="CHANNEL_LINEUP" type="LineupInfoStruct" isNullable="true" optional="true">
       <mandatoryConform>
         <feature name="LI"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfoStruct" isNullable="true" optional="true">
-      <description>CurrentChannel</description>
+    <attribute side="server" code="0x0002" name="CurrentChannel" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfoStruct" isNullable="true" optional="true">
       <optionalConform/>
     </attribute>
     

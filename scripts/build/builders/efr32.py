@@ -112,6 +112,7 @@ class Efr32Board(Enum):
     BRD4338A = 11
     BRD2703A = 12
     BRD2605A = 13
+    BRD4343A = 14
 
     def GnArgName(self):
         if self == Efr32Board.BRD2704B:
@@ -140,6 +141,8 @@ class Efr32Board(Enum):
             return 'BRD2703A'
         elif self == Efr32Board.BRD2605A:
             return 'BRD2605A'
+        elif self == Efr32Board.BRD4343A:
+            return 'BRD4343A'
         else:
             raise Exception('Unknown board #: %r' % self)
 
@@ -334,7 +337,7 @@ class Efr32Builder(GnBuilder):
     def generate(self):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
-            '--export-compile-commands',
+            '--add-export-compile-commands=*',
             '--root=%s' % self.root
         ]
         if self.dotfile:
