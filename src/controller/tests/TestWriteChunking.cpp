@@ -212,7 +212,7 @@ TEST_F(TestWriteChunking, TestListChunking)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance());
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -286,7 +286,7 @@ TEST_F(TestWriteChunking, TestBadChunking)
     bool atLeastOneRequestFailed = false;
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance());
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -366,7 +366,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance());
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -441,7 +441,7 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance());
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -590,7 +590,7 @@ void TestWriteChunking::RunTest(Instructions instructions)
 TEST_F(TestWriteChunking, TestTransactionalList)
 {
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance());
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.

@@ -272,7 +272,7 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
 
     factoryParams.fabricIndependentStorage = storageAdapter;
     factoryParams.sessionKeystore          = &sSessionKeystore;
-    factoryParams.dataModelProvider        = app::CodegenDataModelProviderInstance();
+    factoryParams.dataModelProvider        = app::CodegenDataModelProviderInstance(storageAdapter);
 
     sICDClientStorage.Init(storageAdapter, &sSessionKeystore);
 
