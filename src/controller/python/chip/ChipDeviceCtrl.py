@@ -2264,9 +2264,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
 
     def get_rcac(self):
+        # Passes captured RCAC data back to python test modules to be used for validation
         try:
             # Assume rcac_size is the size you want to allocate
-            rcac_size = 1024  # Allocate sufficient memory based on expected size
+            rcac_size = 650 # Allocate sufficient memory based on expected size
             rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate a ctypes buffer
 
             actual_rcac_size = ctypes.c_size_t()
