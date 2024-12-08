@@ -1966,7 +1966,8 @@ class ChipDeviceControllerBase():
             #self._dmLib.pychip_SetCommissioningRCACCallback.argtypes = [_RCACCallbackType]
             #self._dmLib.pychip_SetCommissioningRCACCallback.restype = None
 
-            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [POINTER(POINTER(c_uint8)), POINTER(c_size_t)]
+            #self._dmLib.pychip_GetCommissioningRCACData.argtypes = [POINTER(POINTER(c_uint8)), POINTER(c_size_t)]
+            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t)]
             self._dmLib.pychip_GetCommissioningRCACData.restype = None
 
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
@@ -2261,18 +2262,22 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
             return await asyncio.futures.wrap_future(ctx.future)
 
+
     def get_rcac(self):
         try:
-            rcac_data_ptr = POINTER(c_uint8)()
-            rcac_size = c_size_t()
+            # Assume rcac_size is the size you want to allocate
+            rcac_size = 1024  # Allocate sufficient memory based on expected size
+            rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate a ctypes buffer
+
+            actual_rcac_size = ctypes.c_size_t()
 
             # Call the C++ function to get the RCAC data
-            self._dmLib.pychip_GetCommissioningRCACData(byref(rcac_data_ptr), byref(rcac_size))
-
+            self._dmLib.pychip_GetCommissioningRCACData(ctypes.cast(rcac_buffer, ctypes.POINTER(ctypes.c_uint8)), ctypes.byref(actual_rcac_size))
+            
             # Check if data is available
-            if rcac_size.value > 0:
+            if actual_rcac_size.value > 0:
                 # Convert the data to a Python bytes object
-                rcac_data = cast(rcac_data_ptr, POINTER(c_uint8 * rcac_size.value)).contents
+                rcac_data = bytearray(rcac_buffer[:actual_rcac_size.value])
                 rcac_bytes = bytes(rcac_data)
             else:
                 raise Exception("RCAC data is empty")
