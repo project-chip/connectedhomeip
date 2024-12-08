@@ -2262,19 +2262,19 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
             return await asyncio.futures.wrap_future(ctx.future)
 
-
     def get_rcac(self):
         # Passes captured RCAC data back to python test modules to be used for validation
         try:
             # Assume rcac_size is the size you want to allocate
-            rcac_size = 650 # Allocate sufficient memory based on expected size
+            rcac_size = 650  # Allocate sufficient memory based on expected size
             rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate a ctypes buffer
 
             actual_rcac_size = ctypes.c_size_t()
 
             # Call the C++ function to get the RCAC data
-            self._dmLib.pychip_GetCommissioningRCACData(ctypes.cast(rcac_buffer, ctypes.POINTER(ctypes.c_uint8)), ctypes.byref(actual_rcac_size))
-            
+            self._dmLib.pychip_GetCommissioningRCACData(ctypes.cast(
+                rcac_buffer, ctypes.POINTER(ctypes.c_uint8)), ctypes.byref(actual_rcac_size))
+
             # Check if data is available
             if actual_rcac_size.value > 0:
                 # Convert the data to a Python bytes object
