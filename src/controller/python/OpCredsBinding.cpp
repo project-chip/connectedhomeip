@@ -720,26 +720,25 @@ PyChipError pychip_GetCompletionError()
     return ToPyChipError(sTestCommissioner.GetCompletionError());
 }
 
-
 extern "C" {
-    // Function to get the RCAC data from the sTestCommissioner
-    void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize)
+// Function to get the RCAC data from the sTestCommissioner
+void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize)
+{
+    // Attempting to get Python RCAC data in C++
+    const auto & rcacData = sTestCommissioner.GetCHIPRCACData();
+
+    if (rcacData.empty())
     {
-        // Attempting to get Python RCAC data in C++
-        const auto & rcacData = sTestCommissioner.GetCHIPRCACData();
-
-        if (rcacData.empty())
-        {
-            ChipLogError(Controller, "RCAC data is empty in C++. Nothing to return.");
-            *rcacSize = 0;
-            return;
-        }
-
-        // Ensure the size is passed back to Python
-        *rcacSize = rcacData.size();
-
-        // Copy the data from C++ to Python's allocated memory
-        std::memcpy(rcacDataPtr, rcacData.data(), *rcacSize);
+        ChipLogError(Controller, "RCAC data is empty in C++. Nothing to return.");
+        *rcacSize = 0;
+        return;
     }
+
+    // Ensure the size is passed back to Python
+    *rcacSize = rcacData.size();
+
+    // Copy the data from C++ to Python's allocated memory
+    std::memcpy(rcacDataPtr, rcacData.data(), *rcacSize);
+}
 }
 } // extern "C"
