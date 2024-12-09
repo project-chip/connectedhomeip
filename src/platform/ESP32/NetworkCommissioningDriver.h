@@ -45,18 +45,18 @@ public:
 
     bool Next(WiFiScanResponse & item) override
     {
-        if (mIternum >= mSize)
-        {
-            return false;
-        }
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
         wifi_ap_record_t ap_record;
         VerifyOrReturnValue(esp_wifi_scan_get_ap_record(&ap_record) == ESP_OK, false);
         SetApData(item, ap_record);
 #else
+        if (mIternum >= mSize)
+        {
+            return false;
+        }
         SetApData(item, mpScanResults[mIternum]);
-#endif // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
         mIternum++;
+#endif // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
         return true;
     }
 
@@ -84,8 +84,8 @@ private:
     const size_t mSize;
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 1, 3)
     const wifi_ap_record_t * mpScanResults;
-#endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 1, 3)
     size_t mIternum = 0;
+#endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 1, 3)
 };
 
 class ESPWiFiDriver final : public WiFiDriver
