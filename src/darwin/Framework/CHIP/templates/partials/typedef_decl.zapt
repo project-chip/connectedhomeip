@@ -1,0 +1,2 @@
+{{! Arguments: cluster (might be "Globals", is not case-canonicalized), name, typedefLabel }}
+typedef {{asObjectiveCType type cluster}} {{asUnderlyingZclType name}};

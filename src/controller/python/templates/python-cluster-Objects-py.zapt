@@ -2,7 +2,7 @@
 {{> header}}
 '''
 
-# This file contains generated struct, enum, command definition.
+# This file contains generated struct, enum, typedef, and command definition.
 # Users are not expected to import this file, instead, users can use import chip.clusters,
 # which will import all symbols from this file and can get a readable, pretty naming like
 # clusters.OnOff.commands.OnCommand
@@ -55,6 +55,13 @@ class Globals:
 
 {{/if}}
 {{/zcl_structs}}
+    class Typedefs:
+{{#zcl_typedefs}}
+{{#if has_no_clusters}}
+{{> typedef_def cluster="Globals"}}
+
+{{/if}}
+{{/zcl_typedefs}}
 
 {{#zcl_clusters}}
 
@@ -106,6 +113,13 @@ class {{asUpperCamelCase name}}(Cluster):
 {{> struct_def cluster=(asUpperCamelCase parent.name) }}
 
 {{/zcl_structs}}
+{{#zcl_typedefs}}
+{{#first}}
+    class Typedefs:
+{{/first}}
+{{> typedef_def cluster=(asUpperCamelCase parent.name) }}
+
+{{/zcl_typedefs}}
 {{#zcl_commands}}
 {{#first}}
     class Commands:

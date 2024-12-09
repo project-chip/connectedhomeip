@@ -190,6 +190,7 @@ static_library("core") {
     ":chip_config_header",
     ":error",
     "${chip_root}/src/app/common:enums",
+    "${chip_root}/src/app/common:typedefs",
     "${chip_root}/src/ble",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/support",

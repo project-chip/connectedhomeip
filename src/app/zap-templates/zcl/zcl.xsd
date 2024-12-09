@@ -147,6 +147,7 @@ This schema describes the format of the XML files, that describe the ZCL specifi
           <xs:element ref="clusterExtension"/>
           <xs:element ref="enum"/>
           <xs:element ref="struct"/>
+          <xs:element ref="typedef"/>
           <xs:element ref="domain"/>
           <xs:element ref="global"/>
           <xs:element ref="tag"/>
@@ -157,7 +158,7 @@ This schema describes the format of the XML files, that describe the ZCL specifi
     </xs:complexType>
 
     <xs:unique name="structNameKey">
-      <xs:selector xpath="./struct|enum" />
+      <xs:selector xpath="./struct|enum|typedef" />
       <xs:field xpath="@name" />
     </xs:unique>
   </xs:element>
@@ -385,6 +386,16 @@ This schema describes the format of the XML files, that describe the ZCL specifi
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" name="cluster" type="clusterRef"/>
         <xs:element maxOccurs="unbounded" name="item" type="item"/>
+      </xs:sequence>
+      <xs:attribute name="description"/>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="type" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="typedef">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="cluster" type="clusterRef"/>
       </xs:sequence>
       <xs:attribute name="description"/>
       <xs:attribute name="name" use="required" type="xs:string"/>

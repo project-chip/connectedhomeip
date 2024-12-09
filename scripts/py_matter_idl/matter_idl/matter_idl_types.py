@@ -207,6 +207,13 @@ class Bitmap:
 
 
 @dataclass
+class Typedef:
+    name: str
+    base_type: str
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
+    is_global: bool = False
+
+@dataclass
 class Command:
     name: str
     code: int
@@ -235,6 +242,7 @@ class Cluster:
     events: List[Event] = field(default_factory=list)
     attributes: List[Attribute] = field(default_factory=list)
     structs: List[Struct] = field(default_factory=list)
+    typedefs: List[Typedef] = field(default_factory=list)
     commands: List[Command] = field(default_factory=list)
     description: Optional[str] = None
     api_maturity: ApiMaturity = ApiMaturity.STABLE
@@ -297,6 +305,7 @@ class Idl:
     global_bitmaps: List[Bitmap] = field(default_factory=list)
     global_enums: List[Enum] = field(default_factory=list)
     global_structs: List[Struct] = field(default_factory=list)
+    global_typedefs: List[Typedef] = field(default_factory=list)
 
     # IDL file name is available only if parsing provides a file name
     parse_file_name: Optional[str] = field(default=None)

@@ -60,6 +60,7 @@
         "global-bitmaps.xml",
         "global-enums.xml",
         "global-structs.xml",
+        "global-typedefs.xml",
         "groups-cluster.xml",
         "group-key-mgmt-cluster.xml",
         "icd-management-cluster.xml",
@@ -686,7 +687,15 @@
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
-    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
+    "ZCLDataTypes": [
+        "ARRAY",
+        "BITMAP",
+        "ENUM",
+        "NUMBER",
+        "STRING",
+        "STRUCT",
+        "TYPEDEF"
+    ],
     "fabricHandling": {
         "automaticallyCreateFields": true,
         "indexFieldId": 254,

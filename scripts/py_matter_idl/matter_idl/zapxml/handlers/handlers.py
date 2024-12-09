@@ -16,7 +16,7 @@ import logging
 from typing import Any, Optional
 
 from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, CommandQuality, ConstantEntry, DataType, Enum, Event,
-                                         EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality, StructTag)
+                                         EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality, StructTag, Typedef)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
@@ -351,6 +351,43 @@ class BitmapHandler(BaseHandler):
             if not found:
                 LOGGER.error('Bitmap %s could not find its cluster (code %d/0x%X)' %
                              (self._bitmap.name, code, code))
+
+    def EndProcessing(self):
+        self.context.AddIdlPostProcessor(self)
+
+class TypedefHandler(BaseHandler, IdlPostProcessor):
+    """ Handling /configurator/typedef elements."""
+
+    def __init__(self, context: Context, attrs):
+        super().__init__(context)
+
+        # no cluster codes means global. Note that at the time
+        # of writing this, no global typedefs were defined in XMLs
+        self._cluster_codes = set()
+        self.typedef = Typedef(name=attrs['name'],
+                          base_type=attrs['type'])
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'cluster':
+            self._cluster_codes.add(ParseInt(attrs['code']))
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        else:
+            return BaseHandler(self.context)
+
+    def FinalizeProcessing(self, idl: Idl):
+        if not self._cluster_codes:
+            idl.global_typedefs.append(self._typedef)
+            return
+
+        found = set()
+        for c in idl.clusters:
+            if c.code in self._cluster_codes:
+                c.typedefs.append(self._typedef)
+                found.add(c.code)
+
+        if found != self._cluster_codes:
+            LOGGER.error('Typedef %s could not find its clusters (codes: %r)' %
+                         (self._typedef.name, self._cluster_codes - found))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -704,5 +741,7 @@ class ConfiguratorHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name.lower() == 'global':
             return GlobalHandler(self.context)
+        elif name.lower() == 'typedef':
+            return TypedefHandler(self.context, attrs)
         else:
             return BaseHandler(self.context)

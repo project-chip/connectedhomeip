@@ -1,0 +1,2 @@
+// Typedef for {{label}}
+using {{asType label}} = {{zapTypeToEncodableClusterObjectType type}};

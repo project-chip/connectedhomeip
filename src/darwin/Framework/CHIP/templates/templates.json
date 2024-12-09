@@ -57,6 +57,10 @@
             "path": "partials/enum_decl.zapt"
         },
         {
+            "name": "typedef_decl",
+            "path": "partials/typedef_decl.zapt"
+        },
+        {
             "name": "renamed_struct_field_impl",
             "path": "partials/renamed_struct_field_impl.zapt"
         },

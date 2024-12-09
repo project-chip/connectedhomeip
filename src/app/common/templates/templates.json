@@ -26,6 +26,10 @@
             "path": "../../zap-templates/partials/cluster-enums-enum.zapt"
         },
         {
+            "name": "cluster_typedefs_typedef",
+            "path": "../../zap-templates/partials/cluster-typedefs-typedef.zapt"
+        },
+        {
             "name": "cluster_enums_ensure_known_value",
             "path": "../../zap-templates/partials/cluster-enums-ensure-known-value.zapt"
         },
@@ -98,6 +102,11 @@
             "path": "../../zap-templates/templates/app/cluster-enums-check.zapt",
             "name": "Enum and bitmap method check header for clusters",
             "output": "cluster-enums-check.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-typedefs.zapt",
+            "name": "Typedef header for clusters",
+            "output": "cluster-typedefs.h"
         }
     ]
 }
