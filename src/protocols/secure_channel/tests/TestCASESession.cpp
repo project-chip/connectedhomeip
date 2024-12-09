@@ -867,6 +867,178 @@ TEST_F(TestCASESession, Sigma1ParsingTest)
     TestSigma1Parsing(mem, bufferSize, Sigma1SessionIdTooBig);
 }
 
+TEST_F(TestCASESession, EncodeSigma1Test)
+{
+    System::PacketBufferHandle msg;
+    CASESession session;
+    CASESession::EncodeSigma1Param encodeParams;
+
+    uint8_t random[32];
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(&random[0], 32), CHIP_NO_ERROR);
+    encodeParams.initiatorRandom    = ByteSpan(random, sizeof(random));
+    encodeParams.initiatorSessionId = 7315;
+    uint8_t destinationId[32]       = { 0xDE, 0xAD };
+    encodeParams.destinationId      = ByteSpan(destinationId, sizeof(destinationId));
+
+    ReliableMessageProtocolConfig MRPConfig = GetDefaultMRPConfig();
+    encodeParams.initiatorMrpConfig         = &MRPConfig;
+
+    // EncodeSigma1 should fail when there is no public key
+    EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, session.EncodeSigma1(msg, encodeParams));
+
+    // Free the PacketBuffer
+    msg = nullptr;
+
+    Crypto::P256Keypair * EphemeralKey = gDeviceOperationalKeystore.AllocateEphemeralKeypairForCASE();
+    ASSERT_NE(EphemeralKey, nullptr);
+    EXPECT_EQ(CHIP_NO_ERROR, EphemeralKey->Initialize(ECPKeyTarget::ECDH));
+    encodeParams.pEphPubKey = &EphemeralKey->Pubkey();
+
+    // Succeed when Public Key is provided
+    EXPECT_EQ(CHIP_NO_ERROR, session.EncodeSigma1(msg, encodeParams));
+
+    // Free the PacketBuffer
+    msg = nullptr;
+
+    // EncodeSigma1 should fail when MRP config is missing
+    encodeParams.initiatorMrpConfig = nullptr;
+    EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, session.EncodeSigma1(msg, encodeParams));
+
+    // Free the PacketBuffer
+    msg = nullptr;
+
+    // Succeed when MRP Config is provided
+    encodeParams.initiatorMrpConfig = &MRPConfig;
+    EXPECT_EQ(CHIP_NO_ERROR, session.EncodeSigma1(msg, encodeParams));
+
+    {
+        System::PacketBufferHandle nonEmptyMsg = System::PacketBufferHandle::New(100);
+
+        // EncodeSigma1 should fail when the packetBufferHandle passed to it is not empty
+        EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, session.EncodeSigma1(nonEmptyMsg, encodeParams));
+    }
+
+    {
+        System::PacketBufferHandle msg1;
+        System::PacketBufferTLVReader tlvReader;
+        CASESession::ParseSigma1Param parseParams;
+
+        // Round Trip Test: Encode Sigma1, Parse it then verify parsed values
+        EXPECT_EQ(CHIP_NO_ERROR, session.EncodeSigma1(msg1, encodeParams));
+
+        tlvReader.Init(std::move(msg1));
+        EXPECT_EQ(CHIP_NO_ERROR, session.ParseSigma1(tlvReader, parseParams));
+
+        // compare parsed values with original values
+        EXPECT_TRUE(parseParams.initiatorRandom.data_equal(encodeParams.initiatorRandom));
+        EXPECT_EQ(parseParams.initiatorSessionId, encodeParams.initiatorSessionId);
+        EXPECT_TRUE(parseParams.destinationId.data_equal(encodeParams.destinationId));
+        EXPECT_TRUE(parseParams.initiatorEphPubKey.data_equal(
+            ByteSpan(encodeParams.pEphPubKey->ConstBytes(), encodeParams.pEphPubKey->Length())));
+    }
+
+    {
+        System::PacketBufferHandle msg2;
+        System::PacketBufferTLVReader tlvReader;
+        CASESession::ParseSigma1Param parseParams;
+
+        // Round Trip Test: Sigma1 with Session Resumption
+        // Encode Sigma1 with Resumption, parse it and and verify with original values
+        chip::SessionResumptionStorage::ResumptionIdStorage resumptionId;
+
+        EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
+        EXPECT_EQ(chip::Crypto::DRBG_get_bytes(&encodeParams.initiatorResume1MIC[0], sizeof(encodeParams.initiatorResume1MIC)),
+                  CHIP_NO_ERROR);
+
+        encodeParams.resumptionId               = ByteSpan(resumptionId.data(), resumptionId.size());
+        encodeParams.initiatorResumeMICSpan     = ByteSpan(encodeParams.initiatorResume1MIC);
+        encodeParams.sessionResumptionRequested = true;
+
+        EXPECT_EQ(CHIP_NO_ERROR, session.EncodeSigma1(msg2, encodeParams));
+
+        // Encode and Parse Round Trip Test
+        tlvReader.Init(std::move(msg2));
+
+        EXPECT_EQ(CHIP_NO_ERROR, session.ParseSigma1(tlvReader, parseParams));
+
+        // RoundTrip
+        EXPECT_TRUE(parseParams.initiatorRandom.data_equal(encodeParams.initiatorRandom));
+        EXPECT_EQ(parseParams.initiatorSessionId, encodeParams.initiatorSessionId);
+        EXPECT_TRUE(parseParams.destinationId.data_equal(encodeParams.destinationId));
+        EXPECT_TRUE(parseParams.initiatorEphPubKey.data_equal(
+            ByteSpan(encodeParams.pEphPubKey->ConstBytes(), encodeParams.pEphPubKey->Length())));
+
+        EXPECT_TRUE(parseParams.resumptionId.data_equal(encodeParams.resumptionId));
+        EXPECT_TRUE(parseParams.initiatorResumeMICSpan.data_equal(encodeParams.initiatorResumeMICSpan));
+        EXPECT_TRUE(parseParams.InitiatorMRPParamsPresent);
+    }
+    // Release EphemeralKeyPair
+    gDeviceOperationalKeystore.ReleaseEphemeralKeypair(EphemeralKey);
+}
+
+TEST_F(TestCASESession, EncodeSigma2Test)
+{
+    System::PacketBufferHandle msg;
+    CASESession session;
+    CASESession::EncodeSigma2Param encodeParams;
+
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(&encodeParams.responderRandom[0], sizeof(encodeParams.responderRandom)), CHIP_NO_ERROR);
+    encodeParams.responderSessionId = 7315;
+
+    // Generate Ephemeral Public Key
+    Crypto::P256Keypair * EphemeralKey = gDeviceOperationalKeystore.AllocateEphemeralKeypairForCASE();
+    ASSERT_NE(EphemeralKey, nullptr);
+    EXPECT_EQ(CHIP_NO_ERROR, EphemeralKey->Initialize(ECPKeyTarget::ECDH));
+    encodeParams.pEphPubKey = &EphemeralKey->Pubkey();
+
+    // TBEData2Encrypted
+    encodeParams.msg_R2_Encrypted.Alloc(100);
+
+    // responder Session Parameters
+    ReliableMessageProtocolConfig MRPConfig = GetDefaultMRPConfig();
+    encodeParams.responderMrpConfig         = &MRPConfig;
+
+    EXPECT_EQ(CHIP_NO_ERROR, session.EncodeSigma2(msg, encodeParams));
+
+    {
+        System::PacketBufferHandle nonEmptyMsg = System::PacketBufferHandle::New(100);
+
+        // EncodeSigma2 should fail when the packetBufferHandle passed to it is not empty
+        EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, session.EncodeSigma2(nonEmptyMsg, encodeParams));
+    }
+
+    // EncodeSigma1 should fail when there is no public key
+    encodeParams.pEphPubKey = nullptr;
+    EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, session.EncodeSigma2(msg, encodeParams));
+    msg = nullptr;
+
+    encodeParams.pEphPubKey = &EphemeralKey->Pubkey();
+    EXPECT_EQ(CHIP_NO_ERROR, session.EncodeSigma2(msg, encodeParams));
+    msg = nullptr;
+
+    // EncodeSigma1 should fail when TBEData2Encrypted is not allocated
+    encodeParams.msg_R2_Encrypted.Free();
+
+    EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, session.EncodeSigma2(msg, encodeParams));
+    msg = nullptr;
+
+    encodeParams.msg_R2_Encrypted.Alloc(100);
+
+    EXPECT_EQ(CHIP_NO_ERROR, session.EncodeSigma2(msg, encodeParams));
+
+    // EncodeSigma1 should fail when MRP config is missing
+    encodeParams.responderMrpConfig = nullptr;
+    EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, session.EncodeSigma2(msg, encodeParams));
+    msg = nullptr;
+
+    // Succeed when MRP Config is provided
+    encodeParams.responderMrpConfig = &MRPConfig;
+    EXPECT_EQ(CHIP_NO_ERROR, session.EncodeSigma2(msg, encodeParams));
+
+    // Release EphemeralKeyPair
+    gDeviceOperationalKeystore.ReleaseEphemeralKeypair(EphemeralKey);
+}
+
 struct SessionResumptionTestStorage : SessionResumptionStorage
 {
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode, ScopedNodeId peerNodeId, ResumptionIdStorage * resumptionId,
