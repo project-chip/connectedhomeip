@@ -17,7 +17,6 @@
 
 import glob
 import importlib
-from importlib.abc import Traversable
 import importlib.resources as pkg_resources
 import logging
 import pathlib
@@ -26,6 +25,7 @@ import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum, auto
+from importlib.abc import Traversable
 from typing import Callable, Optional, Union
 
 import chip.clusters as Clusters
