@@ -20,7 +20,7 @@
 # Generates a basic RevocationSet from TestNet or MainNet.
 # Note: Indirect CRLs are only supported with py cryptography version 44.0.0.
 #       You may need to patch in a change locally if you are using an older
-#       version of py cryptography. The required changes can be viewed in this
+#       version of py cryptography. The required changes can be viewed in this 
 #       PR: https://github.com/pyca/cryptography/pull/11467/files. The file that
 #       needs to be patched is accessible from your local connectedhomeip
 #       directory at ./.environment/pigweed-venv/lib/python3.11/site-packages/cryptography/x509/extensions.py
@@ -30,6 +30,7 @@
 import base64
 import json
 import logging
+import re
 import subprocess
 import sys
 from enum import Enum
@@ -114,15 +115,6 @@ def get_skid(cert: x509.Certificate) -> Optional[bytes]:
         logging.warning("SKID not found in certificate")
         return None
 
-
-def get_subject_b64(cert: x509.Certificate) -> str:
-    return base64.b64encode(cert.subject.public_bytes()).decode('utf-8')
-
-
-def get_issuer_b64(cert: x509.Certificate) -> str:
-    return base64.b64encode(cert.issuer.public_bytes()).decode('utf-8')
-
-
 def verify_cert(cert: x509.Certificate, root: x509.Certificate) -> bool:
     '''
     Verifies if the cert is signed by root.
@@ -141,7 +133,7 @@ def verify_cert(cert: x509.Certificate, root: x509.Certificate) -> bool:
     try:
         root.public_key().verify(cert.signature, cert.tbs_certificate_bytes, ec.ECDSA(cert.signature_hash_algorithm))
     except Exception:
-        logging.warning(f"Signature verification failed for cert subject: {get_subject_b64(cert)}, issuer: {get_issuer_b64(cert)}")
+        logging.warning(f"Signature verification failed for cert subject: {cert.subject.rfc4514_string()}, issuer: {cert.issuer.rfc4514_string()}")
         return False
 
     return True
@@ -201,16 +193,26 @@ def fetch_crl_from_url(url: str, timeout: int) -> x509.CertificateRevocationList
     try:
         r = requests.get(url, timeout=timeout)
         return x509.load_der_x509_crl(r.content)
-    except Exception:
-        logging.error('Failed to fetch a valid CRL')
+    except Exception as e:
+        logging.error('Failed to fetch a valid CRL', e)
 
 
 class DCLDClientInterface:
     '''
     An interface for interacting with DCLD.
-
     '''
+    def send_get_request(self, url: str) -> dict:
+        '''
+        Send a GET request for a json object.
+        '''
+        try:
+            response = requests.get(url).json()
+            return response
+        except Exception as e:
+            logging.error(f"Failed to fetch {url}: {e}")
+            return None
 
+        
     def get_revocation_points(self) -> list[dict]:
         '''
         Get revocation points from DCL
@@ -237,35 +239,38 @@ class DCLDClientInterface:
             List of revocation points
         '''
         raise NotImplementedError
-
-    def get_certificate(self, issuer_name_b64: str, akid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
+    
+    def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
         Get certificate from DCL
         '''
         raise NotImplementedError
-
-    def get_first_approved_certificate(self, response: dict, akid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
+    
+    def get_only_approved_certificate(self, response: dict, skid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
         '''
-        Get first approved certificate from DCL resposne.
+        Get only approved certificate from DCL resposne.
         '''
-        if response["approvedCertificates"]["certs"][0]["pemCert"]:
-            issuer_certificate = x509.load_pem_x509_certificate(
-                bytes(response["approvedCertificates"]["certs"][0]["pemCert"], 'utf-8'))
-        else:
-            raise requests.exception.NotFound(f"No certificate found for {akid_hex}")
+        if response is None or not response.get("approvedCertificates", {}).get("certs", []):
+            raise requests.exception.NotFound(f"No certificate found for {skid_hex}")
+        if len(response["approvedCertificates"]["certs"]) > 1:
+            raise ValueError(f"Multiple certificates found for {skid_hex}")
+        issuer_certificate = x509.load_pem_x509_certificate(bytes(response["approvedCertificates"]["certs"][0]["pemCert"], "utf-8"))
         return response["approvedCertificates"]["certs"][0]["isRoot"], issuer_certificate
 
     def get_paa_cert(self, initial_cert: x509.Certificate) -> Optional[x509.Certificate]:
-        """Get the PAA certificate for the CRL Signer Certificate."""
-        issuer_name_b64 = get_issuer_b64(initial_cert)
+        '''
+        Get the PAA certificate for the CRL Signer Certificate.
+        '''
+        issuer_name = initial_cert.issuer
         akid = get_akid(initial_cert)
         if akid is None:
+            logging.error('Failed to get PAA certificate')
             return
         paa_certificate = None
         while not paa_certificate:
             try:
                 akid_hex = akid.hex().upper()
-                is_root, issuer_certificate = self.get_certificate(issuer_name_b64, akid_hex)
+                is_root, issuer_certificate = self.get_approved_certificate(issuer_name, akid_hex)
                 if is_root:
                     paa_certificate = issuer_certificate
                     break
@@ -273,23 +278,28 @@ class DCLDClientInterface:
             except Exception as e:
                 logging.error('Failed to get PAA certificate', e)
                 return
-            issuer_name_b64 = get_issuer_b64(issuer_certificate)
+            logging.debug(f"issuer_name: {issuer_certificate.subject.rfc4514_string()}")
+            issuer_name = issuer_certificate.issuer
             akid = get_akid(issuer_certificate)
+            logging.debug(f"akid: {akid}")
         if paa_certificate is None:
             logging.warning("PAA Certificate not found, continue...")
         return paa_certificate
-
+    
+    def get_b64_name(self, name: x509.name.Name) -> str:
+        '''
+        Get base64 encoded name
+        '''
+        return base64.b64encode(name.public_bytes()).decode('utf-8')
 
 class DCLDClient(DCLDClientInterface):
     '''
     A client for interacting with DCLD using command line interface (CLI).
-
     '''
 
     def __init__(self, dcld_exe: str, production: bool, rest_node_url: str):
         '''
         Initialize the client
-
 
         dcld_exe: str
             Path to `dcld` executable
@@ -369,25 +379,25 @@ class DCLDClient(DCLDClientInterface):
         '''
 
         response = self.get_dcld_cmd_output_json(['query', 'pki', 'revocation-points',
-                                                  '--issuer-subject-key-id', issuer_subject_key_id])
+                                                      '--issuer-subject-key-id', issuer_subject_key_id])
         logging.debug(f"Response revocation points: {response}")
         return response["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]["points"]
 
-    def get_certificate(self, issuer_name_b64: str, akid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
+    def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
         Get certificate from DCL
         '''
-        query_cmd_list = ['query', 'pki', 'x509-cert', '-u', issuer_name_b64, '-k', akid_hex]
+        subject_name_b64 = self.get_b64_name(subject_name)
+        query_cmd_list = ['query', 'pki', 'x509-cert', '-u', subject_name_b64, '-k', skid_hex]
         logging.debug(
-            f"Fetching issuer from dcl query{' '.join(query_cmd_list)}")
+                    f"Fetching issuer from dcl query{' '.join(query_cmd_list)}")
         response = self.get_dcld_cmd_output_json(query_cmd_list)
-        return self.get_first_approved_certificate(response, akid_hex)
+        return self.get_only_approved_certificate(response, skid_hex)
 
 
 class RESTDCLDClient(DCLDClientInterface):
     '''
     A client for interacting with DCLD using the REST API.
-
     '''
 
     def __init__(self, rest_node_url: str):
@@ -397,6 +407,9 @@ class RESTDCLDClient(DCLDClientInterface):
         rest_node_url: str
             RESTful API URL
         '''
+
+        if not re.match(r"^https://.*\.dcl\.csa-iot\.org$", rest_node_url):
+            raise ValueError(f"Invalid RESTful API URL: {rest_node_url}")
 
         self.rest_node_url = rest_node_url
 
@@ -410,7 +423,7 @@ class RESTDCLDClient(DCLDClientInterface):
             List of revocation points
         '''
 
-        response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points").json()
+        response = self.send_get_request(f"{self.rest_node_url}/dcl/pki/revocation-points")
         return response["PkiRevocationDistributionPoint"]
 
     def get_revocations_points_by_skid(self, issuer_subject_key_id) -> list[dict]:
@@ -428,21 +441,20 @@ class RESTDCLDClient(DCLDClientInterface):
             List of revocation points
         '''
 
-        response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points/{issuer_subject_key_id}").json()
+        response = self.send_get_request(f"{self.rest_node_url}/dcl/pki/revocation-points/{issuer_subject_key_id}")
         logging.debug(f"Response revocation points: {response}")
         return response["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]["points"]
 
-    def get_certificate(self, issuer_name_b64: str, akid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
+    def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
         Get certificate from DCL
         '''
-        akid_hex = ':'.join([akid_hex[i:i+2] for i in range(0, len(akid_hex), 2)])
-
+        subject_name_b64 = self.get_b64_name(subject_name) 
+        skid_hex_formatted = ':'.join([skid_hex[i:i+2] for i in range(0, len(skid_hex), 2)])
         logging.debug(
-            f"Fetching issuer from:{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}")
-        response = requests.get(f"{self.rest_node_url}/dcl/pki/certificates/{issuer_name_b64}/{akid_hex}").json()
-        return self.get_first_approved_certificate(response, akid_hex)
-
+                    f"Fetching issuer from:{self.rest_node_url}/dcl/pki/certificates/{subject_name_b64}/{skid_hex_formatted}")
+        response = self.send_get_request(f"{self.rest_node_url}/dcl/pki/certificates/{subject_name_b64}/{skid_hex_formatted}")
+        return self.get_only_approved_certificate(response, skid_hex)
 
 @click.command()
 @click.help_option('-h', '--help')
@@ -547,9 +559,9 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
 
         if count_with_matching_vid_issuer_skid > 1:
             try:
-                issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
-                    x509.oid.ExtensionOID.ISSUING_DISTRIBUTION_POINT
-                ).value
+              issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
+                  x509.oid.ExtensionOID.ISSUING_DISTRIBUTION_POINT
+              ).value
             except Exception:
                 logging.warning("CRL Issuing Distribution Point not found, continue...")
                 continue
@@ -560,26 +572,26 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
                     logging.warning("CRL Issuing Distribution Point URI is not CRL URL, continue...")
                     continue
             else:
-                logging.warning("CRL Issuing Distribution Point URI is not CRL URL, continue...")
+                logging.warning("Distribution Point does not contain a single URI, continue...")
                 continue
 
         # TODO: 8. Validate CRL as per Section 6.3 of RFC 5280
 
         # 9. Decide on certificate authority to match against CRL entries.
-        if revocation_point["isPAA"]:
-            certificate_authority_name_b64 = get_subject_b64(paa_certificate_object)
-            certificate_akid = get_skid(paa_certificate_object)
+        if revocation_point["isPAA"] and not is_self_signed_certificate(crl_signer_certificate):
+            certificate_authority_name = crl_signer_certificate.issuer()
+            certificate_akid = get_akid(crl_signer_certificate)
         elif crl_signer_delegator_cert:
-            certificate_authority_name_b64 = get_subject_b64(crl_signer_delegator_cert)
+            certificate_authority_name = crl_signer_delegator_cert.subject
             certificate_akid = get_skid(crl_signer_delegator_cert)
         else:
-            certificate_authority_name_b64 = get_subject_b64(crl_signer_certificate)
+            certificate_authority_name = crl_signer_certificate.subject
             certificate_akid = get_skid(crl_signer_certificate)
 
         # validate issuer skid matchces with the one in revocation points
         certificate_akid_hex = ''.join('{:02X}'.format(x) for x in certificate_akid)
 
-        logging.debug(f"Certificate Authority Name: {certificate_authority_name_b64}")
+        logging.debug(f"Certificate Authority Name: {certificate_authority_name.rfc4514_string()}")
         logging.debug(f"Certificate AKID: {certificate_akid_hex}")
         logging.debug(f"revocation_point['issuerSubjectKeyID']: {revocation_point['issuerSubjectKeyID']}")
 
@@ -591,12 +603,12 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
         # 10. Iterate through the Revoked Certificates List
         for revoked_cert in crl_file:
             try:
-                revoked_cert_issuer = base64.b64encode(revoked_cert.extensions.get_extension_for_oid(
-                    x509.CRLEntryExtensionOID.CERTIFICATE_ISSUER).value.get_values_for_type(x509.DirectoryName)[0].public_bytes()).decode("utf-8")
+                revoked_cert_issuer = revoked_cert.extensions.get_extension_for_oid(
+                    x509.CRLEntryExtensionOID.CERTIFICATE_ISSUER).value.get_values_for_type(x509.DirectoryName)[0]
                 if revoked_cert_issuer is not None:
                     # check if this really are the same thing
-                    if revoked_cert_issuer != certificate_authority_name_b64:
-                        logging.debug("CRL Issuer is not CRL File Issuer, continue...")
+                    if revoked_cert_issuer != x509.DirectoryName(certificate_authority_name).value:
+                        logging.debug("CRL entry issuer is not CRL File Issuer, continue...")
                         continue
             except Exception:
                 logging.warning("certificateIssuer entry extension not found in CRL")
@@ -607,7 +619,7 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
         entry = {
             "type": "revocation_set",
             "issuer_subject_key_id": certificate_akid_hex,
-            "issuer_name": certificate_authority_name_b64,
+            "issuer_name": certificate_authority_name.rfc4514_string(),
             "revoked_serial_numbers": serialnumber_list,
             "crl_signer_cert": revocation_point["crlSignerCertificate"],
         }
