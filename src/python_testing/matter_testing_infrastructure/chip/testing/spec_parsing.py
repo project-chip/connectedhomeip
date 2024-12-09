@@ -19,7 +19,6 @@ import glob
 import importlib
 import importlib.resources as pkg_resources
 import logging
-import pathlib
 import typing
 import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
