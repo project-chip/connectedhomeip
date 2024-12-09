@@ -477,7 +477,7 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
         publisher->Shutdown();
 
         DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded };
-        error      = DeviceLayer::PlatformMgr().PostEvent(&event);
+        error = DeviceLayer::PlatformMgr().PostEvent(&event);
 
         if (error != CHIP_NO_ERROR)
         {
