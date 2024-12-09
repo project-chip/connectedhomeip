@@ -524,7 +524,7 @@ class PrebuiltDataModelDirectory(Enum):
         raise KeyError("Invalid enum: %r" % self)
 
 
-class DataModelLevel(str, Enum):
+class DataModelLevel(Enum):
     kCluster = auto()
     kDeviceType = auto()
 
@@ -578,7 +578,6 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
             continue
 
         logging.info('Parsing file %s', f.name)
-
         with f.open("r", encoding="utf8") as file:
             root = ElementTree.parse(file).getroot()
             add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
