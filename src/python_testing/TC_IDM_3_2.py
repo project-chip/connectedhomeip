@@ -1,11 +1,13 @@
 import inspect
 from enum import IntFlag
-from typing import Union, get_args, get_origin
+# from typing import Union, get_args, get_origin
+from typing import get_args
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.ClusterObjects import ClusterObject
 from chip.clusters.enum import MatterIntEnum
+from chip.interaction_model import InteractionModelError, Status
 from chip.testing import global_attribute_ids
 from chip.tlv import uint
 from matter_testing_infrastructure.chip.testing.basic_composition import BasicCompositionTests
@@ -95,10 +97,12 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                     print(f'attributes_of_type_on_device: {attributes_of_type_on_device}, attributes_of_type: {attributes_of_type}')
                     chosen_attribute = next(iter(attributes_of_type_on_device))
                     value = self.pick_writable_value(chosen_attribute)
-                #     output = await self.write_single_attribute(
-                #         attribute_value=chosen_attribute(value=value),
-                #         endpoint_id=endpoint,
-                #         )
+                    # output = await self.write_single_attribute(
+                    await self.write_single_attribute(
+                        attribute_value=chosen_attribute(value=value),
+                        endpoint_id=endpoint,
+                        )
+
                 if attributes_of_type_on_device:
                     return True
         return False
@@ -109,11 +113,11 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         await self.setup_class_helper()
         self.xml_clusters, self.problems = build_xml_clusters()
         all_clusters = [cluster for cluster in Clusters.ClusterObjects.ALL_ATTRIBUTES]
-        expected_descriptor_attributes = ClusterObjects.ALL_ATTRIBUTES[Clusters.Objects.Descriptor.id]
+        # expected_descriptor_attributes = ClusterObjects.ALL_ATTRIBUTES[Clusters.Objects.Descriptor.id]
 
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor)])
-        returned_attributes = [a for a in read_request[0][Clusters.Objects.Descriptor].keys() if a !=
-                               Clusters.Attribute.DataVersion]
+        # returned_attributes = [a for a in read_request[0][Clusters.Objects.Descriptor].keys() if a !=
+        #                        Clusters.Attribute.DataVersion]
 
         self.device_clusters = self.all_device_clusters()
         self.device_attributes = self.all_device_attributes()
@@ -305,10 +309,12 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         supported_endpoints = set(self.endpoints.keys())
         all_endpoints = set(range(max(supported_endpoints)+2))
         unsupported = list(all_endpoints - supported_endpoints)
-        # result = await self.read_single_attribute_expect_error(endpoint=unsupported[0], cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.FeatureMap, error=Status.UnsupportedEndpoint)
+        result = await self.read_single_attribute_expect_error(endpoint=unsupported[0], cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.FeatureMap, error=Status.UnsupportedEndpoint)
+        await self.read_single_attribute_expect_error(endpoint=unsupported[0], cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.FeatureMap, error=Status.UnsupportedEndpoint)
         chosen_writable_attribute = next(writable_attributes_iter)
         value = self.pick_writable_value(chosen_writable_attribute)
-        # result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
+        await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
+        result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
 
         # Step 14
 
@@ -417,7 +423,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         endpoint = next(iter(output_1.attributes))
 
         value = self.pick_writable_value(chosen_writable_attribute)
-        data_version = output_1.attributes[endpoint][Clusters.Thermostat][Clusters.Attribute.DataVersion]
+        # data_version = output_1.attributes[endpoint][Clusters.Thermostat][Clusters.Attribute.DataVersion]
         result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
         result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value + 1), endpoint_id=endpoint)
 
