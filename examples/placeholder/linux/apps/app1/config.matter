@@ -9645,13 +9645,13 @@ endpoint 1 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
-    ram      attribute PIROccupiedToUnoccupiedDelay default = 0x00;
+    callback attribute PIROccupiedToUnoccupiedDelay;
     ram      attribute PIRUnoccupiedToOccupiedDelay default = 0x00;
     ram      attribute PIRUnoccupiedToOccupiedThreshold default = 1;
-    ram      attribute ultrasonicOccupiedToUnoccupiedDelay default = 0x00;
+    callback attribute ultrasonicOccupiedToUnoccupiedDelay;
     ram      attribute ultrasonicUnoccupiedToOccupiedDelay default = 0x00;
     ram      attribute ultrasonicUnoccupiedToOccupiedThreshold default = 1;
-    ram      attribute physicalContactOccupiedToUnoccupiedDelay default = 0x00;
+    callback attribute physicalContactOccupiedToUnoccupiedDelay;
     ram      attribute physicalContactUnoccupiedToOccupiedDelay default = 0x00;
     ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 1;
     callback attribute featureMap;

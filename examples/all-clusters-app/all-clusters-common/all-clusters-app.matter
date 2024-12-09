@@ -9047,7 +9047,7 @@ endpoint 1 {
     ram      attribute occupancySensorTypeBitmap default = 1;
     callback attribute holdTime;
     callback attribute holdTimeLimits;
-    ram      attribute PIROccupiedToUnoccupiedDelay default = 10;
+    callback attribute PIROccupiedToUnoccupiedDelay;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 5;
   }
@@ -9505,7 +9505,7 @@ endpoint 2 {
     ram      attribute occupancySensorTypeBitmap default = 1;
     callback attribute holdTime;
     callback attribute holdTimeLimits;
-    ram      attribute PIROccupiedToUnoccupiedDelay default = 10;
+    callback attribute PIROccupiedToUnoccupiedDelay;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 5;
   }

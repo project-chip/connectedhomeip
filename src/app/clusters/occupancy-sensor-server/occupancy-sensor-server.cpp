@@ -59,7 +59,10 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::FeatureMap::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mFeature));
         break;
-    case Attributes::HoldTime::Id: {
+    case Attributes::HoldTime::Id:
+    case Attributes::PIROccupiedToUnoccupiedDelay::Id:
+    case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
+    case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
 
         uint16_t * holdTime = GetHoldTimeForEndpoint(aPath.mEndpointId);
 
@@ -189,12 +192,6 @@ CHIP_ERROR SetHoldTime(EndpointId endpointId, uint16_t newHoldTime)
     {
         MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
     }
-
-    // Blindly try to write RAM-backed legacy attributes (will fail silently if absent)
-    // to keep them in sync.
-    (void) Attributes::PIROccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
-    (void) Attributes::UltrasonicOccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
-    (void) Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
 
     return CHIP_NO_ERROR;
 }
