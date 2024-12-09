@@ -61,11 +61,16 @@ namespace {
 static void GetThreadInfo(const struct k_thread * thread, void * user_data)
 {
     size_t unusedStackSize;
-    ThreadMetrics ** threadMetricsListHead = (ThreadMetrics **) user_data;
-    ThreadMetrics * threadMetrics          = (ThreadMetrics *) malloc(sizeof(ThreadMetrics));
+    ThreadMetrics ** threadMetricsListHead = static_cast<ThreadMetrics **>(user_data);
+    ThreadMetrics * threadMetrics          = Platform::New<ThreadMetrics>();
 
+    VerifyOrReturn(threadMetrics != NULL, ChipLogError(DeviceLayer, "Failed to allocate ThreadMetrics"));
+
+#if defined(CONFIG_THREAD_NAME)
     Platform::CopyString(threadMetrics->NameBuf, k_thread_name_get((k_tid_t) thread));
     threadMetrics->name.Emplace(CharSpan::fromCharString(threadMetrics->NameBuf));
+#endif
+
     threadMetrics->id = (uint64_t) thread;
     threadMetrics->stackFreeCurrent.ClearValue(); // unsupported metric
     threadMetrics->stackFreeMinimum.ClearValue();
@@ -81,14 +86,7 @@ static void GetThreadInfo(const struct k_thread * thread, void * user_data)
     (void) unusedStackSize;
 #endif
 
-    if (*threadMetricsListHead)
-    {
-        threadMetrics->Next = *threadMetricsListHead;
-    }
-    else
-    {
-        threadMetrics->Next = NULL;
-    }
+    threadMetrics->Next    = *threadMetricsListHead;
     *threadMetricsListHead = threadMetrics;
 }
 
@@ -224,6 +222,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
 {
 #if defined(CONFIG_THREAD_MONITOR)
+    *threadMetricsOut = NULL;
     k_thread_foreach((k_thread_user_cb_t) GetThreadInfo, threadMetricsOut);
     return CHIP_NO_ERROR;
 #else
@@ -237,7 +236,7 @@ void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetr
     {
         ThreadMetrics * thread = threadMetrics;
         threadMetrics          = threadMetrics->Next;
-        free(thread);
+        Platform::Delete<ThreadMetrics>(thread);
     }
 }
 
