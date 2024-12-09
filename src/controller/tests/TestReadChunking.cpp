@@ -482,7 +482,7 @@ TEST_F(TestReadChunking, TestChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -545,7 +545,7 @@ TEST_F(TestReadChunking, TestListChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -647,7 +647,7 @@ TEST_F(TestReadChunking, TestBadChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(0);
@@ -699,7 +699,7 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.

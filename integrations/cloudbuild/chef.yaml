@@ -29,7 +29,7 @@ steps:
       args:
           - >-
               perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
-              ./examples/chef/chef.py --build_all --build_exclude noip
+              ./examples/chef/chef.py --build_all --build_exclude "noip|temperaturecontrolledcabinet"
       id: CompileAll
       waitFor:
           - Bootstrap
