@@ -580,11 +580,8 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
 
         logging.info('Parsing file %s', f.name)
 
-        # Open the resource file using importlib.resources and parse it
         with f.open("r", encoding="utf8") as file:
-            # Directly parse the XML file without assigning it to 'tree'
-            tree = ElementTree.parse(file)  # Parse the file to process it
-            root = tree.getroot()
+            root = ElementTree.parse(file).getroot()
             add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
