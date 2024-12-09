@@ -552,18 +552,19 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     return top.joinpath(data_model_level.dirname)
 
 
-def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, pathlib.Path] = PrebuiltDataModelDirectory.k1_4) -> typing.Tuple[dict[int, dict], list]:
+def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> typing.Tuple[dict[int, dict], list]:
     """
     Build XML clusters from the specified data model directory.
     This function supports both pre-built locations and full paths
+
+    if data_model_directory is a Travesable, it is assumed to already contain `clusters` (i.e. be a directory
+    with all XML files in it)
     """
 
     if isinstance(data_model_directory, PrebuiltDataModelDirectory):
-        top = pkg_resources.files(importlib.import_module("chip.testing")).joinpath('data_model').joinpath(data_model_directory.dirname)
+        top = pkg_resources.files(importlib.import_module("chip.testing")).joinpath('data_model').joinpath(data_model_directory.dirname).joinpath(DataModelLevel.kCluster.dirname)
     else:
         top = data_model_directory
-
-    top = top.joinpath(DataModelLevel.kCluster.dirname)
 
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
