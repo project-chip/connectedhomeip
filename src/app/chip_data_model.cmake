@@ -17,7 +17,7 @@
 set(CHIP_APP_BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 include("${CHIP_ROOT}/build/chip/chip_codegen.cmake")
-include("${CHIP_ROOT}/src/app/codegen-data-model-provider/model.cmake")
+include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 
 # Configure ${APP_TARGET} with source files associated with ${CLUSTER} cluster
 #
