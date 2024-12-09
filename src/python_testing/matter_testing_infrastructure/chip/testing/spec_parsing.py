@@ -545,7 +545,8 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     """
     # If it's a prebuilt directory, build the path based on the version and data model level
     if isinstance(data_model_directory, PrebuiltDataModelDirectory):
-        top = pkg_resources.files(importlib.import_module('chip.testing')).joinpath('data_model').joinpath(data_model_directory.dirname)
+        top = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+            'data_model').joinpath(data_model_directory.dirname)
     else:
         top = data_model_directory
 
@@ -562,7 +563,8 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     """
 
     if isinstance(data_model_directory, PrebuiltDataModelDirectory):
-        top = pkg_resources.files(importlib.import_module("chip.testing")).joinpath('data_model').joinpath(data_model_directory.dirname).joinpath(DataModelLevel.kCluster.dirname)
+        top = pkg_resources.files(importlib.import_module("chip.testing")).joinpath(
+            'data_model').joinpath(data_model_directory.dirname).joinpath(DataModelLevel.kCluster.dirname)
     else:
         top = data_model_directory
 
