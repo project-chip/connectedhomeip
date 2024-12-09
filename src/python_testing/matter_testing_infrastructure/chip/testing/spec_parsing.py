@@ -742,7 +742,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure
             xml_clusters[id] = new
 
 
-def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNotice], dict[int, XmlDeviceType]]:
+def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
     device_types: dict[int, XmlDeviceType] = {}
     device = root.iter('deviceType')
@@ -823,7 +823,7 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
             continue
         logging.info('Parsing file %r / %s', top, file.name)
         with file.open('r', encoding="utf8") as xml:
-            root = ElementTree.parse(xml)
+            root = ElementTree.parse(xml).getroot()
             tmp_device_types, tmp_problems = parse_single_device_type(root)
             problems = problems + tmp_problems
             device_types.update(tmp_device_types)
