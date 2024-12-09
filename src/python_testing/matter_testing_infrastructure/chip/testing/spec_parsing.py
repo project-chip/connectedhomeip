@@ -815,16 +815,18 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
 
 
 def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
-    dir = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
+    top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems = []
-    for xml in glob.glob(f"{dir}/*.xml"):
-        logging.info(f'Parsing file {xml}')
-        tree = ElementTree.parse(f'{xml}')
-        root = tree.getroot()
-        tmp_device_types, tmp_problems = parse_single_device_type(root)
-        problems = problems + tmp_problems
-        device_types.update(tmp_device_types)
+    for file in top.iterdir():
+        if not file.name.endswith('.xml'):
+            continue
+        logging.info('Parsing file %r / %s', top, file.name)
+        with file.open('r', encoding="utf8") as xml:
+            root = ElementTree.parse(xml)
+            tmp_device_types, tmp_problems = parse_single_device_type(root)
+            problems = problems + tmp_problems
+            device_types.update(tmp_device_types)
 
     if -1 not in device_types.keys():
         raise ConformanceException("Base device type not found in device type xml data")
