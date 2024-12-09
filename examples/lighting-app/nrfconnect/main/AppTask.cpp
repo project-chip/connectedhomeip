@@ -33,6 +33,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/util/persistence/DeferredAttributePersistenceProvider.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -112,7 +113,10 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 // be written, so it must live so long as the DeferredAttributePersistenceProvider object.
 DeferredAttribute gCurrentLevelPersister(ConcreteAttributePath(kLightEndpointId, Clusters::LevelControl::Id,
                                                                Clusters::LevelControl::Attributes::CurrentLevel::Id));
-DeferredAttributePersistenceProvider gDeferredAttributePersister(Server::GetInstance().GetDefaultAttributePersister(),
+
+// Deferred persistence will be auto-initialized as soon as the default persistence is initialized
+DefaultAttributePersistenceProvider gSimpleAttributePersistence;
+DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttributePersistence,
                                                                  Span<DeferredAttribute>(&gCurrentLevelPersister, 1),
                                                                  System::Clock::Milliseconds32(5000));
 
@@ -263,7 +267,9 @@ CHIP_ERROR AppTask::Init()
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider        = CodegenDataModelProviderInstance();
+    VerifyOrDie(gSimpleAttributePersistence.Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
+
+    initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();

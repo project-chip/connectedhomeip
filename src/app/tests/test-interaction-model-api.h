@@ -131,6 +131,7 @@ public:
     std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
     ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
     ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
+    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override {}
 };
 
 } // namespace app
