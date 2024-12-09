@@ -43,8 +43,9 @@ constexpr uint8_t kMaxSpeakerLevel          = 254;
 constexpr uint8_t kMaxMicrophoneLevel       = 254;
 constexpr uint16_t kMaxImageRotationDegrees = 359;
 
-constexpr size_t kViewportStructMaxSerializedSize =
-    TLV::EstimateStructOverhead(sizeof(uint16_t) * 4);
+constexpr size_t kViewportStructMaxSerializedSize = TLV::EstimateStructOverhead(sizeof(uint16_t) * 4);
+
+constexpr uint8_t kNumOfStreamTypes = 4;
 
 class CameraAVStreamMgmtServer;
 
@@ -61,23 +62,18 @@ public:
     /**
      *   @brief Handle Command Delegate for Video stream allocation.
      */
-    virtual Protocols::InteractionModel::Status VideoStreamAllocate(StreamTypeEnum streamType,
-                                                                    CameraAvStreamManagement::VideoCodecEnum videoCodec,
-                                                                    const uint16_t minFrameRate, const uint16_t maxFrameRate,
-                                                                    VideoResolutionStruct minResolution,
-                                                                    VideoResolutionStruct maxResolution, const uint32_t minBitRate,
-                                                                    const uint32_t maxBitRate, const uint16_t minFragmentLen,
-                                                                    const uint16_t maxFragmentLen,
-                                                                    bool waterMarkEnabled,
-                                                                    bool osdEnabled) = 0;
+    virtual Protocols::InteractionModel::Status
+    VideoStreamAllocate(StreamTypeEnum streamType, CameraAvStreamManagement::VideoCodecEnum videoCodec, const uint16_t minFrameRate,
+                        const uint16_t maxFrameRate, VideoResolutionStruct minResolution, VideoResolutionStruct maxResolution,
+                        const uint32_t minBitRate, const uint32_t maxBitRate, const uint16_t minFragmentLen,
+                        const uint16_t maxFragmentLen, bool waterMarkEnabled, bool osdEnabled) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream modification.
      */
     virtual Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID,
                                                                   Optional<VideoResolutionStruct> videoResolution,
-                                                                  bool waterMarkEnabled,
-                                                                  bool osdEnabled) = 0;
+                                                                  bool waterMarkEnabled, bool osdEnabled) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream deallocation.
@@ -117,41 +113,14 @@ public:
     /**
      *   @brief Handle Command Delegate for SetStreamPriorities.
      */
-    virtual Protocols::InteractionModel::Status SetStreamPriorities(const DataModel::DecodableList<StreamTypeEnum>  streamPriorities) = 0;
+    virtual Protocols::InteractionModel::Status
+    SetStreamPriorities(const DataModel::DecodableList<StreamTypeEnum> streamPriorities) = 0;
 
-    // Get attribute methods for list index items
-
-    virtual uint8_t GetMaxConcurrentVideoEncoders() = 0;
-    virtual uint32_t GetMaxEncodedPixelRate()       = 0;
-
-    virtual CHIP_ERROR StartAllocatedVideoStreamsRead()                                            = 0;
-    virtual CHIP_ERROR GetAllocatedVideoStreamByIndex(uint8_t, Structs::VideoStreamStruct::Type &) = 0;
-    virtual CHIP_ERROR EndAllocatedVideoStreamsRead()                                              = 0;
-
-    virtual CHIP_ERROR StartAllocatedAudioStreamsRead()                                            = 0;
-    virtual CHIP_ERROR GetAllocatedAudioStreamByIndex(uint8_t, Structs::AudioStreamStruct::Type &) = 0;
-    virtual CHIP_ERROR EndAllocatedAudioStreamsRead()                                              = 0;
-
-    virtual CHIP_ERROR StartAllocatedSnapshotStreamsRead()                                               = 0;
-    virtual CHIP_ERROR GetAllocatedSnapshotStreamByIndex(uint8_t, Structs::SnapshotStreamStruct::Type &) = 0;
-    virtual CHIP_ERROR EndAllocatedSnapshotStreamsRead()                                                 = 0;
-
-    virtual CHIP_ERROR StartRateDistortionTradeOffPointsRead()                                                             = 0;
-    virtual CHIP_ERROR GetRateDistortionTradeOffPointByIndex(uint8_t, Structs::RateDistortionTradeOffPointsStruct::Type &) = 0;
-    virtual CHIP_ERROR EndRateDistortionTradeOffPointsRead()                                                               = 0;
-
-    virtual CHIP_ERROR StartSupportedSnapshotParamsRead()                                               = 0;
-    virtual CHIP_ERROR GetSupportedSnapshotParamByIndex(uint8_t, Structs::SnapshotParamsStruct::Type &) = 0;
-    virtual CHIP_ERROR EndSupportedSnapshotParamsRead()                                                 = 0;
-
-    virtual CHIP_ERROR StartFabricsUsingCameraRead()                             = 0;
-    virtual CHIP_ERROR GetFabricUsingCameraByIndex(uint8_t, chip::FabricIndex &) = 0;
-    virtual CHIP_ERROR EndFabricsUsingCameraRead()                               = 0;
-
-    virtual CHIP_ERROR StartRankedVideoStreamPrioritiesListRead()                           = 0;
-    virtual CHIP_ERROR GetRankedVideoStreamPrioritiesListByIndex(uint8_t, StreamTypeEnum &) = 0;
-    virtual CHIP_ERROR EndRankedVideoStreamPrioritiesListRead()                             = 0;
-
+    /**
+     *  @brief Callback into the delegate once persistent attributes managed by
+     *  the Cluster have been loaded from Storage.
+     */
+    virtual Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() = 0;
 
 protected:
     friend class CameraAVStreamMgmtServer;
@@ -194,20 +163,19 @@ public:
      * @param aDelegate A pointer to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId The ID of the Microwave Oven Control cluster to be instantiated.
+     * @param aClusterId The ID of the Camera AV Stream Management cluster to be instantiated.
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
      */
-   CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId,
-                            ClusterId aClusterId, BitMask<Feature> aFeature,
-                            OptionalAttributes aOptionalAttrs,
-                            PersistentStorageDelegate & aPersistentStorage,
-                            uint8_t aMaxConcurrentVideoEncoders,
-                            uint32_t aMaxEncodedPixelRate,
-                            const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
-                            const VideoResolutionStruct & aMinViewPort, uint32_t aMaxContentBufferSize,
-                            const AudioCapabilitiesStruct & aMicrophoneCapabilities,
-                            const AudioCapabilitiesStruct & aSpkrCapabilities,
-                            TwoWayTalkSupportTypeEnum aTwoWayTalkSupport, uint32_t aMaxNetworkBandwidth);
+    CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
+                             BitMask<Feature> aFeature, OptionalAttributes aOptionalAttrs,
+                             PersistentStorageDelegate & aPersistentStorage, uint8_t aMaxConcurrentVideoEncoders,
+                             uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
+                             bool aNightVisionCapable, const VideoResolutionStruct & aMinViewPort,
+                             const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & aRateDistortionTradeOffPoints,
+                             uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
+                             const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
+                             const std::vector<Structs::SnapshotParamsStruct::Type> & aSupportedSnapshotParams,
+                             uint32_t aMaxNetworkBandwidth);
 
     ~CameraAVStreamMgmtServer() override;
 
@@ -226,6 +194,7 @@ public:
 
     bool IsLocalVideoRecordingEnabled() const;
 
+    // Attribute Setters
     Protocols::InteractionModel::Status SetCurrentFrameRate(uint16_t aCurrentFrameRate);
 
     Protocols::InteractionModel::Status SetHDRModeEnabled(bool aHDRModeEnabled);
@@ -274,7 +243,115 @@ public:
 
     Protocols::InteractionModel::Status SetStatusLightBrightness(Globals::ThreeLevelAutoEnum aStatusLightBrightness);
 
+    // Attribute Getters
+    uint8_t GetMaxConcurrentVideoEncoders() const { return mMaxConcurrentVideoEncoders; }
+
+    uint32_t GetMaxEncodedPixelRate() const { return mMaxEncodedPixelRate; }
+
+    const VideoSensorParamsStruct & GetVideoSensorParams() const { return mVideoSensorParams; }
+
+    bool GetNightVisionCapable() const { return mNightVisionCapable; }
+
+    const VideoResolutionStruct & GetMinViewport() const { return mMinViewPort; }
+
+    const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & GetRateDistortionTradeOffPoints() const
+    {
+        return mRateDistortionTradeOffPointsList;
+    }
+
+    uint32_t GetMaxContentBufferSize() const { return mMaxContentBufferSize; }
+
+    const AudioCapabilitiesStruct & GetMicrophoneCapabilities() const { return mMicrophoneCapabilities; }
+
+    const AudioCapabilitiesStruct & GetSpeakerCapabilities() const { return mSpeakerCapabilities; }
+
+    TwoWayTalkSupportTypeEnum GetTwoWayTalkSupport() const { return mTwoWayTalkSupport; }
+
+    const std::vector<Structs::SnapshotParamsStruct::Type> & GetSupportedSnapshotParams() const
+    {
+        return mSupportedSnapshotParamsList;
+    }
+
+    uint32_t GetMaxNetworkBandwidth() const { return mMaxNetworkBandwidth; }
+
+    uint16_t GetCurrentFrameRate() const { return mCurrentFrameRate; }
+
+    bool GetHDRModeEnabled() const { return mHDRModeEnabled; }
+
+    const std::unordered_set<chip::FabricIndex> & GetFabricsUsingCamera() const { return mFabricsUsingCamera; }
+
+    const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const { return mAllocatedVideoStreams; }
+
+    const std::vector<AudioStreamStruct> & GetAllocatedAudioStreams() const { return mAllocatedAudioStreams; }
+
+    const std::vector<SnapshotStreamStruct> & GetAllocatedSnapshotStreams() const { return mAllocatedSnapshotStreams; }
+
+    const StreamTypeEnum * GetRankedVideoStreamPriorities() const { return mRankedVideoStreamPriorities; }
+
+    bool GetSoftRecordingPrivacyModeEnabled() const { return mSoftRecordingPrivacyModeEnabled; }
+
+    bool GetSoftLivestreamPrivacyModeEnabled() const { return mSoftLivestreamPrivacyModeEnabled; }
+
+    bool GetHardPrivacyModeOn() const { return mHardPrivacyModeOn; }
+
+    TriStateAutoEnum GetNightVision() const { return mNightVision; }
+
+    TriStateAutoEnum GetNightVisionIllum() const { return mNightVisionIllum; }
+
+    const ViewportStruct & GetViewport() const { return mViewport; }
+
+    bool GetSpeakerMuted() const { return mSpeakerMuted; }
+
+    uint8_t GetSpeakerVolumeLevel() const { return mSpeakerVolumeLevel; }
+
+    uint8_t GetSpeakerMaxLevel() const { return mSpeakerMaxLevel; }
+
+    uint8_t GetSpeakerMinLevel() const { return mSpeakerMinLevel; }
+
+    bool GetMicrophoneMuted() const { return mMicrophoneMuted; }
+
+    uint8_t GetMicrophoneVolumeLevel() const { return mMicrophoneVolumeLevel; }
+
+    uint8_t GetMicrophoneMaxLevel() const { return mMicrophoneMaxLevel; }
+
+    uint8_t GetMicrophoneMinLevel() const { return mMicrophoneMinLevel; }
+
+    bool IsMicrophoneAGCEnabled() const { return mMicrophoneAGCEnabled; }
+
+    uint16_t GetImageRotation() const { return mImageRotation; }
+
+    bool GetImageFlipHorizontal() const { return mImageFlipHorizontal; }
+
+    bool GetImageFlipVertical() const { return mImageFlipVertical; }
+
+    bool GetLocalVideoRecordingEnabled() const { return mLocalVideoRecordingEnabled; }
+
+    bool GetLocalSnapshotRecordingEnabled() const { return mLocalSnapshotRecordingEnabled; }
+
+    bool GetStatusLightEnabled() const { return mStatusLightEnabled; }
+
+    Globals::ThreeLevelAutoEnum GetStatusLightBrightness() const { return mStatusLightBrightness; }
+
     EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
+
+    // Add/Remove Management functions for streams
+    CHIP_ERROR AddToFabricsUsingCamera(chip::FabricIndex aFabricIndex);
+
+    CHIP_ERROR RemoveFromFabricsUsingCamera(chip::FabricIndex aFabricIndex);
+
+    CHIP_ERROR SetRankedVideoStreamPriorities(const StreamTypeEnum newPriorities[kNumOfStreamTypes]);
+
+    CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
+
+    CHIP_ERROR RemoveVideoStream(uint16_t videoStreamId);
+
+    CHIP_ERROR AddAudioStream(const AudioStreamStruct & audioStream);
+
+    CHIP_ERROR RemoveAudioStream(uint16_t audioStreamId);
+
+    CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
+
+    CHIP_ERROR RemoveSnapshotStream(uint16_t snapshotStreamId);
 
 private:
     CameraAVStreamMgmtDelegate & mDelegate;
@@ -284,42 +361,54 @@ private:
     BitMask<OptionalAttributes> mOptionalAttrs;
     PersistentStorageDelegate * mPersistentStorage = nullptr;
 
-    // Attributes with F quality
+    // Attributes
     const uint8_t mMaxConcurrentVideoEncoders;
     const uint32_t mMaxEncodedPixelRate;
     const VideoSensorParamsStruct mVideoSensorParams;
     const bool mNightVisionCapable;
     const VideoResolutionStruct mMinViewPort;
+    const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> mRateDistortionTradeOffPointsList;
     const uint32_t mMaxContentBufferSize;
     const AudioCapabilitiesStruct mMicrophoneCapabilities;
     const AudioCapabilitiesStruct mSpeakerCapabilities;
     const TwoWayTalkSupportTypeEnum mTwoWayTalkSupport;
+    const std::vector<Structs::SnapshotParamsStruct::Type> mSupportedSnapshotParamsList;
     const uint32_t mMaxNetworkBandwidth;
 
-    uint16_t mCurrentFrameRate;
+    uint16_t mCurrentFrameRate             = 0;
     bool mHDRModeEnabled                   = false;
     bool mSoftRecordingPrivacyModeEnabled  = false;
     bool mSoftLivestreamPrivacyModeEnabled = false;
     bool mHardPrivacyModeOn                = false;
-    TriStateAutoEnum mNightVision;
-    TriStateAutoEnum mNightVisionIllum;
-    ViewportStruct mViewport;
-    bool mSpeakerMuted = false;
-    uint8_t mSpeakerVolumeLevel;
-    uint8_t mSpeakerMaxLevel = kMaxSpeakerLevel;
-    uint8_t mSpeakerMinLevel = 0;
-    bool mMicrophoneMuted    = false;
-    uint8_t mMicrophoneVolumeLevel;
-    uint8_t mMicrophoneMaxLevel = kMaxMicrophoneLevel;
-    uint8_t mMicrophoneMinLevel = 0;
-    bool mMicrophoneAGCEnabled  = false;
-    uint16_t mImageRotation;
-    bool mImageFlipHorizontal           = false;
-    bool mImageFlipVertical             = false;
-    bool mLocalVideoRecordingEnabled    = false;
-    bool mLocalSnapshotRecordingEnabled = false;
-    bool mStatusLightEnabled            = false;
-    Globals::ThreeLevelAutoEnum mStatusLightBrightness;
+    TriStateAutoEnum mNightVision          = TriStateAutoEnum::kOn;
+    TriStateAutoEnum mNightVisionIllum     = TriStateAutoEnum::kOn;
+    ViewportStruct mViewport               = { 0, 0, 0, 0 };
+    bool mSpeakerMuted                     = false;
+    uint8_t mSpeakerVolumeLevel            = 0;
+    uint8_t mSpeakerMaxLevel               = kMaxSpeakerLevel;
+    uint8_t mSpeakerMinLevel               = 0;
+    bool mMicrophoneMuted                  = false;
+    uint8_t mMicrophoneVolumeLevel         = 0;
+    uint8_t mMicrophoneMaxLevel            = kMaxMicrophoneLevel;
+    uint8_t mMicrophoneMinLevel            = 0;
+    bool mMicrophoneAGCEnabled             = false;
+    uint16_t mImageRotation                = 0;
+    bool mImageFlipHorizontal              = false;
+    bool mImageFlipVertical                = false;
+    bool mLocalVideoRecordingEnabled       = false;
+    bool mLocalSnapshotRecordingEnabled    = false;
+    bool mStatusLightEnabled               = false;
+
+    Globals::ThreeLevelAutoEnum mStatusLightBrightness = Globals::ThreeLevelAutoEnum::kMedium;
+
+    // Managed lists
+    std::unordered_set<chip::FabricIndex> mFabricsUsingCamera;
+
+    StreamTypeEnum mRankedVideoStreamPriorities[kNumOfStreamTypes];
+
+    std::vector<VideoStreamStruct> mAllocatedVideoStreams;
+    std::vector<AudioStreamStruct> mAllocatedAudioStreams;
+    std::vector<SnapshotStreamStruct> mAllocatedSnapshotStreams;
 
     /**
      * IM-level implementation of read
