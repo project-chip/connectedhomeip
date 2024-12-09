@@ -539,19 +539,6 @@ class DataModelLevel(str, Enum):
         raise KeyError("Invalid enum: %r" % self)
 
 
-def _get_data_model_root() -> pathlib.PosixPath:
-    """Attempts to find the 'data_model' directory inside the 'chip.testing' package."""
-    # Access the 'chip.testing' package directly via importlib and pkg_resources
-    package = pkg_resources.files(importlib.import_module('chip.testing'))  # Corrected: using importlib
-    try:
-        # We assume the 'data_model' directory is inside the package itself
-        data_model_root = package / 'data_model'
-    except FileNotFoundError:
-        raise FileNotFoundError(f"Data model directory not found in the package at {data_model_root}")
-
-    return data_model_root
-
-
 def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], data_model_level: DataModelLevel) -> Traversable:
     """
     Get the directory of the data model for a specific version and level from the installed package.
