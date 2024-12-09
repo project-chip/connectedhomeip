@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-# pylint: disable=C,R,F,I,W,E
-
 #
 # Copyright (c) 2023-2024 Project CHIP Authors
 #
