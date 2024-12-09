@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2023-2024 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,11 +55,10 @@
 	};
 };
 
-
 &flexspi {
 	status = "okay";
 
-	mx25u51245g: mx25u51245g@0 {
+	w25q512jvfiq: w25q512jvfiq@0 {
 		status = "okay";
 
 		partitions {
