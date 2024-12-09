@@ -394,12 +394,12 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
             {
                 GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
                 GetInstance().mpScanCallback = nullptr;
-                iter.Release();
             }
             else
             {
                 ChipLogError(DeviceLayer, "can't find the ScanCallback function");
             }
+            iter.Release();
         }))
     {
     }
@@ -453,7 +453,7 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
         mpScanCallback = nullptr;
     }
-#endif
+#endif // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
 }
 
 void ESPWiFiDriver::OnNetworkStatusChange()
