@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import glob
 import importlib
 import importlib.resources as pkg_resources
 import logging
