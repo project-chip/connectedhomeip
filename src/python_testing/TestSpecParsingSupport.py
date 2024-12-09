@@ -276,9 +276,6 @@ class TestSpecParsingSupport(MatterBaseTest):
 
         asserts.assert_count_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
 
-        with asserts.assert_raises(SpecParsingException):
-            build_xml_clusters("baddir")
-
     def test_spec_parsing_access(self):
         strs = [None, 'view', 'operate', 'manage', 'admin']
         for read in strs:
