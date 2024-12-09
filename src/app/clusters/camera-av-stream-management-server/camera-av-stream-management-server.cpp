@@ -43,24 +43,24 @@ namespace app {
 namespace Clusters {
 namespace CameraAvStreamManagement {
 
-CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId,
-                                                   ClusterId aClusterId, BitMask<Feature> aFeature,
-                                                   OptionalAttributes aOptionalAttrs,
-                                                   PersistentStorageDelegate & aPersistentStorage,
-                                                   uint8_t aMaxConcurrentVideoEncoders,
-                                                   uint32_t aMaxEncodedPixelRate,
-                                                   const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
-                                                   const VideoResolutionStruct & aMinViewPort, uint32_t aMaxContentBufferSize,
-                                                   const AudioCapabilitiesStruct & aMicrophoneCapabilities,
-                                                   const AudioCapabilitiesStruct & aSpeakerCapabilities,
-                                                   TwoWayTalkSupportTypeEnum aTwoWayTalkSupport, uint32_t aMaxNetworkBandwidth) :
+CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
+    CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, ClusterId aClusterId, BitMask<Feature> aFeature,
+    OptionalAttributes aOptionalAttrs, PersistentStorageDelegate & aPersistentStorage, uint8_t aMaxConcurrentVideoEncoders,
+    uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
+    const VideoResolutionStruct & aMinViewPort,
+    const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & aRateDistortionTradeOffPoints,
+    uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
+    const AudioCapabilitiesStruct & aSpeakerCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
+    const std::vector<Structs::SnapshotParamsStruct::Type> & aSupportedSnapshotParams, uint32_t aMaxNetworkBandwidth) :
     CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
     AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
     mClusterId(aClusterId), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs), mPersistentStorage(&aPersistentStorage),
     mMaxConcurrentVideoEncoders(aMaxConcurrentVideoEncoders), mMaxEncodedPixelRate(aMaxEncodedPixelRate),
     mVideoSensorParams(aVideoSensorParams), mNightVisionCapable(aNightVisionCapable), mMinViewPort(aMinViewPort),
-    mMaxContentBufferSize(aMaxContentBufferSize), mMicrophoneCapabilities(aMicrophoneCapabilities),
-    mSpeakerCapabilities(aSpeakerCapabilities), mTwoWayTalkSupport(aTwoWayTalkSupport), mMaxNetworkBandwidth(aMaxNetworkBandwidth)
+    mRateDistortionTradeOffPointsList(aRateDistortionTradeOffPoints), mMaxContentBufferSize(aMaxContentBufferSize),
+    mMicrophoneCapabilities(aMicrophoneCapabilities), mSpeakerCapabilities(aSpeakerCapabilities),
+    mTwoWayTalkSupport(aTwoWayTalkSupport), mSupportedSnapshotParamsList(aSupportedSnapshotParams),
+    mMaxNetworkBandwidth(aMaxNetworkBandwidth)
 {
     mDelegate.SetCameraAVStreamMgmtServer(this);
 }
@@ -105,29 +105,14 @@ CameraAVStreamMgmtServer::ReadAndEncodeRateDistortionTradeOffPoints(const Attrib
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Tell the delegate the read is starting..
-    ReturnErrorOnFailure(mDelegate.StartRateDistortionTradeOffPointsRead());
-
-    for (uint8_t i = 0; true; i++)
+    for (const auto & rateDistortionTradeOffPoints : mRateDistortionTradeOffPointsList)
     {
-        Structs::RateDistortionTradeOffPointsStruct::Type rateDistortionTradeOffPoints;
-
-        err = mDelegate.GetRateDistortionTradeOffPointByIndex(i, rateDistortionTradeOffPoints);
-        SuccessOrExit(err);
-
         err = encoder.Encode(rateDistortionTradeOffPoints);
         SuccessOrExit(err);
     }
 
 exit:
-    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-    {
-        // Convert end of list to CHIP_NO_ERROR
-        err = CHIP_NO_ERROR;
-    }
 
-    // Tell the delegate the read is complete
-    err = mDelegate.EndRateDistortionTradeOffPointsRead();
     return err;
 }
 
@@ -135,29 +120,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeSupportedSnapshotParams(const 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Tell the delegate the read is starting..
-    ReturnErrorOnFailure(mDelegate.StartSupportedSnapshotParamsRead());
-
-    for (uint8_t i = 0; true; i++)
+    for (const auto & snapshotParams : mSupportedSnapshotParamsList)
     {
-        Structs::SnapshotParamsStruct::Type supportedSnapshotParams;
-
-        err = mDelegate.GetSupportedSnapshotParamByIndex(i, supportedSnapshotParams);
-        SuccessOrExit(err);
-
-        err = encoder.Encode(supportedSnapshotParams);
+        err = encoder.Encode(snapshotParams);
         SuccessOrExit(err);
     }
 
 exit:
-    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-    {
-        // Convert end of list to CHIP_NO_ERROR
-        err = CHIP_NO_ERROR;
-    }
 
-    // Tell the delegate the read is complete
-    err = mDelegate.EndSupportedSnapshotParamsRead();
     return err;
 }
 
@@ -165,29 +135,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeFabricsUsingCamera(const Attri
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Tell the delegate the read is starting..
-    ReturnErrorOnFailure(mDelegate.StartFabricsUsingCameraRead());
-
-    for (uint8_t i = 0; true; i++)
+    for (const auto & fabricIndex : mFabricsUsingCamera)
     {
-        chip::FabricIndex fabricIndex;
-
-        err = mDelegate.GetFabricUsingCameraByIndex(i, fabricIndex);
-        SuccessOrExit(err);
-
         err = encoder.Encode(fabricIndex);
         SuccessOrExit(err);
     }
 
 exit:
-    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-    {
-        // Convert end of list to CHIP_NO_ERROR
-        err = CHIP_NO_ERROR;
-    }
 
-    // Tell the delegate the read is complete
-    err = mDelegate.EndFabricsUsingCameraRead();
     return err;
 }
 
@@ -195,29 +150,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedVideoStreams(const At
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Tell the delegate the read is starting..
-    ReturnErrorOnFailure(mDelegate.StartAllocatedVideoStreamsRead());
-
-    for (uint8_t i = 0; true; i++)
+    for (const auto & videoStream : mAllocatedVideoStreams)
     {
-        Structs::VideoStreamStruct::Type videoStream;
-
-        err = mDelegate.GetAllocatedVideoStreamByIndex(i, videoStream);
-        SuccessOrExit(err);
-
         err = encoder.Encode(videoStream);
         SuccessOrExit(err);
     }
 
 exit:
-    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-    {
-        // Convert end of list to CHIP_NO_ERROR
-        err = CHIP_NO_ERROR;
-    }
 
-    // Tell the delegate the read is complete
-    err = mDelegate.EndAllocatedVideoStreamsRead();
     return err;
 }
 
@@ -225,29 +165,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedAudioStreams(const At
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Tell the delegate the read is starting..
-    ReturnErrorOnFailure(mDelegate.StartAllocatedAudioStreamsRead());
-
-    for (uint8_t i = 0; true; i++)
+    for (const auto & audioStream : mAllocatedAudioStreams)
     {
-        Structs::AudioStreamStruct::Type audioStream;
-
-        err = mDelegate.GetAllocatedAudioStreamByIndex(i, audioStream);
-        SuccessOrExit(err);
-
         err = encoder.Encode(audioStream);
         SuccessOrExit(err);
     }
 
 exit:
-    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-    {
-        // Convert end of list to CHIP_NO_ERROR
-        err = CHIP_NO_ERROR;
-    }
 
-    // Tell the delegate the read is complete
-    err = mDelegate.EndAllocatedAudioStreamsRead();
     return err;
 }
 
@@ -255,29 +180,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedSnapshotStreams(const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Tell the delegate the read is starting..
-    ReturnErrorOnFailure(mDelegate.StartAllocatedSnapshotStreamsRead());
-
-    for (uint8_t i = 0; true; i++)
+    for (const auto & audioStream : mAllocatedAudioStreams)
     {
-        Structs::SnapshotStreamStruct::Type snapshotStream;
-
-        err = mDelegate.GetAllocatedSnapshotStreamByIndex(i, snapshotStream);
-        SuccessOrExit(err);
-
-        err = encoder.Encode(snapshotStream);
+        err = encoder.Encode(audioStream);
         SuccessOrExit(err);
     }
 
 exit:
-    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-    {
-        // Convert end of list to CHIP_NO_ERROR
-        err = CHIP_NO_ERROR;
-    }
 
-    // Tell the delegate the read is complete
-    err = mDelegate.EndAllocatedSnapshotStreamsRead();
     return err;
 }
 
@@ -286,30 +196,79 @@ CameraAVStreamMgmtServer::ReadAndEncodeRankedVideoStreamPrioritiesList(const Att
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Tell the delegate the read is starting..
-    ReturnErrorOnFailure(mDelegate.StartRankedVideoStreamPrioritiesListRead());
-
-    for (uint8_t i = 0; true; i++)
+    for (uint8_t i = 0; i < kNumOfStreamTypes; i++)
     {
-        detail::StreamTypeEnum streamType;
 
-        err = mDelegate.GetRankedVideoStreamPrioritiesListByIndex(i, streamType);
-        SuccessOrExit(err);
-
-        err = encoder.Encode(streamType);
+        err = encoder.Encode(mRankedVideoStreamPriorities[i]);
         SuccessOrExit(err);
     }
 
 exit:
-    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-    {
-        // Convert end of list to CHIP_NO_ERROR
-        err = CHIP_NO_ERROR;
-    }
 
-    // Tell the delegate the read is complete
-    err = mDelegate.EndRankedVideoStreamPrioritiesListRead();
     return err;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::AddToFabricsUsingCamera(chip::FabricIndex aFabricIndex)
+{
+    mFabricsUsingCamera.insert(aFabricIndex);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::RemoveFromFabricsUsingCamera(chip::FabricIndex aFabricIndex)
+{
+    mFabricsUsingCamera.erase(aFabricIndex);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::SetRankedVideoStreamPriorities(const StreamTypeEnum newPriorities[kNumOfStreamTypes])
+{
+    std::copy(newPriorities, newPriorities + kNumOfStreamTypes, mRankedVideoStreamPriorities);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & videoStream)
+{
+    mAllocatedVideoStreams.push_back(videoStream);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::RemoveVideoStream(uint16_t videoStreamId)
+{
+    mAllocatedVideoStreams.erase(
+        std::remove_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
+                       [&](const VideoStreamStruct & vStream) { return vStream.videoStreamID == videoStreamId; }),
+        mAllocatedVideoStreams.end());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::AddAudioStream(const AudioStreamStruct & audioStream)
+{
+    mAllocatedAudioStreams.push_back(audioStream);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
+{
+    mAllocatedAudioStreams.erase(
+        std::remove_if(mAllocatedAudioStreams.begin(), mAllocatedAudioStreams.end(),
+                       [&](const AudioStreamStruct & aStream) { return aStream.audioStreamID == audioStreamId; }),
+        mAllocatedAudioStreams.end());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruct & snapshotStream)
+{
+    mAllocatedSnapshotStreams.push_back(snapshotStream);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::RemoveSnapshotStream(uint16_t snapshotStreamId)
+{
+    mAllocatedSnapshotStreams.erase(
+        std::remove_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
+                       [&](const SnapshotStreamStruct & sStream) { return sStream.snapshotStreamID == snapshotStreamId; }),
+        mAllocatedSnapshotStreams.end());
+    return CHIP_NO_ERROR;
 }
 
 // AttributeAccessInterface
@@ -397,33 +356,29 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get FabricsUsingCamera, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this](const auto & encoder) -> CHIP_ERROR {
-            return this->ReadAndEncodeFabricsUsingCamera(encoder); }));
+            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeFabricsUsingCamera(encoder); }));
         break;
     case AllocatedVideoStreams::Id:
         VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get AllocatedVideoStreams, feature is not supported"));
 
         ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this](const auto & encoder) -> CHIP_ERROR {
-            return this->ReadAndEncodeAllocatedVideoStreams(encoder); }));
+            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeAllocatedVideoStreams(encoder); }));
         break;
     case AllocatedAudioStreams::Id:
         VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get AllocatedAudioStreams, feature is not supported"));
 
         ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this](const auto & encoder) -> CHIP_ERROR {
-            return this->ReadAndEncodeAllocatedAudioStreams(encoder); }));
+            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeAllocatedAudioStreams(encoder); }));
         break;
     case AllocatedSnapshotStreams::Id:
         VerifyOrReturnError(
-            HasFeature(Feature::kAudio), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            HasFeature(Feature::kSnapshot), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get AllocatedSnapshotStreams, feature is not supported"));
 
         ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this](const auto & encoder) -> CHIP_ERROR {
-            return this->ReadAndEncodeAllocatedSnapshotStreams(encoder); }));
+            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeAllocatedSnapshotStreams(encoder); }));
         break;
     case RankedVideoStreamPrioritiesList::Id:
         VerifyOrReturnError(
@@ -431,8 +386,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get RankedVideoStreamPrioritiesList, feature is not supported"));
 
         ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this](const auto & encoder) -> CHIP_ERROR {
-            return this->ReadAndEncodeRankedVideoStreamPrioritiesList(encoder); }));
+            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeRankedVideoStreamPrioritiesList(encoder); }));
         break;
     case SoftRecordingPrivacyModeEnabled::Id:
         VerifyOrReturnError(
@@ -447,20 +401,21 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mSoftLivestreamPrivacyModeEnabled));
         break;
     case HardPrivacyModeOn::Id:
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttributes::kSupportsHardPrivacyModeOn),
-                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttributes::kSupportsHardPrivacyModeOn), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get HardPrivacyModeOn, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mHardPrivacyModeOn));
         break;
     case NightVision::Id:
         VerifyOrReturnError((HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot)) &&
-                            SupportsOptAttr(OptionalAttributes::kSupportsNightVision), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                                SupportsOptAttr(OptionalAttributes::kSupportsNightVision),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get NightVision, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVision));
         break;
     case NightVisionIllum::Id:
         VerifyOrReturnError((HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot)) &&
-                            SupportsOptAttr(OptionalAttributes::kSupportsNightVisionIllum), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                                SupportsOptAttr(OptionalAttributes::kSupportsNightVisionIllum),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get NightVisionIllumination, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVisionIllum));
         break;
@@ -546,8 +501,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mLocalSnapshotRecordingEnabled));
         break;
     case StatusLightEnabled::Id:
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttributes::kSupportsStatusLightEnabled),
-                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttributes::kSupportsStatusLightEnabled), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get StatusLightEnabled, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightEnabled));
         break;
@@ -717,8 +671,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         return StatusIB(status).ToChipError();
     }
     case StatusLightEnabled::Id: {
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttributes::kSupportsStatusLightEnabled),
-                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttributes::kSupportsStatusLightEnabled), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set StatusLightEnabled, feature is not supported"));
         bool statusLightEnabled;
         ReturnErrorOnFailure(aDecoder.Decode(statusLightEnabled));
@@ -1104,6 +1057,11 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     }
 
     // TODO: Load allocated streams and ranked priorities list
+    // Load AllocatedVideoStreams
+
+    // Load AllocatedAudioStreams
+
+    // Load AllocatedSnapshotStreams
 
     // Load SoftRecordingPrivacyModeEnabled
     bool softRecordingPrivacyModeEnabled;
@@ -1148,7 +1106,8 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the NightVision from the KVS. Defaulting to %d", to_underlying(mNightVision));
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the NightVision from the KVS. Defaulting to %d",
+                      to_underlying(mNightVision));
     }
 
     // Load NightVisionIllum
@@ -1357,6 +1316,9 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
         ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the StatusLightBrightness from the KVS. Defaulting to %d",
                       to_underlying(mStatusLightBrightness));
     }
+
+    // Signal delegate that all persistent configuration attributes have been loaded.
+    mDelegate.PersistentAttributesLoadedCallback();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const ViewportStruct & viewport)
@@ -1534,7 +1496,7 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
 void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
                                                          const Commands::VideoStreamAllocate::DecodableType & commandData)
 {
-    Status status           = Status::Success;
+    Status status = Status::Success;
 
     Commands::VideoStreamAllocateResponse::Type response;
     auto & streamType       = commandData.streamType;
@@ -1571,9 +1533,9 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     }
 
     // Call the delegate
-    status = mDelegate.VideoStreamAllocate(streamType, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution,
-                                           minBitRate, maxBitRate, minFragmentLen, maxFragmentLen,
-                                           isWaterMarkEnabled, isOSDEnabled);
+    status =
+        mDelegate.VideoStreamAllocate(streamType, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution, minBitRate,
+                                      maxBitRate, minFragmentLen, maxFragmentLen, isWaterMarkEnabled, isOSDEnabled);
 
     if (status == Status::Success)
     {
@@ -1597,7 +1559,6 @@ void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
     if (HasFeature(Feature::kWatermark))
     {
         isWaterMarkEnabled = commandData.watermarkEnabled.ValueOr(false);
-
     }
     else
     {
