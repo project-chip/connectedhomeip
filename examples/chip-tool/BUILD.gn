@@ -25,6 +25,10 @@ if (config_use_interactive_mode) {
 
 assert(chip_build_tools)
 
+declare_args() {
+  libs = []
+}
+
 config("config") {
   include_dirs = [
     ".",
