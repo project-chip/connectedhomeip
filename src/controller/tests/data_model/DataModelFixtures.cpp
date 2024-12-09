@@ -67,6 +67,14 @@ private:
     AttributeValueDecoder & mDecoder;
 };
 
+class TestProviderChangeListener : public DataModel::ProviderChangeListener
+{
+public:
+    explicit TestProviderChangeListener() {}
+
+    void MarkDirty(const AttributePathParams & path) override {}
+};
+
 namespace DataModelTests {
 
 ScopedChangeOnly<ReadResponseDirective> gReadResponseDirective(ReadResponseDirective::kSendDataResponse);
@@ -472,6 +480,12 @@ std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & 
 {
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt; // handler status is set by the dispatch
+}
+
+ProviderChangeListener & CustomDataModel::GetAttributeChangeReporter()
+{
+    static TestProviderChangeListener changeListener;
+    return changeListener;
 }
 
 DataModel::EndpointEntry CustomDataModel::FirstEndpoint()

@@ -97,6 +97,15 @@ public:
     virtual std::optional<ActionReturnStatus> Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                      CommandHandler * handler) = 0;
 
+    /// Returns a reference to the ProviderChangeListener used for reporting attribute changes.
+    ///
+    /// This is used to notify listeners about changes in attributes managed by the provider.
+    /// Listeners can be used to react to updates in the underlying data model.
+    ///
+    /// It is expected that implementations provide a valid reference, ensuring that
+    /// attribute change reporting is functional throughout the lifecycle of the Provider.
+    virtual ProviderChangeListener & GetAttributeChangeReporter() = 0;
+
 private:
     InteractionModelContext mContext = { nullptr };
 };
