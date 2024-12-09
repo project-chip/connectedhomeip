@@ -577,7 +577,7 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
 
         # 9. Decide on certificate authority to match against CRL entries.
         if revocation_point["isPAA"] and not is_self_signed_certificate(crl_signer_certificate):
-            certificate_authority_name = crl_signer_certificate.issuer()
+            certificate_authority_name = crl_signer_certificate.issuer
             certificate_akid = get_akid(crl_signer_certificate)
         elif crl_signer_delegator_cert:
             certificate_authority_name = crl_signer_delegator_cert.subject
