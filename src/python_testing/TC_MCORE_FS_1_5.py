@@ -36,6 +36,23 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --bool-arg unified_fabric_sync_app:true
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -189,8 +206,10 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         if not self.is_pics_sdk_ci_only:
             self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
         else:
-            self.dut_fsa_stdin.write(
-                f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
+            if self.user_params.get("unified_fabric_sync_app"):
+                self.dut_fsa_stdin.write(f"app pair-device 2 {self.th_server_setup_params.qr_code}\n")
+            else:
+                self.dut_fsa_stdin.write(f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
             self.dut_fsa_stdin.flush()
             # Wait for the commissioning to complete.
             await asyncio.sleep(5)
