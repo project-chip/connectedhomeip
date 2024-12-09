@@ -606,7 +606,7 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
                 if revoked_cert_issuer is not None:
                     # check if this really are the same thing
                     if revoked_cert_issuer != x509.DirectoryName(certificate_authority_name).value:
-                        logging.debug("CRL entry issuer is not CRL File Issuer, continue...")
+                        logging.warning("CRL entry issuer is not CRL File Issuer, continue...")
                         continue
             except Exception:
                 logging.warning("certificateIssuer entry extension not found in CRL")
