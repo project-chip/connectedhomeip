@@ -376,6 +376,11 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
+void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+{
+    listener->MarkDirty(AttributePathParams(endpoint));
+}
+
 unsigned emberAfMetadataStructureGeneration()
 {
     return metadataStructureGeneration;

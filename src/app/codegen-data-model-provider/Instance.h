@@ -16,12 +16,20 @@
  */
 #pragma once
 
+#include "lib/core/CHIPPersistentStorageDelegate.h"
 #include <app/data-model-provider/Provider.h>
 
 namespace chip {
 namespace app {
 
-DataModel::Provider * CodegenDataModelProviderInstance();
+/// Gets an instance of a global data model provider that is based off a code generated
+/// (i.e. ember framework) data storage
+///
+/// @param delegate - determines the storage delegate to be used by the returned provider
+///                   in case default ember storage is required. Applications can also
+///                   call SetAttributeStorageProvider themselves and provide nullptr here
+///                   if required.
+DataModel::Provider * CodegenDataModelProviderInstance(PersistentStorageDelegate * delegate);
 
 } // namespace app
 } // namespace chip

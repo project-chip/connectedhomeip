@@ -14,15 +14,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/CHIPPersistentStorageDelegate.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 #include <app/codegen-data-model-provider/Instance.h>
 
 namespace chip {
 namespace app {
 
-DataModel::Provider * CodegenDataModelProviderInstance()
+DataModel::Provider * CodegenDataModelProviderInstance(PersistentStorageDelegate * delegate)
 {
     static CodegenDataModelProvider gCodegenModel;
+
+    if (delegate != nullptr)
+    {
+        gCodegenModel.SetPersistentStorageDelegate(delegate);
+    }
+
     return &gCodegenModel;
 }
 

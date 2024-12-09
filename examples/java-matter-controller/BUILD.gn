@@ -29,6 +29,8 @@ kotlin_binary("java-matter-controller") {
 
   sources = [
     "java/src/com/matter/controller/Main.kt",
+    "java/src/com/matter/controller/commands/bdx/DownloadLogCommand.kt",
+    "java/src/com/matter/controller/commands/bdx/PairOnNetworkLongDownloadLogCommand.kt",
     "java/src/com/matter/controller/commands/common/Argument.kt",
     "java/src/com/matter/controller/commands/common/ArgumentType.kt",
     "java/src/com/matter/controller/commands/common/Command.kt",

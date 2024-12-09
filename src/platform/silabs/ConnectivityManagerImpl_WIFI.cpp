@@ -81,60 +81,45 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     // Handle Wfx wifi events...
     if (event->Type == DeviceEventType::kWFXSystemEvent)
     {
-        if (event->Platform.WFXSystemEvent.eventBase == WIFI_EVENT)
+
+        switch (event->Platform.WFXSystemEvent.data.genericMsgEvent.header.id)
         {
-            switch (event->Platform.WFXSystemEvent.data.genericMsgEvent.header.id)
+        case to_underlying(WifiEvent::kStartUp):
+            ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_START");
+            DriveStationState();
+            break;
+        case to_underlying(WifiEvent::kConnect):
+            ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_CONNECTED");
+            if (mWiFiStationState == kWiFiStationState_Connecting)
             {
-            case SL_WFX_STARTUP_IND_ID:
-                ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_START");
-                DriveStationState();
-                break;
-            case SL_WFX_CONNECT_IND_ID:
-                ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_CONNECTED");
-                if (mWiFiStationState == kWiFiStationState_Connecting)
+                if (event->Platform.WFXSystemEvent.data.connectEvent.body.status == 0)
                 {
-                    if (event->Platform.WFXSystemEvent.data.connectEvent.body.status == 0)
-                    {
-                        ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
-                    }
-                    else
-                    {
-                        ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
-                    }
+                    ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
                 }
-                DriveStationState();
-                break;
-            case SL_WFX_DISCONNECT_IND_ID:
-                ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_DISCONNECTED");
-                if (mWiFiStationState == kWiFiStationState_Connecting)
+                else
                 {
                     ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
                 }
-                DriveStationState();
-                break;
-            default:
-                break;
             }
-        }
-        else if (event->Platform.WFXSystemEvent.eventBase == IP_EVENT)
-        {
-            switch (event->Platform.WFXSystemEvent.data.genericMsgEvent.header.id)
+            DriveStationState();
+            break;
+        case to_underlying(WifiEvent::kDisconnect):
+            ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_DISCONNECTED");
+            if (mWiFiStationState == kWiFiStationState_Connecting)
             {
-            case IP_EVENT_STA_GOT_IP:
-                ChipLogProgress(DeviceLayer, "IP_EVENT_STA_GOT_IP");
-                UpdateInternetConnectivityState();
-                break;
-            case IP_EVENT_STA_LOST_IP:
-                ChipLogProgress(DeviceLayer, "IP_EVENT_STA_LOST_IP");
-                UpdateInternetConnectivityState();
-                break;
-            case IP_EVENT_GOT_IP6:
-                ChipLogProgress(DeviceLayer, "IP_EVENT_GOT_IP6");
-                UpdateInternetConnectivityState();
-                break;
-            default:
-                break;
+                ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
             }
+            DriveStationState();
+            break;
+
+        case to_underlying(WifiEvent::kGotIPv4):
+        case to_underlying(WifiEvent::kLostIP):
+        case to_underlying(WifiEvent::kGotIPv6):
+            ChipLogProgress(DeviceLayer, "IP Change Event");
+            UpdateInternetConnectivityState();
+            break;
+        default:
+            break;
         }
     }
 }
