@@ -35,8 +35,33 @@
 #include "esp_wifi.h"
 #include "nvs.h"
 
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#include "esp_heap_caps.h"
+#include <system/SystemTimer.h>
+#include <tracing/macros.h>
+#include <tracing/metric_event.h>
+
+using namespace chip::DeviceLayer;
+using namespace chip::Tracing;
+
+// Heap Diagnostics (internal)
+constexpr MetricKey kMetricHeapInternalFree = "internal_free";
+constexpr MetricKey kMetricHeapInternalMinFree = "internal_min_free";
+constexpr MetricKey kMetricHeapInternalLargestBlock = "internal_largest_free";
+
+// Heap Diagnostics (external)
+constexpr MetricKey kMetricHeapExternalFree = "external_free";
+constexpr MetricKey kMetricHeapExternalMinFree = "external_min_free";
+constexpr MetricKey kMetricHeapExternalLargestBlock = "external_largest_block";
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
+
+#ifndef CONFIG_HEAP_LOG_INTERVAL
+#define CONFIG_HEAP_LOG_INTERVAL 300000
+#endif // CONFIG_HEAP_LOG_INTERVAL
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 {
@@ -421,6 +446,56 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+void LogHeapDataCallback(chip::System::Layer * systemLayer, void * appState)
+{
+    // Internal RAM (default heap)
+    uint32_t internal_free               = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
+    uint32_t internal_largest_free_block = heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL);
+    uint32_t internal_min_free           = heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL);
+
+    MATTER_LOG_METRIC(kMetricHeapInternalFree, internal_free);
+    MATTER_LOG_METRIC(kMetricHeapInternalMinFree, internal_min_free);
+    MATTER_LOG_METRIC(kMetricHeapInternalLargestBlock, internal_largest_free_block);
+
+#ifdef CONFIG_SPIRAM
+    // External RAM (if PSRAM is enabled)
+    uint32_t external_free               = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+    uint32_t external_largest_free_block = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
+    uint32_t external_min_free           = heap_caps_get_minimum_free_size(MALLOC_CAP_SPIRAM);
+
+    MATTER_LOG_METRIC(kMetricHeapExternalFree, external_free);
+    MATTER_LOG_METRIC(kMetricHeapExternalMinFree, external_min_free);
+    MATTER_LOG_METRIC(kMetricHeapExternalLargestBlock, external_largest_free_block);
+#endif
+
+    // Reschedule the timer for the next interval
+    systemLayer->StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL), LogHeapDataCallback, nullptr);
+}
+
+void FailedAllocCallback(size_t size, uint32_t caps, const char * function_name)
+{
+    MATTER_TRACE_COUNTER("Failed_memory_allocations");
+    ESP_LOGE(TAG, "Memory allocation failed!");
+    ESP_LOGE(TAG, "Requested Size: %zu, Caps: %lu, Function: %s", size, caps, function_name);
+}
+
+// Function to initialize and start periodic heap logging
+void ESP32Utils::LogHeapInfo()
+{
+    esp_err_t err = heap_caps_register_failed_alloc_callback(FailedAllocCallback);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to register callback. Error: 0x%08x", err);
+    }
+    // Log immediately
+    LogHeapDataCallback(&SystemLayer(), nullptr);
+
+    // Start the periodic logging using SystemLayer
+    SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL), LogHeapDataCallback, nullptr);
+}
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 struct netif * ESP32Utils::GetNetif(const char * ifKey)
 {
