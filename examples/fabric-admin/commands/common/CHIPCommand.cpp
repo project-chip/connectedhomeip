@@ -20,9 +20,9 @@
 
 #include "IcdManager.h"
 
-#include <app/codegen-data-model-provider/Instance.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <device_manager/PairingManager.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>

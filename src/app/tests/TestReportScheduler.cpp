@@ -17,10 +17,10 @@
  */
 
 #include <app/InteractionModelEngine.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #include <app/tests/AppTestContext.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>

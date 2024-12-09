@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -106,12 +106,12 @@ using detail::EnumeratorCommandFinder;
 
 namespace {
 
-const chip::CommandId * AcceptedCommands(const EmberAfCluster & cluster)
+const CommandId * AcceptedCommands(const EmberAfCluster & cluster)
 {
     return cluster.acceptedCommandList;
 }
 
-const chip::CommandId * GeneratedCommands(const EmberAfCluster & cluster)
+const CommandId * GeneratedCommands(const EmberAfCluster & cluster)
 {
     return cluster.generatedCommandList;
 }

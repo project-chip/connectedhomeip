@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model-provider/EmberMetadata.h>
+#include <data-model-providers/codegen/EmberMetadata.h>
 
 #include <app/GlobalAttributes.h>
 #include <app/util/attribute-storage.h>
