@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attribute-type.h>
