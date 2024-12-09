@@ -24,11 +24,11 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <transport/Session.h>
 
@@ -59,7 +59,7 @@ static CHIP_ERROR CmdAppServerStart(int argc, char ** argv)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider             = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider             = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.operationalServicePort        = sServerPortOperational;
     initParams.userDirectedCommissioningPort = sServerPortCommissioning;
 

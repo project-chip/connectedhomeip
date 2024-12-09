@@ -32,12 +32,12 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -1069,7 +1069,7 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
 
         static chip::CommonCaseDeviceServerInitParams initParams;
         (void) initParams.InitializeStaticResourcesBeforeServerInit();
-        initParams.dataModelProvider = CodegenDataModelProviderInstance();
+        initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
         chip::Server::GetInstance().Init(initParams);
         PRINTF("Done to call chip::Server() \r\n");
     }
