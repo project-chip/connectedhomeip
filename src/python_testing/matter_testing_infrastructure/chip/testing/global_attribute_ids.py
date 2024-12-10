@@ -141,7 +141,7 @@ def cluster_id_type(id: int) -> ClusterIdType:
 
 def is_standard_cluster_id(id: int) -> bool:
     id_type = cluster_id_type(id)
-    return id_type in [ClusterIdType.kStandard]
+    return id_type == ClusterIdType.kStandard
 
 
 def is_valid_cluster_id(id: int, allow_test: bool = False) -> bool:
