@@ -15,6 +15,7 @@
  */
 #pragma once
 
+#include <cstddef>
 #include <lib/support/Span.h>
 
 #include <optional>
@@ -55,6 +56,8 @@ template <typename T>
 class FluentTreeObject
 {
 public:
+    FluentTreeObject() : mValue(nullptr) {}
+    FluentTreeObject(std::nullptr_t) : mValue(nullptr) {}
     explicit FluentTreeObject(T * value) : mValue(value) {}
 
     /// Returns NULLPTR if such an element does not exist or non-null valid value if the element exists
@@ -65,10 +68,10 @@ public:
     FluentTreeObject<typename TYPE::Type> First(unsigned & indexHint)
     {
         // if no value, searching more also yields no value
-        VerifyOrReturnValue(mValue != nullptr, FluentTreeObject<typename TYPE::Type>(nullptr));
+        VerifyOrReturnValue(mValue != nullptr, nullptr);
 
         Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
-        VerifyOrReturnValue(!value_span.empty(), FluentTreeObject<typename TYPE::Type>(nullptr));
+        VerifyOrReturnValue(!value_span.empty(), nullptr);
 
         // found it, save the hint
         indexHint = 0;
@@ -79,12 +82,12 @@ public:
     template <typename TYPE>
     FluentTreeObject<typename TYPE::Type> Find(typename TYPE::Key key, unsigned & indexHint)
     {
-        VerifyOrReturnValue(mValue != nullptr, FluentTreeObject<typename TYPE::Type>(nullptr));
+        VerifyOrReturnValue(mValue != nullptr, nullptr);
 
         Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
         std::optional<unsigned> idx          = FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey);
 
-        VerifyOrReturnValue(idx.has_value(), FluentTreeObject<typename TYPE::Type>(nullptr));
+        VerifyOrReturnValue(idx.has_value(), nullptr);
         return FluentTreeObject<typename TYPE::Type>(&value_span[*idx]);
     }
 
@@ -92,12 +95,12 @@ public:
     template <typename TYPE>
     FluentTreeObject<typename TYPE::Type> Next(typename TYPE::Key key, unsigned & indexHint)
     {
-        VerifyOrReturnValue(mValue != nullptr, FluentTreeObject<typename TYPE::Type>(nullptr));
+        VerifyOrReturnValue(mValue != nullptr, nullptr);
 
         Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
         std::optional<unsigned> idx          = FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey);
 
-        VerifyOrReturnValue(idx.has_value() && ((*idx + 1) < value_span.size()), FluentTreeObject<typename TYPE::Type>(nullptr));
+        VerifyOrReturnValue(idx.has_value() && ((*idx + 1) < value_span.size()), nullptr);
 
         indexHint = *idx + 1;
         return FluentTreeObject<typename TYPE::Type>(&value_span[*idx + 1]);
