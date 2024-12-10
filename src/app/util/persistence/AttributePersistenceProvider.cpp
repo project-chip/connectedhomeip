@@ -1,6 +1,5 @@
 /*
  *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,16 +13,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
-#include <app/codegen-data-model-provider/Instance.h>
+#include <app/util/persistence/AttributePersistenceProvider.h>
 
 namespace chip {
 namespace app {
 
-DataModel::Provider * CodegenDataModelProviderInstance()
+namespace {
+
+AttributePersistenceProvider * gAttributeSaver = nullptr;
+
+} // anonymous namespace
+
+AttributePersistenceProvider * GetAttributePersistenceProvider()
 {
-    static CodegenDataModelProvider gCodegenModel;
-    return &gCodegenModel;
+    return gAttributeSaver;
+}
+
+void SetAttributePersistenceProvider(AttributePersistenceProvider * aProvider)
+{
+    VerifyOrReturn(aProvider != nullptr);
+    gAttributeSaver = aProvider;
 }
 
 } // namespace app

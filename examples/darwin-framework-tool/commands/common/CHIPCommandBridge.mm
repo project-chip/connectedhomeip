@@ -18,7 +18,7 @@
 
 #include "CHIPCommandBridge.h"
 
-#import "CHIPToolKeypair.h"
+#import "DFTKeypair.h"
 #import <Matter/Matter.h>
 
 #include <lib/core/CHIPConfig.h>

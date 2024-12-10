@@ -195,6 +195,7 @@ silabs_executable("energy-management-app") {
 
   deps = [
     ":sdk",
+    "${chip_root}/src/app:attribute-persistence",
     app_data_model,
   ]
 

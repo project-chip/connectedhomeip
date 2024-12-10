@@ -102,3 +102,8 @@ To preserve `codegen/zap` generated logic, use
 `CodegenDataModelProviderInstance` (see changes in
 [36558](https://github.com/project-chip/connectedhomeip/pull/36558) and
 [36613](https://github.com/project-chip/connectedhomeip/pull/36613) ).
+
+To use default attribute persistence, you need to pass in a
+`PersistentStorageDelegate` to `CodegenDataModelProviderInstance`. See example
+changes in [36658](https://github.com/project-chip/connectedhomeip/pull/36658)
+).
