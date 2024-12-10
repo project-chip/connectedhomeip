@@ -42,7 +42,7 @@ chip_test_suite("tests") {
     "TestDefer.cpp",
     "TestErrorStr.cpp",
     "TestFixedBufferAllocator.cpp",
-    "TestFluentTreeObject.cpp",
+    "TestSpanSearchValue.cpp",
     "TestFold.cpp",
     "TestIniEscaping.cpp",
     "TestIntrusiveList.cpp",

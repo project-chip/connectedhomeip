@@ -19,7 +19,7 @@
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/support/FluentTreeObject.h>
+#include <lib/support/SpanSearchValue.h>
 
 namespace {
 
@@ -115,10 +115,10 @@ struct ByClientCluster
 
 } // namespace
 
-TEST(TestFluentTreeObject, TestFunctionality)
+TEST(TestSpanSearchValue, TestFunctionality)
 {
     EndpointItemsWrapper wrapper(gEndpointDataItems);
-    FluentTreeObject<EndpointItemsWrapper> tree(&wrapper);
+    SpanSearchValue<EndpointItemsWrapper> tree(&wrapper);
 
     EXPECT_EQ(tree.Value(), &wrapper); // value getting to start matches
 

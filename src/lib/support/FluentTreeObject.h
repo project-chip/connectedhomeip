@@ -31,7 +31,7 @@ namespace chip {
 ///
 /// General usage is for fluent-searching for things like:
 ///
-///    FluentTreeObject container(somePointer);
+///    SpanSearchValue container(somePointer);
 ///
 ///    const AcceptedCommandData * value =
 ///           container
@@ -47,7 +47,7 @@ namespace chip {
 ///      using Type = SomeValueType;    // The type that is indexed by `Key`
 ///
 ///      /// Allows getting the "Span of Type" from an underlying structure.
-///      /// A `FluentTreeObject<Foo>` will require a `GetSpan(Foo&)`
+///      /// A `SpanSearchValue<Foo>` will require a `GetSpan(Foo&)`
 ///      static Span<Type> GetSpan(ContainerType & data) { /* return ... */ }
 ///
 ///      /// Checks that the `Type` value has the given `Key` or not
@@ -58,19 +58,19 @@ namespace chip {
 ///    - how to get a "span of sub-elements" for an object (`GetSpan`)
 ///    - how to determine if a given sub-element has the "correct key"
 template <typename T>
-class FluentTreeObject
+class SpanSearchValue
 {
 public:
-    FluentTreeObject() : mValue(nullptr) {}
-    FluentTreeObject(std::nullptr_t) : mValue(nullptr) {}
-    explicit FluentTreeObject(T * value) : mValue(value) {}
+    SpanSearchValue() : mValue(nullptr) {}
+    SpanSearchValue(std::nullptr_t) : mValue(nullptr) {}
+    explicit SpanSearchValue(T * value) : mValue(value) {}
 
     /// Returns nullptr if such an element does not exist or non-null valid value if the element exists
     T * Value() const { return mValue; }
 
     /// Gets the first element of `TYPE::Type`
     template <typename TYPE>
-    FluentTreeObject<typename TYPE::Type> First(unsigned & indexHint)
+    SpanSearchValue<typename TYPE::Type> First(unsigned & indexHint)
     {
         // if no value, searching more also yields no value
         VerifyOrReturnValue(mValue != nullptr, nullptr);
@@ -80,12 +80,12 @@ public:
 
         // found it, save the hint
         indexHint = 0;
-        return FluentTreeObject<typename TYPE::Type>(&value_span[0]);
+        return SpanSearchValue<typename TYPE::Type>(&value_span[0]);
     }
 
     /// Find the value corresponding to `key`
     template <typename TYPE>
-    FluentTreeObject<typename TYPE::Type> Find(typename TYPE::Key key, unsigned & indexHint)
+    SpanSearchValue<typename TYPE::Type> Find(typename TYPE::Key key, unsigned & indexHint)
     {
         VerifyOrReturnValue(mValue != nullptr, nullptr);
 
@@ -93,12 +93,12 @@ public:
         std::optional<unsigned> idx          = FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey);
 
         VerifyOrReturnValue(idx.has_value(), nullptr);
-        return FluentTreeObject<typename TYPE::Type>(&value_span[*idx]);
+        return SpanSearchValue<typename TYPE::Type>(&value_span[*idx]);
     }
 
     /// Finds the value that occurs after `key` in the underlying collection.
     template <typename TYPE>
-    FluentTreeObject<typename TYPE::Type> Next(typename TYPE::Key key, unsigned & indexHint)
+    SpanSearchValue<typename TYPE::Type> Next(typename TYPE::Key key, unsigned & indexHint)
     {
         VerifyOrReturnValue(mValue != nullptr, nullptr);
 
@@ -108,7 +108,7 @@ public:
         VerifyOrReturnValue(idx.has_value() && ((*idx + 1) < value_span.size()), nullptr);
 
         indexHint = *idx + 1;
-        return FluentTreeObject<typename TYPE::Type>(&value_span[*idx + 1]);
+        return SpanSearchValue<typename TYPE::Type>(&value_span[*idx + 1]);
     }
 
 private:

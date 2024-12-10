@@ -35,7 +35,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/FluentTreeObject.h>
+#include <lib/support/SpanSearchValue.h>
 
 #include <optional>
 #include <variant>
@@ -870,7 +870,7 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceT
 
     CHIP_ERROR err                                  = CHIP_NO_ERROR;
     chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
-    FluentTreeObject<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
+    SpanSearchValue<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
 
     const EmberAfDeviceType * entry = tree.First<ByDeviceType>(mDeviceTypeIterationHint).Value();
 
@@ -891,7 +891,7 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
 
     CHIP_ERROR err                                  = CHIP_NO_ERROR;
     chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
-    FluentTreeObject<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
+    SpanSearchValue<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
 
     const EmberAfDeviceType * entry = tree.Next<ByDeviceType>(previous, mDeviceTypeIterationHint).Value();
     return entry == nullptr ? std::nullopt : std::make_optional(DeviceTypeEntryFromEmber(*entry));
