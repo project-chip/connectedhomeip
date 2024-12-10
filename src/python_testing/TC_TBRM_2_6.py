@@ -39,21 +39,42 @@ class TC_TBRM_2_6(MatterBaseTest):
 
     def desc_TC_TBRM_2_6(self) -> str:
         """Returns a description of this test"""
-        return "This test case verifies that the Network Commissioning Cluster will reflect the same underlying network configuration when Thread Border Router endpoint that supports also Secondary Network Interface device type is used to configure Thread network."
-
+        return "This test case verifies that the Network Commissioning Cluster will reflect the same underlying " \
+               "network configuration when Thread Border Router endpoint that supports also Secondary Network " \
+               "Interface device type is used to configure Thread network."
+    
     def steps_TC_TBRM_2_6(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH commissions DUT, putting device on operational network using Network Commissioning cluster on primary network interface.", is_commissioning=False),
-            TestStep(2, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 120", "Verify that DUT sends ArmFailSafeResponse command to the TH"),
-            TestStep(3,"In a CASE session, TH sends command SetActiveDatasetRequest to DUT with ActiveDataset: PIXIT.TBRM.THREAD_ACTIVE_DATASET", "Verify DUT responds w/ status SUCCESS(0x00)."),
-            TestStep(4, "TH read InterfaceEnabled attribute from DUT on Thread Border Router Endpoint.", "Verify that InterfaceEnabled attribute value is True"),
-            TestStep(5, "TH sends CommissioningComplete command to the DUT", "Verify that DUT sends CommissioningCompleteResponse command to the TH with errorCode: 0 (Success status)"),
-            TestStep(6, "TH read LastNetworkID attribute from DUT on Thread Border Router Endpoint.", "LastNetworkID received from DUT has value PIXIT.TBRM.THREAD_EXTENDED_PANID."),
-            TestStep(7, "TH read MaxNetworks attribute from DUT on Thread Border Router Endpoint.", "Verify that MaxNetwork attribute value is equal to 1")
+            TestStep(1,
+                     "TH commissions DUT, putting device on operational network using Network Commissioning cluster "
+                     "on primary network interface.",
+                     is_commissioning=False),
+            TestStep(2, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 120",
+                     "Verify that DUT sends ArmFailSafeResponse command to the TH"),
+            TestStep(3,
+                     "In a CASE session, TH sends command SetActiveDatasetRequest to DUT with ActiveDataset: "
+                     "PIXIT.TBRM.THREAD_ACTIVE_DATASET",
+                     "Verify DUT responds w/ status SUCCESS(0x00)."),
+            TestStep(4, "TH read InterfaceEnabled attribute from DUT on Thread Border Router Endpoint.",
+                     "Verify that InterfaceEnabled attribute value is True"),
+            TestStep(5, "TH sends CommissioningComplete command to the DUT",
+                     "Verify that DUT sends CommissioningCompleteResponse command to the TH with errorCode: 0 ("
+                     "Success status)"),
+            TestStep(6, "TH read LastNetworkID attribute from DUT on Thread Border Router Endpoint.",
+                     "LastNetworkID received from DUT has value PIXIT.TBRM.THREAD_EXTENDED_PANID."),
+            TestStep(7, "TH read MaxNetworks attribute from DUT on Thread Border Router Endpoint.",
+                     "Verify that MaxNetwork attribute value is equal to 1")
         ]     
 
-    def extract_dataset_tlvs(self, b_operational_dataset: bytes):
-        self.nwk_dataset = {
+    def pics_TC_TBRM_2_6(self) -> list[str]:
+        """ This function returns a list of PICS for this test case that must be True for the test to be run"""
+        return [
+            "TBRM.S",
+        ]
+
+    @staticmethod
+    def extract_active_dataset_tlvs(b_active_dataset: bytes):
+        nwk_dataset_tlvs = {
             # Active Timestamp TLV
             14: {
                 "name": "timestamp",
@@ -106,42 +127,45 @@ class TC_TBRM_2_6(MatterBaseTest):
             },
         }
         _index = 0
-        while _index < len(b_operational_dataset):
-            tlv_type = b_operational_dataset[_index]
-            tlv_lenght = b_operational_dataset[_index+1]
-            self.nwk_dataset[tlv_type]["value"] = b_operational_dataset[_index+2:_index+2+tlv_lenght]
+        while _index < len(b_active_dataset):
+            tlv_type = b_active_dataset[_index]
+            tlv_lenght = b_active_dataset[_index+1]
+            nwk_dataset_tlvs[tlv_type]["value"] = b_active_dataset[_index+2:_index+2+tlv_lenght]
             _index += tlv_lenght + 2
+        return nwk_dataset_tlvs
 
     @async_test_body
     async def test_TC_TBRM_2_6(self):
         
         self.step(1)
         
-        self.th1 = self.default_controller
+        test_harness = self.default_controller
         tbrm_endpoint = self.matter_test_config.global_test_params['PIXIT.TBRM.ENDPOINT']
         # Check if DUT has Secondary Network Interface and Thread Border Router Management Support on the same endpoint
-        rsp = await self.th1.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.MaxNetworks)])
+        rsp = await test_harness.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.MaxNetworks)])
         logging.info(f" Response: {rsp}")
         if self.matter_test_config.commissioning_method == "ble-thread" or rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.MaxNetworks] != 1:
             logging.info("Device doesn't support SNI and TBRM on PIXIT.TBRM.ENDPOINT or ble-thread commissioning was used. SKIP remaining steps!")
             self.skip_all_remaining_steps(starting_step_number=2)
-        
+        else:
+            logging.info("Device support SNI and TBRM on PIXIT.TBRM.ENDPOINT. Contiune test ...")
+            
         self.step(2)
         
         # ArmFailSafe in order to set Active Dataset and connect to Thread network
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=120, breadcrumb=1)
-        rsp = await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+        rsp = await test_harness.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
         logging.info(f" Response: {rsp}")
 
         self.step(3)
         
         thread_active_dataset = self.matter_test_config.global_test_params['PIXIT.TBRM.THREAD_ACTIVE_DATASET']
         cmd = Clusters.ThreadBorderRouterManagement.Commands.SetActiveDatasetRequest(activeDataset=thread_active_dataset, breadcrumb=1)
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=tbrm_endpoint, payload=cmd)
+        await test_harness.SendCommand(nodeid=self.dut_node_id, endpoint=tbrm_endpoint, payload=cmd)
         
         self.step(4)
 
-        rsp = await self.th1.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.InterfaceEnabled)])
+        rsp = await test_harness.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.InterfaceEnabled)])
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
             True, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.InterfaceEnabled], 
@@ -150,21 +174,21 @@ class TC_TBRM_2_6(MatterBaseTest):
         self.step(5)
 
         cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
-        rsp = await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+        rsp = await test_harness.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
         logging.info(f" Response: {rsp}")
 
         self.step(6)
 
-        self.extract_dataset_tlvs(b_operational_dataset=thread_active_dataset)
-        rsp = await self.th1.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.LastNetworkID)])
+        nwk_dataset = self.extract_active_dataset_tlvs(b_active_dataset=thread_active_dataset)
+        rsp = await test_harness.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.LastNetworkID)])
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
-            self.nwk_dataset[2]["value"], rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.LastNetworkID], 
+            nwk_dataset[2]["value"], rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.LastNetworkID], 
             "NetworkCommissioning.Attributes.LastNetworkID Attribute != 1")
 
         self.step(7)
 
-        rsp = await self.th1.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.MaxNetworks)])
+        rsp = await test_harness.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.MaxNetworks)])
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
             1, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.MaxNetworks], 
