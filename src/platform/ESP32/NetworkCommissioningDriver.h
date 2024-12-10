@@ -60,19 +60,6 @@ public:
         return true;
     }
 
-    void SetApData(WiFiScanResponse & item, wifi_ap_record_t ap_record)
-    {
-        item.security = ConvertSecurityType(ap_record.authmode);
-        static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "SSID length might not fit in item.ssidLen");
-        item.ssidLen = static_cast<uint8_t>(
-            strnlen(reinterpret_cast<const char *>(ap_record.ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
-        item.channel  = ap_record.primary;
-        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = ap_record.rssi;
-        memcpy(item.ssid, ap_record.ssid, item.ssidLen);
-        memcpy(item.bssid, ap_record.bssid, 6);
-    }
-
     void Release() override
     {
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
@@ -86,6 +73,19 @@ private:
     const wifi_ap_record_t * mpScanResults;
     size_t mIternum = 0;
 #endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 1, 3)
+
+    void SetApData(WiFiScanResponse & item, wifi_ap_record_t ap_record)
+    {
+        item.security = ConvertSecurityType(ap_record.authmode);
+        static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "SSID length might not fit in item.ssidLen");
+        item.ssidLen = static_cast<uint8_t>(
+            strnlen(reinterpret_cast<const char *>(ap_record.ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
+        item.channel  = ap_record.primary;
+        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+        item.rssi     = ap_record.rssi;
+        memcpy(item.ssid, ap_record.ssid, item.ssidLen);
+        memcpy(item.bssid, ap_record.bssid, sizeof(item.bssid));
+    }
 };
 
 class ESPWiFiDriver final : public WiFiDriver
