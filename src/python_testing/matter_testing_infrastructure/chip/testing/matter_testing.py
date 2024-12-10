@@ -2223,6 +2223,7 @@ def has_command(command: ClusterObjects.ClusterCommand) -> EndpointCheckFunction
     """
     return partial(_has_command, command=command)
 
+
 def _has_feature(wildcard, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
     try:
         feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]

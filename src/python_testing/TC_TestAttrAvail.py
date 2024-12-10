@@ -47,9 +47,9 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
-#       --storage-path admin_storage.json 
-#       --endpoint 1 
-#       --discriminator 1234 
+#       --storage-path admin_storage.json
+#       --endpoint 1
+#       --discriminator 1234
 #       --passcode 20202021
 #     factory-reset: false
 #     quiet: true
@@ -57,7 +57,7 @@
 
 # Run 1: Tests PASE connection using manual code
 # Run 2: Tests CASE connection using manual discriminator and passcode
-# Run 3: Tests without factory reset 
+# Run 3: Tests without factory reset
 
 import asyncio
 import chip.clusters as Clusters
@@ -65,6 +65,7 @@ from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 import logging
 from mobly import asserts
+
 
 class TC_TestAttrAvail(MatterBaseTest):
     # Using get_code and a modified version of setup_class_helper functions from chip.testing.basic_composition module
@@ -160,6 +161,7 @@ class TC_TestAttrAvail(MatterBaseTest):
         feat_should_be_there = await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible)
         asserts.assert_true(feat_should_be_there, True)
         self.print_step("Boolean State Config Audio Feature available ", feat_should_be_there)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
