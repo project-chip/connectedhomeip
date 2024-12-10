@@ -60,7 +60,8 @@ enum ID : uint16_t
     kGeneratorFW   = 0x0135,
     kProductionFW  = 0x0136,
     kCertToolPath  = 0x0137,
-    kPylinkLib     = 0x0138,
+    kPylinkLib     = 0x013a,
+    kBufferSize    = 0x013b,
     // Instance Info,
     kSerialNumber       = 0x0141,
     kVendorId           = 0x0142,
@@ -149,7 +150,6 @@ struct Storage : public GenericStorage,
     static constexpr size_t kSpake2pSaltB64LengthMax     = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
     static constexpr size_t kFirmwareInfoSizeMax         = 32;
     static constexpr size_t kCertificationSizeMax        = 350;
-    static constexpr size_t kCertificateSizeMax          = kArgumentSizeMax;
     static constexpr size_t kDeviceAttestationKeySizeMax = 128;
     static constexpr size_t kSetupPayloadSizeMax         = 32;
     static constexpr size_t kCsrLengthMax                = 512;
@@ -161,8 +161,6 @@ struct Storage : public GenericStorage,
     static constexpr size_t kTotalPayloadDataSize = kTotalPayloadDataSizeInBits / 8;
 
 public:
-    static uint8_t aux_buffer[Storage::kArgumentSizeMax];
-
     friend class Manager;
     friend class Protocol1;
     friend class Command;
@@ -247,6 +245,8 @@ public:
     CHIP_ERROR GetSetupPayload(chip::MutableCharSpan & value);
     CHIP_ERROR SetProvisionRequest(bool value);
     CHIP_ERROR GetProvisionRequest(bool & value);
+    void SetBufferSize(size_t size) { mBufferSize = size > 0 ? size : kArgumentSizeMax; }
+    size_t GetBufferSize() { return mBufferSize; }
 
 private:
     // Generic Interface
@@ -300,6 +300,7 @@ private:
     uint32_t mRendezvousFlags        = 0;
     uint32_t mPasscode               = 0;
     uint32_t mKeyId                  = 0;
+    uint32_t mBufferSize             = kArgumentSizeMax;
     char mCommonName[kCommonNameMax] = { 0 };
     CustomStorage mCustom;
 };
