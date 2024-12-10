@@ -187,6 +187,7 @@ constexpr uint8_t kAdvActiveScanDuration     = 15;
 constexpr uint8_t kAdvPassiveScanDuration    = 20;
 constexpr uint8_t kAdvMultiProbe             = 1;
 constexpr uint8_t kAdvScanPeriodicity        = 10;
+constexpr uint8_t kAdvEnableInstantbgScan    = 1;
 
 // TODO: Confirm that this value works for size and timing
 constexpr uint8_t kWfxQueueSize = 10;
@@ -745,12 +746,14 @@ void ProcessEvent(WifiPlatformEvent event)
                 wifi_scan_configuration.periodic_scan_interval = kAdvScanPeriodicity;
             }
 
-            sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = { 0 };
-            advanced_scan_configuration.active_channel_time                   = kAdvActiveScanDuration;
-            advanced_scan_configuration.passive_channel_time                  = kAdvPassiveScanDuration;
-            advanced_scan_configuration.trigger_level                         = kAdvScanThreshold;
-            advanced_scan_configuration.trigger_level_change                  = kAdvRssiToleranceThreshold;
-            advanced_scan_configuration.enable_multi_probe                    = kAdvMultiProbe;
+            sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = { .active_channel_time  = kAdvActiveScanDuration,
+                                                                                  .passive_channel_time = kAdvPassiveScanDuration,
+                                                                                  .trigger_level        = kAdvScanThreshold,
+                                                                                  .trigger_level_change =
+                                                                                      kAdvRssiToleranceThreshold,
+                                                                                  .enable_multi_probe  = kAdvMultiProbe,
+                                                                                  .enable_instant_scan = kAdvEnableInstantbgScan };
+
             status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
             if (SL_STATUS_OK != status)
             {
