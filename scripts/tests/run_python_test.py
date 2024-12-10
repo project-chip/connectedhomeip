@@ -116,7 +116,7 @@ def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event)
 @click.option("--quiet/--no-quiet", default=None,
               help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
-@click.argument("run", nargs=-1)
+@click.option("--run", type=str, multiple=True, help="Run only the specified test run(s).")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env, run):
