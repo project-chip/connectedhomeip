@@ -105,7 +105,7 @@ public:
 private:
     T * mValue = nullptr; // underlying value, NULL if such a value does not exist
 
-    /// Search for the index where `needle` inside `haystack`
+    /// Search for the index where `needle` is located inside `haystack`
     ///
     /// using `haystackValueMatchesNeedle` to find if a given haystack value matches the given needle
     template <typename N, typename H>
