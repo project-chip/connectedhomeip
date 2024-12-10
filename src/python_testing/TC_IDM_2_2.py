@@ -246,6 +246,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         for endpoint in read_request:
             returned_clusters = sorted([x.id for x in read_request[endpoint]])
             server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
+            asserts.assert_equal(returned_clusters, server_list)
 
         for endpoint in read_request:
             for cluster in read_request[endpoint]:
