@@ -84,7 +84,6 @@ public:
     }
 
     /// Find the value corresponding to `key`
-    /// p
     template <typename TYPE>
     SpanSearchValue<typename TYPE::Type> Find(typename TYPE::Key key, unsigned & indexHint)
     {
