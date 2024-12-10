@@ -210,10 +210,7 @@ class TC_OPSTATE_BASE():
     async def TEST_TC_OPSTATE_BASE_1_1(self, endpoint=1, cluster_revision=1, feature_map=0):
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
-
         commands = cluster.Commands
-        accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attributes.AcceptedCommandList)
-
         events = cluster.Events
 
         self.init_test()
