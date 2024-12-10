@@ -43,9 +43,14 @@ namespace chip {
 /// Where a `ByFoo` structure looks like:
 ///
 ///    struct ByFoo {
-///      using Key  = int;                  // the KEY inside a type
-///      using Type = SomeContainerStruct;  // the values for a sub-search
-///      static Span<Type> GetSpan(Data & data) { /* return ... */ }
+///      using Key  = int;              // the KEY inside a type
+///      using Type = SomeValueType;    // The type that is indexed by `Key`
+///
+///      /// Allows getting the "Span of Type" from an underlying structure.
+///      /// A `FluentTreeObject<Foo>` will require a `GetSpan(Foo&)`
+///      static Span<Type> GetSpan(ContainerType & data) { /* return ... */ }
+///
+///      /// Checks that the `Type` value has the given `Key` or not
 ///      static bool HasKey(const Key & id, const Type & instance) { /* return "instance has key id" */ }
 ///    }
 ///
