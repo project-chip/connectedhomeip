@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <optional>
 #include <variant>
@@ -28,8 +28,6 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
-#include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
-#include <app/codegen-data-model-provider/EmberMetadata.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
@@ -40,6 +38,8 @@
 #include <app/util/ember-io-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/odd-sized-integers.h>
+#include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
+#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>

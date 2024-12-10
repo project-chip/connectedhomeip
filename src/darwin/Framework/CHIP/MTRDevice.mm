@@ -363,6 +363,32 @@ MTR_DIRECT_MEMBERS
     return [NSArray array];
 }
 
+- (NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)descriptorClusters
+{
+    @autoreleasepool {
+        // For now, we have a temp array that we should make sure dies as soon
+        // as possible.
+        //
+        // TODO: We should have a version of readAttributePaths that returns a
+        // dictionary in the format we want here.
+        auto path = [MTRAttributeRequestPath requestPathWithEndpointID:nil
+                                                             clusterID:@(MTRClusterIDTypeDescriptorID)
+                                                           attributeID:nil];
+        auto * data = [self readAttributePaths:@[ path ]];
+
+        auto * retval = [NSMutableDictionary dictionaryWithCapacity:data.count];
+        for (NSDictionary * item in data) {
+            // We double-check that the things in our dictionaries are the right
+            // thing, because XPC has no way to check that for us.
+            if (MTR_SAFE_CAST(item[MTRAttributePathKey], MTRAttributePath) && MTR_SAFE_CAST(item[MTRDataKey], NSDictionary)) {
+                retval[item[MTRAttributePathKey]] = item[MTRDataKey];
+            }
+        }
+
+        return retval;
+    }
+}
+
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
