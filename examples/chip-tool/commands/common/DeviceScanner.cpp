@@ -17,6 +17,7 @@
  */
 
 #include "DeviceScanner.h"
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 using namespace chip;
 using namespace chip::Dnssd;
@@ -243,3 +244,5 @@ DeviceScanner & GetDeviceScanner()
     static DeviceScanner scanner;
     return scanner;
 }
+
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
