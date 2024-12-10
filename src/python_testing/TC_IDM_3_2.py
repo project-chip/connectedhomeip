@@ -101,7 +101,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                     await self.write_single_attribute(
                         attribute_value=chosen_attribute(value=value),
                         endpoint_id=endpoint,
-                        )
+                    )
 
                 if attributes_of_type_on_device:
                     return True
@@ -115,7 +115,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         all_clusters = [cluster for cluster in Clusters.ClusterObjects.ALL_ATTRIBUTES]
         # expected_descriptor_attributes = ClusterObjects.ALL_ATTRIBUTES[Clusters.Objects.Descriptor.id]
 
-        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor)])
+        # read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor)])
         # returned_attributes = [a for a in read_request[0][Clusters.Objects.Descriptor].keys() if a !=
         #                        Clusters.Attribute.DataVersion]
 
@@ -402,7 +402,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         output_1 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
         endpoint = next(iter(output_1.attributes))
         value = self.pick_writable_value(chosen_writable_attribute)
-        data_version = output_1.attributes[endpoint][Clusters.Thermostat][Clusters.Attribute.DataVersion]
+        # data_version = output_1.attributes[endpoint][Clusters.Thermostat][Clusters.Attribute.DataVersion]
         result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
 
         asserts.assert_true(isinstance(result.Reason, InteractionModelError),
