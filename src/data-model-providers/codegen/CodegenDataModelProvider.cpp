@@ -868,7 +868,7 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceT
         return std::nullopt;
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
     chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
     FluentTreeObject<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
 
@@ -889,7 +889,7 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
         return std::nullopt;
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
     chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
     FluentTreeObject<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
 
