@@ -77,7 +77,7 @@ private:
      * This method is called to reset state. It resets the transfer, cleans up the
      * exchange and ends log collection.
      */
-    void Reset();
+    void Reset(CHIP_ERROR error);
 
     Messaging::ExchangeContext * mBDXTransferExchangeCtx;
     DiagnosticLogsProviderDelegate * mDelegate;

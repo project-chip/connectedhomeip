@@ -65,7 +65,7 @@ CHIP_ERROR LogProvider::GetLogForIntent(IntentEnum intent, MutableByteSpan & out
     err = CollectLog(sessionHandle, outBuffer, unusedOutIsEndOfLog);
     VerifyOrReturnError(CHIP_NO_ERROR == err, err, outBuffer.reduce_size(0));
 
-    err = EndLogCollection(sessionHandle);
+    err = EndLogCollection(sessionHandle, CHIP_NO_ERROR);
     VerifyOrReturnError(CHIP_NO_ERROR == err, err, outBuffer.reduce_size(0));
 
     return CHIP_NO_ERROR;
@@ -276,7 +276,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle)
+CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error)
 {
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mSessionContextMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
