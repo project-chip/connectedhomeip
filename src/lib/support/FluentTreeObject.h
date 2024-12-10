@@ -60,7 +60,7 @@ public:
     /// Returns NULLPTR if such an element does not exist or non-null valid value if the element exists
     T * Value() const { return mValue; }
 
-    // Get the first element of `TYPE`
+    /// Gets the first element of `TYPE::Type`
     template <typename TYPE>
     FluentTreeObject<typename TYPE::Type> First(unsigned & indexHint)
     {
@@ -75,7 +75,7 @@ public:
         return FluentTreeObject<typename TYPE::Type>(&value_span[0]);
     }
 
-    // Find the value for type EXACTLY type
+    /// Find the value corresponding to `key`
     template <typename TYPE>
     FluentTreeObject<typename TYPE::Type> Find(typename TYPE::Key key, unsigned & indexHint)
     {
@@ -88,6 +88,7 @@ public:
         return FluentTreeObject<typename TYPE::Type>(&value_span[*idx]);
     }
 
+    /// Finds the value that occurs after `key` in the underlying collection.
     template <typename TYPE>
     FluentTreeObject<typename TYPE::Type> Next(typename TYPE::Key key, unsigned & indexHint)
     {
