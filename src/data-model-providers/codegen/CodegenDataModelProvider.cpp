@@ -281,14 +281,17 @@ DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath
 //       to a common type is probably better. Need to figure out dependencies since
 //       this would make ember return datamodel-provider types.
 //       See: https://github.com/project-chip/connectedhomeip/issues/35889
-DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
+std::optional<DataModel::DeviceTypeEntry> DeviceTypeEntryFromEmber(const EmberAfDeviceType * other)
 {
-    DataModel::DeviceTypeEntry entry;
+    if (other == nullptr)
+    {
+        return std::nullopt;
+    }
 
-    entry.deviceTypeId       = other.deviceId;
-    entry.deviceTypeRevision = other.deviceVersion;
-
-    return entry;
+    return DataModel::DeviceTypeEntry{
+        .deviceTypeId       = other->deviceId,
+        .deviceTypeRevision = other->deviceVersion,
+    };
 }
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
@@ -872,9 +875,7 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceT
     chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
     SpanSearchValue<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
 
-    const EmberAfDeviceType * entry = tree.First<ByDeviceType>(mDeviceTypeIterationHint).Value();
-
-    return entry == nullptr ? std::nullopt : std::make_optional(DeviceTypeEntryFromEmber(*entry));
+    return DeviceTypeEntryFromEmber(tree.First<ByDeviceType>(mDeviceTypeIterationHint).Value());
 }
 
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
@@ -893,8 +894,7 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
     chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
     SpanSearchValue<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
 
-    const EmberAfDeviceType * entry = tree.Next<ByDeviceType>(previous, mDeviceTypeIterationHint).Value();
-    return entry == nullptr ? std::nullopt : std::make_optional(DeviceTypeEntryFromEmber(*entry));
+    return DeviceTypeEntryFromEmber(tree.Next<ByDeviceType>(previous, mDeviceTypeIterationHint).Value());
 }
 
 std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetFirstSemanticTag(EndpointId endpoint)
