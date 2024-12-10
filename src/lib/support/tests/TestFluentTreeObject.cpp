@@ -91,24 +91,24 @@ EndpointData gEndpointDataItems[] = {
 /// search index definitions
 struct ByEndpoint
 {
-    using Key  = EndpointId;         // the KEY inside a type │    │ │
-    using Type = const EndpointData; // the values for a sub-search │    │ │
+    using Key  = EndpointId;
+    using Type = const EndpointData;
     static Span<Type> GetSpan(EndpointItemsWrapper & data) { return data.data; }
     static bool HasKey(const Key & id, const Type & instance) { return instance.id == id; }
 };
 
 struct ByServerCluster
 {
-    using Key  = ClusterId;         // the KEY inside a type │    │ │
-    using Type = const ClusterData; // the values for a sub-search │    │ │
+    using Key  = ClusterId;
+    using Type = const ClusterData;
     static Span<Type> GetSpan(const EndpointData & data) { return data.serverClusters; }
     static bool HasKey(const Key & id, const Type & instance) { return instance.id == id; }
 };
 
 struct ByClientCluster
 {
-    using Key  = ClusterId;         // the KEY inside a type │    │ │
-    using Type = const ClusterData; // the values for a sub-search │    │ │
+    using Key  = ClusterId;
+    using Type = const ClusterData;
     static Span<Type> GetSpan(const EndpointData & data) { return data.clientClusters; }
     static bool HasKey(const Key & id, const Type & instance) { return instance.id == id; }
 };

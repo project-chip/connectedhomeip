@@ -252,6 +252,15 @@ choice SCHED_ALGORITHM
 	default SCHED_MULTIQ
 endchoice
 
+config WIFI_NM_MAX_MANAGED_INTERFACES
+	default 2
+
+config WIFI_NM_WPA_SUPPLICANT_WQ_PRIO
+	default 3
+
+config WIFI_NM_WPA_SUPPLICANT_PRIO
+	default 3
+
 choice WIFI_NM_WPA_SUPPLICANT_LOG_LEVEL_CHOICE
 	default WIFI_NM_WPA_SUPPLICANT_LOG_LEVEL_INF
 endchoice
@@ -320,6 +329,9 @@ config HEAP_MEM_POOL_SIZE
 config CHIP_MALLOC_SYS_HEAP_SIZE
 	default 28672 # 28 kB
 
+config ETH_DRIVER
+	default n
+
 endif
 
 if CHIP_ETHERNET || CHIP_WIFI
@@ -354,10 +366,10 @@ config MBEDTLS_USER_CONFIG_ENABLE
 config MBEDTLS_USER_CONFIG_FILE
     default "nxp-zephyr-mbedtls-config.h"
 
-config MBEDTLS_ENTROPY_ENABLED
+config MBEDTLS_ENTROPY_C
 	default y
 
-config MBEDTLS_ZEPHYR_ENTROPY
+config MBEDTLS_ENTROPY_POLL_ZEPHYR
 	default y
 
 config MBEDTLS_SSL_MAX_CONTENT_LEN
