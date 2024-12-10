@@ -122,20 +122,15 @@ private:
     FindIndexUsingHint(const N & needle, Span<H> haystack, unsigned & hint,
                        bool (*haystackValueMatchesNeedle)(const N &, const typename std::remove_const<H>::type &))
     {
-        if (hint < haystack.size())
-        {
-            if (haystackValueMatchesNeedle(needle, haystack[hint]))
-            {
-                return hint;
-            }
-        }
+        // search starts at `hint` rather than 0
+        const unsigned hayscackSize = static_cast<unsigned>(haystack.size());
 
-        for (unsigned i = 0; i < haystack.size(); i++)
+        for (unsigned i = 0, checkIndex = hint; i < hayscackSize; i++, checkIndex++)
         {
-            if (haystackValueMatchesNeedle(needle, haystack[i]))
+            if (haystackValueMatchesNeedle(needle, haystack[checkIndex % hayscackSize]))
             {
-                hint = i;
-                return i;
+                hint = checkIndex % hayscackSize;
+                return checkIndex % hayscackSize;
             }
         }
 
