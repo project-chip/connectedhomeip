@@ -84,16 +84,19 @@ public:
     }
 
     /// Find the value corresponding to `key`
+    /// p
     template <typename TYPE>
     SpanSearchValue<typename TYPE::Type> Find(typename TYPE::Key key, unsigned & indexHint)
     {
         VerifyOrReturnValue(mValue != nullptr, nullptr);
 
         Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
-        std::optional<unsigned> idx          = FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey);
 
-        VerifyOrReturnValue(idx.has_value(), nullptr);
-        return SpanSearchValue<typename TYPE::Type>(&value_span[*idx]);
+        if (!FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey)) {
+            return nullptr;
+        }
+
+        return SpanSearchValue<typename TYPE::Type>(&value_span[indexHint]);
     }
 
     /// Finds the value that occurs after `key` in the underlying collection.
@@ -103,12 +106,15 @@ public:
         VerifyOrReturnValue(mValue != nullptr, nullptr);
 
         Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
-        std::optional<unsigned> idx          = FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey);
 
-        VerifyOrReturnValue(idx.has_value() && ((*idx + 1) < value_span.size()), nullptr);
+        if (!FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey)) {
+            return nullptr;
+        }
 
-        indexHint = *idx + 1;
-        return SpanSearchValue<typename TYPE::Type>(&value_span[*idx + 1]);
+        VerifyOrReturnValue((indexHint + 1) < value_span.size(), nullptr);
+
+        indexHint++;
+        return SpanSearchValue<typename TYPE::Type>(&value_span[indexHint]);
     }
 
 private:
@@ -117,24 +123,31 @@ private:
     /// Search for the index where `needle` is located inside `haystack`
     ///
     /// using `haystackValueMatchesNeedle` to find if a given haystack value matches the given needle
+    ///
+    /// `in_out_hint` contains a start search point at the start and will contain the found index
+    /// location (if found) at the end.
+    ///
+    /// Returns true on success (index found) false on failure (index not found). If returning
+    /// false, the value of `in_out_hint` is unchanged
     template <typename N, typename H>
-    static std::optional<unsigned>
-    FindIndexUsingHint(const N & needle, Span<H> haystack, unsigned & hint,
+    static bool
+    FindIndexUsingHint(const N & needle, Span<H> haystack, unsigned & in_out_hint,
                        bool (*haystackValueMatchesNeedle)(const N &, const typename std::remove_const<H>::type &))
     {
         // search starts at `hint` rather than 0
-        const unsigned hayscackSize = static_cast<unsigned>(haystack.size());
+        const unsigned haystackSize = static_cast<unsigned>(haystack.size());
+        unsigned checkIndex = (in_out_hint < haystackSize) ? in_out_hint : 0;
 
-        for (unsigned i = 0, checkIndex = hint; i < hayscackSize; i++, checkIndex++)
+        for (unsigned i = 0; i < haystackSize; i++, checkIndex++)
         {
-            if (haystackValueMatchesNeedle(needle, haystack[checkIndex % hayscackSize]))
+            if (haystackValueMatchesNeedle(needle, haystack[checkIndex % haystackSize]))
             {
-                hint = checkIndex % hayscackSize;
-                return checkIndex % hayscackSize;
+                in_out_hint = checkIndex % haystackSize;
+                return true;
             }
         }
 
-        return std::nullopt;
+        return false;
     }
 };
 
