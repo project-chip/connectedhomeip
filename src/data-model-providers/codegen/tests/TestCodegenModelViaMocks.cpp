@@ -786,6 +786,29 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
         model.ChangeListener().DirtyList().clear();
     }
 
+    // non-nullable test with markDirty set to false
+    {
+        WriteOperation test(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZclType));
+        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+        AttributeValueDecoder decoder = test.DecoderFor(value);
+
+        // write should succeed
+        ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder, std::make_optional(false)).IsSuccess());
+
+        // Validate data after write
+        chip::ByteSpan writtenData = Test::GetEmberBuffer();
+
+        typename NumericAttributeTraits<T>::StorageType storage;
+        ASSERT_GE(writtenData.size(), sizeof(storage));
+        memcpy(&storage, writtenData.data(), sizeof(storage));
+        typename NumericAttributeTraits<T>::WorkingType actual = NumericAttributeTraits<T>::StorageToWorking(storage);
+
+        EXPECT_EQ(actual, value);
+        // Change Listener Dirty list should be empty
+        ASSERT_EQ(model.ChangeListener().DirtyList().size(), 0u);
+    }
+
     // nullable test: write null to make sure content of buffer changed (otherwise it will be a noop for dirty checking)
     {
         WriteOperation test(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZclType));

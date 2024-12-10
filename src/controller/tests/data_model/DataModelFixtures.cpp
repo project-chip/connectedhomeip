@@ -340,7 +340,8 @@ ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & r
     return err;
 }
 
-ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder,
+                                                   std::optional<bool> markDirty)
 {
     static ListIndex listStructOctetStringElementCount = 0;
 

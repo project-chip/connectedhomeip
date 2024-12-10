@@ -74,12 +74,17 @@ public:
     /// When this is invoked, caller is expected to have already done some validations:
     ///    - cluster `data version` has been checked for the incoming request if applicable
     ///
+    /// When markDirty is true, the attribute will be marked as dirty after a successful write.
+    /// When markDirty is false, the attribute will not be marked as dirty after a successful write.
+    /// When markDirty is null, the attribute will be marked as dirty when its value changes
+    ///
     /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
     ///   WriteAttribute is REQUIRED to perform:
     ///     - ACL validation (see notes on OperationFlags::kInternal)
     ///     - Validation of readability/writability (also controlled by OperationFlags::kInternal)
     ///     - Validation of timed interaction required (also controlled by OperationFlags::kInternal)
-    virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
+    virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder,
+                                              std::optional<bool> markDirty = std::nullopt) = 0;
 
     /// `handler` is used to send back the reply.
     ///    - returning `std::nullopt` means that return value was placed in handler directly.

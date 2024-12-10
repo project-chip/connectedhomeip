@@ -21,6 +21,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
@@ -89,7 +90,8 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttribute
 } // namespace
 
 DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                       AttributeValueDecoder & decoder)
+                                                                       AttributeValueDecoder & decoder,
+                                                                       std::optional<bool> markDirty)
 {
     ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
@@ -213,7 +215,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
     if (aai_result.has_value())
     {
-        if (*aai_result == CHIP_NO_ERROR)
+        if ((*aai_result == CHIP_NO_ERROR) && markDirty.value_or(true))
         {
             // TODO: this is awkward since it provides AAI no control over this, specifically
             //       AAI may not want to increase versions for some attributes that are Q
@@ -239,7 +241,11 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     EmberAfWriteDataInput dataInput(dataBuffer.data(), (*attributeMetadata)->attributeType);
 
     dataInput.SetChangeListener(&change_listener);
-    // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
+    // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmited`
+    if (markDirty.has_value())
+    {
+        dataInput.SetMarkDirty(markDirty.value() ? MarkAttributeDirty::kYes : MarkAttributeDirty::kNo);
+    }
 
     if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
