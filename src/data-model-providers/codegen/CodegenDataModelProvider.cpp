@@ -107,18 +107,12 @@ using detail::EnumeratorCommandFinder;
 
 namespace {
 
-struct DeviceListWrapper
-{
-    Span<const EmberAfDeviceType> deviceTypes;
-    explicit DeviceListWrapper(Span<const EmberAfDeviceType> types) : deviceTypes(types) {}
-};
-
 /// Search by device type within a `DeviceListWrapper` which just wraps a span of EmberAfDeviceType
 struct ByDeviceType
 {
     using Key  = DataModel::DeviceTypeEntry;
     using Type = const EmberAfDeviceType;
-    static Span<Type> GetSpan(DeviceListWrapper & data) { return data.deviceTypes; }
+    static Span<Type> GetSpan(Span<const EmberAfDeviceType> & data) { return data; }
     static bool HasKey(const Key & id, const Type & instance)
     {
         return (instance.deviceId == id.deviceTypeId) && (instance.deviceVersion == id.deviceTypeRevision);
@@ -875,8 +869,8 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceT
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceListWrapper wrapper(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
-    FluentTreeObject<DeviceListWrapper> tree(&wrapper);
+    chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+    FluentTreeObject<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
 
     const EmberAfDeviceType * entry = tree.First<ByDeviceType>(mDeviceTypeIterationHint).Value();
 
@@ -896,8 +890,8 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceListWrapper wrapper(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
-    FluentTreeObject<DeviceListWrapper> tree(&wrapper);
+    chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+    FluentTreeObject<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
 
     const EmberAfDeviceType * entry = tree.Next<ByDeviceType>(previous, mDeviceTypeIterationHint).Value();
     return entry == nullptr ? std::nullopt : std::make_optional(DeviceTypeEntryFromEmber(*entry));
