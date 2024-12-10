@@ -97,6 +97,7 @@ slow_tests:
     - { name: TC_PS_2_3.py, duration: 30 seconds }
     - { name: TC_RR_1_1.py, duration: 25 seconds }
     - { name: TC_SWTCH.py, duration: 1 minute }
+    - { name: TC_TestAttrAvail.py, duration: 30 seconds }
     - { name: TC_TIMESYNC_2_10.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_11.py, duration: 30 seconds }
     - { name: TC_TIMESYNC_2_12.py, duration: 20 seconds }
