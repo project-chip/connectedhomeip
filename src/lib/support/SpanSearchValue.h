@@ -92,7 +92,8 @@ public:
 
         Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
 
-        if (!FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey)) {
+        if (!FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey))
+        {
             return nullptr;
         }
 
@@ -107,7 +108,8 @@ public:
 
         Span<typename TYPE::Type> value_span = TYPE::GetSpan(*mValue);
 
-        if (!FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey)) {
+        if (!FindIndexUsingHint(key, value_span, indexHint, TYPE::HasKey))
+        {
             return nullptr;
         }
 
@@ -130,13 +132,12 @@ private:
     /// Returns true on success (index found) false on failure (index not found). If returning
     /// false, the value of `in_out_hint` is unchanged
     template <typename N, typename H>
-    static bool
-    FindIndexUsingHint(const N & needle, Span<H> haystack, unsigned & in_out_hint,
-                       bool (*haystackValueMatchesNeedle)(const N &, const typename std::remove_const<H>::type &))
+    static bool FindIndexUsingHint(const N & needle, Span<H> haystack, unsigned & in_out_hint,
+                                   bool (*haystackValueMatchesNeedle)(const N &, const typename std::remove_const<H>::type &))
     {
         // search starts at `hint` rather than 0
         const unsigned haystackSize = static_cast<unsigned>(haystack.size());
-        unsigned checkIndex = (in_out_hint < haystackSize) ? in_out_hint : 0;
+        unsigned checkIndex         = (in_out_hint < haystackSize) ? in_out_hint : 0;
 
         for (unsigned i = 0; i < haystackSize; i++, checkIndex++)
         {
