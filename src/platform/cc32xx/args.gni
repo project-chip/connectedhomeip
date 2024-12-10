@@ -37,4 +37,3 @@ chip_build_tests = false
 
 # small binaries even in CI
 optimize_debug_level = "s"
-
