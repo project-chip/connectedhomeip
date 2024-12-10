@@ -57,7 +57,7 @@ class FluentTreeObject
 public:
     explicit FluentTreeObject(T * value) : mValue(value) {}
 
-    /// Returns NULLPTR if such an element does not exist or non-null valid value if the element exists
+    /// Returns nullptr if such an element does not exist or non-null valid value if the element exists
     T * Value() const { return mValue; }
 
     // Get the first element of `TYPE`
