@@ -16,8 +16,8 @@
  */
 
 #include "AppMain.h"
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <CommissionableInit.h>
 

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 #include "lib/core/CHIPPersistentStorageDelegate.h"
-#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/Instance.h>
 
 namespace chip {
 namespace app {
