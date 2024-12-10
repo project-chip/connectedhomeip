@@ -42,7 +42,7 @@ class TC_TBRM_2_6(MatterBaseTest):
         return "This test case verifies that the Network Commissioning Cluster will reflect the same underlying " \
                "network configuration when Thread Border Router endpoint that supports also Secondary Network " \
                "Interface device type is used to configure Thread network."
-    
+
     def steps_TC_TBRM_2_6(self) -> list[TestStep]:
         return [
             TestStep(1,
@@ -64,7 +64,7 @@ class TC_TBRM_2_6(MatterBaseTest):
                      "LastNetworkID received from DUT has value PIXIT.TBRM.THREAD_EXTENDED_PANID."),
             TestStep(7, "TH read MaxNetworks attribute from DUT on Thread Border Router Endpoint.",
                      "Verify that MaxNetwork attribute value is equal to 1")
-        ]     
+        ]
 
     def pics_TC_TBRM_2_6(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
@@ -136,9 +136,9 @@ class TC_TBRM_2_6(MatterBaseTest):
 
     @async_test_body
     async def test_TC_TBRM_2_6(self):
-        
+
         self.step(1)
-        
+
         test_harness = self.default_controller
         tbrm_endpoint = self.matter_test_config.global_test_params['PIXIT.TBRM.ENDPOINT']
         # Check if DUT has Secondary Network Interface and Thread Border Router Management Support on the same endpoint
@@ -149,26 +149,27 @@ class TC_TBRM_2_6(MatterBaseTest):
             self.skip_all_remaining_steps(starting_step_number=2)
         else:
             logging.info("Device support SNI and TBRM on PIXIT.TBRM.ENDPOINT. Contiune test ...")
-            
+
         self.step(2)
-        
+
         # ArmFailSafe in order to set Active Dataset and connect to Thread network
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=120, breadcrumb=1)
         rsp = await test_harness.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
         logging.info(f" Response: {rsp}")
 
         self.step(3)
-        
+
         thread_active_dataset = self.matter_test_config.global_test_params['PIXIT.TBRM.THREAD_ACTIVE_DATASET']
-        cmd = Clusters.ThreadBorderRouterManagement.Commands.SetActiveDatasetRequest(activeDataset=thread_active_dataset, breadcrumb=1)
+        cmd = Clusters.ThreadBorderRouterManagement.Commands.SetActiveDatasetRequest(
+            activeDataset=thread_active_dataset, breadcrumb=1)
         await test_harness.SendCommand(nodeid=self.dut_node_id, endpoint=tbrm_endpoint, payload=cmd)
-        
+
         self.step(4)
 
         rsp = await test_harness.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.InterfaceEnabled)])
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
-            True, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.InterfaceEnabled], 
+            True, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.InterfaceEnabled],
             "Clusters.NetworkCommissioning.Attributes.InterfaceEnabled != True")
 
         self.step(5)
@@ -183,7 +184,7 @@ class TC_TBRM_2_6(MatterBaseTest):
         rsp = await test_harness.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.LastNetworkID)])
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
-            nwk_dataset[2]["value"], rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.LastNetworkID], 
+            nwk_dataset[2]["value"], rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.LastNetworkID],
             "NetworkCommissioning.Attributes.LastNetworkID Attribute != 1")
 
         self.step(7)
@@ -191,8 +192,9 @@ class TC_TBRM_2_6(MatterBaseTest):
         rsp = await test_harness.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.MaxNetworks)])
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
-            1, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.MaxNetworks], 
+            1, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.MaxNetworks],
             "NetworkCommissioning.Attributes.MaxNetworks Attribute != 1")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

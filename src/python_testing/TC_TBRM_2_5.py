@@ -58,7 +58,7 @@ class TC_TBRM_2_5(MatterBaseTest):
                      "Verify that MaxNetwork attribute value is equal to 1"),
             TestStep(5, "TH read InterfaceEnabled attribute from DUT on Thread Border Router Endpoint",
                      "Verify that InterfaceEnabled attribute value is True")
-        ]     
+        ]
 
     def pics_TC_TBRM_2_5(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
@@ -124,15 +124,15 @@ class TC_TBRM_2_5(MatterBaseTest):
         while _index < len(b_active_dataset):
             tlv_type = b_active_dataset[_index]
             tlv_lenght = b_active_dataset[_index+1]
-            nwk_dataset_tlvs[tlv_type]["value"] = b_active_dataset[_index+2:_index+2+tlv_lenght] 
+            nwk_dataset_tlvs[tlv_type]["value"] = b_active_dataset[_index+2:_index+2+tlv_lenght]
             _index += tlv_lenght + 2
         return nwk_dataset_tlvs
 
     @async_test_body
     async def test_TC_TBRM_2_5(self):
-        
+
         self.step(1)
-        
+
         test_harness = self.default_controller
         tbrm_endpoint = self.matter_test_config.global_test_params['PIXIT.TBRM.ENDPOINT']
         # Check if DUT has Secondary Network Interface and Thread Border Router Management Support on the same endpoint
@@ -151,7 +151,7 @@ class TC_TBRM_2_5(MatterBaseTest):
         assert thread_active_dataset is not None
 
         self.step(2)
-        
+
         if self.matter_test_config.commissioning_method != "ble-thread":
             logging.info("Use NetworkCommissioning to configure Thread network")
             # ArmFailSafe in order to set Active Dataset and connect to Thread network
@@ -159,7 +159,8 @@ class TC_TBRM_2_5(MatterBaseTest):
             rsp = await test_harness.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
             logging.info(f" Response: {rsp}")
             # Use NetworkCommissioning cluster to write the Thread Operational Dataset
-            cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(operationalDataset=thread_active_dataset, breadcrumb=1)
+            cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
+                operationalDataset=thread_active_dataset, breadcrumb=1)
             rsp = await test_harness.SendCommand(nodeid=self.dut_node_id, endpoint=tbrm_endpoint, payload=cmd)
             logging.info(f" Response: {rsp}")
             # Connect to Thread Network
@@ -173,29 +174,31 @@ class TC_TBRM_2_5(MatterBaseTest):
             logging.info(f" Response: {rsp}")
         else:
             logging.info("SKIP Step 2 - Thread network was already configured.")
-        
+
         self.step(3)
-        
+
         cmd = Clusters.ThreadBorderRouterManagement.Commands.GetActiveDatasetRequest()
         rsp = await test_harness.SendCommand(nodeid=self.dut_node_id, endpoint=tbrm_endpoint, payload=cmd)
         logging.info(f" Response: {rsp}")
-        asserts.assert_equal(thread_active_dataset, rsp.dataset, "Dataset configured through NetwrokCommissioning != Dataset extracted from TBRM")
-        
+        asserts.assert_equal(thread_active_dataset, rsp.dataset,
+                             "Dataset configured through NetwrokCommissioning != Dataset extracted from TBRM")
+
         self.step(4)
-        
+
         rsp = await test_harness.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.MaxNetworks)])
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
-            1, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.MaxNetworks], 
+            1, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.MaxNetworks],
             "NetworkCommissioning.Attributes.MaxNetworks Attribute != 1")
-        
+
         self.step(5)
-        
+
         rsp = await test_harness.ReadAttribute(self.dut_node_id, [(tbrm_endpoint, Clusters.NetworkCommissioning.Attributes.InterfaceEnabled)])
         logging.info(f" Response: {rsp}")
         asserts.assert_equal(
-            True, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.InterfaceEnabled], 
+            True, rsp[tbrm_endpoint][Clusters.NetworkCommissioning][Clusters.NetworkCommissioning.Attributes.InterfaceEnabled],
             "NClusters.NetworkCommissioning.Attributes.InterfaceEnabled != True")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
