@@ -669,12 +669,12 @@ void PairingManager::ResetForNextCommand()
 {
     mCommissioningWindowDelegate = nullptr;
     mPairingDelegate             = nullptr;
-    mNodeId         = chip::kUndefinedNodeId;
-    mVerifier       = chip::ByteSpan();
-    mSalt           = chip::ByteSpan();
-    mDiscriminator  = 0;
-    mSetupPINCode   = 0;
-    mDeviceIsICD    = false;
+    mNodeId                      = chip::kUndefinedNodeId;
+    mVerifier                    = chip::ByteSpan();
+    mSalt                        = chip::ByteSpan();
+    mDiscriminator               = 0;
+    mSetupPINCode                = 0;
+    mDeviceIsICD                 = false;
 
     memset(mRandomGeneratedICDSymmetricKey, 0, sizeof(mRandomGeneratedICDSymmetricKey));
     memset(mVerifierBuffer, 0, sizeof(mVerifierBuffer));
