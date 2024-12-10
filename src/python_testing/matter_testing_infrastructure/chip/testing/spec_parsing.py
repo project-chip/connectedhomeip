@@ -572,15 +572,26 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     problems: list[ProblemNotice] = []
 
     logging.info("Reading XML clusters from %r", top)
+
+    found_xmls = 0
     for f in top.iterdir():
         if not f.name.endswith('.xml'):
             logging.info("Ignoring non-XML file %s", f.name)
             continue
 
         logging.info('Parsing file %s', f.name)
+        found_xmls += 1
         with f.open("r", encoding="utf8") as file:
             root = ElementTree.parse(file).getroot()
             add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
+
+    # For now we assume even a single XML means the directory was probaly OK
+    # we may increase this later as most our data model directories are larger
+    #
+    # Intent here is to make user aware of typos in paths instead of silently having
+    # empty parsing
+    if found_xmls < 1:
+        raise SpecParsingException(f'No data model files found in specified directory {top:r}')
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
