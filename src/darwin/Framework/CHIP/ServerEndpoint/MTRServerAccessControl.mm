@@ -47,7 +47,7 @@ class DeviceTypeResolver : public chip::Access::DynamicProviderDeviceTypeResolve
 public:
     DeviceTypeResolver()
         : chip::Access::DynamicProviderDeviceTypeResolver(
-            [] { return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(); })
+              [] { return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(); })
     {
     }
 };
@@ -93,7 +93,7 @@ class AccessControlDelegate : public AccessControl::Delegate {
                 }
                 break;
             default:
-                MTR_LOG_ERROR("Uknown granted privilege %u, ignoring", grant.grantedPrivilege);
+                MTR_LOG_ERROR("Unknown granted privilege %u, ignoring", grant.grantedPrivilege);
                 break;
             }
 
