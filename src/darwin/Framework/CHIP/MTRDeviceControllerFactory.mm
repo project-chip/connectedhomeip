@@ -50,7 +50,6 @@
 
 #import <os/lock.h>
 
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/CHIPCert.h>
@@ -59,6 +58,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
@@ -399,7 +399,7 @@ MTR_DIRECT_MEMBERS
             params.opCertStore = _opCertStore;
             params.certificateValidityPolicy = &_certificateValidityPolicy;
             params.sessionResumptionStorage = _sessionResumptionStorage;
-            params.dataModelProvider = app::CodegenDataModelProviderInstance();
+            params.dataModelProvider = app::CodegenDataModelProviderInstance(_persistentStorageDelegate);
             SuccessOrExit(err = _controllerFactory->Init(params));
         }
 

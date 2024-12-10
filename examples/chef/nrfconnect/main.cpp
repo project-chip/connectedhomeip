@@ -25,9 +25,9 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -126,7 +126,7 @@ int main()
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     err                          = chip::Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)
     {

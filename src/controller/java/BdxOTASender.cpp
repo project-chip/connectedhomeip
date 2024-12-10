@@ -73,15 +73,12 @@ CHIP_ERROR BdxOTASender::Init(System::Layer * systemLayer, Messaging::ExchangeMa
 CHIP_ERROR BdxOTASender::Shutdown()
 {
     assertChipStackLockedByCurrentThread();
-
-    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
     ResetState();
 
     mExchangeMgr = nullptr;
-    mSystemLayer = nullptr;
 
     return CHIP_NO_ERROR;
 }

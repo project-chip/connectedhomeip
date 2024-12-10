@@ -14,15 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
-#include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
-#include <app/codegen-data-model-provider/EmberMetadata.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
@@ -35,6 +33,8 @@
 #include <app/util/ember-io-storage.h>
 #include <app/util/ember-strings.h>
 #include <app/util/odd-sized-integers.h>
+#include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
+#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 
@@ -259,6 +259,22 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     }
 
     return CHIP_NO_ERROR;
+}
+
+void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
+{
+    ContextAttributesChangeListener change_listener(CurrentContext());
+    if (path.mClusterId != kInvalidClusterId)
+    {
+        emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, &change_listener);
+    }
+    else
+    {
+        // When the path has wildcard cluster Id, call the emberAfEndpointChanged to mark attributes on the given endpoint
+        // as having changing, but do NOT increase/alter any cluster data versions, as this happens when a bridged endpoint is
+        // added or removed from a bridge and the cluster data is not changed during the process.
+        emberAfEndpointChanged(path.mEndpointId, &change_listener);
+    }
 }
 
 } // namespace app
