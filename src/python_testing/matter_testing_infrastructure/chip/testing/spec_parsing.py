@@ -541,7 +541,9 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     """
     Get the directory of the data model for a specific version and level from the installed package.
 
-    If `data_model_directory` is given as a PATH, it is returned directly WITHOUT using the data_model level at all.
+
+    `data_model_directory` given as a path MUST be of type Traversable (often `pathlib.Path(somepathstring)`).
+    If `data_model_directory` is given as a Traversable, it is returned directly WITHOUT using the data_model_level at all.
     """
     # If it's a prebuilt directory, build the path based on the version and data model level
     if isinstance(data_model_directory, PrebuiltDataModelDirectory):
@@ -554,9 +556,10 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> typing.Tuple[dict[int, dict], list]:
     """
     Build XML clusters from the specified data model directory.
-    This function supports both pre-built locations and full paths
+    This function supports both pre-built locations and full paths.
 
-    if data_model_directory is a Travesable, it is assumed to already contain `clusters` (i.e. be a directory
+    `data_model_directory`` given as a path MUST be of type Traversable (often `pathlib.Path(somepathstring)`).
+    If data_model_directory is a Travesable, it is assumed to already contain `clusters` (i.e. be a directory
     with all XML files in it)
     """
 
