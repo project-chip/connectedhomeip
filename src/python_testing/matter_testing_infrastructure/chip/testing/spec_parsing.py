@@ -537,18 +537,18 @@ class DataModelLevel(Enum):
         raise KeyError("Invalid enum: %r" % self)
 
 
-def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], data_model_level: DataModelLevel) -> Traversable:
+def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], data_model_level: DataModelLevel = DataModelLevel.kCluster) -> Traversable:
     """
     Get the directory of the data model for a specific version and level from the installed package.
+
+    If `data_model_directory` is given as a PATH, it is returned directly WITHOUT using the data_model level at all.
     """
     # If it's a prebuilt directory, build the path based on the version and data model level
     if isinstance(data_model_directory, PrebuiltDataModelDirectory):
-        top = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
-            'data_model').joinpath(data_model_directory.dirname)
+        return pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+            'data_model').joinpath(data_model_directory.dirname).joinpath(data_model_level.dirname)
     else:
-        top = data_model_directory
-
-    return top.joinpath(data_model_level.dirname)
+        return data_model_directory
 
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> typing.Tuple[dict[int, dict], list]:
@@ -560,17 +560,12 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     with all XML files in it)
     """
 
-    if isinstance(data_model_directory, PrebuiltDataModelDirectory):
-        top = pkg_resources.files(importlib.import_module("chip.testing")).joinpath(
-            'data_model').joinpath(data_model_directory.dirname).joinpath(DataModelLevel.kCluster.dirname)
-    else:
-        top = data_model_directory
-
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
     ids_by_name: dict[str, int] = {}
     problems: list[ProblemNotice] = []
 
+    top = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
     logging.info("Reading XML clusters from %r", top)
 
     found_xmls = 0
@@ -591,7 +586,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     # Intent here is to make user aware of typos in paths instead of silently having
     # empty parsing
     if found_xmls < 1:
-        raise SpecParsingException(f'No data model files found in specified directory {top:r}')
+        raise SpecParsingException(f'No data model files found in specified directory {top:!r}')
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
