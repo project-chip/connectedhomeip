@@ -265,17 +265,16 @@ chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(wfx_sec_t securit
 
 bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
-    bool scanStarted = false;
     ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks");
-
     return StartNetworkScan(ssid, OnScanWiFiNetworkDone) == CHIP_NO_ERROR;
 }
 
 void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
 {
-    ChipLogProgress(DeviceLayer, "OnScanWiFiNetworkDone");
     if (!aScanResult)
     {
+        ChipLogProgress(DeviceLayer, "OnScanWiFiNetworkDone: Receive all scanned networks information.");
+
         if (GetInstance().mpScanCallback != nullptr)
         {
             if (mScanResponseIter.Count() == 0)
