@@ -60,6 +60,7 @@
 # Run 3: Tests without factory reset
 
 import asyncio
+
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
