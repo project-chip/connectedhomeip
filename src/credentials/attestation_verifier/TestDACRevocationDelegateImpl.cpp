@@ -131,10 +131,10 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const std::string & a
     std::string errs;
 
     // Try direct data first, then fall back to file
-    std::istringstream jsonStream(!mRevocationData.empty() ? mRevocationData : "[]");
 
     if (!mRevocationData.empty())
     {
+        std::istringstream jsonStream(!mRevocationData.empty() ? mRevocationData : "[]");
         if (!Json::parseFromStream(readerBuilder, jsonStream, &jsonData, &errs))
         {
             ChipLogError(NotSpecified, "Failed to parse JSON data: %s", errs.c_str());
