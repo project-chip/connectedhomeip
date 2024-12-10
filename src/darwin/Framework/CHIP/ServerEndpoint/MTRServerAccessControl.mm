@@ -47,7 +47,7 @@ class DeviceTypeResolver : public chip::Access::DynamicProviderDeviceTypeResolve
 public:
     DeviceTypeResolver()
         : chip::Access::DynamicProviderDeviceTypeResolver(
-              [] { return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(); })
+            [] { return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(); })
     {
     }
 };
