@@ -449,6 +449,13 @@ using namespace chip::Tracing::DarwinFramework;
     for (MTRDevice * device in devices) {
         [device invalidate];
     }
+
+    // Since MTRDevice invalidate may issue asynchronous writes to storage, perform a
+    // block synchronously on the storage delegate queue to flush those operations.
+    [self.controllerDataStore synchronouslyPerformBlock:^{
+        MTR_LOG("%@ Finished flushing data store", self);
+    }];
+
     [self stopBrowseForCommissionables];
 
     [_factory controllerShuttingDown:self];

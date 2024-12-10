@@ -1169,6 +1169,15 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
     });
 }
 
+- (void)synchronouslyPerformBlock:(void (^_Nullable)(void))block
+{
+    dispatch_sync(_storageDelegateQueue, ^{
+        if (block) {
+            block();
+        }
+    });
+}
+
 @end
 
 @implementation MTRCASESessionResumptionInfo

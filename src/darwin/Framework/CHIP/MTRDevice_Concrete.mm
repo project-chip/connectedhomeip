@@ -850,6 +850,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     os_unfair_lock_lock(&self->_lock);
 
+    // Flush unstored attributes if any
+    [self _persistClusterData];
+
     _state = MTRDeviceStateUnknown;
 
     // Make sure we don't try to resubscribe if we have a pending resubscribe
