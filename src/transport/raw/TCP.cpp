@@ -343,8 +343,12 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             // We have not yet received the complete message.
             return CHIP_NO_ERROR;
         }
+        if (messageSize == 0)
+        {
+            // No payload but considered a valid message. Return success to keep the connection alive.
+            return CHIP_NO_ERROR;
+        }
         state->mReceived.Consume(kPacketSizeBytes);
-        VerifyOrReturnError(!state->mReceived.IsNull(), CHIP_ERROR_MESSAGE_INCOMPLETE);
         ReturnErrorOnFailure(ProcessSingleMessage(peerAddress, state, messageSize));
     }
 
