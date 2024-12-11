@@ -393,7 +393,6 @@ externalproject_add(
     BUILD_COMMAND           ninja "esp32"
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${chip_libraries}
-    WORKING_DIRECTORY       ${CMAKE_CURRENT_LIST_DIR}
     DEPENDS                 args_gn
     BUILD_ALWAYS            1
 )
@@ -436,6 +435,8 @@ if(CONFIG_BT_ENABLED)
         idf_component_get_property(bt_dir bt COMPONENT_DIR)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
         list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a")
+    elseif(target_name STREQUAL "esp32p4")
+        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
     else()
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
     endif()
@@ -514,11 +515,12 @@ endif()
 idf_component_get_property(lwip_lib lwip COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${lwip_lib}>)
 
-
-if (CONFIG_ESP32_WIFI_ENABLED)
+if (CONFIG_ESP32_WIFI_ENABLED OR CONFIG_IDF_TARGET_ESP32P4)
     idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
-    idf_component_get_property(esp_wifi_dir esp_wifi COMPONENT_DIR)
     list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)
+endif()
+if (CONFIG_ESP32_WIFI_ENABLED)
+    idf_component_get_property(esp_wifi_dir esp_wifi COMPONENT_DIR)
     if (CONFIG_IDF_TARGET_ESP32C2)
         set(blobs core net80211 pp)
     else()
@@ -544,6 +546,7 @@ list(APPEND chip_libraries $<TARGET_FILE:${esp_netif_lib}>)
 idf_component_get_property(esp_hw_support_lib esp_hw_support COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${esp_hw_support_lib}>)
 
+if (NOT CONFIG_IDF_TARGET_ESP32P4)
 idf_component_get_property(esp_phy_lib esp_phy COMPONENT_LIB)
 idf_component_get_property(esp_phy_dir esp_phy COMPONENT_DIR)
 list(APPEND chip_libraries $<TARGET_FILE:${esp_phy_lib}>)
@@ -558,8 +561,12 @@ endif()
 foreach(phy_blob ${phy_blobs})
     list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
 endforeach()
+endif()
 
-set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos esp_timer)
+set(components_to_link esp_event hal esp_system soc efuse vfs driver freertos esp_timer)
+if (NOT CONFIG_IDF_TARGET_ESP32P4)
+list(APPEND components_to_link esp_coex)
+endif()
 idf_build_get_property(build_components BUILD_COMPONENTS)
 foreach(component ${components_to_link})
     # Some of the components are not present in IDF v4.x
