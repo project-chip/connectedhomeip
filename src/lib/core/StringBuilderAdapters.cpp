@@ -32,14 +32,16 @@ template <>
 StatusWithSize ToString<std::chrono::duration<uint64_t, std::milli>>(const std::chrono::duration<uint64_t, std::milli> & time,
                                                                      pw::span<char> buffer)
 {
-    return pw::string::Format(buffer, "%llums", time.count());
+    // Cast to llu because some platforms use lu and others use llu.
+    return pw::string::Format(buffer, "%llums", static_cast<long long unsigned int>(time.count()));
 }
 
 template <>
 StatusWithSize ToString<std::chrono::duration<uint64_t, std::micro>>(const std::chrono::duration<uint64_t, std::micro> & time,
                                                                      pw::span<char> buffer)
 {
-    return pw::string::Format(buffer, "%lluus", time.count());
+    // Cast to llu because some platforms use lu and others use llu.
+    return pw::string::Format(buffer, "%lluus", static_cast<long long unsigned int>(time.count()));
 }
 
 } // namespace pw
