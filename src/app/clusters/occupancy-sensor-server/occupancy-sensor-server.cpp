@@ -63,7 +63,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::PIROccupiedToUnoccupiedDelay::Id:
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
     case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
-
+        // HoldTime is equivalent to the legacy *OccupiedToUnoccupiedDelay attributes.
         uint16_t * holdTime = GetHoldTimeForEndpoint(aPath.mEndpointId);
 
         if (holdTime == nullptr)
