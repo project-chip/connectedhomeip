@@ -1393,7 +1393,6 @@ bool Instance::GeneratesCommandId(const ConcreteCommandPath & commandPath)
     case ConnectNetworkResponse::Id:
         return mFeatureFlags.HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface);
     case QueryIdentityResponse::Id:
-
         return mFeatureFlags.Has(Feature::kPerDeviceCredentials);
     default:
         return false;
