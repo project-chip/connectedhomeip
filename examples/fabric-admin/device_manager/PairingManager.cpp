@@ -661,4 +661,35 @@ CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
     });
 }
 
+void PairingManager::ResetForNextCommand()
+{
+    mCommissioningWindowDelegate = nullptr;
+    mPairingDelegate             = nullptr;
+    mNodeId                      = chip::kUndefinedNodeId;
+    mVerifier                    = chip::ByteSpan();
+    mSalt                        = chip::ByteSpan();
+    mDiscriminator               = 0;
+    mSetupPINCode                = 0;
+    mDeviceIsICD                 = false;
+
+    memset(mRandomGeneratedICDSymmetricKey, 0, sizeof(mRandomGeneratedICDSymmetricKey));
+    memset(mVerifierBuffer, 0, sizeof(mVerifierBuffer));
+    memset(mSaltBuffer, 0, sizeof(mSaltBuffer));
+    memset(mRemoteIpAddr, 0, sizeof(mRemoteIpAddr));
+    memset(mOnboardingPayload, 0, sizeof(mOnboardingPayload));
+
+    mICDRegistration.ClearValue();
+    mICDCheckInNodeId.ClearValue();
+    mICDClientType.ClearValue();
+    mICDSymmetricKey.ClearValue();
+    mICDMonitoredSubject.ClearValue();
+    mICDStayActiveDurationMsec.ClearValue();
+
+    mWindowOpener.reset();
+    mOnOpenCommissioningWindowCallback.Cancel();
+    mOnOpenCommissioningWindowVerifierCallback.Cancel();
+    mCurrentFabricRemover.reset();
+    mCurrentFabricRemoveCallback.Cancel();
+}
+
 } // namespace admin
