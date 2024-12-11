@@ -10008,8 +10008,12 @@
                   - XY
                   - ColorTemperature
 
-- release: "Future"
-  versions: "future"
+- release: "8377F965-9A14-4120-AAC4-4F296BA64949"
+  versions:
+      iOS: "18.4"
+      macOS: "15.4"
+      watchOS: "11.4"
+      tvOS: "18.4"
   introduced:
       clusters:
           - DishwasherAlarm
@@ -10632,3 +10636,6 @@
               # The one bit in this bitmap is marked X in the spec, but we can't have
               # an empty bitmap.
               - Feature
+
+- release: "Future"
+  versions: "future"

@@ -31,7 +31,7 @@ MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3))
  */
 - (void)cancel;
 
-@property (readonly, nonatomic) NSUUID * UUID MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic) NSUUID * UUID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 @end
 
