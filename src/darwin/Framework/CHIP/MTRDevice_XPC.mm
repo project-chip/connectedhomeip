@@ -322,7 +322,20 @@ static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKey
 - (MTRDeviceState)state
 {
     NSNumber * stateNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
-    return stateNumber ? static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue) : MTRDeviceStateUnknown;
+    switch (static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue)) {
+    case MTRDeviceStateUnknown:
+        return MTRDeviceStateUnknown;
+
+    case MTRDeviceStateUnreachable:
+        return MTRDeviceStateUnreachable;
+
+    case MTRDeviceStateReachable:
+        return MTRDeviceStateReachable;
+    }
+
+    MTR_LOG_ERROR("stateNumber from internal state is an invalid value: %@", stateNumber);
+
+    return MTRDeviceStateUnknown;
 }
 
 - (BOOL)deviceCachePrimed

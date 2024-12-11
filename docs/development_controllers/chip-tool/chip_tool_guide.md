@@ -9,6 +9,26 @@ the setup payload or performing discovery actions.
 
 <hr>
 
+## Table of Contents
+
+-   [Installation](#installation)
+-   [Building from source](#building-from-source)
+-   [Running the CHIP Tool](#running-the-chip-tool)
+-   [CHIP Tool modes](#chip-tool-modes)
+    -   [Single-command mode (default)](#single-command-mode-default)
+    -   [Interactive mode](#interactive-mode)
+-   [Using CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
+-   [Supported commands and options](#supported-commands-and-options)
+    -   [List all supported clusters](#printing-all-supported-clusters)
+    -   [List all supported command for a cluster](#getting-the-list-of-commands-supported-for-a-specific-cluster)
+    -   [List all supported attributes for a cluster](#getting-the-list-of-attributes-supported-for-a-specific-cluster)
+    -   [Command options](#getting-the-list-of-command-options)
+-   [Testing and Interaction](#running-a-test-suite-against-a-paired-peer-device)
+-   [Multi-admin scenario](#multi-admin-scenario)
+-   [Subscribing to events or attributes](#subscribing-to-events-or-attributes)
+-   [Using wildcards](#using-wildcards)
+-   [Saving users and credentials for door lock device](#saving-users-and-credentials-on-door-lock-devices)
+
 ## Installation
 
 On Linux distributions

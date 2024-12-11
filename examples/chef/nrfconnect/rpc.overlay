@@ -48,3 +48,7 @@ CONFIG_LOG_OUTPUT=y
 
 # Increase zephyr tty rx buffer
 CONFIG_CONSOLE_GETCHAR_BUFSIZE=128
+
+# Increase BLE thread stack size
+CONFIG_BT_RX_STACK_SIZE=2048
+

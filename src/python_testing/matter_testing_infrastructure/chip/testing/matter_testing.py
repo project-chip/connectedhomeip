@@ -637,6 +637,9 @@ class MatterTestConfig:
     # This allows cert tests to be run without re-commissioning for RR-1.1.
     maximize_cert_chains: bool = True
 
+    # By default, let's set validity to 10 years
+    certificate_validity_period = int(timedelta(days=10*365).total_seconds())
+
     qr_code_content: List[str] = field(default_factory=list)
     manual_code: List[str] = field(default_factory=list)
 
@@ -887,6 +890,7 @@ class MatterStackState:
                 "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
             ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex=self._config.root_of_trust_index)
             ca.maximizeCertChains = self._config.maximize_cert_chains
+            ca.certificateValidityPeriodSec = self._config.certificate_validity_period
             ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
         elif (len(self._certificate_authority_manager.activeCaList[0].adminList) == 0):
             self._logger.warn("Didn't find any FabricAdmins in storage -- creating a new one...")
@@ -2212,8 +2216,6 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
     """
     def run_if_endpoint_matches_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
-            asserts.assert_false(self.get_test_pics(self.current_test_info.name),
-                                 "pics_ method supplied for run_if_endpoint_matches.")
             runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(self, accept_function), timeout=60)
             should_run_test = asyncio.run(runner_with_timeout)
             if not should_run_test:

@@ -116,7 +116,13 @@ def device_type_id_type(id: int) -> DeviceTypeIdType:
     return DeviceTypeIdType.kInvalid
 
 
-def is_valid_device_type_id(id_type: DeviceTypeIdType, allow_test=False) -> bool:
+def is_standard_device_type_id(id: int) -> bool:
+    id_type = device_type_id_type(id)
+    return id_type == DeviceTypeIdType.kStandard
+
+
+def is_valid_device_type_id(id: int, allow_test=False) -> bool:
+    id_type = device_type_id_type(id)
     valid = [DeviceTypeIdType.kStandard, DeviceTypeIdType.kManufacturer]
     if allow_test:
         valid.append(DeviceTypeIdType.kTest)
@@ -133,7 +139,13 @@ def cluster_id_type(id: int) -> ClusterIdType:
     return ClusterIdType.kInvalid
 
 
-def is_valid_cluster_id(id_type: ClusterIdType, allow_test: bool = False) -> bool:
+def is_standard_cluster_id(id: int) -> bool:
+    id_type = cluster_id_type(id)
+    return id_type == ClusterIdType.kStandard
+
+
+def is_valid_cluster_id(id: int, allow_test: bool = False) -> bool:
+    id_type = cluster_id_type(id)
     valid = [ClusterIdType.kStandard, ClusterIdType.kManufacturer]
     if allow_test:
         valid.append(ClusterIdType.kTest)
@@ -152,11 +164,17 @@ def attribute_id_type(id: int) -> AttributeIdType:
     return AttributeIdType.kInvalid
 
 
-def is_valid_attribute_id(id_type: AttributeIdType, allow_test: bool = False):
+def is_valid_attribute_id(id: int, allow_test: bool = False):
+    id_type = attribute_id_type(id)
     valid = [AttributeIdType.kStandardGlobal, AttributeIdType.kStandardNonGlobal, AttributeIdType.kManufacturer]
     if allow_test:
         valid.append(AttributeIdType.kTest)
     return id_type in valid
+
+
+def is_standard_attribute_id(id: int):
+    id_type = attribute_id_type(id)
+    return id_type in [AttributeIdType.kStandardGlobal, AttributeIdType.kStandardNonGlobal]
 
 
 def command_id_type(id: int) -> CommandIdType:
@@ -171,7 +189,13 @@ def command_id_type(id: int) -> CommandIdType:
     return CommandIdType.kInvalid
 
 
-def is_valid_command_id(id_type: CommandIdType, allow_test: bool = False):
+def is_standard_command_id(id: int):
+    id_type = command_id_type(id)
+    return id_type in [CommandIdType.kScopedNonGlobal, CommandIdType.kStandardGlobal]
+
+
+def is_valid_command_id(id: int, allow_test: bool = False):
+    id_type = command_id_type(id)
     valid = [CommandIdType.kStandardGlobal, CommandIdType.kScopedNonGlobal, CommandIdType.kManufacturer]
     if allow_test:
         valid.append(CommandIdType.kTest)

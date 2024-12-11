@@ -133,6 +133,7 @@ public:
         int8_t mRssi{};
         uint8_t mSsid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
         size_t mSsidLen{ 0 };
+        uint64_t mCurrentPhyRate{};
     };
 
     struct NetworkStatistics
@@ -143,6 +144,7 @@ public:
         uint32_t mPacketUnicastTxCount{};
         uint32_t mBeaconsSuccessCount{};
         uint32_t mBeaconsLostCount{};
+        uint32_t mOverRunCount{};
     };
 
     struct WiFiNetwork
