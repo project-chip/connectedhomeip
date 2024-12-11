@@ -10,6 +10,8 @@ class TC_PAVS_1_0(MatterBaseTest):
     for a better integration. It is not designed to be merged nor does it actually run.
     """
 
+    # TODO Rewrite it to work with non-global state (e.g. decouple background server and setup)
+
     def setup_class(self):
         super().setup_class()
 

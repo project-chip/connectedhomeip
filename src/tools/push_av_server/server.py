@@ -20,7 +20,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes, CertificatePublicKeyTypes
 from cryptography.x509.oid import NameOID
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response, APIRouter
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -391,219 +391,210 @@ class CAHierarchy:
         return (key_path, cert_bundle_path, False)
 
 
-app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
-# Couldn't find how to do DI with state created in __main__ without using
-# global variables, so using those.
-wd: WorkingDirectory = None
-device_hierarchy: CAHierarchy = None
-
-
-# UI website
-
-@app.get("/", response_class=RedirectResponse)
-def root():
-    return RedirectResponse("/ui/streams")
-
-
-@app.get("/ui/streams", response_class=HTMLResponse)
-def ui_streams_list(request: Request):
-    s = list_streams()
-    return templates.TemplateResponse(
-        request=request, name="streams_list.html", context={"streams": s["streams"]}
-    )
-
-
-@app.get("/ui/streams/{stream_id}/{file_path:path}")
-def ui_streams_details(request: Request, stream_id: int, file_path: str):
-    context = {}
-    context['streams'] = list_streams()['streams']
-    context['stream_id'] = stream_id
-    context['file_path'] = file_path
-
-    if file_path.endswith('.crt'):
-        context['type'] = 'cert'
-        p = wd.path("streams", str(stream_id), file_path)
-        with open(p, "r") as f:
-            context['cert'] = json.load(f)
-    else:
-        context['type'] = 'media'
-        context['probe'] = ffprobe_check(stream_id, file_path)
-        context['pretty_probe'] = json.dumps(context['probe'], sort_keys=True, indent=4)
-
-    return templates.TemplateResponse(request=request, name="streams_details.html", context=context)
-
-
-@app.get("/ui/certificates", response_class=HTMLResponse)
-def ui_certificates_list(request: Request):
-    return templates.TemplateResponse(
-        request=request, name="certificates_list.html", context={"certs": list_certs()}
-    )
-
-
-@app.get("/ui/certificates/{hierarchy}/{name}", response_class=HTMLResponse)
-def ui_certificates_details(request: Request, hierarchy: str, name: str):
-    context = certificate_details(hierarchy, name)
-    context["certs"] = list_certs()
-
-    return templates.TemplateResponse(request=request, name="certificates_details.html", context=context)
-
-# APIs
-
-
-@app.post("/streams", status_code=201)
-def create_stream():
-    # Find the last registered stream
-    dirs = [d for d in pathlib.Path(wd.path("streams")).iterdir() if d.is_dir()]
-    last_stream = int(dirs[-1].name) if len(dirs) > 0 else 0
-    stream_id = last_stream + 1
-
-    wd.mkdir("streams", str(stream_id))
-
-    return {"stream_id": stream_id}
-
-
-@app.get("/streams")
-def list_streams():
-    dirs = [d for d in pathlib.Path(wd.path("streams")).iterdir() if d.is_dir()]
-
-    def stream_files(dir: Path):
-        return [f.relative_to(dir) for f in dir.glob("**/*") if f.is_file()]
-
-    streams = [{"id": d.name, "files": stream_files(d)} for d in dirs]
-
-    return {"streams": streams}
-
-
-@app.put("/streams/{stream_id}")
-async def manifest_upload(stream_id: int, req: Request):
-    """The DASH manifest is uploaded onto the base path without any file path"""
-
-    # Here we assume that no camera will upload an index.mpd file on their own.
-    # That is something that may not be true, in which case we would have to add
-    # another layer of abstraction on the file system where we can store the mpd
-    # file and the camera direct uploads.
-    return await segment_upload("index.mpd", stream_id, req)
-
-
-@app.put("/streams/{stream_id}/{file_path:path}", status_code=202)
-async def segment_upload(file_path: str, stream_id: int, req: Request):
-    """Extract the parsed version of a client certificate.
-    See https://docs.python.org/3/library/ssl.html#ssl.SSLSocket.getpeercert
-    for the exact content.
-    """
-    cert_details = req.scope["transport"].get_extra_info("ssl_object").getpeercert()
-
-    logging.debug(f"segment_upload. stream_id={stream_id} file_path:{file_path}")
-
-    if not wd.path("streams", str(stream_id)).exists():
-        raise HTTPException(404, detail="Stream doesn't exists")
-
-    dst = wd.mkdir("streams", str(stream_id), file_path, is_file=True)
-
-    with open(dst.with_suffix(dst.suffix + ".crt"), "w") as f:
-        f.write(json.dumps(cert_details))
-
-    with open(dst, "wb") as f:
-        async for chunk in req.stream():
-            f.write(chunk)
-
-    return Response(status_code=202)
-
-
-@app.get("/streams/probe/{stream_id}/{file_path:path}")
-def ffprobe_check(stream_id: int, file_path: str):
-
-    p = wd.path("streams", str(stream_id), file_path)
-
-    if not p.exists():
-        return HTTPException(404, detail="Stream doesn't exists")
-
-    proc = subprocess.run(
-        ["ffprobe", "-show_streams", "-show_format", "-output_format", "json", str(p.absolute())],
-        capture_output=True
-    )
-
-    if proc.returncode != 0:
-        # TODO Add more details (maybe stderr) to the response
-        return HTTPException(500)
-
-    return json.loads(proc.stdout)
-
-
-@app.get("/streams/{stream_id}/{file_path:path}")
-async def segment_download(file_path: str, stream_id: int):
-    return FileResponse(wd.path("streams", str(stream_id), file_path))
-
-
-@app.get("/certs", status_code=200)
-def list_certs():
-    server = [f.name for f in pathlib.Path(wd.path("certs", "server")).iterdir()]
-    device = [f.name for f in pathlib.Path(wd.path("certs", "device")).iterdir()]
-
-    return {"server": server, "device": device}
-
-
-@app.get("/certs/{hierarchy}/{name}", status_code=200)
-def certificate_details(hierarchy: str, name: str):
-    data = pathlib.Path(wd.path("certs", hierarchy, name)).read_bytes()
-    type = "key" if name.endswith(".key") else "cert"
-
-    key = None
-    cert = None
-    if type == "key":
-        key = serialization.load_pem_private_key(data, None)
-        key = {
-            "key_size": key.key_size,
-            "private_key": key.private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.TraditionalOpenSSL,
-                encryption_algorithm=serialization.NoEncryption(),
-            ),
-            "public_key": key.public_key().public_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.PKCS1,
-            ),
-        }
-    else:
-        cert = x509.load_pem_x509_certificate(data)
-        cert = {
-            "public_cert": cert.public_bytes(serialization.Encoding.PEM),
-            "serial_number": hex(cert.serial_number),
-            "not_valid_before": cert.not_valid_before_utc,
-            "not_valid_after": cert.not_valid_after_utc,
-            # public_key? fingerprint?
-            "issuer": cert.issuer.rfc4514_string(),
-            "subject": cert.subject.rfc4514_string(),
-            "extensions": [str(ext) for ext in cert.extensions]
-        }
-
-    return {"type": type, "key": key, "cert": cert}
-
-
-@app.post("/certs/{name}/keypair")
-def create_client_keypair(name: str, override: bool = True):
-    (key, cert, created) = device_hierarchy.gen_keypair(name, override)
-
-    return {key, cert, created}
-
-
 class SignClientCertificate(BaseModel):
+    """Request model to sign a client certificate"""
     csr: str
 
 
-@app.post("/certs/{name}/issue")
-def sign_client_certificate(
-    name: str, req: SignClientCertificate, override: bool = True
-):
-    (key, cert, created) = device_hierarchy.gen_cert(name, req.csr, override)
+class PushAvServer:
 
-    return {key, cert, created}
+    templates = Jinja2Templates(directory="templates")
+
+    def __init__(self, wd: WorkingDirectory, device_hierarchy: CAHierarchy):
+        self.wd = wd
+        self.device_hierarchy = device_hierarchy
+        self.router = APIRouter()
+
+        # UI
+        self.router.add_api_route("/", self.index, methods=["GET"], response_class=RedirectResponse)
+        self.router.add_api_route("/ui/streams", self.ui_streams_list, methods=["GET"], response_class=HTMLResponse)
+        self.router.add_api_route("/ui/streams/{stream_id}/{file_path:path}", self.ui_streams_details, methods=["GET"])
+        self.router.add_api_route("/ui/certificates", self.ui_certificates_list, methods=["GET"], response_class=HTMLResponse)
+        self.router.add_api_route("/ui/certificates/{hierarchy}/{name}",
+                                  self.ui_certificates_details, methods=["GET"], response_class=HTMLResponse)
+
+        # HTTP APIs
+        self.router.add_api_route("/streams", self.create_stream, methods=["POST"], status_code=201)
+        self.router.add_api_route("/streams", self.list_streams, methods=["GET"])
+        self.router.add_api_route("/streams/probe/{stream_id}/{file_path:path}", self.ffprobe_check, methods=["GET"])
+        self.router.add_api_route("/streams/{stream_id}", self.manifest_upload, methods=["PUT"])
+        self.router.add_api_route("/streams/{stream_id}/{file_path:path}", self.segment_upload, methods=["PUT"], status_code=202)
+        self.router.add_api_route("/streams/{stream_id}/{file_path:path}", self.segment_download, methods=["GET"])
+        self.router.add_api_route("/certs", self.list_certs, methods=["GET"], status_code=200)
+        self.router.add_api_route("/certs/{hierarchy}/{name}", self.certificate_details, methods=["GET"], status_code=200)
+        self.router.add_api_route("/certs/{name}/keypair", self.create_client_keypair, methods=["POST"])
+        self.router.add_api_route("/certs/{name}/sign", self.sign_client_certificate, methods=["POST"])
+
+    # UI website
+
+    def index(self):
+        return RedirectResponse("/ui/streams")
+
+    def ui_streams_list(self, request: Request):
+        s = self.list_streams()
+        return self.templates.TemplateResponse(
+            request=request, name="streams_list.html", context={"streams": s["streams"]}
+        )
+
+    def ui_streams_details(self, request: Request, stream_id: int, file_path: str):
+        context = {}
+        context['streams'] = self.list_streams()['streams']
+        context['stream_id'] = stream_id
+        context['file_path'] = file_path
+
+        if file_path.endswith('.crt'):
+            context['type'] = 'cert'
+            p = self.wd.path("streams", str(stream_id), file_path)
+            with open(p, "r") as f:
+                context['cert'] = json.load(f)
+        else:
+            context['type'] = 'media'
+            context['probe'] = self.ffprobe_check(stream_id, file_path)
+            context['pretty_probe'] = json.dumps(context['probe'], sort_keys=True, indent=4)
+
+        return self.templates.TemplateResponse(request=request, name="streams_details.html", context=context)
+
+    def ui_certificates_list(self, request: Request):
+        return self.templates.TemplateResponse(
+            request=request, name="certificates_list.html", context={"certs": self.list_certs()}
+        )
+
+    def ui_certificates_details(self, request: Request, hierarchy: str, name: str):
+        context = self.certificate_details(hierarchy, name)
+        context["certs"] = self.list_certs()
+
+        return self.templates.TemplateResponse(request=request, name="certificates_details.html", context=context)
+
+    # APIs
+
+    def create_stream(self):
+        # Find the last registered stream
+        dirs = [d for d in pathlib.Path(self.wd.path("streams")).iterdir() if d.is_dir()]
+        last_stream = int(dirs[-1].name) if len(dirs) > 0 else 0
+        stream_id = last_stream + 1
+
+        self.wd.mkdir("streams", str(stream_id))
+
+        return {"stream_id": stream_id}
+
+    def list_streams(self):
+        dirs = [d for d in pathlib.Path(self.wd.path("streams")).iterdir() if d.is_dir()]
+
+        def stream_files(dir: Path):
+            return [f.relative_to(dir) for f in dir.glob("**/*") if f.is_file()]
+
+        streams = [{"id": d.name, "files": stream_files(d)} for d in dirs]
+
+        return {"streams": streams}
+
+    async def manifest_upload(self, stream_id: int, req: Request):
+        """The DASH manifest is uploaded onto the base path without any file path"""
+
+        # Here we assume that no camera will upload an index.mpd file on their own.
+        # That is something that may not be true, in which case we would have to add
+        # another layer of abstraction on the file system where we can store the mpd
+        # file and the camera direct uploads.
+        return await self.segment_upload("index.mpd", stream_id, req)
+
+    async def segment_upload(self, file_path: str, stream_id: int, req: Request):
+        """Extract the parsed version of a client certificate.
+        See https://docs.python.org/3/library/ssl.html#ssl.SSLSocket.getpeercert
+        for the exact content.
+        """
+        cert_details = req.scope["transport"].get_extra_info("ssl_object").getpeercert()
+
+        logging.debug(f"segment_upload. stream_id={stream_id} file_path:{file_path}")
+
+        if not self.wd.path("streams", str(stream_id)).exists():
+            raise HTTPException(404, detail="Stream doesn't exists")
+
+        dst = self.wd.mkdir("streams", str(stream_id), file_path, is_file=True)
+
+        with open(dst.with_suffix(dst.suffix + ".crt"), "w") as f:
+            f.write(json.dumps(cert_details))
+
+        with open(dst, "wb") as f:
+            async for chunk in req.stream():
+                f.write(chunk)
+
+        return Response(status_code=202)
+
+    def ffprobe_check(self, stream_id: int, file_path: str):
+
+        p = self.wd.path("streams", str(stream_id), file_path)
+
+        if not p.exists():
+            return HTTPException(404, detail="Stream doesn't exists")
+
+        proc = subprocess.run(
+            ["ffprobe", "-show_streams", "-show_format", "-output_format", "json", str(p.absolute())],
+            capture_output=True
+        )
+
+        if proc.returncode != 0:
+            # TODO Add more details (maybe stderr) to the response
+            return HTTPException(500)
+
+        return json.loads(proc.stdout)
+
+    async def segment_download(self, file_path: str, stream_id: int):
+        return FileResponse(self.wd.path("streams", str(stream_id), file_path))
+
+    def list_certs(self):
+        server = [f.name for f in pathlib.Path(self.wd.path("certs", "server")).iterdir()]
+        device = [f.name for f in pathlib.Path(self.wd.path("certs", "device")).iterdir()]
+
+        return {"server": server, "device": device}
+
+    def certificate_details(self, hierarchy: str, name: str):
+        data = pathlib.Path(self.wd.path("certs", hierarchy, name)).read_bytes()
+        type = "key" if name.endswith(".key") else "cert"
+
+        key = None
+        cert = None
+        if type == "key":
+            key = serialization.load_pem_private_key(data, None)
+            key = {
+                "key_size": key.key_size,
+                "private_key": key.private_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PrivateFormat.TraditionalOpenSSL,
+                    encryption_algorithm=serialization.NoEncryption(),
+                ),
+                "public_key": key.public_key().public_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PublicFormat.PKCS1,
+                ),
+            }
+        else:
+            cert = x509.load_pem_x509_certificate(data)
+            cert = {
+                "public_cert": cert.public_bytes(serialization.Encoding.PEM),
+                "serial_number": hex(cert.serial_number),
+                "not_valid_before": cert.not_valid_before_utc,
+                "not_valid_after": cert.not_valid_after_utc,
+                # public_key? fingerprint?
+                "issuer": cert.issuer.rfc4514_string(),
+                "subject": cert.subject.rfc4514_string(),
+                "extensions": [str(ext) for ext in cert.extensions]
+            }
+
+        return {"type": type, "key": key, "cert": cert}
+
+    def create_client_keypair(self, name: str, override: bool = True):
+        (key, cert, created) = self.device_hierarchy.gen_keypair(name, override)
+
+        return {key, cert, created}
+
+    def sign_client_certificate(
+        self, name: str, req: SignClientCertificate, override: bool = True
+    ):
+        (key, cert, created) = self.device_hierarchy.gen_cert(name, req.csr, override)
+
+        return {key, cert, created}
 
 
 def run(host: Optional[str], port: Optional[int], working_directory: Optional[str], dns: Optional[str]):
-    global wd, device_hierarchy
     """Run the reference server. This function will not return.
         In the context where a background server is required, the multiprocessing.Process object
         can be used.
@@ -611,7 +602,6 @@ def run(host: Optional[str], port: Optional[int], working_directory: Optional[st
     with WorkingDirectory(working_directory) as directory:
 
         # Sharing state with the various endpoints
-        wd = directory
 
         dns = "localhost" if dns is None else f"{dns}._http._tcp_.local."
 
@@ -636,9 +626,14 @@ def run(host: Optional[str], port: Optional[int], working_directory: Optional[st
             zeroconf.register_service(svc_info)
 
         # Streams holder
-        wd.mkdir("streams")
+        directory.mkdir("streams")
 
-        # Setup the web server
+        app = FastAPI()
+        app.mount("/static", StaticFiles(directory="static"), name="static")
+        pas = PushAvServer()
+        app.include_router(pas.router)
+
+        # Start the web server
         try:
             uvicorn.run(
                 app,
