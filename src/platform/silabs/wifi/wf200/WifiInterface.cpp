@@ -115,7 +115,6 @@ bool hasNotifiedWifiConnectivity = false;
 static uint8_t retryJoin         = 0;
 bool retryInProgress             = false;
 
-#ifdef SL_WFX_CONFIG_SCAN
 static struct scan_result_holder
 {
     struct scan_result_holder * next;
@@ -127,7 +126,6 @@ static uint8_t * scan_ssid     = nullptr; /* Which one are we scanning for */
 static size_t scan_ssid_length = 0;
 static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_result);
 static void sl_wfx_scan_complete_callback(uint32_t status);
-#endif /* SL_WFX_CONFIG_SCAN */
 
 static void wfx_events_task(void * p_arg);
 
@@ -384,7 +382,6 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
         }
         break;
     }
-#ifdef SL_WFX_CONFIG_SCAN
     case SL_WFX_SCAN_RESULT_IND_ID: {
         sl_wfx_scan_result_ind_t * scan_result = (sl_wfx_scan_result_ind_t *) event_payload;
         sl_wfx_scan_result_callback(&scan_result->body);
@@ -395,7 +392,6 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
         sl_wfx_scan_complete_callback(scan_complete->body.status);
         break;
     }
-#endif /* SL_WFX_CONFIG_SCAN */
 #ifdef SL_WFX_CONFIG_SOFTAP
     case SL_WFX_START_AP_IND_ID: {
         sl_wfx_start_ap_ind_t * start_ap_indication = (sl_wfx_start_ap_ind_t *) event_payload;
@@ -706,10 +702,7 @@ static void wfx_events_task(void * p_arg)
 #ifdef SL_WFX_CONFIG_SOFTAP
                                         | SL_WFX_START_AP | SL_WFX_STOP_AP
 #endif /* SL_WFX_CONFIG_SOFTAP */
-#ifdef SL_WFX_CONFIG_SCAN
-                                        | SL_WFX_SCAN_START | SL_WFX_SCAN_COMPLETE
-#endif /* SL_WFX_CONFIG_SCAN */
-                                        | BITS_TO_WAIT,
+                                        | SL_WFX_SCAN_START | SL_WFX_SCAN_COMPLETE | BITS_TO_WAIT,
                                     pdTRUE, pdFALSE, pdMS_TO_TICKS(250)); /* 250 msec delay converted to ticks */
         if (flags & SL_WFX_RETRY_CONNECT)
         {
@@ -793,7 +786,6 @@ static void wfx_events_task(void * p_arg)
             wfx_lwip_set_sta_link_down();
         }
 
-#ifdef SL_WFX_CONFIG_SCAN
         if (flags & SL_WFX_SCAN_START)
         {
 
@@ -854,7 +846,6 @@ static void wfx_events_task(void * p_arg)
             }
             scan_cb = nullptr;
         }
-#endif /* SL_WFX_CONFIG_SCAN */
     }
 }
 

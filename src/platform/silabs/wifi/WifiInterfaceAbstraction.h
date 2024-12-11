@@ -168,11 +168,9 @@ typedef struct wfx_rsi_s
     chip::BitFlags<WifiState> dev_state;
     uint16_t ap_chan; /* The chan our STA is using	*/
     wfx_wifi_provision_t sec;
-#ifdef SL_WFX_CONFIG_SCAN
     ScanCallback scan_cb;
     uint8_t * scan_ssid; /* Which one are we scanning for */
     size_t scan_ssid_length;
-#endif
 #ifdef SL_WFX_CONFIG_SOFTAP
     MacAddress softap_mac;
 #endif

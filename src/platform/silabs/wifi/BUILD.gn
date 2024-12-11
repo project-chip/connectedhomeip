@@ -21,7 +21,6 @@ import("${chip_root}/third_party/silabs/silabs_board.gni")
 declare_args() {
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   sl_wfx_config_softap = false
-  sl_wfx_config_scan = true
 
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_transition = true
@@ -83,10 +82,6 @@ config("wifi-platform-config") {
 
   if (sl_wfx_config_softap) {
     defines += [ "SL_WFX_CONFIG_SOFTAP" ]
-  }
-
-  if (sl_wfx_config_scan) {
-    defines += [ "SL_WFX_CONFIG_SCAN" ]
   }
 
   if (chip_enable_wifi_ipv4) {
