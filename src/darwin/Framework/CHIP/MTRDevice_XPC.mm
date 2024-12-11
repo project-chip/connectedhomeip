@@ -323,14 +323,14 @@ static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKey
 {
     NSNumber * stateNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
     switch (static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue)) {
-        case MTRDeviceStateUnknown:
-            return MTRDeviceStateUnknown;
+    case MTRDeviceStateUnknown:
+        return MTRDeviceStateUnknown;
 
-        case MTRDeviceStateUnreachable:
-            return MTRDeviceStateUnreachable;
+    case MTRDeviceStateUnreachable:
+        return MTRDeviceStateUnreachable;
 
-        case MTRDeviceStateReachable:
-            return MTRDeviceStateReachable;
+    case MTRDeviceStateReachable:
+        return MTRDeviceStateReachable;
     }
 
     return MTRDeviceStateUnknown;
