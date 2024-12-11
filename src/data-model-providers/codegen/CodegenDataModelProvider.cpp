@@ -727,12 +727,12 @@ DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const Con
     const EmberAfCluster * cluster = FindServerCluster(path);
 
     VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
-    VerifyOrReturnValue(cluster->generatedCommandList != nullptr, DataModel::CommandEntry::kInvalid);
+    VerifyOrReturnValue(cluster->acceptedCommandList != nullptr, DataModel::CommandEntry::kInvalid);
 
     auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-    for (unsigned i = 0; cluster->generatedCommandList[i] != kInvalidCommandId; i++)
+    for (unsigned i = 0; cluster->acceptedCommandList[i] != kInvalidCommandId; i++)
     {
-        const ConcreteCommandPath commandPath(path.mEndpointId, path.mClusterId, cluster->generatedCommandList[i]);
+        const ConcreteCommandPath commandPath(path.mEndpointId, path.mClusterId, cluster->acceptedCommandList[i]);
         if ((commandHandler == nullptr) || commandHandler->AcceptsCommandId(commandPath))
         {
             mAcceptedCommandHint = i;
@@ -747,26 +747,26 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
     const EmberAfCluster * cluster = FindServerCluster(before);
 
     VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
-    VerifyOrReturnValue(cluster->generatedCommandList != nullptr, DataModel::CommandEntry::kInvalid);
+    VerifyOrReturnValue(cluster->acceptedCommandList != nullptr, DataModel::CommandEntry::kInvalid);
 
     // TODO: this does NOT make use of the hint because the command list is NOT sized (it is value-terminated)
     //       and we have no way to check `is hint in bounds`
     auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(before.mEndpointId, before.mClusterId);
     unsigned beforeIdx;
-    for (beforeIdx = 0; cluster->generatedCommandList[beforeIdx] != kInvalidCommandId; beforeIdx++)
+    for (beforeIdx = 0; cluster->acceptedCommandList[beforeIdx] != kInvalidCommandId; beforeIdx++)
     {
-        if (cluster->generatedCommandList[beforeIdx] == before.mCommandId)
+        if (cluster->acceptedCommandList[beforeIdx] == before.mCommandId)
         {
             break; // found it
         }
     }
 
-    VerifyOrReturnValue(cluster->generatedCommandList[beforeIdx] == before.mCommandId, DataModel::CommandEntry::kInvalid);
+    VerifyOrReturnValue(cluster->acceptedCommandList[beforeIdx] == before.mCommandId, DataModel::CommandEntry::kInvalid);
 
     // find the first "accepted" index out if thios
-    for (unsigned i = beforeIdx + 1; cluster->generatedCommandList[i] != kInvalidCommandId; i++)
+    for (unsigned i = beforeIdx + 1; cluster->acceptedCommandList[i] != kInvalidCommandId; i++)
     {
-        const ConcreteCommandPath commandPath(before.mEndpointId, before.mClusterId, cluster->generatedCommandList[i]);
+        const ConcreteCommandPath commandPath(before.mEndpointId, before.mClusterId, cluster->acceptedCommandList[i]);
         if ((commandHandler == nullptr) || commandHandler->AcceptsCommandId(commandPath))
         {
             mAcceptedCommandHint = i;
@@ -781,19 +781,19 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
     const EmberAfCluster * cluster = FindServerCluster(path);
 
     VerifyOrReturnValue(cluster != nullptr, std::nullopt);
-    VerifyOrReturnValue(cluster->generatedCommandList != nullptr, std::nullopt);
+    VerifyOrReturnValue(cluster->acceptedCommandList != nullptr, std::nullopt);
 
     // TODO: this does NOT make use of the hint because the command list is NOT sized (it is value-terminated)
     //       and we have no way to check `is hint in bounds`
     auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-    for (unsigned i = 0; cluster->generatedCommandList[i] != kInvalidCommandId; i++)
+    for (unsigned i = 0; cluster->acceptedCommandList[i] != kInvalidCommandId; i++)
     {
-        if (cluster->generatedCommandList[i] != path.mCommandId)
+        if (cluster->acceptedCommandList[i] != path.mCommandId)
         {
             continue;
         }
 
-        const ConcreteCommandPath commandPath(path.mEndpointId, path.mClusterId, cluster->generatedCommandList[i]);
+        const ConcreteCommandPath commandPath(path.mEndpointId, path.mClusterId, cluster->acceptedCommandList[i]);
         VerifyOrReturnValue((commandHandler == nullptr) || commandHandler->AcceptsCommandId(commandPath), std::nullopt);
 
         mAcceptedCommandHint = i;
@@ -808,7 +808,7 @@ ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const Concre
     const EmberAfCluster * cluster = FindServerCluster(path);
 
     VerifyOrReturnValue(cluster != nullptr, ConcreteCommandPath());
-    VerifyOrReturnValue(cluster->acceptedCommandList != nullptr, ConcreteCommandPath());
+    VerifyOrReturnValue(cluster->generatedCommandList != nullptr, ConcreteCommandPath());
 
     auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     for (unsigned i = 0; cluster->generatedCommandList[i] != kInvalidCommandId; i++)
@@ -828,26 +828,26 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
     const EmberAfCluster * cluster = FindServerCluster(before);
 
     VerifyOrReturnValue(cluster != nullptr, ConcreteCommandPath());
-    VerifyOrReturnValue(cluster->acceptedCommandList != nullptr, ConcreteCommandPath());
+    VerifyOrReturnValue(cluster->generatedCommandList != nullptr, ConcreteCommandPath());
 
     // TODO: this does NOT make use of the hint because the command list is NOT sized (it is value-terminated)
     //       and we have no way to check `is hint in bounds`
     auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(before.mEndpointId, before.mClusterId);
     unsigned beforeIdx;
-    for (beforeIdx = 0; cluster->acceptedCommandList[beforeIdx] != kInvalidCommandId; beforeIdx++)
+    for (beforeIdx = 0; cluster->generatedCommandList[beforeIdx] != kInvalidCommandId; beforeIdx++)
     {
-        if (cluster->acceptedCommandList[beforeIdx] == before.mCommandId)
+        if (cluster->generatedCommandList[beforeIdx] == before.mCommandId)
         {
             break; // found it
         }
     }
 
-    VerifyOrReturnValue(cluster->acceptedCommandList[beforeIdx] == before.mCommandId, ConcreteCommandPath());
+    VerifyOrReturnValue(cluster->generatedCommandList[beforeIdx] == before.mCommandId, ConcreteCommandPath());
 
     // find the first "accepted" index out if thios
-    for (unsigned i = beforeIdx + 1; cluster->acceptedCommandList[i] != kInvalidCommandId; i++)
+    for (unsigned i = beforeIdx + 1; cluster->generatedCommandList[i] != kInvalidCommandId; i++)
     {
-        const ConcreteCommandPath commandPath(before.mEndpointId, before.mClusterId, cluster->acceptedCommandList[i]);
+        const ConcreteCommandPath commandPath(before.mEndpointId, before.mClusterId, cluster->generatedCommandList[i]);
         if ((commandHandler == nullptr) || commandHandler->AcceptsCommandId(commandPath))
         {
             mAcceptedCommandHint = i;
