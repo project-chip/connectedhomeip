@@ -1386,22 +1386,18 @@ bool Instance::AcceptsCommandId(const ConcreteCommandPath & commandPath)
 bool Instance::GeneratesCommandId(const ConcreteCommandPath & commandPath)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
-
-    if (mFeatureFlags.HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
+    switch (commandPath.mCommandId)
     {
-        for (auto && cmd : { ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
-    }
+    case ScanNetworksResponse::Id:
+    case NetworkConfigResponse::Id:
+    case ConnectNetworkResponse::Id:
+        return mFeatureFlags.HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface);
+    case QueryIdentityResponse::Id:
 
-    if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
-    {
-        VerifyOrExit(callback(QueryIdentityResponse::Id, context) == Loop::Continue, /**/);
+        return mFeatureFlags.Has(Feature::kPerDeviceCredentials);
+    default:
+        return false;
     }
-
-exit:
-    return CHIP_NO_ERROR;
 }
 
 bool NullNetworkDriver::GetEnabled()
