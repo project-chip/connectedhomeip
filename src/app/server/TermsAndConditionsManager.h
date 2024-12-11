@@ -31,9 +31,9 @@ public:
     static TermsAndConditionsManager * GetInstance();
     CHIP_ERROR Init(PersistentStorageDelegate * const inPersistentStorageDelegate,
                     const Optional<TermsAndConditions> & inRequiredTermsAndConditions);
-    CHIP_ERROR CheckAcceptance(const Optional<TermsAndConditions> & inTermsAndConditions, TermsAndConditionsState & outState) const;
     CHIP_ERROR CommitAcceptance();
     CHIP_ERROR GetAcceptance(Optional<TermsAndConditions> & outTermsAndConditions) const;
+    CHIP_ERROR GetAcknowledgementsRequired(bool & outAcknowledgementsRequired) const;
     CHIP_ERROR GetRequirements(Optional<TermsAndConditions> & outTermsAndConditions) const;
     CHIP_ERROR GetUpdateAcceptanceDeadline(Optional<uint32_t> & outUpdateAcceptanceDeadline) const;
     CHIP_ERROR ResetAcceptance();

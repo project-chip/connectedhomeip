@@ -39,12 +39,6 @@ CHIP_ERROR chip::app::TermsAndConditionsManager::Init(chip::PersistentStorageDel
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR chip::app::TermsAndConditionsManager::CheckAcceptance(const Optional<TermsAndConditions> & inTermsAndConditions,
-                                                                 TermsAndConditionsState & outState) const
-{
-    return sTermsAndConditionsProviderInstance.CheckAcceptance(inTermsAndConditions, outState);
-}
-
 CHIP_ERROR chip::app::TermsAndConditionsManager::CommitAcceptance()
 {
     return sTermsAndConditionsProviderInstance.CommitAcceptance();
@@ -53,6 +47,11 @@ CHIP_ERROR chip::app::TermsAndConditionsManager::CommitAcceptance()
 CHIP_ERROR chip::app::TermsAndConditionsManager::GetAcceptance(Optional<TermsAndConditions> & outTermsAndConditions) const
 {
     return sTermsAndConditionsProviderInstance.GetAcceptance(outTermsAndConditions);
+}
+
+CHIP_ERROR chip::app::TermsAndConditionsManager::GetAcknowledgementsRequired(bool & outAcknowledgementsRequired) const
+{
+    return sTermsAndConditionsProviderInstance.GetAcknowledgementsRequired(outAcknowledgementsRequired);
 }
 
 CHIP_ERROR chip::app::TermsAndConditionsManager::GetRequirements(Optional<TermsAndConditions> & outTermsAndConditions) const

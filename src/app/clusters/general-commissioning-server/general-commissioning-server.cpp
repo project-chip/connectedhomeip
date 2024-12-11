@@ -21,26 +21,24 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include "general-commissioning-server.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
 #include <app/reporting/reporting.h>
-#include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
-#include <app/server/TermsAndConditionsProvider.h>
-#include <app/util/attribute-storage.h>
-#include <credentials/FabricTable.h>
-#include <lib/support/Span.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
 #include <tracing/macros.h>
+#include <transport/SecureSession.h>
 
 #if CHIP_CONFIG_TC_REQUIRED
 #include <app/server/TermsAndConditionsManager.h>
+#include <app/server/TermsAndConditionsProvider.h>
 #endif
 
 using namespace chip;
@@ -105,52 +103,47 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     }
 #if CHIP_CONFIG_TC_REQUIRED
     case TCAcceptedVersion::Id: {
-        TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
+        TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
-        VerifyOrReturnError(nullptr != termsAndConditionsProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        ReturnErrorOnFailure(termsAndConditionsProvider->GetAcceptance(outTermsAndConditions));
+        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(tcProvider->GetAcceptance(outTermsAndConditions));
 
         return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
     }
     case TCMinRequiredVersion::Id: {
-        TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
+        TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
-        VerifyOrReturnError(nullptr != termsAndConditionsProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        ReturnErrorOnFailure(termsAndConditionsProvider->GetRequirements(outTermsAndConditions));
+        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(tcProvider->GetRequirements(outTermsAndConditions));
 
         return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
     }
     case TCAcknowledgements::Id: {
-        TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
+        TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
-        VerifyOrReturnError(nullptr != termsAndConditionsProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        ReturnErrorOnFailure(termsAndConditionsProvider->GetAcceptance(outTermsAndConditions));
+        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(tcProvider->GetAcceptance(outTermsAndConditions));
 
         return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetValue());
     }
     case TCAcknowledgementsRequired::Id: {
-        TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
-        Optional<TermsAndConditions> outTermsAndConditions;
-        TermsAndConditionsState termsAndConditionsState;
+        TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+        bool acknowledgementsRequired;
 
-        VerifyOrReturnError(nullptr != termsAndConditionsProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(tcProvider->GetAcknowledgementsRequired(acknowledgementsRequired));
 
-        ReturnErrorOnFailure(termsAndConditionsProvider->GetAcceptance(outTermsAndConditions));
-        ReturnErrorOnFailure(termsAndConditionsProvider->CheckAcceptance(outTermsAndConditions, termsAndConditionsState));
-
-        bool setTermsAndConditionsCallRequiredBeforeCommissioningCompleteSuccess =
-            termsAndConditionsState != TermsAndConditionsState::OK;
-        return aEncoder.Encode(setTermsAndConditionsCallRequiredBeforeCommissioningCompleteSuccess);
+        return aEncoder.Encode(acknowledgementsRequired);
     }
     case TCUpdateDeadline::Id: {
-        TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
+        TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<uint32_t> outUpdateAcceptanceDeadline;
 
-        VerifyOrReturnError(nullptr != termsAndConditionsProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        ReturnErrorOnFailure(termsAndConditionsProvider->GetUpdateAcceptanceDeadline(outUpdateAcceptanceDeadline));
+        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(tcProvider->GetUpdateAcceptanceDeadline(outUpdateAcceptanceDeadline));
 
         if (!outUpdateAcceptanceDeadline.HasValue())
         {
@@ -210,68 +203,68 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(Attr
 }
 
 #if CHIP_CONFIG_TC_REQUIRED
-CommissioningErrorEnum CheckTermsAndConditionsAcknowledgementsState(TermsAndConditionsProvider * const termsAndConditionsProvider,
-                                                                    const Optional<TermsAndConditions> & acceptedTermsAndConditions)
+typedef struct sTermsAndConditionsState
+{
+    Optional<TermsAndConditions> acceptance;
+    bool acknowledgementsRequired;
+    Optional<TermsAndConditions> requirements;
+    Optional<uint32_t> updateAcceptanceDeadline;
+} TermsAndConditionsState;
+
+CHIP_ERROR GetTermsAndConditionsAttributeState(TermsAndConditionsProvider * const tcProvider,
+                                               TermsAndConditionsState & outTermsAndConditionsState)
 {
     TermsAndConditionsState termsAndConditionsState;
 
-    VerifyOrReturnValue(CHIP_NO_ERROR ==
-                            termsAndConditionsProvider->CheckAcceptance(acceptedTermsAndConditions, termsAndConditionsState),
-                        CommissioningErrorEnum::kRequiredTCNotAccepted);
+    ReturnErrorOnFailure(tcProvider->GetAcceptance(termsAndConditionsState.acceptance));
+    ReturnErrorOnFailure(tcProvider->GetAcknowledgementsRequired(termsAndConditionsState.acknowledgementsRequired));
+    ReturnErrorOnFailure(tcProvider->GetRequirements(termsAndConditionsState.requirements));
+    ReturnErrorOnFailure(tcProvider->GetUpdateAcceptanceDeadline(termsAndConditionsState.updateAcceptanceDeadline));
 
-    switch (termsAndConditionsState)
+    outTermsAndConditionsState = termsAndConditionsState;
+    return CHIP_NO_ERROR;
+}
+
+void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsState & initialState,
+                                                       const TermsAndConditionsState & updatedState)
+{
+    // Notify on TCAcknowledgementsRequired change
+    if (initialState.acknowledgementsRequired != updatedState.acknowledgementsRequired)
     {
-    case TermsAndConditionsState::OK:
-        return CommissioningErrorEnum::kOk;
-    case TermsAndConditionsState::TC_ACKNOWLEDGEMENTS_NOT_RECEIVED:
-        return CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
-    case TermsAndConditionsState::TC_MIN_VERSION_NOT_MET:
-        return CommissioningErrorEnum::kTCMinVersionNotMet;
-    case TermsAndConditionsState::REQUIRED_TC_NOT_ACCEPTED:
-        return CommissioningErrorEnum::kRequiredTCNotAccepted;
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcknowledgementsRequired::Id);
     }
 
-    return CommissioningErrorEnum::kOk;
-}
-
-CommissioningErrorEnum CheckTermsAndConditionsAcknowledgements(TermsAndConditionsProvider * const termsAndConditionsProvider)
-{
-    Optional<TermsAndConditions> acceptedTermsAndConditions;
-
-    VerifyOrReturnValue(CHIP_NO_ERROR == termsAndConditionsProvider->GetAcceptance(acceptedTermsAndConditions),
-                        CommissioningErrorEnum::kTCAcknowledgementsNotReceived);
-
-    return CheckTermsAndConditionsAcknowledgementsState(termsAndConditionsProvider, acceptedTermsAndConditions);
-}
-
-void NotifyTermsAndConditionsAttributesChange(TermsAndConditionsProvider * const termsAndConditionsProvider,
-                                              chip::EndpointId endpoint,
-                                              Optional<TermsAndConditions> currentTermsAndConditionsAcceptance,
-                                              Optional<TermsAndConditions> updatedTermsAndConditions)
-{
-    if (currentTermsAndConditionsAcceptance != updatedTermsAndConditions)
+    // Notify on TCAcceptedVersion change
+    if ((initialState.acceptance.HasValue() != updatedState.acceptance.HasValue()) ||
+        (initialState.acceptance.HasValue() &&
+         (initialState.acceptance.Value().GetVersion() != updatedState.acceptance.Value().GetVersion())))
     {
-        if (currentTermsAndConditionsAcceptance.ValueOr(TermsAndConditions(0, 0)).GetVersion() !=
-            updatedTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion())
-        {
-            MatterReportingAttributeChangeCallback(endpoint, GeneralCommissioning::Id, Attributes::TCAcceptedVersion::Id);
-        }
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcceptedVersion::Id);
+    }
 
-        if (currentTermsAndConditionsAcceptance.ValueOr(TermsAndConditions(0, 0)).GetValue() !=
-            updatedTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetValue())
-        {
-            MatterReportingAttributeChangeCallback(endpoint, GeneralCommissioning::Id, Attributes::TCAcknowledgements::Id);
-        }
+    // Notify on TCAcknowledgements change
+    if ((initialState.acceptance.HasValue() != updatedState.acceptance.HasValue()) ||
+        (initialState.acceptance.HasValue() &&
+         (initialState.acceptance.Value().GetValue() != updatedState.acceptance.Value().GetValue())))
+    {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcknowledgements::Id);
+    }
 
-        CommissioningErrorEnum previousState =
-            CheckTermsAndConditionsAcknowledgementsState(termsAndConditionsProvider, currentTermsAndConditionsAcceptance);
-        CommissioningErrorEnum updatedState =
-            CheckTermsAndConditionsAcknowledgementsState(termsAndConditionsProvider, updatedTermsAndConditions);
+    // Notify on TCRequirements change
+    if ((initialState.requirements.HasValue() != updatedState.requirements.HasValue()) ||
+        (initialState.requirements.HasValue() &&
+         (initialState.requirements.Value().GetVersion() != updatedState.requirements.Value().GetVersion() ||
+          initialState.requirements.Value().GetValue() != updatedState.requirements.Value().GetValue())))
+    {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCMinRequiredVersion::Id);
+    }
 
-        if (previousState != updatedState)
-        {
-            MatterReportingAttributeChangeCallback(endpoint, GeneralCommissioning::Id, Attributes::TCAcknowledgementsRequired::Id);
-        }
+    // Notify on TCUpdateDeadline change
+    if ((initialState.updateAcceptanceDeadline.HasValue() != updatedState.updateAcceptanceDeadline.HasValue()) ||
+        (initialState.updateAcceptanceDeadline.HasValue() &&
+         (initialState.updateAcceptanceDeadline.Value() != updatedState.updateAcceptanceDeadline.Value())))
+    {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCUpdateDeadline::Id);
     }
 }
 #endif // CHIP_CONFIG_TC_REQUIRED
@@ -365,23 +358,48 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     }
 
 #if CHIP_CONFIG_TC_REQUIRED
-    TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
+    TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
 
     // Ensure required terms and conditions have been accepted, then attempt to commit
-    if (nullptr != termsAndConditionsProvider)
+    if (nullptr != tcProvider)
     {
-        response.errorCode = CheckTermsAndConditionsAcknowledgements(termsAndConditionsProvider);
-        if (CommissioningErrorEnum::kOk != response.errorCode)
+        Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
+        Optional<TermsAndConditions> acceptedTermsAndConditionsMaybe;
+
+        CheckSuccess(tcProvider->GetRequirements(requiredTermsAndConditionsMaybe), Failure);
+        CheckSuccess(tcProvider->GetAcceptance(acceptedTermsAndConditionsMaybe), Failure);
+
+        if (requiredTermsAndConditionsMaybe.HasValue() && !acceptedTermsAndConditionsMaybe.HasValue())
         {
-            ChipLogError(FailSafe, "GeneralCommissioning: Terms and conditions not accepted");
+            response.errorCode = CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
             commandObj->AddResponse(commandPath, response);
             return true;
+        }
+
+        if (requiredTermsAndConditionsMaybe.HasValue() && acceptedTermsAndConditionsMaybe.HasValue())
+        {
+            TermsAndConditions requiredTermsAndConditions = requiredTermsAndConditionsMaybe.Value();
+            TermsAndConditions acceptedTermsAndConditions = acceptedTermsAndConditionsMaybe.Value();
+
+            if (!requiredTermsAndConditions.ValidateVersion(acceptedTermsAndConditions))
+            {
+                response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
+                commandObj->AddResponse(commandPath, response);
+                return true;
+            }
+
+            if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
+            {
+                response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
+                commandObj->AddResponse(commandPath, response);
+                return true;
+            }
         }
 
         if (failSafe.UpdateTermsAndConditionsHasBeenInvoked())
         {
             // Commit terms and conditions acceptance on commissioning complete
-            err = termsAndConditionsProvider->CommitAcceptance();
+            err = tcProvider->CommitAcceptance();
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit terms and conditions: %" CHIP_ERROR_FORMAT,
@@ -494,41 +512,69 @@ bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData)
 {
-#if CHIP_CONFIG_TC_REQUIRED
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
 
-    auto & failSafeContext                                        = Server::GetInstance().GetFailSafeContext();
-    TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
+#if CHIP_CONFIG_TC_REQUIRED
+    auto & failSafeContext                        = Server::GetInstance().GetFailSafeContext();
+    TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+
+    if (nullptr == tcProvider)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
+        return true;
+    }
+
+    Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
+    Optional<TermsAndConditions> previousAcceptedTermsAndConditionsMaybe;
+    CheckSuccess(tcProvider->GetRequirements(requiredTermsAndConditionsMaybe), Failure);
+    CheckSuccess(tcProvider->GetAcceptance(previousAcceptedTermsAndConditionsMaybe), Failure);
+    TermsAndConditions acceptedTermsAndConditions = TermsAndConditions(commandData.TCUserResponse, commandData.TCVersion);
+    Optional<TermsAndConditions> acceptedTermsAndConditionsPresent = Optional<TermsAndConditions>(acceptedTermsAndConditions);
 
     Commands::SetTCAcknowledgementsResponse::Type response;
 
-    if (CommissioningErrorEnum::kOk == response.errorCode)
+    if (requiredTermsAndConditionsMaybe.HasValue())
     {
-        Optional<TermsAndConditions> acceptedTermsAndConditions =
-            Optional<TermsAndConditions>(TermsAndConditions(commandData.TCUserResponse, commandData.TCVersion));
+        TermsAndConditions requiredTermsAndConditions = requiredTermsAndConditionsMaybe.Value();
 
-        Optional<TermsAndConditions> currentTermsAndConditionsAcceptance;
-        (void) termsAndConditionsProvider->GetAcceptance(currentTermsAndConditionsAcceptance);
-
-        if (currentTermsAndConditionsAcceptance != acceptedTermsAndConditions)
+        if (!requiredTermsAndConditions.ValidateVersion(acceptedTermsAndConditions))
         {
-            CheckSuccess(termsAndConditionsProvider->SetAcceptance(acceptedTermsAndConditions), Failure);
+            response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
+            commandObj->AddResponse(commandPath, response);
+            return true;
+        }
 
-            NotifyTermsAndConditionsAttributesChange(termsAndConditionsProvider, commandPath.mEndpointId,
-                                                     currentTermsAndConditionsAcceptance, acceptedTermsAndConditions);
-
-            if (failSafeContext.IsFailSafeArmed())
-            {
-                failSafeContext.SetUpdateTermsAndConditionsHasBeenInvoked();
-            }
-            else
-            {
-                CheckSuccess(termsAndConditionsProvider->CommitAcceptance(), Failure);
-            }
+        if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
+        {
+            response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
+            commandObj->AddResponse(commandPath, response);
+            return true;
         }
     }
 
+    if (previousAcceptedTermsAndConditionsMaybe != acceptedTermsAndConditionsPresent)
+    {
+        TermsAndConditionsState initialState, updatedState;
+        CheckSuccess(GetTermsAndConditionsAttributeState(tcProvider, initialState), Failure);
+        CheckSuccess(tcProvider->SetAcceptance(acceptedTermsAndConditionsPresent), Failure);
+        CheckSuccess(GetTermsAndConditionsAttributeState(tcProvider, updatedState), Failure);
+        NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
+
+        // Commit or defer based on fail-safe state
+        if (!failSafeContext.IsFailSafeArmed())
+        {
+            CheckSuccess(tcProvider->CommitAcceptance(), Failure);
+        }
+        else
+        {
+            failSafeContext.SetUpdateTermsAndConditionsHasBeenInvoked();
+        }
+    }
+
+    response.errorCode = CommissioningErrorEnum::kOk;
     commandObj->AddResponse(commandPath, response);
+    return true;
+
 #endif // CHIP_CONFIG_TC_REQUIRED
     return true;
 }
@@ -544,15 +590,14 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
         if (event->FailSafeTimerExpired.updateTermsAndConditionsHasBeenInvoked)
         {
 #if CHIP_CONFIG_TC_REQUIRED
-            TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
-
-            if (nullptr == termsAndConditionsProvider)
-            {
-                return;
-            }
-
             // Clear terms and conditions acceptance on failsafe timer expiration
-            termsAndConditionsProvider->RevertAcceptance();
+            TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+            TermsAndConditionsState initialState, updatedState;
+            VerifyOrReturn(nullptr != tcProvider);
+            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
+            VerifyOrReturn(CHIP_NO_ERROR == tcProvider->RevertAcceptance());
+            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
+            NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
 #endif // CHIP_CONFIG_TC_REQUIRED
         }
     }
@@ -574,12 +619,13 @@ public:
                             static_cast<unsigned>(fabricIndex));
 
 #if CHIP_CONFIG_TC_REQUIRED
-            TermsAndConditionsProvider * const termsAndConditionsProvider = TermsAndConditionsManager::GetInstance();
-
-            if (nullptr != termsAndConditionsProvider)
-            {
-                termsAndConditionsProvider->ResetAcceptance();
-            }
+            TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+            TermsAndConditionsState initialState, updatedState;
+            VerifyOrReturn(nullptr != tcProvider);
+            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
+            VerifyOrReturn(CHIP_NO_ERROR == tcProvider->ResetAcceptance());
+            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
+            NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
 #endif // CHIP_CONFIG_TC_REQUIRED
         }
     }

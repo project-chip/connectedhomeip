@@ -149,54 +149,6 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::Init(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::CheckAcceptance(const Optional<TermsAndConditions> & inTermsAndConditions,
-                                                                         TermsAndConditionsState & outState) const
-{
-    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_INVALID_ARGUMENT);
-
-    // No validation checks required if no required terms and conditions
-    if (!mRequiredAcknowledgements.HasValue())
-    {
-        ChipLogProgress(AppServer, "No terms and conditions required");
-        outState = TermsAndConditionsState::OK;
-        return CHIP_NO_ERROR;
-    }
-
-    // Validate if we have received any terms and conditions acceptance
-    if (!inTermsAndConditions.HasValue())
-    {
-        ChipLogError(AppServer, "No terms and conditions have been accepted");
-        outState = TermsAndConditionsState::TC_ACKNOWLEDGEMENTS_NOT_RECEIVED;
-        return CHIP_NO_ERROR;
-    }
-
-    const TermsAndConditions requiredTermsAndConditions = mRequiredAcknowledgements.Value();
-    const TermsAndConditions termsAndConditionsToCheck  = inTermsAndConditions.Value();
-
-    // Validate the accepted version first...
-    if (requiredTermsAndConditions.GetVersion() > termsAndConditionsToCheck.GetVersion())
-    {
-        ChipLogError(AppServer, "Minimum terms and conditions version, 0x%04x, has not been accepted",
-                     requiredTermsAndConditions.GetVersion());
-        outState = TermsAndConditionsState::TC_MIN_VERSION_NOT_MET;
-        return CHIP_NO_ERROR;
-    }
-
-    // Validate the accepted bits second...
-    if (requiredTermsAndConditions.GetValue() != (requiredTermsAndConditions.GetValue() & termsAndConditionsToCheck.GetValue()))
-    {
-        ChipLogError(AppServer, "Required terms and conditions, 0x%04x, have not been accepted",
-                     requiredTermsAndConditions.GetValue());
-        outState = TermsAndConditionsState::REQUIRED_TC_NOT_ACCEPTED;
-        return CHIP_NO_ERROR;
-    }
-
-    // All validation check succeeded...
-    ChipLogProgress(AppServer, "Required terms and conditions, 0x%04x, have been accepted", requiredTermsAndConditions.GetValue());
-    outState = TermsAndConditionsState::OK;
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::CommitAcceptance()
 {
     VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
@@ -236,23 +188,43 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetAcceptance(Optional<
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetAcknowledgementsRequired(bool & outAcknowledgementsRequired) const
+{
+    Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
+    ReturnErrorOnFailure(GetRequirements(requiredTermsAndConditionsMaybe));
+
+    if (!requiredTermsAndConditionsMaybe.HasValue())
+    {
+        outAcknowledgementsRequired = false;
+        return CHIP_NO_ERROR;
+    }
+
+    Optional<TermsAndConditions> acceptedTermsAndConditionsMaybe;
+    ReturnErrorOnFailure(GetAcceptance(acceptedTermsAndConditionsMaybe));
+
+    if (!acceptedTermsAndConditionsMaybe.HasValue())
+    {
+        outAcknowledgementsRequired = true;
+        return CHIP_NO_ERROR;
+    }
+
+    TermsAndConditions requiredTermsAndConditions = requiredTermsAndConditionsMaybe.Value();
+    TermsAndConditions acceptedTermsAndConditions = acceptedTermsAndConditionsMaybe.Value();
+    outAcknowledgementsRequired                   = requiredTermsAndConditions.Validate(acceptedTermsAndConditions);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetRequirements(Optional<TermsAndConditions> & outTermsAndConditions) const
 {
-    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
-
     outTermsAndConditions = mRequiredAcknowledgements;
-
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR
 chip::app::DefaultTermsAndConditionsProvider::GetUpdateAcceptanceDeadline(Optional<uint32_t> & outUpdateAcceptanceDeadline) const
 {
-    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
-
     // No-op stub implementation. This feature is not implemented in this default implementation.
     outUpdateAcceptanceDeadline = Optional<uint32_t>();
-
     return CHIP_NO_ERROR;
 }
 
@@ -261,23 +233,18 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::ResetAcceptance()
     VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
 
     (void) mTermsAndConditionsStorageDelegate->Delete();
-    return RevertAcceptance();
+    ReturnErrorOnFailure(RevertAcceptance());
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::RevertAcceptance()
 {
-    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
-
     mTemporalAcceptance.ClearValue();
-
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::SetAcceptance(const Optional<TermsAndConditions> & inTermsAndConditions)
 {
-    VerifyOrReturnValue(nullptr != mTermsAndConditionsStorageDelegate, CHIP_ERROR_UNINITIALIZED);
-
     mTemporalAcceptance = inTermsAndConditions;
-
     return CHIP_NO_ERROR;
 }

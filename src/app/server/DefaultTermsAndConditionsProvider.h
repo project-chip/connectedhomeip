@@ -126,12 +126,11 @@ public:
     CHIP_ERROR Init(TermsAndConditionsStorageDelegate * const inStorageDelegate,
                     const Optional<TermsAndConditions> & inRequiredTermsAndConditions);
 
-    CHIP_ERROR CheckAcceptance(const Optional<TermsAndConditions> & inTermsAndConditions,
-                               TermsAndConditionsState & outState) const override;
-
     CHIP_ERROR CommitAcceptance() override;
 
     CHIP_ERROR GetAcceptance(Optional<TermsAndConditions> & outTermsAndConditions) const override;
+
+    CHIP_ERROR GetAcknowledgementsRequired(bool & outAcknowledgementsRequired) const override;
 
     CHIP_ERROR GetRequirements(Optional<TermsAndConditions> & outTermsAndConditions) const override;
 
