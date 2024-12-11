@@ -374,7 +374,8 @@ TEST_F(TestServerCommandDispatch, TestDataResponseHandlerOverride1)
     TestClusterCommandHandler commandHandler;
     commandHandler.OverrideAcceptedCommands();
 
-    // Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id exists on Endpoint1
+    // Clusters::UnitTesting exists on testEndpoint1, so metadata about generated commands
+    // exists
     TestDataResponseHelper(&testEndpoint1, true);
 }
 
@@ -383,7 +384,7 @@ TEST_F(TestServerCommandDispatch, TestDataResponseHandlerOverride2)
     TestClusterCommandHandler commandHandler;
     commandHandler.OverrideAcceptedCommands();
 
-    // Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id DOES NOT exist on endpoint1
+    // Clusters::UnitTesting DOES NOT exist on testEndpoint3
     // so overriding accepting does nothing (there is no metadata to accept it)
     TestDataResponseHelper(&testEndpoint3, false);
 }
