@@ -5385,36 +5385,6 @@ static id _Nullable DecodeAttributeValueForOvenModeCluster(AttributeId aAttribut
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-    case Attributes::StartUpMode::Id: {
-        using TypeInfo = Attributes::StartUpMode::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::OnMode::Id: {
-        using TypeInfo = Attributes::OnMode::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
-        }
-        return value;
-    }
     default: {
         break;
     }
@@ -5681,36 +5651,6 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeCluster(AttributeId 
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-    case Attributes::StartUpMode::Id: {
-        using TypeInfo = Attributes::StartUpMode::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::OnMode::Id: {
-        using TypeInfo = Attributes::OnMode::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
-        }
-        return value;
-    }
     default: {
         break;
     }
@@ -5787,36 +5727,6 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:cppValue];
-        return value;
-    }
-    case Attributes::StartUpMode::Id: {
-        using TypeInfo = Attributes::StartUpMode::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::OnMode::Id: {
-        using TypeInfo = Attributes::OnMode::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
-        }
         return value;
     }
     default: {
@@ -6289,36 +6199,6 @@ static id _Nullable DecodeAttributeValueForDishwasherModeCluster(AttributeId aAt
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:cppValue];
-        return value;
-    }
-    case Attributes::StartUpMode::Id: {
-        using TypeInfo = Attributes::StartUpMode::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::OnMode::Id: {
-        using TypeInfo = Attributes::OnMode::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
-        }
         return value;
     }
     default: {
