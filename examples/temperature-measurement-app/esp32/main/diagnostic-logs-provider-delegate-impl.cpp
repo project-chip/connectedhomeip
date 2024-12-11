@@ -29,10 +29,6 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 LogProvider LogProvider::sInstance;
 LogProvider::CrashLogContext LogProvider::sCrashLogContext;
 
-#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-static uint32_t sIntentSize = CONFIG_END_USER_BUFFER_SIZE;
-#endif
-
 namespace {
 bool IsValidIntent(IntentEnum intent)
 {
@@ -83,7 +79,7 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
         return CircularDiagnosticBuffer::GetInstance().GetDataSize();
 #else
         return static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart);
-#endif
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     }
     break;
     case IntentEnum::kNetworkDiag:
@@ -121,25 +117,17 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
         CircularDiagnosticBuffer & diagnosticStorage = CircularDiagnosticBuffer::GetInstance();
         MutableByteSpan endUserSupportSpan(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
 
-        if (diagnosticStorage.IsEmptyBuffer())
-        {
-            ChipLogError(DeviceLayer, "Empty Diagnostic buffer");
-            return CHIP_ERROR_NOT_FOUND;
-        }
+        VerifyOrReturnError(!diagnosticStorage.IsEmptyBuffer(), CHIP_ERROR_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "Empty Diagnostic buffer"));
         // Retrieve data from the diagnostic storage
         CHIP_ERROR err = diagnosticStorage.Retrieve(endUserSupportSpan);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Failed to retrieve data: %s", chip::ErrorStr(err));
-            return err;
-        }
-        sIntentSize = endUserSupportSpan.size();
-        // Now, assign the span to the EndUserSupport object or whatever is required
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                            ChipLogError(DeviceLayer, "Failed to retrieve data: %s", chip::ErrorStr(err)));
         context->EndUserSupport.span = endUserSupportSpan;
 #else
         context->EndUserSupport.span =
             ByteSpan(&endUserSupportLogStart[0], static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart));
-#endif
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     }
     break;
 
