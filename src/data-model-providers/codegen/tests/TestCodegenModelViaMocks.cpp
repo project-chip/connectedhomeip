@@ -266,7 +266,7 @@ private:
 const MockNodeConfig gTestNodeConfig({
     MockEndpointConfig(kMockEndpoint1, {
         MockClusterConfig(
-            MockClusterId(1), 
+            MockClusterId(1),
             {
                 ClusterRevision::Id, FeatureMap::Id,
             },  /* attributes */
