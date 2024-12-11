@@ -220,32 +220,14 @@ public:
 
     void InvokeCommand(HandlerContext & handlerContext) override { handlerContext.SetCommandNotHandled(); }
 
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    bool AcceptsCommandId(const app::ConcreteCommandPath & path) override
     {
-        VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
-
-        for (auto id : mAccepted)
-        {
-            if (callback(id, context) != Loop::Continue)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
+        return mOverrideAccepted && std::find(mAccepted.cbegin(), mAccepted.cend(), path.mCommandId) != mAccepted.cend();
     }
 
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    bool GeneratesCommandId(const app::ConcreteCommandPath & path) override
     {
-        VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
-
-        for (auto id : mGenerated)
-        {
-            if (callback(id, context) != Loop::Continue)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
+        return mOverrideGenerated && std::find(mGenerated.cbegin(), mGenerated.cend(), path.mCommandId) != mGenerated.cend();
     }
 
     void SetOverrideAccepted(bool o) { mOverrideAccepted = o; }
