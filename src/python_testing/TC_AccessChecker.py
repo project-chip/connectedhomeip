@@ -24,11 +24,12 @@ from enum import Enum, auto
 from typing import Optional
 
 import chip.clusters as Clusters
-from chip.interaction_model import Status, InteractionModelError
+from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.global_attribute_ids import GlobalAttributeIds, cluster_id_type, is_standard_attribute_id, is_standard_cluster_id, is_standard_command_id
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
+from chip.testing.global_attribute_ids import (GlobalAttributeIds, cluster_id_type, is_standard_attribute_id,
+                                               is_standard_cluster_id, is_standard_command_id)
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
+                                         async_test_body, default_matter_test_main)
 from chip.testing.spec_parsing import XmlCluster, build_xml_clusters
 from chip.tlv import uint
 
