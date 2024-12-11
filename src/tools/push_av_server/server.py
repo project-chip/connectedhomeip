@@ -12,7 +12,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, Literal
 
 import uvicorn
 from cryptography import x509
@@ -128,8 +128,32 @@ class CAHierarchy:
 
     default_ca_duration = datetime.timedelta(days=365.25*20)
 
-    def __init__(self, base: Path, name: str) -> None:
+    client_key_usage_cert = x509.KeyUsage(
+        digital_signature=True,
+        content_commitment=False,
+        key_encipherment=True,
+        data_encipherment=False,
+        key_agreement=False,
+        key_cert_sign=False,
+        crl_sign=False,
+        encipher_only=False,
+        decipher_only=False,
+    )
+    server_key_usage_cert = x509.KeyUsage(
+        digital_signature=True,
+        content_commitment=False,
+        key_encipherment=False,
+        data_encipherment=False,
+        key_agreement=False,
+        key_cert_sign=False,
+        crl_sign=False,
+        encipher_only=False,
+        decipher_only=False,
+    )
+
+    def __init__(self, base: Path, name: str, kind: Literal['server', 'client']) -> None:
         self.name = name
+        self.kind = kind
         self.directory = base
 
         self.root_cert_path = self.directory / "root.pem"
@@ -176,7 +200,8 @@ class CAHierarchy:
                     datetime.datetime.now(datetime.timezone.utc) + self.default_ca_duration
                 )
                 .add_extension(
-                    x509.BasicConstraints(ca=True, path_length=None), critical=True
+                    # We make it so that our root can only issue leaf certificates, no intermediate here.
+                    x509.BasicConstraints(ca=True, path_length=0), critical=True
                 )
                 .add_extension(
                     x509.KeyUsage(
@@ -258,55 +283,34 @@ class CAHierarchy:
             ]
         )
 
-        extended_key_usage = [x509.ExtendedKeyUsageOID.CLIENT_AUTH] if self.name == "device" else [
+        extended_key_usage = [x509.ExtendedKeyUsageOID.CLIENT_AUTH] if self.kind == "client" else [
             x509.ExtendedKeyUsageOID.SERVER_AUTH]
 
-        return (
-            x509.CertificateBuilder()
-            .subject_name(subject)
-            .issuer_name(self.root_cert.subject)
-            .public_key(public_key)
-            .serial_number(x509.random_serial_number())
-            .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
-            .not_valid_after(
-                datetime.datetime.now(datetime.timezone.utc) + duration
-            )
-            .add_extension(
-                x509.SubjectAlternativeName(
-                    [
-                        # Describe what sites we want this certificate for.
-                        # TODO Is it needed when we already have it in the CN field ?
-                        x509.DNSName(dns),
-                    ]
-                ),
-                critical=False,
-            )
+        builder = (x509.CertificateBuilder()
+                   .subject_name(subject)
+                   .issuer_name(self.root_cert.subject)
+                   .public_key(public_key)
+                   .serial_number(x509.random_serial_number())
+                   .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+                   .not_valid_after(
+            datetime.datetime.now(datetime.timezone.utc) + duration
+        )
             .add_extension(
                 x509.BasicConstraints(ca=False, path_length=None),
-                critical=True,
-            )
+                critical=False,
+        )
             .add_extension(
-                x509.KeyUsage(
-                    digital_signature=True,
-                    content_commitment=False,
-                    key_encipherment=True,
-                    data_encipherment=False,
-                    key_agreement=False,
-                    key_cert_sign=False,
-                    crl_sign=False,
-                    encipher_only=False,
-                    decipher_only=False,
-                ),
+                self.client_key_usage_cert if self.kind == "client" else self.server_key_usage_cert,
                 critical=True,
-            )
+        )
             .add_extension(
                 x509.ExtendedKeyUsage(extended_key_usage),
                 critical=False,
-            )
+        )
             .add_extension(
                 x509.SubjectKeyIdentifier.from_public_key(public_key),
                 critical=False,
-            )
+        )
             .add_extension(
                 x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
                     self.root_cert.extensions.get_extension_for_class(
@@ -314,9 +318,22 @@ class CAHierarchy:
                     ).value
                 ),
                 critical=False,
-            )
-            .sign(self.root_key, hashes.SHA256())
         )
+            .add_extension(x509.CRLDistributionPoints([x509.DistributionPoint(
+                full_name=[x509.UniformResourceIdentifier("http://not.a.valid.website.com/some/path/to/a.crl")],
+                relative_name=None,
+                reasons=None,
+                crl_issuer=None
+            )]), critical=False)
+        )
+
+        if self.kind == 'server':
+            builder.add_extension(
+                x509.SubjectAlternativeName([x509.DNSName(dns)]),
+                critical=False,
+            )
+
+        return builder.sign(self.root_key, hashes.SHA256())
 
     def gen_cert(self, dns: str, csr: str, override=False, duration: datetime.timedelta = datetime.timedelta(hours=1)) -> tuple[Path, Path, bool]:
         """
@@ -600,8 +617,8 @@ def run(host: Optional[str], port: Optional[int], working_directory: Optional[st
         dns = "localhost" if dns is None else f"{dns}._http._tcp_.local."
 
         # Create CA hierarchies (for webserver and devices)
-        device_hierarchy = CAHierarchy(directory.mkdir("certs", "device"), "device")
-        server_hierarchy = CAHierarchy(directory.mkdir("certs", "server"), "server")
+        device_hierarchy = CAHierarchy(directory.mkdir("certs", "device"), "device", "client")
+        server_hierarchy = CAHierarchy(directory.mkdir("certs", "server"), "server", "server")
         (server_key_file, server_cert_file, _) = server_hierarchy.gen_keypair(dns, override=True)
 
         # mDNS configuration. Registration only happen if the dns isn't localhost.
