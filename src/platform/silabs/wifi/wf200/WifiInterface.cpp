@@ -319,12 +319,12 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
     }
     else
     {
-        scan_ssid = reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(scan_ssid_length));
+        scan_ssid_length = ssid.size();
+        scan_ssid        = reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(scan_ssid_length));
         VerifyOrReturnError(scan_ssid != nullptr, CHIP_ERROR_NO_MEMORY);
 
         chip::MutableByteSpan scannedSsidSpan(scan_ssid, WFX_MAX_SSID_LENGTH);
         chip::CopySpanToMutableSpan(ssid, scannedSsidSpan);
-        scan_ssid_length = scannedSsidSpan.size();
     }
     scan_cb = callback;
 
@@ -1241,7 +1241,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
      */
     uint8_t ip4_addr[4];
 
-    ip4_addr[0] = (ip) &0xFF;
+    ip4_addr[0] = (ip) & 0xFF;
     ip4_addr[1] = (ip >> 8) & 0xFF;
     ip4_addr[2] = (ip >> 16) & 0xFF;
     ip4_addr[3] = (ip >> 24) & 0xFF;

@@ -541,6 +541,8 @@ sl_status_t sl_matter_wifi_platform_init(void)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
+    // TODO: Convert this to a int8
+    int32_t rssi = 0;
     ap->security = wfx_rsi.sec.security;
     ap->chan     = wfx_rsi.ap_chan;
 
@@ -554,7 +556,9 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
     chip::MutableByteSpan bssidSpan(ap->bssid, kWifiMacAddressLength);
     chip::CopySpanToMutableSpan(apMacSpan, bssidSpan);
 
-    sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &(ap->rssi));
+    // TODO: add error processing
+    sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &(rssi));
+    ap->rssi = rssi;
 
     return SL_STATUS_OK;
 }
@@ -731,8 +735,6 @@ void ProcessEvent(WifiPlatformEvent event)
 
     case WifiPlatformEvent::kScan:
         ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kScan");
-
-#ifdef SL_WFX_CONFIG_SCAN
         if (!(wfx_rsi.dev_state.Has(WifiState::kScanStarted)))
         {
             ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kScan");
@@ -746,13 +748,14 @@ void ProcessEvent(WifiPlatformEvent event)
                 wifi_scan_configuration.periodic_scan_interval = kAdvScanPeriodicity;
             }
 
-            sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = { .active_channel_time  = kAdvActiveScanDuration,
-                                                                                  .passive_channel_time = kAdvPassiveScanDuration,
-                                                                                  .trigger_level        = kAdvScanThreshold,
-                                                                                  .trigger_level_change =
-                                                                                      kAdvRssiToleranceThreshold,
-                                                                                  .enable_multi_probe  = kAdvMultiProbe,
-                                                                                  .enable_instant_scan = kAdvEnableInstantbgScan };
+            sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = {
+                .trigger_level        = kAdvScanThreshold,
+                .trigger_level_change = kAdvRssiToleranceThreshold,
+                .active_channel_time  = kAdvActiveScanDuration,
+                .passive_channel_time = kAdvPassiveScanDuration,
+                .enable_instant_scan  = kAdvEnableInstantbgScan,
+                .enable_multi_probe   = kAdvMultiProbe,
+            };
 
             status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
 
@@ -787,7 +790,6 @@ void ProcessEvent(WifiPlatformEvent event)
 
             osSemaphoreRelease(sScanInProgressSemaphore);
         }
-#endif /* SL_WFX_CONFIG_SCAN */
         break;
 
     case WifiPlatformEvent::kStationStartJoin:
@@ -869,7 +871,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[0] = (ip) & 0xFF;
     wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
     wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
