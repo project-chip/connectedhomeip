@@ -17,6 +17,7 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/ConcreteCommandPath.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -69,7 +70,7 @@ public:
 
 private:
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) final;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) final;
+    bool AcceptsCommandId(const ConcreteCommandPath & path) override;
 
     bool mOverrideAcceptedCommands = false;
     bool mClaimNoCommands          = false;
@@ -104,27 +105,21 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
         });
 }
 
-CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
+bool TestClusterCommandHandler::AcceptsCommandId(const ConcreteCommandPath & path)
 {
     if (!mOverrideAcceptedCommands)
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        return true; // anything accepted
     }
 
     if (mClaimNoCommands)
     {
-        return CHIP_NO_ERROR;
+        return false; // deny all
     }
 
     // We just have one command id.
-    callback(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, context);
-    return CHIP_NO_ERROR;
+    return path.mCommandId == Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id;
 }
-
-} // namespace
-
-namespace {
 
 class DispatchTestDataModel : public CodegenDataModelProvider
 {
@@ -139,12 +134,12 @@ public:
 class TestServerCommandDispatch : public chip::Test::AppContext
 {
 public:
-    void SetUp()
+    void SetUp() override
     {
         AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&DispatchTestDataModel::Instance());
     }
-    void TearDown()
+    void TearDown() override
     {
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         AppContext::TearDown();
@@ -378,14 +373,19 @@ TEST_F(TestServerCommandDispatch, TestDataResponseHandlerOverride1)
 {
     TestClusterCommandHandler commandHandler;
     commandHandler.OverrideAcceptedCommands();
-    TestDataResponseHelper(&testEndpoint2, true);
+
+    // Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id exists on Endpoint1
+    TestDataResponseHelper(&testEndpoint1, true);
 }
 
 TEST_F(TestServerCommandDispatch, TestDataResponseHandlerOverride2)
 {
     TestClusterCommandHandler commandHandler;
     commandHandler.OverrideAcceptedCommands();
-    TestDataResponseHelper(&testEndpoint3, true);
+
+    // Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id DOES NOT exist on endpoint1
+    // so overriding accepting does nothing (there is no metadata to accept it)
+    TestDataResponseHelper(&testEndpoint3, false);
 }
 
 } // namespace
