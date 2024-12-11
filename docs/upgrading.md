@@ -68,14 +68,14 @@ independent of the InteractionModelEngine class.
 
 The following replacements exist:
 
--   `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
-    `chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler`
--   `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
-    `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler`
--   `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
-    `chip::app::CommandHandlerInterfaceRegistry::Instance().GetCommandHandler`
--   `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
-    `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterAllCommandHandlersForEndpoint`
+- `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
+  `chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler`
+- `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
+  `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler`
+- `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
+  `chip::app::CommandHandlerInterfaceRegistry::Instance().GetCommandHandler`
+- `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
+  `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterAllCommandHandlersForEndpoint`
 
 ### AttributeAccessInterface registration and removal
 
@@ -84,14 +84,14 @@ A new object exists for the attribute access interface registry, accessible as
 
 Replacements for methods are:
 
--   `registerAttributeAccessOverride` replaced by
-    `chip::app::AttributeAccessInterfaceRegistry::Instance().Register`
--   `unregisterAttributeAccessOverride` replaced by
-    `chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister`
--   `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
-    `chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAllForEndpoint`
--   `chip::app::GetAttributeAccessOverride` replaced by
-    `chip::app::AttributeAccessInterfaceRegistry::Instance().Get`
+- `registerAttributeAccessOverride` replaced by
+  `chip::app::AttributeAccessInterfaceRegistry::Instance().Register`
+- `unregisterAttributeAccessOverride` replaced by
+  `chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister`
+- `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
+  `chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAllForEndpoint`
+- `chip::app::GetAttributeAccessOverride` replaced by
+  `chip::app::AttributeAccessInterfaceRegistry::Instance().Get`
 
 ### `ServerInitParams::dataModelProvider` in `Server::Init` and `FactoryInitParams`
 
@@ -107,3 +107,13 @@ To use default attribute persistence, you need to pass in a
 `PersistentStorageDelegate` to `CodegenDataModelProviderInstance`. See example
 changes in [36658](https://github.com/project-chip/connectedhomeip/pull/36658)
 ).
+
+### `EnumerateAcceptedCommands` and `EnumerateGeneratedCommands` in `CommandHandlerInterface`
+
+Commands are generally highly coupled with metadata. Code was changed to allow
+the interfaces to filter out accepted/generated commands, however they cannot
+control the actual list of commands anymore since they must reside in metadata
+(e.g. ember/zap).provider
+
+Replace these functions with `AcceptsCommandId` and `GeneratesCommandId`. See
+[36809](https://github.com/project-chip/connectedhomeip/pull/36809) for changes.
