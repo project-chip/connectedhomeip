@@ -91,11 +91,27 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
         }
     }
     break;
+    case Clusters::BasicInformation::Attributes::VendorID::Id: {
+        uint32_t vendorId;
+        if (SuccessOrLog(data->Get(vendorId), "VendorID"))
+        {
+            mCurrentDeviceData.vendorId = static_cast<chip::VendorId>(vendorId);
+        }
+    }
+    break;
     case Clusters::BasicInformation::Attributes::VendorName::Id: {
         char vendorNameBuffer[kBasicInformationAttributeBufSize];
         if (SuccessOrLog(data->GetString(vendorNameBuffer, sizeof(vendorNameBuffer)), "VendorName"))
         {
             mCurrentDeviceData.vendorName = std::string(vendorNameBuffer);
+        }
+    }
+    break;
+    case Clusters::BasicInformation::Attributes::ProductID::Id: {
+        uint32_t productId;
+        if (SuccessOrLog(data->Get(productId), "ProductID"))
+        {
+            mCurrentDeviceData.productId = productId;
         }
     }
     break;
@@ -121,6 +137,14 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
                          "HardwareVersionString"))
         {
             mCurrentDeviceData.hardwareVersionString = std::string(hardwareVersionStringBuffer);
+        }
+    }
+    break;
+    case Clusters::BasicInformation::Attributes::SoftwareVersion::Id: {
+        uint32_t softwareVersion;
+        if (SuccessOrLog(data->Get(softwareVersion), "SoftwareVersion"))
+        {
+            mCurrentDeviceData.softwareVersion = softwareVersion;
         }
     }
     break;
