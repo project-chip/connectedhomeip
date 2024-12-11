@@ -28,7 +28,7 @@ namespace admin {
 namespace {
 
 constexpr uint16_t kSubscribeMinInterval = 0;
-constexpr uint16_t kSubscribeMaxInterval = 60;
+constexpr uint16_t kSubscribeMaxInterval = 30;
 
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
