@@ -28,6 +28,18 @@ StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffe
     return pw::string::Format(buffer, "CHIP_ERROR:<%" CHIP_ERROR_FORMAT ">", err.Format());
 }
 
+template <>
+StatusWithSize ToString<std::chrono::duration<uint64_t, std::milli>>(const std::chrono::duration<uint64_t, std::milli> & time, pw::span<char> buffer)
+{
+    return pw::string::Format(buffer, "%llums", time.count());
+}
+
+template <>
+StatusWithSize ToString<std::chrono::duration<uint64_t, std::micro>>(const std::chrono::duration<uint64_t, std::micro> & time, pw::span<char> buffer)
+{
+    return pw::string::Format(buffer, "%lluus", time.count());
+}
+
 } // namespace pw
 
 #if CHIP_CONFIG_TEST_GOOGLETEST
@@ -42,5 +54,16 @@ void PrintTo(const CHIP_ERROR & err, std::ostream * os)
     }
     *os << "CHIP_ERROR:<" << err.Format() << ">";
 }
+
+void PrintTo(const std::chrono::duration<uint64_t, std::milli> & time, std::ostream * os)
+{
+    *os << time.count() << "ms";
+}
+
+void PrintTo(const std::chrono::duration<uint64_t, std::micro> & time, std::ostream * os)
+{
+    *os << time.count() << "us";
+}
+
 } // namespace chip
 #endif // CHIP_CONFIG_TEST_GOOGLETEST
