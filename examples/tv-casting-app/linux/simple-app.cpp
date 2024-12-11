@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <signal.h>
+
 #include "simple-app-helper.h"
 
 #include "core/CastingPlayer.h"
@@ -24,11 +26,11 @@
 
 #include <LinuxCommissionableDataProvider.h>
 #include <Options.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -84,14 +86,43 @@ public:
         CHIP_ERROR err = serverInitParams.InitializeStaticResourcesBeforeServerInit();
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogError(AppServer, "Initialization of ServerInitParams failed %" CHIP_ERROR_FORMAT, err.Format()));
-        serverInitParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+        serverInitParams.dataModelProvider =
+            chip::app::CodegenDataModelProviderInstance(serverInitParams.persistentStorageDelegate);
         return &serverInitParams;
     }
 };
 
+void StopMainEventLoop()
+{
+    chip::Server::GetInstance().GenerateShutDownEvent();
+    chip::DeviceLayer::SystemLayer().ScheduleLambda([]() { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
+}
+
+void StopSignalHandler(int /* signal */)
+{
+#if defined(ENABLE_CHIP_SHELL)
+    chip::Shell::Engine::Root().StopMainLoop();
+#endif
+    StopMainEventLoop();
+}
+
 int main(int argc, char * argv[])
 {
-    ChipLogProgress(AppServer, "chip_casting_simplified = 1"); // this file is built/run only if chip_casting_simplified = 1
+    // This file is built/run only if chip_casting_simplified = 1
+    ChipLogProgress(AppServer, "chip_casting_simplified = 1");
+
+#if defined(ENABLE_CHIP_SHELL)
+    /* Block SIGINT and SIGTERM. Other threads created by the main thread
+     * will inherit the signal mask. Then we can explicitly unblock signals
+     * in the shell thread to handle them, so the read(stdin) call can be
+     * interrupted by a signal. */
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, SIGINT);
+    sigaddset(&set, SIGTERM);
+    pthread_sigmask(SIG_BLOCK, &set, nullptr);
+#endif
+
     // Create AppParameters that need to be passed to CastingApp.Initialize()
     AppParameters appParameters;
     RotatingDeviceIdUniqueIdProvider rotatingDeviceIdUniqueIdProvider;
@@ -122,8 +153,18 @@ int main(int argc, char * argv[])
 
 #if defined(ENABLE_CHIP_SHELL)
     chip::Shell::Engine::Root().Init();
-    std::thread shellThread([]() { chip::Shell::Engine::Root().RunMainLoop(); });
     RegisterCommands();
+    std::thread shellThread([]() {
+        sigset_t set_;
+        sigemptyset(&set_);
+        sigaddset(&set_, SIGINT);
+        sigaddset(&set_, SIGTERM);
+        // Unblock SIGINT and SIGTERM, so that the shell thread can handle
+        // them - we need read() call to be interrupted.
+        pthread_sigmask(SIG_UNBLOCK, &set_, nullptr);
+        chip::Shell::Engine::Root().RunMainLoop();
+        StopMainEventLoop();
+    });
 #endif
 
     CastingPlayerDiscovery::GetInstance()->SetDelegate(DiscoveryDelegateImpl::GetInstance());
@@ -133,7 +174,20 @@ int main(int argc, char * argv[])
     VerifyOrReturnValue(err == CHIP_NO_ERROR, -1,
                         ChipLogError(AppServer, "CastingPlayerDiscovery::StartDiscovery failed %" CHIP_ERROR_FORMAT, err.Format()));
 
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
+    sigaction(SIGINT, &sa, nullptr);
+    sigaction(SIGTERM, &sa, nullptr);
+
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+
+#if defined(ENABLE_CHIP_SHELL)
+    shellThread.join();
+#endif
+
+    chip::Server::GetInstance().Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
 
     return 0;
 }

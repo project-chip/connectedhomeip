@@ -19,6 +19,7 @@ package com.matter.controller
 
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ControllerParams
+import com.matter.controller.commands.bdx.*
 import com.matter.controller.commands.common.*
 import com.matter.controller.commands.discover.*
 import com.matter.controller.commands.icd.*
@@ -80,6 +81,16 @@ private fun getICDCommands(
   )
 }
 
+private fun getBdxCommands(
+  controller: ChipDeviceController,
+  credentialsIssuer: CredentialsIssuer
+): List<Command> {
+  return listOf(
+    DownloadLogCommand(controller, credentialsIssuer),
+    PairOnNetworkLongDownloadLogCommand(controller, credentialsIssuer),
+  )
+}
+
 fun main(args: Array<String>) {
   val controller =
     ChipDeviceController(
@@ -96,6 +107,7 @@ fun main(args: Array<String>) {
   commandManager.register("pairing", getPairingCommands(controller, credentialsIssuer))
   commandManager.register("im", getImCommands(controller, credentialsIssuer))
   commandManager.register("icd", getICDCommands(controller, credentialsIssuer))
+  commandManager.register("bdx", getBdxCommands(controller, credentialsIssuer))
 
   try {
     commandManager.run(args)

@@ -152,7 +152,7 @@ BOOL MTREventReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * repo
                 break;
             }
             default:
-                MTR_LOG_ERROR("Uknown time type for event report: %@", item);
+                MTR_LOG_ERROR("Unknown time type for event report: %@", item);
                 return NO;
             }
         }

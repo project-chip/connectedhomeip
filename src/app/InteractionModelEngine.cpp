@@ -50,10 +50,6 @@
 #include <lib/support/FibonacciUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-// TODO: defaulting to codegen should eventually be an application choice and not
-//       hard-coded in the interaction model
-#include <app/codegen-data-model-provider/Instance.h>
-
 namespace chip {
 namespace app {
 namespace {
@@ -93,14 +89,14 @@ bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, Endp
                                                                aSubjectDescriptor);
     }
 
-    DataModel::ClusterEntry clusterEntry = aProvider->FirstCluster(aEventPath.mEndpointId);
+    DataModel::ClusterEntry clusterEntry = aProvider->FirstServerCluster(aEventPath.mEndpointId);
     while (clusterEntry.IsValid())
     {
         if (MayHaveAccessibleEventPathForEndpointAndCluster(clusterEntry.path, aEventPath, aSubjectDescriptor))
         {
             return true;
         }
-        clusterEntry = aProvider->NextCluster(clusterEntry.path);
+        clusterEntry = aProvider->NextServerCluster(clusterEntry.path);
     }
 
     return false;
@@ -116,10 +112,9 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
         return MayHaveAccessibleEventPathForEndpoint(aProvider, aEventPath.mEndpointId, aEventPath, subjectDescriptor);
     }
 
-    for (EndpointId endpointId = aProvider->FirstEndpoint(); endpointId != kInvalidEndpointId;
-         endpointId            = aProvider->NextEndpoint(endpointId))
+    for (DataModel::EndpointEntry ep = aProvider->FirstEndpoint(); ep.IsValid(); ep = aProvider->NextEndpoint(ep.id))
     {
-        if (MayHaveAccessibleEventPathForEndpoint(aProvider, endpointId, aEventPath, subjectDescriptor))
+        if (MayHaveAccessibleEventPathForEndpoint(aProvider, ep.id, aEventPath, subjectDescriptor))
         {
             return true;
         }
@@ -464,6 +459,28 @@ bool InteractionModelEngine::SubjectHasPersistedSubscription(FabricIndex aFabric
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
     return persistedSubMatches;
+}
+
+bool InteractionModelEngine::FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex)
+{
+    bool hasActiveSubscription = false;
+    mReadHandlers.ForEachActiveObject([aFabricIndex, &hasActiveSubscription](ReadHandler * handler) {
+        VerifyOrReturnValue(handler->IsType(ReadHandler::InteractionType::Subscribe), Loop::Continue);
+
+        Access::SubjectDescriptor subject = handler->GetSubjectDescriptor();
+        VerifyOrReturnValue(subject.fabricIndex == aFabricIndex, Loop::Continue);
+
+        if ((subject.authMode == Access::AuthMode::kCase) && handler->IsActiveSubscription())
+        {
+            // On first subscription found for fabric, we can immediately stop checking.
+            hasActiveSubscription = true;
+            return Loop::Break;
+        }
+
+        return Loop::Continue;
+    });
+
+    return hasActiveSubscription;
 }
 
 void InteractionModelEngine::OnDone(CommandResponseSender & apResponderObj)
@@ -1775,17 +1792,16 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 
     // We failed, figure out why ...
     //
-    if (provider->GetClusterInfo(aCommandPath).has_value())
+    if (provider->GetServerClusterInfo(aCommandPath).has_value())
     {
         return Protocols::InteractionModel::Status::UnsupportedCommand; // cluster exists, so command is invalid
     }
 
     // At this point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
     // is invalid
-    for (EndpointId endpoint = provider->FirstEndpoint(); endpoint != kInvalidEndpointId;
-         endpoint            = provider->NextEndpoint(endpoint))
+    for (DataModel::EndpointEntry ep = provider->FirstEndpoint(); ep.IsValid(); ep = provider->NextEndpoint(ep.id))
     {
-        if (endpoint == aCommandPath.mEndpointId)
+        if (ep.id == aCommandPath.mEndpointId)
         {
             // endpoint exists, so cluster is invalid
             return Protocols::InteractionModel::Status::UnsupportedCluster;
@@ -1798,8 +1814,14 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 
 DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model)
 {
-    // Alternting data model should not be done while IM is actively handling requests.
+    // Altering data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
+
+    if (model == mDataModelProvider)
+    {
+        // no-op, just return
+        return model;
+    }
 
     DataModel::Provider * oldModel = mDataModelProvider;
     if (oldModel != nullptr)
@@ -1830,14 +1852,11 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     return oldModel;
 }
 
-DataModel::Provider * InteractionModelEngine::GetDataModelProvider()
+DataModel::Provider * InteractionModelEngine::GetDataModelProvider() const
 {
-    if (mDataModelProvider == nullptr)
-    {
-        // These should be called within the CHIP processing loop.
-        assertChipStackLockedByCurrentThread();
-        SetDataModelProvider(CodegenDataModelProviderInstance());
-    }
+    // These should be called within the CHIP processing loop.
+    assertChipStackLockedByCurrentThread();
+
     return mDataModelProvider;
 }
 

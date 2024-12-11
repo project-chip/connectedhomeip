@@ -17,9 +17,10 @@
  */
 
 #include <AppMain.h>
-#include <EnergyEvseMain.h>
-#include <WaterHeaterMain.h>
+#include <EnergyManagementAppCmdLineOptions.h>
+#include <EnergyManagementAppCommonMain.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/support/BitMask.h>
 
 using namespace chip;
@@ -39,10 +40,12 @@ static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::Optio
 constexpr uint16_t kOptionApplication = 0xffd0;
 constexpr uint16_t kOptionFeatureMap  = 0xffd1;
 
-constexpr const char * kEvseApp = "evse";
-constexpr const char * kWhmApp  = "water-heater";
-
-constexpr const char * kValidApps[] = { kEvseApp, kWhmApp };
+constexpr chip::EndpointId kEvseEndpoint        = 1;
+constexpr chip::EndpointId kWaterHeaterEndpoint = 2;
+constexpr const char * kEvseApp                 = "evse";
+constexpr const char * kWhmApp                  = "water-heater";
+constexpr const char * kValidApps[]             = { kEvseApp, kWhmApp };
+constexpr EndpointId kValidEndpoints[]          = { kEvseEndpoint, kWaterHeaterEndpoint };
 
 // Define the chip::ArgParser command line structures for extending the command line to support the
 // energy apps
@@ -65,11 +68,12 @@ namespace DeviceEnergyManagement {
 
 // Keep track of the parsed featureMap option
 static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
-                                          Feature::kStateForecastReporting, Feature::kStartTimeAdjustment, Feature::kPausable,
-                                          Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
+                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
+                                          Feature::kConstraintBasedAdjustment);
 
 // Make EVSE the default app
-static const char * spApp = kEvseApp;
+static const char * spApp        = kEvseApp;
+static EndpointId sAppEndpointId = kEvseEndpoint;
 
 chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 {
@@ -80,6 +84,11 @@ chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+chip::EndpointId GetEnergyDeviceEndpointId()
+{
+    return sAppEndpointId;
+}
 
 static uint32_t ParseNumber(const char * pString)
 {
@@ -101,11 +110,15 @@ void ApplicationInit()
     ChipLogDetail(AppServer, "Energy Management App: ApplicationInit()");
     if (strcmp(spApp, kEvseApp) == 0)
     {
+        // Disable Water Heater Endpoint
+        emberAfEndpointEnableDisable(kWaterHeaterEndpoint, false);
         EvseApplicationInit();
     }
     else if (strcmp(spApp, kWhmApp) == 0)
     {
-        FullWhmApplicationInit();
+        // Disable EVSE Endpoint
+        emberAfEndpointEnableDisable(kEvseEndpoint, false);
+        WaterHeaterApplicationInit();
     }
     else
     {
@@ -118,7 +131,7 @@ void ApplicationShutdown()
     ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
 
     EvseApplicationShutdown();
-    FullWhmApplicationShutdown();
+    WaterHeaterApplicationShutdown();
 }
 
 static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,
@@ -134,7 +147,8 @@ static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::Optio
         {
             if (strcmp(kValidApps[idx], aValue) == 0)
             {
-                spApp = kValidApps[idx];
+                spApp          = kValidApps[idx];
+                sAppEndpointId = kValidEndpoints[idx];
                 break;
             }
         }

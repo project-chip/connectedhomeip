@@ -87,6 +87,9 @@ void ApplicationInit()
 
     CHIP_ERROR err = bridge::BridgeInit(&admin::FabricAdmin::Instance());
     VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified, "Fabric-Sync: Failed to initialize bridge, error: %s", ErrorStr(err));
+
+    err = admin::FabricAdmin::Instance().Init();
+    VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified, "Fabric-Sync: Failed to initialize admin, error: %s", ErrorStr(err));
 }
 
 void ApplicationShutdown()
@@ -109,15 +112,6 @@ int main(int argc, char * argv[])
 #if defined(ENABLE_CHIP_SHELL)
     Shell::RegisterCommands();
 #endif
-
-    CHIP_ERROR err = admin::PairingManager::Instance().Init(GetDeviceCommissioner());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(NotSpecified, "Failed to init PairingManager: %s ", ErrorStr(err));
-
-        // End the program with non zero error code to indicate a error.
-        return 1;
-    }
 
     ChipLinuxAppMainLoop();
 

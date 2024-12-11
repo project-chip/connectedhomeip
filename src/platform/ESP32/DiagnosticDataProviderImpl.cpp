@@ -217,32 +217,37 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         {
             NetworkInterface * ifp = new NetworkInterface();
             esp_netif_ip_info_t ipv4_info;
+            uint8_t addressSize = 0;
             Platform::CopyString(ifp->Name, esp_netif_get_ifkey(ifa));
             ifp->name          = CharSpan::fromCharString(ifp->Name);
             ifp->isOperational = true;
             ifp->type          = GetInterfaceType(esp_netif_get_desc(ifa));
             ifp->offPremiseServicesReachableIPv4.SetNull();
             ifp->offPremiseServicesReachableIPv6.SetNull();
-#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
-            if (esp_netif_get_mac(ifa, ifp->MacAddress) != ESP_OK)
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+            if (ifp->type == InterfaceTypeEnum::kThread)
             {
-                ChipLogError(DeviceLayer, "Failed to get network hardware address");
+                static_assert(OT_EXT_ADDRESS_SIZE <= sizeof(ifp->MacAddress), "Unexpected extended address size");
+                if (ThreadStackMgr().GetPrimary802154MACAddress(ifp->MacAddress) == CHIP_NO_ERROR)
+                {
+                    addressSize = OT_EXT_ADDRESS_SIZE;
+                }
             }
             else
-            {
-                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
-            }
-#else
-            if (esp_read_mac(ifp->MacAddress, ESP_MAC_IEEE802154) != ESP_OK)
-            {
-                ChipLogError(DeviceLayer, "Failed to get network hardware address");
-            }
-            else
-            {
-                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 8);
-            }
 #endif
-
+                if (esp_netif_get_mac(ifa, ifp->MacAddress) == ESP_OK)
+            {
+                // For Wi-Fi or Ethernet interface, the MAC address size should be 6
+                addressSize = 6;
+            }
+            if (addressSize != 0)
+            {
+                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, addressSize);
+            }
+            else
+            {
+                ChipLogError(DeviceLayer, "Failed to get network hardware address");
+            }
 #ifndef CONFIG_DISABLE_IPV4
             if (esp_netif_get_ip_info(ifa, &ipv4_info) == ESP_OK)
             {
@@ -285,6 +290,56 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
         netifp                 = netifp->Next;
         delete del;
     }
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+#ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
+    ThreadMetrics * head = nullptr;
+    uint32_t arraySize   = uxTaskGetNumberOfTasks();
+
+    Platform::ScopedMemoryBuffer<TaskStatus_t> taskStatusArray;
+    VerifyOrReturnError(taskStatusArray.Calloc(arraySize), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t dummyRunTimeCounter;
+    arraySize = uxTaskGetSystemState(taskStatusArray.Get(), arraySize, &dummyRunTimeCounter);
+
+    for (uint32_t i = 0; i < arraySize; i++)
+    {
+        auto thread = static_cast<ThreadMetrics *>(Platform::MemoryCalloc(1, sizeof(ThreadMetrics)));
+        VerifyOrReturnError(thread, CHIP_ERROR_NO_MEMORY, ReleaseThreadMetrics(head));
+
+        Platform::CopyString(thread->NameBuf, taskStatusArray[i].pcTaskName);
+        thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+        thread->id = taskStatusArray[i].xTaskNumber;
+        thread->stackFreeMinimum.Emplace(taskStatusArray[i].usStackHighWaterMark);
+
+        // Todo: Calculate stack size and current free stack value and assign.
+        thread->stackFreeCurrent.ClearValue();
+        thread->stackSize.ClearValue();
+
+        thread->Next = head;
+        head         = thread;
+    }
+
+    *threadMetricsOut = head;
+
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
+
+void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+#ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
+    while (threadMetrics)
+    {
+        ThreadMetrics * del = threadMetrics;
+        threadMetrics       = threadMetrics->Next;
+        Platform::MemoryFree(del);
+    }
+#endif
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

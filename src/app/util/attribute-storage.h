@@ -378,5 +378,17 @@ bool IsFlatCompositionForEndpoint(EndpointId endpoint);
  */
 bool IsTreeCompositionForEndpoint(EndpointId endpoint);
 
+enum class EndpointComposition : uint8_t
+{
+    kFullFamily,
+    kTree,
+    kInvalid,
+};
+
+/**
+ * @brief Returns the composition for a given endpoint index
+ */
+EndpointComposition GetCompositionForEndpointIndex(uint16_t index);
+
 } // namespace app
 } // namespace chip

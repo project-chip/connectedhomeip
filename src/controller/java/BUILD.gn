@@ -19,8 +19,8 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tests.gni")
-import("${chip_root}/src/app/codegen-data-model-provider/model.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/platform/device.gni")
 
 buildconfig_header("controller_buildconfig") {
@@ -132,10 +132,14 @@ shared_library("jni") {
     "AndroidCurrentFabricRemover.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
+    "AndroidLogDownloadFromNode.cpp",
+    "AndroidLogDownloadFromNode.h",
     "AndroidOperationalCredentialsIssuer.cpp",
     "AndroidOperationalCredentialsIssuer.h",
     "AttestationTrustStoreBridge.cpp",
     "AttestationTrustStoreBridge.h",
+    "BdxDiagnosticLogsReceiver.cpp",
+    "BdxDiagnosticLogsReceiver.h",
     "CHIPDeviceController-JNI.cpp",
     "CHIPP256KeypairBridge.cpp",
     "CHIPP256KeypairBridge.h",
@@ -637,7 +641,9 @@ android_library("java") {
     "src/chip/devicecontroller/ControllerParams.java",
     "src/chip/devicecontroller/DeviceAttestation.java",
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
+    "src/chip/devicecontroller/DiagnosticLogType.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",
+    "src/chip/devicecontroller/DownloadLogCallback.java",
     "src/chip/devicecontroller/GroupKeySecurityPolicy.java",
     "src/chip/devicecontroller/ICDCheckInDelegate.java",
     "src/chip/devicecontroller/ICDCheckInDelegateWrapper.java",

@@ -22,6 +22,10 @@ declare_args() {
 
   # Use PSA Spake2+ implementation. Only used if chip_crypto == "psa"
   chip_crypto_psa_spake2p = false
+
+  # Crypto storage: psa, raw, app.
+  #   app: includes zero new files and disables the unit tests for the keystore.
+  chip_crypto_keystore = ""
 }
 
 assert(
