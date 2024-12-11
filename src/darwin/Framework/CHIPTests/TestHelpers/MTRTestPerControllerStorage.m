@@ -40,7 +40,7 @@
                             securityLevel:(MTRStorageSecurityLevel)securityLevel
                               sharingType:(MTRStorageSharingType)sharingType
 {
-    @synchronized (self) {
+    @synchronized(self) {
         XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
 
         __auto_type * data = self.storage[key];
@@ -63,7 +63,7 @@
      securityLevel:(MTRStorageSecurityLevel)securityLevel
        sharingType:(MTRStorageSharingType)sharingType
 {
-    @synchronized (self) {
+    @synchronized(self) {
         XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
 
         NSError * error;
@@ -81,7 +81,7 @@
         securityLevel:(MTRStorageSecurityLevel)securityLevel
           sharingType:(MTRStorageSharingType)sharingType
 {
-    @synchronized (self) {
+    @synchronized(self) {
         XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
         self.storage[key] = nil;
         return YES;
@@ -90,7 +90,7 @@
 
 - (NSUInteger)count
 {
-    @synchronized (self) {
+    @synchronized(self) {
         return self.storage.count;
     }
 }
@@ -101,7 +101,7 @@
 
 - (NSDictionary<NSString *, id<NSSecureCoding>> *)valuesForController:(MTRDeviceController *)controller securityLevel:(MTRStorageSecurityLevel)securityLevel sharingType:(MTRStorageSharingType)sharingType
 {
-    @synchronized (self) {
+    @synchronized(self) {
         XCTAssertEqualObjects(self.controllerID, controller.uniqueIdentifier);
 
         if (!self.storage.count) {
@@ -119,7 +119,7 @@
 
 - (BOOL)controller:(MTRDeviceController *)controller storeValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values securityLevel:(MTRStorageSecurityLevel)securityLevel sharingType:(MTRStorageSharingType)sharingType
 {
-    @synchronized (self) {
+    @synchronized(self) {
         XCTAssertEqualObjects(self.controllerID, controller.uniqueIdentifier);
 
         for (NSString * key in values) {
