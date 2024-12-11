@@ -38,16 +38,19 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 
-from tc_mode_base import TC_MODE_BASE
+from tc_mode_base import ClusterModeCheck
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
-class TC_TCCM_1_2(MatterBaseTest, TC_MODE_BASE):
+class TC_TCCM_1_2(MatterBaseTest, ClusterModeCheck):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        ClusterModeCheck.__init__(self,
+                                  requested_cluster=Clusters.RefrigeratorAndTemperatureControlledCabinetMode)
 
     def desc_TC_TCCM_1_2(self) -> str:
         return "[TC-TCCM-1.2] Cluster attributes with DUT as Server"
@@ -71,30 +74,34 @@ class TC_TCCM_1_2(MatterBaseTest, TC_MODE_BASE):
     @async_test_body
     async def test_TC_TCCM_1_2(self):
 
+        # Setup common mode check
         endpoint = self.get_endpoint(default=1)
-
-        attributes = Clusters.RefrigeratorAndTemperatureControlledCabinetMode.Attributes
-
-        self.initialize_tc_base(requested_cluster=Clusters.RefrigeratorAndTemperatureControlledCabinetMode,
-                                cluster_objects=Clusters.Objects.RefrigeratorAndTemperatureControlledCabinetMode,
-                                endpoint=endpoint, attributes=attributes)
 
         self.step(1)
 
         self.step(2)
-        await self.check_supported_modes_and_labels()
+        # Verify common checks for Mode Base as described in the TC-TCCM-1.2
+        await self.check_supported_modes_and_labels(endpoint=endpoint)
+        # According to the spec, there should be at least one RapidCool or RapidFreeze tag in
+        # the ones supported.
         additional_tags = [Clusters.RefrigeratorAndTemperatureControlledCabinetMode.Enums.ModeTag.kRapidCool,
                            Clusters.RefrigeratorAndTemperatureControlledCabinetMode.Enums.ModeTag.kRapidFreeze]
-        await self.check_if_labels_in_lists(requiredtags=additional_tags)
+        self.check_tags_in_lists(requiredtags=additional_tags)
 
         self.step(3)
-        await self.read_and_check_mode(mode=attributes.CurrentMode)
+        # Verify that the CurrentMode attribute has a valid value.
+        mode = Clusters.RefrigeratorAndTemperatureControlledCabinetMode.Attributes.CurrentMode
+        await self.read_and_check_mode(endpoint=endpoint, mode=mode)
 
         self.step(4)
-        await self.read_and_check_mode(mode=attributes.OnMode, is_nullable=True)
+        # Verify that the OnMode attribute has a valid value or null.
+        mode = Clusters.RefrigeratorAndTemperatureControlledCabinetMode.Attributes.OnMode
+        await self.read_and_check_mode(endpoint=endpoint, mode=mode, is_nullable=True)
 
         self.step(5)
-        await self.read_and_check_mode(mode=attributes.StartUpMode, is_nullable=True)
+        # Verify that the StartUpMode has a valid value or null
+        mode = Clusters.RefrigeratorAndTemperatureControlledCabinetMode.Attributes.StartUpMode
+        await self.read_and_check_mode(endpoint=endpoint, mode=mode, is_nullable=True)
 
 
 if __name__ == "__main__":

@@ -22,31 +22,45 @@ from chip.clusters.Types import NullValue
 
 logger = logging.getLogger(__name__)
 
+# Maximum value for ModeTags according to specs is 16bits.
+MAX_MODE_TAG = 0xFFFF
+# According to specs, the specific MfgTags should be defined in the range 0x8000 - 0xBFFF
+START_MFGTAGS_RANGE = 0x8000
+END_MFGTAGS_RANGE = 0xBFFF
 
-class TC_MODE_BASE:
 
-    def initialize_tc_base(self, endpoint, attributes, requested_cluster, cluster_objects, *args):
-        self.commonTags = {0x0: 'Auto',
-                           0x1: 'Quick',
-                           0x2: 'Quiet',
-                           0x3: 'LowNoise',
-                           0x4: 'LowEnergy',
-                           0x5: 'Vacation',
-                           0x6: 'Min',
-                           0x7: 'Max',
-                           0x8: 'Night',
-                           0x9: 'Day'}
-        self.specificTags = [tag.value for tag in requested_cluster.Enums.ModeTag]
+class ClusterModeCheck:
+    """ Class that holds the common Mode checks between TCs
+
+    Several TCs have similar checks in place for functionality that is common among them.
+    This class holds most of this common functionality to avoid duplicating code with the same validations.
+
+    Link to spec:
+    https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/modebase_common.adoc
+
+
+    Attributes:
+        requested_cluster: A reference to the cluster to be tested, it should be a derived from the Mode Base cluster.
+    """
+
+    def __init__(self, requested_cluster):
+        self.modeTags = [tag.value for tag in requested_cluster.Enums.ModeTag]
+        self.requested_cluster = requested_cluster
+        self.attributes = requested_cluster.Attributes
         self.supported_modes_dut = set()
-        self.cluster_objects = cluster_objects
         self.supported_modes = None
-        self.endpoint = endpoint
-        self.attributes = attributes
 
-    async def check_supported_modes_and_labels(self):
+    async def check_supported_modes_and_labels(self, endpoint):
+        """ Verifies the device supported modes and labels.
+
+        Checks that the SupportedModes attribute has the expected structure and values like:
+        - Between 2 and 255 entries.
+        - The Mode values of all entries are unique.
+        - The Label values of all entries are unique.
+        """
         # Get the supported modes
-        self.supported_modes = await self.read_single_attribute_check_success(endpoint=self.endpoint,
-                                                                              cluster=self.cluster_objects,
+        self.supported_modes = await self.read_single_attribute_check_success(endpoint=endpoint,
+                                                                              cluster=self.requested_cluster,
                                                                               attribute=self.attributes.SupportedModes)
 
         # Check if the list of supported modes is larger than 2
@@ -68,7 +82,16 @@ class TC_MODE_BASE:
             else:
                 labels.add(mode_options_struct.label)
 
-    async def check_if_labels_in_lists(self, requiredtags=None):
+    def check_tags_in_lists(self, requiredtags=None):
+        """ Validates the ModeTags values.
+
+        This function evaluates the ModeTags of each ModeOptionsStruct:
+        - Should have at least one tag.
+        - Should be maximum 16bits in size.
+        - Should be a Mfg tag or one of the supported ones (either common or specific).
+        - Should have at least one common or specific tag.
+        - If defined, verify that at least one of the "requiredTags" exists.
+        """
         # Verify the ModeTags on each ModeOptionsStruct
         for mode_options_struct in self.supported_modes:
             # Shuld have at least one entry
@@ -79,13 +102,12 @@ class TC_MODE_BASE:
             at_least_one_common_or_derived = False
             for tag in mode_options_struct.modeTags:
                 # Value should not larger than 16bits
-                if tag.value > 0xFFFF or tag.value < 0:
+                if tag.value > MAX_MODE_TAG or tag.value < 0:
                     asserts.fail("Tag should not be larger than 16bits.")
 
                 # Check if is tag is common, derived or mfg.
-                is_mfg = (0x8000 <= tag.value <= 0xBFFF)
-                if (tag.value not in self.commonTags and
-                    tag.value not in self.specificTags and
+                is_mfg = (START_MFGTAGS_RANGE <= tag.value <= END_MFGTAGS_RANGE)
+                if (tag.value not in self.modeTags and
                         not is_mfg):
                     asserts.fail("Mode tag value is not a common, derived or vendor tag.")
 
@@ -104,8 +126,13 @@ class TC_MODE_BASE:
                     break
             asserts.assert_true(has_required_tags, "No ModeOptionsStruct has the required tags.")
 
-    async def read_and_check_mode(self, mode, is_nullable=False):
-        mode_value = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster_objects, attribute=mode)
+    async def read_and_check_mode(self, endpoint, mode, is_nullable=False):
+        """Evaluates the current mode
+
+        This functions checks if the requested mode attribute has a valid value from the SupportedModes,
+        supports optional nullable values.
+        """
+        mode_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=self.requested_cluster, attribute=mode)
         is_valid = mode_value in self.supported_modes_dut
         if is_nullable and mode_value == NullValue:
             is_valid = True
