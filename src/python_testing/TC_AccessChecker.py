@@ -13,6 +13,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --bool-arg ci_only_linux_skip_ota_cluster_disallowed_for_certification:True
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
@@ -180,6 +181,11 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             no commands are actually run on the device, which means there are no side effects. However, we can differentiate
             ACL rejections from commands being unsupported.
         """
+        ota_exception = self.user_params.get('ci_only_linux_skip_ota_cluster_disallowed_for_certification', False)
+        if cluster_id == Clusters.OtaSoftwareUpdateRequestor.id and ota_exception:
+            logging.warn('WARNING: Skipping OTA cluster check for CI. THIS IS DISALLOWED FOR CERTIFICATION')
+            return
+
         for command_id in checkable_commands(cluster_id, device_cluster_data, xml_cluster):
             spec_requires = xml_cluster.accepted_commands[command_id].privilege
             command = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][command_id]
