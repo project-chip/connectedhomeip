@@ -29,7 +29,7 @@ chip::app::TermsAndConditionsManager * chip::app::TermsAndConditionsManager::Get
     return &sTermsAndConditionsManager;
 }
 
-CHIP_ERROR chip::app::TermsAndConditionsManager::Init(chip::PersistentStorageDelegate * const inPersistentStorageDelegate,
+CHIP_ERROR chip::app::TermsAndConditionsManager::Init(chip::PersistentStorageDelegate * inPersistentStorageDelegate,
                                                       const Optional<TermsAndConditions> & inRequiredTermsAndConditions)
 {
     ReturnErrorOnFailure(sTermsAndConditionsStorageDelegateInstance.Init(inPersistentStorageDelegate));

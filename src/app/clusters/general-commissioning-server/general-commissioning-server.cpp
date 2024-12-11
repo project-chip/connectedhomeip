@@ -103,7 +103,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     }
 #if CHIP_CONFIG_TC_REQUIRED
     case TCAcceptedVersion::Id: {
-        TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
         VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -112,7 +112,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
         return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
     }
     case TCMinRequiredVersion::Id: {
-        TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
         VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -121,7 +121,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
         return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
     }
     case TCAcknowledgements::Id: {
-        TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
         VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -130,7 +130,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
         return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetValue());
     }
     case TCAcknowledgementsRequired::Id: {
-        TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
         bool acknowledgementsRequired;
 
         VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -139,7 +139,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
         return aEncoder.Encode(acknowledgementsRequired);
     }
     case TCUpdateDeadline::Id: {
-        TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<uint32_t> outUpdateAcceptanceDeadline;
 
         VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -211,7 +211,7 @@ typedef struct sTermsAndConditionsState
     Optional<uint32_t> updateAcceptanceDeadline;
 } TermsAndConditionsState;
 
-CHIP_ERROR GetTermsAndConditionsAttributeState(TermsAndConditionsProvider * const tcProvider,
+CHIP_ERROR GetTermsAndConditionsAttributeState(TermsAndConditionsProvider * tcProvider,
                                                TermsAndConditionsState & outTermsAndConditionsState)
 {
     TermsAndConditionsState termsAndConditionsState;
@@ -358,7 +358,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     }
 
 #if CHIP_CONFIG_TC_REQUIRED
-    TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+    TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
 
     // Ensure required terms and conditions have been accepted, then attempt to commit
     if (nullptr != tcProvider)
@@ -516,7 +516,7 @@ bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
 
 #if CHIP_CONFIG_TC_REQUIRED
     auto & failSafeContext                        = Server::GetInstance().GetFailSafeContext();
-    TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+    TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
 
     if (nullptr == tcProvider)
     {
@@ -591,7 +591,7 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
         {
 #if CHIP_CONFIG_TC_REQUIRED
             // Clear terms and conditions acceptance on failsafe timer expiration
-            TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+            TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
             TermsAndConditionsState initialState, updatedState;
             VerifyOrReturn(nullptr != tcProvider);
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
@@ -619,7 +619,7 @@ public:
                             static_cast<unsigned>(fabricIndex));
 
 #if CHIP_CONFIG_TC_REQUIRED
-            TermsAndConditionsProvider * const tcProvider = TermsAndConditionsManager::GetInstance();
+            TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
             TermsAndConditionsState initialState, updatedState;
             VerifyOrReturn(nullptr != tcProvider);
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));

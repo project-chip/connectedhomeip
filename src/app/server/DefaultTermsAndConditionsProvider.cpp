@@ -40,7 +40,7 @@ constexpr size_t kEstimatedTlvBufferSize = chip::TLV::EstimateStructOverhead(siz
     4; // Extra space for rollback compatibility
 } // namespace
 
-CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Init(PersistentStorageDelegate * const inPersistentStorageDelegate)
+CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Init(PersistentStorageDelegate * inPersistentStorageDelegate)
 {
     VerifyOrReturnValue(nullptr != inPersistentStorageDelegate, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -138,7 +138,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Set(const TermsA
 }
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::Init(
-    TermsAndConditionsStorageDelegate * const inStorageDelegate,
+    TermsAndConditionsStorageDelegate * inStorageDelegate,
     const chip::Optional<chip::app::TermsAndConditions> & inRequiredTermsAndConditions)
 {
     VerifyOrReturnValue(nullptr != inStorageDelegate, CHIP_ERROR_INVALID_ARGUMENT);

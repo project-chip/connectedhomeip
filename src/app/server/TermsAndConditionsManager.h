@@ -29,7 +29,7 @@ class TermsAndConditionsManager : public TermsAndConditionsProvider
 {
 public:
     static TermsAndConditionsManager * GetInstance();
-    CHIP_ERROR Init(PersistentStorageDelegate * const inPersistentStorageDelegate,
+    CHIP_ERROR Init(PersistentStorageDelegate * inPersistentStorageDelegate,
                     const Optional<TermsAndConditions> & inRequiredTermsAndConditions);
     CHIP_ERROR CommitAcceptance();
     CHIP_ERROR GetAcceptance(Optional<TermsAndConditions> & outTermsAndConditions) const;

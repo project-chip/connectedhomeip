@@ -102,7 +102,7 @@ public:
      * @retval CHIP_NO_ERROR if the storage delegate was successfully initialized.
      * @retval CHIP_ERROR_INVALID_ARGUMENT if the provided storage delegate is null.
      */
-    CHIP_ERROR Init(PersistentStorageDelegate * const inPersistentStorageDelegate);
+    CHIP_ERROR Init(PersistentStorageDelegate * inPersistentStorageDelegate);
 
     CHIP_ERROR Delete() override;
 
@@ -123,7 +123,7 @@ public:
      * @param[in] inStorageDelegate Storage delegate dependency.
      * @param[in] inRequiredTermsAndConditions The required terms and conditions that must be met.
      */
-    CHIP_ERROR Init(TermsAndConditionsStorageDelegate * const inStorageDelegate,
+    CHIP_ERROR Init(TermsAndConditionsStorageDelegate * inStorageDelegate,
                     const Optional<TermsAndConditions> & inRequiredTermsAndConditions);
 
     CHIP_ERROR CommitAcceptance() override;
