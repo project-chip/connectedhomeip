@@ -477,9 +477,16 @@ def list_streams():
     return {"streams": streams}
 
 
-# TODO app.put("/streams/{stream_id}")
-# To conform to the ingest spec, support of that path with discarding the body
-# and not doing anything.
+@app.put("/streams/{stream_id}")
+async def manifest_upload(stream_id: int, req: Request):
+    """The DASH manifest is uploaded onto the base path without any file path"""
+
+    # Here we assume that no camera will upload an index.mpd file on their own.
+    # That is something that may not be true, in which case we would have to add
+    # another layer of abstraction on the file system where we can store the mpd
+    # file and the camera direct uploads.
+    return await segment_upload("index.mpd", stream_id, req)
+
 
 @app.put("/streams/{stream_id}/{file_path:path}", status_code=202)
 async def segment_upload(file_path: str, stream_id: int, req: Request):
@@ -529,13 +536,6 @@ def ffprobe_check(stream_id: int, file_path: str):
 @app.get("/streams/{stream_id}/{file_path:path}")
 async def segment_download(file_path: str, stream_id: int):
     return FileResponse(wd.path("streams", str(stream_id), file_path))
-
-
-# TODO app.post("streams/convert/{stream_id}")
-# Will execute a ffmpeg conversion of the uploaded stream to a regular mp4
-# for easier consumption. Need to double check first if Firefox/Chrome can
-# read DASH media with CMAF tracks. If they can no need to actually convert
-# to a new format.
 
 
 @app.get("/certs", status_code=200)
