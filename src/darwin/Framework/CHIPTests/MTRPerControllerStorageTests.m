@@ -1692,6 +1692,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [self waitForExpectations:@[ newDeviceSubscriptionExpectation ] timeout:60];
     if (!disableStorageBehaviorOptimization) {
         [self waitForExpectations:@[ newDeviceGotClusterDataPersisted ] timeout:60];
+        newDelegate.onClusterDataPersisted = nil;
     }
     newDelegate.onReportEnd = nil;
 
