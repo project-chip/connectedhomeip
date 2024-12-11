@@ -68,14 +68,14 @@ independent of the InteractionModelEngine class.
 
 The following replacements exist:
 
-- `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
-  `chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler`
-- `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
-  `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler`
-- `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
-  `chip::app::CommandHandlerInterfaceRegistry::Instance().GetCommandHandler`
-- `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
-  `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterAllCommandHandlersForEndpoint`
+-   `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
+    `chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler`
+-   `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
+    `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler`
+-   `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
+    `chip::app::CommandHandlerInterfaceRegistry::Instance().GetCommandHandler`
+-   `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
+    `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterAllCommandHandlersForEndpoint`
 
 ### AttributeAccessInterface registration and removal
 
@@ -84,14 +84,14 @@ A new object exists for the attribute access interface registry, accessible as
 
 Replacements for methods are:
 
-- `registerAttributeAccessOverride` replaced by
-  `chip::app::AttributeAccessInterfaceRegistry::Instance().Register`
-- `unregisterAttributeAccessOverride` replaced by
-  `chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister`
-- `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
-  `chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAllForEndpoint`
-- `chip::app::GetAttributeAccessOverride` replaced by
-  `chip::app::AttributeAccessInterfaceRegistry::Instance().Get`
+-   `registerAttributeAccessOverride` replaced by
+    `chip::app::AttributeAccessInterfaceRegistry::Instance().Register`
+-   `unregisterAttributeAccessOverride` replaced by
+    `chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister`
+-   `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
+    `chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAllForEndpoint`
+-   `chip::app::GetAttributeAccessOverride` replaced by
+    `chip::app::AttributeAccessInterfaceRegistry::Instance().Get`
 
 ### `ServerInitParams::dataModelProvider` in `Server::Init` and `FactoryInitParams`
 
