@@ -237,7 +237,16 @@ public:
     CHIP_ERROR GetSetupPayload(chip::MutableCharSpan & value);
     CHIP_ERROR SetProvisionRequest(bool value);
     CHIP_ERROR GetProvisionRequest(bool & value);
+
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+    /**
+     * @brief Reads the test event trigger key from NVM. If the key isn't present, returns default value if defined.
+     *
+     * @param[out] keySpan output buffer. Must be at least large enough for 16 bytes (key length)
+     * @return CHIP_ERROR
+     */
     CHIP_ERROR GetTestEventTriggerKey(MutableByteSpan & keySpan);
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 private:
     // Generic Interface
