@@ -54,7 +54,7 @@
 
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 #include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
-#endif
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -79,6 +79,12 @@ static AppDeviceCallbacks EchoCallbacks;
 static void InitServer(intptr_t context)
 {
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    CircularDiagnosticBuffer & diagnosticStorage = CircularDiagnosticBuffer::GetInstance();
+    diagnosticStorage.Init(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
+    static ESP32Diagnostics diagnosticBackend(diagnosticStorage);
+    Tracing::Register(diagnosticBackend);
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 }
 
 extern "C" void app_main()
@@ -86,14 +92,6 @@ extern "C" void app_main()
 #if CONFIG_ENABLE_PW_RPC
     chip::rpc::Init();
 #endif
-
-#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    CircularDiagnosticBuffer & diagnosticStorage = CircularDiagnosticBuffer::GetInstance();
-    diagnosticStorage.Init(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
-    static ESP32Diagnostics diagnosticBackend(diagnosticStorage);
-    Tracing::Register(diagnosticBackend);
-#endif
-
     ESP_LOGI(TAG, "Temperature sensor!");
 
     // Initialize the ESP NVS layer.
