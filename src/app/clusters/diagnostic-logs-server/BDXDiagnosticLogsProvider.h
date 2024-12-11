@@ -79,7 +79,7 @@ private:
      * @param[in] error  A CHIP_ERROR value indicating the reason for resetting the state.
      *                   It is permissible to pass CHIP_NO_ERROR to indicate normal termination.
      */
-    void Reset(CHIP_ERROR error = CHIP_NO_ERROR);
+    void Reset(CHIP_ERROR error);
 
     Messaging::ExchangeContext * mBDXTransferExchangeCtx;
     DiagnosticLogsProviderDelegate * mDelegate;

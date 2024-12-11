@@ -213,7 +213,7 @@ void BDXDiagnosticLogsProvider::OnAckEOFReceived()
 {
     ChipLogProgress(BDX, "Diagnostic logs transfer: Success");
 
-    Reset();
+    Reset(CHIP_NO_ERROR);
 }
 
 void BDXDiagnosticLogsProvider::OnStatusReceived(TransferSession::OutputEvent & event)
