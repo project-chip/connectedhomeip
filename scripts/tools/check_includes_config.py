@@ -119,6 +119,7 @@ ALLOW: Dict[str, Set[str]] = {
     # Only uses <chrono> for zero-cost types.
     'src/system/SystemClock.h': {'chrono'},
     'src/platform/mbed/MbedEventTimeout.h': {'chrono'},
+    'src/lib/core/StringBuilderAdapters.h': {'chrono'},
 
     'src/app/app-platform/ContentApp.h': {'list', 'string'},
     'src/app/app-platform/ContentAppPlatform.cpp': {'string'},

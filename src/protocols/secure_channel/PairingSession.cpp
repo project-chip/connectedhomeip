@@ -81,8 +81,7 @@ void PairingSession::Finish()
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrDie(mSecureSessionHolder);
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type                                   = DeviceLayer::DeviceEventType::kSecureSessionEstablished;
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kSecureSessionEstablished };
         event.SecureSessionEstablished.TransportType = to_underlying(address.GetTransportType());
         event.SecureSessionEstablished.SecureSessionType =
             to_underlying(mSecureSessionHolder->AsSecureSession()->GetSecureSessionType());

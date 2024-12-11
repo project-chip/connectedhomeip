@@ -122,7 +122,7 @@ public:
      */
     void SetGroupDataProvider(Credentials::GroupDataProvider * groupDataProvider) { mGroupDataProvider = groupDataProvider; }
 
-    // This struct is only serves as a base struct for EncodeSigma1 and ParseSigma1
+    // This struct  only serves as a base struct for EncodeSigma1 and ParseSigma1
     struct Sigma1Param
     {
         ByteSpan initiatorRandom;
@@ -176,6 +176,7 @@ public:
      */
     CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParseSigma1Param & outparam);
 
+    // Helper Enum for usage in HandleSigma1_and_SendSigma2
     enum class Step : uint8_t
     {
         kNone,

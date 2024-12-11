@@ -21,6 +21,7 @@
 
 #include <access/Privilege.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
@@ -33,10 +34,20 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+/// Represents various endpoint composition patters as defined in the spec
+/// as `9.2.1. Endpoint Composition patterns`
 enum class EndpointCompositionPattern : uint8_t
 {
-    kTreePattern       = 0x1,
-    kFullFamilyPattern = 0x2,
+    // Tree pattern supports a general tree of endpoints. Commonly used for
+    // device types that support physical device composition (e.g. Refrigerator)
+    kTree = 0x1,
+
+    // A full-family pattern is a list fo all descendant endpoints, with no
+    // imposed hierarchy.
+    //
+    // For example the Root Node and Aggregator device types use the full-familiy
+    // pattern, as defined in their device type specification
+    kFullFamily = 0x2,
 };
 
 struct EndpointInfo
@@ -46,9 +57,8 @@ struct EndpointInfo
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
 
-    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamilyPattern)
-    {}
-    explicit EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
+    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamily) {}
+    EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
 };
 
 struct EndpointEntry
@@ -211,6 +221,24 @@ public:
     // returned as responses.
     virtual ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) = 0;
     virtual ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before)   = 0;
+
+    /// Workaround function to report attribute change.
+    ///
+    /// When this is invoked, the caller is expected to increment the cluster data version, and the attribute path
+    /// should be marked as `dirty` by the data model provider listener so that the reporter can notify the subscriber
+    /// of attribute changes.
+    /// This function should be invoked when attribute managed by attribute access interface is modified but not
+    /// through an actual Write interaction.
+    /// For example, if the LastNetworkingStatus attribute changes because the NetworkCommissioning driver detects a
+    /// network connection status change and calls SetLastNetworkingStatusValue(). The data model provider can recognize
+    /// this change by invoking this function at the point of change.
+    ///
+    /// This is a workaround function as we cannot notify the attribute change to the data model provider. The provider
+    /// should own its data and versions.
+    ///
+    /// TODO: We should remove this function when the AttributeAccessInterface/CommandHandlerInterface is able to report
+    /// the attribute changes.
+    virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
 };
 
 } // namespace DataModel
