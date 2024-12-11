@@ -141,8 +141,9 @@ class TC_PAVS_1_0(MatterBaseTest):
         wrong_chain = push_av_server.CAHierarchy(push_av_server.wd.mkdir("certs", "wrong"), "wrong chain", "client")
 
         wrong_chain.root_cert_path  # Install onto the device
-        ["path_to_key", "path_to_cert"] = wrong_chain.gen_cert("dns", "csr")  # Sign for the device
+        [path_to_key, path_to_cert] = wrong_chain.gen_cert("dns", "csr")  # Sign for the device
         # Install onto the device
+        print(f"{path_to_cert}, {path_to_key}")  # to not have unused values
 
         # After setting up the device, trigger an upload which will use the wrong cert and should fail
 
