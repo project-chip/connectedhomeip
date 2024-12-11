@@ -177,7 +177,9 @@ bool SoftwareDiagnosticsCommandHandler::AcceptsCommandId(const ConcreteCommandPa
     default:
         return false;
     }
-} // anonymous namespace
+}
+
+} // namespace
 
 namespace chip {
 namespace app {
