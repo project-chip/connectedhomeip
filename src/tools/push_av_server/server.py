@@ -21,7 +21,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes, CertificatePublicKeyTypes
 from cryptography.x509.oid import NameOID
 from fastapi import FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -402,10 +402,9 @@ device_hierarchy: CAHierarchy = None
 
 # UI website
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=RedirectResponse)
 def root():
-    with open("index.html", "r") as f:
-        return f.read()
+    return RedirectResponse("/ui/streams")
 
 
 @app.get("/ui/streams", response_class=HTMLResponse)
