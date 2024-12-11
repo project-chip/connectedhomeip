@@ -26,13 +26,14 @@ namespace commands {
 class PairDeviceCommand : public Command, public admin::PairingDelegate
 {
 public:
-    PairDeviceCommand(chip::NodeId nodeId, const char * payload);
+    PairDeviceCommand(chip::NodeId nodeId, const char * payload, bool enableICDRegistration);
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) override;
     CHIP_ERROR RunCommand() override;
 
 private:
     chip::NodeId mNodeId;
     const char * mPayload;
+    bool mEnableICDRegistration;
 };
 
 } // namespace commands
