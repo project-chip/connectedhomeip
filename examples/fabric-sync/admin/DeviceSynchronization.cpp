@@ -274,7 +274,7 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
     bridge::FabricBridge::Instance().AddSynchronizedDevice(mCurrentDeviceData);
 
     // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
-    if (!mCurrentDeviceData.isIcd)
+    if (!mCurrentDeviceData.isIcd.value_or(false))
     {
         VerifyOrDie(mController);
         ScopedNodeId scopedNodeId(mNodeId, mController->GetFabricIndex());
