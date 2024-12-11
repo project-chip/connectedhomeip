@@ -59,10 +59,11 @@ public:
      * returned from StartLogCollection.
      *
      * @param[in] sessionHandle  The unique handle for this log session returned from a call to StartLogCollection.
-     * @param[in] error A CHIP_ERROR value that indicates the reason for ending the log collection.
+     * @param[in] error          A CHIP_ERROR value indicating the reason for ending the log collection.
+     *                           It is permissible to pass CHIP_NO_ERROR to indicate normal termination.
      *
      */
-    virtual CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error) = 0;
+    virtual CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error = CHIP_NO_ERROR) = 0;
 
     /**
      * Called to get the next chunk for the log session identified by sessionHandle.

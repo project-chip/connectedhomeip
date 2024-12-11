@@ -191,7 +191,7 @@ void BDXDiagnosticLogsProvider::OnAckReceived()
     // If the buffer has empty space, end the log collection session.
     if (isEndOfLog)
     {
-        mDelegate->EndLogCollection(mLogSessionHandle, CHIP_NO_ERROR);
+        mDelegate->EndLogCollection(mLogSessionHandle);
         mLogSessionHandle = kInvalidLogSessionHandle;
     }
 
@@ -213,7 +213,7 @@ void BDXDiagnosticLogsProvider::OnAckEOFReceived()
 {
     ChipLogProgress(BDX, "Diagnostic logs transfer: Success");
 
-    Reset(CHIP_NO_ERROR);
+    Reset();
 }
 
 void BDXDiagnosticLogsProvider::OnStatusReceived(TransferSession::OutputEvent & event)

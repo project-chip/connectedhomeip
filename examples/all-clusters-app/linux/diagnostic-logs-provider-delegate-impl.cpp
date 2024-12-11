@@ -79,7 +79,7 @@ CHIP_ERROR LogProvider::GetLogForIntent(IntentEnum intent, MutableByteSpan & out
     err = CollectLog(sessionHandle, outBuffer, unusedOutIsEndOfLog);
     VerifyOrReturnError(CHIP_NO_ERROR == err, err, outBuffer.reduce_size(0));
 
-    err = EndLogCollection(sessionHandle, CHIP_NO_ERROR);
+    err = EndLogCollection(sessionHandle);
     VerifyOrReturnError(CHIP_NO_ERROR == err, err, outBuffer.reduce_size(0));
 
     return CHIP_NO_ERROR;
