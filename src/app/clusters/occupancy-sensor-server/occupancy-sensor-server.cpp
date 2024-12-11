@@ -64,6 +64,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
     case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
         // HoldTime is equivalent to the legacy *OccupiedToUnoccupiedDelay attributes.
+        // The AAI will read/write these attributes at the same storage for one endpoint.
         uint16_t * holdTime = GetHoldTimeForEndpoint(aPath.mEndpointId);
 
         if (holdTime == nullptr)
