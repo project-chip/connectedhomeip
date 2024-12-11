@@ -134,6 +134,16 @@ public:
         static DispatchTestDataModel instance;
         return instance;
     }
+
+    // The Startup method initializes the data model provider with a given context.
+    // This approach ensures that the test relies on a more controlled and explicit data model provider
+    // rather than depending on the code-generated one with undefined modifications.
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override
+    {
+        ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+
+        return CHIP_NO_ERROR;
+    }
 };
 
 class TestServerCommandDispatch : public chip::Test::AppContext
@@ -144,6 +154,7 @@ public:
         AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&DispatchTestDataModel::Instance());
     }
+
     void TearDown()
     {
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);

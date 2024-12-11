@@ -169,17 +169,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err = mAttributePersister.Init(mDeviceStorage));
     SetSafeAttributePersistenceProvider(&mAttributePersister);
 
-    // SetDataModelProvider() actually initializes/starts the provider.  We need
-    // to preserve the following ordering guarantees:
-    //
-    // 1) Provider initialization (under SetDataModelProvider) happens after
-    //    SetSafeAttributePersistenceProvider, since the provider can then use
-    //    the safe persistence provider to implement and initialize its own attribute persistence logic.
-    // 2) For now, provider initialization happens before InitDataModelHandler(), which depends
-    //    on atttribute persistence being already set up before it runs.  Longer-term, the logic from
-    //    InitDataModelHandler should just move into the codegen provider.
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
-
     {
         FabricTable::InitParams fabricTableInitParams;
         fabricTableInitParams.storage             = mDeviceStorage;
@@ -301,8 +290,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-    // This initializes clusters, so should come after lower level initialization.
-    app::InteractionModelEngine::GetInstance()->GetDataModelProvider()->InitDataModel();
+    // Set the data model provider, initializing it in the process. This must
+    // happen after SetSafeAttributePersistenceProvider to ensure the provider
+    // can utilize the safe persistence provider for its attribute storage.
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);

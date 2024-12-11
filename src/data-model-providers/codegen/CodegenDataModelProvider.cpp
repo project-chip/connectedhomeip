@@ -412,13 +412,6 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 } // namespace
 
-void CodegenDataModelProvider::InitDataModel()
-{
-    // Call the Ember-specific InitDataModelHandler
-    InitDataModelHandler();
-    ChipLogProgress(AppServer, "CodegenDataModelHandler initialized.");
-}
-
 CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
 {
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
@@ -444,6 +437,9 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 #endif
         }
     }
+
+    // Call the Ember-specific InitDataModelHandler
+    InitDataModelHandler();
 
     return CHIP_NO_ERROR;
 }

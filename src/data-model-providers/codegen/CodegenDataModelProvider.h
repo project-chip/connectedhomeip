@@ -126,9 +126,6 @@ private:
     };
 
 public:
-    /// Initialize the data model internal code to be ready to send and receive data model messages.
-    void InitDataModel() override;
-
     /// clears out internal caching. Especially useful in unit tests,
     /// where path caching does not really apply (the same path may result in different outcomes)
     void Reset()

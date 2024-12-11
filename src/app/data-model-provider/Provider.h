@@ -47,9 +47,6 @@ class Provider : public ProviderMetadataTree
 public:
     virtual ~Provider() = default;
 
-    // Initialize the data model internal code to be ready to send and receive data model messages.
-    virtual void InitDataModel() {}
-
     // `context` pointers  will be guaranteed valid until Shutdown is called()
     virtual CHIP_ERROR Startup(InteractionModelContext context)
     {

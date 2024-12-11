@@ -260,8 +260,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     // `InitDataModelHandler`.
     interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
 
-    InitDataModelHandler();
-
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 
     if (params.enableServerInteractions)
