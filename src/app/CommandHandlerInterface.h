@@ -101,55 +101,24 @@ public:
      */
     virtual void InvokeCommand(HandlerContext & handlerContext) = 0;
 
-    typedef Loop (*CommandIdCallback)(CommandId id, void * context);
+    /**
+     * Returns true if the given command path can be processed by an InvokeCommand request.
+     *
+     * Intent for this is that actual command metadata is available somewhere else, so generally code
+     * is aware of 'all possible commands that a cluster could accept/generate', however this
+     * allows a command handler interface to filter such commands to a subset.
+     */
+    virtual bool AcceptsCommandId(const ConcreteCommandPath & commandPath) { return true; }
 
     /**
-     * Function that may be implemented to enumerate accepted (client-to-server)
-     * commands for the given cluster.
+     * Returns true if the given command id will be returned as a generated command (i.e. as a response of some InvokeCommand
+     * request.)
      *
-     * If this function returns CHIP_ERROR_NOT_IMPLEMENTED, the list of accepted
-     * commands will come from the endpoint metadata for the cluster.
-     *
-     * If this function returns any other error, that will be treated as an
-     * error condition by the caller, and handling will depend on the caller.
-     *
-     * Otherwise the list of accepted commands will be the list of values passed
-     * to the provided callback.
-     *
-     * The implementation _must_ pass the provided context to the callback.
-     *
-     * If the callback returns Loop::Break, there must be no more calls to it.
-     * This is used by callbacks that just look for a particular value in the
-     * list.
+     * Intent for this is that actual command metadata is available somewhere else, so generally code
+     * is aware of 'all possible commands that a cluster could accept/generate', however this
+     * allows a command handler interface to filter such commands to a subset.
      */
-    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
-     * Function that may be implemented to enumerate generated (response)
-     * commands for the given cluster.
-     *
-     * If this function returns CHIP_ERROR_NOT_IMPLEMENTED, the list of
-     * generated commands will come from the endpoint metadata for the cluster.
-     *
-     * If this function returns any other error, that will be treated as an
-     * error condition by the caller, and handling will depend on the caller.
-     *
-     * Otherwise the list of generated commands will be the list of values
-     * passed to the provided callback.
-     *
-     * The implementation _must_ pass the provided context to the callback.
-     *
-     * If the callback returns Loop::Break, there must be no more calls to it.
-     * This is used by callbacks that just look for a particular value in the
-     * list.
-     */
-    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual bool GeneratesCommandId(const ConcreteCommandPath & commandPath) { return true; }
 
     /**
      * Mechanism for keeping track of a chain of CommandHandlerInterface.

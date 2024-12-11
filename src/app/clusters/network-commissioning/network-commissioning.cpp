@@ -1360,47 +1360,30 @@ void Instance::OnFailSafeTimerExpired()
     }
 }
 
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+bool Instance::AcceptsCommandId(const ConcreteCommandPath & commandPath)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
 
-    if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
+    switch (commandPath.mCommandId)
     {
-        for (auto && cmd : {
-                 ScanNetworks::Id,
-                 AddOrUpdateThreadNetwork::Id,
-                 RemoveNetwork::Id,
-                 ConnectNetwork::Id,
-                 ReorderNetwork::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
-    }
-    else if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
-    {
-        for (auto && cmd : {
-                 ScanNetworks::Id,
-                 AddOrUpdateWiFiNetwork::Id,
-                 RemoveNetwork::Id,
-                 ConnectNetwork::Id,
-                 ReorderNetwork::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
-    }
+    case AddOrUpdateThreadNetwork::Id:
+        return mFeatureFlags.Has(Feature::kThreadNetworkInterface);
+    case AddOrUpdateWiFiNetwork::Id:
+        return mFeatureFlags.Has(Feature::kWiFiNetworkInterface);
+    case ScanNetworks::Id:
+    case RemoveNetwork::Id:
+    case ConnectNetwork::Id:
+    case ReorderNetwork::Id:
+        return mFeatureFlags.HasAny(Feature::kThreadNetworkInterface, Feature::kWiFiNetworkInterface);
+    case QueryIdentity::Id:
 
-    if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
-    {
-        VerifyOrExit(callback(QueryIdentity::Id, context) == Loop::Continue, /**/);
+        return mFeatureFlags.Has(Feature::kPerDeviceCredentials);
+    default:
+        return false;
     }
-
-exit:
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+bool Instance::GeneratesCommandId(const ConcreteCommandPath & commandPath)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
 

@@ -182,42 +182,26 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+bool Instance::AcceptsCommandId(const ConcreteCommandPath & commandPath)
 {
     using namespace Commands;
 
-    for (auto && cmd : {
-             Disable::Id,
-             EnableCharging::Id,
-         })
+    switch (commandPath.mCommandId)
     {
-        VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
+    case Disable::Id:
+    case EnableCharging::Id:
+        return true;
+    case EnableDischarging::Id:
+        return HasFeature(Feature::kV2x);
+    case SetTargets::Id:
+    case GetTargets::Id:
+    case ClearTargets::Id:
+        return HasFeature(Feature::kChargingPreferences);
+    case StartDiagnostics::Id:
+        return SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics);
+    default:
+        return false;
     }
-
-    if (HasFeature(Feature::kV2x))
-    {
-        VerifyOrExit(callback(EnableDischarging::Id, context) == Loop::Continue, /**/);
-    }
-
-    if (HasFeature(Feature::kChargingPreferences))
-    {
-        for (auto && cmd : {
-                 SetTargets::Id,
-                 GetTargets::Id,
-                 ClearTargets::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
-    }
-
-    if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
-    {
-        callback(StartDiagnostics::Id, context);
-    }
-
-exit:
-    return CHIP_NO_ERROR;
 }
 
 void Instance::InvokeCommand(HandlerContext & handlerContext)
