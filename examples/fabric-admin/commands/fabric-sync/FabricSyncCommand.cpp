@@ -295,7 +295,7 @@ void FabricSyncDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERRO
                      ChipLogValueX64(deviceId), err.Format());
     }
 
-    PairingManager::Instance().ResetForNextCommand();    
+    PairingManager::Instance().ResetForNextCommand();
 }
 
 CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteEndpointId)
