@@ -133,6 +133,19 @@ class TC_PAVS_1_0(MatterBaseTest):
 
         srv.stop()
 
+    async def test_wrong_cert_chain(self):
+        """Intended as an example of how to install an unrecognised """
+        srv = push_av_server.start("localhost", 1234)
+        srv.run_in_thread()
+
+        wrong_chain = push_av_server.CAHierarchy(push_av_server.wd.mkdir("certs", "wrong"), "wrong chain", "client")
+
+        wrong_chain.root_cert_path  # Install onto the device
+        ["path_to_key", "path_to_cert"] = wrong_chain.gen_cert("dns", "csr")  # Sign for the device
+        # Install onto the device
+
+        # After setting up the device, trigger an upload which will use the wrong cert and should fail
+
 
 if __name__ == "__main__":
     default_matter_test_main()
