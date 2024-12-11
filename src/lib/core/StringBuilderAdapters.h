@@ -55,9 +55,11 @@ StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffe
 
 // Adapters for chip::System::Clock::Microseconds64 and Milliseconds64
 template <>
-StatusWithSize ToString<std::chrono::duration<uint64_t, std::milli>>(const std::chrono::duration<uint64_t, std::milli> & time, pw::span<char> buffer);
+StatusWithSize ToString<std::chrono::duration<uint64_t, std::milli>>(const std::chrono::duration<uint64_t, std::milli> & time,
+                                                                     pw::span<char> buffer);
 template <>
-StatusWithSize ToString<std::chrono::duration<uint64_t, std::micro>>(const std::chrono::duration<uint64_t, std::micro> & time, pw::span<char> buffer);
+StatusWithSize ToString<std::chrono::duration<uint64_t, std::micro>>(const std::chrono::duration<uint64_t, std::micro> & time,
+                                                                     pw::span<char> buffer);
 
 } // namespace pw
 #if CHIP_CONFIG_TEST_GOOGLETEST

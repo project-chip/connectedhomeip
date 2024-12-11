@@ -29,13 +29,15 @@ StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffe
 }
 
 template <>
-StatusWithSize ToString<std::chrono::duration<uint64_t, std::milli>>(const std::chrono::duration<uint64_t, std::milli> & time, pw::span<char> buffer)
+StatusWithSize ToString<std::chrono::duration<uint64_t, std::milli>>(const std::chrono::duration<uint64_t, std::milli> & time,
+                                                                     pw::span<char> buffer)
 {
     return pw::string::Format(buffer, "%llums", time.count());
 }
 
 template <>
-StatusWithSize ToString<std::chrono::duration<uint64_t, std::micro>>(const std::chrono::duration<uint64_t, std::micro> & time, pw::span<char> buffer)
+StatusWithSize ToString<std::chrono::duration<uint64_t, std::micro>>(const std::chrono::duration<uint64_t, std::micro> & time,
+                                                                     pw::span<char> buffer)
 {
     return pw::string::Format(buffer, "%lluus", time.count());
 }
