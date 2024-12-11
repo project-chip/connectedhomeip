@@ -141,6 +141,11 @@
     return [[self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID] copy];
 }
 
+- (MTRNetworkCommissioningFeature)networkCommissioningFeatures
+{
+    return [[self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures] unsignedIntValue];
+}
+
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
 // required methods for MTRDeviceDelegates
@@ -253,7 +258,8 @@ static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKey
 
 - (BOOL)_internalState:(NSDictionary *)dictionary hasValidValuesForKeys:(const NSArray<NSString *> *)keys valueRequired:(BOOL)required
 {
-    // All the keys are NSNumber-valued.
+    // At one point, all keys were NSNumber valued; now there are also NSDates.
+    // TODO:  Create a mapping between keys and their expected types and use that in the type check below.
     for (NSString * key in keys) {
         id value = dictionary[key];
         if (!value) {
@@ -264,7 +270,7 @@ static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKey
 
             continue;
         }
-        if (!MTR_SAFE_CAST(value, NSNumber)) {
+        if (!MTR_SAFE_CAST(value, NSNumber) && !MTR_SAFE_CAST(value, NSDate)) {
             MTR_LOG_ERROR("%@ device:internalStateUpdated: handed state with invalid value for \"%@\": %@", self, key, value);
             return NO;
         }
@@ -316,7 +322,20 @@ static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKey
 - (MTRDeviceState)state
 {
     NSNumber * stateNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
-    return stateNumber ? static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue) : MTRDeviceStateUnknown;
+    switch (static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue)) {
+    case MTRDeviceStateUnknown:
+        return MTRDeviceStateUnknown;
+
+    case MTRDeviceStateUnreachable:
+        return MTRDeviceStateUnreachable;
+
+    case MTRDeviceStateReachable:
+        return MTRDeviceStateReachable;
+    }
+
+    MTR_LOG_ERROR("stateNumber from internal state is an invalid value: %@", stateNumber);
+
+    return MTRDeviceStateUnknown;
 }
 
 - (BOOL)deviceCachePrimed

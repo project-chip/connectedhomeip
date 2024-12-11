@@ -55,7 +55,7 @@ struct ScopedNodeIdHasher
     }
 };
 
-class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
+class FabricAdmin final : public rpc::FabricAdmin, public admin::PairingDelegate, public IcdManager::Delegate
 {
 public:
     void OnCheckInCompleted(const app::ICDClientInfo & clientInfo) override
@@ -94,6 +94,33 @@ public:
         {
             ChipLogError(NotSpecified, "Failed to send StayActive command %s", err.AsString());
         }
+    }
+
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err) override
+    {
+        if (mNodeId != deviceId)
+        {
+            ChipLogError(NotSpecified,
+                         "Tried to pair a non-bridge device (0x:" ChipLogFormatX64 ") with result: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(deviceId), err.Format());
+            return;
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Reverse commission succeeded for NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+        }
+
+        if (err == CHIP_NO_ERROR)
+        {
+            DeviceManager::Instance().SetRemoteBridgeNodeId(deviceId);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Failed to pair bridge device (0x:" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(deviceId), err.Format());
+        }
+
+        mNodeId = kUndefinedNodeId;
     }
 
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceCommissioningWindowInfo & request,
@@ -146,13 +173,17 @@ public:
 
         if (error == CHIP_NO_ERROR)
         {
-            NodeId nodeId = DeviceManager::Instance().GetNextAvailableNodeId();
+            mNodeId = DeviceManager::Instance().GetNextAvailableNodeId();
 
             // After responding with RequestCommissioningApproval to the node where the client initiated the
             // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
             usleep(kCommissionPrepareTimeMs * 1000);
+            PairingManager::Instance().SetPairingDelegate(this);
 
-            DeviceManager::Instance().PairRemoteDevice(nodeId, code.c_str());
+            if (PairingManager::Instance().PairDeviceWithCode(mNodeId, code.c_str()) != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Failed to commission device " ChipLogFormatX64, ChipLogValueX64(mNodeId));
+            }
         }
         else
         {
@@ -223,6 +254,8 @@ private:
         data->mFabricAdmin->ScheduleSendingKeepActiveOnCheckIn(data->mScopedNodeId, data->mStayActiveDurationMs, data->mTimeoutMs);
         Platform::Delete(data);
     }
+
+    NodeId mNodeId = chip::kUndefinedNodeId;
 
     // Modifications to mPendingCheckIn should be done on the MatterEventLoop thread
     // otherwise we would need a mutex protecting this data to prevent race as this

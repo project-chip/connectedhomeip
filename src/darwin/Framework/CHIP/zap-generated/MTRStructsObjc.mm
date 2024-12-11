@@ -8867,7 +8867,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRZoneManagementClusterZoneTriggeringTimeControlStruct
+@implementation MTRZoneManagementClusterZoneTriggerControlStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -8879,25 +8879,28 @@ NS_ASSUME_NONNULL_BEGIN
         _maxDuration = @(0);
 
         _blindDuration = @(0);
+
+        _sensitivity = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRZoneManagementClusterZoneTriggeringTimeControlStruct alloc] init];
+    auto other = [[MTRZoneManagementClusterZoneTriggerControlStruct alloc] init];
 
     other.initialDuration = self.initialDuration;
     other.augmentationDuration = self.augmentationDuration;
     other.maxDuration = self.maxDuration;
     other.blindDuration = self.blindDuration;
+    other.sensitivity = self.sensitivity;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; >", NSStringFromClass([self class]), _initialDuration, _augmentationDuration, _maxDuration, _blindDuration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; sensitivity:%@; >", NSStringFromClass([self class]), _initialDuration, _augmentationDuration, _maxDuration, _blindDuration, _sensitivity];
     return descriptionString;
 }
 

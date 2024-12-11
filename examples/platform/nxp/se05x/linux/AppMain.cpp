@@ -24,6 +24,7 @@
 #include <app/server/Server.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -291,6 +292,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     static chip::CommonCaseDeviceServerInitParams initParams;
 
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();

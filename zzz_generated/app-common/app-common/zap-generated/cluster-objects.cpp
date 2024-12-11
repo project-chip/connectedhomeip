@@ -28541,7 +28541,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace ZoneInformationStruct
 
-namespace ZoneTriggeringTimeControlStruct {
+namespace ZoneTriggerControlStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -28549,6 +28549,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kAugmentationDuration), augmentationDuration);
     encoder.Encode(to_underlying(Fields::kMaxDuration), maxDuration);
     encoder.Encode(to_underlying(Fields::kBlindDuration), blindDuration);
+    encoder.Encode(to_underlying(Fields::kSensitivity), sensitivity);
     return encoder.Finalize();
 }
 
@@ -28582,6 +28583,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, blindDuration);
         }
+        else if (__context_tag == to_underlying(Fields::kSensitivity))
+        {
+            err = DataModel::Decode(reader, sensitivity);
+        }
         else
         {
         }
@@ -28590,7 +28595,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace ZoneTriggeringTimeControlStruct
+} // namespace ZoneTriggerControlStruct
 } // namespace Structs
 
 namespace Commands {
@@ -28814,8 +28819,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, supportedZoneSources);
     case Attributes::Zones::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, zones);
-    case Attributes::TimeControl::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, timeControl);
+    case Attributes::Triggers::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, triggers);
     case Attributes::Sensitivity::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, sensitivity);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
@@ -29744,7 +29749,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kImageCodec), imageCodec);
-    encoder.Encode(to_underlying(Fields::kFrameRate), frameRate);
+    encoder.Encode(to_underlying(Fields::kMaxFrameRate), maxFrameRate);
     encoder.Encode(to_underlying(Fields::kBitRate), bitRate);
     encoder.Encode(to_underlying(Fields::kMinResolution), minResolution);
     encoder.Encode(to_underlying(Fields::kMaxResolution), maxResolution);
@@ -29770,9 +29775,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, imageCodec);
         }
-        else if (__context_tag == to_underlying(Fields::kFrameRate))
+        else if (__context_tag == to_underlying(Fields::kMaxFrameRate))
         {
-            err = DataModel::Decode(reader, frameRate);
+            err = DataModel::Decode(reader, maxFrameRate);
         }
         else if (__context_tag == to_underlying(Fields::kBitRate))
         {
@@ -30018,10 +30023,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, currentFrameRate);
     case Attributes::HDRModeEnabled::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, HDRModeEnabled);
-    case Attributes::CurrentVideoCodecs::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentVideoCodecs);
-    case Attributes::CurrentSnapshotConfig::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentSnapshotConfig);
     case Attributes::FabricsUsingCamera::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, fabricsUsingCamera);
     case Attributes::AllocatedVideoStreams::TypeInfo::GetAttributeId():

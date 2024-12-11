@@ -219,7 +219,23 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic, readonly) os_unfair_lock timeSyncLock;
 
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
+
+// The highest event number we have observed, if there was one at all.
+@property (nonatomic, readwrite, nullable) NSNumber * highestObservedEventNumber;
+
+// receivingReport is true if we are receving a subscription report.  In
+// particular, this will be false if we're just getting an attribute value from
+// a read-through.
 @property (nonatomic) BOOL receivingReport;
+
+// receivingPrimingReport is true if this subscription report is part of us
+// establishing a new subscription to the device.  When this is true, it is
+// _not_ guaranteed that any particular set of attributes will be reported
+// (e.g. everything could be filtered out by our DataVersion filters).
+// Conversely, when this is false that tells us nothing about attributes _not_
+// being reported: a device could randomly decide to rev all data versions and
+// report all attributes at any point in time, for example due to performing
+// subscription resumption.
 @property (nonatomic) BOOL receivingPrimingReport;
 
 // TODO: instead of all the BOOL properties that are some facet of the state, move to internal state machine that has (at least):
@@ -390,6 +406,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
         _clusterDataToPersist = nil;
         _persistedClusters = [NSMutableSet set];
+        _highestObservedEventNumber = nil;
 
         // If there is a data store, make sure we have an observer to monitor system clock changes, so
         // NSDate-based write coalescing could be reset and not get into a bad state.
@@ -512,6 +529,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     std::lock_guard lock(_descriptionLock);
     return [_pid copy];
+}
+
+- (MTRNetworkCommissioningFeature)networkCommissioningFeatures
+{
+    std::lock_guard lock(_descriptionLock);
+    return [_allNetworkFeatures unsignedIntValue];
 }
 
 - (void)_notifyDelegateOfPrivateInternalPropertiesChanges
@@ -791,6 +814,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         if ([self _deviceUsesThread]) {
             MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
             mtr_weakify(self);
+            NSString * description = [NSString stringWithFormat:@"MTRDevice setDelegate first subscription / controller resume (%p)", self];
             [self _scheduleSubscriptionPoolWork:^{
                 mtr_strongify(self);
                 VerifyOrReturn(self);
@@ -798,8 +822,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 [self->_deviceController asyncDispatchToMatterQueue:^{
                     std::lock_guard lock(self->_lock);
                     [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
-                } errorHandler:nil];
-            } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
+                } errorHandler:^(NSError * _Nonnull error) {
+                    // If controller is not running, clear work item from the subscription queue
+                    MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
+                    std::lock_guard lock(self->_lock);
+                    [self _clearSubscriptionPoolWork];
+                }];
+            } inNanoseconds:0 description:description];
         } else {
             [_deviceController asyncDispatchToMatterQueue:^{
                 std::lock_guard lock(self->_lock);
@@ -826,6 +855,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // Make sure we don't try to resubscribe if we have a pending resubscribe
     // attempt, since we now have no delegate.
     _reattemptingSubscription = NO;
+
+    // Clear subscription pool work item if it's in progress, to avoid forever
+    // taking up a slot in the controller's work queue.
+    [self _clearSubscriptionPoolWork];
 
     [_deviceController asyncDispatchToMatterQueue:^{
         MTR_LOG("%@ invalidate disconnecting ReadClient and SubscriptionCallback", self);
@@ -1318,7 +1351,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (deviceUsesThread) {
         std::lock_guard lock(_lock);
         // For Thread-enabled devices, schedule the _triggerResubscribeWithReason call to run in the subscription pool
-        [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:@"ReadClient resubscription"];
+        NSString * description = [NSString stringWithFormat:@"ReadClient resubscription (%p)", self];
+        [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:description];
     } else {
         // For non-Thread-enabled devices, just call the resubscription block after the specified time
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, resubscriptionBlock);
@@ -1357,6 +1391,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     if (self.suspended) {
         MTR_LOG("%@ ignoring expected subscription reset on controller suspend", self);
+        [self _clearSubscriptionPoolWork];
         return;
     }
 
@@ -1374,6 +1409,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (![self _delegateExists]) {
         // NOTE: Do not log anything here: we have been invalidated, and the
         // Matter stack might already be torn down.
+        [self _clearSubscriptionPoolWork];
         return;
     }
 
@@ -1422,13 +1458,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             std::lock_guard lock(self->_lock);
             [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
         }
-                                               errorHandler:nil];
+            errorHandler:^(NSError * _Nonnull error) {
+                // If controller is not running, clear work item from the subscription queue
+                MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
+                std::lock_guard lock(self->_lock);
+                [self _clearSubscriptionPoolWork];
+            }];
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(secondsToWait * NSEC_PER_SEC);
     if ([self _deviceUsesThread]) {
         // For Thread-enabled devices, schedule the _reattemptSubscriptionNowIfNeededWithReason call to run in the subscription pool
-        [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:@"MTRDevice resubscription"];
+        NSString * description = [NSString stringWithFormat:@"MTRDevice resubscription (%p)", self];
+        [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:description];
     } else {
         // For non-Thread-enabled devices, just call the resubscription block after the specified time
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, resubscriptionBlock);
@@ -1948,11 +1990,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return;
     }
 
-    //    [_deviceController asyncDispatchToMatterQueue:^{ // TODO: This wasn't used previously, not sure why, so keeping it here for thought, but preserving existing behavior
+    [self _injectPossiblyInvalidEventReport:eventReport];
+}
+
+- (void)_injectPossiblyInvalidEventReport:(NSArray<MTRDeviceResponseValueDictionary> *)eventReport
+{
     dispatch_async(self.queue, ^{
         [self _handleEventReport:eventReport];
     });
-    //    } errorHandler: nil];
 }
 
 // END DRAGON: This is used by the XPC Server to inject attribute reports
@@ -1960,7 +2005,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #ifdef DEBUG
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
-    [self _injectEventReport:eventReport];
+    // Don't validate incoming event reports for unit tests, because we want to
+    // allow incoming event reports without an MTREventIsHistoricalKey.
+    [self _injectPossiblyInvalidEventReport:eventReport];
 }
 
 - (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
@@ -2096,11 +2143,33 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             }
         }
 
-        NSMutableDictionary * eventToReturn = eventDict.mutableCopy;
-        if (_receivingPrimingReport) {
-            eventToReturn[MTREventIsHistoricalKey] = @(YES);
+        auto * eventNumber = MTR_SAFE_CAST(eventDict[MTREventNumberKey], NSNumber);
+        if (!eventNumber) {
+            MTR_LOG_ERROR("%@ Event %@ missing event number", self, eventDict);
+            continue;
+        }
+
+        if (!self.highestObservedEventNumber ||
+            [self.highestObservedEventNumber compare:eventNumber] == NSOrderedAscending) {
+            // This is an event we have not seen before.
+            self.highestObservedEventNumber = eventNumber;
         } else {
-            eventToReturn[MTREventIsHistoricalKey] = @(NO);
+            // We have seen this event already; just filter it out.  But also, we must be getting
+            // some sort of priming report if we are getting events we have seen before.
+            if (_receivingReport) {
+                _receivingPrimingReport = YES;
+            }
+            continue;
+        }
+
+        NSMutableDictionary * eventToReturn = eventDict.mutableCopy;
+        // If MTREventIsHistoricalKey is already present, do not mess with the value.
+        if (eventToReturn[MTREventIsHistoricalKey] == nil) {
+            if (_receivingPrimingReport) {
+                eventToReturn[MTREventIsHistoricalKey] = @(YES);
+            } else {
+                eventToReturn[MTREventIsHistoricalKey] = @(NO);
+            }
         }
 
         [reportToReturn addObject:eventToReturn];
@@ -2406,6 +2475,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     if (![self _subscriptionsAllowed]) {
         MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription (reason: %@)", self, reason);
+        [self _clearSubscriptionPoolWork];
         return;
     }
 
@@ -2425,6 +2495,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // for now just subscribe once
     if (!NeedToStartSubscriptionSetup(_internalDeviceState)) {
         MTR_LOG("%@ setupSubscription: no need to subscribe due to internal state %lu (reason: %@)", self, static_cast<unsigned long>(_internalDeviceState), reason);
+        [self _clearSubscriptionPoolWork];
         return;
     }
 
@@ -2552,8 +2623,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            // Set up a cluster state cache.  We just want this for the logic it has for
                            // tracking data versions and event numbers so we minimize the amount of data we
                            // request on resubscribes, so tell it not to store data.
+                           Optional<EventNumber> highestObservedEventNumber;
+                           {
+                               std::lock_guard lock(self->_lock);
+                               if (self.highestObservedEventNumber) {
+                                   highestObservedEventNumber = MakeOptional(self.highestObservedEventNumber.unsignedLongLongValue);
+                               }
+                           }
                            auto clusterStateCache = std::make_unique<ClusterStateCache>(*callback.get(),
-                               /* highestReceivedEventNumber = */ NullOptional,
+                               highestObservedEventNumber,
                                /* cacheData = */ false);
                            auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
                                clusterStateCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
@@ -2602,6 +2680,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            readParams.mpDataVersionFilterList = dataVersionFilterList;
                            attributePath.release();
                            eventPath.release();
+
+                           // NOTE: We don't set the event number field in readParams, and just let
+                           // the ReadClient get the min event number information from the cluster
+                           // state cache.
 
                            // TODO: Change from local filter list generation to rehydrating ClusterStateCache to take advantage of existing filter list sorting algorithm
 
@@ -3581,11 +3663,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             continue;
         }
 
-        // Additional signal to help mark events as being received during priming report in the event the device rebooted and we get a subscription resumption priming report without noticing it became unreachable first
-        if (_receivingReport && AttributeHasChangesOmittedQuality(attributePath)) {
-            _receivingPrimingReport = YES;
-        }
-
         // check if value is different than cache, and report if needed
         BOOL shouldReportAttribute = NO;
 
@@ -3743,7 +3820,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)setPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData
 {
+    [self _doSetPersistedClusterData:clusterData];
+
+    // Log after we do the state update, so the log includes the data we just set.
     MTR_LOG("%@ setPersistedClusterData count: %lu", self, static_cast<unsigned long>(clusterData.count));
+}
+
+- (void)_doSetPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData
+{
     if (!clusterData.count) {
         return;
     }

@@ -232,6 +232,10 @@
 
     <string name="unpair_device_btn_text">Unpair</string>
 
+    <string name="diagnostic_log_btn_text">Get Diagnostic Log</string>
+    <string name="diagnostic_log_type_title_text">Log Type</string>
+    <string name="diagnostic_log_timeout_title_text">Timeout(Sec)</string>
+
     <string name="group_setting_btn_text">Group Setting</string>
     <string name="group_setting_group_text">Group :</string>
     <string name="group_setting_key_text">Key :</string>
@@ -275,6 +279,8 @@
     <string name="ota_provider_read_attribute_btn_text">Read</string>
     <string name="ota_provider_write_attribute_btn_text">Write</string>
     <string name="ota_provider_vendorId_text">Vendor ID</string>
+    <string name="ota_provider_softwareVersion_text">SW Version</string>
+    <string name="ota_provider_softwareVersion_default_text">1</string>
     <string name="ota_provider_select_firmware_file_text">Select Firmware</string>
     <string name="ota_provider_update_ota_status_text">Update OTA Status</string>
     <string name="ota_provider_start_firmware_update_text">Start Firmware Update</string>

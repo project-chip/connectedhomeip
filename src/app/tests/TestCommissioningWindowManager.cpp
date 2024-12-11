@@ -21,6 +21,7 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <crypto/RandUtils.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/Span.h>
 #include <messaging/tests/echo/common.h>
@@ -113,6 +114,7 @@ public:
         static chip::SimpleTestEventTriggerDelegate sSimpleTestEventTriggerDelegate;
         initParams.testEventTriggerDelegate = &sSimpleTestEventTriggerDelegate;
         (void) initParams.InitializeStaticResourcesBeforeServerInit();
+        initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
         // Use whatever server port the kernel decides to give us.
         initParams.operationalServicePort = 0;
 
