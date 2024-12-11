@@ -265,11 +265,17 @@ private:
 // clang-format off
 const MockNodeConfig gTestNodeConfig({
     MockEndpointConfig(kMockEndpoint1, {
-        MockClusterConfig(MockClusterId(1), {
-            ClusterRevision::Id, FeatureMap::Id,
-        }, {
+        MockClusterConfig(
+            MockClusterId(1), 
+            {
+                ClusterRevision::Id, FeatureMap::Id,
+            },  /* attributes */
+            {
             MockEventId(1), MockEventId(2),
-        }),
+            }, /* events */
+            {100, 1234, 999, 2000, 3000}, /* acceptedCommands */
+            {33, 44, 55, 66}      /* generatedCommands */
+        ),
         MockClusterConfig(MockClusterId(2), {
             ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
         }),

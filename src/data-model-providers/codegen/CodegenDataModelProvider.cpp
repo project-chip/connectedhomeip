@@ -814,7 +814,7 @@ ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const Concre
     for (unsigned i = 0; cluster->generatedCommandList[i] != kInvalidCommandId; i++)
     {
         const ConcreteCommandPath commandPath(path.mEndpointId, path.mClusterId, cluster->generatedCommandList[i]);
-        if ((commandHandler == nullptr) || commandHandler->AcceptsCommandId(commandPath))
+        if ((commandHandler == nullptr) || commandHandler->GeneratesCommandId(commandPath))
         {
             mGeneratedCommandHint = i;
             return commandPath;
@@ -848,7 +848,7 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
     for (unsigned i = beforeIdx + 1; cluster->generatedCommandList[i] != kInvalidCommandId; i++)
     {
         const ConcreteCommandPath commandPath(before.mEndpointId, before.mClusterId, cluster->generatedCommandList[i]);
-        if ((commandHandler == nullptr) || commandHandler->AcceptsCommandId(commandPath))
+        if ((commandHandler == nullptr) || commandHandler->GeneratesCommandId(commandPath))
         {
             mAcceptedCommandHint = i;
             return commandPath;
