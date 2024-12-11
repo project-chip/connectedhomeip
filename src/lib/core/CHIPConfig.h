@@ -1846,11 +1846,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
 /**
- * @file
- * Configuration settings for Terms and Conditions (TC) acknowledgements during device commissioning.
- */
-
-/**
  * @def CHIP_CONFIG_TC_REQUIRED
  *
  * @brief Indicates whether terms and conditions are required during commissioning.
