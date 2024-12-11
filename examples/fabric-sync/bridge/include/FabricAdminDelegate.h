@@ -61,6 +61,19 @@ public:
     virtual CHIP_ERROR CommissionRemoteBridge(chip::Controller::CommissioningWindowPasscodeParams params, chip::VendorId vendorId,
                                               uint16_t productId) = 0;
 
+    /**
+     * Sends a request to keep a device active for a specified duration.
+     *
+     * @param ScopedNodeId          Identifies the target node within the fabric.
+     * @param StayActiveDurationMs  The duration for which the device should stay active.
+     * @param TimeoutMs             Timeout for the operation.
+     *
+     * @return CHIP_ERROR An error code indicating the success or failure of the
+     * operation.
+     * - CHIP_NO_ERROR: Request processed successfully.
+     * - CHIP_ERROR_INTERNAL: An internal error occurred during the preparation or sending
+     * of the command.
+     */
     virtual CHIP_ERROR KeepActive(chip::ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs) = 0;
 };
 

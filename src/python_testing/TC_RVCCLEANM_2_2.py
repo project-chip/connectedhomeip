@@ -105,7 +105,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_RVCCLEANM_2_2(self):
         self.directmodech_bit_mask = Clusters.RvcCleanMode.Bitmaps.Feature.kDirectModeChange
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         if self.is_ci:
             app_pid = self.matter_test_config.app_pid

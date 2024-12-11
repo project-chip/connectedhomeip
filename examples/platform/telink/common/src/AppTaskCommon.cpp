@@ -38,6 +38,7 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #if CONFIG_BOOTLOADER_MCUBOOT
 #include <OTAUtil.h>
@@ -301,6 +302,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.appDelegate              = &sCallbacks;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));

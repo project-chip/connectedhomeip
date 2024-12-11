@@ -33,6 +33,7 @@
 #include <app/EventLogging.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
@@ -309,6 +310,7 @@ int AppTask::Init()
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     chip::Server::GetInstance().Init(initParams);
 

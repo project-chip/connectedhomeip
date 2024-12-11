@@ -20,6 +20,7 @@
 #include "AppEvent.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 
 #include <DeviceInfoProviderImpl.h>
@@ -298,6 +299,7 @@ void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     auto & infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
     infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);

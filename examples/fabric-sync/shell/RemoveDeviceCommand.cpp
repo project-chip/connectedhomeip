@@ -47,6 +47,7 @@ void RemoveDeviceCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
                      ChipLogValueX64(deviceId), err.Format());
     }
 
+    admin::PairingManager::Instance().ResetForNextCommand();
     CommandRegistry::Instance().ResetActiveCommand();
 }
 
@@ -61,9 +62,9 @@ CHIP_ERROR RemoveDeviceCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    ChipLogProgress(NotSpecified, "Running RemoveDeviceCommand with Node ID: %lu", mNodeId);
+    ChipLogProgress(NotSpecified, "Running RemoveDeviceCommand with Node ID: " ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
-    return admin::DeviceManager::Instance().UnpairRemoteDevice(mNodeId);
+    return admin::PairingManager::Instance().UnpairDevice(mNodeId);
 }
 
 } // namespace commands

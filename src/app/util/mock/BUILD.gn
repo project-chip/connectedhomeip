@@ -14,7 +14,7 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/app/codegen-data-model-provider/model.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 
 config("mock_include") {
   include_dirs = [ "include" ]
@@ -56,4 +56,5 @@ source_set("mock_codegen_data_model") {
 
   public_configs = [ ":mock_include" ]
   public_deps += [ ":mock_ember" ]
+  deps = [ "${chip_root}/src/app/util/persistence:persistence" ]
 }

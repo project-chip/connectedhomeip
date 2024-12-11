@@ -71,6 +71,7 @@ void AddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
                      ChipLogValueX64(deviceId), err.Format());
     }
 
+    admin::PairingManager::Instance().ResetForNextCommand();
     CommandRegistry::Instance().ResetActiveCommand();
 }
 
@@ -85,10 +86,11 @@ CHIP_ERROR AddBridgeCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    ChipLogProgress(NotSpecified, "Running AddBridgeCommand with Node ID: %lu, PIN Code: %u, Address: %s, Port: %u", mBridgeNodeId,
-                    mSetupPINCode, mRemoteAddr, mRemotePort);
+    ChipLogProgress(NotSpecified,
+                    "Running AddBridgeCommand with Node ID: " ChipLogFormatX64 ", PIN Code: %u, Address: %s, Port: %u",
+                    ChipLogValueX64(mBridgeNodeId), mSetupPINCode, mRemoteAddr, mRemotePort);
 
-    return admin::DeviceManager::Instance().PairRemoteFabricBridge(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
+    return admin::PairingManager::Instance().PairDevice(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
 }
 
 } // namespace commands

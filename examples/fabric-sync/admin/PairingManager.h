@@ -106,10 +106,11 @@ public:
      *
      * @param nodeId The target node ID for pairing.
      * @param payload The setup code payload, which typically contains device-specific pairing information.
+     * @param icdRegistration The boolean value to set for mICDRegistration.*
      *
      * @return CHIP_NO_ERROR on successful initiation of the pairing process, or an appropriate CHIP_ERROR if pairing fails.
      */
-    CHIP_ERROR PairDeviceWithCode(chip::NodeId nodeId, const char * payload);
+    CHIP_ERROR PairDeviceWithCode(chip::NodeId nodeId, const char * payload, bool icdRegistration = false);
 
     /**
      * Pairs a device using its setup PIN code and remote IP address.
@@ -132,6 +133,12 @@ public:
      */
     CHIP_ERROR UnpairDevice(chip::NodeId nodeId);
 
+    /**
+     * Resets the PairingManager's internal state to a baseline, making it ready to handle a new command.
+     * This method clears all internal states and resets all members to their initial values.
+     */
+    void ResetForNextCommand();
+
 private:
     // Constructors
     PairingManager();
@@ -149,6 +156,8 @@ private:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
+    void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
+    void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
@@ -176,10 +185,19 @@ private:
     chip::ByteSpan mSalt;
     uint16_t mDiscriminator = 0;
     uint32_t mSetupPINCode  = 0;
+    bool mDeviceIsICD       = false;
+    uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
     uint8_t mVerifierBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
     uint8_t mSaltBuffer[chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length];
     char mRemoteIpAddr[chip::Inet::IPAddress::kMaxStringLength];
     char mOnboardingPayload[kMaxManualCodeLength + 1];
+
+    chip::Optional<bool> mICDRegistration;
+    chip::Optional<chip::NodeId> mICDCheckInNodeId;
+    chip::Optional<chip::app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
+    chip::Optional<chip::ByteSpan> mICDSymmetricKey;
+    chip::Optional<uint64_t> mICDMonitoredSubject;
+    chip::Optional<uint32_t> mICDStayActiveDurationMsec;
 
     /**
      * Holds the unique_ptr to the current CommissioningWindowOpener.

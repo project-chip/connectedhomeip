@@ -21,6 +21,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <platform/Beken/NetworkCommissioningDriver.h>
 
 using namespace chip;
@@ -38,6 +39,7 @@ void BekenAppServer::Init(AppDelegate * sAppDelegate)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     if (sAppDelegate != nullptr)
     {
         initParams.appDelegate = sAppDelegate;

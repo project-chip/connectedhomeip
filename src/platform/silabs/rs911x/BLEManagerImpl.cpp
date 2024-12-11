@@ -699,9 +699,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     mFlags.Clear(Flags::kRestartAdvertising);
 
-    sl_wfx_mac_address_t macaddr;
-    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
-
     status = sInstance.SendBLEAdvertisementCommand();
 
     if (status == RSI_SUCCESS)

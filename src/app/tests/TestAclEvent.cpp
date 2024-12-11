@@ -30,6 +30,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -217,6 +218,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
 
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
 
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     // A custom AccessControl::Delegate has been installed that grants privilege to any cluster except the test cluster.

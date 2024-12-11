@@ -103,8 +103,6 @@ Here is the interpretation of the **required** parameters:
 --hw_version       -> Hardware Version as number
 --hw_version_str   -> Hardware Version as string
 --cert_declaration -> path to the Certification Declaration (der format) location
---dac_cert         -> path to the DAC (der format) location
---dac_key          -> path to the DAC key (der format) location
 --pai_cert         -> path to the PAI (der format) location
 --spake2p_path     -> path to the spake2p tool
 --out              -> name of the binary that will be used for storing all the generated data
@@ -113,6 +111,11 @@ Here is the interpretation of the **required** parameters:
 Here is the interpretation of the **optional** parameters:
 
 ```shell
+--dac_cert              -> path to the DAC certificate (der format) location
+--dac_key               -> path to the DAC key (der format) location
+--EL2GO_bin             -> path to the EdgeLock 2Go binary (bin format) location
+--EL2GO_DAC_KEY_ID      -> DAC key ID configured into EdgeLock 2Go as hex value
+--EL2GO_DAC_CERT_ID     -> DAC certificate ID configured into EdgeLock 2Go as hex value
 --dac_key_password      -> Password to decode DAC key
 --dac_key_use_sss_blob  -> Used when --dac_key contains a path to an encrypted blob, instead of the
                            actual DAC private key. The blob metadata size is 24, so the total length
@@ -182,17 +185,56 @@ Also, demo **DAC**, **PAI** and **PAA** certificates needed in case
 
 ## 6. Increased security for DAC private key
 
-### 6.1 SSS-based platforms
+### 6.1 SSS-based with EdgeLock2go support
+
+EdgeLock2go services could be used to securely provisioned DAC key/cert during
+manufacturing.
+
+Prior to the generation of the factory data binary. `EL2GO` data needs to be
+generated following `EL2GO` process.
+
+For the factory data generation following option need to be added:
+
+`--EL2GO_bin ~/secure_objects.bin` containing `EL2GO` information including
+encrypted DAC private key and certificate. `--EL2GO_DAC_KEY_ID 1234` containing
+corresponding to the ID of the DAC key chosen during `EL2GO` key generation.
+`--EL2GO_DAC_CERT_ID 4321` containing corresponding to the ID of the DAC
+certification chosen during `EL2GO` key generation.
+
+Reference factory data generation command:
+
+```shell
+python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p ${passcode} -d ${discriminator} --vid "0x$VID" --pid "0x$PID" --vendor_name "NXP Semiconductors" --product_name "Thermostat" --serial_num "12345678" --date "$DATE" --hw_version 1 --hw_version_str "1.0" --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --EL2GO_bin ~/secure_objects.bin --EL2GO_DAC_KEY_ID 1234 --EL2GO_DAC_CERT_ID 4321 --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der --spake2p_path ./out/spake2p --unique_id "00112233445566778899aabbccddeeff" --out $FACTORY_DATA_DEST/factory_data.bin
+```
+
+Supported platforms:
+
+-   `rw61x`
+
+In addition to the GN flag `nxp_use_factory_data=true`, a Matter application
+needs to be built with `nxp_enable_secure_EL2GO_factory_data=true` to allow
+loading of EdgeLock2go data to the secure element.
+
+In this mode EdgeLock2go keys will always remain encrypted and only usable by
+the `SSS`. In this case, all operations that requires DAC private access will be
+transferred to the `SSS`.
+
+### 6.2 SSS-based without EdgeLock2go support for DAC private key secure storage
 
 Supported platforms:
 
 -   `k32w1`
 -   `mcxw71`
+-   `rw61x`
 
 For platforms that have a secure subsystem (`SSS`), the DAC private key can be
 converted to an encrypted blob. This blob will overwrite the DAC private key in
-factory data and will be imported in the `SSS` at initialization, by the factory
-data provider instance.
+factory data and will be imported in the `SSS` by the factory data provider
+instance.
+
+In this architecture, outside of the manufacturing flow, the DAC private will
+always remain usable only by the `SSS`. In this case, all operations that
+requires DAC private access will be transferred to the `SSS`.
 
 The application will check at initialization whether the DAC private key has
 been converted or not and convert it if needed. However, the conversion process
@@ -226,64 +268,5 @@ Please note that `--dac_key` now points to a binary file that contains the
 encrypted blob.
 
 The user can use the DAC private in plain text instead of using the `SSS` by
-adding the following gn argument `chip_use_plain_dac_key=true`.
-
-### 6.2 RW61X
-
-Supported platforms:
-
--   RW61X
-
-there are three implementations for factory data protection
-
--   whole factory data protection with AES encryption (
-    nxp_use_factory_data=true nxp_enable_secure_whole_factory_data=true )
-    `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp`\
-    `src/platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.cpp`
-
--   only dac private key protection ( nxp_use_factory_data=true
-    nxp_enable_secure_dac_private_key_storage=true )
-    `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp`
-    \
-    `src/platform/nxp/rt/rw61x/FactoryDataProviderImpl.cpp`
-
--   whole factory data protection with hard-coded AES key (
-    nxp_use_factory_data=true )
-    `examples/platform/nxp/common/factory_data/source/AppFactoryDataDefaultImpl.cpp`
-    \
-    `src/platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.cpp`
-
-for the first one, the whole factory data is encrypted by an AES-256 key, the
-AES key can be passed through serial link when in factory production mode, and
-will be provisioned into Edge Lock, and the returned AES Key blob (wrapped key)
-can be stored in the end of factory data region in TLV format. for the
-decryption process, the blob is retrieved and provisioned into Edge Lock and the
-whole factory data can be decrypted using the returned key index in Edge Lock.
-Compared with only dac private key protection solution, this solution can avoid
-tampering with the original factory data.
-
-the factory data should be encrypted by an AES-256 key using "--aes256_key"
-option in "generate.py" script file.
-
-it will check whether there is AES key blob in factory data region when in each
-initialization, if not, the default AES key is converted and the result is
-stored into flash, it run only once.
-
-for the second one, it only protect the dac private key inside the factory data,
-the dac private key is retrieved and provisioned into Edge Lock, the returned
-key blob replace the previous dac private key, and also update the overall size
-and hash, and re-write the factory data. when device is doing matter
-commissioning, the blob is retrieved and provisioned into Edge Lock and the
-signing can be done using the returned key index in Edge Lock.
-
-the factory data should be plain text for the first programming. it will check
-whether there is dac private key blob (base on the size of blob, should be 48)
-in factory data when in each initialization, if not, the dac private key is
-converted and the result is stored into flash, it run only once.
-
-for the third one, it is a little similar to the first one, the whole factory
-data is encrypted by an AES key, but there are two differences:
-
--   the AES key is hard-coded and not provisioned into Edge Lock
--   the factory data should be encrypted by AES-128 key using "--aes128_key"
-    option in "generate.py" script file.
+adding the following gn argument `chip_use_plain_dac_key=true` (not supported on
+rw61x).

@@ -1588,6 +1588,22 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqualObjects([NSSet setWithArray:variousThings],
         [[NSSet setWithArray:clusterRevisions] setByAddingObjectsFromSet:[NSSet setWithArray:basicInformationAllRootAttributes]]);
 
+    // Quick test for descriptorClusters
+    __auto_type * descriptorPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:nil];
+    __auto_type * descriptorRead = [device descriptorClusters];
+    __auto_type * descriptorWildcardRead = [device readAttributePaths:@[ descriptorPath ]];
+    XCTAssertEqual(descriptorRead.count, descriptorWildcardRead.count);
+    for (MTRAttributePath * path in descriptorRead) {
+        __auto_type * expectedObj = @{
+            MTRAttributePathKey : path,
+            MTRDataKey : descriptorRead[path],
+        };
+        XCTAssertTrue([descriptorWildcardRead containsObject:expectedObj]);
+    }
+    for (NSDictionary * item in descriptorWildcardRead) {
+        XCTAssertEqualObjects(descriptorRead[item[MTRAttributePathKey]], item[MTRDataKey]);
+    }
+
     // Some quick tests for waitForAttributeValues.  First, values that we know
     // are already there:
     XCTestExpectation * deviceTypesWaitExpectation = [self expectationWithDescription:@"deviceTypes is already the value we expect"];
