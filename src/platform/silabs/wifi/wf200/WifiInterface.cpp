@@ -319,12 +319,12 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
     }
     else
     {
-        scan_ssid_length = ssid.size();
-        scan_ssid        = reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(scan_ssid_length));
+        scan_ssid = reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(scan_ssid_length));
         VerifyOrReturnError(scan_ssid != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        chip::MutableByteSpan scannedSsidSpan(scan_ssid, scan_ssid_length);
+        chip::MutableByteSpan scannedSsidSpan(scan_ssid, WFX_MAX_SSID_LENGTH);
         chip::CopySpanToMutableSpan(ssid, scannedSsidSpan);
+        scan_ssid_length = scannedSsidSpan.size();
     }
     scan_cb = callback;
 
@@ -488,9 +488,9 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
     scan_save = ap;
 
     // Copy scanned SSID to the output buffer
-    ap->scan.ssid_length = scan_result->ssid_def.ssid_length;
-    chip::MutableByteSpan outputSsid(ap->scan.ssid, ap->scan.ssid_length);
+    chip::MutableByteSpan outputSsid(ap->scan.ssid, WFX_MAX_SSID_LENGTH);
     chip::CopySpanToMutableSpan(scannedSsid, outputSsid);
+    ap->scan.ssid_length = outputSsid.size();
 
     // Set Network Security - We start by WPA3 to set the most secure type
     ap->scan.security = WFX_SEC_UNSPECIFIED;
@@ -804,11 +804,12 @@ static void wfx_events_task(void * p_arg)
 
             if (scan_ssid)
             {
-                ssid.ssid_length = scan_ssid_length;
 
-                chip::ByteSpan ssidSpan(scan_ssid, scan_ssid_length);
-                chip::MutableByteSpan ssidMutableSpan(ssid.ssid, ssid.ssid_length);
-                chip::CopySpanToMutableSpan(ssidSpan, ssidMutableSpan);
+                chip::ByteSpan requestedSsid(scan_ssid, scan_ssid_length);
+                chip::MutableByteSpan outputSsid(ssid.ssid, WFX_MAX_SSID_LENGTH);
+
+                chip::CopySpanToMutableSpan(requestedSsid, outputSsid);
+                ssid.ssid_length = outputSsid.size();
 
                 nbreScannedNetworks = 1;
                 ssidPtr             = &ssid;

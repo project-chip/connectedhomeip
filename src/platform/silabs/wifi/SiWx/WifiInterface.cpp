@@ -219,11 +219,10 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
         size_t scannedSsidLenght = strnlen(reinterpret_cast<char *>(result->scan_info[i].ssid), WFX_MAX_SSID_LENGTH);
         chip::ByteSpan scannedSsidSpan(result->scan_info[i].ssid, scannedSsidLenght);
 
-        currentScanResult.ssid_length = scannedSsidLenght;
-        chip::MutableByteSpan currentScanSsid(currentScanResult.ssid, currentScanResult.ssid_length);
-
         // Copy the scanned SSID to the current scan ssid buffer that will be forwarded to the callback
+        chip::MutableByteSpan currentScanSsid(currentScanResult.ssid, WFX_MAX_SSID_LENGTH);
         chip::CopySpanToMutableSpan(scannedSsidSpan, currentScanSsid);
+        currentScanResult.ssid_length = currentScanSsid.size();
 
         chip::ByteSpan inBssid(result->scan_info[i].bssid, kWifiMacAddressLength);
         chip::MutableByteSpan outBssid(currentScanResult.bssid, kWifiMacAddressLength);
@@ -542,19 +541,20 @@ sl_status_t sl_matter_wifi_platform_init(void)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
-    int32_t rssi    = 0;
-    ap->ssid_length = wfx_rsi.sec.ssid_length;
-    ap->security    = wfx_rsi.sec.security;
-    ap->chan        = wfx_rsi.ap_chan;
+    ap->security = wfx_rsi.sec.security;
+    ap->chan     = wfx_rsi.ap_chan;
 
-    chip::MutableByteSpan output(ap->ssid, ap->ssid_length);
+    chip::MutableByteSpan output(ap->ssid, WFX_MAX_SSID_LENGTH);
     // Cast is a workaround until the wfx_rsi structure is refactored
     chip::ByteSpan ssid(reinterpret_cast<uint8_t *>(wfx_rsi.sec.ssid), wfx_rsi.sec.ssid_length);
     chip::CopySpanToMutableSpan(ssid, output);
+    ap->ssid_length = output.size();
 
-    memcpy(&ap->bssid[0], wfx_rsi.ap_mac.data(), kWifiMacAddressLength);
-    sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &rssi);
-    ap->rssi = rssi;
+    chip::ByteSpan apMacSpan(wfx_rsi.ap_mac.data(), wfx_rsi.ap_mac.size());
+    chip::MutableByteSpan bssidSpan(ap->bssid, kWifiMacAddressLength);
+    chip::CopySpanToMutableSpan(apMacSpan, bssidSpan);
+
+    sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &(ap->rssi));
 
     return SL_STATUS_OK;
 }
