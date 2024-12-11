@@ -956,6 +956,100 @@ class TestInfo:
     pics: list[str]
 
 
+class PIXITType(Enum):
+    INT = "int"    # Maps to the command line flag --int-arg, below fields will be mapped to the corresponding flag
+    BOOL = "bool"
+    FLOAT = "float"
+    STRING = "string"
+    JSON = "json"
+    HEX = "hex"
+
+    @property
+    def arg_flag(self) -> str:
+        """Maps PIXIT type to command line flag"""
+        return f"--{self.value}-arg"
+
+
+@dataclass
+class PIXITDefinition:
+    name: str
+    pixit_type: PIXITType
+    description: str
+    required: bool = True
+    default: Any = None
+
+    @staticmethod
+    def is_pixit(arg_name: str) -> bool:
+        """Only validate args starting with PIXIT."""
+        return arg_name.startswith("PIXIT.")
+
+    def validate_value(self, value: Any) -> bool:
+        """Validate PIXIT value matches its declared type"""
+        if not self.is_pixit(self.name):
+            return True  # Skip validation for non-PIXIT args
+
+        if value is None:
+            return not self.required
+
+        # Mapping of PIXITType to validation function
+        type_validators = {
+            PIXITType.INT: self.validate_int,
+            PIXITType.BOOL: self.validate_bool,
+            PIXITType.FLOAT: self.validate_float,
+            PIXITType.STRING: self.validate_string,
+            PIXITType.JSON: self.validate_json,
+            PIXITType.HEX: self.validate_hex,
+        }
+
+        validator = type_validators.get(self.pixit_type)
+        if validator:
+            try:
+                return validator(value)
+            except (ValueError, TypeError, json.JSONDecodeError):
+                return False
+        else:
+            # Unknown type, consider validation failed
+            return False
+
+    def validate_int(self, value: Any) -> bool:
+        int(value)
+        return True
+
+    def validate_bool(self, value: Any) -> bool:
+        # Handle various boolean representations
+        if isinstance(value, str):
+            value_lower = value.lower()
+            if value_lower not in ('true', 'false', '1', '0', 'yes', 'no'):
+                return False
+        else:
+            bool(value)
+        return True
+
+    def validate_float(self, value: Any) -> bool:
+        float(value)
+        return True
+
+    def validate_string(self, value: Any) -> bool:
+        str(value)
+        return True
+
+    def validate_json(self, value: Any) -> bool:
+        if isinstance(value, str):
+            json.loads(value)
+        elif not isinstance(value, (dict, list)):
+            return False
+        return True
+
+    def validate_hex(self, value: Any) -> bool:
+        if not isinstance(value, str):
+            return False
+        hex_str = value.lower().replace("0x", "")
+        int(hex_str, 16)
+        if len(hex_str) % 2 != 0:
+            return False
+        return True
+
+
 class MatterBaseTest(base_test.BaseTestClass):
     def __init__(self, *args):
         super().__init__(*args)
