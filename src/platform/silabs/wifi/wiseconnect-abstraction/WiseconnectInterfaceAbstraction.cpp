@@ -58,8 +58,6 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
     // SSID Max Length that is supported by the Wi-Fi SDK is 32
     VerifyOrReturnError(ssid.size() <= WFX_MAX_SSID_LENGTH, CHIP_ERROR_INVALID_STRING_LENGTH);
 
-    wfx_rsi.scan_cb = callback;
-
     if (ssid.empty()) // Scan all networks
     {
         wfx_rsi.scan_ssid_length = 0;
@@ -74,6 +72,7 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
         chip::MutableByteSpan scanSsidSpan(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length);
         chip::CopySpanToMutableSpan(ssid, scanSsidSpan);
     }
+    wfx_rsi.scan_cb = callback;
 
     // TODO: We should be calling the start function directly instead of doing it asynchronously
     WifiPlatformEvent event = WifiPlatformEvent::kScan;

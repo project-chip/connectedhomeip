@@ -755,12 +755,11 @@ void ProcessEvent(WifiPlatformEvent event)
                                                                                   .enable_instant_scan = kAdvEnableInstantbgScan };
 
             status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
-            if (SL_STATUS_OK != status)
-            {
-                // TODO: Seems like Chipdie should be called here, the device should be initialized here
-                ChipLogError(DeviceLayer, "sl_wifi_set_advanced_scan_configuration failed: 0x%lx", static_cast<uint32_t>(status));
-                return;
-            }
+
+            // TODO: Seems like Chipdie should be called here, the device should be initialized here
+            VerifyOrReturn(
+                status == SL_STATUS_OK,
+                ChipLogError(DeviceLayer, "sl_wifi_set_advanced_scan_configuration failed: 0x%lx", static_cast<uint32_t>(status)));
 
             sl_wifi_set_scan_callback(BackgroundScanCallback, nullptr);
             wfx_rsi.dev_state.Set(WifiState::kScanStarted);
@@ -771,9 +770,12 @@ void ProcessEvent(WifiPlatformEvent event)
 
             if (wfx_rsi.scan_ssid != nullptr)
             {
-                ssid.length = wfx_rsi.scan_ssid_length;
-                memcpy(ssid.value, wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length);
-                ssidPtr = &ssid;
+                chip::ByteSpan requestedSsid(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length);
+                chip::MutableByteSpan ouputSsid(ssid.value, sizeof(ssid.value));
+                chip::CopySpanToMutableSpan(requestedSsid, ouputSsid);
+
+                ssid.length = ouputSsid.size();
+                ssidPtr     = &ssid;
             }
 
             osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
@@ -867,7 +869,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[0] = (ip) & 0xFF;
     wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
     wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
