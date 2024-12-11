@@ -140,10 +140,13 @@ public:
     // rather than depending on the code-generated one with undefined modifications.
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override
     {
-        ReturnErrorOnFailure(DataModel::Provider::Startup(context));
-
+        ReturnErrorOnFailure(CodegenDataModelProvider::Startup(context));
         return CHIP_NO_ERROR;
     }
+
+protected:
+    // Override InitDataModel to do nothing.
+    void InitDataModel() override {}
 };
 
 class TestServerCommandDispatch : public chip::Test::AppContext

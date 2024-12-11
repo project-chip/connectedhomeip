@@ -187,6 +187,9 @@ public:
 
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
+protected:
+    virtual void InitDataModel();
+
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned

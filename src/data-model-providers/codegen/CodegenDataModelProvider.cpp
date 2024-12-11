@@ -438,8 +438,7 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
         }
     }
 
-    // Call the Ember-specific InitDataModelHandler
-    InitDataModelHandler();
+    InitDataModel();
 
     return CHIP_NO_ERROR;
 }
@@ -881,6 +880,12 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
 
     VerifyOrReturnValue(commandId != kInvalidCommandId, kInvalidCommandPath);
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, commandId);
+}
+
+void CodegenDataModelProvider::InitDataModel()
+{
+    // Call the Ember-specific InitDataModelHandler
+    InitDataModelHandler();
 }
 
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
