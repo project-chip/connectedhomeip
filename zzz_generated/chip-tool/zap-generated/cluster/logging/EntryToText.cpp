@@ -299,8 +299,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Identify::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Identify::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Identify::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Identify::Attributes::FeatureMap::Id:
@@ -320,8 +318,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Groups::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Groups::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Groups::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Groups::Attributes::FeatureMap::Id:
@@ -349,8 +345,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::OnOff::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::OnOff::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::OnOff::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::OnOff::Attributes::FeatureMap::Id:
@@ -396,8 +390,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::LevelControl::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::LevelControl::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::LevelControl::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::LevelControl::Attributes::FeatureMap::Id:
@@ -415,8 +407,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::PulseWidthModulation::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::PulseWidthModulation::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::PulseWidthModulation::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::PulseWidthModulation::Attributes::FeatureMap::Id:
@@ -444,8 +434,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Descriptor::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Descriptor::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Descriptor::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Descriptor::Attributes::FeatureMap::Id:
@@ -465,8 +453,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Binding::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Binding::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Binding::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Binding::Attributes::FeatureMap::Id:
@@ -498,8 +484,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::AccessControl::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::AccessControl::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::AccessControl::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::AccessControl::Attributes::FeatureMap::Id:
@@ -523,8 +507,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Actions::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Actions::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Actions::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Actions::Attributes::FeatureMap::Id:
@@ -588,8 +570,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::BasicInformation::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::BasicInformation::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::BasicInformation::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::BasicInformation::Attributes::FeatureMap::Id:
@@ -607,8 +587,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::FeatureMap::Id:
@@ -634,8 +612,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::FeatureMap::Id:
@@ -657,8 +633,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::LocalizationConfiguration::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::LocalizationConfiguration::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::LocalizationConfiguration::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::LocalizationConfiguration::Attributes::FeatureMap::Id:
@@ -682,8 +656,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::TimeFormatLocalization::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::TimeFormatLocalization::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::TimeFormatLocalization::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::TimeFormatLocalization::Attributes::FeatureMap::Id:
@@ -703,8 +675,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::UnitLocalization::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::UnitLocalization::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::UnitLocalization::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::UnitLocalization::Attributes::FeatureMap::Id:
@@ -724,8 +694,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::PowerSourceConfiguration::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::PowerSourceConfiguration::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::PowerSourceConfiguration::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::PowerSourceConfiguration::Attributes::FeatureMap::Id:
@@ -807,8 +775,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::PowerSource::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::PowerSource::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::PowerSource::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::PowerSource::Attributes::FeatureMap::Id:
@@ -846,8 +812,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralCommissioning::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::GeneralCommissioning::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::GeneralCommissioning::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::GeneralCommissioning::Attributes::FeatureMap::Id:
@@ -887,8 +851,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::NetworkCommissioning::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::NetworkCommissioning::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::NetworkCommissioning::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id:
@@ -906,8 +868,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::DiagnosticLogs::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::DiagnosticLogs::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::DiagnosticLogs::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::DiagnosticLogs::Attributes::FeatureMap::Id:
@@ -943,8 +903,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::GeneralDiagnostics::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::FeatureMap::Id:
@@ -970,8 +928,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::SoftwareDiagnostics::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::SoftwareDiagnostics::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::SoftwareDiagnostics::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::SoftwareDiagnostics::Attributes::FeatureMap::Id:
@@ -1115,8 +1071,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::FeatureMap::Id:
@@ -1160,8 +1114,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::FeatureMap::Id:
@@ -1197,8 +1149,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::FeatureMap::Id:
@@ -1242,8 +1192,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::TimeSynchronization::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::TimeSynchronization::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::TimeSynchronization::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::TimeSynchronization::Attributes::FeatureMap::Id:
@@ -1295,8 +1243,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::FeatureMap::Id:
@@ -1320,8 +1266,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Switch::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Switch::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Switch::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Switch::Attributes::FeatureMap::Id:
@@ -1345,8 +1289,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::AdministratorCommissioning::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::AdministratorCommissioning::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::AdministratorCommissioning::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::AdministratorCommissioning::Attributes::FeatureMap::Id:
@@ -1376,8 +1318,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::OperationalCredentials::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::OperationalCredentials::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::OperationalCredentials::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::OperationalCredentials::Attributes::FeatureMap::Id:
@@ -1403,8 +1343,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::GroupKeyManagement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::GroupKeyManagement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::GroupKeyManagement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::GroupKeyManagement::Attributes::FeatureMap::Id:
@@ -1424,8 +1362,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::FixedLabel::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::FixedLabel::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::FixedLabel::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::FixedLabel::Attributes::FeatureMap::Id:
@@ -1445,8 +1381,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::UserLabel::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::UserLabel::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::UserLabel::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::UserLabel::Attributes::FeatureMap::Id:
@@ -1464,8 +1398,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ProxyConfiguration::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ProxyConfiguration::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ProxyConfiguration::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ProxyConfiguration::Attributes::FeatureMap::Id:
@@ -1483,8 +1415,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ProxyDiscovery::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ProxyDiscovery::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ProxyDiscovery::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ProxyDiscovery::Attributes::FeatureMap::Id:
@@ -1502,8 +1432,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ProxyValid::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ProxyValid::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ProxyValid::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ProxyValid::Attributes::FeatureMap::Id:
@@ -1523,8 +1451,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::BooleanState::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::BooleanState::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::BooleanState::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::BooleanState::Attributes::FeatureMap::Id:
@@ -1562,8 +1488,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::IcdManagement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::IcdManagement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::IcdManagement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::IcdManagement::Attributes::FeatureMap::Id:
@@ -1587,8 +1511,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Timer::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Timer::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Timer::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Timer::Attributes::FeatureMap::Id:
@@ -1618,8 +1540,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::OvenCavityOperationalState::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::OvenCavityOperationalState::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::OvenCavityOperationalState::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::OvenCavityOperationalState::Attributes::FeatureMap::Id:
@@ -1645,8 +1565,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::OvenMode::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::OvenMode::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::OvenMode::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::OvenMode::Attributes::FeatureMap::Id:
@@ -1668,8 +1586,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::LaundryDryerControls::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::LaundryDryerControls::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::LaundryDryerControls::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::LaundryDryerControls::Attributes::FeatureMap::Id:
@@ -1699,8 +1615,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ModeSelect::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ModeSelect::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ModeSelect::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ModeSelect::Attributes::FeatureMap::Id:
@@ -1726,8 +1640,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::LaundryWasherMode::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::LaundryWasherMode::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::LaundryWasherMode::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::LaundryWasherMode::Attributes::FeatureMap::Id:
@@ -1753,8 +1665,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::FeatureMap::Id:
@@ -1780,8 +1690,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::LaundryWasherControls::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::LaundryWasherControls::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::LaundryWasherControls::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::LaundryWasherControls::Attributes::FeatureMap::Id:
@@ -1803,8 +1711,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::RvcRunMode::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::RvcRunMode::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::RvcRunMode::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::RvcRunMode::Attributes::FeatureMap::Id:
@@ -1826,8 +1732,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::RvcCleanMode::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::RvcCleanMode::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::RvcCleanMode::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::RvcCleanMode::Attributes::FeatureMap::Id:
@@ -1857,8 +1761,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::TemperatureControl::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::TemperatureControl::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::TemperatureControl::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::TemperatureControl::Attributes::FeatureMap::Id:
@@ -1882,8 +1784,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::RefrigeratorAlarm::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::RefrigeratorAlarm::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::RefrigeratorAlarm::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::RefrigeratorAlarm::Attributes::FeatureMap::Id:
@@ -1909,8 +1809,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::DishwasherMode::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::DishwasherMode::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::DishwasherMode::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::DishwasherMode::Attributes::FeatureMap::Id:
@@ -1930,8 +1828,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::AirQuality::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::AirQuality::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::AirQuality::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::AirQuality::Attributes::FeatureMap::Id:
@@ -1975,8 +1871,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::SmokeCoAlarm::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::FeatureMap::Id:
@@ -2002,8 +1896,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::DishwasherAlarm::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::DishwasherAlarm::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::DishwasherAlarm::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::DishwasherAlarm::Attributes::FeatureMap::Id:
@@ -2025,8 +1917,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::MicrowaveOvenMode::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::MicrowaveOvenMode::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::MicrowaveOvenMode::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::MicrowaveOvenMode::Attributes::FeatureMap::Id:
@@ -2062,8 +1952,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::MicrowaveOvenControl::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::MicrowaveOvenControl::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::MicrowaveOvenControl::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::MicrowaveOvenControl::Attributes::FeatureMap::Id:
@@ -2093,8 +1981,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::OperationalState::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::OperationalState::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::OperationalState::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::OperationalState::Attributes::FeatureMap::Id:
@@ -2124,8 +2010,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::RvcOperationalState::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::RvcOperationalState::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::RvcOperationalState::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::RvcOperationalState::Attributes::FeatureMap::Id:
@@ -2149,8 +2033,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ScenesManagement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ScenesManagement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ScenesManagement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ScenesManagement::Attributes::FeatureMap::Id:
@@ -2180,8 +2062,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::HepaFilterMonitoring::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::HepaFilterMonitoring::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::HepaFilterMonitoring::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::HepaFilterMonitoring::Attributes::FeatureMap::Id:
@@ -2211,8 +2091,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Attributes::FeatureMap::Id:
@@ -2246,8 +2124,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::BooleanStateConfiguration::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::BooleanStateConfiguration::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::BooleanStateConfiguration::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::BooleanStateConfiguration::Attributes::FeatureMap::Id:
@@ -2287,8 +2163,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ValveConfigurationAndControl::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ValveConfigurationAndControl::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ValveConfigurationAndControl::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ValveConfigurationAndControl::Attributes::FeatureMap::Id:
@@ -2344,8 +2218,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ElectricalPowerMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ElectricalPowerMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ElectricalPowerMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ElectricalPowerMeasurement::Attributes::FeatureMap::Id:
@@ -2375,8 +2247,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ElectricalEnergyMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ElectricalEnergyMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ElectricalEnergyMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ElectricalEnergyMeasurement::Attributes::FeatureMap::Id:
@@ -2406,8 +2276,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::WaterHeaterManagement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::WaterHeaterManagement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::WaterHeaterManagement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::WaterHeaterManagement::Attributes::FeatureMap::Id:
@@ -2441,8 +2309,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::DemandResponseLoadControl::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::DemandResponseLoadControl::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::DemandResponseLoadControl::Attributes::FeatureMap::Id:
@@ -2464,8 +2330,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Messages::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Messages::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Messages::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Messages::Attributes::FeatureMap::Id:
@@ -2499,8 +2363,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::DeviceEnergyManagement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::FeatureMap::Id:
@@ -2564,8 +2426,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::EnergyEvse::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::EnergyEvse::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::EnergyEvse::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::EnergyEvse::Attributes::FeatureMap::Id:
@@ -2593,8 +2453,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::EnergyPreference::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::EnergyPreference::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::EnergyPreference::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::EnergyPreference::Attributes::FeatureMap::Id:
@@ -2616,8 +2474,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::PowerTopology::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::PowerTopology::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::PowerTopology::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::PowerTopology::Attributes::FeatureMap::Id:
@@ -2635,16 +2491,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::EnergyEvseMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::EnergyEvseMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::EnergyEvseMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::EnergyEvseMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::EnergyEvseMode::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::EnergyEvseMode::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::EnergyEvseMode::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::EnergyEvseMode::Attributes::FeatureMap::Id:
@@ -2662,16 +2512,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::WaterHeaterMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::WaterHeaterMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::WaterHeaterMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::WaterHeaterMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::WaterHeaterMode::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::WaterHeaterMode::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::WaterHeaterMode::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::WaterHeaterMode::Attributes::FeatureMap::Id:
@@ -2689,16 +2533,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::FeatureMap::Id:
@@ -2806,8 +2644,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::DoorLock::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::DoorLock::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::DoorLock::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::DoorLock::Attributes::FeatureMap::Id:
@@ -2869,8 +2705,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::WindowCovering::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::WindowCovering::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::WindowCovering::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::WindowCovering::Attributes::FeatureMap::Id:
@@ -2900,8 +2734,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ServiceArea::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ServiceArea::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ServiceArea::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ServiceArea::Attributes::FeatureMap::Id:
@@ -2965,8 +2797,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::PumpConfigurationAndControl::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::PumpConfigurationAndControl::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::PumpConfigurationAndControl::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::PumpConfigurationAndControl::Attributes::FeatureMap::Id:
@@ -3104,8 +2934,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Thermostat::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Thermostat::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Thermostat::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Thermostat::Attributes::FeatureMap::Id:
@@ -3147,8 +2975,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::FanControl::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::FanControl::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::FanControl::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::FanControl::Attributes::FeatureMap::Id:
@@ -3172,8 +2998,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::FeatureMap::Id:
@@ -3295,8 +3119,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ColorControl::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ColorControl::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ColorControl::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ColorControl::Attributes::FeatureMap::Id:
@@ -3342,8 +3164,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::BallastConfiguration::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::BallastConfiguration::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::BallastConfiguration::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::BallastConfiguration::Attributes::FeatureMap::Id:
@@ -3371,8 +3191,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::IlluminanceMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::IlluminanceMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::IlluminanceMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::IlluminanceMeasurement::Attributes::FeatureMap::Id:
@@ -3398,8 +3216,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::TemperatureMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::TemperatureMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::TemperatureMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::TemperatureMeasurement::Attributes::FeatureMap::Id:
@@ -3435,8 +3251,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::PressureMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::PressureMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::PressureMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::PressureMeasurement::Attributes::FeatureMap::Id:
@@ -3462,8 +3276,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::FlowMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::FlowMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::FlowMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::FlowMeasurement::Attributes::FeatureMap::Id:
@@ -3489,8 +3301,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::RelativeHumidityMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::RelativeHumidityMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::RelativeHumidityMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::RelativeHumidityMeasurement::Attributes::FeatureMap::Id:
@@ -3536,8 +3346,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::OccupancySensing::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::OccupancySensing::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::OccupancySensing::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::OccupancySensing::Attributes::FeatureMap::Id:
@@ -3577,8 +3385,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::Attributes::FeatureMap::Id:
@@ -3618,8 +3424,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Attributes::FeatureMap::Id:
@@ -3659,8 +3463,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::Attributes::FeatureMap::Id:
@@ -3700,8 +3502,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::OzoneConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::OzoneConcentrationMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::OzoneConcentrationMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::OzoneConcentrationMeasurement::Attributes::FeatureMap::Id:
@@ -3741,8 +3541,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Pm25ConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Pm25ConcentrationMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Pm25ConcentrationMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Pm25ConcentrationMeasurement::Attributes::FeatureMap::Id:
@@ -3782,8 +3580,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::FormaldehydeConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::FormaldehydeConcentrationMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::FormaldehydeConcentrationMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::FormaldehydeConcentrationMeasurement::Attributes::FeatureMap::Id:
@@ -3823,8 +3619,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Pm1ConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Pm1ConcentrationMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Pm1ConcentrationMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Pm1ConcentrationMeasurement::Attributes::FeatureMap::Id:
@@ -3864,8 +3658,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Pm10ConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Pm10ConcentrationMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Pm10ConcentrationMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Pm10ConcentrationMeasurement::Attributes::FeatureMap::Id:
@@ -3905,8 +3697,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::FeatureMap::Id:
@@ -3946,8 +3736,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::RadonConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::RadonConcentrationMeasurement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::RadonConcentrationMeasurement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::RadonConcentrationMeasurement::Attributes::FeatureMap::Id:
@@ -3969,8 +3757,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::WiFiNetworkManagement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::WiFiNetworkManagement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::WiFiNetworkManagement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::WiFiNetworkManagement::Attributes::FeatureMap::Id:
@@ -4000,8 +3786,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ThreadBorderRouterManagement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ThreadBorderRouterManagement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ThreadBorderRouterManagement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ThreadBorderRouterManagement::Attributes::FeatureMap::Id:
@@ -4025,8 +3809,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ThreadNetworkDirectory::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ThreadNetworkDirectory::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ThreadNetworkDirectory::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ThreadNetworkDirectory::Attributes::FeatureMap::Id:
@@ -4048,8 +3830,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::WakeOnLan::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::WakeOnLan::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::WakeOnLan::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::WakeOnLan::Attributes::FeatureMap::Id:
@@ -4073,8 +3853,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Channel::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Channel::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Channel::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Channel::Attributes::FeatureMap::Id:
@@ -4096,8 +3874,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::TargetNavigator::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::TargetNavigator::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::TargetNavigator::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::TargetNavigator::Attributes::FeatureMap::Id:
@@ -4137,8 +3913,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::MediaPlayback::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::MediaPlayback::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::MediaPlayback::Attributes::FeatureMap::Id:
@@ -4160,8 +3934,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::MediaInput::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::MediaInput::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::MediaInput::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::MediaInput::Attributes::FeatureMap::Id:
@@ -4179,8 +3951,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::LowPower::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::LowPower::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::LowPower::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::LowPower::Attributes::FeatureMap::Id:
@@ -4198,8 +3968,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::KeypadInput::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::KeypadInput::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::KeypadInput::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::KeypadInput::Attributes::FeatureMap::Id:
@@ -4221,8 +3989,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ContentLauncher::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ContentLauncher::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ContentLauncher::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ContentLauncher::Attributes::FeatureMap::Id:
@@ -4244,8 +4010,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::AudioOutput::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::AudioOutput::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::AudioOutput::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::AudioOutput::Attributes::FeatureMap::Id:
@@ -4267,8 +4031,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ApplicationLauncher::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ApplicationLauncher::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ApplicationLauncher::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ApplicationLauncher::Attributes::FeatureMap::Id:
@@ -4302,8 +4064,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ApplicationBasic::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ApplicationBasic::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ApplicationBasic::Attributes::FeatureMap::Id:
@@ -4321,8 +4081,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::AccountLogin::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::AccountLogin::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::AccountLogin::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::AccountLogin::Attributes::FeatureMap::Id:
@@ -4356,8 +4114,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ContentControl::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ContentControl::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ContentControl::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ContentControl::Attributes::FeatureMap::Id:
@@ -4375,8 +4131,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::ContentAppObserver::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ContentAppObserver::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ContentAppObserver::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ContentAppObserver::Attributes::FeatureMap::Id:
@@ -4394,16 +4148,14 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedZoneSources";
         case chip::app::Clusters::ZoneManagement::Attributes::Zones::Id:
             return "Zones";
-        case chip::app::Clusters::ZoneManagement::Attributes::TimeControl::Id:
-            return "TimeControl";
+        case chip::app::Clusters::ZoneManagement::Attributes::Triggers::Id:
+            return "Triggers";
         case chip::app::Clusters::ZoneManagement::Attributes::Sensitivity::Id:
             return "Sensitivity";
         case chip::app::Clusters::ZoneManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ZoneManagement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::ZoneManagement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::ZoneManagement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::ZoneManagement::Attributes::FeatureMap::Id:
@@ -4429,8 +4181,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MinViewport";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id:
             return "RateDistortionTradeOffPoints";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxPreRollBufferSize::Id:
-            return "MaxPreRollBufferSize";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxContentBufferSize::Id:
+            return "MaxContentBufferSize";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MicrophoneCapabilities::Id:
             return "MicrophoneCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerCapabilities::Id:
@@ -4445,10 +4197,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentFrameRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::HDRModeEnabled::Id:
             return "HDRModeEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentVideoCodecs::Id:
-            return "CurrentVideoCodecs";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentSnapshotConfig::Id:
-            return "CurrentSnapshotConfig";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::FabricsUsingCamera::Id:
             return "FabricsUsingCamera";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedVideoStreams::Id:
@@ -4469,12 +4217,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "NightVision";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::NightVisionIllum::Id:
             return "NightVisionIllum";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AWBEnabled::Id:
-            return "AWBEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AutoShutterSpeedEnabled::Id:
-            return "AutoShutterSpeedEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AutoISOEnabled::Id:
-            return "AutoISOEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::Viewport::Id:
             return "Viewport";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerMuted::Id:
@@ -4509,14 +4251,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "StatusLightEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::StatusLightBrightness::Id:
             return "StatusLightBrightness";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::DepthSensorStatus::Id:
-            return "DepthSensorStatus";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::FeatureMap::Id:
@@ -4536,8 +4274,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::WebRTCTransportProvider::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::WebRTCTransportProvider::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::WebRTCTransportProvider::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::WebRTCTransportProvider::Attributes::FeatureMap::Id:
@@ -4557,8 +4293,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::WebRTCTransportRequestor::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::WebRTCTransportRequestor::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::WebRTCTransportRequestor::Attributes::FeatureMap::Id:
@@ -4582,8 +4316,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::Chime::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::Chime::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::Chime::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::Chime::Attributes::FeatureMap::Id:
@@ -4605,8 +4337,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::EcosystemInformation::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::EcosystemInformation::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::EcosystemInformation::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::EcosystemInformation::Attributes::FeatureMap::Id:
@@ -4626,8 +4356,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::CommissionerControl::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::CommissionerControl::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::CommissionerControl::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::CommissionerControl::Attributes::FeatureMap::Id:
@@ -4821,8 +4549,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::UnitTesting::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::UnitTesting::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::UnitTesting::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::UnitTesting::Attributes::FeatureMap::Id:
@@ -4842,8 +4568,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::FaultInjection::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::FaultInjection::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::FaultInjection::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::FaultInjection::Attributes::FeatureMap::Id:
@@ -4863,8 +4587,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GeneratedCommandList";
         case chip::app::Clusters::SampleMei::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::SampleMei::Attributes::EventList::Id:
-            return "EventList";
         case chip::app::Clusters::SampleMei::Attributes::AttributeList::Id:
             return "AttributeList";
         case chip::app::Clusters::SampleMei::Attributes::FeatureMap::Id:
@@ -5956,14 +5678,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "SetStreamPriorities";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::Id:
             return "CaptureSnapshot";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetViewport::Id:
-            return "SetViewport";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageRotation::Id:
-            return "SetImageRotation";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipHorizontal::Id:
-            return "SetImageFlipHorizontal";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipVertical::Id:
-            return "SetImageFlipVertical";
         default:
             return "Unknown";
         }
@@ -6655,6 +6369,10 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Contact Sensor";
     case 0x00000016:
         return "Root Node";
+    case 0x00000017:
+        return "Solar Power";
+    case 0x00000018:
+        return "Battery Storage";
     case 0x00000019:
         return "Secondary Network Interface";
     case 0x00000022:
@@ -6757,10 +6475,14 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Flow Sensor";
     case 0x00000307:
         return "Humidity Sensor";
+    case 0x00000309:
+        return "Heat Pump";
     case 0x0000050C:
         return "EVSE";
     case 0x0000050D:
         return "Device Energy Management";
+    case 0x0000050F:
+        return "Water Heater";
     case 0x00000510:
         return "Electrical Sensor";
     case 0x00000840:

@@ -131,7 +131,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(6)
         sub_handler = ClusterAttributeChangeAccumulator(lvl)
-        await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint)
+        await sub_handler.start(self.default_controller, self.dut_node_id, self.get_endpoint())
 
         self.step(7)
         cmd = lvl.Commands.MoveToLevelWithOnOff(level=max_level, transitionTime=100, optionsMask=0, optionsOverride=0)

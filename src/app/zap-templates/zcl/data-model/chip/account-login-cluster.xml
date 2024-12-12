@@ -28,31 +28,36 @@ limitations under the License.
 
     <command source="client" code="0x00" name="GetSetupPIN" isFabricScoped="true" response="GetSetupPINResponse" mustUseTimedInvoke="true" optional="false">
       <description>Upon receipt, the Content App checks if the account associated with the client Temp Account Identifier Rotating ID is the same acount that is active on the given Content App. If the accounts are the same, then the Content App includes the Setup PIN in the GetSetupPIN Response.</description>
-      <access op="invoke" role="administer" />
+      <access op="invoke" role="administer"/>
       <arg name="TempAccountIdentifier" minLength="16" length="100" type="char_string"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x02" name="Login" isFabricScoped="true" mustUseTimedInvoke="true" optional="false">
       <description>Upon receipt, the Content App checks if the account associated with the client’s Temp Account Identifier (Rotating ID) has a current active Setup PIN with the given value. If the Setup PIN is valid for the user account associated with the Temp Account Identifier, then the Content App MAY make that user account active.</description>
-      <access op="invoke" role="administer" />
+      <access op="invoke" role="administer"/>
       <arg name="TempAccountIdentifier" minLength="16" length="100" type="char_string"/>
       <arg name="SetupPIN" minLength="8" type="char_string"/>
-      <arg name="Node" type="node_id" optional="true" />
+      <arg name="Node" type="node_id" optional="true"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x03" name="Logout" isFabricScoped="true" mustUseTimedInvoke="true" optional="false">
       <description>The purpose of this command is to instruct the Content App to clear the current user account. This command SHOULD be used by clients of a Content App to indicate the end of a user session.</description>
       <arg name="Node" type="node_id" optional="true"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x01" name="GetSetupPINResponse" optional="false" disableDefaultResponse="true">
       <description>This message is sent in response to the GetSetupPIN Request, and contains the Setup PIN code, or null when the accounts identified in the request does not match the active account of the running Content App.</description>
       <arg name="SetupPIN" type="char_string"/>
+      <mandatoryConform/>
     </command>
 
     <event side="server" code="0x00" priority="critical" name="LoggedOut" optional="false">
       <description>This event can be used by the Content App to indicate that the current user has logged out. In response to this event, the Fabric Admin SHALL remove access to this Content App by the specified Node. If no Node is provided, then the Fabric Admin SHALL remove access to all non-Admin Nodes.</description>
       <field id="0" name="Node" type="node_id" optional="true"/>
+      <optionalConform/>
     </event>
 
   </cluster>

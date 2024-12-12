@@ -17,9 +17,11 @@
  */
 
 #import "CertificateIssuer.h"
-#import "CHIPToolKeypair.h"
+#import "DFTKeypair.h"
 
 #include <lib/support/logging/CHIPLogging.h>
+
+constexpr const uint32_t kIssuerId = 12345678;
 
 @interface CertificateIssuer ()
 - (MTRCertificateDERBytes _Nullable)issueOperationalCertificateForNodeID:(NSNumber *)nodeID
@@ -59,17 +61,13 @@
 - (void)startWithStorage:(id<MTRStorage>)storage
                    error:(NSError * _Nullable __autoreleasing * _Nonnull)error
 {
-    __auto_type * signingKey = [[CHIPToolKeypair alloc] init];
-
-    __auto_type err = [signingKey createOrLoadKeys:storage];
-    if (CHIP_NO_ERROR != err) {
-        *error = [NSError errorWithDomain:@"Error" code:0 userInfo:@{ @"reason" : @"Error creating or loading keys" }];
+    __auto_type * signingKey = [DFTKeypair createKeypairWithStorage:storage error:error];
+    if (!signingKey) {
         return;
     }
 
-    __auto_type * rootCertificate = [MTRCertificates createRootCertificate:signingKey issuerID:nil fabricID:nil error:error];
-    if (nil == rootCertificate) {
-        *error = [NSError errorWithDomain:@"Error" code:0 userInfo:@{ @"reason" : @"Error creating root certificate" }];
+    __auto_type * rootCertificate = [MTRCertificates createRootCertificate:signingKey issuerID:@(kIssuerId) fabricID:nil error:error];
+    if (!rootCertificate) {
         return;
     }
 
@@ -80,15 +78,12 @@
 
 - (id<MTRKeypair>)issueOperationalKeypairWithControllerStorage:(ControllerStorage *)storage error:(NSError * _Nullable __autoreleasing * _Nonnull)error
 {
-    __auto_type * keypair = [[CHIPToolKeypair alloc] init];
-
-    __auto_type err = [keypair createOrLoadKeys:storage];
-    if (CHIP_NO_ERROR != err) {
-        *error = [NSError errorWithDomain:@"Error" code:0 userInfo:@{ @"reason" : @"Error creating or loading keys" }];
+    __auto_type * signingKey = [DFTKeypair createKeypairWithStorage:storage error:error];
+    if (!signingKey) {
         return nil;
     }
 
-    return keypair;
+    return signingKey;
 }
 
 - (void)issueOperationalCertificateForRequest:(MTROperationalCSRInfo *)csrInfo

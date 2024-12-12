@@ -9,33 +9,49 @@ the setup payload or performing discovery actions.
 
 <hr>
 
-## Source files
+## Table of Contents
 
-You can find source files of the CHIP Tool in the `examples/chip-tool`
+-   [Installation](#installation)
+-   [Building from source](#building-from-source)
+-   [Running the CHIP Tool](#running-the-chip-tool)
+-   [CHIP Tool modes](#chip-tool-modes)
+    -   [Single-command mode (default)](#single-command-mode-default)
+    -   [Interactive mode](#interactive-mode)
+-   [Using CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
+-   [Supported commands and options](#supported-commands-and-options)
+    -   [List all supported clusters](#printing-all-supported-clusters)
+    -   [List all supported command for a cluster](#getting-the-list-of-commands-supported-for-a-specific-cluster)
+    -   [List all supported attributes for a cluster](#getting-the-list-of-attributes-supported-for-a-specific-cluster)
+    -   [Command options](#getting-the-list-of-command-options)
+-   [Testing and Interaction](#running-a-test-suite-against-a-paired-peer-device)
+-   [Multi-admin scenario](#multi-admin-scenario)
+-   [Subscribing to events or attributes](#subscribing-to-events-or-attributes)
+-   [Using wildcards](#using-wildcards)
+-   [Saving users and credentials for door lock device](#saving-users-and-credentials-on-door-lock-devices)
+
+## Installation
+
+On Linux distributions
+[running snapd](https://snapcraft.io/docs/installing-snapd), such as Ubuntu, the
+CHIP Tool can be installed using the
+[chip-tool snap](https://snapcraft.io/chip-tool). To do this, run:
+
+```
+sudo snap install chip-tool
+```
+
+## Building from source
+
+The source files of the CHIP Tool are available in the `examples/chip-tool`
 directory.
 
-> **Note:** The CHIP Tool caches the configuration state in the
-> `/tmp/chip_tool_config.ini` file. Deleting this and other `.ini` files in the
-> `/tmp` directory can sometimes resolve issues related to stale configuration.
-
-> **Note:** To make the configuration persistent (since `/tmp` directory might
-> be flushed at each reboot) you can change the directory where CHIP Tool caches
-> its configuration by using the option `--storage-directory`
-
-<hr>
-
-## Building and running the CHIP Tool
-
-Before you can use the CHIP Tool, you must compile it from source on Linux
-(amd64/aarch64) or macOS. If you want to run it on Raspberry Pi, it must use a
-64-bit OS.
+The source can be compiled on Linux (amd64/aarch64) or macOS. If you want to run
+it on Raspberry Pi, you must use a 64-bit OS.
 
 > **Note:** To ensure compatibility, always build the CHIP Tool and the Matter
 > device from the same revision of the `connectedhomeip` repository.
 
-### Building the CHIP Tool
-
-To build and run the CHIP Tool:
+To build the CHIP Tool:
 
 1. Install all required packages for Matter and prepare the source code and the
    build system. Read the [Building Matter](../../guides/BUILDING.md) guide for
@@ -50,10 +66,16 @@ To build and run the CHIP Tool:
     In this command, `BUILD_PATH` specifies where the target binaries are to be
     placed.
 
-### Running the CHIP Tool
+## Running the CHIP Tool
 
-To check if the CHIP Tool runs correctly, execute the following command from the
-`BUILD_PATH` directory:
+If you installed the CHIP Tool as a snap, the command to run it would be:
+
+```
+$ chip-tool
+```
+
+If you compiled the CHIP Tool from source, it can be executed with the following
+command from the `BUILD_PATH` directory:
 
 ```
 $ ./chip-tool
@@ -67,6 +89,13 @@ discover commands). Each listed command can however become the root of the new
 more complex command by appending it with sub-commands. Examples of specific
 commands and their use cases are described in the
 [Supported commands and options](#supported-commands-and-options) section.
+
+> **Note:** The CHIP Tool caches the configuration state in the
+> `/tmp/chip_tool_config.ini` file. Deleting this and other `.ini` files in the
+> `/tmp` directory can sometimes resolve issues related to stale configuration.
+> To make the configuration persistent you can change the directory where CHIP
+> Tool caches its configuration by using the command line option
+> `--storage-directory`
 
 <hr>
 

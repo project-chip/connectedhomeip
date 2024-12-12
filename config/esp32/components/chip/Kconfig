@@ -37,16 +37,6 @@ menu "CHIP Core"
                 exchange (conversation) with a peer, e.g. a cloud service, a mobile application, or
                 another device.
 
-        config MAX_BINDINGS
-            int "Max Bindings"
-            range 0 65535
-            default 8
-            help
-                The maximum number of simultaneously active CHIP Binding objects.
-
-                A Binding object is used to configure how the local device communicates with
-                a remote entity, be it a cloud service, a mobile application, or another device.
-
         config MAX_FABRICS
             int "Max Fabrics"
             range 5 255
@@ -202,6 +192,13 @@ menu "CHIP Core"
             default 3
             help
                 Specifies the maximum number of group key sets supported per fabric.
+
+        config CHIP_DEVICE_ENABLE_DYNAMIC_SERVER
+            bool "Enable dynamic server"
+            default n
+            help
+                Enable dynamic server to handle a different interaction model dispatch.
+                Can be implied when users do not want to use the same server clusters.
 
     endmenu # "General Options"
 

@@ -41,6 +41,7 @@
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_XPC.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRDevice_XPC_Internal.h"
@@ -55,6 +56,7 @@
 #import "MTRSetupPayload.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
+#import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
@@ -112,22 +114,36 @@
     }
 
     // TODO: Add these to the description
-    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, _internalDeviceStateForDescription, properties);
     // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, _lastSubscriptionAttemptWaitForDescription, properties);
     // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
     // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
 
-    return [NSString
-        stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, controller: %@>",
-        NSStringFromClass(self.class), self,
-        _deviceController.compressedFabricID.unsignedLongLongValue,
-        _nodeID.unsignedLongLongValue,
-        _nodeID.unsignedLongLongValue,
-        [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyVendorID],
-        [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID],
-        wifi,
-        thread,
-        _deviceController.uniqueIdentifier];
+    return [NSString stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, controller: %@ state: %lu>",
+                     NSStringFromClass(self.class), self,
+                     _deviceController.compressedFabricID.unsignedLongLongValue,
+                     _nodeID.unsignedLongLongValue,
+                     _nodeID.unsignedLongLongValue,
+                     [self vendorID],
+                     [self productID],
+                     wifi,
+                     thread,
+                     _deviceController.uniqueIdentifier,
+                     (unsigned long) self.state];
+}
+
+- (nullable NSNumber *)vendorID
+{
+    return [[self._internalState objectForKey:kMTRDeviceInternalPropertyKeyVendorID] copy];
+}
+
+- (nullable NSNumber *)productID
+{
+    return [[self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID] copy];
+}
+
+- (MTRNetworkCommissioningFeature)networkCommissioningFeatures
+{
+    return [[self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures] unsignedIntValue];
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
@@ -135,23 +151,67 @@
 // required methods for MTRDeviceDelegates
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
-        [delegate device:self stateChanged:state];
-    }];
+    // Not needed, since internal will get this
 }
 
-- (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+- (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<MTRDeviceResponseValueDictionary> *)attributeReport
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid device:receivedAttributeReport: nodeID: %@", self, nodeID);
+        return;
+    }
+
+    if (!MTRAttributeReportIsWellFormed(attributeReport)) {
+        MTR_LOG_ERROR("%@ invalid device:receivedAttributeReport: attributeReport: %@", self, attributeReport);
+        return;
+    }
+
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedAttributeReport:attributeReport];
     }];
+
+    std::lock_guard lock(_lock);
+    for (NSDictionary<NSString *, id> * report in attributeReport) {
+        if (!MTR_SAFE_CAST(report, NSDictionary)) {
+            MTR_LOG_ERROR("%@ handed a response-value that is not a dictionary: %@", self, report);
+            continue;
+        }
+
+        MTRAttributePath * path = MTR_SAFE_CAST(report[MTRAttributePathKey], MTRAttributePath);
+        if (!path) {
+            MTR_LOG_ERROR("%@ no valid path for attribute report %@", self, report);
+            continue;
+        }
+
+        MTRDeviceDataValueDictionary value = report[MTRDataKey];
+        if (!value) {
+            // This is normal; this could be an error report.
+            continue;
+        }
+
+        if (!MTR_SAFE_CAST(value, NSDictionary)) {
+            MTR_LOG_ERROR("%@ invalid data-value reported: %@", self, report);
+            continue;
+        }
+
+        [self _attributeValue:value reportedForPath:path];
+    }
 }
 
-- (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+- (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<MTRDeviceResponseValueDictionary> *)eventReport
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid device:receivedEventReport: nodeID: %@", self, nodeID);
+        return;
+    }
+
+    if (!MTREventReportIsWellFormed(eventReport)) {
+        MTR_LOG_ERROR("%@ invalid device:receivedEventReport: eventReport: %@", self, eventReport);
+        return;
+    }
+
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedEventReport:eventReport];
     }];
@@ -160,7 +220,12 @@
 // optional methods for MTRDeviceDelegates - check for implementation before calling
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid deviceBecameActive: nodeID: %@", self, nodeID);
+        return;
+    }
+
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
             [delegate deviceBecameActive:self];
@@ -170,15 +235,17 @@
 
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
-    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(deviceCachePrimed:)]) {
-            [delegate deviceCachePrimed:self];
-        }
-    }];
+    // Not needed since this is a state update now
 }
 
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid deviceConfigurationChanged: nodeID: %@", self, nodeID);
+        return;
+    }
+
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
             [delegate deviceConfigurationChanged:self];
@@ -186,18 +253,108 @@
     }];
 }
 
+static const auto * requiredInternalStateKeys = @[ kMTRDeviceInternalPropertyDeviceState, kMTRDeviceInternalPropertyLastSubscriptionAttemptWait ];
+static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKeyVendorID, kMTRDeviceInternalPropertyKeyProductID, kMTRDeviceInternalPropertyNetworkFeatures, kMTRDeviceInternalPropertyMostRecentReportTime, kMTRDeviceInternalPropertyLastSubscriptionFailureTime ];
+
+- (BOOL)_internalState:(NSDictionary *)dictionary hasValidValuesForKeys:(const NSArray<NSString *> *)keys valueRequired:(BOOL)required
+{
+    // At one point, all keys were NSNumber valued; now there are also NSDates.
+    // TODO:  Create a mapping between keys and their expected types and use that in the type check below.
+    for (NSString * key in keys) {
+        id value = dictionary[key];
+        if (!value) {
+            if (required) {
+                MTR_LOG_ERROR("%@ device:internalStateUpdated: handed state with no value for \"%@\": %@", self, key, value);
+                return NO;
+            }
+
+            continue;
+        }
+        if (!MTR_SAFE_CAST(value, NSNumber) && !MTR_SAFE_CAST(value, NSDate)) {
+            MTR_LOG_ERROR("%@ device:internalStateUpdated: handed state with invalid value for \"%@\": %@", self, key, value);
+            return NO;
+        }
+    }
+
+    return YES;
+}
+
 - (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
 {
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid device:internalStateUpdated: nodeID: %@", self, nodeID);
+        return;
+    }
+
+    if (!MTR_SAFE_CAST(dictionary, NSDictionary)) {
+        MTR_LOG_ERROR("%@ invalid device:internalStateUpdated dictionary: %@", self, dictionary);
+        return;
+    }
+
+    NSNumber * oldStateNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
+    NSNumber * newStateNumber = MTR_SAFE_CAST(dictionary[kMTRDeviceInternalPropertyDeviceState], NSNumber);
+
+    VerifyOrReturn([self _internalState:dictionary hasValidValuesForKeys:requiredInternalStateKeys valueRequired:YES]);
+    VerifyOrReturn([self _internalState:dictionary hasValidValuesForKeys:optionalInternalStateKeys valueRequired:NO]);
+
     [self _setInternalState:dictionary];
-    MTR_LOG("%@ internal state updated", self);
+
+    if (!MTREqualObjects(oldStateNumber, newStateNumber)) {
+        MTRDeviceState state = self.state;
+        [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+            [delegate device:self stateChanged:state];
+        }];
+    }
+
+    NSNumber * oldPrimedState = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceCachePrimed], NSNumber);
+    NSNumber * newPrimedState = MTR_SAFE_CAST(dictionary[kMTRDeviceInternalPropertyDeviceCachePrimed], NSNumber);
+
+    if (!MTREqualObjects(oldPrimedState, newPrimedState)) {
+        [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+            if ([delegate respondsToSelector:@selector(deviceCachePrimed:)]) {
+                [delegate deviceCachePrimed:self];
+            }
+        }];
+    }
+}
+
+- (MTRDeviceState)state
+{
+    NSNumber * stateNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
+    switch (static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue)) {
+    case MTRDeviceStateUnknown:
+        return MTRDeviceStateUnknown;
+
+    case MTRDeviceStateUnreachable:
+        return MTRDeviceStateUnreachable;
+
+    case MTRDeviceStateReachable:
+        return MTRDeviceStateReachable;
+    }
+
+    MTR_LOG_ERROR("stateNumber from internal state is an invalid value: %@", stateNumber);
+
+    return MTRDeviceStateUnknown;
+}
+
+- (BOOL)deviceCachePrimed
+{
+    NSNumber * deviceCachePrimedNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceCachePrimed], NSNumber);
+    return deviceCachePrimedNumber.boolValue;
+}
+
+- (nullable NSDate *)estimatedStartTime
+{
+    return MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyEstimatedStartTime], NSDate);
+}
+
+- (nullable NSNumber *)estimatedSubscriptionLatency
+{
+    return MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyEstimatedSubscriptionLatency], NSNumber);
 }
 
 #pragma mark - Remote Commands
-
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(state, MTRDeviceState, MTRDeviceStateUnknown, getStateWithReply)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(deviceCachePrimed, BOOL, NO, getDeviceCachePrimedWithReply)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate * _Nullable, nil, getEstimatedStartTimeWithReply)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber * _Nullable, nil, getEstimatedSubscriptionLatencyWithReply)
 
 typedef NSDictionary<NSString *, id> * _Nullable ReadAttributeResponseType;
 MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID
@@ -262,7 +419,34 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                   expectedValueInterval:expectedValueInterval
                      timedInvokeTimeout:timeout
             serverSideProcessingTimeout:serverSideProcessingTimeout
-                             completion:completion];
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 if (values == nil && error == nil) {
+                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) without values or error", self, endpointID, clusterID, commandID);
+                                     completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                                     return;
+                                 }
+
+                                 if (error != nil && !MTR_SAFE_CAST(error, NSError)) {
+                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid error object: %@", self, endpointID, clusterID, commandID, error);
+                                     completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                                     return;
+                                 }
+
+                                 if (values != nil && !MTRInvokeResponseIsWellFormed(values)) {
+                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid data: %@", self, clusterID, commandID, values, values);
+                                     completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                                     return;
+                                 }
+
+                                 if (values != nil && error != nil) {
+                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) with both values and error: %@, %@", self, endpointID, clusterID, commandID, values, error);
+                                     // Just propagate through the error.
+                                     completion(nil, error);
+                                     return;
+                                 }
+
+                                 completion(values, error);
+                             }];
     } @catch (NSException * exception) {
         MTR_LOG_ERROR("Exception sending XPC message: %@", exception);
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);

@@ -45,24 +45,12 @@ public:
 
     ~ClusterCommand() {}
 
+    using ModelCommand::SendCommand;
+
     CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
-        chip::TLV::TLVWriter writer;
-        chip::TLV::TLVReader reader;
-
-        mData = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(sizeof(uint8_t), mDataMaxLen));
-        VerifyOrReturnError(mData != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        writer.Init(mData, mDataMaxLen);
-
-        ReturnErrorOnFailure(mPayload.Encode(writer, chip::TLV::AnonymousTag()));
-        reader.Init(mData, writer.GetLengthWritten());
-        ReturnErrorOnFailure(reader.Next());
-
-        id commandFields = NSObjectFromCHIPTLV(&reader);
-        if (commandFields == nil) {
-            return CHIP_ERROR_INTERNAL;
-        }
+        id commandFields;
+        ReturnErrorOnFailure(GetCommandFields(&commandFields));
         return ClusterCommand::SendCommand(device, endpointId, mClusterId, mCommandId, commandFields);
     }
 
@@ -136,6 +124,35 @@ protected:
     NSError * _Nullable mError = nil;
 
 private:
+    CHIP_ERROR GetCommandFields(id _Nonnull * _Nonnull outCommandFields)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVWriter writer;
+        chip::TLV::TLVReader reader;
+
+        mData = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(sizeof(uint8_t), mDataMaxLen));
+        VerifyOrExit(mData != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+        writer.Init(mData, mDataMaxLen);
+
+        err = mPayload.Encode(writer, chip::TLV::AnonymousTag());
+        SuccessOrExit(err);
+
+        reader.Init(mData, writer.GetLengthWritten());
+        err = reader.Next();
+        SuccessOrExit(err);
+
+        *outCommandFields = NSObjectFromCHIPTLV(&reader);
+        VerifyOrDo(nil != *outCommandFields, err = CHIP_ERROR_INTERNAL);
+
+    exit:
+        if (nullptr != mData) {
+            chip::Platform::MemoryFree(mData);
+            mData = nullptr;
+        }
+        return err;
+    }
+
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
 

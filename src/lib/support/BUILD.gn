@@ -334,9 +334,7 @@ static_library("support") {
   }
 }
 
-static_library("test_utils") {
-  output_name = "libTestUtils"
-  output_dir = "${root_out_dir}/lib"
+source_set("test_utils") {
   deps = [ "${chip_root}/src/platform" ]
 
   sources = [

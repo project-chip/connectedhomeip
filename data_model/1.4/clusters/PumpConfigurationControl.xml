@@ -373,11 +373,8 @@ Davis, CA 95616, USA
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0022" name="AlarmMask" type="map16" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+    <attribute id="0x0022" name="AlarmMask">
       <deprecateConform/>
-      <constraint type="desc"/>
     </attribute>
   </attributes>
   <events>

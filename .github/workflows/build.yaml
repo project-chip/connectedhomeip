@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:94
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -76,7 +76,7 @@ jobs:
               with:
                   languages: "cpp"
             - name: Setup Build
-              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false chip_data_model_check_die_on_failure=true"
+              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
             - name: Run Build
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
@@ -139,7 +139,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:94
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -183,7 +183,7 @@ jobs:
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
             - name: Setup Build, Run Build and Run Tests
               run: |
-                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false chip_data_model_check_die_on_failure=true"
+                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false"
                   scripts/run_in_build_env.sh "ninja -C ./out/gcc_release"
                   BUILD_TYPE=gcc_release scripts/tests/gn_tests.sh
             - name: Clean output
@@ -205,14 +205,14 @@ jobs:
                       esac
 
                       rm -rf ./out/sanitizers
-                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --export-compile-commands
+                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --add-export-compile-commands=*
                       BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                   done
             - name: Generate tests with sanitizers (for tidy)
               if: github.event.pull_request.number != null
               run: |
                   rm -rf ./out/sanitizers
-                  BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="is_clang=true is_asan=true chip_data_model_check_die_on_failure=true" --export-compile-commands
+                  BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="is_clang=true is_asan=true" --add-export-compile-commands=*
             - name: Ensure codegen is done for sanitize
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
@@ -308,7 +308,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:94
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -333,7 +333,7 @@ jobs:
 
             - name: Setup Build, Run Build and Run Tests
               run: |
-                  scripts/build/gn_gen.sh --args="enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false chip_data_model_check_die_on_failure=true"
+                  scripts/build/gn_gen.sh --args="enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false"
                   scripts/run_in_build_env.sh "ninja -C ./out"
                   scripts/tests/gn_tests.sh
             - name: Setup test python environment
@@ -371,7 +371,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:94
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -439,7 +439,7 @@ jobs:
                   # We want to build various standalone example apps (similar to what examples-linux-standalone.yaml
                   # does), so use target_os="all" to get those picked up as part of the "unified" build.  But then
                   # to save CI resources we want to exclude the "host clang" build, which uses the pigweed clang.
-                  scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false chip_data_model_check_die_on_failure=true' --export-compile-commands
+                  scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false' --add-export-compile-commands=*
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
                   scripts/tests/gn_tests.sh
             - name: Ensure codegen is done for default
@@ -490,7 +490,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:94
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"

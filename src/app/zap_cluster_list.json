@@ -171,7 +171,7 @@
             "concentration-measurement-server"
         ],
         "CHANNEL_CLUSTER": ["channel-server"],
-        "CHIME_CLUSTER": [],
+        "CHIME_CLUSTER": ["chime-server"],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],

@@ -16,6 +16,8 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRAttributeValueWaiter.h>
+#import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
 
@@ -108,6 +110,25 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, readonly, nullable, copy) NSNumber * estimatedSubscriptionLatency MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
+ * The Vendor Identifier associated with the device.
+ *
+ * A non-nil value if the vendor identifier has been determined from the device, nil if unknown.
+ */
+@property (nonatomic, readonly, nullable, copy) NSNumber * vendorID MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+
+/**
+ * The Product Identifier associated with the device.
+ *
+ * A non-nil value if the product identifier has been determined from the device, nil if unknown.
+ */
+@property (nonatomic, readonly, nullable, copy) NSNumber * productID MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+
+/**
+ * Network commissioning features supported by the device.
+ */
+@property (nonatomic, readonly) MTRNetworkCommissioningFeature networkCommissioningFeatures MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
  * Set the delegate to receive asynchronous callbacks about the device.
  *
  * The delegate will be called on the provided queue, for attribute reports, event reports, and device state changes.
@@ -198,7 +219,16 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *         documentation for MTRDeviceResponseHandler.  Each one will have an
  *         MTRAttributePathKey and an MTRDataKey.
  */
-- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths MTR_NEWLY_AVAILABLE;
+- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
+/**
+ * Read all known attributes from descriptor clusters on all known endpoints.
+ *
+ * @return A dictionary with the paths of the attributes as keys and the
+ *         data-values (as described in the documentation for
+ *         MTRDeviceResponseHandler) as values.
+ */
+- (NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)descriptorClusters MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Invoke a command with a designated command path
@@ -323,6 +353,26 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
     MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+/**
+ * Sets up the provided completion to be called when any of the following
+ * happens:
+ *
+ * 1) A set of attributes reaches certain values: completion called with nil.
+ * 2) The provided timeout expires: completion called with MTRErrorCodeTimeout error.
+ * 3) The wait is canceled: completion called with MTRErrorCodeCancelled error.
+ *
+ * If the MTRAttributeValueWaiter is destroyed before the
+ * completion is called, that is treated the same as canceling the waiter.
+ *
+ * The attributes and values to wait for are represented as a dictionary which
+ * has the attribute paths as keys and the expected data-values as values.
+ */
+- (MTRAttributeValueWaiter *)waitForAttributeValues:(NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)values
+                                            timeout:(NSTimeInterval)timeout
+                                              queue:(dispatch_queue_t)queue
+                                         completion:(void (^)(NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+
 @end
 
 MTR_EXTERN NSString * const MTRPreviousDataKey MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));

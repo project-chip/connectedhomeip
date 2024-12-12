@@ -10236,28 +10236,6 @@ public class ClusterReadMapping {
           readEnergyEvseModeCurrentModeCommandParams
         );
         result.put("readCurrentModeAttribute", readEnergyEvseModeCurrentModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readEnergyEvseModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readEnergyEvseModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.EnergyEvseModeCluster) cluster).readStartUpModeAttribute(
-              (ChipClusters.EnergyEvseModeCluster.StartUpModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedEnergyEvseModeClusterStartUpModeAttributeCallback(),
-          readEnergyEvseModeStartUpModeCommandParams
-        );
-        result.put("readStartUpModeAttribute", readEnergyEvseModeStartUpModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readEnergyEvseModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readEnergyEvseModeOnModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.EnergyEvseModeCluster) cluster).readOnModeAttribute(
-              (ChipClusters.EnergyEvseModeCluster.OnModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedEnergyEvseModeClusterOnModeAttributeCallback(),
-          readEnergyEvseModeOnModeCommandParams
-        );
-        result.put("readOnModeAttribute", readEnergyEvseModeOnModeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readEnergyEvseModeGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readEnergyEvseModeGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -10350,28 +10328,6 @@ public class ClusterReadMapping {
           readWaterHeaterModeCurrentModeCommandParams
         );
         result.put("readCurrentModeAttribute", readWaterHeaterModeCurrentModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readWaterHeaterModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readWaterHeaterModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.WaterHeaterModeCluster) cluster).readStartUpModeAttribute(
-              (ChipClusters.WaterHeaterModeCluster.StartUpModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedWaterHeaterModeClusterStartUpModeAttributeCallback(),
-          readWaterHeaterModeStartUpModeCommandParams
-        );
-        result.put("readStartUpModeAttribute", readWaterHeaterModeStartUpModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readWaterHeaterModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readWaterHeaterModeOnModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.WaterHeaterModeCluster) cluster).readOnModeAttribute(
-              (ChipClusters.WaterHeaterModeCluster.OnModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedWaterHeaterModeClusterOnModeAttributeCallback(),
-          readWaterHeaterModeOnModeCommandParams
-        );
-        result.put("readOnModeAttribute", readWaterHeaterModeOnModeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readWaterHeaterModeGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWaterHeaterModeGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -10464,28 +10420,6 @@ public class ClusterReadMapping {
           readDeviceEnergyManagementModeCurrentModeCommandParams
         );
         result.put("readCurrentModeAttribute", readDeviceEnergyManagementModeCurrentModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readDeviceEnergyManagementModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readDeviceEnergyManagementModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.DeviceEnergyManagementModeCluster) cluster).readStartUpModeAttribute(
-              (ChipClusters.DeviceEnergyManagementModeCluster.StartUpModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedDeviceEnergyManagementModeClusterStartUpModeAttributeCallback(),
-          readDeviceEnergyManagementModeStartUpModeCommandParams
-        );
-        result.put("readStartUpModeAttribute", readDeviceEnergyManagementModeStartUpModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readDeviceEnergyManagementModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readDeviceEnergyManagementModeOnModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.DeviceEnergyManagementModeCluster) cluster).readOnModeAttribute(
-              (ChipClusters.DeviceEnergyManagementModeCluster.OnModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedDeviceEnergyManagementModeClusterOnModeAttributeCallback(),
-          readDeviceEnergyManagementModeOnModeCommandParams
-        );
-        result.put("readOnModeAttribute", readDeviceEnergyManagementModeOnModeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readDeviceEnergyManagementModeGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readDeviceEnergyManagementModeGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18270,17 +18204,17 @@ public class ClusterReadMapping {
           readZoneManagementZonesCommandParams
         );
         result.put("readZonesAttribute", readZoneManagementZonesAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readZoneManagementTimeControlCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readZoneManagementTimeControlAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readZoneManagementTriggersCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementTriggersAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ZoneManagementCluster) cluster).readTimeControlAttribute(
-              (ChipClusters.ZoneManagementCluster.TimeControlAttributeCallback) callback
+            ((ChipClusters.ZoneManagementCluster) cluster).readTriggersAttribute(
+              (ChipClusters.ZoneManagementCluster.TriggersAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedZoneManagementClusterTimeControlAttributeCallback(),
-          readZoneManagementTimeControlCommandParams
+          () -> new ClusterInfoMapping.DelegatedZoneManagementClusterTriggersAttributeCallback(),
+          readZoneManagementTriggersCommandParams
         );
-        result.put("readTimeControlAttribute", readZoneManagementTimeControlAttributeInteractionInfo);
+        result.put("readTriggersAttribute", readZoneManagementTriggersAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readZoneManagementSensitivityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readZoneManagementSensitivityAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18406,17 +18340,17 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementRateDistortionTradeOffPointsCommandParams
         );
         result.put("readRateDistortionTradeOffPointsAttribute", readCameraAvStreamManagementRateDistortionTradeOffPointsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementMaxPreRollBufferSizeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementMaxPreRollBufferSizeAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readCameraAvStreamManagementMaxContentBufferSizeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCameraAvStreamManagementMaxContentBufferSizeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readMaxPreRollBufferSizeAttribute(
+            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readMaxContentBufferSizeAttribute(
               (ChipClusters.LongAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readCameraAvStreamManagementMaxPreRollBufferSizeCommandParams
+          readCameraAvStreamManagementMaxContentBufferSizeCommandParams
         );
-        result.put("readMaxPreRollBufferSizeAttribute", readCameraAvStreamManagementMaxPreRollBufferSizeAttributeInteractionInfo);
+        result.put("readMaxContentBufferSizeAttribute", readCameraAvStreamManagementMaxContentBufferSizeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementTwoWayTalkSupportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementTwoWayTalkSupportAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18472,17 +18406,6 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementHDRModeEnabledCommandParams
         );
         result.put("readHDRModeEnabledAttribute", readCameraAvStreamManagementHDRModeEnabledAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementCurrentVideoCodecsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementCurrentVideoCodecsAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readCurrentVideoCodecsAttribute(
-              (ChipClusters.CameraAvStreamManagementCluster.CurrentVideoCodecsAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedCameraAvStreamManagementClusterCurrentVideoCodecsAttributeCallback(),
-          readCameraAvStreamManagementCurrentVideoCodecsCommandParams
-        );
-        result.put("readCurrentVideoCodecsAttribute", readCameraAvStreamManagementCurrentVideoCodecsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementFabricsUsingCameraCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementFabricsUsingCameraAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18593,39 +18516,6 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementNightVisionIllumCommandParams
         );
         result.put("readNightVisionIllumAttribute", readCameraAvStreamManagementNightVisionIllumAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementAWBEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementAWBEnabledAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readAWBEnabledAttribute(
-              (ChipClusters.BooleanAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readCameraAvStreamManagementAWBEnabledCommandParams
-        );
-        result.put("readAWBEnabledAttribute", readCameraAvStreamManagementAWBEnabledAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementAutoShutterSpeedEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementAutoShutterSpeedEnabledAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readAutoShutterSpeedEnabledAttribute(
-              (ChipClusters.BooleanAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readCameraAvStreamManagementAutoShutterSpeedEnabledCommandParams
-        );
-        result.put("readAutoShutterSpeedEnabledAttribute", readCameraAvStreamManagementAutoShutterSpeedEnabledAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementAutoISOEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementAutoISOEnabledAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readAutoISOEnabledAttribute(
-              (ChipClusters.BooleanAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readCameraAvStreamManagementAutoISOEnabledCommandParams
-        );
-        result.put("readAutoISOEnabledAttribute", readCameraAvStreamManagementAutoISOEnabledAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementSpeakerMutedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementSpeakerMutedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18802,17 +18692,6 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementStatusLightBrightnessCommandParams
         );
         result.put("readStatusLightBrightnessAttribute", readCameraAvStreamManagementStatusLightBrightnessAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementDepthSensorStatusCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementDepthSensorStatusAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readDepthSensorStatusAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readCameraAvStreamManagementDepthSensorStatusCommandParams
-        );
-        result.put("readDepthSensorStatusAttribute", readCameraAvStreamManagementDepthSensorStatusAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

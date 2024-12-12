@@ -2804,7 +2804,6 @@ endpoint 0 {
     callback attribute activeModeThreshold;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0000;
     ram      attribute clusterRevision default = 3;

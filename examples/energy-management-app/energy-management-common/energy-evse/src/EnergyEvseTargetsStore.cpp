@@ -75,7 +75,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
 
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     uint16_t length = GetTlvSizeUpperBound();
-    ReturnErrorCodeIf(!backingBuffer.Calloc(length), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(backingBuffer.Calloc(length), CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err = mpTargetStore->SyncGetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(), length);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -390,7 +390,7 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
     uint16_t total = GetTlvSizeUpperBound();
 
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    ReturnErrorCodeIf(!backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
     TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), total);
 
     TLV::TLVType arrayType;

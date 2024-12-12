@@ -32,11 +32,7 @@
 using namespace ::chip;
 using namespace ::chip::app;
 
-DeviceSubscriptionManager & DeviceSubscriptionManager::Instance()
-{
-    static DeviceSubscriptionManager instance;
-    return instance;
-}
+namespace admin {
 
 CHIP_ERROR DeviceSubscriptionManager::StartSubscription(Controller::DeviceController & controller, ScopedNodeId scopedNodeId)
 {
@@ -78,3 +74,5 @@ void DeviceSubscriptionManager::DeviceSubscriptionTerminated(ScopedNodeId scoped
     VerifyOrDie(it != mDeviceSubscriptionMap.end());
     mDeviceSubscriptionMap.erase(scopedNodeId);
 }
+
+} // namespace admin

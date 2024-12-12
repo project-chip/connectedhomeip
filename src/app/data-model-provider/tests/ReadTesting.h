@@ -136,7 +136,7 @@ public:
     ReadOperation(const ConcreteAttributePath & path)
     {
         mRequest.path              = path;
-        mRequest.subjectDescriptor = kDenySubjectDescriptor;
+        mRequest.subjectDescriptor = &kDenySubjectDescriptor;
     }
 
     ReadOperation(EndpointId endpoint, ClusterId cluster, AttributeId attribute) :
@@ -146,7 +146,7 @@ public:
     ReadOperation & SetSubjectDescriptor(const chip::Access::SubjectDescriptor & descriptor)
     {
         VerifyOrDie(mState == State::kInitializing);
-        mRequest.subjectDescriptor = descriptor;
+        mRequest.subjectDescriptor = &descriptor;
         return *this;
     }
 

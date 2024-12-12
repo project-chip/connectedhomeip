@@ -24,6 +24,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
@@ -100,6 +101,10 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.certificateValidityPolicy = mCertificateValidityPolicy;
     params.sessionResumptionStorage  = mSessionResumptionStorage;
 
+    // re-initialization keeps any previously initialized values. The only place where
+    // a provider exists is in the InteractionModelEngine, so just say "keep it as is".
+    params.dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+
     return InitSystemState(params);
 }
 
@@ -127,13 +132,20 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ChipLogError(Controller, "Warning: Device Controller Factory should be with a CHIP Device Layer...");
 #endif // CONFIG_DEVICE_LAYER
 
+    if (params.dataModelProvider == nullptr)
+    {
+        ChipLogError(AppServer, "Device Controller Factory requires a `dataModelProvider` value.");
+        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance(...)`");
+    }
+
+    VerifyOrReturnError(params.dataModelProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(stateParams.systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(stateParams.udpEndPointManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // OperationalCertificateStore needs to be provided to init the fabric table if fabric table is
     // not provided wholesale.
-    ReturnErrorCodeIf((params.fabricTable == nullptr) && (params.opCertStore == nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(params.sessionKeystore == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((params.fabricTable != nullptr) || (params.opCertStore != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.sessionKeystore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
 #if CONFIG_DEVICE_LAYER
@@ -197,7 +209,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     {
         // TODO(#16231): Previously (and still) the objects new-ed in this entire method seem expected to last forever...
         auto newFabricTable = Platform::MakeUnique<FabricTable>();
-        ReturnErrorCodeIf(!newFabricTable, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(newFabricTable, CHIP_ERROR_NO_MEMORY);
 
         FabricTable::InitParams fabricTableInitParams;
         fabricTableInitParams.storage             = params.fabricIndependentStorage;
@@ -237,6 +249,16 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
     ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
     ReturnErrorOnFailure(stateParams.bdxTransferServer->Init(stateParams.systemLayer, stateParams.exchangeMgr));
+
+    chip::app::InteractionModelEngine * interactionModelEngine = chip::app::InteractionModelEngine::GetInstance();
+
+    // Note placement of this BEFORE `InitDataModelHandler` since InitDataModelHandler may
+    // rely on ember (does emberAfInit() and configure which may load data from NVM).
+    //
+    // Expected forward path is that we will move move and more things inside datamodel
+    // provider (e.g. storage settings) so we want datamodelprovider available before
+    // `InitDataModelHandler`.
+    interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
 
     InitDataModelHandler();
 
@@ -295,8 +317,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.caseSessionManager = Platform::New<CASESessionManager>();
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(
-        stateParams.exchangeMgr, stateParams.fabricTable, stateParams.reportScheduler, stateParams.caseSessionManager));
+    ReturnErrorOnFailure(interactionModelEngine->Init(stateParams.exchangeMgr, stateParams.fabricTable, stateParams.reportScheduler,
+                                                      stateParams.caseSessionManager));
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));

@@ -71,7 +71,7 @@ class NxpBoard(Enum):
                 if self == NxpBoard.RW61X_ETH:
                     return 'rd_rw612_bga/rw612/ethernet'
                 else:
-                    return 'rd_rw612_bga'
+                    return 'frdm_rw612'
             else:
                 return 'rw61x'
         elif self == NxpBoard.MCXW71:
@@ -158,6 +158,14 @@ class NxpApp(Enum):
         return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
 
 
+class NxpLogLevel(Enum):
+    DEFAULT = auto()  # default everything
+    ALL = auto()  # enable all logging
+    PROGRESS = auto()  # progress and above
+    ERROR = auto()  # error and above
+    NONE = auto()  # no chip_logging at all
+
+
 class NxpBuilder(GnBuilder):
 
     def __init__(self,
@@ -182,12 +190,13 @@ class NxpBuilder(GnBuilder):
                  enable_ethernet: bool = False,
                  enable_shell: bool = False,
                  enable_ota: bool = False,
-                 data_model_interface: Optional[str] = None,
                  enable_factory_data_build: bool = False,
                  disable_pairing_autostart: bool = False,
                  iw416_transceiver: bool = False,
                  w8801_transceiver: bool = False,
-                 iwx12_transceiver: bool = False):
+                 iwx12_transceiver: bool = False,
+                 log_level: NxpLogLevel = NxpLogLevel.DEFAULT,
+                 ):
         super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env),
             runner=runner)
@@ -210,30 +219,33 @@ class NxpBuilder(GnBuilder):
         self.enable_ethernet = enable_ethernet
         self.enable_ota = enable_ota
         self.enable_shell = enable_shell
-        self.data_model_interface = data_model_interface
         self.enable_factory_data_build = enable_factory_data_build
         self.disable_pairing_autostart = disable_pairing_autostart
         self.board_variant = board_variant
         self.iw416_transceiver = iw416_transceiver
         self.w8801_transceiver = w8801_transceiver
         self.iwx12_transceiver = iwx12_transceiver
+        if self.low_power and log_level != NxpLogLevel.NONE:
+            logging.warning("Switching log level to 'NONE' for low power build")
+            log_level = NxpLogLevel.NONE
+        self.log_level = log_level
 
     def GnBuildArgs(self):
         args = []
 
         if self.low_power:
-            args.append('chip_with_low_power=1 chip_logging=false')
+            args.append('nxp_use_low_power=true')
             if self.board == NxpBoard.K32W0:
                 args.append('chip_pw_tokenizer_logging=false chip_with_OM15082=0')
 
         if self.smu2:
-            args.append('use_smu2_static=true use_smu2_dynamic=true')
+            args.append('nxp_use_smu2_static=true nxp_use_smu2_dynamic=true')
 
         if self.enable_factory_data:
-            args.append('chip_with_factory_data=1')
+            args.append('nxp_use_factory_data=true')
 
         if self.convert_dac_pk:
-            args.append('chip_convert_dac_private_key=1')
+            args.append('nxp_convert_dac_private_key=true')
 
         if self.use_fro32k:
             args.append('use_fro_32k=1')
@@ -243,6 +255,31 @@ class NxpBuilder(GnBuilder):
 
         if self.enable_rotating_id:
             args.append('chip_enable_rotating_device_id=1 chip_enable_additional_data_advertising=1')
+
+        if self.log_level == NxpLogLevel.DEFAULT:
+            pass
+        elif self.log_level == NxpLogLevel.ALL:
+            args.append("chip_logging=true")
+            args.append("chip_error_logging=true")
+            args.append("chip_progress_logging=true")
+            args.append("chip_detail_logging=true")
+            args.append("chip_automation_logging=true")
+        elif self.log_level == NxpLogLevel.PROGRESS:
+            args.append("chip_logging=true")
+            args.append("chip_error_logging=true")
+            args.append("chip_progress_logging=true")
+            args.append("chip_detail_logging=false")
+            args.append("chip_automation_logging=false")
+        elif self.log_level == NxpLogLevel.ERROR:
+            args.append("chip_logging=true")
+            args.append("chip_error_logging=true")
+            args.append("chip_progress_logging=false")
+            args.append("chip_detail_logging=false")
+            args.append("chip_automation_logging=false")
+        elif self.log_level == NxpLogLevel.NONE:
+            args.append("chip_logging=false")
+        else:
+            raise Exception("Unknown log level: %r", self.log_level)
 
         if self.has_sw_version_2:
             args.append('nxp_software_version=2')
@@ -259,7 +296,7 @@ class NxpBuilder(GnBuilder):
             args.append('chip_enable_ble=false')
 
         if self.enable_shell:
-            args.append('chip_enable_matter_cli=true')
+            args.append('nxp_enable_matter_cli=true')
 
         if self.enable_thread:
             # thread is enabled by default on kw32
@@ -269,9 +306,6 @@ class NxpBuilder(GnBuilder):
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
             if self.board == NxpBoard.RT1170:
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
-
-        if self.data_model_interface is not None:
-            args.append(f'chip_use_data_model_interface="{self.data_model_interface}"')
 
         if self.board_variant:
             if self.board == NxpBoard.RT1060:
@@ -309,11 +343,6 @@ class NxpBuilder(GnBuilder):
         if self.has_sw_version_2:
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2")
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING=\"2.0\"")
-
-        if self.data_model_interface:
-            # NOTE: this is not supporting "check"
-            enabled = "y" if self.data_model_interface.lower() == "enabled" else "n"
-            flags.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={enabled}")
 
         if self.enable_ota:
             flags.append("-DCONFIG_CHIP_OTA_REQUESTOR=true")
@@ -392,7 +421,7 @@ class NxpBuilder(GnBuilder):
 
             elif self.build_system == NxpBuildSystem.GN:
                 # add empty space at the end to avoid concatenation issue when there is no --args
-                cmd += 'gn gen --check --fail-on-unused-args --export-compile-commands --root=%s ' % self.root
+                cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root=%s ' % self.root
 
                 extra_args = []
 

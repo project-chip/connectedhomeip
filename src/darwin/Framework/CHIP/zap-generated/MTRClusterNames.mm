@@ -434,10 +434,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterIdentifyAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterIdentifyAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -471,10 +467,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterGroupsAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterGroupsAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterGroupsAttributeAttributeListID:
@@ -526,10 +518,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterOnOffAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterOnOffAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterOnOffAttributeAttributeListID:
@@ -619,10 +607,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterLevelControlAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -652,10 +636,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterPulseWidthModulationAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterPulseWidthModulationAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterPulseWidthModulationAttributeAttributeListID:
@@ -709,10 +689,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterDescriptorAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -746,10 +722,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterBindingAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterBindingAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterBindingAttributeAttributeListID:
@@ -811,10 +783,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterAccessControlAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -856,10 +824,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterActionsAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterActionsAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterActionsAttributeAttributeListID:
@@ -985,10 +949,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterBasicInformationAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -1018,10 +978,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAttributeListID:
@@ -1071,10 +1027,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -1112,10 +1064,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAttributeListID:
@@ -1161,10 +1109,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -1200,10 +1144,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterUnitLocalizationAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterUnitLocalizationAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -1237,10 +1177,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAttributeListID:
@@ -1402,10 +1338,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterPowerSourceAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -1475,10 +1407,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterGeneralCommissioningAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterGeneralCommissioningAttributeAttributeListID:
@@ -1556,10 +1484,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterNetworkCommissioningAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -1589,10 +1513,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterDiagnosticLogsAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterDiagnosticLogsAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterDiagnosticLogsAttributeAttributeListID:
@@ -1662,10 +1582,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -1711,10 +1627,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAttributeListID:
@@ -2000,10 +1912,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -2087,10 +1995,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -2156,10 +2060,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAttributeListID:
@@ -2243,10 +2143,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterTimeSynchronizationAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterTimeSynchronizationAttributeAttributeListID:
@@ -2348,10 +2244,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -2395,10 +2287,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterSwitchAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterSwitchAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -2440,10 +2328,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAttributeListID:
@@ -2501,10 +2385,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterOperationalCredentialsAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -2552,10 +2432,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterGroupKeyManagementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -2589,10 +2465,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterFixedLabelAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterFixedLabelAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterFixedLabelAttributeAttributeListID:
@@ -2630,10 +2502,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterUserLabelAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterUserLabelAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -2667,10 +2535,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterBooleanStateAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterBooleanStateAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterBooleanStateAttributeAttributeListID:
@@ -2744,10 +2608,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterICDManagementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -2789,10 +2649,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterTimerAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterTimerAttributeAttributeListID:
@@ -2850,10 +2706,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -2885,24 +2737,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterOvenModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterOvenModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
 
         case MTRAttributeIDTypeClusterOvenModeAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterOvenModeAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterOvenModeAttributeAttributeListID:
@@ -2942,10 +2782,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeAttributeListID:
@@ -3003,10 +2839,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterModeSelectAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -3038,24 +2870,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterLaundryWasherModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
 
         case MTRAttributeIDTypeClusterLaundryWasherModeAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterLaundryWasherModeAttributeAttributeListID:
@@ -3089,24 +2909,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
 
         case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeAttributeListID:
@@ -3156,10 +2964,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -3199,10 +3003,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterRVCRunModeAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterRVCRunModeAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -3240,10 +3040,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterRVCCleanModeAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterRVCCleanModeAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterRVCCleanModeAttributeAttributeListID:
@@ -3301,10 +3097,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterTemperatureControlAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -3348,10 +3140,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -3383,24 +3171,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterDishwasherModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
 
         case MTRAttributeIDTypeClusterDishwasherModeAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterDishwasherModeAttributeAttributeListID:
@@ -3436,10 +3212,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterAirQualityAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterAirQualityAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterAirQualityAttributeAttributeListID:
@@ -3525,10 +3297,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -3576,10 +3344,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterDishwasherAlarmAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterDishwasherAlarmAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -3617,10 +3381,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeAttributeListID:
@@ -3690,10 +3450,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -3747,10 +3503,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterOperationalStateAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterOperationalStateAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterOperationalStateAttributeAttributeListID:
@@ -3808,10 +3560,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterRVCOperationalStateAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -3853,10 +3601,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterScenesManagementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterScenesManagementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterScenesManagementAttributeAttributeListID:
@@ -3914,10 +3658,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -3971,10 +3711,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeAttributeListID:
@@ -4038,10 +3774,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAttributeListID:
@@ -4117,10 +3849,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAttributeListID:
@@ -4230,10 +3958,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -4289,10 +4013,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -4346,10 +4066,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAttributeListID:
@@ -4415,10 +4131,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -4456,10 +4168,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterMessagesAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterMessagesAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterMessagesAttributeAttributeListID:
@@ -4523,10 +4231,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAttributeListID:
@@ -4652,10 +4356,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterEnergyEVSEAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -4707,10 +4407,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterEnergyPreferenceAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -4750,10 +4446,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterPowerTopologyAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterPowerTopologyAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -4785,24 +4477,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
 
         case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeAttributeListID:
@@ -4836,24 +4516,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterWaterHeaterModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
 
         case MTRAttributeIDTypeClusterWaterHeaterModeAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterWaterHeaterModeAttributeAttributeListID:
@@ -4887,24 +4555,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAttributeListID:
@@ -5118,10 +4774,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterDoorLockAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -5241,10 +4893,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterWindowCoveringAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -5298,10 +4946,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterServiceAreaAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterServiceAreaAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterServiceAreaAttributeAttributeListID:
@@ -5425,10 +5069,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAttributeListID:
@@ -5702,10 +5342,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterThermostatAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -5785,10 +5421,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterFanControlAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -5830,10 +5462,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAttributeListID:
@@ -6075,10 +5703,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterColorControlAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -6166,10 +5790,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterBallastConfigurationAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -6221,10 +5841,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -6270,10 +5886,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAttributeListID:
@@ -6343,10 +5955,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterPressureMeasurementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -6394,10 +6002,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterFlowMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterFlowMeasurementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -6443,10 +6047,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAttributeListID:
@@ -6536,10 +6136,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterOccupancySensingAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -6613,10 +6209,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAttributeListID:
@@ -6694,10 +6286,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -6771,10 +6359,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAttributeListID:
@@ -6852,10 +6436,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -6929,10 +6509,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAttributeListID:
@@ -7010,10 +6586,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -7087,10 +6659,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAttributeListID:
@@ -7168,10 +6736,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -7245,10 +6809,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAttributeListID:
@@ -7326,10 +6886,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -7367,10 +6923,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAttributeListID:
@@ -7428,10 +6980,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -7475,10 +7023,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -7516,10 +7060,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterWakeOnLANAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterWakeOnLANAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterWakeOnLANAttributeAttributeListID:
@@ -7565,10 +7105,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterChannelAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterChannelAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -7606,10 +7142,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterTargetNavigatorAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterTargetNavigatorAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterTargetNavigatorAttributeAttributeListID:
@@ -7687,10 +7219,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterMediaPlaybackAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -7730,10 +7258,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterMediaInputAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterMediaInputAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -7765,10 +7289,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterLowPowerAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterLowPowerAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -7798,10 +7318,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterKeypadInputAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterKeypadInputAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterKeypadInputAttributeAttributeListID:
@@ -7843,10 +7359,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterContentLauncherAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterContentLauncherAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -7886,10 +7398,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterAudioOutputAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterAudioOutputAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -7927,10 +7435,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterApplicationLauncherAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterApplicationLauncherAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterApplicationLauncherAttributeAttributeListID:
@@ -7996,10 +7500,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterApplicationBasicAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -8029,10 +7529,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterAccountLoginAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterAccountLoginAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterAccountLoginAttributeAttributeListID:
@@ -8098,10 +7594,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterContentControlAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -8131,10 +7623,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterContentAppObserverAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterContentAppObserverAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterContentAppObserverAttributeAttributeListID:
@@ -8168,8 +7656,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Zones";
             break;
 
-        case MTRAttributeIDTypeClusterZoneManagementAttributeTimeControlID:
-            result = @"TimeControl";
+        case MTRAttributeIDTypeClusterZoneManagementAttributeTriggersID:
+            result = @"Triggers";
             break;
 
         case MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID:
@@ -8182,10 +7670,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterZoneManagementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterZoneManagementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterZoneManagementAttributeAttributeListID:
@@ -8235,8 +7719,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"RateDistortionTradeOffPoints";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxPreRollBufferSizeID:
-            result = @"MaxPreRollBufferSize";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxContentBufferSizeID:
+            result = @"MaxContentBufferSize";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMicrophoneCapabilitiesID:
@@ -8265,14 +7749,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHDRModeEnabledID:
             result = @"HDRModeEnabled";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentVideoCodecsID:
-            result = @"CurrentVideoCodecs";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentSnapshotConfigID:
-            result = @"CurrentSnapshotConfig";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID:
@@ -8313,18 +7789,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeNightVisionIllumID:
             result = @"NightVisionIllum";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAWBEnabledID:
-            result = @"AWBEnabled";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAutoShutterSpeedEnabledID:
-            result = @"AutoShutterSpeedEnabled";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAutoISOEnabledID:
-            result = @"AutoISOEnabled";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeViewportID:
@@ -8395,20 +7859,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"StatusLightBrightness";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeDepthSensorStatusID:
-            result = @"DepthSensorStatus";
-            break;
-
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAttributeListID:
@@ -8446,10 +7902,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -8483,10 +7935,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeAttributeListID:
@@ -8532,10 +7980,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterChimeAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterChimeAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -8575,10 +8019,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterEcosystemInformationAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -8612,10 +8052,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterCommissionerControlAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterCommissionerControlAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterCommissionerControlAttributeAttributeListID:
@@ -9001,10 +8437,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeEventListID:
-            result = @"EventList";
-            break;
-
         case MTRAttributeIDTypeClusterUnitTestingAttributeAttributeListID:
             result = @"AttributeList";
             break;
@@ -9042,10 +8474,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterSampleMEIAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterSampleMEIAttributeEventListID:
-            result = @"EventList";
             break;
 
         case MTRAttributeIDTypeClusterSampleMEIAttributeAttributeListID:
@@ -9794,20 +9222,12 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         switch (commandID) {
 
-        case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandPauseID:
-            result = @"Pause";
-            break;
-
         case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandStopID:
             result = @"Stop";
             break;
 
         case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandStartID:
             result = @"Start";
-            break;
-
-        case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandResumeID:
-            result = @"Resume";
             break;
 
         default:
@@ -11346,22 +10766,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotID:
             result = @"CaptureSnapshot";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetViewportID:
-            result = @"SetViewport";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageRotationID:
-            result = @"SetImageRotation";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageFlipHorizontalID:
-            result = @"SetImageFlipHorizontal";
-            break;
-
-        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageFlipVerticalID:
-            result = @"SetImageFlipVertical";
             break;
 
         default:

@@ -106,7 +106,7 @@ def stash_globally(o: object) -> str:
     return id
 
 
-def unstash_globally(id: str) -> object:
+def unstash_globally(id: str) -> Any:
     return _GLOBAL_DATA.get(id)
 
 
@@ -205,7 +205,7 @@ def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
     return datetime.fromtimestamp(seconds, timezone.utc) + timedelta(milliseconds=millis)
 
 
-def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
+def compare_time(received: int, offset: timedelta = timedelta(), utc: Optional[int] = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
     if utc is None:
         utc = utc_time_in_matter_epoch()
 
@@ -243,7 +243,7 @@ class EventChangeCallback:
         """This class creates a queue to store received event callbacks, that can be checked by the test script
            expected_cluster: is the cluster from which the events are expected
         """
-        self._q = queue.Queue()
+        self._q: queue.Queue = queue.Queue()
         self._expected_cluster = expected_cluster
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
@@ -585,9 +585,9 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         # TODO: Do we really need the expression as a string? We can evaluate this in code very easily
         logging.info(f'\t\t**** Skipping: {name}')
 
-    def step_start(self, name: str, endpoint: int | None = None):
-        # TODO: The way I'm calling this, the name already includes the step number, but it seems like it might be good to separate these
-        logging.info(f'\t\t***** Test Step {name} started with endpoint {endpoint} ')
+    def step_start(self, name: str):
+        # The way I'm calling this, the name is already includes the step number, but it seems like it might be good to separate these
+        logging.info(f'\t\t***** Test Step {name}')
 
     def step_success(self, logger, logs, duration: int, request):
         pass
@@ -636,6 +636,9 @@ class MatterTestConfig:
     # By default, we start with maximized cert chains, as required for RR-1.1.
     # This allows cert tests to be run without re-commissioning for RR-1.1.
     maximize_cert_chains: bool = True
+
+    # By default, let's set validity to 10 years
+    certificate_validity_period = int(timedelta(days=10*365).total_seconds())
 
     qr_code_content: List[str] = field(default_factory=list)
     manual_code: List[str] = field(default_factory=list)
@@ -822,6 +825,27 @@ class ProblemNotice:
 
 
 @dataclass
+class SetupParameters:
+    passcode: int
+    vendor_id: int = 0xFFF1
+    product_id: int = 0x8001
+    discriminator: int = 3840
+    custom_flow: int = 0
+    capabilities: int = 0b0100
+    version: int = 0
+
+    @property
+    def qr_code(self):
+        return SetupPayload().GenerateQrCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                             self.custom_flow, self.capabilities, self.version)
+
+    @property
+    def manual_code(self):
+        return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                                        self.custom_flow, self.capabilities, self.version)
+
+
+@dataclass
 class SetupPayloadInfo:
     filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
     filter_value: int = 0
@@ -866,6 +890,7 @@ class MatterStackState:
                 "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
             ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex=self._config.root_of_trust_index)
             ca.maximizeCertChains = self._config.maximize_cert_chains
+            ca.certificateValidityPeriodSec = self._config.certificate_validity_period
             ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
         elif (len(self._certificate_authority_manager.activeCaList[0].adminList) == 0):
             self._logger.warn("Didn't find any FabricAdmins in storage -- creating a new one...")
@@ -916,9 +941,11 @@ def hex_from_bytes(b: bytes) -> str:
 class TestStep:
     test_plan_number: typing.Union[int, str]
     description: str
-    endpoint: int | None = None
     expectation: str = ""
     is_commissioning: bool = False
+
+    def __str__(self):
+        return f'{self.test_plan_number}: {self.description}\tExpected outcome: {self.expectation}'
 
 
 @dataclass
@@ -953,7 +980,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         steps = self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
-    def get_defined_test_steps(self, test: str) -> list[TestStep]:
+    def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
         steps_name = f'steps_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, steps_name)
@@ -973,7 +1000,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         pics = self._get_defined_pics(test)
         return [] if pics is None else pics
 
-    def _get_defined_pics(self, test: str) -> list[TestStep]:
+    def _get_defined_pics(self, test: str) -> Optional[list[str]]:
         steps_name = f'pics_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, steps_name)
@@ -1070,7 +1097,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return unstash_globally(self.user_params.get("matter_test_config"))
 
     @property
-    def default_controller(self) -> ChipDeviceCtrl:
+    def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
         return unstash_globally(self.user_params.get("default_controller"))
 
     @property
@@ -1084,6 +1111,9 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def dut_node_id(self) -> int:
         return self.matter_test_config.dut_node_ids[0]
+
+    def get_endpoint(self, default: Optional[int] = 0) -> int:
+        return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
 
     def setup_class(self):
         super().setup_class()
@@ -1136,10 +1166,14 @@ class MatterBaseTest(base_test.BaseTestClass):
     def is_pics_sdk_ci_only(self) -> bool:
         return self.check_pics('PICS_SDK_CI_ONLY')
 
-    async def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
+    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if node_id is None:
+            node_id = self.dut_node_id
         try:
-            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
+            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=timeout, iteration=1000,
                                                                           discriminator=rnd_discriminator, option=1)
             params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
             return params
@@ -1148,20 +1182,20 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.fail(e.status, 'Failed to open commissioning window')
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
         data = result[endpoint]
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
+            endpoint = self.get_endpoint()
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
@@ -1186,14 +1220,14 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_expect_error(
             self, cluster: object, attribute: object,
-            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
+            error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
+            endpoint = self.get_endpoint()
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
@@ -1211,7 +1245,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: object, endpoint_id: int = None, expect_success: bool = True) -> Status:
+    async def write_single_attribute(self, attribute_value: object, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
         """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
 
         If `endpoint_id` is None, the default DUT endpoint for the test is selected.
@@ -1233,7 +1267,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             timedRequestTimeoutMs: typing.Union[None, int] = None,
             payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
@@ -1241,7 +1275,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
+            endpoint = self.get_endpoint()
 
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
                                             payloadCapability=payloadCapability)
@@ -1284,9 +1318,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
         asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
 
-    def print_step(self, stepnum: typing.Union[int, str], title: str, endpoint: int | None = None) -> None:
-        endpoint_info = f" with endpoint {endpoint}" if endpoint is not None else ""
-        logging.info(f'***** Test Step {stepnum} : {title}{endpoint_info}')
+    def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
+        logging.info(f'***** Test Step {stepnum} : {title}')
 
     def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
@@ -1327,7 +1360,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 if not trace:
                     return no_stack_trace
 
-                if isinstance(exception, signals.TestError):
+                if isinstance(exception, signals.TestError) or isinstance(exception, signals.TestFailure):
                     # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
                     assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
                     if not assert_candidates:
@@ -1345,6 +1378,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                 return probable_error.strip(), trace[file_candidates[-1]].strip()
 
             probable_error, probable_file = extract_error_text()
+            test_steps = self.get_defined_test_steps(self.current_test_info.name)
+            test_step = str(test_steps[self.current_step_index-1]
+                            ) if test_steps is not None else 'UNKNOWN - no test steps provided in test script'
             logging.error(textwrap.dedent(f"""
 
                                           ******************************************************************
@@ -1355,8 +1391,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                                           * {probable_file}
                                           * {probable_error}
                                           *
+                                          * Test step:
+                                          *     {test_step}
+                                          *
+                                          * Endpoint: {self.matter_test_config.endpoint}
+                                          *
                                           *******************************************************************
-
                                           """))
 
     def on_pass(self, record):
@@ -1455,7 +1495,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         for step in remaining:
             self.skip_step(step.test_plan_number)
 
-    def step(self, step: typing.Union[int, str], endpoint: Optional[int] = None):
+    def step(self, step: typing.Union[int, str]):
         test_name = self.current_test_info.name
         steps = self.get_test_steps(test_name)
 
@@ -1464,7 +1504,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
 
         current_step = steps[self.current_step_index]
-        self.print_step(step, current_step.description, endpoint)
+        self.print_step(step, current_step.description)
 
         if self.runner_hook:
             # If we've reached the next step with no assertion and the step wasn't skipped, it passed
@@ -1473,14 +1513,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                 step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
                 self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
-            current_step.endpoint = endpoint
-
             # TODO: it seems like the step start should take a number and a name
             name = f'{step} : {current_step.description}'
+            self.runner_hook.step_start(name=name)
 
-            self.runner_hook.step_start(name=name, endpoint=current_step.endpoint)
         self.step_start_time = datetime.now(tz=timezone.utc)
-        self.current_step_index += 1
+        self.current_step_index = self.current_step_index + 1
         self.step_skipped = False
 
     def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
@@ -1830,7 +1868,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = [] if args.tests is None else args.tests
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
-    config.endpoint = args.endpoint
+    config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
 
     config.controller_node_id = args.controller_node_id
@@ -2178,8 +2216,6 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
     """
     def run_if_endpoint_matches_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
-            asserts.assert_false(self.get_test_pics(self.current_test_info.name),
-                                 "pics_ method supplied for run_if_endpoint_matches.")
             runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(self, accept_function), timeout=60)
             should_run_test = asyncio.run(runner_with_timeout)
             if not should_run_test:

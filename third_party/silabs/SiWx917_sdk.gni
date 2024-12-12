@@ -16,12 +16,11 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
-
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/lib.gni")
-import("${chip_root}/src/platform/silabs/wifi_args.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${chip_root}/src/platform/silabs/wifi/args.gni")
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("silabs_board.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
@@ -137,8 +136,6 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/service/iostream/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/config",
-      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/inc",
-      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/config",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
 
       # sl memory manager
@@ -155,6 +152,18 @@ template("siwx917_sdk") {
 
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/inc",
     ]
+
+    if (sl_enable_rgb_led) {
+      _include_dirs += [
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led/config",
+      ]
+    } else {
+      _include_dirs += [
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/config",
+      ]
+    }
 
     if (use_system_view) {
       _include_dirs += [
@@ -299,6 +308,12 @@ template("siwx917_sdk") {
       defines += [ "ENABLE_WSTK_LEDS" ]
     }
 
+    if (sl_enable_rgb_led) {
+      defines += [ "SL_MATTER_RGB_LED_ENABLED=1" ]
+    } else {
+      defines += [ "SL_MATTER_RGB_LED_ENABLED=0" ]
+    }
+
     if (chip_enable_icd_server) {
       defines += [
         "SL_ICD_ENABLED=1",
@@ -306,17 +321,19 @@ template("siwx917_sdk") {
         "SL_ACTIVE_MODE_DURATION_MS=${sl_active_mode_duration_ms}",
         "SL_IDLE_MODE_DURATION_S=${sl_idle_mode_duration_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
-        "SL_SI91X_NPSS_GPIO_BTN_HANDLER=1",
         "SL_SI91X_POWER_MANAGER_UC_AVAILABLE=1",
         "SL_SI91X_TICKLESS_MODE=1",
+
+        # Enable Wakeup source for ICD
+        "SL_ENABLE_GPIO_WAKEUP_SOURCE=1",
+        "ENABLE_NPSS_GPIO_2=1",
       ]
     }
 
     if (sl_uart_log_output) {
-      defines += [
-        "SILABS_LOG_OUT_UART=1",
-        "SILABS_LOG_OUT_RTT=0",
-      ]
+      defines += [ "SILABS_LOG_OUT_UART=1" ]
+    } else {
+      defines += [ "SILABS_LOG_OUT_UART=0" ]
     }
 
     if (chip_build_libshell) {  # matter shell
@@ -649,7 +666,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_driver_gpio.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_usart.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_peripheral_drivers/src/sl_si91x_peripheral_gpio.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.c",
@@ -667,7 +683,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c",
-      "${wifi_sdk_root}/components/service/network_manager/si91x/sl_net_si91x.c",
 
       # modified hal
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default_common_linker.c",
@@ -687,11 +702,9 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
       "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_event_handler.c",
       "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_button_instances.c",
-      "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_led_instances.c",
       "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_ulp_timer_init.c",
       "${sdk_support_root}/matter/si91x/support/hal/rsi_hal_mcu_m4.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/src/sl_si91x_button.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/src/sl_si91x_led.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c",
 
       # sl memory manager
@@ -715,6 +728,18 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/hal/src/sl_si91x_hal_soc_soft_reset.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c",
     ]
+
+    if (sl_enable_rgb_led) {
+      sources += [
+        "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_rgb_led_instances.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led/src/sl_si91x_rgb_led.c",
+      ]
+    } else {
+      sources += [
+        "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_led_instances.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/src/sl_si91x_led.c",
+      ]
+    }
 
     if (use_system_view) {
       sources += [
@@ -804,7 +829,7 @@ template("siwx917_sdk") {
         "${_mbedtls_root}/library/ssl_srv.c",
         "${_mbedtls_root}/library/ssl_tls.c",
         "${_mbedtls_root}/library/x509.c",
-        "${efr32_sdk_build_root}/mqtt/stack/mqtt.c",
+        "${silabs_sdk_build_root}/mqtt/stack/mqtt.c",
       ]
     }
 

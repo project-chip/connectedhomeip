@@ -162,7 +162,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
         self.step("4")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.DeviceEnergyManagement)
         await sub_handler.start(self.default_controller, self.dut_node_id,
-                                self.matter_test_config.endpoint,
+                                self.get_endpoint(),
                                 min_interval_sec=0,
                                 max_interval_sec=10, keepSubscriptions=False)
 

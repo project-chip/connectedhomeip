@@ -21,6 +21,7 @@
 
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
+#import <Matter/MTRAttributeValueWaiter.h>
 #import <Matter/MTRBackwardsCompatShims.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>

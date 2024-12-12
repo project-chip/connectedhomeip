@@ -20,6 +20,7 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_XPC.h"
 #import "MTRDevice_XPC_Internal.h"
+#import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
@@ -37,12 +38,17 @@
 @property (nonnull, atomic, readwrite, retain) MTRXPCDeviceControllerParameters * xpcParameters;
 @property (atomic, readwrite, assign) NSTimeInterval xpcRetryTimeInterval;
 @property (atomic, readwrite, assign) BOOL xpcConnectedOrConnecting;
+@property (nonatomic, readonly, retain) dispatch_queue_t workQueue;
 
 @end
 
 NSString * const MTRDeviceControllerRegistrationControllerContextKey = @"MTRDeviceControllerRegistrationControllerContext";
 NSString * const MTRDeviceControllerRegistrationNodeIDsKey = @"MTRDeviceControllerRegistrationNodeIDs";
 NSString * const MTRDeviceControllerRegistrationNodeIDKey = @"MTRDeviceControllerRegistrationNodeID";
+NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey = @"MTRDeviceControllerRegistrationControllerNodeID";
+NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey = @"MTRDeviceControllerRegistrationControllerIsRunning";
+NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey = @"MTRDeviceControllerRegistrationDeviceInternalState";
+NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey = @"MTRDeviceControllerRegistrationControllerCompressedFabricID";
 
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
@@ -90,6 +96,9 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 }
 
 #pragma mark - XPC
+@synthesize controllerNodeID = _controllerNodeID;
+@synthesize compressedFabricID = _compressedFabricID;
+
 + (NSMutableSet *)_allowedClasses
 {
     static NSArray * sBaseAllowedClasses = @[
@@ -167,6 +176,13 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
             argumentIndex:1
                   ofReply:NO];
 
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+
+    [interface setClasses:allowedClasses
+              forSelector:@selector(controller:controllerConfigurationUpdated:)
+            argumentIndex:1
+                  ofReply:NO];
+
     return interface;
 }
 
@@ -182,7 +198,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
         self.xpcRetryTimeInterval = 0.5;
         mtr_weakify(self);
 
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.chipWorkQueue, ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.workQueue, ^{
             mtr_strongify(self);
             [self _xpcConnectionRetry];
         });
@@ -202,7 +218,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
             self.xpcRetryTimeInterval = MIN(60.0, self.xpcRetryTimeInterval);
             mtr_weakify(self);
 
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.chipWorkQueue, ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.workQueue, ^{
                 mtr_strongify(self);
                 [self _xpcConnectionRetry];
             });
@@ -290,7 +306,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
         self.uniqueIdentifier = UUID;
         self.xpcParameters = xpcParameters;
-        self.chipWorkQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        _workQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
 
         if (![self _setupXPCConnection]) {
             return nil;
@@ -345,9 +361,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 }
 
 #pragma mark - XPC Action Overrides
-
-MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(isRunning, BOOL, NO, getIsRunningWithReply)
-MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSNumber *, nil, controllerNodeIDWithReply)
 
 // Not Supported via XPC
 // - (oneway void)deviceController:(NSUUID *)controller setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload newNodeID:(NSNumber *)newNodeID withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
@@ -423,6 +436,67 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSNumber *, nil,
 }
 
 #pragma mark - MTRDeviceController Protocol Client
+
+- (oneway void)controller:(NSUUID *)controller controllerConfigurationUpdated:(NSDictionary *)configuration
+{
+    // Reuse the same format as config dictionary, and add values for internal states
+    //  @{
+    //     MTRDeviceControllerRegistrationControllerContextKey: @{
+    //         MTRDeviceControllerRegistrationControllerNodeIDKey: controllerNodeID
+    //     }
+    //     MTRDeviceControllerRegistrationNodeIDsKey: @[
+    //        @{
+    //            MTRDeviceControllerRegistrationNodeIDKey: nodeID,
+    //            MTRDeviceControllerRegistrationDeviceInternalStateKey: deviceInternalStateDictionary
+    //        }
+    //     ]
+    //  }
+
+    NSDictionary * controllerContext = MTR_SAFE_CAST(configuration[MTRDeviceControllerRegistrationControllerContextKey], NSDictionary);
+    if (controllerContext) {
+        NSNumber * controllerNodeID = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey], NSNumber);
+        if (controllerNodeID) {
+            _controllerNodeID = controllerNodeID;
+        }
+
+        NSNumber * compressedFabricID = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationControllerCompressedFabricIDKey], NSNumber);
+        if (compressedFabricID) {
+            _compressedFabricID = compressedFabricID;
+        }
+    }
+
+    NSArray * deviceInfoList = MTR_SAFE_CAST(configuration[MTRDeviceControllerRegistrationNodeIDsKey], NSArray);
+
+    MTR_LOG("Received controllerConfigurationUpdated: controllerNodeID %@ compressedFabricID %016lluX deviceInfoList %@", self.controllerNodeID, self.compressedFabricID.unsignedLongLongValue, deviceInfoList);
+
+    for (NSDictionary * deviceInfo in deviceInfoList) {
+        if (!MTR_SAFE_CAST(deviceInfo, NSDictionary)) {
+            MTR_LOG_ERROR(" - Missing or malformed device Info");
+            continue;
+        }
+
+        NSNumber * nodeID = MTR_SAFE_CAST(deviceInfo[MTRDeviceControllerRegistrationNodeIDKey], NSNumber);
+        if (!nodeID) {
+            MTR_LOG_ERROR(" - Missing or malformed nodeID");
+            continue;
+        }
+
+        NSDictionary * deviceInternalState = MTR_SAFE_CAST(deviceInfo[MTRDeviceControllerRegistrationDeviceInternalStateKey], NSDictionary);
+        if (!deviceInternalState) {
+            MTR_LOG_ERROR(" - Missing or malformed deviceInternalState");
+            continue;
+        }
+
+        auto * device = static_cast<MTRDevice_XPC *>([self _deviceForNodeID:nodeID createIfNeeded:NO]);
+        [device device:nodeID internalStateUpdated:deviceInternalState];
+    }
+}
+
+- (BOOL)isRunning
+{
+    // For XPC controller, always return yes
+    return YES;
+}
 
 // Not Supported via XPC
 //- (oneway void)controller:(NSUUID *)controller statusUpdate:(MTRCommissioningStatus)status {

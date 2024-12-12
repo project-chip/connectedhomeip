@@ -76,7 +76,7 @@ class DecoratorTestRunnerHooks:
     def step_skipped(self, name: str, expression: str):
         pass
 
-    def step_start(self, name: str, endpoint: Optional[int] = None):
+    def step_start(self, name: str):
         pass
 
     def step_success(self, logger, logs, duration: int, request):
@@ -144,16 +144,6 @@ class TestDecorators(MatterBaseTest):
 
             should_run = await should_run_test_on_endpoint(self, has_timesync_utc)
             asserts.assert_false(should_run, msg)
-
-    # This test should cause an assertion because it has a pics_ method
-    @run_if_endpoint_matches(has_cluster(Clusters.OnOff))
-    async def test_endpoint_with_pics(self):
-        pass
-
-    # This method returns the top level pics for test_endpoint_with_pics
-    # It is used to test that test_endpoint_with_pics will fail since you can't have a per endpoint test gated on a PICS.
-    def pics_endpoint_with_pics(self):
-        return ['EXAMPLE.S']
 
     # This test should be run once per endpoint
     @run_if_endpoint_matches(has_cluster(Clusters.OnOff))
@@ -242,12 +232,6 @@ def main():
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if not ok:
         failures.append("Test case failure: test_endpoints")
-
-    test_name = 'test_endpoint_with_pics'
-    test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
-    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
-    if ok:
-        failures.append(f"Did not get expected test assertion on {test_name}")
 
     # Test should run once for the whole node, regardless of the number of endpoints
     def run_check(test_name: str, read_response: Attribute.AsyncReadTransaction.ReadResponse, expect_skip: bool) -> None:

@@ -53,8 +53,8 @@ declare_args() {
   sl_matter_ble_extended_adv = false
 
   # ICD Openthread Configuration flags
-  sl_ot_idle_interval_ms = 15000  # 15s Idle Intervals
-  sl_ot_active_interval_ms = 200  # 200ms Active Intervals
+  sl_transport_idle_interval_ms = 15000  # 15s Idle Intervals
+  sl_transport_active_interval_ms = 200  # 200ms Active Intervals
 
   # SSED Specific configurations
   sl_ot_csl_timeout_sec = 30  # 30s CSL timeout
@@ -96,6 +96,7 @@ declare_args() {
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 silabs_plat_efr32_wifi_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
+silabs_platform_dir = "${chip_root}/src/platform/silabs"
 
 is_series_2 = silabs_family == "mgm24" || silabs_family == "efr32mg24" ||
               silabs_family == "efr32mg26"
@@ -333,6 +334,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/firmware",
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/pds/brd8022a",
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/secure_link",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/config",
       ]
     }
 
@@ -365,12 +367,20 @@ template("efr32_sdk") {
         "${wifi_sdk_root}/components/protocol/wifi/si91x",
       ]
     }
+
+    if (use_rs9116) {
+      # TODO: we should create a seperate directory for headers that are necessary for the underlying sdks
+      _include_dirs += [ "${chip_root}/src/platform/silabs/wifi/rs911x/ncp" ]
+    }
+
     if (use_rs9116 || use_SiWx917) {
       _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
     }
+
     if (use_wf200 || use_rs9116 || use_SiWx917) {
       _include_dirs += [ "${chip_root}/src/platform/silabs/wifi" ]
     }
+
     if (silabs_family != "mgm24") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/radio/rail_lib/hal",
@@ -477,10 +487,9 @@ template("efr32_sdk") {
     }
 
     if (sl_uart_log_output) {
-      defines += [
-        "SILABS_LOG_OUT_UART=1",
-        "SILABS_LOG_OUT_RTT=0",
-      ]
+      defines += [ "SILABS_LOG_OUT_UART=1" ]
+    } else {
+      defines += [ "SILABS_LOG_OUT_UART=0" ]
     }
 
     if (use_silabs_thread_lib) {
@@ -583,7 +592,7 @@ template("efr32_sdk") {
       }
 
       if (use_wf200 || use_rs9116 || use_SiWx917) {
-        import("${chip_root}/src/platform/silabs/wifi_args.gni")
+        import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
         defines += [ "LWIP_NETIF_API=1" ]
         if (chip_enable_wifi_ipv4) {
@@ -617,33 +626,18 @@ template("efr32_sdk") {
         "SL_ACTIVE_MODE_DURATION_MS=${sl_active_mode_duration_ms}",
         "SL_IDLE_MODE_DURATION_S=${sl_idle_mode_duration_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
+        "SL_TRANSPORT_IDLE_INTERVAL=${sl_transport_idle_interval_ms}",
+        "SL_TRANSPORT_ACTIVE_INTERVAL=${sl_transport_active_interval_ms}",
       ]
 
       if (defined(invoker.chip_enable_openthread) &&
           invoker.chip_enable_openthread) {
-        defines += [
-          "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
-          "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
-        ]
-
         if (enable_synchronized_sed) {
           defines += [
             "CHIP_DEVICE_CONFIG_THREAD_SSED=1",
             "SL_CSL_ENABLE=1",
           ]
         }
-      }
-
-      if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
-        defines += [
-          # Used for wifi devices to get packet details
-          # TODO: Remove this flag, once the communication is fixed
-          "WIFI_DEBUG_ENABLED=1",
-        ]
-
-        # This is kept due to the warning on the LWIP when on demand timer is added
-        # TODO: remove this flag once the warning is fixed in SiSDK MATTER-3946
-        cflags_c = [ "-Wno-implicit-function-declaration" ]
       }
     }
 
@@ -1012,7 +1006,6 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/bus/sl_wfx_bus.c",
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/bus/sl_wfx_bus_spi.c",
-        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/secure_link/sl_wfx_secure_link.c",
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/sl_wfx.c",
       ]
     }

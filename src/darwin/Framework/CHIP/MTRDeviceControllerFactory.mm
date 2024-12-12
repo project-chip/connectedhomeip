@@ -58,6 +58,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
@@ -78,6 +79,18 @@ using namespace chip::Tracing::DarwinFramework;
 
 @end
 
+class MTRApplicationCallback : public app::ReadHandler::ApplicationCallback {
+    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & readHandler, Transport::SecureSession & secureSession) override
+    {
+        uint16_t requestedMinInterval = 0;
+        uint16_t requestedMaxInterval = 0;
+        readHandler.GetReportingIntervals(requestedMinInterval, requestedMaxInterval);
+
+        uint16_t maximumMaxInterval = std::max(kSubscriptionMaxIntervalPublisherLimit, requestedMaxInterval);
+        return readHandler.SetMaxReportingInterval(maximumMaxInterval);
+    }
+};
+
 MTR_DIRECT_MEMBERS
 @interface MTRDeviceControllerFactory ()
 - (void)preWarmCommissioningSessionDone;
@@ -90,6 +103,7 @@ MTR_DIRECT_MEMBERS
 
     Credentials::IgnoreCertificateValidityPeriodPolicy _certificateValidityPolicy;
     Crypto::RawKeySessionKeystore _sessionKeystore;
+    MTRApplicationCallback _applicationCallback;
     // We use TestPersistentStorageDelegate just to get an in-memory store to back
     // our group data provider impl.  We initialize this store correctly on every
     // controller startup, so don't need to actually persist it.
@@ -239,6 +253,8 @@ MTR_DIRECT_MEMBERS
 
     // Make sure the deinit order here is the reverse of the init order in
     // startControllerFactory:
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+
     _certificationDeclarationCertificates = nil;
     _productAttestationAuthorityCertificates = nil;
 
@@ -327,6 +343,7 @@ MTR_DIRECT_MEMBERS
                           error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+    [self _maybeLogBacktrace:@"Controller Factory Start"];
 
     __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     dispatch_sync(_chipWorkQueue, ^{
@@ -366,6 +383,8 @@ MTR_DIRECT_MEMBERS
         _productAttestationAuthorityCertificates = [startupParams.productAttestationAuthorityCertificates copy];
         _certificationDeclarationCertificates = [startupParams.certificationDeclarationCertificates copy];
 
+        app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&_applicationCallback);
+
         {
             chip::Controller::FactoryInitParams params;
             if (startupParams.port != nil) {
@@ -380,6 +399,7 @@ MTR_DIRECT_MEMBERS
             params.opCertStore = _opCertStore;
             params.certificateValidityPolicy = &_certificateValidityPolicy;
             params.sessionResumptionStorage = _sessionResumptionStorage;
+            params.dataModelProvider = app::CodegenDataModelProviderInstance(_persistentStorageDelegate);
             SuccessOrExit(err = _controllerFactory->Init(params));
         }
 
@@ -418,6 +438,7 @@ MTR_DIRECT_MEMBERS
 - (void)stopControllerFactory
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+    [self _maybeLogBacktrace:@"Controller Factory Stop"];
 
     for (MTRDeviceController * controller in [_controllers copy]) {
         [controller shutdown];
@@ -800,7 +821,7 @@ MTR_DIRECT_MEMBERS
     } else {
         // No root certificate means the nocSigner is using the root keys, because
         // consumers must provide a root certificate whenever an ICA is used.
-        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(params.nocSigner.publicKey, &pubKey);
+        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromMTRKeypair(params.nocSigner, &pubKey);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Can't extract public key from MTRKeypair: %s", ErrorStr(err));
             return NO;
@@ -1243,6 +1264,13 @@ MTR_DIRECT_MEMBERS
     }
 
     return systemState->Fabrics();
+}
+
+- (void)_maybeLogBacktrace:(NSString *)message
+{
+    @autoreleasepool {
+        MTR_LOG("[%@]: %@", message, [NSThread callStackSymbols]);
+    }
 }
 
 @end

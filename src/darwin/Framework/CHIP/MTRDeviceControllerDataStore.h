@@ -18,7 +18,9 @@
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#import <Matter/MTRDevice_Internal.h>
+
+#import "MTRDeviceClusterData.h"
+#import "MTRDevice_Internal.h"
 
 #include <lib/core/CHIPError.h>
 

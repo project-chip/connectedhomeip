@@ -18,7 +18,7 @@
 
 #include "CHIPCommandBridge.h"
 
-#import "CHIPToolKeypair.h"
+#import "DFTKeypair.h"
 #import <Matter/Matter.h>
 
 #include <lib/core/CHIPConfig.h>
@@ -28,12 +28,16 @@
 #import "CHIPCommandStorageDelegate.h"
 #import "CertificateIssuer.h"
 #import "ControllerStorage.h"
+#import "DeviceDelegate.h"
 #include "MTRError_Utils.h"
 
 #include <map>
 #include <string>
 
 static CHIPToolPersistentStorageDelegate * storage = nil;
+static MTRDevice * sLastUsedDevice = nil;
+static DeviceDelegate * sDeviceDelegate = nil;
+static dispatch_queue_t sDeviceDelegateDispatchQueue = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
 dispatch_queue_t CHIPCommandBridge::mOTAProviderCallbackQueue;
@@ -139,7 +143,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
         productAttestationAuthorityCertificates = nil;
     }
 
-    sUseSharedStorage = mCommissionerSharedStorage.ValueOr(true);
+    sUseSharedStorage = mCommissionerSharedStorage.ValueOr(false);
     if (sUseSharedStorage) {
         return SetUpStackWithSharedStorage(productAttestationAuthorityCertificates);
     }
@@ -154,10 +158,10 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithPerControllerStorage(NSArray<NSData 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     std::string commissionerName = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        __auto_type * uuidString = [NSString stringWithFormat:@"%@%@", @"8DCADB14-AF1F-45D0-B084-00000000000", @(i)];
+        __auto_type * fabricId = GetCommissionerFabricId(identities[i]);
+        __auto_type * uuidString = [NSString stringWithFormat:@"%@%@", @(kControllerIdPrefix), fabricId];
         __auto_type * controllerId = [[NSUUID alloc] initWithUUIDString:uuidString];
         __auto_type * vendorId = @(mCommissionerVendorId.ValueOr(chip::VendorId::TestVendor1));
-        __auto_type * fabricId = @(i + 1);
         __auto_type * nodeId = @(chip::kTestControllerNodeId);
 
         if (commissionerName.compare(identities[i]) == 0 && mCommissionerNodeId.HasValue()) {
@@ -168,10 +172,17 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithPerControllerStorage(NSArray<NSData 
 
         NSError * error;
         __auto_type * operationalKeypair = [certificateIssuer issueOperationalKeypairWithControllerStorage:controllerStorage error:&error];
+        SecKeyRef publicKey = [operationalKeypair copyPublicKey];
+
         __auto_type * operational = [certificateIssuer issueOperationalCertificateForNodeID:nodeId
                                                                                    fabricID:fabricId
-                                                                                  publicKey:operationalKeypair.publicKey
+                                                                                  publicKey:publicKey
                                                                                       error:&error];
+
+        if (publicKey != NULL) {
+            CFAutorelease(publicKey);
+        }
+
         VerifyOrReturnError(nil == error, MTRErrorToCHIPErrorCode(error), ChipLogError(chipTool, "Can not issue an operational certificate: %@", error));
 
         __auto_type * controllerStorageQueue = dispatch_queue_create("com.chip.storage", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -185,6 +196,10 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithPerControllerStorage(NSArray<NSData 
                                                                                          intermediateCertificate:nil
                                                                                                  rootCertificate:certificateIssuer.rootCertificate];
         [params setOperationalCertificateIssuer:certificateIssuer queue:controllerStorageQueue];
+
+        __auto_type * otaDelegateQueue = dispatch_queue_create("com.chip.ota", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        [params setOTAProviderDelegate:mOTADelegate queue:otaDelegateQueue];
+
         params.productAttestationAuthorityCertificates = productAttestationAuthorityCertificates;
 
         __auto_type * controller = [[MTRDeviceController alloc] initWithParameters:params error:&error];
@@ -214,7 +229,7 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithSharedStorage(NSArray<NSData *> * pr
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     std::string commissionerName = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        __auto_type * fabricId = @(i + 1);
+        __auto_type * fabricId = GetCommissionerFabricId(identities[i]);
         __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:certificateIssuer.ipk
                                                                             fabricID:fabricId
                                                                            nocSigner:certificateIssuer.signingKey];
@@ -260,14 +275,19 @@ MTRDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrent
 
 NSNumber * CHIPCommandBridge::CurrentCommissionerFabricId()
 {
-    if (mCurrentIdentity.compare(kIdentityAlpha) == 0) {
+    return GetCommissionerFabricId(mCurrentIdentity.c_str());
+}
+
+NSNumber * CHIPCommandBridge::GetCommissionerFabricId(const char * identity)
+{
+    if (strcmp(identity, kIdentityAlpha) == 0) {
         return @(1);
-    } else if (mCurrentIdentity.compare(kIdentityBeta) == 0) {
+    } else if (strcmp(identity, kIdentityBeta) == 0) {
         return @(2);
-    } else if (mCurrentIdentity.compare(kIdentityGamma) == 0) {
+    } else if (strcmp(identity, kIdentityGamma) == 0) {
         return @(3);
     } else {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", mCurrentIdentity.c_str(), kIdentityAlpha,
+        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", identity, kIdentityAlpha,
             kIdentityBeta, kIdentityGamma);
         chipDie();
     }
@@ -283,6 +303,25 @@ MTRBaseDevice * CHIPCommandBridge::BaseDeviceWithNodeId(chip::NodeId nodeId)
     VerifyOrReturnValue(controller != nil, nil);
     return [controller deviceBeingCommissionedWithNodeID:@(nodeId) error:nullptr]
         ?: [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:controller];
+}
+
+MTRDevice * CHIPCommandBridge::DeviceWithNodeId(chip::NodeId nodeId)
+{
+    __auto_type * controller = CurrentCommissioner();
+    VerifyOrReturnValue(nil != controller, nil);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(nodeId) controller:controller];
+    VerifyOrReturnValue(nil != device, nil);
+
+    // The device delegate is initialized only once, when the first MTRDevice is created.
+    if (sDeviceDelegate == nil) {
+        sDeviceDelegate = [[DeviceDelegate alloc] init];
+        sDeviceDelegateDispatchQueue = dispatch_queue_create("com.chip.devicedelegate", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    }
+    [device addDelegate:sDeviceDelegate queue:sDeviceDelegateDispatchQueue];
+
+    sLastUsedDevice = device;
+    return device;
 }
 
 void CHIPCommandBridge::StopCommissioners()
@@ -326,6 +365,21 @@ void CHIPCommandBridge::ShutdownCommissioner()
     mCurrentController = nil;
 
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+}
+
+void CHIPCommandBridge::SuspendOrResumeCommissioners()
+{
+    for (auto & pair : mControllers) {
+        __auto_type * commissioner = pair.second;
+        if (commissioner.running) {
+            commissioner.suspended ? [commissioner resume] : [commissioner suspend];
+        }
+    }
+}
+
+MTRDevice * CHIPCommandBridge::GetLastUsedDevice()
+{
+    return sLastUsedDevice;
 }
 
 CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration)

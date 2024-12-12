@@ -19,7 +19,7 @@ import("${chip_root}/config/standalone/args.gni")
 nxp_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 nxp_device = "MCXW716C"
 
-chip_config_dimmable_led = false
+nxp_config_dimmable_led = false
 chip_enable_ota_requestor = true
 chip_stack_lock_tracking = "fatal"
 chip_enable_ble = true
@@ -29,11 +29,13 @@ is_debug = false
 
 chip_crypto = "platform"
 chip_openthread_ftd = true
-chip_with_ot_cli = 0
+nxp_enable_ot_cli = false
 
 chip_system_config_provide_statistics = false
 chip_system_config_use_open_thread_inet_endpoints = true
 chip_with_lwip = false
 
-use_smu2_static = true
-use_smu2_dynamic = true
+nxp_nvm_component = "nvs"
+
+nxp_use_smu2_static = true
+nxp_use_smu2_dynamic = true

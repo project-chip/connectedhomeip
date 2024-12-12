@@ -12952,26 +12952,30 @@ public static class ZoneManagementClusterZoneInformationStruct {
     return output.toString();
   }
 }
-public static class ZoneManagementClusterZoneTriggeringTimeControlStruct {
+public static class ZoneManagementClusterZoneTriggerControlStruct {
   public Integer initialDuration;
   public Integer augmentationDuration;
   public Long maxDuration;
   public Integer blindDuration;
+  public Optional<Integer> sensitivity;
   private static final long INITIAL_DURATION_ID = 0L;
   private static final long AUGMENTATION_DURATION_ID = 1L;
   private static final long MAX_DURATION_ID = 2L;
   private static final long BLIND_DURATION_ID = 3L;
+  private static final long SENSITIVITY_ID = 4L;
 
-  public ZoneManagementClusterZoneTriggeringTimeControlStruct(
+  public ZoneManagementClusterZoneTriggerControlStruct(
     Integer initialDuration,
     Integer augmentationDuration,
     Long maxDuration,
-    Integer blindDuration
+    Integer blindDuration,
+    Optional<Integer> sensitivity
   ) {
     this.initialDuration = initialDuration;
     this.augmentationDuration = augmentationDuration;
     this.maxDuration = maxDuration;
     this.blindDuration = blindDuration;
+    this.sensitivity = sensitivity;
   }
 
   public StructType encodeTlv() {
@@ -12980,11 +12984,12 @@ public static class ZoneManagementClusterZoneTriggeringTimeControlStruct {
     values.add(new StructElement(AUGMENTATION_DURATION_ID, new UIntType(augmentationDuration)));
     values.add(new StructElement(MAX_DURATION_ID, new UIntType(maxDuration)));
     values.add(new StructElement(BLIND_DURATION_ID, new UIntType(blindDuration)));
+    values.add(new StructElement(SENSITIVITY_ID, sensitivity.<BaseTLVType>map((nonOptionalsensitivity) -> new UIntType(nonOptionalsensitivity)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
 
-  public static ZoneManagementClusterZoneTriggeringTimeControlStruct decodeTlv(BaseTLVType tlvValue) {
+  public static ZoneManagementClusterZoneTriggerControlStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -12992,6 +12997,7 @@ public static class ZoneManagementClusterZoneTriggeringTimeControlStruct {
     Integer augmentationDuration = null;
     Long maxDuration = null;
     Integer blindDuration = null;
+    Optional<Integer> sensitivity = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == INITIAL_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -13013,20 +13019,26 @@ public static class ZoneManagementClusterZoneTriggeringTimeControlStruct {
           UIntType castingValue = element.value(UIntType.class);
           blindDuration = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == SENSITIVITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sensitivity = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
-    return new ZoneManagementClusterZoneTriggeringTimeControlStruct(
+    return new ZoneManagementClusterZoneTriggerControlStruct(
       initialDuration,
       augmentationDuration,
       maxDuration,
-      blindDuration
+      blindDuration,
+      sensitivity
     );
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ZoneManagementClusterZoneTriggeringTimeControlStruct {\n");
+    output.append("ZoneManagementClusterZoneTriggerControlStruct {\n");
     output.append("\tinitialDuration: ");
     output.append(initialDuration);
     output.append("\n");
@@ -13038,6 +13050,9 @@ public static class ZoneManagementClusterZoneTriggeringTimeControlStruct {
     output.append("\n");
     output.append("\tblindDuration: ");
     output.append(blindDuration);
+    output.append("\n");
+    output.append("\tsensitivity: ");
+    output.append(sensitivity);
     output.append("\n");
     output.append("}\n");
     return output.toString();

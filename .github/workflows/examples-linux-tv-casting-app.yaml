@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:94
 
         steps:
             - name: Checkout
@@ -72,16 +72,13 @@ jobs:
                     "python3 ./scripts/tests/run_tv_casting_test.py"
               timeout-minutes: 2 # Comment this out to debug if GitHub Action times out.
 
-            # TODO: this test is flaky and was disabled
-            #       https://github.com/project-chip/connectedhomeip/issues/34598
-            #
-            #  - name:
-            #        Test casting from Linux tv-casting-app to Linux tv-app -
-            #        Commissioner Generated Passcode
-            #    run: |
-            #        ./scripts/run_in_build_env.sh \
-            #          "python3 ./scripts/tests/run_tv_casting_test.py --commissioner-generated-passcode=True"
-            #    timeout-minutes: 2 # Comment this out to debug if GitHub Action times out.
+            - name:
+                  Test casting from Linux tv-casting-app to Linux tv-app -
+                  Commissioner Generated Passcode
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "python3 ./scripts/tests/run_tv_casting_test.py --commissioner-generated-passcode=True"
+              timeout-minutes: 2 # Comment this out to debug if GitHub Action times out.
 
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports

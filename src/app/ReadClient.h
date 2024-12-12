@@ -676,6 +676,12 @@ private:
     // of RequestMessage (another end of container)).
     static constexpr uint16_t kReservedSizeForTLVEncodingOverhead =
         kReservedSizeForEndOfContainer + kReservedSizeForIMRevision + kReservedSizeForEndOfContainer;
+
+#if CHIP_PROGRESS_LOGGING
+    // Tracks the time when a subscribe request is successfully sent.
+    // This timestamp allows for logging the duration taken to established the subscription.
+    System::Clock::Timestamp mSubscribeRequestTime = System::Clock::kZero;
+#endif
 };
 
 };     // namespace app

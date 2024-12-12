@@ -86,6 +86,72 @@
 #     script-args: --storage-path admin_storage.json
 #     factory-reset: false
 #     quiet: true
+#   run9:
+#     app: ${ENERGY_MANAGEMENT_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run10:
+#     app: ${LIT_ICD_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run11:
+#     app: ${CHIP_MICROWAVE_OVEN_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run12:
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run13:
+#     app: ${NETWORK_MANAGEMENT_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run14:
+#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 # Run 1: runs through all tests
@@ -95,6 +161,13 @@
 # Run 5: Tests CASE connection using manual code (12.1 only)
 # Run 6: Tests CASE connection using QR code (12.1 only)
 # Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
+# Run 8: Tests reusing storage from run7 (i.e. factory-reset=false)
+# Run 9: Tests against energy-management-app
+# Run 10: Tests against lit-icd app
+# Run 11: Tests against microwave-oven app
+# Run 12: Tests against chip-rvc app
+# Run 13: Tests against network-management-app
+# Run 14: Tests against lighting-app-data-mode-no-unique-id
 
 import logging
 from dataclasses import dataclass
@@ -108,7 +181,8 @@ from chip.clusters.Attribute import ValueDecodeFailure
 from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.global_attribute_ids import AttributeIdType, ClusterIdType, GlobalAttributeIds, attribute_id_type, cluster_id_type
+from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds, attribute_id_type,
+                                               cluster_id_type, command_id_type)
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
                                          async_test_body, default_matter_test_main)
 from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
@@ -503,7 +577,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                     location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad_cmd_id)
                     vendor_id = get_vendor_id(bad_cmd_id)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Command 0x{bad_cmd_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                    ), location=location, problem=f'Command 0x{bad_cmd_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}' + (' (Test Vendor)' if command_id_type(bad_cmd_id) == CommandIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
 
         self.print_step(7, "Validate that none of the MEI global attribute IDs contain values outside of the allowed suffix range")
@@ -818,11 +892,14 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             1.2, "For device types with more than one endpoint listed, ensure each of the listed endpoints has a tag attribute and the tag attributes are not the same")
         problems = find_tag_list_problems(roots, device_types, self.endpoints)
 
-        for ep, problem in problems.items():
-            location = AttributePathLocation(endpoint_id=ep, cluster_id=Clusters.Descriptor.id,
-                                             attribute_id=Clusters.Descriptor.Attributes.TagList.attribute_id)
-            msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
-            self.record_error(self.get_test_name(), location=location, problem=msg, spec_location="Descriptor TagList")
+        def record_problems(problems):
+            for ep, problem in problems.items():
+                location = AttributePathLocation(endpoint_id=ep, cluster_id=Clusters.Descriptor.id,
+                                                 attribute_id=Clusters.Descriptor.Attributes.TagList.attribute_id)
+                msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
+                self.record_error(self.get_test_name(), location=location, problem=msg, spec_location="Descriptor TagList")
+
+        record_problems(problems)
 
         self.print_step(2, "Identify all the direct children of the root node endpoint")
         root_direct_children = get_direct_children_of_root(self.endpoints)
@@ -832,6 +909,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         self.print_step(
             2.2, "For device types with more than one endpoint listed, ensure each of the listed endpoints has a tag attribute and the tag attributes are not the same")
         root_problems = find_tag_list_problems([0], {0: device_types}, self.endpoints)
+        record_problems(root_problems)
 
         if problems or root_problems:
             self.fail_current_test("Problems with tags lists")

@@ -33,6 +33,8 @@ using namespace ::chip;
 using namespace ::chip::app;
 using chip::app::ReadClient;
 
+namespace admin {
+
 namespace {
 
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
@@ -125,6 +127,16 @@ void DeviceSubscription::OnDone(ReadClient * apReadClient)
 
 void DeviceSubscription::OnError(CHIP_ERROR error)
 {
+#if defined(PW_RPC_ENABLED)
+    if (error == CHIP_ERROR_TIMEOUT && mState == State::SubscriptionStarted)
+    {
+        chip_rpc_ReachabilityChanged reachabilityChanged;
+        reachabilityChanged.has_id       = true;
+        reachabilityChanged.id           = mCurrentAdministratorCommissioningAttributes.id;
+        reachabilityChanged.reachability = false;
+        DeviceReachableChanged(reachabilityChanged);
+    }
+#endif
     ChipLogProgress(NotSpecified, "Error subscribing: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
@@ -198,7 +210,16 @@ void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, 
 {
     VerifyOrDie(mState == State::Connecting || mState == State::Stopping);
     ChipLogError(NotSpecified, "DeviceSubscription failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    // TODO(#35333) Figure out how we should recover if we fail to connect and mState == State::Connecting.
+#if defined(PW_RPC_ENABLED)
+    if (mState == State::Connecting)
+    {
+        chip_rpc_ReachabilityChanged reachabilityChanged;
+        reachabilityChanged.has_id       = true;
+        reachabilityChanged.id           = mCurrentAdministratorCommissioningAttributes.id;
+        reachabilityChanged.reachability = false;
+        DeviceReachableChanged(reachabilityChanged);
+    }
+#endif
 
     // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
     // DeviceSubscription.
@@ -262,3 +283,5 @@ void DeviceSubscription::StopSubscription()
     MoveToState(State::AwaitingDestruction);
     mOnDoneCallback(mScopedNodeId);
 }
+
+} // namespace admin

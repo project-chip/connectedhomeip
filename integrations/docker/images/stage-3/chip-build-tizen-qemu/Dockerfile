@@ -182,9 +182,13 @@ RUN set -x \
     && echo -n \
     "#!/bin/bash\n" \
     "grep -q 'rootshell' /proc/cmdline && exit\n" \
-    "if [[ -x /mnt/chip/runner.sh ]]; then\n" \
+    "runner=\$(grep -o 'runner=[^ ]*' /proc/cmdline | sed 's/runner=//')\n" \
+    "if [[ -z \"\$runner\" ]]; then\n" \
+    "  runner='/mnt/chip/runner.sh' \n" \
+    "fi\n" \
+    "if [[ -x \"\$runner\" ]]; then\n" \
     "  echo '### RUNNER START ###'\n" \
-    "  /mnt/chip/runner.sh\n" \
+    "  \"\$runner\"\n" \
     "  echo '### RUNNER STOP:' \$?\n" \
     "else\n" \
     "  read -r -t 5 -p 'Press ENTER to access root shell...' && exit || echo ' timeout.'\n" \

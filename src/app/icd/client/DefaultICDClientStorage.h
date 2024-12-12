@@ -120,6 +120,12 @@ public:
     CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
                                      Protocols::SecureChannel::CounterType & counter) override;
 
+    /**
+     * Shut down DefaultICDClientStorage
+     *
+     */
+    void Shutdown();
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     size_t GetFabricListSize() { return mFabricList.size(); }
 

@@ -55,13 +55,13 @@ class TC_OCC_3_1(MatterBaseTest):
 
     async def read_occ_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.OccupancySensing
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint()
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def write_hold_time(self, hold_time: Optional[Any]) -> Status:
         dev_ctrl = self.default_controller
         node_id = self.dut_node_id
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint()
 
         cluster = Clusters.OccupancySensing
         write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint, cluster.Attributes.HoldTime(hold_time))])
@@ -144,7 +144,7 @@ class TC_OCC_3_1(MatterBaseTest):
 
         self.step(4)
         # Setup Occupancy attribute subscription here
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
         attrib_listener = ClusterAttributeChangeAccumulator(cluster)

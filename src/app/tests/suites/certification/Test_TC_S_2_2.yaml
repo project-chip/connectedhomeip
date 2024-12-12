@@ -874,7 +874,7 @@ tests:
           to 60 000 000 (60 000s) and a set of extension fields appropriate to
           AC1."
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0001 0x01 60000000 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4001", "ValueUnsigned8": "0x01"}]}]' 1 1
+          ./chip-tool scenesmanagement add-scene 0x0001 0x01 60000000 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4000", "valueUnsigned16": "0x01"}]}]' 1 1
 
           Verify DUT sends a AddSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to G1 and the SceneID field set to 0x01 on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 

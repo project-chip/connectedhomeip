@@ -26,25 +26,22 @@
 #include <string.h>
 
 #include <app/server/Dnssd.h>
-
-#include <lib/support/CodeUtils.h>
-#include <lib/support/JniReferences.h>
-#include <lib/support/JniTypeWrappers.h>
-
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/java/AndroidICDClient.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/TLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
-#ifndef JAVA_MATTER_CONTROLLER_TEST
-#include <platform/android/CHIPP256KeypairBridge.h>
-#endif // JAVA_MATTER_CONTROLLER_TEST
+
 using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Credentials;
@@ -52,15 +49,14 @@ using namespace TLV;
 
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
+    getICDClientStorage()->Shutdown();
     mController->Shutdown();
 
-#ifndef JAVA_MATTER_CONTROLLER_TEST
     if (mKeypairBridge != nullptr)
     {
         chip::Platform::Delete(mKeypairBridge);
         mKeypairBridge = nullptr;
     }
-#endif // JAVA_MATTER_CONTROLLER_TEST
 
     if (mDeviceAttestationDelegateBridge != nullptr)
     {
@@ -213,6 +209,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
     initParams.fabricIndependentStorage        = wrapperStorage;
     initParams.sessionKeystore                 = &wrapper->mSessionKeystore;
+    initParams.dataModelProvider               = app::CodegenDataModelProviderInstance(wrapperStorage);
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
     wrapper->mGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
@@ -298,7 +295,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 
     // The lifetime of the ephemeralKey variable must be kept until SetupParams is saved.
     Crypto::P256Keypair ephemeralKey;
-#ifndef JAVA_MATTER_CONTROLLER_TEST
     if (rootCertificate != nullptr && nodeOperationalCertificate != nullptr && keypairDelegate != nullptr)
     {
         CHIPP256KeypairBridge * nativeKeypairBridge = wrapper->GetP256KeypairBridge();
@@ -335,7 +331,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.controllerNOC  = chip::ByteSpan(wrapper->mNocCertificate.data(), wrapper->mNocCertificate.size());
     }
     else
-#endif // JAVA_MATTER_CONTROLLER_TEST
     {
         ChipLogProgress(Controller,
                         "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer");

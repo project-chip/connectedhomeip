@@ -20,6 +20,7 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRCommandPayloads_Internal.h"
+#import "MTRDefines_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
@@ -641,11 +642,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.groupList.count; ++i_0) {
-                    if (![self.groupList[i_0] isKindOfClass:[NSNumber class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.groupList[i_0], NSNumber);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.groupList[i_0], NSStringFromClass(NSNumber.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSNumber *) self.groupList[i_0];
                     listHolder_0->mList[i_0] = element_0.unsignedShortValue;
                 }
                 encodableStruct.groupList = ListType_0(listHolder_0->mList, self.groupList.count);
@@ -2559,11 +2561,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.arl.count; ++i_0) {
-                    if (![self.arl[i_0] isKindOfClass:[MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.arl[i_0], MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arl[i_0], NSStringFromClass(MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct *) self.arl[i_0];
                     listHolder_0->mList[i_0].endpoint = element_0.endpoint.unsignedShortValue;
                     listHolder_0->mList[i_0].cluster = element_0.cluster.unsignedIntValue;
                     {
@@ -2576,11 +2579,12 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.restrictions.count; ++i_2) {
-                                if (![element_0.restrictions[i_2] isKindOfClass:[MTRAccessControlClusterAccessRestrictionStruct class]]) {
+                                auto element_2 = MTR_SAFE_CAST(element_0.restrictions[i_2], MTRAccessControlClusterAccessRestrictionStruct);
+                                if (!element_2) {
                                     // Wrong kind of value.
+                                    MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.restrictions[i_2], NSStringFromClass(MTRAccessControlClusterAccessRestrictionStruct.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (MTRAccessControlClusterAccessRestrictionStruct *) element_0.restrictions[i_2];
                                 listHolder_2->mList[i_2].type = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].type)>>(element_2.type.unsignedCharValue);
                                 if (element_2.id == nil) {
                                     listHolder_2->mList[i_2].id.SetNull();
@@ -3910,11 +3914,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.protocolsSupported.count; ++i_0) {
-                    if (![self.protocolsSupported[i_0] isKindOfClass:[NSNumber class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.protocolsSupported[i_0], NSNumber);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.protocolsSupported[i_0], NSStringFromClass(NSNumber.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSNumber *) self.protocolsSupported[i_0];
                     listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(element_0.unsignedCharValue);
                 }
                 encodableStruct.protocolsSupported = ListType_0(listHolder_0->mList, self.protocolsSupported.count);
@@ -7601,11 +7606,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.timeZone.count; ++i_0) {
-                    if (![self.timeZone[i_0] isKindOfClass:[MTRTimeSynchronizationClusterTimeZoneStruct class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.timeZone[i_0], MTRTimeSynchronizationClusterTimeZoneStruct);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.timeZone[i_0], NSStringFromClass(MTRTimeSynchronizationClusterTimeZoneStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRTimeSynchronizationClusterTimeZoneStruct *) self.timeZone[i_0];
                     listHolder_0->mList[i_0].offset = element_0.offset.intValue;
                     listHolder_0->mList[i_0].validAt = element_0.validAt.unsignedLongLongValue;
                     if (element_0.name != nil) {
@@ -7785,11 +7791,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.dstOffset.count; ++i_0) {
-                    if (![self.dstOffset[i_0] isKindOfClass:[MTRTimeSynchronizationClusterDSTOffsetStruct class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.dstOffset[i_0], MTRTimeSynchronizationClusterDSTOffsetStruct);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.dstOffset[i_0], NSStringFromClass(MTRTimeSynchronizationClusterDSTOffsetStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRTimeSynchronizationClusterDSTOffsetStruct *) self.dstOffset[i_0];
                     listHolder_0->mList[i_0].offset = element_0.offset.intValue;
                     listHolder_0->mList[i_0].validStarting = element_0.validStarting.unsignedLongLongValue;
                     if (element_0.validUntil == nil) {
@@ -10710,79 +10717,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROvenCavityOperationalStateClusterPauseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTROvenCavityOperationalStateClusterPauseParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTROvenCavityOperationalStateClusterPauseParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::OvenCavityOperationalState::Commands::Pause::Type encodableStruct;
-    ListFreer listFreer;
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
 @implementation MTROvenCavityOperationalStateClusterStopParams
 - (instancetype)init
 {
@@ -10889,79 +10823,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
     chip::app::Clusters::OvenCavityOperationalState::Commands::Start::Type encodableStruct;
-    ListFreer listFreer;
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTROvenCavityOperationalStateClusterResumeParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTROvenCavityOperationalStateClusterResumeParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTROvenCavityOperationalStateClusterResumeParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::Type encodableStruct;
     ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -13509,11 +13370,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.extensionFieldSets.count; ++i_0) {
-                    if (![self.extensionFieldSets[i_0] isKindOfClass:[MTRScenesManagementClusterExtensionFieldSet class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.extensionFieldSets[i_0], MTRScenesManagementClusterExtensionFieldSet);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.extensionFieldSets[i_0], NSStringFromClass(MTRScenesManagementClusterExtensionFieldSet.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRScenesManagementClusterExtensionFieldSet *) self.extensionFieldSets[i_0];
                     listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
                     {
                         using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
@@ -13525,11 +13387,12 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
-                                if (![element_0.attributeValueList[i_2] isKindOfClass:[MTRScenesManagementClusterAttributeValuePairStruct class]]) {
+                                auto element_2 = MTR_SAFE_CAST(element_0.attributeValueList[i_2], MTRScenesManagementClusterAttributeValuePairStruct);
+                                if (!element_2) {
                                     // Wrong kind of value.
+                                    MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.attributeValueList[i_2], NSStringFromClass(MTRScenesManagementClusterAttributeValuePairStruct.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (MTRScenesManagementClusterAttributeValuePairStruct *) element_0.attributeValueList[i_2];
                                 listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
                                 if (element_2.valueUnsigned8 != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].valueUnsigned8.Emplace();
@@ -15884,11 +15747,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_1);
                 for (size_t i_1 = 0; i_1 < self.event.transitions.count; ++i_1) {
-                    if (![self.event.transitions[i_1] isKindOfClass:[MTRDemandResponseLoadControlClusterLoadControlEventTransitionStruct class]]) {
+                    auto element_1 = MTR_SAFE_CAST(self.event.transitions[i_1], MTRDemandResponseLoadControlClusterLoadControlEventTransitionStruct);
+                    if (!element_1) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.event.transitions[i_1], NSStringFromClass(MTRDemandResponseLoadControlClusterLoadControlEventTransitionStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_1 = (MTRDemandResponseLoadControlClusterLoadControlEventTransitionStruct *) self.event.transitions[i_1];
                     listHolder_1->mList[i_1].duration = element_1.duration.unsignedShortValue;
                     listHolder_1->mList[i_1].control = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].control)>>(element_1.control.unsignedShortValue);
                     if (element_1.temperatureControl != nil) {
@@ -16246,11 +16110,12 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     listFreer.add(listHolder_1);
                     for (size_t i_1 = 0; i_1 < self.responses.count; ++i_1) {
-                        if (![self.responses[i_1] isKindOfClass:[MTRMessagesClusterMessageResponseOptionStruct class]]) {
+                        auto element_1 = MTR_SAFE_CAST(self.responses[i_1], MTRMessagesClusterMessageResponseOptionStruct);
+                        if (!element_1) {
                             // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.responses[i_1], NSStringFromClass(MTRMessagesClusterMessageResponseOptionStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (MTRMessagesClusterMessageResponseOptionStruct *) self.responses[i_1];
                         if (element_1.messageResponseID != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].messageResponseID.Emplace();
                             definedValue_3 = element_1.messageResponseID.unsignedIntValue;
@@ -16354,11 +16219,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.messageIDs.count; ++i_0) {
-                    if (![self.messageIDs[i_0] isKindOfClass:[NSData class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.messageIDs[i_0], NSData);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.messageIDs[i_0], NSStringFromClass(NSData.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSData *) self.messageIDs[i_0];
                     listHolder_0->mList[i_0] = AsByteSpan(element_0);
                 }
                 encodableStruct.messageIDs = ListType_0(listHolder_0->mList, self.messageIDs.count);
@@ -16870,11 +16736,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.slotAdjustments.count; ++i_0) {
-                    if (![self.slotAdjustments[i_0] isKindOfClass:[MTRDeviceEnergyManagementClusterSlotAdjustmentStruct class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.slotAdjustments[i_0], MTRDeviceEnergyManagementClusterSlotAdjustmentStruct);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.slotAdjustments[i_0], NSStringFromClass(MTRDeviceEnergyManagementClusterSlotAdjustmentStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRDeviceEnergyManagementClusterSlotAdjustmentStruct *) self.slotAdjustments[i_0];
                     listHolder_0->mList[i_0].slotIndex = element_0.slotIndex.unsignedCharValue;
                     if (element_0.nominalPower != nil) {
                         auto & definedValue_2 = listHolder_0->mList[i_0].nominalPower.Emplace();
@@ -16981,11 +16848,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.constraints.count; ++i_0) {
-                    if (![self.constraints[i_0] isKindOfClass:[MTRDeviceEnergyManagementClusterConstraintsStruct class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.constraints[i_0], MTRDeviceEnergyManagementClusterConstraintsStruct);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.constraints[i_0], NSStringFromClass(MTRDeviceEnergyManagementClusterConstraintsStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRDeviceEnergyManagementClusterConstraintsStruct *) self.constraints[i_0];
                     listHolder_0->mList[i_0].startTime = element_0.startTime.unsignedIntValue;
                     listHolder_0->mList[i_0].duration = element_0.duration.unsignedIntValue;
                     if (element_0.nominalPower != nil) {
@@ -17622,11 +17490,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.chargingTargetSchedules.count; ++i_0) {
-                    if (![self.chargingTargetSchedules[i_0] isKindOfClass:[MTREnergyEVSEClusterChargingTargetScheduleStruct class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.chargingTargetSchedules[i_0], MTREnergyEVSEClusterChargingTargetScheduleStruct);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.chargingTargetSchedules[i_0], NSStringFromClass(MTREnergyEVSEClusterChargingTargetScheduleStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTREnergyEVSEClusterChargingTargetScheduleStruct *) self.chargingTargetSchedules[i_0];
                     listHolder_0->mList[i_0].dayOfWeekForSequence = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].dayOfWeekForSequence)>>(element_0.dayOfWeekForSequence.unsignedCharValue);
                     {
                         using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].chargingTargets)>;
@@ -17638,11 +17507,12 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.chargingTargets.count; ++i_2) {
-                                if (![element_0.chargingTargets[i_2] isKindOfClass:[MTREnergyEVSEClusterChargingTargetStruct class]]) {
+                                auto element_2 = MTR_SAFE_CAST(element_0.chargingTargets[i_2], MTREnergyEVSEClusterChargingTargetStruct);
+                                if (!element_2) {
                                     // Wrong kind of value.
+                                    MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.chargingTargets[i_2], NSStringFromClass(MTREnergyEVSEClusterChargingTargetStruct.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (MTREnergyEVSEClusterChargingTargetStruct *) element_0.chargingTargets[i_2];
                                 listHolder_2->mList[i_2].targetTimeMinutesPastMidnight = element_2.targetTimeMinutesPastMidnight.unsignedShortValue;
                                 if (element_2.targetSoC != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].targetSoC.Emplace();
@@ -21675,11 +21545,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.newAreas.count; ++i_0) {
-                    if (![self.newAreas[i_0] isKindOfClass:[NSNumber class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.newAreas[i_0], NSNumber);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.newAreas[i_0], NSStringFromClass(NSNumber.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSNumber *) self.newAreas[i_0];
                     listHolder_0->mList[i_0] = element_0.unsignedIntValue;
                 }
                 encodableStruct.newAreas = ListType_0(listHolder_0->mList, self.newAreas.count);
@@ -22259,11 +22130,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.transitions.count; ++i_0) {
-                    if (![self.transitions[i_0] isKindOfClass:[MTRThermostatClusterWeeklyScheduleTransitionStruct class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.transitions[i_0], MTRThermostatClusterWeeklyScheduleTransitionStruct);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.transitions[i_0], NSStringFromClass(MTRThermostatClusterWeeklyScheduleTransitionStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRThermostatClusterWeeklyScheduleTransitionStruct *) self.transitions[i_0];
                     listHolder_0->mList[i_0].transitionTime = element_0.transitionTime.unsignedShortValue;
                     if (element_0.heatSetpoint == nil) {
                         listHolder_0->mList[i_0].heatSetpoint.SetNull();
@@ -22812,11 +22684,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.attributeRequests.count; ++i_0) {
-                    if (![self.attributeRequests[i_0] isKindOfClass:[NSNumber class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.attributeRequests[i_0], NSNumber);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.attributeRequests[i_0], NSStringFromClass(NSNumber.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSNumber *) self.attributeRequests[i_0];
                     listHolder_0->mList[i_0] = element_0.unsignedIntValue;
                 }
                 encodableStruct.attributeRequests = ListType_0(listHolder_0->mList, self.attributeRequests.count);
@@ -26190,11 +26063,12 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     listFreer.add(listHolder_1);
                     for (size_t i_1 = 0; i_1 < self.channelList.count; ++i_1) {
-                        if (![self.channelList[i_1] isKindOfClass:[MTRChannelClusterChannelInfoStruct class]]) {
+                        auto element_1 = MTR_SAFE_CAST(self.channelList[i_1], MTRChannelClusterChannelInfoStruct);
+                        if (!element_1) {
                             // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.channelList[i_1], NSStringFromClass(MTRChannelClusterChannelInfoStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (MTRChannelClusterChannelInfoStruct *) self.channelList[i_1];
                         listHolder_1->mList[i_1].majorNumber = element_1.majorNumber.unsignedShortValue;
                         listHolder_1->mList[i_1].minorNumber = element_1.minorNumber.unsignedShortValue;
                         if (element_1.name != nil) {
@@ -26261,11 +26135,12 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     listFreer.add(listHolder_1);
                     for (size_t i_1 = 0; i_1 < self.externalIDList.count; ++i_1) {
-                        if (![self.externalIDList[i_1] isKindOfClass:[MTRChannelClusterAdditionalInfoStruct class]]) {
+                        auto element_1 = MTR_SAFE_CAST(self.externalIDList[i_1], MTRChannelClusterAdditionalInfoStruct);
+                        if (!element_1) {
                             // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.externalIDList[i_1], NSStringFromClass(MTRChannelClusterAdditionalInfoStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (MTRChannelClusterAdditionalInfoStruct *) self.externalIDList[i_1];
                         listHolder_1->mList[i_1].name = AsCharSpan(element_1.name);
                         listHolder_1->mList[i_1].value = AsCharSpan(element_1.value);
                     }
@@ -26827,11 +26702,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.externalIDList.count; ++i_0) {
-                    if (![self.externalIDList[i_0] isKindOfClass:[MTRChannelClusterAdditionalInfoStruct class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.externalIDList[i_0], MTRChannelClusterAdditionalInfoStruct);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.externalIDList[i_0], NSStringFromClass(MTRChannelClusterAdditionalInfoStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRChannelClusterAdditionalInfoStruct *) self.externalIDList[i_0];
                     listHolder_0->mList[i_0].name = AsCharSpan(element_0.name);
                     listHolder_0->mList[i_0].value = AsCharSpan(element_0.value);
                 }
@@ -26946,11 +26822,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.externalIDList.count; ++i_0) {
-                    if (![self.externalIDList[i_0] isKindOfClass:[MTRChannelClusterAdditionalInfoStruct class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.externalIDList[i_0], MTRChannelClusterAdditionalInfoStruct);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.externalIDList[i_0], NSStringFromClass(MTRChannelClusterAdditionalInfoStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRChannelClusterAdditionalInfoStruct *) self.externalIDList[i_0];
                     listHolder_0->mList[i_0].name = AsCharSpan(element_0.name);
                     listHolder_0->mList[i_0].value = AsCharSpan(element_0.value);
                 }
@@ -28964,11 +28841,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_1);
                 for (size_t i_1 = 0; i_1 < self.search.parameterList.count; ++i_1) {
-                    if (![self.search.parameterList[i_1] isKindOfClass:[MTRContentLauncherClusterParameterStruct class]]) {
+                    auto element_1 = MTR_SAFE_CAST(self.search.parameterList[i_1], MTRContentLauncherClusterParameterStruct);
+                    if (!element_1) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.search.parameterList[i_1], NSStringFromClass(MTRContentLauncherClusterParameterStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_1 = (MTRContentLauncherClusterParameterStruct *) self.search.parameterList[i_1];
                     listHolder_1->mList[i_1].type = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].type)>>(element_1.type.unsignedCharValue);
                     listHolder_1->mList[i_1].value = AsCharSpan(element_1.value);
                     if (element_1.externalIDList != nil) {
@@ -28983,11 +28861,12 @@ NS_ASSUME_NONNULL_BEGIN
                                 }
                                 listFreer.add(listHolder_4);
                                 for (size_t i_4 = 0; i_4 < element_1.externalIDList.count; ++i_4) {
-                                    if (![element_1.externalIDList[i_4] isKindOfClass:[MTRContentLauncherClusterAdditionalInfoStruct class]]) {
+                                    auto element_4 = MTR_SAFE_CAST(element_1.externalIDList[i_4], MTRContentLauncherClusterAdditionalInfoStruct);
+                                    if (!element_4) {
                                         // Wrong kind of value.
+                                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_1.externalIDList[i_4], NSStringFromClass(MTRContentLauncherClusterAdditionalInfoStruct.class));
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_4 = (MTRContentLauncherClusterAdditionalInfoStruct *) element_1.externalIDList[i_4];
                                     listHolder_4->mList[i_4].name = AsCharSpan(element_4.name);
                                     listHolder_4->mList[i_4].value = AsCharSpan(element_4.value);
                                 }
@@ -29030,11 +28909,12 @@ NS_ASSUME_NONNULL_BEGIN
                         }
                         listFreer.add(listHolder_4);
                         for (size_t i_4 = 0; i_4 < self.playbackPreferences.textTrack.characteristics.count; ++i_4) {
-                            if (![self.playbackPreferences.textTrack.characteristics[i_4] isKindOfClass:[NSNumber class]]) {
+                            auto element_4 = MTR_SAFE_CAST(self.playbackPreferences.textTrack.characteristics[i_4], NSNumber);
+                            if (!element_4) {
                                 // Wrong kind of value.
+                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.playbackPreferences.textTrack.characteristics[i_4], NSStringFromClass(NSNumber.class));
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            auto element_4 = (NSNumber *) self.playbackPreferences.textTrack.characteristics[i_4];
                             listHolder_4->mList[i_4] = static_cast<std::remove_reference_t<decltype(listHolder_4->mList[i_4])>>(element_4.unsignedCharValue);
                         }
                         definedValue_3 = ListType_4(listHolder_4->mList, self.playbackPreferences.textTrack.characteristics.count);
@@ -29056,11 +28936,12 @@ NS_ASSUME_NONNULL_BEGIN
                         }
                         listFreer.add(listHolder_3);
                         for (size_t i_3 = 0; i_3 < self.playbackPreferences.audioTracks.count; ++i_3) {
-                            if (![self.playbackPreferences.audioTracks[i_3] isKindOfClass:[MTRContentLauncherClusterTrackPreferenceStruct class]]) {
+                            auto element_3 = MTR_SAFE_CAST(self.playbackPreferences.audioTracks[i_3], MTRContentLauncherClusterTrackPreferenceStruct);
+                            if (!element_3) {
                                 // Wrong kind of value.
+                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.playbackPreferences.audioTracks[i_3], NSStringFromClass(MTRContentLauncherClusterTrackPreferenceStruct.class));
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            auto element_3 = (MTRContentLauncherClusterTrackPreferenceStruct *) self.playbackPreferences.audioTracks[i_3];
                             listHolder_3->mList[i_3].languageCode = AsCharSpan(element_3.languageCode);
                             if (element_3.characteristics != nil) {
                                 auto & definedValue_5 = listHolder_3->mList[i_3].characteristics.Emplace();
@@ -29074,11 +28955,12 @@ NS_ASSUME_NONNULL_BEGIN
                                         }
                                         listFreer.add(listHolder_6);
                                         for (size_t i_6 = 0; i_6 < element_3.characteristics.count; ++i_6) {
-                                            if (![element_3.characteristics[i_6] isKindOfClass:[NSNumber class]]) {
+                                            auto element_6 = MTR_SAFE_CAST(element_3.characteristics[i_6], NSNumber);
+                                            if (!element_6) {
                                                 // Wrong kind of value.
+                                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_3.characteristics[i_6], NSStringFromClass(NSNumber.class));
                                                 return CHIP_ERROR_INVALID_ARGUMENT;
                                             }
-                                            auto element_6 = (NSNumber *) element_3.characteristics[i_6];
                                             listHolder_6->mList[i_6] = static_cast<std::remove_reference_t<decltype(listHolder_6->mList[i_6])>>(element_6.unsignedCharValue);
                                         }
                                         definedValue_5 = ListType_6(listHolder_6->mList, element_3.characteristics.count);
@@ -31387,11 +31269,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_1);
                 for (size_t i_1 = 0; i_1 < self.zone.vertices.count; ++i_1) {
-                    if (![self.zone.vertices[i_1] isKindOfClass:[MTRZoneManagementClusterTwoDCartesianVertexStruct class]]) {
+                    auto element_1 = MTR_SAFE_CAST(self.zone.vertices[i_1], MTRZoneManagementClusterTwoDCartesianVertexStruct);
+                    if (!element_1) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.zone.vertices[i_1], NSStringFromClass(MTRZoneManagementClusterTwoDCartesianVertexStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_1 = (MTRZoneManagementClusterTwoDCartesianVertexStruct *) self.zone.vertices[i_1];
                     listHolder_1->mList[i_1].x = element_1.x.unsignedShortValue;
                     listHolder_1->mList[i_1].y = element_1.y.unsignedShortValue;
                 }
@@ -31579,11 +31462,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_1);
                 for (size_t i_1 = 0; i_1 < self.zone.vertices.count; ++i_1) {
-                    if (![self.zone.vertices[i_1] isKindOfClass:[MTRZoneManagementClusterTwoDCartesianVertexStruct class]]) {
+                    auto element_1 = MTR_SAFE_CAST(self.zone.vertices[i_1], MTRZoneManagementClusterTwoDCartesianVertexStruct);
+                    if (!element_1) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.zone.vertices[i_1], NSStringFromClass(MTRZoneManagementClusterTwoDCartesianVertexStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_1 = (MTRZoneManagementClusterTwoDCartesianVertexStruct *) self.zone.vertices[i_1];
                     listHolder_1->mList[i_1].x = element_1.x.unsignedShortValue;
                     listHolder_1->mList[i_1].y = element_1.y.unsignedShortValue;
                 }
@@ -32619,7 +32503,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _imageCodec = @(0);
 
-        _frameRate = @(0);
+        _maxFrameRate = @(0);
 
         _bitRate = @(0);
 
@@ -32639,7 +32523,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRCameraAVStreamManagementClusterSnapshotStreamAllocateParams alloc] init];
 
     other.imageCodec = self.imageCodec;
-    other.frameRate = self.frameRate;
+    other.maxFrameRate = self.maxFrameRate;
     other.bitRate = self.bitRate;
     other.minResolution = self.minResolution;
     other.maxResolution = self.maxResolution;
@@ -32652,7 +32536,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; frameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; >", NSStringFromClass([self class]), _imageCodec, _frameRate, _bitRate, _minResolution, _maxResolution, _quality];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; maxFrameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; >", NSStringFromClass([self class]), _imageCodec, _maxFrameRate, _bitRate, _minResolution, _maxResolution, _quality];
     return descriptionString;
 }
 
@@ -32668,7 +32552,7 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.imageCodec = static_cast<std::remove_reference_t<decltype(encodableStruct.imageCodec)>>(self.imageCodec.unsignedCharValue);
     }
     {
-        encodableStruct.frameRate = self.frameRate.unsignedShortValue;
+        encodableStruct.maxFrameRate = self.maxFrameRate.unsignedShortValue;
     }
     {
         encodableStruct.bitRate = self.bitRate.unsignedIntValue;
@@ -32929,11 +32813,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.streamPriorities.count; ++i_0) {
-                    if (![self.streamPriorities[i_0] isKindOfClass:[NSNumber class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.streamPriorities[i_0], NSNumber);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.streamPriorities[i_0], NSStringFromClass(NSNumber.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSNumber *) self.streamPriorities[i_0];
                     listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(element_0.unsignedCharValue);
                 }
                 encodableStruct.streamPriorities = ListType_0(listHolder_0->mList, self.streamPriorities.count);
@@ -33160,325 +33045,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVStreamManagementClusterSetViewportParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _viewport = [MTRCameraAVStreamManagementClusterViewportStruct new];
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRCameraAVStreamManagementClusterSetViewportParams alloc] init];
-
-    other.viewport = self.viewport;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: viewport:%@; >", NSStringFromClass([self class]), _viewport];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRCameraAVStreamManagementClusterSetViewportParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::CameraAvStreamManagement::Commands::SetViewport::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.viewport.x1 = self.viewport.x1.unsignedShortValue;
-        encodableStruct.viewport.y1 = self.viewport.y1.unsignedShortValue;
-        encodableStruct.viewport.x2 = self.viewport.x2.unsignedShortValue;
-        encodableStruct.viewport.y2 = self.viewport.y2.unsignedShortValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRCameraAVStreamManagementClusterSetImageRotationParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _angle = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRCameraAVStreamManagementClusterSetImageRotationParams alloc] init];
-
-    other.angle = self.angle;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: angle:%@; >", NSStringFromClass([self class]), _angle];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRCameraAVStreamManagementClusterSetImageRotationParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageRotation::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.angle = self.angle.unsignedShortValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRCameraAVStreamManagementClusterSetImageFlipHorizontalParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _enabled = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRCameraAVStreamManagementClusterSetImageFlipHorizontalParams alloc] init];
-
-    other.enabled = self.enabled;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: enabled:%@; >", NSStringFromClass([self class]), _enabled];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRCameraAVStreamManagementClusterSetImageFlipHorizontalParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipHorizontal::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.enabled = self.enabled.boolValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRCameraAVStreamManagementClusterSetImageFlipVerticalParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _enabled = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRCameraAVStreamManagementClusterSetImageFlipVerticalParams alloc] init];
-
-    other.enabled = self.enabled;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: enabled:%@; >", NSStringFromClass([self class]), _enabled];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRCameraAVStreamManagementClusterSetImageFlipVerticalParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipVertical::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.enabled = self.enabled.boolValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
 @implementation MTRWebRTCTransportProviderClusterSolicitOfferParams
 - (instancetype)init
 {
@@ -33569,11 +33135,12 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     listFreer.add(listHolder_1);
                     for (size_t i_1 = 0; i_1 < self.iceServers.count; ++i_1) {
-                        if (![self.iceServers[i_1] isKindOfClass:[MTRWebRTCTransportProviderClusterICEServerStruct class]]) {
+                        auto element_1 = MTR_SAFE_CAST(self.iceServers[i_1], MTRWebRTCTransportProviderClusterICEServerStruct);
+                        if (!element_1) {
                             // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceServers[i_1], NSStringFromClass(MTRWebRTCTransportProviderClusterICEServerStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (MTRWebRTCTransportProviderClusterICEServerStruct *) self.iceServers[i_1];
                         {
                             using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].urls)>;
                             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
@@ -33584,11 +33151,12 @@ NS_ASSUME_NONNULL_BEGIN
                                 }
                                 listFreer.add(listHolder_3);
                                 for (size_t i_3 = 0; i_3 < element_1.urls.count; ++i_3) {
-                                    if (![element_1.urls[i_3] isKindOfClass:[NSString class]]) {
+                                    auto element_3 = MTR_SAFE_CAST(element_1.urls[i_3], NSString);
+                                    if (!element_3) {
                                         // Wrong kind of value.
+                                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_1.urls[i_3], NSStringFromClass(NSString.class));
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_3 = (NSString *) element_1.urls[i_3];
                                     listHolder_3->mList[i_3] = AsCharSpan(element_3);
                                 }
                                 listHolder_1->mList[i_1].urls = ListType_3(listHolder_3->mList, element_1.urls.count);
@@ -33887,11 +33455,12 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     listFreer.add(listHolder_1);
                     for (size_t i_1 = 0; i_1 < self.iceServers.count; ++i_1) {
-                        if (![self.iceServers[i_1] isKindOfClass:[MTRWebRTCTransportProviderClusterICEServerStruct class]]) {
+                        auto element_1 = MTR_SAFE_CAST(self.iceServers[i_1], MTRWebRTCTransportProviderClusterICEServerStruct);
+                        if (!element_1) {
                             // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceServers[i_1], NSStringFromClass(MTRWebRTCTransportProviderClusterICEServerStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (MTRWebRTCTransportProviderClusterICEServerStruct *) self.iceServers[i_1];
                         {
                             using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].urls)>;
                             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
@@ -33902,11 +33471,12 @@ NS_ASSUME_NONNULL_BEGIN
                                 }
                                 listFreer.add(listHolder_3);
                                 for (size_t i_3 = 0; i_3 < element_1.urls.count; ++i_3) {
-                                    if (![element_1.urls[i_3] isKindOfClass:[NSString class]]) {
+                                    auto element_3 = MTR_SAFE_CAST(element_1.urls[i_3], NSString);
+                                    if (!element_3) {
                                         // Wrong kind of value.
+                                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_1.urls[i_3], NSStringFromClass(NSString.class));
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_3 = (NSString *) element_1.urls[i_3];
                                     listHolder_3->mList[i_3] = AsCharSpan(element_3);
                                 }
                                 listHolder_1->mList[i_1].urls = ListType_3(listHolder_3->mList, element_1.urls.count);
@@ -34396,11 +33966,12 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     listFreer.add(listHolder_1);
                     for (size_t i_1 = 0; i_1 < self.iceServers.count; ++i_1) {
-                        if (![self.iceServers[i_1] isKindOfClass:[MTRWebRTCTransportRequestorClusterICEServerStruct class]]) {
+                        auto element_1 = MTR_SAFE_CAST(self.iceServers[i_1], MTRWebRTCTransportRequestorClusterICEServerStruct);
+                        if (!element_1) {
                             // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceServers[i_1], NSStringFromClass(MTRWebRTCTransportRequestorClusterICEServerStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (MTRWebRTCTransportRequestorClusterICEServerStruct *) self.iceServers[i_1];
                         {
                             using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].urls)>;
                             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
@@ -34411,11 +33982,12 @@ NS_ASSUME_NONNULL_BEGIN
                                 }
                                 listFreer.add(listHolder_3);
                                 for (size_t i_3 = 0; i_3 < element_1.urls.count; ++i_3) {
-                                    if (![element_1.urls[i_3] isKindOfClass:[NSString class]]) {
+                                    auto element_3 = MTR_SAFE_CAST(element_1.urls[i_3], NSString);
+                                    if (!element_3) {
                                         // Wrong kind of value.
+                                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_1.urls[i_3], NSStringFromClass(NSString.class));
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_3 = (NSString *) element_1.urls[i_3];
                                     listHolder_3->mList[i_3] = AsCharSpan(element_3);
                                 }
                                 listHolder_1->mList[i_1].urls = ListType_3(listHolder_3->mList, element_1.urls.count);
@@ -36398,11 +35970,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.arg1.count; ++i_0) {
-                    if (![self.arg1[i_0] isKindOfClass:[MTRUnitTestingClusterNestedStructList class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.arg1[i_0], MTRUnitTestingClusterNestedStructList);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg1[i_0], NSStringFromClass(MTRUnitTestingClusterNestedStructList.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRUnitTestingClusterNestedStructList *) self.arg1[i_0];
                     listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
                     listHolder_0->mList[i_0].b = element_0.b.boolValue;
                     listHolder_0->mList[i_0].c.a = element_0.c.a.unsignedCharValue;
@@ -36427,11 +36000,12 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.d.count; ++i_2) {
-                                if (![element_0.d[i_2] isKindOfClass:[MTRUnitTestingClusterSimpleStruct class]]) {
+                                auto element_2 = MTR_SAFE_CAST(element_0.d[i_2], MTRUnitTestingClusterSimpleStruct);
+                                if (!element_2) {
                                     // Wrong kind of value.
+                                    MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.d[i_2], NSStringFromClass(MTRUnitTestingClusterSimpleStruct.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (MTRUnitTestingClusterSimpleStruct *) element_0.d[i_2];
                                 listHolder_2->mList[i_2].a = element_2.a.unsignedCharValue;
                                 listHolder_2->mList[i_2].b = element_2.b.boolValue;
                                 listHolder_2->mList[i_2].c = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].c)>>(element_2.c.unsignedCharValue);
@@ -36460,11 +36034,12 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.e.count; ++i_2) {
-                                if (![element_0.e[i_2] isKindOfClass:[NSNumber class]]) {
+                                auto element_2 = MTR_SAFE_CAST(element_0.e[i_2], NSNumber);
+                                if (!element_2) {
                                     // Wrong kind of value.
+                                    MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.e[i_2], NSStringFromClass(NSNumber.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (NSNumber *) element_0.e[i_2];
                                 listHolder_2->mList[i_2] = element_2.unsignedIntValue;
                             }
                             listHolder_0->mList[i_0].e = ListType_2(listHolder_2->mList, element_0.e.count);
@@ -36482,11 +36057,12 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.f.count; ++i_2) {
-                                if (![element_0.f[i_2] isKindOfClass:[NSData class]]) {
+                                auto element_2 = MTR_SAFE_CAST(element_0.f[i_2], NSData);
+                                if (!element_2) {
                                     // Wrong kind of value.
+                                    MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.f[i_2], NSStringFromClass(NSData.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (NSData *) element_0.f[i_2];
                                 listHolder_2->mList[i_2] = AsByteSpan(element_2);
                             }
                             listHolder_0->mList[i_0].f = ListType_2(listHolder_2->mList, element_0.f.count);
@@ -36504,11 +36080,12 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.g.count; ++i_2) {
-                                if (![element_0.g[i_2] isKindOfClass:[NSNumber class]]) {
+                                auto element_2 = MTR_SAFE_CAST(element_0.g[i_2], NSNumber);
+                                if (!element_2) {
                                     // Wrong kind of value.
+                                    MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.g[i_2], NSStringFromClass(NSNumber.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (NSNumber *) element_0.g[i_2];
                                 listHolder_2->mList[i_2] = element_2.unsignedCharValue;
                             }
                             listHolder_0->mList[i_0].g = ListType_2(listHolder_2->mList, element_0.g.count);
@@ -36534,11 +36111,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.arg2.count; ++i_0) {
-                    if (![self.arg2[i_0] isKindOfClass:[MTRUnitTestingClusterSimpleStruct class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.arg2[i_0], MTRUnitTestingClusterSimpleStruct);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg2[i_0], NSStringFromClass(MTRUnitTestingClusterSimpleStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRUnitTestingClusterSimpleStruct *) self.arg2[i_0];
                     listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
                     listHolder_0->mList[i_0].b = element_0.b.boolValue;
                     listHolder_0->mList[i_0].c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c)>>(element_0.c.unsignedCharValue);
@@ -36569,11 +36147,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.arg3.count; ++i_0) {
-                    if (![self.arg3[i_0] isKindOfClass:[NSNumber class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.arg3[i_0], NSNumber);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg3[i_0], NSStringFromClass(NSNumber.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSNumber *) self.arg3[i_0];
                     listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(element_0.unsignedCharValue);
                 }
                 encodableStruct.arg3 = ListType_0(listHolder_0->mList, self.arg3.count);
@@ -36593,11 +36172,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.arg4.count; ++i_0) {
-                    if (![self.arg4[i_0] isKindOfClass:[NSNumber class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.arg4[i_0], NSNumber);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg4[i_0], NSStringFromClass(NSNumber.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSNumber *) self.arg4[i_0];
                     listHolder_0->mList[i_0] = element_0.boolValue;
                 }
                 encodableStruct.arg4 = ListType_0(listHolder_0->mList, self.arg4.count);
@@ -37576,11 +37156,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.arg1.count; ++i_0) {
-                    if (![self.arg1[i_0] isKindOfClass:[MTRUnitTestingClusterSimpleStruct class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.arg1[i_0], MTRUnitTestingClusterSimpleStruct);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg1[i_0], NSStringFromClass(MTRUnitTestingClusterSimpleStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRUnitTestingClusterSimpleStruct *) self.arg1[i_0];
                     listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
                     listHolder_0->mList[i_0].b = element_0.b.boolValue;
                     listHolder_0->mList[i_0].c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c)>>(element_0.c.unsignedCharValue);
@@ -37796,11 +37377,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.arg1.count; ++i_0) {
-                    if (![self.arg1[i_0] isKindOfClass:[NSNumber class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.arg1[i_0], NSNumber);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg1[i_0], NSStringFromClass(NSNumber.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSNumber *) self.arg1[i_0];
                     listHolder_0->mList[i_0] = element_0.unsignedCharValue;
                 }
                 encodableStruct.arg1 = ListType_0(listHolder_0->mList, self.arg1.count);
@@ -38002,11 +37584,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_1);
                 for (size_t i_1 = 0; i_1 < self.arg1.d.count; ++i_1) {
-                    if (![self.arg1.d[i_1] isKindOfClass:[MTRUnitTestingClusterSimpleStruct class]]) {
+                    auto element_1 = MTR_SAFE_CAST(self.arg1.d[i_1], MTRUnitTestingClusterSimpleStruct);
+                    if (!element_1) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg1.d[i_1], NSStringFromClass(MTRUnitTestingClusterSimpleStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_1 = (MTRUnitTestingClusterSimpleStruct *) self.arg1.d[i_1];
                     listHolder_1->mList[i_1].a = element_1.a.unsignedCharValue;
                     listHolder_1->mList[i_1].b = element_1.b.boolValue;
                     listHolder_1->mList[i_1].c = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].c)>>(element_1.c.unsignedCharValue);
@@ -38035,11 +37618,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_1);
                 for (size_t i_1 = 0; i_1 < self.arg1.e.count; ++i_1) {
-                    if (![self.arg1.e[i_1] isKindOfClass:[NSNumber class]]) {
+                    auto element_1 = MTR_SAFE_CAST(self.arg1.e[i_1], NSNumber);
+                    if (!element_1) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg1.e[i_1], NSStringFromClass(NSNumber.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_1 = (NSNumber *) self.arg1.e[i_1];
                     listHolder_1->mList[i_1] = element_1.unsignedIntValue;
                 }
                 encodableStruct.arg1.e = ListType_1(listHolder_1->mList, self.arg1.e.count);
@@ -38057,11 +37641,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_1);
                 for (size_t i_1 = 0; i_1 < self.arg1.f.count; ++i_1) {
-                    if (![self.arg1.f[i_1] isKindOfClass:[NSData class]]) {
+                    auto element_1 = MTR_SAFE_CAST(self.arg1.f[i_1], NSData);
+                    if (!element_1) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg1.f[i_1], NSStringFromClass(NSData.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_1 = (NSData *) self.arg1.f[i_1];
                     listHolder_1->mList[i_1] = AsByteSpan(element_1);
                 }
                 encodableStruct.arg1.f = ListType_1(listHolder_1->mList, self.arg1.f.count);
@@ -38079,11 +37664,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_1);
                 for (size_t i_1 = 0; i_1 < self.arg1.g.count; ++i_1) {
-                    if (![self.arg1.g[i_1] isKindOfClass:[NSNumber class]]) {
+                    auto element_1 = MTR_SAFE_CAST(self.arg1.g[i_1], NSNumber);
+                    if (!element_1) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg1.g[i_1], NSStringFromClass(NSNumber.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_1 = (NSNumber *) self.arg1.g[i_1];
                     listHolder_1->mList[i_1] = element_1.unsignedCharValue;
                 }
                 encodableStruct.arg1.g = ListType_1(listHolder_1->mList, self.arg1.g.count);
@@ -38271,11 +37857,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.arg1.count; ++i_0) {
-                    if (![self.arg1[i_0] isKindOfClass:[MTRUnitTestingClusterNestedStructList class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.arg1[i_0], MTRUnitTestingClusterNestedStructList);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg1[i_0], NSStringFromClass(MTRUnitTestingClusterNestedStructList.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRUnitTestingClusterNestedStructList *) self.arg1[i_0];
                     listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
                     listHolder_0->mList[i_0].b = element_0.b.boolValue;
                     listHolder_0->mList[i_0].c.a = element_0.c.a.unsignedCharValue;
@@ -38300,11 +37887,12 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.d.count; ++i_2) {
-                                if (![element_0.d[i_2] isKindOfClass:[MTRUnitTestingClusterSimpleStruct class]]) {
+                                auto element_2 = MTR_SAFE_CAST(element_0.d[i_2], MTRUnitTestingClusterSimpleStruct);
+                                if (!element_2) {
                                     // Wrong kind of value.
+                                    MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.d[i_2], NSStringFromClass(MTRUnitTestingClusterSimpleStruct.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (MTRUnitTestingClusterSimpleStruct *) element_0.d[i_2];
                                 listHolder_2->mList[i_2].a = element_2.a.unsignedCharValue;
                                 listHolder_2->mList[i_2].b = element_2.b.boolValue;
                                 listHolder_2->mList[i_2].c = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].c)>>(element_2.c.unsignedCharValue);
@@ -38333,11 +37921,12 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.e.count; ++i_2) {
-                                if (![element_0.e[i_2] isKindOfClass:[NSNumber class]]) {
+                                auto element_2 = MTR_SAFE_CAST(element_0.e[i_2], NSNumber);
+                                if (!element_2) {
                                     // Wrong kind of value.
+                                    MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.e[i_2], NSStringFromClass(NSNumber.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (NSNumber *) element_0.e[i_2];
                                 listHolder_2->mList[i_2] = element_2.unsignedIntValue;
                             }
                             listHolder_0->mList[i_0].e = ListType_2(listHolder_2->mList, element_0.e.count);
@@ -38355,11 +37944,12 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.f.count; ++i_2) {
-                                if (![element_0.f[i_2] isKindOfClass:[NSData class]]) {
+                                auto element_2 = MTR_SAFE_CAST(element_0.f[i_2], NSData);
+                                if (!element_2) {
                                     // Wrong kind of value.
+                                    MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.f[i_2], NSStringFromClass(NSData.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (NSData *) element_0.f[i_2];
                                 listHolder_2->mList[i_2] = AsByteSpan(element_2);
                             }
                             listHolder_0->mList[i_0].f = ListType_2(listHolder_2->mList, element_0.f.count);
@@ -38377,11 +37967,12 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.g.count; ++i_2) {
-                                if (![element_0.g[i_2] isKindOfClass:[NSNumber class]]) {
+                                auto element_2 = MTR_SAFE_CAST(element_0.g[i_2], NSNumber);
+                                if (!element_2) {
                                     // Wrong kind of value.
+                                    MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.g[i_2], NSStringFromClass(NSNumber.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (NSNumber *) element_0.g[i_2];
                                 listHolder_2->mList[i_2] = element_2.unsignedCharValue;
                             }
                             listHolder_0->mList[i_0].g = ListType_2(listHolder_2->mList, element_0.g.count);
@@ -38568,11 +38159,12 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.arg1.count; ++i_0) {
-                    if (![self.arg1[i_0] isKindOfClass:[NSNumber class]]) {
+                    auto element_0 = MTR_SAFE_CAST(self.arg1[i_0], NSNumber);
+                    if (!element_0) {
                         // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.arg1[i_0], NSStringFromClass(NSNumber.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSNumber *) self.arg1[i_0];
                     listHolder_0->mList[i_0] = element_0.unsignedCharValue;
                 }
                 encodableStruct.arg1 = ListType_0(listHolder_0->mList, self.arg1.count);
@@ -39187,11 +38779,12 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     listFreer.add(listHolder_1);
                     for (size_t i_1 = 0; i_1 < self.nullableList.count; ++i_1) {
-                        if (![self.nullableList[i_1] isKindOfClass:[NSNumber class]]) {
+                        auto element_1 = MTR_SAFE_CAST(self.nullableList[i_1], NSNumber);
+                        if (!element_1) {
                             // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.nullableList[i_1], NSStringFromClass(NSNumber.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (NSNumber *) self.nullableList[i_1];
                         listHolder_1->mList[i_1] = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1])>>(element_1.unsignedCharValue);
                     }
                     nonNullValue_0 = ListType_1(listHolder_1->mList, self.nullableList.count);
@@ -39214,11 +38807,12 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     listFreer.add(listHolder_1);
                     for (size_t i_1 = 0; i_1 < self.optionalList.count; ++i_1) {
-                        if (![self.optionalList[i_1] isKindOfClass:[NSNumber class]]) {
+                        auto element_1 = MTR_SAFE_CAST(self.optionalList[i_1], NSNumber);
+                        if (!element_1) {
                             // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.optionalList[i_1], NSStringFromClass(NSNumber.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (NSNumber *) self.optionalList[i_1];
                         listHolder_1->mList[i_1] = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1])>>(element_1.unsignedCharValue);
                     }
                     definedValue_0 = ListType_1(listHolder_1->mList, self.optionalList.count);
@@ -39245,11 +38839,12 @@ NS_ASSUME_NONNULL_BEGIN
                         }
                         listFreer.add(listHolder_2);
                         for (size_t i_2 = 0; i_2 < self.nullableOptionalList.count; ++i_2) {
-                            if (![self.nullableOptionalList[i_2] isKindOfClass:[NSNumber class]]) {
+                            auto element_2 = MTR_SAFE_CAST(self.nullableOptionalList[i_2], NSNumber);
+                            if (!element_2) {
                                 // Wrong kind of value.
+                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.nullableOptionalList[i_2], NSStringFromClass(NSNumber.class));
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            auto element_2 = (NSNumber *) self.nullableOptionalList[i_2];
                             listHolder_2->mList[i_2] = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2])>>(element_2.unsignedCharValue);
                         }
                         nonNullValue_1 = ListType_2(listHolder_2->mList, self.nullableOptionalList.count);

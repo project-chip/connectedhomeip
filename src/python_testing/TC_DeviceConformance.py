@@ -295,7 +295,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                 continue
 
             device_type_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
-            invalid_device_types = [x for x in device_type_list if not is_valid_device_type_id(device_type_id_type(x.deviceType))]
+            invalid_device_types = [x for x in device_type_list if not is_valid_device_type_id(x.deviceType)]
             standard_device_types = [x for x in endpoint[Clusters.Descriptor]
                                      [Clusters.Descriptor.Attributes.DeviceTypeList] if device_type_id_type(x.deviceType) == DeviceTypeIdType.kStandard]
             endpoint_clusters = []

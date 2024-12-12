@@ -75,29 +75,8 @@ buildconfig_header("app_buildconfig") {
     "NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR=${non_spec_compliant_ota_action_delay_floor}",
     "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=${chip_build_controller_dynamic_server}",
     "CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP=${chip_enable_busy_handling_for_operational_session_setup}",
-    "CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE=${chip_data_model_check_die_on_failure}",
+    "CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING=${chip_data_model_extra_logging}",
   ]
-
-  if (chip_use_data_model_interface == "disabled") {
-    defines += [
-      "CHIP_CONFIG_USE_DATA_MODEL_INTERFACE=0",
-      "CHIP_CONFIG_USE_EMBER_DATA_MODEL=1",
-    ]
-  } else if (chip_use_data_model_interface == "check") {
-    defines += [
-      "CHIP_CONFIG_USE_DATA_MODEL_INTERFACE=1",
-      "CHIP_CONFIG_USE_EMBER_DATA_MODEL=1",
-    ]
-  } else {
-    # only one of disabled/check/enabled must be used
-    assert(chip_use_data_model_interface == "enabled",
-           "chip_use_data_model_interface must use a supported value")
-
-    defines += [
-      "CHIP_CONFIG_USE_DATA_MODEL_INTERFACE=1",
-      "CHIP_CONFIG_USE_EMBER_DATA_MODEL=0",
-    ]
-  }
 
   visibility = [ ":app_config" ]
 }
@@ -207,7 +186,6 @@ static_library("interaction-model") {
     "WriteClient.h",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
-    "reporting/Read.h",
     "reporting/ReportScheduler.h",
     "reporting/ReportSchedulerImpl.cpp",
     "reporting/ReportSchedulerImpl.h",
@@ -223,7 +201,10 @@ static_library("interaction-model") {
     "reporting/reporting.h",
   ]
 
-  deps = [ "${chip_root}/src/app:events" ]
+  deps = [
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/app:global-attributes",
+  ]
 
   public_deps = [
     ":app_config",
@@ -232,7 +213,6 @@ static_library("interaction-model") {
     ":paths",
     ":subscription-info-provider",
     "${chip_root}/src/app/MessageDef",
-    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:manager",
@@ -248,33 +228,6 @@ static_library("interaction-model") {
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
-
-  if (chip_use_data_model_interface == "disabled") {
-    sources += [
-      "reporting/Read-Ember.cpp",
-      "reporting/Read-Ember.h",
-    ]
-    public_deps += [ "${chip_root}/src/app/ember_coupling" ]
-  } else if (chip_use_data_model_interface == "check") {
-    sources += [
-      "reporting/Read-Checked.cpp",
-      "reporting/Read-Checked.h",
-      "reporting/Read-DataModel.cpp",
-      "reporting/Read-DataModel.h",
-      "reporting/Read-Ember.cpp",
-      "reporting/Read-Ember.h",
-    ]
-    public_deps += [
-      "${chip_root}/src/app/data-model-provider",
-      "${chip_root}/src/app/ember_coupling",
-    ]
-  } else {  # enabled
-    sources += [
-      "reporting/Read-DataModel.cpp",
-      "reporting/Read-DataModel.h",
-    ]
-    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
-  }
 
   if (chip_enable_read_client) {
     sources += [ "ReadClient.cpp" ]
@@ -294,13 +247,24 @@ static_library("interaction-model") {
       "clusters/ota-provider/ota-provider.cpp",
       "dynamic_server/AccessControl.cpp",
       "dynamic_server/AccessControl.h",
+    ]
+
+    # DynamicDispatcher is actually an ember-override that takes over
+    # util/attribute-storage.cpp and util/attribute-table.cpp functions.
+    #
+    # We likely should formalize and change this with a proper DataModel::Provider that
+    # is consistent instead
+    sources += [
+      "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
+      "${chip_root}/src/app/util/ember-io-storage.cpp",
       "dynamic_server/DynamicDispatcher.cpp",
     ]
 
     public_deps += [
       ":global-attributes",
       "${chip_root}/src/access",
-      "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
+      "${chip_root}/src/access:provider-impl",
+      "${chip_root}/src/app/common:attribute-type",
     ]
 
     public_configs += [ ":config-controller-dynamic-server" ]
@@ -424,22 +388,48 @@ source_set("command-handler-impl") {
   ]
 }
 
+source_set("storage-wrapper") {
+  sources = [
+    "StorageDelegateWrapper.cpp",
+    "StorageDelegateWrapper.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("attribute-persistence") {
+  sources = [
+    "DefaultSafeAttributePersistenceProvider.h",
+    "SafeAttributePersistenceProvider.cpp",
+    "SafeAttributePersistenceProvider.h",
+  ]
+
+  public_deps = [
+    ":paths",
+    ":storage-wrapper",
+    "${chip_root}/src/app/data-model:nullable",
+    "${chip_root}/src/app/util:types",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:span",
+  ]
+}
+
 # Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.
 # This way, we can have a better understanding of dependencies and other componenets can depend on the different source_sets without needing to depend on the entire app library.
 static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
+    "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
-    "AttributePersistenceProvider.h",
+    "AttributePathExpandIterator.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
-    "DefaultAttributePersistenceProvider.cpp",
-    "DefaultAttributePersistenceProvider.h",
-    "DeferredAttributePersistenceProvider.cpp",
-    "DeferredAttributePersistenceProvider.h",
     "EventLogging.h",
     "EventManagement.cpp",
     "EventManagement.h",
@@ -449,7 +439,6 @@ static_library("app") {
     "GenericEventManagementTestEventTriggerHandler.h",
     "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
-    "SafeAttributePersistenceProvider.h",
     "TimerDelegates.cpp",
     "TimerDelegates.h",
     "WriteHandler.cpp",
@@ -469,6 +458,7 @@ static_library("app") {
     ":global-attributes",
     ":interaction-model",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/address_resolve",
@@ -477,32 +467,6 @@ static_library("app") {
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/system",
   ]
-
-  if (chip_use_data_model_interface == "disabled") {
-    sources += [
-      "AttributePathExpandIterator-Ember.cpp",
-      "AttributePathExpandIterator-Ember.h",
-      "AttributePathExpandIterator.h",
-    ]
-  } else if (chip_use_data_model_interface == "check") {
-    sources += [
-      "AttributePathExpandIterator-Checked.cpp",
-      "AttributePathExpandIterator-Checked.h",
-      "AttributePathExpandIterator-DataModel.cpp",
-      "AttributePathExpandIterator-DataModel.h",
-      "AttributePathExpandIterator-Ember.cpp",
-      "AttributePathExpandIterator-Ember.h",
-      "AttributePathExpandIterator.h",
-    ]
-    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
-  } else {  # enabled
-    sources += [
-      "AttributePathExpandIterator-DataModel.cpp",
-      "AttributePathExpandIterator-DataModel.h",
-      "AttributePathExpandIterator.h",
-    ]
-    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
-  }
 
   if (chip_enable_read_client) {
     sources += [

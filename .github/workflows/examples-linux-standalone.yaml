@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:94
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -219,6 +219,16 @@ jobs:
                     linux debug fabric-bridge-app \
                     out/linux-x64-fabric-bridge-no-ble-rpc/fabric-bridge-app \
                     /tmp/bloat_reports/
+            - name: Build example Fabric Sync
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-fabric-sync-no-ble \
+                        build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug fabric-sync \
+                    out/linux-x64-fabric-sync-no-ble/fabric-sync \
+                    /tmp/bloat_reports/                    
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}

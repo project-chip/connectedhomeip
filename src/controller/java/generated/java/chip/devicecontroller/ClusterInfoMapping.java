@@ -11742,48 +11742,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedEnergyEvseModeClusterStartUpModeAttributeCallback implements ChipClusters.EnergyEvseModeCluster.StartUpModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedEnergyEvseModeClusterOnModeAttributeCallback implements ChipClusters.EnergyEvseModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedEnergyEvseModeClusterGeneratedCommandListAttributeCallback implements ChipClusters.EnergyEvseModeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -11913,48 +11871,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedWaterHeaterModeClusterStartUpModeAttributeCallback implements ChipClusters.WaterHeaterModeCluster.StartUpModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedWaterHeaterModeClusterOnModeAttributeCallback implements ChipClusters.WaterHeaterModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedWaterHeaterModeClusterGeneratedCommandListAttributeCallback implements ChipClusters.WaterHeaterModeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -12075,48 +11991,6 @@ public class ClusterInfoMapping {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DeviceEnergyManagementModeClusterModeOptionStruct>");
       responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDeviceEnergyManagementModeClusterStartUpModeAttributeCallback implements ChipClusters.DeviceEnergyManagementModeCluster.StartUpModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDeviceEnergyManagementModeClusterOnModeAttributeCallback implements ChipClusters.DeviceEnergyManagementModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
 
@@ -20081,7 +19955,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedZoneManagementClusterTimeControlAttributeCallback implements ChipClusters.ZoneManagementCluster.TimeControlAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedZoneManagementClusterTriggersAttributeCallback implements ChipClusters.ZoneManagementCluster.TriggersAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20089,9 +19963,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> valueList) {
+    public void onSuccess(List<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -20369,48 +20243,6 @@ public class ClusterInfoMapping {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct>");
       responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedCameraAvStreamManagementClusterCurrentVideoCodecsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.CurrentVideoCodecsAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Integer> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedCameraAvStreamManagementClusterCurrentSnapshotConfigAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.CurrentSnapshotConfigAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct");
-      responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
 
@@ -29933,8 +29765,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocateimageCodecCommandParameterInfo = new CommandParameterInfo("imageCodec", Integer.class, Integer.class);
     cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("imageCodec",cameraAvStreamManagementsnapshotStreamAllocateimageCodecCommandParameterInfo);
 
-    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocateframeRateCommandParameterInfo = new CommandParameterInfo("frameRate", Integer.class, Integer.class);
-    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("frameRate",cameraAvStreamManagementsnapshotStreamAllocateframeRateCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatemaxFrameRateCommandParameterInfo = new CommandParameterInfo("maxFrameRate", Integer.class, Integer.class);
+    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("maxFrameRate",cameraAvStreamManagementsnapshotStreamAllocatemaxFrameRateCommandParameterInfo);
 
     CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatebitRateCommandParameterInfo = new CommandParameterInfo("bitRate", Long.class, Long.class);
     cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("bitRate",cameraAvStreamManagementsnapshotStreamAllocatebitRateCommandParameterInfo);
@@ -29951,7 +29783,7 @@ public class ClusterInfoMapping {
              commandArguments.get("imageCodec")
 
            , (Integer)
-             commandArguments.get("frameRate")
+             commandArguments.get("maxFrameRate")
 
            , (Long)
              commandArguments.get("bitRate")
@@ -30025,72 +29857,6 @@ public class ClusterInfoMapping {
         cameraAvStreamManagementcaptureSnapshotCommandParams
     );
     cameraAvStreamManagementClusterInteractionInfoMap.put("captureSnapshot", cameraAvStreamManagementcaptureSnapshotInteractionInfo);
-
-    Map<String, CommandParameterInfo> cameraAvStreamManagementsetViewportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    InteractionInfo cameraAvStreamManagementsetViewportInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
-        .setViewport((DefaultClusterCallback) callback
-        , (ChipStructs.CameraAvStreamManagementClusterViewportStruct)
-        commandArguments.get("viewport")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        cameraAvStreamManagementsetViewportCommandParams
-    );
-    cameraAvStreamManagementClusterInteractionInfoMap.put("setViewport", cameraAvStreamManagementsetViewportInteractionInfo);
-
-    Map<String, CommandParameterInfo> cameraAvStreamManagementsetImageRotationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo cameraAvStreamManagementsetImageRotationangleCommandParameterInfo = new CommandParameterInfo("angle", Integer.class, Integer.class);
-    cameraAvStreamManagementsetImageRotationCommandParams.put("angle",cameraAvStreamManagementsetImageRotationangleCommandParameterInfo);
-    InteractionInfo cameraAvStreamManagementsetImageRotationInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
-        .setImageRotation((DefaultClusterCallback) callback
-        , (Integer)
-        commandArguments.get("angle")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        cameraAvStreamManagementsetImageRotationCommandParams
-    );
-    cameraAvStreamManagementClusterInteractionInfoMap.put("setImageRotation", cameraAvStreamManagementsetImageRotationInteractionInfo);
-
-    Map<String, CommandParameterInfo> cameraAvStreamManagementsetImageFlipHorizontalCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo cameraAvStreamManagementsetImageFlipHorizontalenabledCommandParameterInfo = new CommandParameterInfo("enabled", Boolean.class, Boolean.class);
-    cameraAvStreamManagementsetImageFlipHorizontalCommandParams.put("enabled",cameraAvStreamManagementsetImageFlipHorizontalenabledCommandParameterInfo);
-    InteractionInfo cameraAvStreamManagementsetImageFlipHorizontalInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
-        .setImageFlipHorizontal((DefaultClusterCallback) callback
-        , (Boolean)
-        commandArguments.get("enabled")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        cameraAvStreamManagementsetImageFlipHorizontalCommandParams
-    );
-    cameraAvStreamManagementClusterInteractionInfoMap.put("setImageFlipHorizontal", cameraAvStreamManagementsetImageFlipHorizontalInteractionInfo);
-
-    Map<String, CommandParameterInfo> cameraAvStreamManagementsetImageFlipVerticalCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo cameraAvStreamManagementsetImageFlipVerticalenabledCommandParameterInfo = new CommandParameterInfo("enabled", Boolean.class, Boolean.class);
-    cameraAvStreamManagementsetImageFlipVerticalCommandParams.put("enabled",cameraAvStreamManagementsetImageFlipVerticalenabledCommandParameterInfo);
-    InteractionInfo cameraAvStreamManagementsetImageFlipVerticalInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
-        .setImageFlipVertical((DefaultClusterCallback) callback
-        , (Boolean)
-        commandArguments.get("enabled")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        cameraAvStreamManagementsetImageFlipVerticalCommandParams
-    );
-    cameraAvStreamManagementClusterInteractionInfoMap.put("setImageFlipVertical", cameraAvStreamManagementsetImageFlipVerticalInteractionInfo);
 
     commandMap.put("cameraAvStreamManagement", cameraAvStreamManagementClusterInteractionInfoMap);
 
