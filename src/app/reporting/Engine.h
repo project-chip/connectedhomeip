@@ -55,7 +55,7 @@ namespace reporting {
  *         At its core, it  tries to gather and pack as much relevant attributes changes and/or events as possible into a report
  * message before sending that to the reader. It continues to do so until it has no more work to do.
  */
-class Engine : public DataModel::ProviderChangeListener
+class Engine : public DataModel::ProviderChangeListener, public EventScheduler
 {
 public:
     /**
@@ -65,11 +65,13 @@ public:
 
     /**
      * Initializes the reporting engine. Should only be called once.
+     * 
+     * @param[in] A pointer to EventManagement. Use the global one by default.
      *
      * @retval #CHIP_NO_ERROR On success.
      * @retval other           Was unable to retrieve data and write it into the writer.
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(EventManagement * apEventManagement = nullptr);
 
     void Shutdown();
 
@@ -101,7 +103,7 @@ public:
      *  Schedule the event delivery
      *
      */
-    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten);
+    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten) override;
 
     /*
      * Resets the tracker that tracks the currently serviced read handler.
@@ -287,6 +289,8 @@ private:
 #endif
 
     InteractionModelEngine * mpImEngine = nullptr;
+
+    EventManagement * mpEventManagement = nullptr;
 };
 
 }; // namespace reporting

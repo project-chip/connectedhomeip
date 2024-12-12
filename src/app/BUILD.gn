@@ -163,6 +163,7 @@ static_library("interaction-model") {
     "CommandSender.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
+    "EventScheduler.h",
     "InteractionModelDelegatePointers.cpp",
     "InteractionModelDelegatePointers.h",
     "InteractionModelEngine.cpp",
