@@ -57,7 +57,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
         )
         return comm_service
 
-    async def OpenCommissioningWindow(self, timeout: int, iteration: int=10000, discriminator: int=1234) -> CommissioningParameters:
+    async def OpenCommissioningWindow(self, timeout: int, iteration: int = 10000, discriminator: int = 1234) -> CommissioningParameters:
         try:
             params = await self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=timeout, iteration=iteration, discriminator=self.discriminator, option=1)
@@ -84,33 +84,35 @@ class TC_CADMIN_1_5(MatterBaseTest):
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM"),
-            TestStep(3, "TH_CR1 finds DUT_CE advertising as a commissionable node on DNS-SD", "Verify that the DNS-SD advertisement TXT record shows CM=2"),
-            TestStep(4, "TH_CR2 attempts to start a commissioning process with DUT_CE after 190 seconds", 
-                "TH_CR2 should fail to commission the DUT since the window should be closed. This may be a failure to find the commissionable node or a failure to establish a PASE connection."),
-            TestStep(5, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM", "{resDutSuccess}"),
+            TestStep(3, "TH_CR1 finds DUT_CE advertising as a commissionable node on DNS-SD",
+                     "Verify that the DNS-SD advertisement TXT record shows CM=2"),
+            TestStep(4, "TH_CR2 attempts to start a commissioning process with DUT_CE after 190 seconds",
+                     "TH_CR2 should fail to commission the DUT since the window should be closed. This may be a failure to find the commissionable node or a failure to establish a PASE connection."),
+            TestStep(
+                5, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM", "{resDutSuccess}"),
             TestStep(6, "TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command", "{resDutSuccess}"),
-            TestStep(7, "TH_CR2 attempts to start a commissioning process with DUT_CE", 
-                "TH_CR2 should fail to commission the DUT since the window should be closed. This may be a failure to find the commissionable node or a failure to establish a PASE connection."),
-            TestStep(8, "TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command.", 
-                "Verify this command fails with the cluster specific status code of WindowNotOpen"),
-            TestStep(9, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with a discriminator of 4096", 
-                "Verify DUT_CE fails to open Commissioning window with status code 3 (PakeParameterError)"),
-            TestStep(10, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the iterations set to 999", 
-                "Verify DUT_CE fails to open Commissioning window with status code 3 (PakeParameterError)"),
-            TestStep(11, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the iterations set to 100001", 
-                "Verify DUT_CE fails to open Commissioning window with status code 3 (PakeParameterError)"),
-            TestStep(12, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the salt set to 'too_short'", 
-                "Verify DUT_CE fails to open Commissioning window with status code 3 (PakeParameterError)"),
-            TestStep(13, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the salt set to 'this pake salt very very very long'", 
-                "Verify DUT_CE fails to open Commissioning window with status code 3 (PakeParameterError)"),
-            TestStep(14, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of {PIXIT_CWDURATION} seconds using ECM", 
-                "Verify DUT_CE opens its Commissioning window to allow a second commissioning"),
-            TestStep(15, "TH_CR1 opens another commissioning window on DUT_CE using a commissioning timeout of {PIXIT_CWDURATION} seconds using ECM", 
-                "Verify DUT_CE fails to open Commissioning window with status code 2 (Busy)"),
-            TestStep(16, "TH_CR2 starts a commissioning process with DUT_CE", 
-                "Commissioning is successful"),
-            TestStep(17, "TH_CR1 tries to revoke the commissioning window on DUT_CE using RevokeCommissioning command", 
-                "Verify DUT_CE fails to revoke giving status code 4 (WindowNotOpen) as there was no window open"),
+            TestStep(7, "TH_CR2 attempts to start a commissioning process with DUT_CE",
+                     "TH_CR2 should fail to commission the DUT since the window should be closed. This may be a failure to find the commissionable node or a failure to establish a PASE connection."),
+            TestStep(8, "TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command.",
+                     "Verify this command fails with the cluster specific status code of WindowNotOpen"),
+            TestStep(9, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with a discriminator of 4096",
+                     "Verify DUT_CE fails to open Commissioning window with status code 3 (PakeParameterError)"),
+            TestStep(10, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the iterations set to 999",
+                     "Verify DUT_CE fails to open Commissioning window with status code 3 (PakeParameterError)"),
+            TestStep(11, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the iterations set to 100001",
+                     "Verify DUT_CE fails to open Commissioning window with status code 3 (PakeParameterError)"),
+            TestStep(12, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the salt set to 'too_short'",
+                     "Verify DUT_CE fails to open Commissioning window with status code 3 (PakeParameterError)"),
+            TestStep(13, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the salt set to 'this pake salt very very very long'",
+                     "Verify DUT_CE fails to open Commissioning window with status code 3 (PakeParameterError)"),
+            TestStep(14, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of {PIXIT_CWDURATION} seconds using ECM",
+                     "Verify DUT_CE opens its Commissioning window to allow a second commissioning"),
+            TestStep(15, "TH_CR1 opens another commissioning window on DUT_CE using a commissioning timeout of {PIXIT_CWDURATION} seconds using ECM",
+                     "Verify DUT_CE fails to open Commissioning window with status code 2 (Busy)"),
+            TestStep(16, "TH_CR2 starts a commissioning process with DUT_CE",
+                     "Commissioning is successful"),
+            TestStep(17, "TH_CR1 tries to revoke the commissioning window on DUT_CE using RevokeCommissioning command",
+                     "Verify DUT_CE fails to revoke giving status code 4 (WindowNotOpen) as there was no window open"),
         ]
 
     def pics_TC_CADMIN_1_5(self) -> list[str]:
@@ -140,7 +142,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
         self.step(4)
         # TH_CR2 attempts to start a commissioning process with DUT_CE after 190 seconds
         sleep(190)
-        #await self.CommissionAttempt(setupPinCode, expectedErrCode=0x03)
+        # await self.CommissionAttempt(setupPinCode, expectedErrCode=0x03)
         await self.CommissionOnNetwork(params.setupPinCode)
 
         self.step(5)
