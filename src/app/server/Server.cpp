@@ -189,7 +189,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // 2) `InitDataModelHandler` (under SetDataModelProvider), which depends
     //    on atttribute persistence being already set up before it runs. this call will
     //    remain the single point of entry for ensuring all cluster-level initialization
-    //    has occurred.    
+    //    has occurred.
     app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
