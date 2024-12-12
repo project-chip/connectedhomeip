@@ -225,7 +225,7 @@ public:
      * @param[in] aMonotonicStartupTime  Time we should consider as "monotonic
      *                                   time 0" for cases when we use
      *                                   system-time event timestamps.
-     * 
+     *
      * @param[in] apEventScheduler       Scheduler to deliver the event, default is the reporting
      *                                   engine in InteractionModelEngine.
      *

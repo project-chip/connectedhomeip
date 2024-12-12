@@ -65,7 +65,7 @@ public:
 
     /**
      * Initializes the reporting engine. Should only be called once.
-     * 
+     *
      * @param[in] A pointer to EventManagement. Use the global one by default.
      *
      * @retval #CHIP_NO_ERROR On success.
