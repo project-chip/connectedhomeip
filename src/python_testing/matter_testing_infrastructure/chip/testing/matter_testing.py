@@ -1126,7 +1126,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
         self.global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
             None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
-        # self.stored_global_wildcard stores value of self.global_wildcard after first async call, appears needed in order to not timeout during commissioning
+        # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
+        # Because setup_class can be called before commissioning, this variable is lazy-initialized
+        # where the read is deferred until the first guard function call that requires global attributes.
         self.stored_global_wildcard = None
 
     def setup_test(self):
