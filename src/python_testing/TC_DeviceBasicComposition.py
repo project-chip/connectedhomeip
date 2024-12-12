@@ -892,11 +892,14 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             1.2, "For device types with more than one endpoint listed, ensure each of the listed endpoints has a tag attribute and the tag attributes are not the same")
         problems = find_tag_list_problems(roots, device_types, self.endpoints)
 
-        for ep, problem in problems.items():
-            location = AttributePathLocation(endpoint_id=ep, cluster_id=Clusters.Descriptor.id,
-                                             attribute_id=Clusters.Descriptor.Attributes.TagList.attribute_id)
-            msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
-            self.record_error(self.get_test_name(), location=location, problem=msg, spec_location="Descriptor TagList")
+        def record_problems(problems):
+            for ep, problem in problems.items():
+                location = AttributePathLocation(endpoint_id=ep, cluster_id=Clusters.Descriptor.id,
+                                                 attribute_id=Clusters.Descriptor.Attributes.TagList.attribute_id)
+                msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
+                self.record_error(self.get_test_name(), location=location, problem=msg, spec_location="Descriptor TagList")
+
+        record_problems(problems)
 
         self.print_step(2, "Identify all the direct children of the root node endpoint")
         root_direct_children = get_direct_children_of_root(self.endpoints)
@@ -906,6 +909,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         self.print_step(
             2.2, "For device types with more than one endpoint listed, ensure each of the listed endpoints has a tag attribute and the tag attributes are not the same")
         root_problems = find_tag_list_problems([0], {0: device_types}, self.endpoints)
+        record_problems(root_problems)
 
         if problems or root_problems:
             self.fail_current_test("Problems with tags lists")
