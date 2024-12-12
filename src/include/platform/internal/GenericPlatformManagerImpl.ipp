@@ -119,7 +119,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
-    // Initialize the CHIP NFC manager for NFC Onboarding
+    // Initialize the NFC onboarding payload manager
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
     err = NFCOnboardingPayloadMgr().Init();
     VerifyOrExit(err == CHIP_NO_ERROR,
