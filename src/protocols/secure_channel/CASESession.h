@@ -135,8 +135,8 @@ public:
 
     struct EncodeSigma1Param : Sigma1Param
     {
-        const Crypto::P256PublicKey * pEphPubKey;
-        const ReliableMessageProtocolConfig * initiatorMrpConfig;
+        const Crypto::P256PublicKey * pEphPubKey                 = nullptr;
+        const ReliableMessageProtocolConfig * initiatorMrpConfig = nullptr;
         uint8_t initiatorResume1MIC[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
     };
 
@@ -191,9 +191,9 @@ public:
     {
         uint8_t responderRandom[kSigmaParamRandomNumberSize];
         uint16_t responderSessionId;
-        const Crypto::P256PublicKey * pEphPubKey;
+        const Crypto::P256PublicKey * pEphPubKey = nullptr;
         Platform::ScopedMemoryBuffer<uint8_t> msg_R2_Encrypted;
-        size_t encrypted2Length;
+        size_t encrypted2Length = 0;
         const ReliableMessageProtocolConfig * responderMrpConfig;
     };
 

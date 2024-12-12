@@ -981,6 +981,7 @@ TEST_F(TestCASESession, EncodeSigma2Test)
     System::PacketBufferHandle msg;
     CASESession session;
     CASESession::EncodeSigma2Param encodeParams;
+    constexpr uint8_t kEncrypted2datalen = 100U;
 
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(&encodeParams.responderRandom[0], sizeof(encodeParams.responderRandom)), CHIP_NO_ERROR);
     encodeParams.responderSessionId = 7315;
@@ -992,7 +993,8 @@ TEST_F(TestCASESession, EncodeSigma2Test)
     encodeParams.pEphPubKey = &EphemeralKey->Pubkey();
 
     // TBEData2Encrypted
-    encodeParams.msg_R2_Encrypted.Alloc(100);
+    encodeParams.encrypted2Length = kEncrypted2datalen + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
+    encodeParams.msg_R2_Encrypted.Alloc(encodeParams.encrypted2Length);
 
     // responder Session Parameters
     ReliableMessageProtocolConfig MRPConfig = GetDefaultMRPConfig();
@@ -1022,9 +1024,17 @@ TEST_F(TestCASESession, EncodeSigma2Test)
     EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, session.EncodeSigma2(msg, encodeParams));
     msg = nullptr;
 
-    encodeParams.msg_R2_Encrypted.Alloc(100);
+    encodeParams.msg_R2_Encrypted.Alloc(encodeParams.encrypted2Length);
 
     EXPECT_EQ(CHIP_NO_ERROR, session.EncodeSigma2(msg, encodeParams));
+
+    // EncodeSigma1 should fail when the encrypted2Length is not set
+    encodeParams.encrypted2Length = 0;
+    EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, session.EncodeSigma2(msg, encodeParams));
+    msg = nullptr;
+
+    // Set encrypted2Length again
+    encodeParams.encrypted2Length = kEncrypted2datalen + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
     // EncodeSigma1 should fail when MRP config is missing
     encodeParams.responderMrpConfig = nullptr;

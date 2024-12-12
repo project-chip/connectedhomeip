@@ -1356,6 +1356,9 @@ CHIP_ERROR CASESession::EncodeSigma2(System::PacketBufferHandle & msg_R2, Encode
     // Check if msg_R2_Encrypted is not nullptr
     VerifyOrReturnError(input.msg_R2_Encrypted, CHIP_ERROR_INCORRECT_STATE);
 
+    // Check if length of msg_R2_Encrypted is set and is at least larger than the MIC length
+    VerifyOrReturnError(input.encrypted2Length > CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, CHIP_ERROR_INCORRECT_STATE);
+
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(TLV::ContextTag(kTag_Sigma2_Encrypted2), input.msg_R2_Encrypted.Get(),
                                                 static_cast<uint32_t>(input.encrypted2Length)));
 
