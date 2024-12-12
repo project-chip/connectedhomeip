@@ -141,8 +141,6 @@ private:
     unsigned mAttributeIterationHint     = 0;
     unsigned mDeviceTypeIterationHint    = 0;
     unsigned mSemanticTagIterationHint   = 0;
-    unsigned mAcceptedCommandHint        = 0;
-    unsigned mGeneratedCommandHint       = 0;
     EmberCommandListIterator mAcceptedCommandsIterator;
     EmberCommandListIterator mGeneratedCommandsIterator;
 

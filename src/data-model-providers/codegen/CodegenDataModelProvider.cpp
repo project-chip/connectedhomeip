@@ -730,14 +730,16 @@ DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const Con
     VerifyOrReturnValue(cluster->acceptedCommandList != nullptr, DataModel::CommandEntry::kInvalid);
 
     auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-    for (unsigned i = 0; cluster->acceptedCommandList[i] != kInvalidCommandId; i++)
+
+    std::optional<CommandId> mCommand = mAcceptedCommandsIterator.First(cluster->acceptedCommandList);
+    while (mCommand.has_value())
     {
-        const ConcreteCommandPath commandPath(path.mEndpointId, path.mClusterId, cluster->acceptedCommandList[i]);
+        const ConcreteCommandPath commandPath(path.mEndpointId, path.mClusterId, *mCommand);
         if ((commandHandler == nullptr) || commandHandler->AcceptsCommandId(commandPath))
         {
-            mAcceptedCommandHint = i;
             return CommandEntryFrom(path, commandPath.mCommandId);
         }
+        mCommand = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, *mCommand);
     }
     return DataModel::CommandEntry::kInvalid;
 }
@@ -749,29 +751,17 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
     VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
     VerifyOrReturnValue(cluster->acceptedCommandList != nullptr, DataModel::CommandEntry::kInvalid);
 
-    // TODO: this does NOT make use of the hint because the command list is NOT sized (it is value-terminated)
-    //       and we have no way to check `is hint in bounds`
     auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(before.mEndpointId, before.mClusterId);
-    unsigned beforeIdx;
-    for (beforeIdx = 0; cluster->acceptedCommandList[beforeIdx] != kInvalidCommandId; beforeIdx++)
-    {
-        if (cluster->acceptedCommandList[beforeIdx] == before.mCommandId)
-        {
-            break; // found it
-        }
-    }
 
-    VerifyOrReturnValue(cluster->acceptedCommandList[beforeIdx] == before.mCommandId, DataModel::CommandEntry::kInvalid);
-
-    // find the first "accepted" index out if thios
-    for (unsigned i = beforeIdx + 1; cluster->acceptedCommandList[i] != kInvalidCommandId; i++)
+    std::optional<CommandId> mCommand = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, before.mCommandId);
+    while (mCommand.has_value())
     {
-        const ConcreteCommandPath commandPath(before.mEndpointId, before.mClusterId, cluster->acceptedCommandList[i]);
+        const ConcreteCommandPath commandPath(before.mEndpointId, before.mClusterId, *mCommand);
         if ((commandHandler == nullptr) || commandHandler->AcceptsCommandId(commandPath))
         {
-            mAcceptedCommandHint = i;
             return CommandEntryFrom(before, commandPath.mCommandId);
         }
+        mCommand = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, *mCommand);
     }
     return DataModel::CommandEntry::kInvalid;
 }
@@ -783,24 +773,14 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
     VerifyOrReturnValue(cluster != nullptr, std::nullopt);
     VerifyOrReturnValue(cluster->acceptedCommandList != nullptr, std::nullopt);
 
-    // TODO: this does NOT make use of the hint because the command list is NOT sized (it is value-terminated)
-    //       and we have no way to check `is hint in bounds`
     auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-    for (unsigned i = 0; cluster->acceptedCommandList[i] != kInvalidCommandId; i++)
-    {
-        if (cluster->acceptedCommandList[i] != path.mCommandId)
-        {
-            continue;
-        }
 
-        const ConcreteCommandPath commandPath(path.mEndpointId, path.mClusterId, cluster->acceptedCommandList[i]);
-        VerifyOrReturnValue((commandHandler == nullptr) || commandHandler->AcceptsCommandId(commandPath), std::nullopt);
+    VerifyOrReturnValue(mAcceptedCommandsIterator.Exists(cluster->acceptedCommandList, path.mCommandId), std::nullopt);
 
-        mAcceptedCommandHint = i;
-        return CommandEntryFrom(path, commandPath.mCommandId).info;
-    }
+    const ConcreteCommandPath commandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
+    VerifyOrReturnValue((commandHandler == nullptr) || commandHandler->AcceptsCommandId(commandPath), std::nullopt);
 
-    return std::nullopt;
+    return CommandEntryFrom(path, commandPath.mCommandId).info;
 }
 
 ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const ConcreteClusterPath & path)
@@ -811,14 +791,16 @@ ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const Concre
     VerifyOrReturnValue(cluster->generatedCommandList != nullptr, ConcreteCommandPath());
 
     auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-    for (unsigned i = 0; cluster->generatedCommandList[i] != kInvalidCommandId; i++)
+
+    std::optional<CommandId> mCommand = mGeneratedCommandsIterator.First(cluster->generatedCommandList);
+    while (mCommand.has_value())
     {
-        const ConcreteCommandPath commandPath(path.mEndpointId, path.mClusterId, cluster->generatedCommandList[i]);
+        const ConcreteCommandPath commandPath(path.mEndpointId, path.mClusterId, *mCommand);
         if ((commandHandler == nullptr) || commandHandler->GeneratesCommandId(commandPath))
         {
-            mGeneratedCommandHint = i;
             return commandPath;
         }
+        mCommand = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, *mCommand);
     }
     return {};
 }
@@ -833,27 +815,18 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
     // TODO: this does NOT make use of the hint because the command list is NOT sized (it is value-terminated)
     //       and we have no way to check `is hint in bounds`
     auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(before.mEndpointId, before.mClusterId);
-    unsigned beforeIdx;
-    for (beforeIdx = 0; cluster->generatedCommandList[beforeIdx] != kInvalidCommandId; beforeIdx++)
-    {
-        if (cluster->generatedCommandList[beforeIdx] == before.mCommandId)
-        {
-            break; // found it
-        }
-    }
 
-    VerifyOrReturnValue(cluster->generatedCommandList[beforeIdx] == before.mCommandId, ConcreteCommandPath());
-
-    // find the first "accepted" index out if thios
-    for (unsigned i = beforeIdx + 1; cluster->generatedCommandList[i] != kInvalidCommandId; i++)
+    std::optional<CommandId> mCommand = mGeneratedCommandsIterator.Next(cluster->generatedCommandList, before.mCommandId);
+    while (mCommand.has_value())
     {
-        const ConcreteCommandPath commandPath(before.mEndpointId, before.mClusterId, cluster->generatedCommandList[i]);
+        const ConcreteCommandPath commandPath(before.mEndpointId, before.mClusterId, *mCommand);
         if ((commandHandler == nullptr) || commandHandler->GeneratesCommandId(commandPath))
         {
-            mAcceptedCommandHint = i;
             return commandPath;
         }
+        mCommand = mGeneratedCommandsIterator.Next(cluster->generatedCommandList, *mCommand);
     }
+
     return {};
 }
 
