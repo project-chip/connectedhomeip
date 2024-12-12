@@ -172,7 +172,7 @@ class TC_CADMIN(MatterBaseTest):
         th1_fabric_info = await self.get_fabrics(th=self.th1)
 
         # Verify that the RootPublicKey matches the root public key for TH_CR1 and the NodeID matches the node ID used when TH_CR1 commissioned the device.
-        #await self.send_single_cmd(dev_ctrl=self.th1, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
+        # await self.send_single_cmd(dev_ctrl=self.th1, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
         th1_cam_rcac = TLVReader(base64.b64decode(
             self.certificate_authority_manager.activeCaList[0]._persistentStorage._jsonData["sdk-config"]["f/1/r"])).get()["Any"][9]
 
@@ -182,22 +182,22 @@ class TC_CADMIN(MatterBaseTest):
             asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning")
 
         # Expiring the failsafe timer in an attempt to clean up before TH2 attempt.
-        #await self.th1.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
+        # await self.th1.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
 
         self.step(6)
         # TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read
         th2_fabric_info = await self.get_fabrics(th=self.th2)
 
         # Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device.
-        #await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
+        # await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
 
         if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded:
             asserts.fail("public keys from fabric and certs for TH1 are not the same")
         if th2_fabric_info[0].nodeID != self.dut_node_id:
             asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning")
 
-        #await self.th2.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
-        #await self.th1.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
+        # await self.th2.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
+        # await self.th1.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
 
         self.step(7)
         # TH_CR1 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE
@@ -338,7 +338,7 @@ class TC_CADMIN(MatterBaseTest):
         th1_fabric_info = await self.get_fabrics(th=self.th1)
 
         # Verify that the RootPublicKey matches the root public key for TH_CR1 and the NodeID matches the node ID used when TH_CR1 commissioned the device.
-        #await self.send_single_cmd(dev_ctrl=self.th1, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
+        # await self.send_single_cmd(dev_ctrl=self.th1, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
         th1_cam_rcac = TLVReader(base64.b64decode(
             self.certificate_authority_manager.activeCaList[0]._persistentStorage._jsonData["sdk-config"]["f/1/r"])).get()["Any"][9]
         if th1_fabric_info[0].rootPublicKey != th1_cam_rcac:
@@ -347,21 +347,21 @@ class TC_CADMIN(MatterBaseTest):
             asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning")
 
         # Expiring the failsafe timer in an attempt to clean up before TH2 attempt.
-        #await self.th1.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
+        # await self.th1.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
 
         self.step(6)
         # TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read
         th2_fabric_info = await self.get_fabrics(th=self.th2)
 
         # Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device.
-        #await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
+        # await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
 
         if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded:
             asserts.fail("public keys from fabric and certs for TH1 are not the same")
         if th2_fabric_info[0].nodeID != self.dut_node_id:
             asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning")
 
-        #await self.th2.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
+        # await self.th2.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
 
         self.step(7)
         # TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx

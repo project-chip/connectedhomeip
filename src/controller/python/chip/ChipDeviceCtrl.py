@@ -2241,7 +2241,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         # Passes captured RCAC data back to python test modules to be used for validation
         try:
             rcac_size = 650
-            rcac_buffer = (ctypes.c_uint8 * rcac_size)() 
+            rcac_buffer = (ctypes.c_uint8 * rcac_size)()
 
             actual_rcac_size = ctypes.c_size_t()
 
