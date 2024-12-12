@@ -1,8 +1,8 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| darwin                                  |          88 |
-| cirque                                  |          88 |
+| darwin                                  |          75 |
+| builds                                  |          92 |
 | unit-integration-tests                  |         100 |
 | build-example-telink                    |         100 |
 | build-example-esp32                     |         100 |
@@ -17,6 +17,7 @@
 | build-example-qpg                       |         100 |
 | build-example-ti-cc32xx                 |         100 |
 | documentation-build                     |         100 |
+| run-misspell                            |         100 |
 | tests                                   |         100 |
 | build-example-linux-standalone          |         100 |
 | validate-gradle-wrapper                 |         100 |
@@ -30,16 +31,16 @@
 | build-example-asr                       |         100 |
 | qemu                                    |         100 |
 | delete-old-artifacts                    |         100 |
-| issue-labeler                           |         100 |
 | build-example-nuttx                     |         100 |
-| builds                                  |         100 |
+| issue-labeler                           |         100 |
 | recent-fail-summary                     |         100 |
-| full-builds-android                     |         100 |
 | java-tests                              |         100 |
+| full-builds-android                     |         100 |
+| build-example-i-mx-linux                |         100 |
 | build-example-tizen                     |         100 |
 | lint-code-base                          |         100 |
 | bloat-check                             |         100 |
-| build-example-i-mx-linux                |         100 |
 | test-tv-casting-example                 |         100 |
+| cirque                                  |         100 |
 | build-example-ameba                     |         100 |
 | build-example-bouffalolab               |         100 |
