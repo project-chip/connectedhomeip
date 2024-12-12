@@ -70,4 +70,4 @@ To view your application in the web browser run:
   $ gcloud app browse --project=matter-build-automation
 ```
 
-If you run into permission issues, reach out to "Yufeng Wang (Google)".
+If you run into permission issues, reach out to a team member from Google.
