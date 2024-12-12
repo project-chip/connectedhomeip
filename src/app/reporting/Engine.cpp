@@ -570,9 +570,9 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     size_t eventCount     = 0;
     bool hasEncodedStatus = false;
     TLV::TLVWriter backup;
-    bool eventClean                = true;
-    auto & eventMin                = apReadHandler->GetEventMin();
-    bool hasMoreChunks             = false;
+    bool eventClean    = true;
+    auto & eventMin    = apReadHandler->GetEventMin();
+    bool hasMoreChunks = false;
 
     aReportDataBuilder.Checkpoint(backup);
 
@@ -603,8 +603,8 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         err = CheckAccessDeniedEventPaths(*(eventReportIBs.GetWriter()), hasEncodedStatus, apReadHandler);
         SuccessOrExit(err);
 
-        err = mpEventManagement->FetchEventsSince(*(eventReportIBs.GetWriter()), apReadHandler->GetEventPathList(), eventMin, eventCount,
-                                            apReadHandler->GetSubjectDescriptor());
+        err = mpEventManagement->FetchEventsSince(*(eventReportIBs.GetWriter()), apReadHandler->GetEventPathList(), eventMin,
+                                                  eventCount, apReadHandler->GetSubjectDescriptor());
 
         if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
         {
