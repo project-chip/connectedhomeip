@@ -25,8 +25,6 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from chip.testing.spec_parsing import build_xml_clusters
-
 BASIC_INFORMATION_CLUSTER_ID = int("0x0039", 16)
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../../..'))
@@ -222,10 +220,20 @@ def main():
     os.chdir(CHIP_ROOT_DIR)
 
     targets = getTargets(args.cluster_id if args.cluster_id else 0)
-    spec_xml_clusters, problems = build_xml_clusters()
-    items = [(args, target, spec_xml_clusters) for target in targets]
 
-    update_func = updateOne if args.new_revision else updateOneToLatest
+    if args.new_revision:
+        update_func = updateOne
+        items = [(args, target, None) for target in targets]
+    else:
+        update_func = updateOneToLatest
+        try:
+            from chip.testing.spec_parsing import build_xml_clusters
+        except ImportError:
+            print("Couldn't import 'chip.testing.spec_parsing'. Try building/activating your python environment: ./scripts/build_python.sh -i out/python_env && source out/python_env/bin/activate)")
+            return 1
+        spec_xml_clusters, problems = build_xml_clusters()
+        items = [(args, target, spec_xml_clusters) for target in targets]
+
     if args.parallel:
         # Ensure each zap run is independent
         os.environ['ZAP_TEMPSTATE'] = '1'

@@ -15,7 +15,9 @@ attributes, events or commands are implemented accordingly.
 
 ## Prerequisites
 
-This tool uses the python environment, which can be built and activated using:
+This tool may require the python environment to parse the latest version of the
+cluster revisions (i.e. if you don't provide a '--new-revision' argument). The python
+environment can be built and activated using:
 
 ```
 # Build
