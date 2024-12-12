@@ -22,16 +22,16 @@ _install_lcov() {
     if ! lcov --version >/dev/null 2>&1; then
         echo "lcov not installed. Installing..."
         case "$(uname)" in
-        "Darwin")
-            brew install lcov
-            ;;
-        "Linux")
-            sudo apt-get update
-            sudo apt-get install -y lcov
-            ;;
-        *)
-            die
-            ;;
+            "Darwin")
+                brew install lcov
+                ;;
+            "Linux")
+                sudo apt-get update
+                sudo apt-get install -y lcov
+                ;;
+            *)
+                die
+                ;;
         esac
     fi
 }
@@ -79,33 +79,33 @@ file_name=${0##*/}
 
 for i in "$@"; do
     case $i in
-    -h | --help)
-        help
-        exit 1
-        ;;
-    -c=* | --code=*)
-        CODE="${i#*=}"
-        shift
-        ;;
-    -t=* | --tests=*)
-        TESTS="${i#*=}"
-        shift
-        ;;
-    --target=*)
-        TEST_TARGET="${i#*=}"
-        ;;
-    -o=* | --output_root=*)
-        OUTPUT_ROOT="${i#*=}"
-        COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
-        skip_gn=true
-        shift
-        ;;
-    *)
-        echo "Unknown Option \"$1\""
-        echo
-        help
-        exit 1
-        ;;
+        -h | --help)
+            help
+            exit 1
+            ;;
+        -c=* | --code=*)
+            CODE="${i#*=}"
+            shift
+            ;;
+        -t=* | --tests=*)
+            TESTS="${i#*=}"
+            shift
+            ;;
+        --target=*)
+            TEST_TARGET="${i#*=}"
+            ;;
+        -o=* | --output_root=*)
+            OUTPUT_ROOT="${i#*=}"
+            COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
+            skip_gn=true
+            shift
+            ;;
+        *)
+            echo "Unknown Option \"$1\""
+            echo
+            help
+            exit 1
+            ;;
     esac
 done
 
