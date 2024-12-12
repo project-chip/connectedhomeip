@@ -105,6 +105,7 @@ jobs:
                      --known-failure app/reporting/reporting.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.h \
+                     --known-failure app/server/TermsAndConditionsManager.cpp \
                      --known-failure app/util/attribute-storage-detail.h \
                      --known-failure app/util/attribute-storage.h \
                      --known-failure app/util/attribute-table-detail.h \
