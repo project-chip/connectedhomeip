@@ -77,7 +77,6 @@ source_set("enums") {
     # "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
     "${chip_project_app_common_include_dir}/app-common/zap-generated/cluster-enums-check.h",
     "${chip_project_app_common_include_dir}/app-common/zap-generated/cluster-enums.h",
-    
     "CompatEnumNames.h",
   ]
 
