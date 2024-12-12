@@ -13,7 +13,7 @@ The Thermostat example is supported on the following platforms :
 
 | NXP platform        | Dedicated readme                                                             |
 | ------------------- | ---------------------------------------------------------------------------- |
-| RW61x (Zephyr OS)   | [NXP Zephyr Guide](zephyr/README.md)                                         |
+| RW61x (Zephyr OS)   | [NXP Zephyr Guide](../../../docs/platforms/nxp/nxp_zephyr_guide.md)    |
 | RW61x (FreeRTOS OS) | [NXP RW61x (FreeRTOS) Guide](../../../docs/platforms/nxp/nxp_rw61x_guide.md) |
 | RT1170              | [NXP RT1170 Guide](../../../docs/platforms/nxp/nxp_rt1170_guide.md)          |
 | RT1060              | [NXP RT1060 Guide](../../../docs/platforms/nxp/nxp_rw61x_guide.md)           |
@@ -29,4 +29,4 @@ and test it can be found in the common readme for NXP platforms :
 -   NXP FreeRTOS Platforms : Refer to the
     [CHIP NXP Examples Guide for FreeRTOS platforms](../../../docs/platforms/nxp/nxp_examples_freertos_platforms.md)
 -   NXP Zephyr Platform : Refer to the
-    [NXP Zephyr All-Clusters Application](zephyr/README.md)
+    [NXP Zephyr Application](../../../docs/platforms/nxp/nxp_zephyr_guide.md)
