@@ -60,22 +60,23 @@ class TC_CADMIN_1_5(MatterBaseTest):
     async def OpenCommissioningWindow(self, timeout: int, iteration: int = 10000, discriminator: int = 1234) -> CommissioningParameters:
         try:
             params = await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=timeout, iteration=iteration, discriminator=self.discriminator, option=1)
+                nodeid=self.dut_node_id, timeout=timeout, iteration=iteration, discriminator=discriminator, option=1)
             return params
 
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
-            asserts.assert_true(False, 'Failed to open commissioning window')
+            asserts.assert_equal(e.code, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError, 'Failed to open commissioning window due to unexpected error')
 
-    async def CommissionOnNetwork(self, setup_code: int):
+    async def CommissionOnNetwork(self, setup_code: int, discriminator: int = 1234):
         ctx = asserts.assert_raises(ChipStackError)
         try:
             with ctx:
                 await self.th2.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=setup_code,
-                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
             errcode = PyChipError.from_code(ctx.exception.err)
 
+        # Timeout error occurs during step 7 for TH2 due to commissioning window being closed already
         except ae.CancelledError as e:
             errcode = e.__cause__
         return errcode
@@ -88,8 +89,8 @@ class TC_CADMIN_1_5(MatterBaseTest):
                      "Verify that the DNS-SD advertisement TXT record shows CM=2"),
             TestStep(4, "TH_CR2 attempts to start a commissioning process with DUT_CE after 190 seconds",
                      "TH_CR2 should fail to commission the DUT since the window should be closed. This may be a failure to find the commissionable node or a failure to establish a PASE connection."),
-            TestStep(
-                5, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM", "{resDutSuccess}"),
+            TestStep(5, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM", 
+                    "{resDutSuccess}"),
             TestStep(6, "TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command", "{resDutSuccess}"),
             TestStep(7, "TH_CR2 attempts to start a commissioning process with DUT_CE",
                      "TH_CR2 should fail to commission the DUT since the window should be closed. This may be a failure to find the commissionable node or a failure to establish a PASE connection."),
@@ -124,7 +125,6 @@ class TC_CADMIN_1_5(MatterBaseTest):
 
         # Establishing TH1 and TH2
         self.th1 = self.default_controller
-        self.discriminator = random.randint(0, 4095)
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
@@ -142,7 +142,6 @@ class TC_CADMIN_1_5(MatterBaseTest):
         self.step(4)
         # TH_CR2 attempts to start a commissioning process with DUT_CE after 190 seconds
         sleep(190)
-        # await self.CommissionAttempt(setupPinCode, expectedErrCode=0x03)
         await self.CommissionOnNetwork(params.setupPinCode)
 
         self.step(5)
@@ -151,11 +150,9 @@ class TC_CADMIN_1_5(MatterBaseTest):
 
         self.step(6)
         # TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command
-        try:
-            revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
-        except chip.interaction_model.InteractionModelError as e:
-            self.print_step("interaction model error", dir(e))
+        revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        sleep(1)
 
         self.step(7)
         # TH_CR2 attempts to start a commissioning process with DUT_CE
@@ -167,8 +164,9 @@ class TC_CADMIN_1_5(MatterBaseTest):
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         except chip.interaction_model.InteractionModelError as e:
-            asserts.assert_true(e.clusterStatus, 4, "Cluster status must be 4 to pass this step")
-
+            asserts.assert_true(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen, 
+                                "Cluster status must be 4 to pass this step as window should be reported as not open")
+            
         self.step(9)
         # TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with a discriminator of 4096
         await self.OpenCommissioningWindow(timeout=180, discriminator=4096)
