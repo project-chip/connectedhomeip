@@ -628,6 +628,7 @@ class PIXITType(Enum):
 
 @dataclass
 class PIXITDefinition:
+    """Describes a PIXIT requirement for a test"""
     name: str
     pixit_type: PIXITType
     description: str
@@ -639,40 +640,17 @@ class PIXITDefinition:
         """Only validate args starting with PIXIT."""
         return arg_name.startswith("PIXIT.")
 
-    def validate_value(self, value: Any) -> bool:
-        """Validate PIXIT value matches its declared type"""
-        if not self.is_pixit(self.name):
-            return True  # Skip validation for non-PIXIT args
 
-        if value is None:
-            return not self.required
+class PIXITValidator:
+    """Handles validation of PIXIT values against their definitions"""
 
-        # Mapping of PIXITType to validation function
-        type_validators = {
-            PIXITType.INT: self.validate_int,
-            PIXITType.BOOL: self.validate_bool,
-            PIXITType.FLOAT: self.validate_float,
-            PIXITType.STRING: self.validate_string,
-            PIXITType.JSON: self.validate_json,
-            PIXITType.HEX: self.validate_hex,
-        }
-
-        validator = type_validators.get(self.pixit_type)
-        if validator:
-            try:
-                return validator(value)
-            except (ValueError, TypeError, json.JSONDecodeError):
-                return False
-        else:
-            # Unknown type, consider validation failed
-            return False
-
-    def validate_int(self, value: Any) -> bool:
+    @staticmethod
+    def validate_int(value: Any) -> bool:
         int(value)
         return True
 
-    def validate_bool(self, value: Any) -> bool:
-        # Handle various boolean representations
+    @staticmethod
+    def validate_bool(value: Any) -> bool:
         if isinstance(value, str):
             value_lower = value.lower()
             if value_lower not in ('true', 'false', '1', '0', 'yes', 'no'):
@@ -681,22 +659,26 @@ class PIXITDefinition:
             bool(value)
         return True
 
-    def validate_float(self, value: Any) -> bool:
+    @staticmethod
+    def validate_float(value: Any) -> bool:
         float(value)
         return True
 
-    def validate_string(self, value: Any) -> bool:
+    @staticmethod
+    def validate_string(value: Any) -> bool:
         str(value)
         return True
 
-    def validate_json(self, value: Any) -> bool:
+    @staticmethod
+    def validate_json(value: Any) -> bool:
         if isinstance(value, str):
             json.loads(value)
         elif not isinstance(value, (dict, list)):
             return False
         return True
 
-    def validate_hex(self, value: Any) -> bool:
+    @staticmethod
+    def validate_hex(value: Any) -> bool:
         if not isinstance(value, str):
             return False
         hex_str = value.lower().replace("0x", "")
@@ -704,6 +686,66 @@ class PIXITDefinition:
         if len(hex_str) % 2 != 0:
             return False
         return True
+
+    @classmethod
+    def validate_value(cls, value: Any, pixit_def: PIXITDefinition) -> tuple[bool, Optional[str]]:
+        """Validate PIXIT value matches its declared type"""
+        if not PIXITDefinition.is_pixit(pixit_def.name):
+            return True, None  # Skip validation for non-PIXIT args
+
+        if value is None:
+            if pixit_def.required:
+                return False, f"Required PIXIT {pixit_def.name} ({pixit_def.description}) is missing"
+            return True, None
+
+        # Mapping of PIXITType to validation function
+        type_validators = {
+            PIXITType.INT: cls.validate_int,
+            PIXITType.BOOL: cls.validate_bool,
+            PIXITType.FLOAT: cls.validate_float,
+            PIXITType.STRING: cls.validate_string,
+            PIXITType.JSON: cls.validate_json,
+            PIXITType.HEX: cls.validate_hex,
+        }
+
+        validator = type_validators.get(pixit_def.pixit_type)
+        if not validator:
+            return False, f"Unknown PIXIT type: {pixit_def.pixit_type}"
+
+        try:
+            if validator(value):
+                return True, None
+            return False, f"Invalid value for {pixit_def.name}: expected {pixit_def.pixit_type.value}"
+        except (ValueError, TypeError, json.JSONDecodeError):
+            return False, f"Invalid value for {pixit_def.name}: {value} (expected {pixit_def.pixit_type.value})"
+
+    @classmethod
+    def validate_pixits(cls, pixits: list[PIXITDefinition],
+                        provided_values: dict[str, Any]) -> tuple[bool, str]:
+        """Validate all PIXITs against provided values"""
+        missing = []
+        invalid = []
+
+        for pixit in pixits:
+            value = provided_values.get(pixit.name)
+            if value is None:
+                if pixit.required:
+                    missing.append(f"{pixit.name} ({pixit.description})")
+                continue
+
+            valid, error = cls.validate_value(value, pixit)
+            if not valid:
+                invalid.append(error)
+
+        if missing or invalid:
+            error = ""
+            if missing:
+                error += "\nMissing required PIXITs:\n" + "\n".join(missing)
+            if invalid:
+                error += "\nInvalid PIXIT values:\n" + "\n".join(invalid)
+            return False, error
+
+        return True, ""
 
 
 @dataclass
@@ -763,58 +805,6 @@ class MatterTestConfig:
     chip_tool_credentials_path: Optional[pathlib.Path] = None
 
     trace_to: List[str] = field(default_factory=list)
-
-    def __post_init__(self):
-        # Initialize an empty dictionary to store PIXIT definitions
-        self.pixit_definitions: Dict[str, PIXITDefinition] = {}
-
-    def require_pixit(self, name: str, pixit_type: PIXITType, description: str):
-        """Register a required PIXIT"""
-        # Create a PIXITDefinition object for the required PIXIT and store it in pixit_definitions
-        self.pixit_definitions[name] = PIXITDefinition(
-            name=name,
-            pixit_type=pixit_type,
-            description=description,
-            required=True
-        )
-
-    def optional_pixit(self, name: str, pixit_type: PIXITType, description: str, default: Any = None):
-        """Register an optional PIXIT"""
-        # Create a PIXITDefinition object for the optional PIXIT and store it in pixit_definitions
-        self.pixit_definitions[name] = PIXITDefinition(
-            name=name,
-            pixit_type=pixit_type,
-            description=description,
-            required=False,
-            default=default
-        )
-
-    def validate_pixits(self) -> Tuple[bool, str]:
-        """Ensure all required PIXITs are provided with valid values"""
-        missing = []
-        invalid = []
-        # Iterate through all PIXIT definitions to check for missing or invalid values
-        for name, pixit in self.pixit_definitions.items():
-            if name not in self.global_test_params:
-                if pixit.required:
-                    # If a required PIXIT is missing, add it to the missing list
-                    missing.append(f"{name} ({pixit.description})")
-            else:
-                value = self.global_test_params[name]
-                if not pixit.validate_value(value):
-                    # If a PIXIT value is invalid, add it to the invalid list
-                    invalid.append(f"{name}: expected {pixit.pixit_type.value}")
-
-        if missing or invalid:
-            error = ""
-            if missing:
-                # Construct error message for missing PIXITs
-                error += "\nMissing required PIXITs:\n" + "\n".join(missing)
-            if invalid:
-                # Construct error message for invalid PIXIT values
-                error += "\nInvalid PIXIT values:\n" + "\n".join(invalid)
-            return False, error
-        return True, ""
 
 
 class ClusterMapper:
@@ -1100,6 +1090,7 @@ class TestInfo:
     desc: str
     steps: list[TestStep]
     pics: list[str]
+    pixits: list[PIXITDefinition]
 
 
 class MatterBaseTest(base_test.BaseTestClass):
@@ -1111,6 +1102,15 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.is_commissioning = False
         # The named pipe name must be set in the derived classes
         self.app_pipe = None
+
+    def get_test_pixits(self, test: str) -> list[PIXITDefinition]:
+        """Get PIXIT definitions for a specific test"""
+        pixits_name = f'pixits_{test.removeprefix("test_")}'
+        try:
+            fn = getattr(self, pixits_name)
+            return fn()
+        except AttributeError:
+            return []
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -2486,14 +2486,23 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
 
     info = []
     for t in tests:
-        info.append(TestInfo(t, steps=base.get_test_steps(t), desc=base.get_test_desc(t), pics=base.get_test_pics(t)))
+        info.append(TestInfo(t, steps=base.get_test_steps(t), desc=base.get_test_desc(t),
+                    pics=base.get_test_pics(t), pixits=base.get_test_pixits(t)))
 
     return info
 
 
 def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> bool:
 
-    get_test_info(test_class, matter_test_config)
+    # Get test info which now includes PIXITs
+    test_info = get_test_info(test_class, matter_test_config)
+
+    # Validate PIXITs before proceeding
+    validator = PIXITValidator()
+    valid, error = validator.validate_pixits(test_info[0].pixits, matter_test_config.global_test_params)
+    if not valid:
+        logging.error(f"PIXIT validation failed: {error}")
+        return False
 
     # Load test config file.
     test_config = generate_mobly_test_config(matter_test_config)
