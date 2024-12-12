@@ -94,7 +94,10 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
 - (void)storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID;
 
 /**
- * Mechanism for API client to perform a block after previous async operations (writes) on the storage queue have executed.
+ * Mechanism for and API client to perform a block after previous async operations (writes) on the storage queue have executed.
+ *
+ * This should be used only when something really needs to wait for the asynchronous writes 
+ * to complete and can't proceed until they have.
  *
  * If no block is passed in, then the method returns after having synchronously flushed the queue.
  */
