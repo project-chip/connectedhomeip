@@ -451,9 +451,10 @@ using namespace chip::Tracing::DarwinFramework;
     }
 
     // Since MTRDevice invalidate may issue asynchronous writes to storage, perform a
-    // block synchronously on the storage delegate queue to flush those operations.
+    // block synchronously on the storage delegate queue so the async write operations
+    // get to run, in case the API client tears down the storage backend afterwards.
     [self.controllerDataStore synchronouslyPerformBlock:^{
-        MTR_LOG("%@ Finished flushing data store", self);
+        MTR_LOG("%@ Finished flushing data write operations", self);
     }];
 
     [self stopBrowseForCommissionables];
