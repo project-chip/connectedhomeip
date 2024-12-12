@@ -179,19 +179,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err);
     }
 
-    // SetDataModelProvider() actually initializes/starts the provider, which in turn
-    // triggers the initialization of cluster implementations.  We need
-    // to preserve the following ordering guarantees:
-    //
-    // 1) Provider initialization (under SetDataModelProvider) happens after
-    //    SetSafeAttributePersistenceProvider, since the provider can then use
-    //    the safe persistence provider to implement and initialize its own attribute persistence logic.
-    // 2) `InitDataModelHandler` (under SetDataModelProvider), which depends
-    //    on atttribute persistence being already set up before it runs. this call will
-    //    remain the single point of entry for ensuring all cluster-level initialization
-    //    has occurred.
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
-
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     Access::SetAccessControl(mAccessControl);
 
@@ -302,6 +289,25 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                  std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+
+    // SetDataModelProvider() initializes and starts the provider, which in turn
+    // triggers the initialization of cluster implementations. This callsite is 
+    // critical because it ensures that cluster-level initialization occurs only 
+    // after all necessary low-level dependencies have been set up.
+    //
+    // Ordering guarantees:
+    // 1) Provider initialization (under SetDataModelProvider) must happen after 
+    //    SetSafeAttributePersistenceProvider to ensure the provider can leverage 
+    //    the safe persistence provider for attribute persistence logic.
+    // 2) It must occur after all low-level components that cluster implementations 
+    //    might depend on have been initialized, as they rely on these components 
+    //    during their own initialization.
+    // 3) `InitDataModelHandler` (also under SetDataModelProvider) assumes attribute 
+    //    persistence and other foundational services are fully configured before it runs.
+    //
+    // This remains the single point of entry to ensure that all cluster-level 
+    // initialization is performed in the correct order.
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);
