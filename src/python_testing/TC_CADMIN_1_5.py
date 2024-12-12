@@ -65,7 +65,8 @@ class TC_CADMIN_1_5(MatterBaseTest):
 
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
-            asserts.assert_equal(e.code, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError, 'Failed to open commissioning window due to unexpected error')
+            asserts.assert_equal(e.code, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
+                                 'Failed to open commissioning window due to unexpected error')
 
     async def CommissionOnNetwork(self, setup_code: int, discriminator: int = 1234):
         ctx = asserts.assert_raises(ChipStackError)
@@ -89,8 +90,8 @@ class TC_CADMIN_1_5(MatterBaseTest):
                      "Verify that the DNS-SD advertisement TXT record shows CM=2"),
             TestStep(4, "TH_CR2 attempts to start a commissioning process with DUT_CE after 190 seconds",
                      "TH_CR2 should fail to commission the DUT since the window should be closed. This may be a failure to find the commissionable node or a failure to establish a PASE connection."),
-            TestStep(5, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM", 
-                    "{resDutSuccess}"),
+            TestStep(5, "TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM",
+                     "{resDutSuccess}"),
             TestStep(6, "TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command", "{resDutSuccess}"),
             TestStep(7, "TH_CR2 attempts to start a commissioning process with DUT_CE",
                      "TH_CR2 should fail to commission the DUT since the window should be closed. This may be a failure to find the commissionable node or a failure to establish a PASE connection."),
@@ -164,9 +165,9 @@ class TC_CADMIN_1_5(MatterBaseTest):
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         except chip.interaction_model.InteractionModelError as e:
-            asserts.assert_true(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen, 
+            asserts.assert_true(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen,
                                 "Cluster status must be 4 to pass this step as window should be reported as not open")
-            
+
         self.step(9)
         # TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with a discriminator of 4096
         await self.OpenCommissioningWindow(timeout=180, discriminator=4096)
