@@ -1,4 +1,4 @@
-## Deploy Static Website on App Engine for The CHIP Coverage Report
+## Deploy Static Website on App Engine for The Matter SDK Coverage Report
 
 ### Setup google cloud integration
 
@@ -34,7 +34,6 @@ Deploying your generated report:
 
 ```
 cd out/coverage/coverage
-cp ../../../integrations/appengine/webapp_config.yaml ../../../integrations/appengine/.gcloudignore .
 gcloud app deploy webapp_config.yaml --project matter-build-automation
 ```
 
