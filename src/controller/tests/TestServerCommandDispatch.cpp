@@ -145,7 +145,8 @@ public:
     }
 
 protected:
-    // Override InitDataModel to do nothing.
+    // Since the current unit tests do not involve any cluster implementations, we override InitDataModel
+    // to do nothing, thereby preventing calls to the Ember-specific InitDataModelHandler.
     void InitDataModel() override {}
 };
 
