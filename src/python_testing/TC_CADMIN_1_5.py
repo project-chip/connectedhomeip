@@ -38,10 +38,10 @@ import random
 from time import sleep
 
 import chip.clusters as Clusters
+import chip.interaction_model
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
-import chip.interaction_model
 from chip.native import PyChipError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery import mdns_discovery
