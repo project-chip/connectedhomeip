@@ -291,21 +291,21 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
     // SetDataModelProvider() initializes and starts the provider, which in turn
-    // triggers the initialization of cluster implementations. This callsite is 
-    // critical because it ensures that cluster-level initialization occurs only 
+    // triggers the initialization of cluster implementations. This callsite is
+    // critical because it ensures that cluster-level initialization occurs only
     // after all necessary low-level dependencies have been set up.
     //
     // Ordering guarantees:
-    // 1) Provider initialization (under SetDataModelProvider) must happen after 
-    //    SetSafeAttributePersistenceProvider to ensure the provider can leverage 
+    // 1) Provider initialization (under SetDataModelProvider) must happen after
+    //    SetSafeAttributePersistenceProvider to ensure the provider can leverage
     //    the safe persistence provider for attribute persistence logic.
-    // 2) It must occur after all low-level components that cluster implementations 
-    //    might depend on have been initialized, as they rely on these components 
+    // 2) It must occur after all low-level components that cluster implementations
+    //    might depend on have been initialized, as they rely on these components
     //    during their own initialization.
-    // 3) `InitDataModelHandler` (also under SetDataModelProvider) assumes attribute 
+    // 3) `InitDataModelHandler` (also under SetDataModelProvider) assumes attribute
     //    persistence and other foundational services are fully configured before it runs.
     //
-    // This remains the single point of entry to ensure that all cluster-level 
+    // This remains the single point of entry to ensure that all cluster-level
     // initialization is performed in the correct order.
     app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
