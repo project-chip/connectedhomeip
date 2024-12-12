@@ -2056,13 +2056,13 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     // Now restart controller to decommission the device
     controller = [self startControllerWithRootKeys:rootKeys
-                                                         operationalKeys:operationalKeys
-                                                                fabricID:fabricID
-                                                                  nodeID:nodeID
-                                                                 storage:storageDelegate
-                                                                   error:&error
-                                                       certificateIssuer:&certificateIssuer
-                                            storageBehaviorConfiguration:storageBehaviorConfiguration];
+                                   operationalKeys:operationalKeys
+                                          fabricID:fabricID
+                                            nodeID:nodeID
+                                           storage:storageDelegate
+                                             error:&error
+                                 certificateIssuer:&certificateIssuer
+                      storageBehaviorConfiguration:storageBehaviorConfiguration];
     XCTAssertNil(error);
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
