@@ -515,7 +515,7 @@ bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
 
 #if CHIP_CONFIG_TC_REQUIRED
-    auto & failSafeContext                        = Server::GetInstance().GetFailSafeContext();
+    auto & failSafeContext                  = Server::GetInstance().GetFailSafeContext();
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
 
     if (nullptr == tcProvider)
