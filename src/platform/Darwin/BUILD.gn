@@ -149,6 +149,8 @@ source_set("tracing") {
 
 static_library("logging") {
   sources = [
+    "DispatchQueueNames.cpp",
+    "DispatchQueueNames.h",
     "Logging.h",
     "Logging.mm",
   ]

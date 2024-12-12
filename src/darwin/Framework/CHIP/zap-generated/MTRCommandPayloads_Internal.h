@@ -706,12 +706,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTROvenCavityOperationalStateClusterPauseParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
 @interface MTROvenCavityOperationalStateClusterStopParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -719,12 +713,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTROvenCavityOperationalStateClusterStartParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTROvenCavityOperationalStateClusterResumeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

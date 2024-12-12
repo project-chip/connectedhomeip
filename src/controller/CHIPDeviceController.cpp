@@ -2344,8 +2344,7 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
         mReadCommissioningInfoProgress = kReadProgressNoFurtherAttributes;
     }
 
-    const auto timeout = MakeOptional(app::kExpectedIMProcessingTime); // TODO: Save timeout from PerformCommissioningStep?
-    SendCommissioningReadRequest(mDeviceBeingCommissioned, timeout, builder.paths(), builder.size());
+    SendCommissioningReadRequest(mDeviceBeingCommissioned, mCommissioningStepTimeout, builder.paths(), builder.size());
 }
 
 namespace {
@@ -3004,9 +3003,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                         params.GetCompletionStatus().err.AsString());
     }
 
-    mCommissioningStage      = step;
-    mCommissioningDelegate   = delegate;
-    mDeviceBeingCommissioned = proxy;
+    mCommissioningStepTimeout = timeout;
+    mCommissioningStage       = step;
+    mCommissioningDelegate    = delegate;
+    mDeviceBeingCommissioned  = proxy;
 
     // TODO: Extend timeouts to the DAC and Opcert requests.
     // TODO(cecille): We probably want something better than this for breadcrumbs.

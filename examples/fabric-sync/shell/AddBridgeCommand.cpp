@@ -71,6 +71,7 @@ void AddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
                      ChipLogValueX64(deviceId), err.Format());
     }
 
+    admin::PairingManager::Instance().ResetForNextCommand();
     CommandRegistry::Instance().ResetActiveCommand();
 }
 

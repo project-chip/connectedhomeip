@@ -47,7 +47,9 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout,
                     "  add-device       Pair a device to local fabric. Usage: app add-device node-id setup-pin-code "
                     "device-remote-ip device-remote-port\r\n");
-    streamer_printf(sout, "  pair-device      Pair a device to local fabric. Usage: app pair-device node-id code\r\n");
+    streamer_printf(
+        sout,
+        "  pair-device      Pair a device to local fabric. Usage: app pair-device node-id code [--enable-icd-registration]\r\n");
     streamer_printf(sout, "  remove-device    Remove a device from the local fabric. Usage: app remove-device node-id\r\n");
     streamer_printf(sout, "  sync-device      Sync a device from other ecosystem. Usage: app sync-device endpointid\r\n");
     streamer_printf(sout, "\r\n");
@@ -149,9 +151,11 @@ static CHIP_ERROR HandleAddDeviceCommand(int argc, char ** argv)
 
 static CHIP_ERROR HandlePairDeviceCommand(int argc, char ** argv)
 {
-    if (argc != 3)
+    bool enableICDRegistration = false;
+
+    if (argc < 3 || argc > 4) // Adjusted to allow 3 or 4 arguments
     {
-        fprintf(stderr, "Invalid arguments. Usage: app pair-device node-id code\n");
+        fprintf(stderr, "Invalid arguments. Usage: app pair-device node-id code [--enable-icd-registration]\n");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -162,11 +166,18 @@ static CHIP_ERROR HandlePairDeviceCommand(int argc, char ** argv)
         return CHIP_ERROR_BUSY;
     }
 
-    // Parse arguments
+    // Parse mandatory arguments
     chip::NodeId nodeId    = static_cast<chip::NodeId>(strtoull(argv[1], nullptr, 10));
     const char * setUpCode = argv[2];
 
-    auto command = std::make_unique<commands::PairDeviceCommand>(nodeId, setUpCode);
+    // Parse optional arguments
+    if (argc == 4 && strcmp(argv[3], "--enable-icd-registration") == 0)
+    {
+        enableICDRegistration = true;
+    }
+
+    // Create the command object, passing the new parameter
+    auto command = std::make_unique<commands::PairDeviceCommand>(nodeId, setUpCode, enableICDRegistration);
 
     CHIP_ERROR result = command->RunCommand();
     if (result == CHIP_NO_ERROR)

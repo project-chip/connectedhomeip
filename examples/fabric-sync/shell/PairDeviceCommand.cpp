@@ -25,7 +25,9 @@ using namespace ::chip;
 
 namespace commands {
 
-PairDeviceCommand::PairDeviceCommand(chip::NodeId nodeId, const char * payload) : mNodeId(nodeId), mPayload(payload) {}
+PairDeviceCommand::PairDeviceCommand(chip::NodeId nodeId, const char * payload, bool enableICDRegistration) :
+    mNodeId(nodeId), mPayload(payload), mEnableICDRegistration(enableICDRegistration)
+{}
 
 void PairDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 {
@@ -57,6 +59,7 @@ void PairDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
                      ChipLogValueX64(deviceId), err.Format());
     }
 
+    admin::PairingManager::Instance().ResetForNextCommand();
     CommandRegistry::Instance().ResetActiveCommand();
 }
 
@@ -74,7 +77,7 @@ CHIP_ERROR PairDeviceCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    return admin::PairingManager::Instance().PairDeviceWithCode(mNodeId, mPayload);
+    return admin::PairingManager::Instance().PairDeviceWithCode(mNodeId, mPayload, mEnableICDRegistration);
 }
 
 } // namespace commands

@@ -166,7 +166,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             nodeid=self.dut_node_id,
             attributes=subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
-            keepSubscriptions=False
+            keepSubscriptions=True
         )
 
         parts_list_queue = queue.Queue()
