@@ -161,6 +161,7 @@ endmacro()
 #   DEVICE_INFO_EXAMPLE_PROVIDER Add example device info provider support
 #   PROJECT_CONFIG  Path to the project-specific configuration file
 #   PROJECT_CONFIG_INC_DIR  Extra include dirs for project configurations
+#   PROJECT_APP_COMMON_INC_DIR Extra include dir for custom app-common
 #
 macro(matter_common_gn_args)
     set(options)
@@ -171,6 +172,7 @@ macro(matter_common_gn_args)
         LIB_PW_RPC
         DEVICE_INFO_EXAMPLE_PROVIDER
         PROJECT_CONFIG
+        PROJECT_APP_COMMON_INC_DIR
     )
     set(multiValueArgs
         PROJECT_CONFIG_INC_DIR
@@ -214,6 +216,14 @@ macro(matter_common_gn_args)
     endif() # CHIP_PROJECT_CONFIG
     if (ARG_PROJECT_CONFIG_INC_DIR)
         matter_add_gn_arg_list("chip_project_config_include_dirs"             ${ARG_PROJECT_CONFIG_INC_DIR})
+    endif()
+    if (ARG_PROJECT_APP_COMMON_INC_DIR)
+        get_filename_component(PROJECT_APP_COMMON_INC_DIR
+            ${ARG_PROJECT_APP_COMMON_INC_DIR}
+            REALPATH
+            BASE_DIR ${CMAKE_SOURCE_DIR}
+        )
+        matter_add_gn_arg_string("chip_project_app_common_include_dir"         "${PROJECT_APP_COMMON_INC_DIR}")
     endif()
 endmacro()
 

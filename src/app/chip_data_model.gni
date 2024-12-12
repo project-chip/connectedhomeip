@@ -199,7 +199,7 @@ template("chip_data_model") {
       "${_app_root}/util/binding-table.h",
       "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/privilege-storage.cpp",
-      "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
+      # "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
     sources += codegen_data_model_SOURCES
 
