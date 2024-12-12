@@ -31,10 +31,8 @@
 #     quiet: false
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import asyncio.exceptions as ae
 import logging
-import random
 from time import sleep
 
 import chip.clusters as Clusters
