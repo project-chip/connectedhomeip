@@ -201,6 +201,13 @@ template("chip_data_model") {
       "${_app_root}/util/privilege-storage.cpp",
       # "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
+
+    if (defined(external_app_common)) {
+      sources += ["${external_app_common}/app-common/zap-generated/attributes/Accessors.cpp",]
+    } else {
+      sources += ["${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",]
+    }
+
     sources += codegen_data_model_SOURCES
 
     if (!chip_build_controller_dynamic_server) {
