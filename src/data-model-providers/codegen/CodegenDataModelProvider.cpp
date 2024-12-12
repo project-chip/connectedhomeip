@@ -800,7 +800,7 @@ ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const Concre
         {
             return commandPath;
         }
-        mCommand = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, *mCommand);
+        mCommand = mAcceptedCommandsIterator.Next(cluster->generatedCommandList(), *mCommand);
     }
     return {};
 }
