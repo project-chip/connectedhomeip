@@ -1963,10 +1963,6 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_GetCompletionError.argtypes = []
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
-            #self._dmLib.pychip_SetCommissioningRCACCallback.argtypes = [_RCACCallbackType]
-            #self._dmLib.pychip_SetCommissioningRCACCallback.restype = None
-
-            #self._dmLib.pychip_GetCommissioningRCACData.argtypes = [POINTER(POINTER(c_uint8)), POINTER(c_size_t)]
             self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t)]
             self._dmLib.pychip_GetCommissioningRCACData.restype = None
 
@@ -2202,27 +2198,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ''' Returns the fabric check result if SetCheckMatchingFabric was used.'''
         return self._fabricCheckNodeId
 
-    '''
-    async def get_commissioning_rcac_data(self):
-        # Await the future until the RCAC data is available
-        try:
-            rcac_data = await asyncio.wait_for(commissioning_future, timeout=60)
-            return rcac_data
-        except asyncio.TimeoutError:
-            raise Exception("Timeout while waiting for RCAC data")
-    '''
-
-    # Function to await the RCAC data
-    async def get_commissioning_rcac_data_async(self):
-        try:
-            # Directly call the non-async function to get the data
-            rcac_data = self.get_commissioning_rcac_data()
-            LOGGER.info(f"RCAC data from get_commissioning_rcac_data was {rcac_data}")
-            return rcac_data
-        except Exception as e:
-            LOGGER.error(f"Error while getting RCAC data: {e}")
-            raise
-
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
                                   filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,
                                   discoveryTimeoutMsec: int = 30000) -> int:
@@ -2265,13 +2240,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
     def get_rcac(self):
         # Passes captured RCAC data back to python test modules to be used for validation
         try:
-            # Assume rcac_size is the size you want to allocate
-            rcac_size = 650  # Allocate sufficient memory based on expected size
-            rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate a ctypes buffer
+            rcac_size = 650
+            rcac_buffer = (ctypes.c_uint8 * rcac_size)() 
 
             actual_rcac_size = ctypes.c_size_t()
 
-            # Call the C++ function to get the RCAC data
             self._dmLib.pychip_GetCommissioningRCACData(ctypes.cast(
                 rcac_buffer, ctypes.POINTER(ctypes.c_uint8)), ctypes.byref(actual_rcac_size))
 
