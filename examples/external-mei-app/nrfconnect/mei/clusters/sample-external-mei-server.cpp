@@ -31,7 +31,8 @@ void MatterSampleExternalMeiPluginServerInitCallback()
     ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", MATTER_DM_SAMPLE_EXTERNAL_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
     ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleExternalMeiServer::Instance()));
-    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleExternalMeiServer::Instance()), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleExternalMeiServer::Instance()),
+                   CHIP_ERROR_INCORRECT_STATE);
 }
 
 void emberAfSampleExternalMeiClusterServerInitCallback(chip::EndpointId endpoint)
@@ -89,7 +90,7 @@ void SampleExternalMeiServer::InvokeCommand(HandlerContext & ctxt)
                 ChipLogProgress(Zcl, "Ping Command on Ep %d", endpoint);
                 // NOTE: fabricIndex did not get created by zap, thus I've removed isFabricSensitive="true" in the XML
                 // Events::PingCountEvent::Type event{ .count = content[endpointIndex].pingCount++, .fabricIndex = fabricIndex };
-                Events::PingCountEvent::Type event{ .count = content[endpointIndex].pingCount++};
+                Events::PingCountEvent::Type event{ .count = content[endpointIndex].pingCount++ };
                 chip::EventNumber placeholderEventNumber;
                 CHIP_ERROR err = LogEvent(event, endpoint, placeholderEventNumber);
                 if (CHIP_NO_ERROR != err)
