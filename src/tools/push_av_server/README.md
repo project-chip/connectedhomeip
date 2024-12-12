@@ -35,5 +35,5 @@ $ curl -XGET --cacert ~/.pavstest/certs/server/root.pem https://localhost:1234/s
 
 # Get detailed information about the uploaded media file.
 # This correspond to the ffprobe tool output
-$ curl --cacert ~/.pavstest/certs/server/root.pem -XGET 'https://localhost:1234/streams/probe/1/cmaf/example/video-720p.cmfv'
+$ curl --cacert ~/.pavstest/certs/server/root.pem -XGET 'https://localhost:1234/probe/1/cmaf/example/video-720p.cmfv'
 ```

@@ -13,6 +13,7 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import Literal, Optional, Union
+import multiprocessing
 
 import uvicorn
 from cryptography import x509
@@ -63,6 +64,9 @@ class WorkingDirectory:
         return self
 
     def __exit__(self, exc, value, tb):
+        self.cleanup()
+
+    def cleanup(self):
         if self.tmp:
             self.tmp.cleanup()
 
@@ -594,65 +598,78 @@ class PushAvServer:
         return {key, cert, created}
 
 
-def run(host: Optional[str], port: Optional[int], working_directory: Optional[str], dns: Optional[str]):
-    """Run the reference server. This function will not return.
-        In the context where a background server is required, the multiprocessing.Process object
-        can be used.
-    """
-    with WorkingDirectory(working_directory) as directory:
+class PushAvContext:
+    """Hold the context for a full Push AV Server including temporary disk, CA hierarchies and web server"""
 
-        # Sharing state with the various endpoints
-
-        dns = "localhost" if dns is None else f"{dns}._http._tcp_.local."
+    def __init__(self, host: Optional[str], port: Optional[int], working_directory: Optional[str], dns: Optional[str]):
+        self.directory = WorkingDirectory(working_directory)
+        self.host = host
+        self.port = port
+        self.dns = "localhost" if dns is None else f"{dns}._http._tcp_.local."
+        self.proc: multiprocessing.Process | None = None
 
         # Create CA hierarchies (for webserver and devices)
-        device_hierarchy = CAHierarchy(directory.mkdir("certs", "device"), "device", "client")
-        server_hierarchy = CAHierarchy(directory.mkdir("certs", "server"), "server", "server")
-        (server_key_file, server_cert_file, _) = server_hierarchy.gen_keypair(dns, override=True)
+        self.device_hierarchy = CAHierarchy(self.directory.mkdir("certs", "device"), "device", "client")
+        self.server_hierarchy = CAHierarchy(self.directory.mkdir("certs", "server"), "server", "server")
+        (self.server_key_file, self.server_cert_file, _) = self.server_hierarchy.gen_keypair(self.dns, override=True)
 
         # mDNS configuration. Registration only happen if the dns isn't localhost.
-        zeroconf = Zeroconf()
-        svc_info = None
+        self.zeroconf = Zeroconf()
+        self.svc_info = None
 
-        if dns != "localhost":
-            svc_info = ServiceInfo(
+        if self.dns != "localhost":
+            self.svc_info = ServiceInfo(
                 "_http._tcp.local.",
-                name=dns,
+                name=self.dns,
                 addresses=[socket.inet_aton("127.0.0.1")],
                 port=1234,
             )
-            # Advertise over mDNS
-            logging.info("Advertising the service as %s", svc_info)
-            zeroconf.register_service(svc_info)
 
         # Streams holder
-        directory.mkdir("streams")
+        self.directory.mkdir("streams")
 
-        app = FastAPI()
-        app.mount("/static", StaticFiles(directory="static"), name="static")
-        pas = PushAvServer()
-        app.include_router(pas.router)
+        self.app = FastAPI()
+        self.app.mount("/static", StaticFiles(directory="static"), name="static")
+        pas = PushAvServer(self.directory, self.device_hierarchy)
+        self.app.include_router(pas.router)
 
-        # Start the web server
-        try:
-            uvicorn.run(
-                app,
-                host=host,
-                port=port,
-                ssl_keyfile=server_key_file,
-                ssl_certfile=server_cert_file,
-                ssl_cert_reqs=ssl.CERT_OPTIONAL,
-                ssl_ca_certs=device_hierarchy.root_cert_path,
-            )
-        finally:
-            if dns != "localhost":
-                zeroconf.unregister_service(svc_info)
+    def start_in_background(self):
+        if self.proc:
+            logging.warning("Attempting to start a server when one is already running, no new server is being started.")
+            return
 
-        # directory.print_tree()
+        # Advertise over mDNS
+        if self.svc_info:
+            logging.info("Advertising the service as %s", self.svc_info)
+            self.zeroconf.register_service(self.svc_info)
 
+        def background_job():
+            # Start the web server
+            try:
+                uvicorn.run(
+                    self.app,
+                    host=self.host,
+                    port=self.port,
+                    ssl_keyfile=self.server_key_file,
+                    ssl_certfile=self.server_cert_file,
+                    ssl_cert_reqs=ssl.CERT_OPTIONAL,
+                    ssl_ca_certs=self.device_hierarchy.root_cert_path,
+                )
+            finally:
+                if self.svc_info:
+                    self.zeroconf.unregister_service(self.svc_info)
 
-# TODO UI
-# html page to provide a good way to see uploaded content (file "browser" + video player)
+        # Spawning the function results in python not being able to pickle the full context
+        # (most notably cryptography's rust bindings). So instead we force use forks as the
+        # way to create processes.
+        multiprocessing.set_start_method('fork')
+        self.proc = multiprocessing.Process(target=background_job, daemon=True)
+        self.proc.start()
+
+    def terminate(self):
+        self.proc.terminate()
+        self.directory.cleanup()
+
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -679,4 +696,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    run(args.host, args.port, args.working_directory, args.dns)
+    ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns)
+    ctx.start_in_background()
+    print(ctx.proc)
+    ctx.proc.join()
+    ctx.terminate()

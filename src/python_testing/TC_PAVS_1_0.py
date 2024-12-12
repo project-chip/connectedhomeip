@@ -1,5 +1,3 @@
-from multiprocessing import Process
-
 import push_av_server
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
@@ -7,22 +5,18 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 class TC_PAVS_1_0(MatterBaseTest):
     """
     NOTE: this class is only a guide to understand what APIs I'd need to integrate in the push av server
-    for a better integration. It is not designed to be merged nor does it actually run.
+    for a better integration. It is not designed to be merged nor does it actually run (no chip module).
     """
-
-    # TODO Rewrite it to work with non-global state (e.g. decouple background server and setup)
 
     def setup_class(self):
         super().setup_class()
 
-        self.proc = Process(target=push_av_server.run,
-                            args=("127.0.0.1", 1234, None, "localhost"),
-                            daemon=True)
-        self.proc.start()
+        self.av_ctx = push_av_server.PushAvContext("127.0.0.1", 1234, None, "localhost")
+        self.av_ctx.start_in_background()
 
     def teardown_class(self):
         super().teardown_class()
-        self.proc.terminate()
+        self.av_ctx.terminate()
 
     def steps_TC_PAVS_1_0(self):
         return [TestStep(1, "Commissioning, already done", is_commissioning=True),
@@ -36,15 +30,12 @@ class TC_PAVS_1_0(MatterBaseTest):
 
     @async_test_body
     async def test_TC_PAVS_1_0(self):
-        srv = push_av_server.start("localhost", 1234)
-        srv.run_in_thread()
-
         # commissioning - already done
         self.step(1)
 
         self.step(2)
         # Access CA cert via the push_av_server package.
-        push_av_server.device_hierarchy.root_cert
+        print(self.av_ctx.device_hierarchy.root_cert)
         # read TLSCertificateManagament attributes to validate state
         # Send the TLSCertificateManagament.ProvisionRootCertificate command
         # Assert we got a response that contains a CA id
@@ -55,7 +46,7 @@ class TC_PAVS_1_0(MatterBaseTest):
         self.step("3b")
         # Generate nonce
         # send TLSCertificateManagement.TLSClientCSR, receive TLSClientCSRResponse
-        push_av_server.device_hierarchy.gen_cert("device name", "csr")
+        print(self.av_ctx.device_hierarchy.gen_cert("device name", "csr"))
         # send ProvisionClientCertificate, receive ProvisionClientCertificateResponse
 
         self.step(4)
@@ -133,13 +124,8 @@ class TC_PAVS_1_0(MatterBaseTest):
         self.step(7)
         # TBD. deallocation logic
 
-        srv.stop()
-
     async def test_wrong_cert_chain(self):
         """Intended as an example of how to install an unrecognised """
-        srv = push_av_server.start("localhost", 1234)
-        srv.run_in_thread()
-
         wrong_chain = push_av_server.CAHierarchy(push_av_server.wd.mkdir("certs", "wrong"), "wrong chain", "client")
 
         wrong_chain.root_cert_path  # Install onto the device
