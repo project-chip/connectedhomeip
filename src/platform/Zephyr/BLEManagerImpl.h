@@ -105,6 +105,10 @@ private:
 #endif
     // The summarized number of Bluetooth LE connections related to the device (including these not related to Matter service).
     uint16_t mTotalConnNum;
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+    Span<bt_data> mCustomAdvertising = {};
+    Span<bt_data> mCustomScanResponse = {};
+#endif
 
     void DriveBLEState(void);
     CHIP_ERROR PrepareAdvertisingRequest();
@@ -149,6 +153,10 @@ public:
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
+#endif
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+    void SetCustomAdvertising(Span<bt_data> CustomAdvertising);
+    void SetCustomScanResponse(Span<bt_data> CustomScanResponse);
 #endif
 };
 
