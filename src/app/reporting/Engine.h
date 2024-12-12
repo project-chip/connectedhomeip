@@ -25,6 +25,7 @@
 #pragma once
 
 #include <access/AccessControl.h>
+#include <app/EventScheduler.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/data-model-provider/ProviderChangeListener.h>

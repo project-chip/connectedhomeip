@@ -27,6 +27,7 @@
 #pragma once
 
 #include <app/ConcreteEventPath.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace app {
