@@ -34,8 +34,8 @@ class NFCOnboardingPayloadManagerImpl;
 /**
  * @brief Defines an abstract interface for programming an NFC Tag with onboarding payload.
  *
- * NFC Tag can be used in Project CHIP to share onboarding information such
- * as the device discriminator and PIN code with a commissioner. This class
+ * NFC Tag can be used in Project CHIP to share the onboarding payload, including
+ * the device discriminator and PIN code, with a commissioner. This class
  * provides an interface to set contents of a programmable NFC Tag.
  */
 class NFCOnboardingPayloadManager
