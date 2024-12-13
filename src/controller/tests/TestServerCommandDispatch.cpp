@@ -126,6 +126,9 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
 
 namespace {
 
+// TODO:(#36837) implementing its own provider instead of using "CodegenDataModelProvider"
+// TestServerCommandDispatch should provide its own dedicated data model provider rather than using CodegenDataModelProvider
+// provider. This class exists solely for one specific test scenario, on a temporary basis.
 class DispatchTestDataModel : public CodegenDataModelProvider
 {
 public:
