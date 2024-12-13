@@ -25,6 +25,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
@@ -50,18 +52,21 @@ using Transport::Session;
     {                                                                                                                              \
         if (!::chip::ChipError::IsSuccess(expr))                                                                                   \
         {                                                                                                                          \
-            commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::code, #expr);                                  \
-            return true;                                                                                                           \
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::code, #expr);                     \
+            return;                                                                                                                \
         }                                                                                                                          \
     } while (false)
 
 namespace {
 
-class GeneralCommissioningAttrAccess : public AttributeAccessInterface
+class GeneralCommissioningAttrAccess : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     // Register for the GeneralCommissioning cluster on all endpoints.
-    GeneralCommissioningAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id) {}
+    GeneralCommissioningAttrAccess() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id),
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id)
+    {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
@@ -69,6 +74,12 @@ private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder);
+
+    void InvokeCommand(HandlerContext & ctx) override;
+
+    void HandleArmFailSafe(HandlerContext & ctx, const Commands::ArmFailSafe::DecodableType & req);
+    void HandleSetRegulatoryConfig(HandlerContext & ctx, const Commands::SetRegulatoryConfig::DecodableType & req);
+    void HandleCommissioningComplete(HandlerContext & ctx, const Commands::CommissioningComplete::DecodableType & req);
 };
 
 GeneralCommissioningAttrAccess gAttrAccess;
@@ -144,18 +155,41 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(Attr
     return aEncoder.Encode(supportsConcurrentConnection);
 }
 
-} // anonymous namespace
+void GeneralCommissioningAttrAccess::InvokeCommand(HandlerContext & handlerContext)
+{
+    ChipLogDetail(Zcl, "GeneralCommissioningAttrAccess: InvokeCommand");
+    switch (handlerContext.mRequestPath.mCommandId)
+    {
+    case Commands::ArmFailSafe::Id:
+        ChipLogDetail(Zcl, "GeneralCommissioningAttrAccess: Entering ArmFailSafe");
 
-bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler * commandObj,
-                                                           const app::ConcreteCommandPath & commandPath,
-                                                           const Commands::ArmFailSafe::DecodableType & commandData)
+        CommandHandlerInterface::HandleCommand<Commands::ArmFailSafe::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleArmFailSafe(ctx, req); });
+        break;
+
+    case Commands::SetRegulatoryConfig::Id:
+        ChipLogDetail(Zcl, "GeneralCommissioningAttrAccess: Entering SetRegulatoryConfig");
+
+        CommandHandlerInterface::HandleCommand<Commands::SetRegulatoryConfig::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSetRegulatoryConfig(ctx, req); });
+        break;
+
+    case Commands::CommissioningComplete::Id:
+        ChipLogDetail(Zcl, "GeneralCommissioningAttrAccess: Entering CommissioningComplete");
+
+        CommandHandlerInterface::HandleCommand<Commands::CommissioningComplete::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleCommissioningComplete(ctx, req); });
+        break;
+    }
+}
+
+void GeneralCommissioningAttrAccess::HandleArmFailSafe(HandlerContext & ctx, const Commands::ArmFailSafe::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
 
-    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
-                    static_cast<unsigned>(commandData.expiryLengthSeconds));
+    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)", static_cast<unsigned>(req.expiryLengthSeconds));
 
     /*
      * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
@@ -163,8 +197,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
      * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
      * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
      */
-
-    FabricIndex accessingFabricIndex = commandObj->GetAccessingFabricIndex();
+    FabricIndex accessingFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
 
     // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
     // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
@@ -175,42 +208,88 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
         if (!failSafeContext.IsFailSafeArmed() &&
             Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
-            commandObj->GetSubjectDescriptor().authMode == Access::AuthMode::kCase)
+            ctx.mCommandHandler.GetSubjectDescriptor().authMode == Access::AuthMode::kCase)
         {
+            ChipLogError(FailSafe, "FailSafe arming denied: commissioning window is open.");
             response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
-            commandObj->AddResponse(commandPath, response);
         }
-        else if (commandData.expiryLengthSeconds == 0)
+        else if (req.expiryLengthSeconds == 0)
         {
             // Force the timer to expire immediately.
             failSafeContext.ForceFailSafeTimerExpiry();
             // Don't set the breadcrumb, since expiring the failsafe should
             // reset it anyway.
             response.errorCode = CommissioningErrorEnum::kOk;
-            commandObj->AddResponse(commandPath, response);
         }
         else
         {
-            CheckSuccess(
-                failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
-                Failure);
-            Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
+            CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(req.expiryLengthSeconds)),
+                         Failure);
+            Breadcrumb::Set(ctx.mRequestPath.mEndpointId, req.breadcrumb);
             response.errorCode = CommissioningErrorEnum::kOk;
-            commandObj->AddResponse(commandPath, response);
         }
     }
     else
     {
+        ChipLogError(FailSafe, "FailSafe arming denied: busy with another admin or already armed.");
         response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
-        commandObj->AddResponse(commandPath, response);
     }
 
-    return true;
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Commands::CommissioningComplete::DecodableType & commandData)
+void GeneralCommissioningAttrAccess::HandleSetRegulatoryConfig(HandlerContext & ctx,
+                                                               const Commands::SetRegulatoryConfig::DecodableType & req)
+{
+    MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
+    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    Commands::SetRegulatoryConfigResponse::Type response;
+
+    auto & countryCode = req.countryCode;
+    bool isValidLength = countryCode.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
+    if (!isValidLength)
+    {
+        ChipLogError(Zcl, "Invalid country code: '%.*s'", static_cast<int>(countryCode.size()), countryCode.data());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+        return;
+    }
+
+    if (req.newRegulatoryConfig > RegulatoryLocationTypeEnum::kIndoorOutdoor)
+    {
+        response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
+        // TODO: How does using the country code in debug text make sense, if
+        // the real issue is the newRegulatoryConfig value?
+        response.debugText = countryCode;
+    }
+    else
+    {
+        uint8_t locationCapability;
+        uint8_t location = to_underlying(req.newRegulatoryConfig);
+
+        CheckSuccess(ConfigurationMgr().GetLocationCapability(locationCapability), Failure);
+
+        // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
+        // either the Indoor or Outdoor fixed value in LocationCapability.
+        if ((locationCapability != to_underlying(RegulatoryLocationTypeEnum::kIndoorOutdoor)) && (location != locationCapability))
+        {
+            response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
+            // TODO: How does using the country code in debug text make sense, if
+            // the real issue is the newRegulatoryConfig value?
+            response.debugText = countryCode;
+        }
+        else
+        {
+            CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
+            Breadcrumb::Set(ctx.mRequestPath.mEndpointId, req.breadcrumb);
+            response.errorCode = CommissioningErrorEnum::kOk;
+        }
+    }
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+void GeneralCommissioningAttrAccess::HandleCommissioningComplete(HandlerContext & ctx,
+                                                                 const Commands::CommissioningComplete::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
@@ -227,12 +306,12 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     }
     else
     {
-        SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
+        SessionHandle handle = ctx.mCommandHandler.GetExchangeContext()->GetSessionHandle();
         // If not a CASE session, or the fabric does not match the fail-safe,
         // error out.
         if (handle->GetSessionType() != Session::SessionType::kSecure ||
             handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE ||
-            !failSafe.MatchesFabricIndex(commandObj->GetAccessingFabricIndex()))
+            !failSafe.MatchesFabricIndex(ctx.mCommandHandler.GetAccessingFabricIndex()))
         {
             response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
             ChipLogError(FailSafe, "GeneralCommissioning: Got commissioning complete in invalid security context");
@@ -265,68 +344,15 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
                 devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
                 Failure);
 
-            Breadcrumb::Set(commandPath.mEndpointId, 0);
+            Breadcrumb::Set(ctx.mRequestPath.mEndpointId, 0);
             response.errorCode = CommissioningErrorEnum::kOk;
         }
     }
 
-    commandObj->AddResponse(commandPath, response);
-
-    return true;
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandHandler * commandObj,
-                                                                   const app::ConcreteCommandPath & commandPath,
-                                                                   const Commands::SetRegulatoryConfig::DecodableType & commandData)
-{
-    MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    Commands::SetRegulatoryConfigResponse::Type response;
-
-    auto & countryCode = commandData.countryCode;
-    bool isValidLength = countryCode.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
-    if (!isValidLength)
-    {
-        ChipLogError(Zcl, "Invalid country code: '%.*s'", static_cast<int>(countryCode.size()), countryCode.data());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError);
-        return true;
-    }
-
-    if (commandData.newRegulatoryConfig > RegulatoryLocationTypeEnum::kIndoorOutdoor)
-    {
-        response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
-        // TODO: How does using the country code in debug text make sense, if
-        // the real issue is the newRegulatoryConfig value?
-        response.debugText = countryCode;
-    }
-    else
-    {
-        uint8_t locationCapability;
-        uint8_t location = to_underlying(commandData.newRegulatoryConfig);
-
-        CheckSuccess(ConfigurationMgr().GetLocationCapability(locationCapability), Failure);
-
-        // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
-        // either the Indoor or Outdoor fixed value in LocationCapability.
-        if ((locationCapability != to_underlying(RegulatoryLocationTypeEnum::kIndoorOutdoor)) && (location != locationCapability))
-        {
-            response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
-            // TODO: How does using the country code in debug text make sense, if
-            // the real issue is the newRegulatoryConfig value?
-            response.debugText = countryCode;
-        }
-        else
-        {
-            CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
-            Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
-            response.errorCode = CommissioningErrorEnum::kOk;
-        }
-    }
-
-    commandObj->AddResponse(commandPath, response);
-
-    return true;
-}
+} // anonymous namespace
 
 namespace {
 void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -344,6 +370,7 @@ void MatterGeneralCommissioningPluginServerInitCallback()
 {
     Breadcrumb::Set(0, 0);
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAttrAccess));
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 }
 
