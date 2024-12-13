@@ -59,11 +59,30 @@ public:
      * returned from StartLogCollection.
      *
      * @param[in] sessionHandle  The unique handle for this log session returned from a call to StartLogCollection.
-     * @param[in] error          A CHIP_ERROR value indicating the reason for ending the log collection.
-     *                           It is permissible to pass CHIP_NO_ERROR to indicate normal termination.
      *
      */
-    virtual CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error = CHIP_NO_ERROR) = 0;
+    virtual CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle) = 0;
+
+    /**
+     * Called to end log collection for the log session identified by sessionHandle.
+     * This must be called if StartLogCollection happens successfully and a valid sessionHandle has been
+     * returned from StartLogCollection.
+     *
+     * This overload of EndLogCollection provides additional context through the error parameter, which
+     * can be used to indicate the reason for ending the log collection.
+     *
+     * @param[in] sessionHandle  The unique handle for this log session returned from a call to StartLogCollection.
+     * @param[in] error          A CHIP_ERROR value indicating the reason for ending the log collection.
+     *                           It is permissible to pass CHIP_NO_ERROR to indicate normal termination.
+     * @note Derived classes can override this method to handle additional termination logic specific to their
+     *       implementation. If not overridden, this default implementation calls EndLogCollection with only
+     *       sessionHandle.
+     *
+     */
+    virtual CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error)
+    {
+        return EndLogCollection(sessionHandle);
+    }
 
     /**
      * Called to get the next chunk for the log session identified by sessionHandle.

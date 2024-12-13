@@ -48,7 +48,7 @@ public:
     /////////// DiagnosticLogsProviderDelegate Interface /////////
     CHIP_ERROR StartLogCollection(IntentEnum intent, LogSessionHandle & outHandle, Optional<uint64_t> & outTimeStamp,
                                   Optional<uint64_t> & outTimeSinceBoot) override;
-    CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error = CHIP_NO_ERROR) override;
+    CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle) override;
     CHIP_ERROR CollectLog(LogSessionHandle sessionHandle, MutableByteSpan & outBuffer, bool & outIsEndOfLog) override;
     size_t GetSizeForIntent(IntentEnum intent) override;
     CHIP_ERROR GetLogForIntent(IntentEnum intent, MutableByteSpan & outBuffer, Optional<uint64_t> & outTimeStamp,

@@ -276,7 +276,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error)
+CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle)
 {
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mSessionContextMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
@@ -289,6 +289,26 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ER
     mSessionContextMap.erase(sessionHandle);
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error)
+{
+    if (error != CHIP_NO_ERROR)
+    {
+        // Handle the error
+        ChipLogError(DeviceLayer, "End log collection reason: %s", ErrorStr(error));
+    }
+    VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnValue(mSessionContextMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
+
+    LogContext * context = mSessionContextMap[sessionHandle];
+    VerifyOrReturnError(context, CHIP_ERROR_INCORRECT_STATE);
+
+    CleanupLogContextForIntent(context);
+    Platform::MemoryFree(context);
+    mSessionContextMap.erase(sessionHandle);
+
+    return error;
 }
 
 CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSpan & outBuffer, bool & outIsEndOfLog)

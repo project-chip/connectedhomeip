@@ -89,7 +89,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error)
+CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle)
 {
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mSessionSpanMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
