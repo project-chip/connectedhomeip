@@ -645,32 +645,32 @@ class PIXITValidator:
     """Handles validation of PIXIT values against their definitions"""
 
     @staticmethod
-    def validate_int(value: Any) -> bool:
+    def is_int_pixit_value_valid(value: str) -> bool:
         int(value)
         return True
 
     @staticmethod
-    def validate_bool(value: Any) -> bool:
+    def is_bool_pixit_value_valid(value: str) -> bool:
         if isinstance(value, str):
             value_lower = value.lower()
-            if value_lower not in ('true', 'false', '1', '0', 'yes', 'no'):
+            if value_lower not in ('true', 'false'):
                 return False
         else:
             bool(value)
         return True
 
     @staticmethod
-    def validate_float(value: Any) -> bool:
+    def is_float_pixit_value_valid(value: str) -> bool:
         float(value)
         return True
 
     @staticmethod
-    def validate_string(value: Any) -> bool:
+    def is_string_pixit_value_valid(value: str) -> bool:
         str(value)
         return True
 
     @staticmethod
-    def validate_json(value: Any) -> bool:
+    def is_json_pixit_value_valid(value: str) -> bool:
         if isinstance(value, str):
             json.loads(value)
         elif not isinstance(value, (dict, list)):
@@ -678,7 +678,7 @@ class PIXITValidator:
         return True
 
     @staticmethod
-    def validate_hex(value: Any) -> bool:
+    def is_hex_pixit_value_valid(value: str) -> bool:
         if not isinstance(value, str):
             return False
         hex_str = value.lower().replace("0x", "")
@@ -700,12 +700,12 @@ class PIXITValidator:
 
         # Mapping of PIXITType to validation function
         type_validators = {
-            PIXITType.INT: cls.validate_int,
-            PIXITType.BOOL: cls.validate_bool,
-            PIXITType.FLOAT: cls.validate_float,
-            PIXITType.STRING: cls.validate_string,
-            PIXITType.JSON: cls.validate_json,
-            PIXITType.HEX: cls.validate_hex,
+            PIXITType.INT: cls.is_int_pixit_value_valid,
+            PIXITType.BOOL: cls.is_bool_pixit_value_valid,
+            PIXITType.FLOAT: cls.is_float_pixit_value_valid,
+            PIXITType.STRING: cls.is_string_pixit_value_valid,
+            PIXITType.JSON: cls.is_json_pixit_value_valid,
+            PIXITType.HEX: cls.is_hex_pixit_value_valid,
         }
 
         validator = type_validators.get(pixit_def.pixit_type)
