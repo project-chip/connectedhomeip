@@ -59,11 +59,11 @@ using Transport::Session;
 
 namespace {
 
-class GeneralCommissioningAttrAccess : public AttributeAccessInterface, public CommandHandlerInterface
+class GeneralCommissioningGlobalInstance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     // Register for the GeneralCommissioning cluster on all endpoints.
-    GeneralCommissioningAttrAccess() :
+    GeneralCommissioningGlobalInstance() :
         AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id),
         CommandHandlerInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id)
     {}
@@ -77,14 +77,14 @@ private:
 
     void InvokeCommand(HandlerContext & ctx) override;
 
-    void HandleArmFailSafe(HandlerContext & ctx, const Commands::ArmFailSafe::DecodableType & req);
-    void HandleSetRegulatoryConfig(HandlerContext & ctx, const Commands::SetRegulatoryConfig::DecodableType & req);
-    void HandleCommissioningComplete(HandlerContext & ctx, const Commands::CommissioningComplete::DecodableType & req);
+    void HandleArmFailSafe(HandlerContext & ctx, const Commands::ArmFailSafe::DecodableType & commandData);
+    void HandleCommissioningComplete(HandlerContext & ctx, const Commands::CommissioningComplete::DecodableType & commandData);
+    void HandleSetRegulatoryConfig(HandlerContext & ctx, const Commands::SetRegulatoryConfig::DecodableType & commandData);
 };
 
-GeneralCommissioningAttrAccess gAttrAccess;
+GeneralCommissioningGlobalInstance gAttrAccess;
 
-CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralCommissioningGlobalInstance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != GeneralCommissioning::Id)
     {
@@ -113,8 +113,8 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GeneralCommissioningAttrAccess::ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
-                                                           AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralCommissioningGlobalInstance::ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
+                                                               AttributeValueEncoder & aEncoder)
 {
     uint8_t data;
     CHIP_ERROR err = (DeviceLayer::ConfigurationMgr().*getter)(data);
@@ -130,7 +130,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadIfSupported(CHIP_ERROR (Configura
     return aEncoder.Encode(data);
 }
 
-CHIP_ERROR GeneralCommissioningAttrAccess::ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralCommissioningGlobalInstance::ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder)
 {
     BasicCommissioningInfo::TypeInfo::Type basicCommissioningInfo;
 
@@ -144,7 +144,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadBasicCommissioningInfo(AttributeV
     return aEncoder.Encode(basicCommissioningInfo);
 }
 
-CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralCommissioningGlobalInstance::ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder)
 {
     SupportsConcurrentConnection::TypeInfo::Type supportsConcurrentConnection;
 
@@ -155,41 +155,45 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(Attr
     return aEncoder.Encode(supportsConcurrentConnection);
 }
 
-void GeneralCommissioningAttrAccess::InvokeCommand(HandlerContext & handlerContext)
+void GeneralCommissioningGlobalInstance::InvokeCommand(HandlerContext & handlerContext)
 {
-    ChipLogDetail(Zcl, "GeneralCommissioningAttrAccess: InvokeCommand");
+    ChipLogDetail(Zcl, "GeneralCommissioningGlobalInstance: InvokeCommand");
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Commands::ArmFailSafe::Id:
-        ChipLogDetail(Zcl, "GeneralCommissioningAttrAccess: Entering ArmFailSafe");
+        ChipLogDetail(Zcl, "GeneralCommissioningGlobalInstance: Entering ArmFailSafe");
 
         CommandHandlerInterface::HandleCommand<Commands::ArmFailSafe::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleArmFailSafe(ctx, req); });
-        break;
-
-    case Commands::SetRegulatoryConfig::Id:
-        ChipLogDetail(Zcl, "GeneralCommissioningAttrAccess: Entering SetRegulatoryConfig");
-
-        CommandHandlerInterface::HandleCommand<Commands::SetRegulatoryConfig::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSetRegulatoryConfig(ctx, req); });
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleArmFailSafe(ctx, commandData); });
         break;
 
     case Commands::CommissioningComplete::Id:
-        ChipLogDetail(Zcl, "GeneralCommissioningAttrAccess: Entering CommissioningComplete");
+        ChipLogDetail(Zcl, "GeneralCommissioningGlobalInstance: Entering CommissioningComplete");
 
         CommandHandlerInterface::HandleCommand<Commands::CommissioningComplete::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleCommissioningComplete(ctx, req); });
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleCommissioningComplete(ctx, commandData); });
+        break;
+
+    case Commands::SetRegulatoryConfig::Id:
+        ChipLogDetail(Zcl, "GeneralCommissioningGlobalInstance: Entering SetRegulatoryConfig");
+
+        CommandHandlerInterface::HandleCommand<Commands::SetRegulatoryConfig::DecodableType>(
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleSetRegulatoryConfig(ctx, commandData); });
         break;
     }
 }
 
-void GeneralCommissioningAttrAccess::HandleArmFailSafe(HandlerContext & ctx, const Commands::ArmFailSafe::DecodableType & req)
+void GeneralCommissioningGlobalInstance::HandleArmFailSafe(HandlerContext & ctx,
+                                                           const Commands::ArmFailSafe::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
 
-    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)", static_cast<unsigned>(req.expiryLengthSeconds));
+    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
+                    static_cast<unsigned>(commandData.expiryLengthSeconds));
 
     /*
      * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
@@ -213,7 +217,7 @@ void GeneralCommissioningAttrAccess::HandleArmFailSafe(HandlerContext & ctx, con
             ChipLogError(FailSafe, "FailSafe arming denied: commissioning window is open.");
             response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
         }
-        else if (req.expiryLengthSeconds == 0)
+        else if (commandData.expiryLengthSeconds == 0)
         {
             // Force the timer to expire immediately.
             failSafeContext.ForceFailSafeTimerExpiry();
@@ -223,9 +227,10 @@ void GeneralCommissioningAttrAccess::HandleArmFailSafe(HandlerContext & ctx, con
         }
         else
         {
-            CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(req.expiryLengthSeconds)),
-                         Failure);
-            Breadcrumb::Set(ctx.mRequestPath.mEndpointId, req.breadcrumb);
+            CheckSuccess(
+                failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                Failure);
+            Breadcrumb::Set(ctx.mRequestPath.mEndpointId, commandData.breadcrumb);
             response.errorCode = CommissioningErrorEnum::kOk;
         }
     }
@@ -238,58 +243,8 @@ void GeneralCommissioningAttrAccess::HandleArmFailSafe(HandlerContext & ctx, con
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void GeneralCommissioningAttrAccess::HandleSetRegulatoryConfig(HandlerContext & ctx,
-                                                               const Commands::SetRegulatoryConfig::DecodableType & req)
-{
-    MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    Commands::SetRegulatoryConfigResponse::Type response;
-
-    auto & countryCode = req.countryCode;
-    bool isValidLength = countryCode.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
-    if (!isValidLength)
-    {
-        ChipLogError(Zcl, "Invalid country code: '%.*s'", static_cast<int>(countryCode.size()), countryCode.data());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
-        return;
-    }
-
-    if (req.newRegulatoryConfig > RegulatoryLocationTypeEnum::kIndoorOutdoor)
-    {
-        response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
-        // TODO: How does using the country code in debug text make sense, if
-        // the real issue is the newRegulatoryConfig value?
-        response.debugText = countryCode;
-    }
-    else
-    {
-        uint8_t locationCapability;
-        uint8_t location = to_underlying(req.newRegulatoryConfig);
-
-        CheckSuccess(ConfigurationMgr().GetLocationCapability(locationCapability), Failure);
-
-        // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
-        // either the Indoor or Outdoor fixed value in LocationCapability.
-        if ((locationCapability != to_underlying(RegulatoryLocationTypeEnum::kIndoorOutdoor)) && (location != locationCapability))
-        {
-            response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
-            // TODO: How does using the country code in debug text make sense, if
-            // the real issue is the newRegulatoryConfig value?
-            response.debugText = countryCode;
-        }
-        else
-        {
-            CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
-            Breadcrumb::Set(ctx.mRequestPath.mEndpointId, req.breadcrumb);
-            response.errorCode = CommissioningErrorEnum::kOk;
-        }
-    }
-
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-}
-
-void GeneralCommissioningAttrAccess::HandleCommissioningComplete(HandlerContext & ctx,
-                                                                 const Commands::CommissioningComplete::DecodableType & req)
+void GeneralCommissioningGlobalInstance::HandleCommissioningComplete(
+    HandlerContext & ctx, const Commands::CommissioningComplete::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
@@ -345,6 +300,50 @@ void GeneralCommissioningAttrAccess::HandleCommissioningComplete(HandlerContext 
                 Failure);
 
             Breadcrumb::Set(ctx.mRequestPath.mEndpointId, 0);
+            response.errorCode = CommissioningErrorEnum::kOk;
+        }
+    }
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContext & ctx,
+                                                                   const Commands::SetRegulatoryConfig::DecodableType & commandData)
+{
+    MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
+    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    Commands::SetRegulatoryConfigResponse::Type response;
+
+    auto & countryCode = commandData.countryCode;
+    bool isValidLength = countryCode.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
+    if (!isValidLength)
+    {
+        ChipLogError(Zcl, "Invalid country code: '%.*s'", static_cast<int>(countryCode.size()), countryCode.data());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+        return;
+    }
+
+    if (commandData.newRegulatoryConfig > RegulatoryLocationTypeEnum::kIndoorOutdoor)
+    {
+        response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
+    }
+    else
+    {
+        uint8_t locationCapability;
+        uint8_t location = to_underlying(commandData.newRegulatoryConfig);
+
+        CheckSuccess(ConfigurationMgr().GetLocationCapability(locationCapability), Failure);
+
+        // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
+        // either the Indoor or Outdoor fixed value in LocationCapability.
+        if ((locationCapability != to_underlying(RegulatoryLocationTypeEnum::kIndoorOutdoor)) && (location != locationCapability))
+        {
+            response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
+        }
+        else
+        {
+            CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
+            Breadcrumb::Set(ctx.mRequestPath.mEndpointId, commandData.breadcrumb);
             response.errorCode = CommissioningErrorEnum::kOk;
         }
     }
