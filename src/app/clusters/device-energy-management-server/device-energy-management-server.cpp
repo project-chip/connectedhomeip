@@ -104,50 +104,32 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+bool Instance::AcceptsCommandId(const ConcreteCommandPath & commandPath)
 {
     using namespace Commands;
-
-    if (HasFeature(Feature::kPowerAdjustment))
+    switch (commandPath.mCommandId)
     {
-        for (auto && cmd : {
-                 PowerAdjustRequest::Id,
-                 CancelPowerAdjustRequest::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
-    }
+    case PowerAdjustRequest::Id:
+    case CancelPowerAdjustRequest::Id:
+        return HasFeature(Feature::kPowerAdjustment);
+    case StartTimeAdjustRequest::Id:
+        return HasFeature(Feature::kStartTimeAdjustment);
+    case PauseRequest::Id:
+    case ResumeRequest::Id:
+        return HasFeature(Feature::kPausable);
 
-    if (HasFeature(Feature::kStartTimeAdjustment))
-    {
-        VerifyOrExit(callback(StartTimeAdjustRequest::Id, context) == Loop::Continue, /**/);
-    }
+    case ModifyForecastRequest::Id:
+        return HasFeature(Feature::kForecastAdjustment);
 
-    if (HasFeature(Feature::kPausable))
-    {
-        VerifyOrExit(callback(PauseRequest::Id, context) == Loop::Continue, /**/);
-        VerifyOrExit(callback(ResumeRequest::Id, context) == Loop::Continue, /**/);
-    }
+    case RequestConstraintBasedForecast::Id:
+        return HasFeature(Feature::kConstraintBasedAdjustment);
 
-    if (HasFeature(Feature::kForecastAdjustment))
-    {
-        VerifyOrExit(callback(ModifyForecastRequest::Id, context) == Loop::Continue, /**/);
+    case CancelRequest::Id:
+        return HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
+            HasFeature(Feature::kConstraintBasedAdjustment);
+    default:
+        return false;
     }
-
-    if (HasFeature(Feature::kConstraintBasedAdjustment))
-    {
-        VerifyOrExit(callback(RequestConstraintBasedForecast::Id, context) == Loop::Continue, /**/);
-    }
-
-    if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
-        HasFeature(Feature::kConstraintBasedAdjustment))
-    {
-        VerifyOrExit(callback(CancelRequest::Id, context) == Loop::Continue, /**/);
-    }
-
-exit:
-    return CHIP_NO_ERROR;
 }
 
 void Instance::InvokeCommand(HandlerContext & handlerContext)

@@ -186,17 +186,16 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-// List the commands supported by this instance.
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                               CommandHandlerInterface::CommandIdCallback callback, void * context)
+// Commands supported by this instance.
+bool Instance::AcceptsCommandId(const ConcreteCommandPath & commandPath)
 {
-    ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
-    if (mResetConditionCommandSupported)
+    switch (commandPath.mCommandId)
     {
-        callback(ResourceMonitoring::Commands::ResetCondition::Id, context);
+    case ResourceMonitoring::Commands::ResetCondition::Id:
+        return mResetConditionCommandSupported;
+    default:
+        return false;
     }
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Instance::ReadReplaceableProductList(AttributeValueEncoder & aEncoder)

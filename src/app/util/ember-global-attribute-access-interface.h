@@ -42,13 +42,6 @@ public:
     GlobalAttributeReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-private:
-    typedef CHIP_ERROR (CommandHandlerInterface::*CommandListEnumerator)(const ConcreteClusterPath & cluster,
-                                                                         CommandHandlerInterface::CommandIdCallback callback,
-                                                                         void * context);
-    static CHIP_ERROR EncodeCommandList(const ConcreteClusterPath & aClusterPath, AttributeValueEncoder & aEncoder,
-                                        CommandListEnumerator aEnumerator, const CommandId * aClusterCommandList);
 };
 
 } // namespace Compatibility

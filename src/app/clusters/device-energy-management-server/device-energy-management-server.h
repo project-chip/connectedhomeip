@@ -235,7 +235,7 @@ private:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    bool AcceptsCommandId(const ConcreteCommandPath & commandPath) override;
 
     Protocols::InteractionModel::Status CheckOptOutAllowsRequest(AdjustmentCauseEnum adjustmentCause);
     void HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::PowerAdjustRequest::DecodableType & commandData);

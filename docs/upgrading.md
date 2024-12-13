@@ -107,3 +107,13 @@ To use default attribute persistence, you need to pass in a
 `PersistentStorageDelegate` to `CodegenDataModelProviderInstance`. See example
 changes in [36658](https://github.com/project-chip/connectedhomeip/pull/36658)
 ).
+
+### `EnumerateAcceptedCommands` and `EnumerateGeneratedCommands` in `CommandHandlerInterface`
+
+Commands are generally highly coupled with metadata. Code was changed to allow
+the interfaces to filter out accepted/generated commands, however they cannot
+control the actual list of commands anymore since they must reside in metadata
+(e.g. ember/zap).provider
+
+Replace these functions with `AcceptsCommandId` and `GeneratesCommandId`. See
+[36809](https://github.com/project-chip/connectedhomeip/pull/36809) for changes.

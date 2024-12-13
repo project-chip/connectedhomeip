@@ -13,6 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/ConcreteCommandPath.h"
+#include "lib/core/CHIPError.h"
+#include "lib/core/DataModelTypes.h"
+#include "lib/support/CodeUtils.h"
 #include <app/util/ember-global-attribute-access-interface.h>
 
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -58,12 +62,41 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             }
             return CHIP_NO_ERROR;
         });
-    case AcceptedCommandList::Id:
-        return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateAcceptedCommands,
-                                 mCluster->acceptedCommandList);
-    case GeneratedCommandList::Id:
-        return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateGeneratedCommands,
-                                 mCluster->generatedCommandList);
+    case AcceptedCommandList::Id: {
+        auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aPath.mEndpointId, aPath.mClusterId);
+        return aEncoder.EncodeList([&](const auto & encoder) {
+            if (mCluster->acceptedCommandList != nullptr)
+            {
+                for (unsigned i = 0; mCluster->acceptedCommandList[i] != kInvalidCommandId; i++)
+                {
+                    const ConcreteCommandPath commandPath(aPath.mEndpointId, aPath.mClusterId, mCluster->acceptedCommandList[i]);
+                    if ((commandHandler == nullptr) || commandHandler->AcceptsCommandId(commandPath))
+                    {
+                        ReturnErrorOnFailure(encoder.Encode(commandPath.mCommandId));
+                    }
+                }
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+
+    case GeneratedCommandList::Id: {
+        auto * commandHandler = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aPath.mEndpointId, aPath.mClusterId);
+        return aEncoder.EncodeList([&](const auto & encoder) {
+            if (mCluster->generatedCommandList != nullptr)
+            {
+                for (unsigned i = 0; mCluster->generatedCommandList[i] != kInvalidCommandId; i++)
+                {
+                    const ConcreteCommandPath commandPath(aPath.mEndpointId, aPath.mClusterId, mCluster->generatedCommandList[i]);
+                    if ((commandHandler == nullptr) || commandHandler->GeneratesCommandId(commandPath))
+                    {
+                        ReturnErrorOnFailure(encoder.Encode(commandPath.mCommandId));
+                    }
+                }
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
     default:
         // This function is only called if attributeCluster is non-null in
         // ReadSingleClusterData, which only happens for attributes listed in
@@ -73,47 +106,6 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
                            ChipLogValueMEI(aPath.mAttributeId));
         return CHIP_NO_ERROR;
     }
-}
-
-CHIP_ERROR GlobalAttributeReader::EncodeCommandList(const ConcreteClusterPath & aClusterPath, AttributeValueEncoder & aEncoder,
-                                                    GlobalAttributeReader::CommandListEnumerator aEnumerator,
-                                                    const CommandId * aClusterCommandList)
-{
-    return aEncoder.EncodeList([&](const auto & encoder) {
-        auto * commandHandler =
-            CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aClusterPath.mEndpointId, aClusterPath.mClusterId);
-        if (commandHandler)
-        {
-            struct Context
-            {
-                decltype(encoder) & commandIdEncoder;
-                CHIP_ERROR err;
-            } context{ encoder, CHIP_NO_ERROR };
-            CHIP_ERROR err = (commandHandler->*aEnumerator)(
-                aClusterPath,
-                [](CommandId command, void * closure) -> Loop {
-                    auto * ctx = static_cast<Context *>(closure);
-                    ctx->err   = ctx->commandIdEncoder.Encode(command);
-                    if (ctx->err != CHIP_NO_ERROR)
-                    {
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                &context);
-            if (err != CHIP_ERROR_NOT_IMPLEMENTED)
-            {
-                return context.err;
-            }
-            // Else fall through to the list in aClusterCommandList.
-        }
-
-        for (const CommandId * cmd = aClusterCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
-        {
-            ReturnErrorOnFailure(encoder.Encode(*cmd));
-        }
-        return CHIP_NO_ERROR;
-    });
 }
 
 } // namespace Compatibility
