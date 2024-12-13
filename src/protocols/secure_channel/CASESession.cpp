@@ -951,7 +951,7 @@ CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle &
     case Step::kSendSigma2Resume: {
 
         System::PacketBufferHandle msg_R2_resume;
-        EncodeSigma2ResParam encodeSigma2Resume;
+        EncodeSigma2ResInputs encodeSigma2Resume;
 
         MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma2Resume);
 
@@ -1142,7 +1142,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResParam & output)
+CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResInputs & output)
 {
     MATTER_TRACE_SCOPE("PrepareSigma2Resume", "CASESession");
 
@@ -1165,7 +1165,7 @@ CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResParam & output)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::EncodeSigma2Resume(System::PacketBufferHandle & msg_R2_resume, EncodeSigma2ResParam & input)
+CHIP_ERROR CASESession::EncodeSigma2Resume(System::PacketBufferHandle & msg_R2_resume, EncodeSigma2ResInputs & input)
 {
     MATTER_TRACE_SCOPE("EncodeSigma2Resume", "CASESession");
     size_t max_sigma2_resume_data_len = TLV::EstimateStructOverhead(SessionResumptionStorage::kResumptionIdSize, // resumptionID
@@ -1174,11 +1174,14 @@ CHIP_ERROR CASESession::EncodeSigma2Resume(System::PacketBufferHandle & msg_R2_r
                                                                     SessionParameters::kEstimatedTLVSize // responderSessionParams
     );
 
-    System::PacketBufferTLVWriter tlvWriter;
-    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
+    // the passed PacketBufferHandler should be empty
+    VerifyOrReturnError(msg_R2_resume.IsNull(), CHIP_ERROR_INCORRECT_STATE);
 
     msg_R2_resume = System::PacketBufferHandle::New(max_sigma2_resume_data_len);
     VerifyOrReturnError(!msg_R2_resume.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    System::PacketBufferTLVWriter tlvWriter;
+    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
     tlvWriter.Init(std::move(msg_R2_resume));
 
@@ -1186,6 +1189,9 @@ CHIP_ERROR CASESession::EncodeSigma2Resume(System::PacketBufferHandle & msg_R2_r
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kTag_Sigma2Res_ResumptionID), input.resumptionId));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kTag_Sigma2Res_Sigma2ResumeMIC), input.resumeMICSpan));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kTag_Sigma2Res_ResponderSessionID), input.responderSessionId));
+
+    VerifyOrReturnError(input.responderMrpConfig != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     ReturnErrorOnFailure(
         EncodeSessionParameters(TLV::ContextTag(kTag_Sigma2Res_ResponderMRPParams), *input.responderMrpConfig, tlvWriter));
 
