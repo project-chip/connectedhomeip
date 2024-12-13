@@ -36,4 +36,15 @@ $ curl -XGET --cacert ~/.pavstest/certs/server/root.pem https://localhost:1234/s
 # Get detailed information about the uploaded media file.
 # This correspond to the ffprobe tool output
 $ curl --cacert ~/.pavstest/certs/server/root.pem -XGET 'https://localhost:1234/probe/1/cmaf/example/video-720p.cmfv'
+
+# You can also use the web server to sign certificates if given a CSR.
+# First create a key and csr for your device:
+$ openssl req -new -newkey rsa:2048 -nodes -keyout client.key -out client.csr -subj "/CN=test"
+
+# When sending the CSR over JSON we need to have the newline characters be the literal \n.
+$ sed '$!G' client.csr | paste -sd '\\n' - > client.curl.csr
+
+# Then sign it with the server
+$ curl --cacert ~/.pavstest/certs/server/root.pem -XPOST 'https://localhost:1234/certs/my-device/sign' -d "{\"csr\":\"$(cat client.curl.csr)\"}" --header "content-type: application/json"
+
 ```

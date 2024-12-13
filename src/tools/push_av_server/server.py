@@ -248,7 +248,7 @@ class CAHierarchy:
         turn make it very unsecure.
         """
         cert_path = self.directory / f"{name}.pem"
-        key_path = self.directory / f"{name}.key"
+        key_path = self.directory / f"{name}.key" if key else None
 
         if key:
             with open(key_path, "wb") as f:
@@ -344,7 +344,7 @@ class CAHierarchy:
         Generate a certificate signed by this CA hierarchy using the provided CSR.
         Returns the path to the key, cert, and whether it was reused or not.
         """
-        signing_request = x509.load_pem_x509_csr(csr)
+        signing_request = x509.load_pem_x509_csr(csr.encode('utf-8'))
         signing_request.public_key()
 
         # If we don't always override, first check if an existing keypair already exists
@@ -356,7 +356,7 @@ class CAHierarchy:
                 return (key_path, cert_path, True)
 
         # Sign certificate
-        cert = self._sign_cert(dns, csr.public_key(), duration)
+        cert = self._sign_cert(dns, signing_request.public_key(), duration)
 
         # Save that information to disk
         (key_path, cert_bundle_path) = self._save_cert(
