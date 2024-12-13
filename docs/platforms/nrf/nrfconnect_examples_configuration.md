@@ -194,7 +194,7 @@ intervals:
 -   `CONFIG_CHIP_ICD_SLOW_POLL_INTERVAL`
 -   `CONFIG_CHIP_ICD_FAST_POLLING_INTERVAL`
 
-#### Onboarding with NFC support
+#### Onboarding payload delivered over NFC
 
 You can configure the Matter protocol to use an NFC tag for onboarding, instead
 of using a QR code, which is the default configuration.
