@@ -17,7 +17,7 @@
 
 #include "core/Types.h"
 
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #ifndef MCCommonCaseDeviceServerInitParamsProvider_h
 #define MCCommonCaseDeviceServerInitParamsProvider_h

@@ -17,11 +17,11 @@
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/TimerDelegates.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <crypto/RandUtils.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/Span.h>
 #include <messaging/tests/echo/common.h>

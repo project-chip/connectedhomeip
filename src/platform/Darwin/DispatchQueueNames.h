@@ -1,6 +1,5 @@
 /*
  *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,24 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/core/CHIPPersistentStorageDelegate.h"
-#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
-#include <app/codegen-data-model-provider/Instance.h>
+
+#pragma once
 
 namespace chip {
-namespace app {
+namespace darwin {
+namespace queues {
 
-DataModel::Provider * CodegenDataModelProviderInstance(PersistentStorageDelegate * delegate)
-{
-    static CodegenDataModelProvider gCodegenModel;
+const char * CurrentLabel();
 
-    if (delegate != nullptr)
-    {
-        gCodegenModel.SetPersistentStorageDelegate(delegate);
-    }
-
-    return &gCodegenModel;
-}
-
-} // namespace app
+} // namespace queues
+} // namespace darwin
 } // namespace chip

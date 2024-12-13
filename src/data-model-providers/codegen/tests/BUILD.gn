@@ -13,7 +13,7 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
-import("${chip_root}/src/app/codegen-data-model-provider/model.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 
 source_set("ember_extra_files") {
   sources = [
