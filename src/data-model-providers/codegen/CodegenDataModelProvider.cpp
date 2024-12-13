@@ -871,11 +871,11 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceT
         return std::nullopt;
     }
 
-    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
     Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
-    SpanSearchValue<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
+    SpanSearchValue<chip::Span<const EmberAfDeviceType>> searchable(&deviceTypes);
 
-    return DeviceTypeEntryFromEmber(tree.First<ByDeviceType>(mDeviceTypeIterationHint).Value());
+    return DeviceTypeEntryFromEmber(searchable.First<ByDeviceType>(mDeviceTypeIterationHint).Value());
 }
 
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
@@ -892,9 +892,9 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
 
     CHIP_ERROR err                                  = CHIP_NO_ERROR;
     chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
-    SpanSearchValue<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
+    SpanSearchValue<chip::Span<const EmberAfDeviceType>> searchable(&deviceTypes);
 
-    return DeviceTypeEntryFromEmber(tree.Next<ByDeviceType>(previous, mDeviceTypeIterationHint).Value());
+    return DeviceTypeEntryFromEmber(searchable.Next<ByDeviceType>(previous, mDeviceTypeIterationHint).Value());
 }
 
 std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetFirstSemanticTag(EndpointId endpoint)
