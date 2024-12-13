@@ -25,7 +25,7 @@
 #pragma once
 
 #include <access/AccessControl.h>
-#include <app/EventScheduler.h>
+#include <app/EventReporter.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/data-model-provider/ProviderChangeListener.h>
@@ -56,7 +56,7 @@ namespace reporting {
  *         At its core, it  tries to gather and pack as much relevant attributes changes and/or events as possible into a report
  * message before sending that to the reader. It continues to do so until it has no more work to do.
  */
-class Engine : public DataModel::ProviderChangeListener, public EventScheduler
+class Engine : public DataModel::ProviderChangeListener, public EventReporter
 {
 public:
     /**
@@ -67,12 +67,12 @@ public:
     /**
      * Initializes the reporting engine. Should only be called once.
      *
-     * @param[in] A pointer to EventManagement. Use the global one by default.
+     * @param[in] A pointer to EventManagement, should not be a nullptr.
      *
      * @retval #CHIP_NO_ERROR On success.
      * @retval other           Was unable to retrieve data and write it into the writer.
      */
-    CHIP_ERROR Init(EventManagement * apEventManagement = nullptr);
+    CHIP_ERROR Init(EventManagement * apEventManagement);
 
     void Shutdown();
 
@@ -98,13 +98,6 @@ public:
      * Application marks mutated change path and would be sent out in later report.
      */
     CHIP_ERROR SetDirty(const AttributePathParams & aAttributePathParams);
-
-    /**
-     * @brief
-     *  Schedule the event delivery
-     *
-     */
-    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten) override;
 
     /*
      * Resets the tracker that tracks the currently serviced read handler.
@@ -184,6 +177,12 @@ private:
     // match the current data version of that cluster.
     bool IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFilter> * aDataVersionFilterList,
                                    const ConcreteReadAttributePath & aPath);
+
+    /**
+     *  EventReporter implementations.
+     *
+     */
+    CHIP_ERROR NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesWritten) override;
 
     /**
      * Send Report via ReadHandler

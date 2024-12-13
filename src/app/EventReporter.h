@@ -20,7 +20,7 @@
  * @file
  *
  * @brief
- *   Define EventScheduler interface. Event scheduler is used by EventManagement to notify that events are ready to be scheduled.
+ *   Define EventReporter interface. Event reproter is used by EventManagement to notify that events are ready to be reported.
  *   Usually this is implemented by the Reporting Engine to find the proper ReadHandlers and deliver the events.
  *
  */
@@ -32,19 +32,19 @@
 namespace chip {
 namespace app {
 
-class EventScheduler
+class EventReporter
 {
 public:
-    virtual ~EventScheduler() = default;
+    virtual ~EventReporter() = default;
 
     /**
      * @brief
-     *  Schedule the event delivery
+     *  Notify of a new event generated.
      *
      * @param[in] aPath          The path to the event.
      * @param[in] aBytesWritten  Bytes that the event is written into the buffer in EventManagement.
      */
-    CHIP_ERROR virtual ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten) = 0;
+    CHIP_ERROR virtual NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesWritten) = 0;
 };
 
 } // namespace app

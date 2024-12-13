@@ -83,7 +83,7 @@ struct CopyAndAdjustDeltaTimeContext
 void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                            CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
                            MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-                           System::Clock::Milliseconds64 aMonotonicStartupTime, EventScheduler * apEventScheduler)
+                           System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter)
 {
     CircularEventBuffer * current = nullptr;
     CircularEventBuffer * prev    = nullptr;
@@ -125,13 +125,14 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
 
     mMonotonicStartupTime = aMonotonicStartupTime;
 
-    if (apEventScheduler == nullptr)
+    // Should remove using the global instance and rely only on passed in variable.
+    if (apEventReporter == nullptr)
     {
-        mpEventScheduler = &InteractionModelEngine::GetInstance()->GetReportingEngine();
+        mpEventReporter = &InteractionModelEngine::GetInstance()->GetReportingEngine();
     }
     else
     {
-        mpEventScheduler = apEventScheduler;
+        mpEventReporter = apEventReporter;
     }
 }
 
@@ -499,9 +500,9 @@ exit:
                       opts.mTimestamp.mType == Timestamp::Type::kSystem ? "Sys" : "Epoch", ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
-        if (mpEventScheduler)
+        if (mpEventReporter)
         {
-            err = mpEventScheduler->ScheduleEventDelivery(opts.mPath, mBytesWritten);
+            err = mpEventReporter->NewEventGenerated(opts.mPath, mBytesWritten);
         }
     }
 

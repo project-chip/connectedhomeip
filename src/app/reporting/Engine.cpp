@@ -223,17 +223,10 @@ Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
 
 CHIP_ERROR Engine::Init(EventManagement * apEventManagement)
 {
+    VerifyOrReturnError(apEventManagement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
-
-    if (apEventManagement == nullptr)
-    {
-        mpEventManagement = &EventManagement::GetInstance();
-    }
-    else
-    {
-        mpEventManagement = apEventManagement;
-    }
+    mpEventManagement = apEventManagement;
 
     return CHIP_NO_ERROR;
 }
@@ -1138,7 +1131,7 @@ CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten)
+CHIP_ERROR Engine::NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesWritten)
 {
     // If we literally have no read handlers right now that care about any events,
     // we don't need to call schedule run for event.
