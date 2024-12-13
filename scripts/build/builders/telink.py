@@ -220,7 +220,7 @@ class TelinkBuilder(Builder):
 
         if self.compress_lzma_config:
             flags.append("-DCONFIG_COMPRESS_LZMA=y")
-            #self._copy_lzma_patch_files()
+            self._copy_lzma_patch_files()
 
         if self.thread_analyzer_config:
             flags.append("-DCONFIG_THREAD_ANALYZER=y")
@@ -249,7 +249,7 @@ class TelinkBuilder(Builder):
             logging.error("Environment variable 'TELINK_ZEPHYR_BASE' is not set.")
             return
 
-        patch_dir_path = os.path.join(telink_zephyr_base, 'modules', 'lzma_lib_patch', 'zephyr')
+        patch_dir_path = os.path.join(telink_zephyr_base, 'modules', 'lzma', 'lzma_lib_patch', 'zephyr')
         patch_dest_path = os.path.join(telink_zephyr_base, 'modules', 'lzma', 'lib', 'zephyr')
 
         # Check if the source directory exists
@@ -299,8 +299,8 @@ class TelinkBuilder(Builder):
 
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
-        #if self.compress_lzma_config:
-            #self._clean_lzma_patch_files()
+        if self.compress_lzma_config:
+            self._clean_lzma_patch_files()
 
     def build_outputs(self):
         yield BuilderOutput(
