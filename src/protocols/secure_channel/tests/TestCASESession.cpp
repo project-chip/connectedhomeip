@@ -745,7 +745,7 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
                                                                                                                                    \
         TLV::ContiguousBufferTLVReader reader;                                                                                     \
         reader.Init(buf);                                                                                                          \
-        CASESession::ParseSigma1Param parsedSigma1;                                                                                \
+        CASESession::ParsedSigma1 parsedSigma1;                                                                                    \
         CASESession session;                                                                                                       \
                                                                                                                                    \
         EXPECT_EQ(session.ParseSigma1(reader, parsedSigma1) == CHIP_NO_ERROR, params::expectSuccess);                              \
@@ -871,7 +871,7 @@ TEST_F(TestCASESession, EncodeSigma1Test)
 {
     System::PacketBufferHandle msg;
     CASESession session;
-    CASESession::EncodeSigma1Param encodeParams;
+    CASESession::EncodeSigma1Inputs encodeParams;
 
     uint8_t random[32];
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(&random[0], 32), CHIP_NO_ERROR);
@@ -921,7 +921,7 @@ TEST_F(TestCASESession, EncodeSigma1Test)
     {
         System::PacketBufferHandle msg1;
         System::PacketBufferTLVReader tlvReader;
-        CASESession::ParseSigma1Param parseParams;
+        CASESession::ParsedSigma1 parseParams;
 
         // Round Trip Test: Encode Sigma1, Parse it then verify parsed values
         EXPECT_EQ(CHIP_NO_ERROR, session.EncodeSigma1(msg1, encodeParams));
@@ -940,7 +940,7 @@ TEST_F(TestCASESession, EncodeSigma1Test)
     {
         System::PacketBufferHandle msg2;
         System::PacketBufferTLVReader tlvReader;
-        CASESession::ParseSigma1Param parseParams;
+        CASESession::ParsedSigma1 parseParams;
 
         // Round Trip Test: Sigma1 with Session Resumption
         // Encode Sigma1 with Resumption, parse it and and verify with original values
@@ -970,7 +970,7 @@ TEST_F(TestCASESession, EncodeSigma1Test)
 
         EXPECT_TRUE(parseParams.resumptionId.data_equal(encodeParams.resumptionId));
         EXPECT_TRUE(parseParams.initiatorResumeMICSpan.data_equal(encodeParams.initiatorResumeMICSpan));
-        EXPECT_TRUE(parseParams.InitiatorMRPParamsPresent);
+        EXPECT_TRUE(parseParams.initiatorMrpParamsPresent);
     }
     // Release EphemeralKeyPair
     gDeviceOperationalKeystore.ReleaseEphemeralKeypair(EphemeralKey);
@@ -980,7 +980,7 @@ TEST_F(TestCASESession, EncodeSigma2Test)
 {
     System::PacketBufferHandle msg;
     CASESession session;
-    CASESession::EncodeSigma2Param encodeParams;
+    CASESession::EncodeSigma2Inputs encodeParams;
     constexpr uint8_t kEncrypted2datalen = 100U;
 
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(&encodeParams.responderRandom[0], sizeof(encodeParams.responderRandom)), CHIP_NO_ERROR);
@@ -1053,8 +1053,8 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
 {
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode, ScopedNodeId peerNodeId, ResumptionIdStorage * resumptionId,
                                  Crypto::P256ECDHDerivedSecret * sharedSecret) :
-        mFindMethodReturnCode(findMethodReturnCode),
-        mPeerNodeId(peerNodeId), mResumptionId(resumptionId), mSharedSecret(sharedSecret)
+        mFindMethodReturnCode(findMethodReturnCode), mPeerNodeId(peerNodeId), mResumptionId(resumptionId),
+        mSharedSecret(sharedSecret)
     {}
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode) : mFindMethodReturnCode(findMethodReturnCode) {}
     CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,

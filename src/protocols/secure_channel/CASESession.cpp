@@ -783,7 +783,7 @@ CHIP_ERROR CASESession::SendSigma1()
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
 
     // Struct that will be used as input to EncodeSigma1() method
-    EncodeSigma1Param encodeSigma1Params;
+    EncodeSigma1Inputs encodeSigma1Params;
 
     // Lookup fabric info.
     const auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
@@ -874,7 +874,7 @@ CHIP_ERROR CASESession::SendSigma1()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, EncodeSigma1Param & input)
+CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, EncodeSigma1Inputs & input)
 {
 
     MATTER_TRACE_SCOPE("EncodeSigma1", "CASESession");
@@ -936,7 +936,7 @@ CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle &
     case Step::kSendSigma2: {
 
         System::PacketBufferHandle msg_R2;
-        EncodeSigma2Param encodeSigma2;
+        EncodeSigma2Inputs encodeSigma2;
 
         // TODO verify MATTER_LOG_METRIC locations
         MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma2);
@@ -1074,7 +1074,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     System::PacketBufferTLVReader tlvReader;
 
     // Struct that will serve as output in ParseSigma1
-    ParseSigma1Param parsedSigma1;
+    ParsedSigma1 parsedSigma1;
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg->Start(), msg->DataLength() }));
 
@@ -1088,7 +1088,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Set the MRP parameters provided in the Sigma1 message
-    if (parsedSigma1.InitiatorMRPParamsPresent)
+    if (parsedSigma1.initiatorMrpParamsPresent)
     {
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
@@ -1210,7 +1210,7 @@ CHIP_ERROR CASESession::SendSigma2Resume(System::PacketBufferHandle & msg_R2_res
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Param & output)
+CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & output)
 {
     MATTER_TRACE_SCOPE("PrepareSigma2", "CASESession");
 
@@ -1322,7 +1322,7 @@ CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Param & output)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::EncodeSigma2(System::PacketBufferHandle & msg_R2, EncodeSigma2Param & input)
+CHIP_ERROR CASESession::EncodeSigma2(System::PacketBufferHandle & msg_R2, EncodeSigma2Inputs & input)
 {
 
     size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize,         // responderRandom
@@ -2294,7 +2294,7 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
     return err;
 }
 
-CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParseSigma1Param & output)
+CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma1 & output)
 {
     using namespace TLV;
 
@@ -2322,7 +2322,7 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     if (err == CHIP_NO_ERROR && tlvReader.GetTag() == ContextTag(kInitiatorMRPParamsTag))
     {
         ReturnErrorOnFailure(DecodeMRPParametersIfPresent(TLV::ContextTag(kInitiatorMRPParamsTag), tlvReader));
-        output.InitiatorMRPParamsPresent = true;
+        output.initiatorMrpParamsPresent = true;
 
         err = tlvReader.Next();
     }
