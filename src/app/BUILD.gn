@@ -150,9 +150,7 @@ source_set("test-event-trigger") {
 }
 
 source_set("event-reporter") {
-  sources = [
-    "EventReporter.h",
-  ]
+  sources = [ "EventReporter.h" ]
 }
 
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
