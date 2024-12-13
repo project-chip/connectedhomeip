@@ -26,7 +26,7 @@ namespace chip {
 /// `Span<...>` values of other sub-types. It allows searching within the container sub-spans
 /// to create new containers.
 ///
-/// Use case is that we very often search within a tree, like "find-endpoint" + "find-cluster" + "find-attribute"
+/// The use case is that we very often search within nested containers, like "find-endpoint" + "find-cluster" + "find-attribute"
 /// and we generally only care if "does the last element exist or not"
 ///
 /// General usage is for fluent-searching for things like:
