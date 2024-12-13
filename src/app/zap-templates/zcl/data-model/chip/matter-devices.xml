@@ -2076,7 +2076,7 @@ limitations under the License.
             <include cluster="Smoke CO Alarm" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Carbon Monoxide" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Carbon Monoxide Concentration Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
