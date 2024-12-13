@@ -55,18 +55,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
         )
         return comm_service
 
-    async def OpenCommissioningWindow(self, timeout: int, iteration: int = 10000, discriminator: int = 1234) -> CommissioningParameters:
-        try:
-            params = await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=timeout, iteration=iteration, discriminator=discriminator, option=1)
-            return params
-
-        except Exception as e:
-            logging.exception('Error running OpenCommissioningWindow %s', e)
-            asserts.assert_equal(e.code, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
-                                 'Failed to open commissioning window due to unexpected error')
-
-    async def CommissionOnNetwork(self, setup_code: int, discriminator: int = 1234):
+    async def CommissionOnNetwork(self, setup_code: int, discriminator: int):
         ctx = asserts.assert_raises(ChipStackError)
         try:
             with ctx:
@@ -109,8 +98,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
                      "Verify DUT_CE opens its Commissioning window to allow a second commissioning"),
             TestStep(15, "TH_CR1 opens another commissioning window on DUT_CE using a commissioning timeout of {PIXIT_CWDURATION} seconds using ECM",
                      "Verify DUT_CE fails to open Commissioning window with status code 2 (Busy)"),
-            TestStep(16, "TH_CR2 starts a commissioning process with DUT_CE",
-                     "Commissioning is successful"),
+            TestStep(16, "TH_CR2 starts a commissioning process with DUT_CE", "Commissioning is successful"),
             TestStep(17, "TH_CR1 tries to revoke the commissioning window on DUT_CE using RevokeCommissioning command",
                      "Verify DUT_CE fails to revoke giving status code 4 (WindowNotOpen) as there was no window open"),
         ]
@@ -130,7 +118,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
 
         self.step(2)
         # TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM
-        params = await self.OpenCommissioningWindow(timeout=180)
+        params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=180, node_id=self.dut_node_id)
 
         self.step(3)
         # TH_CR1 finds DUT_CE advertising as a commissionable node on DNS-SD
@@ -141,11 +129,11 @@ class TC_CADMIN_1_5(MatterBaseTest):
         self.step(4)
         # TH_CR2 attempts to start a commissioning process with DUT_CE after 190 seconds
         sleep(190)
-        await self.CommissionOnNetwork(params.setupPinCode)
+        await self.CommissionOnNetwork(setup_code=params.commissioningParameters.setupPinCode, discriminator=params.randomDiscriminator)
 
         self.step(5)
         # TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM
-        params2 = await self.OpenCommissioningWindow(timeout=180)
+        params2 = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=180, node_id=self.dut_node_id)
 
         self.step(6)
         # TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command
@@ -155,7 +143,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
 
         self.step(7)
         # TH_CR2 attempts to start a commissioning process with DUT_CE
-        await self.CommissionOnNetwork(params2.setupPinCode)
+        await self.CommissionOnNetwork(setup_code=params2.commissioningParameters.setupPinCode, discriminator=params2.randomDiscriminator)
 
         self.step(8)
         # TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command.
@@ -166,46 +154,86 @@ class TC_CADMIN_1_5(MatterBaseTest):
             asserts.assert_true(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen,
                                 "Cluster status must be 4 to pass this step as window should be reported as not open")
 
+        EcmPakeVerifier = b"hex:d0e8a02db8629e9d172dfd40719c89204ff395651a6a2612839a71469880ec2404687d05cf0642b91242c712b5405b6905070c2a4bd80bdc8437ae5a2aded0cf3de91318d16f0ce9450d1c802cc01f39b8761de87cc7eeeb7f52b51308353da49a"
         self.step(9)
         # TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with a discriminator of 4096
-        await self.OpenCommissioningWindow(timeout=180, discriminator=4096)
+        try:
+            cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(iterations=10000, discriminator=4096, PAKEPasscodeVerifier=EcmPakeVerifier, commissioningTimeout=180, salt=b"SPAKE2P_Key_Salt")
+            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
+        except chip.interaction_model.InteractionModelError as e:
+            logging.exception('Error running OpenCommissioningWindow %s', e)
+            self.print_step("interaction model error dir", dir(e))
+            self.print_step("interaction model error status", e.status)
+            asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
+                                f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
         self.step(10)
         # TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the iterations set to 999
-        await self.OpenCommissioningWindow(timeout=180, iteration=999)
+        try:
+            cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(iterations=999, discriminator=3045, PAKEPasscodeVerifier=EcmPakeVerifier, commissioningTimeout=180, salt=b"SPAKE2P_Key_Salt")
+            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
+        except chip.interaction_model.InteractionModelError as e:
+            asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
+                                f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
         self.step(11)
         # TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the iterations set to 100001
-        await self.OpenCommissioningWindow(timeout=180, iteration=100001)
+        try:
+            cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(iterations=100001, discriminator=3045, PAKEPasscodeVerifier=EcmPakeVerifier, commissioningTimeout=180, salt=b"SPAKE2P_Key_Salt")
+            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
+        except chip.interaction_model.InteractionModelError as e:
+            asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
+                                f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
         self.step(12)
         # TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the salt set to 'too_short'
-        await self.OpenCommissioningWindow(timeout=180, salt="too_short")
+        try:
+            cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(iterations=10000, discriminator=3045, PAKEPasscodeVerifier=EcmPakeVerifier, commissioningTimeout=180, salt=b"too_short")
+            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
+        except chip.interaction_model.InteractionModelError as e:
+            asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
+                                f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
         self.step(13)
         # TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM with the salt set to 'this pake salt very very very long'
-        await self.OpenCommissioningWindow(timeout=180, salt="'this pake salt very very very long'")
+        try:
+            cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(iterations=10000, discriminator=3045, PAKEPasscodeVerifier=EcmPakeVerifier, commissioningTimeout=180, salt=b"'this pake salt very very very long'")
+            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
+        except chip.interaction_model.InteractionModelError as e:
+            asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
+                                f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
         self.step(14)
         # TH_CR1 opens a new commissioning window on DUT_CE using a commissioning timeout of {PIXIT_CWDURATION} seconds using ECM
         cluster = Clusters.GeneralCommissioning
         attribute = cluster.Attributes.BasicCommissioningInfo
         duration = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=attribute)
-        params2 = await self.OpenCommissioningWindow(timeout=duration.maxCumulativeFailsafeSeconds)
+        params3 = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=duration.maxCumulativeFailsafeSeconds, node_id=self.dut_node_id)
 
         self.step(15)
         # TH_CR1 opens another commissioning window on DUT_CE using a commissioning timeout of {PIXIT_CWDURATION} seconds using ECM
-        params3 = await self.OpenCommissioningWindow(timeout=duration.maxCumulativeFailsafeSeconds)
+        try:
+            await self.open_commissioning_window(dev_ctrl=self.th1, timeout=duration.maxCumulativeFailsafeSeconds, node_id=self.dut_node_id)
+        except chip.exceptions.ChipStackError as e:
+            # Converting error code to useable format to do assert with
+            code = int(((e.msg.split(":"))[2]), 16)
+            asserts.assert_equal(code, Clusters.AdministratorCommissioning.Enums.StatusCode.kBusy,
+                                f'Failed to open commissioning window due to an unexpected error code of {e.code}')
 
         self.step(16)
         # TH_CR2 starts a commissioning process with DUT_CE
-        await self.CommissionOnNetwork(params3.setupPinCode)
+        await self.th2.CommissionOnNetwork(
+            nodeId=self.dut_node_id, setupPinCode=params3.commissioningParameters.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params3.randomDiscriminator)
 
         self.step(17)
         # TH_CR1 tries to revoke the commissioning window on DUT_CE using RevokeCommissioning command
-        revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
-
+        try:
+            revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        except chip.interaction_model.InteractionModelError as e:
+            asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen,
+                                f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
 if __name__ == "__main__":
     default_matter_test_main()
