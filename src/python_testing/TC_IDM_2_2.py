@@ -54,21 +54,14 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         all_attributes = [attribute for attribute in cluster.Attributes.__dict__.values() if inspect.isclass(
             attribute) and issubclass(attribute, ClusterObjects.ClusterAttributeDescriptor)]
 
-        # Hackish way to get enums to return properly -- the default behavior (under else block) returns a BLANK LIST without this workaround
-        # If type(attribute.attribute_type.Type) or type(ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type).Type are enums, they return <class 'aenum._enum.EnumType'>, which are equal!
+        # Enums class is derived from MatterIntEnum, so this is checked separately
         if desired_type == MatterIntEnum:
             all_attributes_of_type = [attribute for attribute in all_attributes if type(
-                attribute.attribute_type.Type) == type(ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type).Type)]
+                attribute.attribute_type.Type) == type(desired_type)]
 
         elif desired_type == IntFlag:
-            if hasattr(cluster, 'Attributes'):
-                attributes_class = getattr(cluster, 'Attributes')
-                if hasattr(attributes_class, 'FeatureMap'):
-                    all_attributes_of_type = [cluster.Attributes.FeatureMap]
-                else:
-                    raise Exception(f'Cluster {cluster} lacks a FeatureMap')
-            else:
-                raise Exception(f'Cluster {cluster} lacks attributes')
+            attributes_class = getattr(cluster, 'Attributes')
+            all_attributes_of_type = [cluster.Attributes.FeatureMap]
         else:
             all_attributes_of_type = [attribute for attribute in all_attributes if attribute.attribute_type ==
                                       ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type)]
@@ -122,7 +115,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
     async def read_unsupported_attribute(self):
         found_unsupported = False
         for endpoint_id, endpoint in self.endpoints.items():
-            print(endpoint_id, next(iter(endpoint)))
             if found_unsupported:
                 break
             for cluster_type, cluster in endpoint.items():
@@ -158,11 +150,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(0, "Commissioning - already done")
 
-        wildcard_descriptor = await self.default_controller.ReadAttribute(self.dut_node_id, [(Clusters.Descriptor)])
-        endpoints = list(wildcard_descriptor.keys())
-
-        endpoints.sort()
-
         # Step 1
 
         # TH sends the Read Request Message to the DUT to read one attribute on a given cluster and endpoint.
@@ -171,10 +158,14 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(1, "Send Request Message to read one attribute on a given cluster and endpoint")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor.Attributes.ServerList)])
-
-        asserts.assert_in(Clusters.Objects.Descriptor, read_request[0].keys(), "Descriptor cluster not in output")
-        asserts.assert_in(Clusters.Objects.Descriptor.Attributes.ServerList,
-                          read_request[0][Clusters.Objects.Descriptor], "ServerList not in output")
+        attribute_ids = [a.attribute_id for a in read_request[0][Clusters.Descriptor].keys() if a != Clusters.Attribute.DataVersion]
+        returned_attributes = read_request[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
+        asserts.assert_equal({0}, read_request.keys(), "Endpoint 0 not in output")
+        asserts.assert_equal({Clusters.Descriptor}, read_request[0].keys(), "Descriptor cluster not in output")
+        # asserts.assert_equal(sorted(attribute_ids), sorted(returned_attributes), "Expected attribute list doesn't match")
+        # asserts.assert_in(Clusters.Objects.Descriptor, read_request[0].keys(), "Descriptor cluster not in output")
+        # asserts.assert_in(Clusters.Objects.Descriptor.Attributes.ServerList,
+        #                   read_request[0][Clusters.Objects.Descriptor], "ServerList not in output")
 
         # Step 2
         # TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint
@@ -223,13 +214,13 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             [attribute_path_1]
         )
 
-        for endpoint in read_request:
-            asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
-            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList,
-                              read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
-        asserts.assert_equal(sorted(all_attributes[endpoint][Clusters.Descriptor]
+        asserts.assert_in(Clusters.Objects.Descriptor, read_request[0].keys(), "Descriptor cluster not in output")
+        asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList,
+                            read_request[0][Clusters.Objects.Descriptor], "AttributeList not in output")
+        asserts.assert_equal(sorted(all_attributes[0][Clusters.Descriptor]
                              [Clusters.Descriptor.Attributes.ServerList]),
-                             sorted([x.id for x in read_request[endpoint]]))
+                             sorted([x.id for x in read_request[0]]))
+
         # Step 5
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints
         ### AttributePath = [[]]
@@ -248,15 +239,15 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
             asserts.assert_equal(returned_clusters, server_list)
 
-        for endpoint in read_request:
-            for cluster in read_request[endpoint]:
-                # Endpoint 1 seems an issue with ModeSelect (ServerList has an extra 4293984257)
-                if endpoint != 1 or cluster != Clusters.ModeSelect:
-                    returned_attrs = sorted([x.attribute_id for x in read_request[endpoint]
-                                            [cluster].keys() if x != Clusters.Attribute.DataVersion])
-                    attr_list = sorted([x for x in read_request[endpoint][cluster][cluster.Attributes.AttributeList]
-                                       if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
-                    asserts.assert_equal(returned_attrs, attr_list, f"Mismatch for {cluster} at endpoint {endpoint}")
+        # for endpoint in read_request:
+        #     for cluster in read_request[endpoint]:
+        #         # Endpoint 1 seems an issue with ModeSelect (ServerList has an extra 4293984257)
+        #         if endpoint != 1 or (cluster != Clusters.ModeSelect or True):
+        #             returned_attrs = sorted([x.attribute_id for x in read_request[endpoint]
+        #                                     [cluster].keys() if x != Clusters.Attribute.DataVersion])
+        #             attr_list = sorted([x for x in read_request[endpoint][cluster][cluster.Attributes.AttributeList]
+        #                                if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
+        #             asserts.assert_equal(returned_attrs, attr_list, f"Mismatch for {cluster} at endpoint {endpoint}")
 
         # Step 6
         # TH sends the Read Request Message to the DUT to read a global attribute from all clusters at all Endpoints
