@@ -118,60 +118,6 @@ public:
      */
     void SetGroupDataProvider(Credentials::GroupDataProvider * groupDataProvider) { mGroupDataProvider = groupDataProvider; }
 
-    // This struct  only serves as a base struct for EncodeSigma1 and ParseSigma1
-    struct Sigma1Param
-    {
-        ByteSpan initiatorRandom;
-        uint16_t initiatorSessionId;
-        ByteSpan destinationId;
-        bool sessionResumptionRequested = false;
-        ByteSpan resumptionId;
-        ByteSpan initiatorResumeMICSpan;
-    };
-
-    struct EncodeSigma1Inputs : Sigma1Param
-    {
-        const Crypto::P256PublicKey * pEphPubKey                 = nullptr;
-        const ReliableMessageProtocolConfig * initiatorMrpConfig = nullptr;
-        uint8_t initiatorResume1MIC[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
-    };
-
-    struct ParsedSigma1 : Sigma1Param
-    {
-        ByteSpan initiatorEphPubKey;
-        bool initiatorMrpParamsPresent = false;
-    };
-
-    // Helper Enum for usage in HandleSigma1_and_SendSigma2
-    enum class Step : uint8_t
-    {
-        kNone,
-        kSendSigma2,
-        kSendSigma2Resume,
-        kSendStatusReport
-    };
-
-    Step mNextStep = Step::kNone;
-
-    struct EncodeSigma2Inputs
-    {
-        uint8_t responderRandom[kSigmaParamRandomNumberSize];
-        uint16_t responderSessionId;
-        const Crypto::P256PublicKey * pEphPubKey = nullptr;
-        Platform::ScopedMemoryBuffer<uint8_t> msg_R2_Encrypted;
-        size_t encrypted2Length = 0;
-        const ReliableMessageProtocolConfig * responderMrpConfig;
-    };
-
-    struct EncodeSigma2ResInputs
-    {
-        ByteSpan resumptionId;
-        uint8_t sigma2ResumeMIC[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
-        MutableByteSpan resumeMICSpan{ sigma2ResumeMIC };
-        uint16_t responderSessionId;
-        const ReliableMessageProtocolConfig * responderMrpConfig;
-    };
-
     /**
      * @brief
      *   Derive a secure session from the established session. The API will return error if called before session is established.
@@ -245,6 +191,60 @@ public:
     bool InvokeBackgroundWorkWatchdog();
 
 protected:
+    // Helper Enum for usage in HandleSigma1_and_SendSigma2
+    enum class Step : uint8_t
+    {
+        kNone,
+        kSendSigma2,
+        kSendSigma2Resume,
+        kSendStatusReport
+    };
+
+    Step mNextStep = Step::kNone;
+
+    // This struct  only serves as a base struct for EncodeSigma1 and ParseSigma1
+    struct Sigma1Param
+    {
+        ByteSpan initiatorRandom;
+        uint16_t initiatorSessionId;
+        ByteSpan destinationId;
+        bool sessionResumptionRequested = false;
+        ByteSpan resumptionId;
+        ByteSpan initiatorResumeMICSpan;
+    };
+
+    struct EncodeSigma1Inputs : Sigma1Param
+    {
+        const Crypto::P256PublicKey * pEphPubKey                 = nullptr;
+        const ReliableMessageProtocolConfig * initiatorMrpConfig = nullptr;
+        uint8_t initiatorResume1MIC[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
+    };
+
+    struct ParsedSigma1 : Sigma1Param
+    {
+        ByteSpan initiatorEphPubKey;
+        bool initiatorMrpParamsPresent = false;
+    };
+
+    struct EncodeSigma2Inputs
+    {
+        uint8_t responderRandom[kSigmaParamRandomNumberSize];
+        uint16_t responderSessionId;
+        const Crypto::P256PublicKey * pEphPubKey = nullptr;
+        Platform::ScopedMemoryBuffer<uint8_t> msg_R2_Encrypted;
+        size_t encrypted2Length = 0;
+        const ReliableMessageProtocolConfig * responderMrpConfig;
+    };
+
+    struct EncodeSigma2ResInputs
+    {
+        ByteSpan resumptionId;
+        uint8_t sigma2ResumeMIC[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
+        MutableByteSpan resumeMICSpan{ sigma2ResumeMIC };
+        uint16_t responderSessionId;
+        const ReliableMessageProtocolConfig * responderMrpConfig;
+    };
+
     /**
      * @brief  Encodes a Sigma1 message into TLV format and allocates a buffer for it within the provided PacketBufferHandle.
      *
