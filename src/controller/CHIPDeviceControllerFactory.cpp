@@ -252,9 +252,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     chip::app::InteractionModelEngine * interactionModelEngine = chip::app::InteractionModelEngine::GetInstance();
 
-    // Calling SetDataModelProvider() initializes the provider and then triggers the
-    // InitDataModelHandler. As a result, the data model provider will be available
-    // before InitDataModelHandler is invoked
+    // Initialize the data model now that everything cluster implementations might
+    // depend on is initalized.
     interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
