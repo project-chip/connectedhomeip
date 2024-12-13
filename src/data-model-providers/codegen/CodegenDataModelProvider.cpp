@@ -107,7 +107,7 @@ using detail::EnumeratorCommandFinder;
 
 namespace {
 
-/// Search by device type within a `DeviceListWrapper` which just wraps a span of EmberAfDeviceType
+/// Search by device type within a span of EmberAfDeviceType (finds the device type that matches the given DataModel::DeviceTypeEntry)
 struct ByDeviceType
 {
     using Key  = DataModel::DeviceTypeEntry;
