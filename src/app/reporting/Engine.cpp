@@ -226,7 +226,7 @@ CHIP_ERROR Engine::Init(EventManagement * apEventManagement)
     VerifyOrReturnError(apEventManagement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
-    mpEventManagement = apEventManagement;
+    mpEventManagement   = apEventManagement;
 
     return CHIP_NO_ERROR;
 }
