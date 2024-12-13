@@ -126,16 +126,14 @@ bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revoke
 bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const std::string & akidHexStr, const std::string & issuerNameBase64Str,
                                                            const std::string & serialNumberHexStr)
 {
-    Json::CharReaderBuilder readerBuilder;
     Json::Value jsonData;
-    std::string errs;
 
     // Try direct data first, then fall back to file
-
     if (!mRevocationData.empty())
     {
+        std::string errs;
         std::istringstream jsonStream(!mRevocationData.empty() ? mRevocationData : "[]");
-        if (!Json::parseFromStream(readerBuilder, jsonStream, &jsonData, &errs))
+        if (!Json::parseFromStream(Json::CharReaderBuilder(), jsonStream, &jsonData, &errs))
         {
             ChipLogError(NotSpecified, "Failed to parse JSON data: %s", errs.c_str());
             return false;
@@ -143,6 +141,7 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const std::string & a
     }
     else if (!mDeviceAttestationRevocationSetPath.empty())
     {
+        std::string errs;
         std::ifstream file(mDeviceAttestationRevocationSetPath.c_str());
         if (!file.is_open())
         {
@@ -150,7 +149,7 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const std::string & a
             return false;
         }
 
-        bool parsingSuccessful = Json::parseFromStream(readerBuilder, file, &jsonData, &errs);
+        bool parsingSuccessful = Json::parseFromStream(Json::CharReaderBuilder(), file, &jsonData, &errs);
         file.close();
 
         if (!parsingSuccessful)
@@ -161,6 +160,7 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const std::string & a
     }
     else
     {
+        ChipLogDetail(NotSpecified, "No revocation data available");
         // No revocation data available
         return false;
     }
