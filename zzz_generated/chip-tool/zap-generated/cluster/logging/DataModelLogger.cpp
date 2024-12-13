@@ -5808,10 +5808,10 @@ CHIP_ERROR DataModelLogger::LogValue(
         }
     }
     {
-        CHIP_ERROR err = LogValue("Values", indent + 1, value.values);
+        CHIP_ERROR err = LogValue("Presets", indent + 1, value.presets);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Values'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Presets'");
             return err;
         }
     }

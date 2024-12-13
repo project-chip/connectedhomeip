@@ -6532,7 +6532,8 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("MPTZPresetStruct.presetID", "presetID", value.isMember("presetID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MPTZPresetStruct.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MPTZPresetStruct.values", "values", value.isMember("values")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("MPTZPresetStruct.presets", "presets", value.isMember("presets")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetID");
@@ -6543,9 +6544,9 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
     valueCopy.removeMember("name");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "values");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.values, value["values"]));
-    valueCopy.removeMember("values");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presets");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presets, value["presets"]));
+    valueCopy.removeMember("presets");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -6555,7 +6556,7 @@ void ComplexArgumentParser::Finalize(
 {
     ComplexArgumentParser::Finalize(request.presetID);
     ComplexArgumentParser::Finalize(request.name);
-    ComplexArgumentParser::Finalize(request.values);
+    ComplexArgumentParser::Finalize(request.presets);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request,

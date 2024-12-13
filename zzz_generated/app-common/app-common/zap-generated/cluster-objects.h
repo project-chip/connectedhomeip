@@ -42557,7 +42557,7 @@ enum class Fields : uint8_t
 {
     kPresetID = 0,
     kName     = 1,
-    kValues   = 2,
+    kPresets  = 2,
 };
 
 struct Type
@@ -42565,7 +42565,7 @@ struct Type
 public:
     uint8_t presetID = static_cast<uint8_t>(0);
     chip::CharSpan name;
-    Structs::MPTZStruct::Type values;
+    Structs::MPTZStruct::Type presets;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

@@ -14181,26 +14181,26 @@ public static class CameraAvSettingsUserLevelManagementClusterMPTZStruct {
 public static class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {
   public Integer presetID;
   public String name;
-  public ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct values;
+  public ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct presets;
   private static final long PRESET_ID_ID = 0L;
   private static final long NAME_ID = 1L;
-  private static final long VALUES_ID = 2L;
+  private static final long PRESETS_ID = 2L;
 
   public CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
     Integer presetID,
     String name,
-    ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct values
+    ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct presets
   ) {
     this.presetID = presetID;
     this.name = name;
-    this.values = values;
+    this.presets = presets;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(PRESET_ID_ID, new UIntType(presetID)));
     values.add(new StructElement(NAME_ID, new StringType(name)));
-    values.add(new StructElement(VALUES_ID, values.encodeTlv()));
+    values.add(new StructElement(PRESETS_ID, presets.encodeTlv()));
 
     return new StructType(values);
   }
@@ -14211,7 +14211,7 @@ public static class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {
     }
     Integer presetID = null;
     String name = null;
-    ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct values = null;
+    ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct presets = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PRESET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -14223,17 +14223,17 @@ public static class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {
           StringType castingValue = element.value(StringType.class);
           name = castingValue.value(String.class);
         }
-      } else if (element.contextTagNum() == VALUES_ID) {
+      } else if (element.contextTagNum() == PRESETS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          values = ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct.decodeTlv(castingValue);
+          presets = ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct.decodeTlv(castingValue);
         }
       }
     }
     return new CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
       presetID,
       name,
-      values
+      presets
     );
   }
 
@@ -14247,8 +14247,8 @@ public static class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {
     output.append("\tname: ");
     output.append(name);
     output.append("\n");
-    output.append("\tvalues: ");
-    output.append(values);
+    output.append("\tpresets: ");
+    output.append(presets);
     output.append("\n");
     output.append("}\n");
     return output.toString();
