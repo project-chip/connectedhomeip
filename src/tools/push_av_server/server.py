@@ -2,6 +2,7 @@ import argparse
 import datetime
 import json
 import logging
+import multiprocessing
 import os.path
 import pathlib
 import random
@@ -13,7 +14,6 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import Literal, Optional, Union
-import multiprocessing
 
 import uvicorn
 from cryptography import x509
@@ -21,7 +21,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes, CertificatePublicKeyTypes
 from cryptography.x509.oid import NameOID
-from fastapi import FastAPI, HTTPException, Request, Response, APIRouter
+from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
