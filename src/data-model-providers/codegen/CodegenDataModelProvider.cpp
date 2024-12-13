@@ -872,7 +872,7 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceT
     }
 
     CHIP_ERROR err                                  = CHIP_NO_ERROR;
-    chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
     SpanSearchValue<chip::Span<const EmberAfDeviceType>> tree(&deviceTypes);
 
     return DeviceTypeEntryFromEmber(tree.First<ByDeviceType>(mDeviceTypeIterationHint).Value());
