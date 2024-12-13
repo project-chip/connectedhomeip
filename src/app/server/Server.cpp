@@ -302,8 +302,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // 2) It must occur after all low-level components that cluster implementations
     //    might depend on have been initialized, as they rely on these components
     //    during their own initialization.
-    // 3) `InitDataModelHandler` (also under SetDataModelProvider) assumes attribute
-    //    persistence and other foundational services are fully configured before it runs.
     //
     // This remains the single point of entry to ensure that all cluster-level
     // initialization is performed in the correct order.
