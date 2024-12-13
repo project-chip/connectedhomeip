@@ -27,7 +27,7 @@ namespace chip {
 /// to create new containers.
 ///
 /// The use case is that we very often search within nested containers, like "find-endpoint" + "find-cluster" + "find-attribute"
-/// and we generally only care if "does the last element exist or not"
+/// and we generally only care about "does the last element exist or not"
 ///
 /// A typical example of the way this class is used looks like this:
 ///
