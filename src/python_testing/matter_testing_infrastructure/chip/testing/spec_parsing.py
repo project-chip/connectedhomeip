@@ -825,15 +825,22 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
     top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems = []
+
+    found_xmls = 0
+
     for file in top.iterdir():
         if not file.name.endswith('.xml'):
             continue
         logging.info('Parsing file %r / %s', top, file.name)
+        found_xmls += 1
         with file.open('r', encoding="utf8") as xml:
             root = ElementTree.parse(xml).getroot()
             tmp_device_types, tmp_problems = parse_single_device_type(root)
             problems = problems + tmp_problems
             device_types.update(tmp_device_types)
+
+    if found_xmls < 1:
+        logging.warning("No XML files found in the specified device type directory: %r", top)
 
     if -1 not in device_types.keys():
         raise ConformanceException("Base device type not found in device type xml data")
