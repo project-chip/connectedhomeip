@@ -32,7 +32,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio.exceptions as ae
-import logging
 from time import sleep
 
 import chip.clusters as Clusters
