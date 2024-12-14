@@ -54,6 +54,7 @@ protected:
         DeviceWithNodeId(mNodeId);
 
         mDelegate = delegate;
+        sLastUsedDevice = device;
         SetCommandExitStatus(CHIP_NO_ERROR);
         return CHIP_NO_ERROR;
     }

@@ -132,6 +132,8 @@ protected:
 
     MTRDevice * GetLastUsedDevice();
 
+    static MTRDevice * sLastUsedDevice;
+
 private:
     CHIP_ERROR InitializeCommissioner(
         std::string key, chip::FabricId fabricId, const chip::Credentials::AttestationTrustStore * trustStore);

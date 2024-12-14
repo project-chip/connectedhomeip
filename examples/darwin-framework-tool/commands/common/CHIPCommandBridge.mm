@@ -35,7 +35,7 @@
 #include <string>
 
 static CHIPToolPersistentStorageDelegate * storage = nil;
-static MTRDevice * sLastUsedDevice = nil;
+MTRDevice * CHIPCommandBridge::sLastUsedDevice = nil;
 static DeviceDelegate * sDeviceDelegate = nil;
 static dispatch_queue_t sDeviceDelegateDispatchQueue = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
