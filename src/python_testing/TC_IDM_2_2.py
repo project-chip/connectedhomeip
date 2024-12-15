@@ -92,8 +92,14 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
     async def check_attribute_read_for_type(self, desired_attribute_type: type) -> bool:
         # Get all clusters from device
         for cluster in self.device_clusters:
+            output = await self.default_controller.Read(self.dut_node_id, [cluster])
+            cluster_attributes = []
+            for endpoint in output.attributes:
+                cluster_attributes.extend(list(output.attributes[endpoint][cluster].keys()))
+
             all_types = await self.all_type_attributes_for_cluster(cluster, desired_attribute_type)
-            all_types = list(set(all_types) & self.device_attributes)
+
+            all_types = list(set(all_types) & set(cluster_attributes))
             if all_types:
                 chosen_attributes = all_types
                 cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_attributes[0].cluster_id]
