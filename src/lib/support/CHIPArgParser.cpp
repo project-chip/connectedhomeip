@@ -416,7 +416,7 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
                 // Set currentCharacter to the first character after the hyphens.
                 currentCharacter = FirstCharacter(argv, currentElement);
             }
-            else // [currentElement][currentCharacter+1] is another option:
+            else // The next character is another option.
                 currentCharacter++;
         }
         else // currentElement is currently uninitialized or a long option.

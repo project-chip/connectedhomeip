@@ -71,7 +71,7 @@ chip_test_suite("tests") {
   if (current_os != "mbed") {
     test_sources += [ "TestCHIPArgParser.cpp" ]
   }
-  if (current_os != "esp32") {
+  if (chip_device_platform != "esp32") {
     # TODO: Disabled on esp32 due to tests failing.
     #  https://github.com/project-chip/connectedhomeip/issues/36785
     test_sources += [
