@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +45,15 @@ constexpr uint16_t kMaxImageRotationDegrees = 359;
 
 constexpr size_t kViewportStructMaxSerializedSize = TLV::EstimateStructOverhead(sizeof(uint16_t) * 4);
 
-constexpr uint8_t kNumOfStreamTypes = 4;
+constexpr size_t kNumOfStreamTypes = 4;
+
+// StreamTypeEnum + Anonymous tag(1 byte)
+constexpr size_t kStreamTypeTlvSize = sizeof(StreamTypeEnum) + 1;
+
+// 1 control byte + end-of-array marker
+constexpr size_t kArrayTlvOverhead = 2;
+
+constexpr size_t kRankedVideoStreamPrioritiesTlvSize = kArrayTlvOverhead + kStreamTypeTlvSize * kNumOfStreamTypes;
 
 class CameraAVStreamMgmtServer;
 
@@ -115,6 +123,25 @@ public:
      */
     virtual Protocols::InteractionModel::Status
     SetStreamPriorities(const DataModel::DecodableList<StreamTypeEnum> streamPriorities) = 0;
+
+    /**
+     *  Delegate functions to load the allocated video, audio, and snapshot streams.
+     *  The delegate application is responsible for creating and persisting
+     *  these streams(based on the Allocation commands). These Load APIs would be
+     *  used to load the pre-allocated stream context information into the cluster server list,
+     *  at initialization.
+     *  Once loaded, the cluster server would be serving Reads on these
+     *  attributes. The list is updatable via the Add/Remove functions for the
+     *  respective streams.
+     */
+    virtual Protocols::InteractionModel::Status
+    LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams) = 0;
+
+    virtual Protocols::InteractionModel::Status
+    LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams) = 0;
+
+    virtual Protocols::InteractionModel::Status
+    LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
@@ -442,6 +469,8 @@ private:
     CHIP_ERROR ClearViewport();
     CHIP_ERROR LoadViewport(ViewportStruct & viewport);
 
+    CHIP_ERROR StoreRankedVideoStreamPriorities();
+    CHIP_ERROR LoadRankedVideoStreamPriorities();
     /**
      * @brief Inherited from CommandHandlerInterface
      */
