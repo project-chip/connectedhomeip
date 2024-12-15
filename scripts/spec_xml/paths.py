@@ -22,8 +22,8 @@ from enum import Enum
 
 class Branch(Enum):
     MASTER = "master"
-    V1_3 = "v1_3"
-    V1_4 = "v1_4"
+    V1_3 = "1.4"
+    V1_4 = "1.4"
     IN_PROGRESS = "in_progress"
 
 
