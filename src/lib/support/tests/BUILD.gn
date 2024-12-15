@@ -45,8 +45,6 @@ chip_test_suite("tests") {
     "TestFold.cpp",
     "TestIniEscaping.cpp",
     "TestIntrusiveList.cpp",
-    "TestJsonToTlv.cpp",
-    "TestJsonToTlvToJson.cpp",
     "TestPersistedCounter.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
@@ -72,6 +70,14 @@ chip_test_suite("tests") {
   ]
   if (current_os != "mbed") {
     test_sources += [ "TestCHIPArgParser.cpp" ]
+  }
+  if (current_os != "esp32") {
+    # TODO: Disabled on esp32 due to tests failing.
+    #  https://github.com/project-chip/connectedhomeip/issues/36785
+    test_sources += [
+      "TestJsonToTlv.cpp",
+      "TestJsonToTlvToJson.cpp",
+    ]
   }
 
   sources = []

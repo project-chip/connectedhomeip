@@ -32,10 +32,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef CHIP_CONFIG_NON_POSIX_LONG_OPT
-#define CHIP_CONFIG_NON_POSIX_LONG_OPT 0
-#endif
-
 namespace chip {
 namespace ArgParser {
 
