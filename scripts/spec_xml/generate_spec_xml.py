@@ -76,12 +76,9 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     default=False,
     is_flag=True,
     help='Flag for dry run')
-@click.option(
-    '--include-in-progress',
-    type=click.Choice(['All', 'None', 'Current']), default='All')
 def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
     if not output_dir:
-        output_dir_map = {'All': DEFAULT_OUTPUT_DIR_TOT, 'None': DEFAULT_OUTPUT_DIR_1_3, 'Current': DEFAULT_OUTPUT_DIR_IN_PROGRESS}
+        output_dir_map = {'All': DEFAULT_OUTPUT_DIR_TOT, 'None': DEFAULT_OUTPUT_DIR_1_3}
         output_dir = output_dir_map[include_in_progress]
     scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress)
     scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress)
