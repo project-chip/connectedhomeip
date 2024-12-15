@@ -32,7 +32,6 @@ CURRENT_IN_PROGRESS_DEFINES = get_in_progress_defines()
 # Replace hardcoded paths with dynamic paths using paths.py functions
 DEFAULT_CHIP_ROOT = get_chip_root()
 DEFAULT_OUTPUT_DIR_1_3 = get_data_model_path(Branch.V1_3)
-DEFAULT_OUTPUT_DIR_IN_PROGRESS = get_data_model_path(Branch.IN_PROGRESS)
 DEFAULT_OUTPUT_DIR_TOT = get_data_model_path(Branch.MASTER)
 DEFAULT_DOCUMENTATION_FILE = get_documentation_file_path()
 
