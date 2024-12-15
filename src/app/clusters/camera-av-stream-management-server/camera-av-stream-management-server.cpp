@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -198,7 +198,6 @@ CameraAVStreamMgmtServer::ReadAndEncodeRankedVideoStreamPrioritiesList(const Att
 
     for (uint8_t i = 0; i < kNumOfStreamTypes; i++)
     {
-
         err = encoder.Encode(mRankedVideoStreamPriorities[i]);
         SuccessOrExit(err);
     }
@@ -223,6 +222,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveFromFabricsUsingCamera(chip::FabricIn
 CHIP_ERROR CameraAVStreamMgmtServer::SetRankedVideoStreamPriorities(const StreamTypeEnum newPriorities[kNumOfStreamTypes])
 {
     std::copy(newPriorities, newPriorities + kNumOfStreamTypes, mRankedVideoStreamPriorities);
+
+    ReturnErrorOnFailure(StoreRankedVideoStreamPriorities());
+
     return CHIP_NO_ERROR;
 }
 
@@ -1056,12 +1058,24 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
         ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the HDRModeEnabled from the KVS. Defaulting to %u", mHDRModeEnabled);
     }
 
-    // TODO: Load allocated streams and ranked priorities list
     // Load AllocatedVideoStreams
+    mDelegate.LoadAllocatedVideoStreams(mAllocatedVideoStreams);
 
     // Load AllocatedAudioStreams
+    mDelegate.LoadAllocatedAudioStreams(mAllocatedAudioStreams);
 
     // Load AllocatedSnapshotStreams
+    mDelegate.LoadAllocatedSnapshotStreams(mAllocatedSnapshotStreams);
+
+    err = LoadRankedVideoStreamPriorities();
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded RankedVideoStreamPrioritiesList");
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the RankedVideoStreamPrioritiesList from the KVS.");
+    }
 
     // Load SoftRecordingPrivacyModeEnabled
     bool softRecordingPrivacyModeEnabled;
@@ -1335,7 +1349,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const ViewportStruct & viewpo
 
 CHIP_ERROR CameraAVStreamMgmtServer::ClearViewport()
 {
-
+    // TODO
     return CHIP_NO_ERROR;
 }
 
@@ -1356,6 +1370,55 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadViewport(ViewportStruct & viewport)
     ReturnErrorOnFailure(viewport.Decode(reader));
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::StoreRankedVideoStreamPriorities()
+{
+    uint8_t buffer[kRankedVideoStreamPrioritiesTlvSize];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+
+    for (uint8_t i = 0; i < kNumOfStreamTypes; i++)
+    {
+        ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), mRankedVideoStreamPriorities[i]));
+    }
+    ReturnErrorOnFailure(writer.EndContainer(arrayType));
+
+    return mPersistentStorage->SyncSetKeyValue(
+        DefaultStorageKeyAllocator::CameraAVStreamMgmtRankedVideoStreamPriorities().KeyName(), buffer,
+        static_cast<uint16_t>(writer.GetLengthWritten()));
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::LoadRankedVideoStreamPriorities()
+{
+    uint8_t buffer[kRankedVideoStreamPrioritiesTlvSize];
+
+    uint16_t len = kRankedVideoStreamPrioritiesTlvSize;
+    ReturnErrorOnFailure(mPersistentStorage->SyncGetKeyValue(
+        DefaultStorageKeyAllocator::CameraAVStreamMgmtRankedVideoStreamPriorities().KeyName(), buffer, len));
+
+    TLV::TLVReader reader;
+    reader.Init(buffer);
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
+
+    for (uint8_t i = 0; i < kNumOfStreamTypes; i++)
+    {
+        if (reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag()) != CHIP_NO_ERROR)
+        {
+            break;
+        }
+
+        ReturnErrorOnFailure(reader.Get(mRankedVideoStreamPriorities[i]));
+    }
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+    return reader.VerifyEndOfContainer();
 }
 
 // CommandHandlerInterface

@@ -262,7 +262,8 @@ public:
     static StorageKeyName TermsAndConditionsAcceptance() { return StorageKeyName::FromConst("g/tc"); }
 
     // CameraAvStreamManagement cluster
-    static StorageKeyName CameraAVStreamMgmtViewport() { return StorageKeyName::FromConst("g/cam/vprt"); }
+    static StorageKeyName CameraAVStreamMgmtViewport() { return StorageKeyName::FromConst("g/cam/vwprt"); }
+    static StorageKeyName CameraAVStreamMgmtRankedVideoStreamPriorities() { return StorageKeyName::FromConst("g/cam/rnvidpr"); }
 };
 
 } // namespace chip
