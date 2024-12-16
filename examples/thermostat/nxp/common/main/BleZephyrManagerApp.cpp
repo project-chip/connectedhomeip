@@ -52,28 +52,28 @@ bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFFF6);
 /**
  * @brief Init BLE application manager
  *
- * In this example, the application manager is used to customize BLE advertising 
+ * In this example, the application manager is used to customize BLE advertising
  * parameters. This example is provided for platforms with Zephyr BLE manager support.
  *
- * @note This example set custom Zephyr BLE manager Matter advertising parameters ( 
- *  CONFIG_CHIP_CUSTOM_BLE_ADV_DATA for kconfig or ble_adv_data_custom for GN is set). 
- *  To keep the advertising support for commissining, it is needed to register the whole 
- *  adv data (adv flags + Matter adv data + custom adv data) and register scan 
+ * @note This example set custom Zephyr BLE manager Matter advertising parameters (
+ *  CONFIG_CHIP_CUSTOM_BLE_ADV_DATA for kconfig or ble_adv_data_custom for GN is set).
+ *  To keep the advertising support for commissining, it is needed to register the whole
+ *  adv data (adv flags + Matter adv data + custom adv data) and register scan
  *  response data as default adv and response data will be skipped.
  *  kAdvertisingFlags and manuf_data are given for examples, size of advertisingData and
  *  scanResponseData have to be set according to custom requirements.
- * 
+ *
  * For custom Gatt services, APIs bt_gatt_service_register and bt_gatt_service_unregister
  * could be called at application layer. It will not override Matter Gatt services but
- * add new one. 
- * 
+ * add new one.
+ *
  * @note At the end of the commissioning advertising will be stopped.
- * 
+ *
  * To start new advertising process, APIs :
  * chip::DeviceLayer::BLEAdvertisingArbiter::InsertRequest
- * chip::DeviceLayer::BLEAdvertisingArbiter::CancelRequest 
+ * chip::DeviceLayer::BLEAdvertisingArbiter::CancelRequest
  * could be called. If InsertRequest API is called several time, only the request with the
- * higher priority will be advertise. 
+ * higher priority will be advertise.
  *
  */
 void BLEApplicationManager::Init(void)
