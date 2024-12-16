@@ -80,6 +80,12 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
         return;
     }
 
+    if (binding.type == MATTER_UNICAST_BINDING && peer_device == nullptr)
+    {
+        ChipLogProgress(NotSpecified, "Binding to self");
+        return;
+    }
+
     if (binding.type == MATTER_UNICAST_BINDING && binding.local == 1 &&
         binding.clusterId.value_or(Clusters::OnOff::Id) == Clusters::OnOff::Id)
     {

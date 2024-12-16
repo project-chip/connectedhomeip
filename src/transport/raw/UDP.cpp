@@ -145,6 +145,17 @@ CHIP_ERROR UDP::MulticastGroupJoinLeave(const Transport::PeerAddress & address, 
 
     if (join)
     {
+#if INET_CONFIG_ENABLE_IPV4
+        if (mUDPEndPoint->SetMulticastLoopback(address.GetIPAddress().IsIPv4() ? Inet::kIPVersion_4 : Inet::kIPVersion_6, true) !=
+            CHIP_NO_ERROR)
+#else
+        if (mUDPEndPoint->SetMulticastLoopback(Inet::kIPVersion_6, true) != CHIP_NO_ERROR)
+#endif
+        {
+            ChipLogError(Inet,
+                         "Failed to set multicast loop back, this could lead to that the device cannot receive multicast message "
+                         "sent by itself");
+        }
         ChipLogProgress(Inet, "Joining Multicast Group with address %s", addressStr);
         return mUDPEndPoint->JoinMulticastGroup(mUDPEndPoint->GetBoundInterface(), address.GetIPAddress());
     }

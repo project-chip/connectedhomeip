@@ -179,8 +179,7 @@ static void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Op
         case Clusters::OnOff::Id:
         case Clusters::LevelControl::Id:
         case Clusters::ColorControl::Id:
-            // TODO should not happen?
-            VerifyOrReturn(peer_device != nullptr, ChipLogError(NotSpecified, "Peer is nullptr"));
+            VerifyOrReturn(peer_device != nullptr, ChipLogProgress(NotSpecified, "Binding to self"));
 
             ProcessSwitchUnicastBindingCommand(data->commandId, binding, peer_device->GetExchangeManager(),
                                                peer_device->GetSecureSession().Value(), data);
