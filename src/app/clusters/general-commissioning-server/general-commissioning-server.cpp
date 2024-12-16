@@ -82,7 +82,7 @@ private:
     void HandleSetRegulatoryConfig(HandlerContext & ctx, const Commands::SetRegulatoryConfig::DecodableType & commandData);
 };
 
-GeneralCommissioningGlobalInstance gAttrAccess;
+GeneralCommissioningGlobalInstance gGeneralCommissioningInstance;
 
 CHIP_ERROR GeneralCommissioningGlobalInstance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -368,8 +368,8 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
 void MatterGeneralCommissioningPluginServerInitCallback()
 {
     Breadcrumb::Set(0, 0);
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
-    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAttrAccess));
+    AttributeAccessInterfaceRegistry::Instance().Register(&gGeneralCommissioningInstance);
+    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gGeneralCommissioningInstance));
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 }
 
