@@ -83,7 +83,8 @@ config HEAP_MEM_POOL_SIZE
     default 1280
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
-    default 20716 if SOC_RISCV_TELINK_TL321X || SOC_SERIES_RISCV_TELINK_B9X_RETENTION
+    default 20716 if  SOC_SERIES_RISCV_TELINK_B9X_RETENTION
+    default 16384 if  SOC_RISCV_TELINK_TL321X
     default 12288
 
 config NET_IPV6_MLD
@@ -104,11 +105,13 @@ config NET_PKT_TX_COUNT
     default 8
 
 config NET_BUF_RX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X
+    default 4 if PM
+    default 16 if SOC_RISCV_TELINK_TL321X
     default 32
 
 config NET_BUF_TX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X
+    default 4 if PM
+    default 16 if SOC_RISCV_TELINK_TL321X
     default 32
 
 config GPIO
@@ -148,8 +151,6 @@ config BT_BUF_ACL_TX_SIZE
     default 107 if SOC_RISCV_TELINK_TL321X
     default 251
 
-if SOC_RISCV_TELINK_TL321X
-
 config BT_BUF_EVT_RX_COUNT
     default 4
 
@@ -159,8 +160,6 @@ config BT_BUF_ACL_RX_COUNT
 config BT_GATT_CACHING
     bool
     default n
-
-endif # SOC_RISCV_TELINK_TL321X
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X
@@ -427,6 +426,10 @@ config MBEDTLS_USER_CONFIG_ENABLE
 
 config MBEDTLS_USER_CONFIG_FILE
     default "telink-mbedtls-config.h"
+
+config MBEDTLS_ZEPHYR_ENTROPY
+    bool
+    default y
 
 config MBEDTLS_CIPHER_AES_ENABLED
 	default y
