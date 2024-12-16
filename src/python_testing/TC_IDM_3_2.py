@@ -97,7 +97,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                     chosen_attribute = next(iter(attributes_of_type_on_device))
                     value = self.pick_writable_value(chosen_attribute)
                     await self.write_single_attribute(
-                    # output = await self.write_single_attribute(
+                        # output = await self.write_single_attribute(
                         attribute_value=chosen_attribute(value=value),
                         endpoint_id=endpoint,
                     )
@@ -426,9 +426,9 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         # This picks, e.g. Clusters.ThreadNetworkDirectory.Attributes.PreferredExtendedPanID on linux-x64-lock/chip-lock-app,
         # which contains an entry for value=Null
         read_request = await self.default_controller.ReadAttribute(
-                self.dut_node_id,
-                [chosen_nullable_attribute]
-            )
+            self.dut_node_id,
+            [chosen_nullable_attribute]
+        )
         # read_request returns {}?
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, chosen_nullable_attribute(value=Nullable))])
         # Why is this exception happening?: ValueError: Field . expected <class 'bytes'>, but got <class 'type'>
