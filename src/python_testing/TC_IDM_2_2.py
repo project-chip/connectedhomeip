@@ -61,7 +61,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         elif desired_type == IntFlag:
             attributes_class = getattr(cluster, 'Attributes')
-            all_attributes_of_type = [cluster.Attributes.FeatureMap]
+            all_attributes_of_type = [attributes_class.FeatureMap]
         else:
             all_attributes_of_type = [attribute for attribute in all_attributes if attribute.attribute_type ==
                                       ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type)]
