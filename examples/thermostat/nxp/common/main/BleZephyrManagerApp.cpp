@@ -26,7 +26,6 @@
 #include <platform/ConfigurationManager.h>
 #include <zephyr/bluetooth/gatt.h>
 
-
 #define ADV_LEN 2
 
 using namespace ::chip::DeviceLayer;
