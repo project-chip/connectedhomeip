@@ -750,7 +750,7 @@ class PIXITValidator:
             raise ValueError(f"Invalid hex value: {e}")
 
     @classmethod
-    def validate_value(cls, value: Any, pixit_def: PIXITDefinition) -> None]:
+    def validate_value(cls, value: Any, pixit_def: PIXITDefinition) -> None:
         """Validate PIXIT value matches its declared type.
 
         Args:
@@ -771,7 +771,7 @@ class PIXITValidator:
             return
 
         # Mapping of PIXITType to validation function
-        type_validators= {
+        type_validators = {
             PIXITType.INT: cls.validate_int_pixit_value,
             PIXITType.BOOL: cls.validate_bool_pixit_value,
             PIXITType.FLOAT: cls.validate_float_pixit_value,
@@ -795,11 +795,11 @@ class PIXITValidator:
     def validate_pixits(cls, pixits: list[PIXITDefinition],
                         provided_values: dict[str, Any]) -> None:
         """Validate all PIXITs against provided values.
-    
+
         Args:
             pixits: List of PIXIT definitions to validate
             provided_values: Dictionary of provided PIXIT values
-            
+
         Raises:
             PIXITValidationError: If any PIXIT validation fails
         """
@@ -811,7 +811,7 @@ class PIXITValidator:
             if value is None and pixit.required:
                 missing.append(f"{pixit.name} ({pixit.description})")
                 continue
-                
+
             # Validate non-missing values
             if value is not None:
                 try:
@@ -1190,7 +1190,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         try:
             fn = getattr(self, pixits_name)
             return fn()
-        except AttributeError:
+        except AttributeError as e:
             return []
 
     def get_test_steps(self, test: str) -> list[TestStep]:
@@ -1360,11 +1360,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.failed = False
         test_name = self.current_test_info.name
 
-        pixits = self.get_test_pixits(test_name)
-        validator = PIXITValidator()
-        valid, error = validator.validate_pixits(pixits, self.matter_test_config.global_test_params)
-        if not valid:
-            raise signals.TestFailure(f"PIXIT validation failed for test {test_name}: {error}")
+        if not self.is_commissioning:
+            pixits = self.get_test_pixits(test_name)
+            validator = PIXITValidator()
+            try:
+                validator.validate_pixits(pixits, self.matter_test_config.global_test_params)
+            except PIXITValidationError as e:
+                raise signals.TestFailure(f"PIXIT validation failed for test {test_name}: {str(e)}")
 
         if self.runner_hook and not self.is_commissioning:
             steps = self.get_defined_test_steps(test_name)
