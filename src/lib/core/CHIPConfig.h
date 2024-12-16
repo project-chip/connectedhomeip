@@ -1857,18 +1857,5 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_TEST_GOOGLETEST
 
 /**
- * @def CHIP_CONFIG_TC_REQUIRED
- *
- * @brief Indicates whether terms and conditions are required during commissioning.
- *
- * This macro defines whether the device commissioning process requires the user to acknowledge terms and conditions.
- * - 1: Terms and conditions are required.
- * - 0: Terms and conditions are not required.
- */
-#ifndef CHIP_CONFIG_TC_REQUIRED
-#define CHIP_CONFIG_TC_REQUIRED 0
-#endif
-
-/**
  * @}
  */

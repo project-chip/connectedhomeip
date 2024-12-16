@@ -197,6 +197,7 @@ def BuildHostTarget():
     target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
+    target.AppendModifier('terms-and-conditions', chip_terms_and_conditions_required=True)
 
     return target
 

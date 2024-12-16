@@ -23,6 +23,7 @@
 
 #include "general-commissioning-server.h"
 
+#include <app/AppConfig.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -36,7 +37,7 @@
 #include <tracing/macros.h>
 #include <transport/SecureSession.h>
 
-#if CHIP_CONFIG_TC_REQUIRED
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 #include <app/server/TermsAndConditionsManager.h>
 #include <app/server/TermsAndConditionsProvider.h>
 #endif
@@ -101,7 +102,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     case SupportsConcurrentConnection::Id: {
         return ReadSupportsConcurrentConnection(aEncoder);
     }
-#if CHIP_CONFIG_TC_REQUIRED
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     case TCAcceptedVersion::Id: {
         TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
@@ -152,7 +153,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
 
         return aEncoder.Encode(outUpdateAcceptanceDeadline.Value());
     }
-#endif // CHIP_CONFIG_TC_REQUIRED
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     default: {
         break;
     }
@@ -202,7 +203,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(Attr
     return aEncoder.Encode(supportsConcurrentConnection);
 }
 
-#if CHIP_CONFIG_TC_REQUIRED
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 typedef struct sTermsAndConditionsState
 {
     Optional<TermsAndConditions> acceptance;
@@ -267,7 +268,7 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
         MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCUpdateDeadline::Id);
     }
 }
-#endif // CHIP_CONFIG_TC_REQUIRED
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
 } // anonymous namespace
 
@@ -357,7 +358,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
         return true;
     }
 
-#if CHIP_CONFIG_TC_REQUIRED
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
 
     // Ensure required terms and conditions have been accepted, then attempt to commit
@@ -412,7 +413,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
             CheckSuccess(err, Failure);
         }
     }
-#endif // CHIP_CONFIG_TC_REQUIRED
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
     SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
 
@@ -514,7 +515,7 @@ bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
 {
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
 
-#if CHIP_CONFIG_TC_REQUIRED
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     auto & failSafeContext                  = Server::GetInstance().GetFailSafeContext();
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
 
@@ -575,7 +576,7 @@ bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
     commandObj->AddResponse(commandPath, response);
     return true;
 
-#endif // CHIP_CONFIG_TC_REQUIRED
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     return true;
 }
 
@@ -589,7 +590,7 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
 
         if (event->FailSafeTimerExpired.updateTermsAndConditionsHasBeenInvoked)
         {
-#if CHIP_CONFIG_TC_REQUIRED
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             // Clear terms and conditions acceptance on failsafe timer expiration
             TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
             TermsAndConditionsState initialState, updatedState;
@@ -598,7 +599,7 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
             VerifyOrReturn(CHIP_NO_ERROR == tcProvider->RevertAcceptance());
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
             NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
-#endif // CHIP_CONFIG_TC_REQUIRED
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         }
     }
 }
@@ -618,7 +619,7 @@ public:
             ChipLogProgress(Zcl, "general-commissioning-server: Last Fabric index 0x%x was removed",
                             static_cast<unsigned>(fabricIndex));
 
-#if CHIP_CONFIG_TC_REQUIRED
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
             TermsAndConditionsState initialState, updatedState;
             VerifyOrReturn(nullptr != tcProvider);
@@ -626,7 +627,7 @@ public:
             VerifyOrReturn(CHIP_NO_ERROR == tcProvider->ResetAcceptance());
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
             NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
-#endif // CHIP_CONFIG_TC_REQUIRED
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         }
     }
 };
