@@ -2,11 +2,9 @@ import inspect
 from enum import IntFlag
 # from typing import Union, get_args, get_origin
 from typing import get_args
-from typing import Generator
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import AttributePath
 from chip.clusters.ClusterObjects import ClusterObject
 from chip.clusters.enum import MatterIntEnum
 from chip.clusters.Types import Nullable
@@ -98,7 +96,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                     print(f'attributes_of_type_on_device: {attributes_of_type_on_device}, attributes_of_type: {attributes_of_type}')
                     chosen_attribute = next(iter(attributes_of_type_on_device))
                     value = self.pick_writable_value(chosen_attribute)
-                    output = await self.write_single_attribute(
+                    await self.write_single_attribute(
+                    # output = await self.write_single_attribute(
                         attribute_value=chosen_attribute(value=value),
                         endpoint_id=endpoint,
                     )
@@ -151,11 +150,11 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         all_clusters = [cluster for cluster in Clusters.ClusterObjects.ALL_ATTRIBUTES]
         self.generate_writable_attributes()
         self.generate_nullable_attributes()
-        expected_descriptor_attributes = ClusterObjects.ALL_ATTRIBUTES[Clusters.Objects.Descriptor.id]
+        # expected_descriptor_attributes = ClusterObjects.ALL_ATTRIBUTES[Clusters.Objects.Descriptor.id]
 
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor)])
-        returned_attributes = [a for a in read_request[0][Clusters.Objects.Descriptor].keys() if a !=
-                               Clusters.Attribute.DataVersion]
+        # returned_attributes = [a for a in read_request[0][Clusters.Objects.Descriptor].keys() if a !=
+        #                        Clusters.Attribute.DataVersion]
 
         self.device_clusters = self.all_device_clusters()
         self.device_attributes = self.all_device_attributes()
@@ -434,10 +433,11 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, chosen_nullable_attribute(value=Nullable))])
         # Why is this exception happening?: ValueError: Field . expected <class 'bytes'>, but got <class 'type'>
 
-        read_request_2 = await self.default_controller.ReadAttribute(
-                self.dut_node_id,
-                [chosen_nullable_attribute]
-            )
+        # read_request_2 = await self.default_controller.ReadAttribute(
+        #         self.dut_node_id,
+        #         [chosen_nullable_attribute]
+        #     )
+        # TODO: Parse once ValueError exception is fixed
 
         # Verify that the DUT sends a WriteResponseMessage with any status except UNSUPPORTED_WRITE or DATA_VERSION_MISMATCH. If the Status is SUCCESS, verify the updated value by sending a ReadRequestMessage for all affected paths. If the status is SUCCESS, send a WriteRequestMessage to set the value back to `original`.
 
