@@ -311,10 +311,10 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
     }
 #endif
 
-    advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
-    advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
-    scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
-#endif //CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+    advertisingData[0]                   = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    advertisingData[1]                   = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
+    scanResponseData[0]                  = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+#endif // CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
 
     mAdvertisingRequest.priority = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
     mAdvertisingRequest.options  = kAdvertisingOptions;

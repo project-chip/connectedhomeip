@@ -19,11 +19,11 @@
 
 #include "BLEApplicationManager.h"
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <zephyr/bluetooth/gatt.h>
+#include "BLEManagerImpl.h"
 #include <ble/CHIPBleServiceData.h>
 #include <platform/ConfigurationManager.h>
-#include "BLEManagerImpl.h"
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <zephyr/bluetooth/gatt.h>
 
 #define ADV_LEN 2
 
@@ -45,7 +45,10 @@ std::array<bt_data, 1> scanResponseData;
 
 constexpr uint8_t kAdvertisingFlags = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
 
-uint8_t manuf_data[ADV_LEN] = { 0x25, 0x00, };
+uint8_t manuf_data[ADV_LEN] = {
+    0x25,
+    0x00,
+};
 
 bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFFF6);
 
@@ -85,9 +88,9 @@ void BLEApplicationManager::Init(void)
     Encoding::LittleEndian::Put16(serviceData.uuid, UUID16_CHIPoBLEService.val);
     chip::DeviceLayer::ConfigurationMgr().GetBLEDeviceIdentificationInfo(serviceData.deviceIdInfo);
 
-    advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    advertisingData[0] = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
     /* Matter adv data for commissining */
-    advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
+    advertisingData[1] = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
     /* Example of custom BLE adv data */
     advertisingData[2]  = BT_DATA(BT_DATA_MANUFACTURER_DATA, manuf_data, ADV_LEN);
     scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);

@@ -311,13 +311,13 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
     }
 #endif
 
-    advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
-    advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
-    scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+    advertisingData[0]                   = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    advertisingData[1]                   = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
+    scanResponseData[0]                  = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
 #endif
 
-    mAdvertisingRequest.priority         = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
-    mAdvertisingRequest.options          = kAdvertisingOptions;
+    mAdvertisingRequest.priority = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
+    mAdvertisingRequest.options  = kAdvertisingOptions;
 
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
@@ -544,7 +544,6 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
     {
         ChipLogError(DeviceLayer, "BLE connection failed (reason: 0x%02x)", connEvent->HciResult);
     }
-
 
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);

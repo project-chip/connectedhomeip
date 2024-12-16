@@ -110,7 +110,7 @@ private:
     // The summarized number of Bluetooth LE connections related to the device (including these not related to Matter service).
     uint16_t mTotalConnNum;
 #ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
-    Span<bt_data> mCustomAdvertising = {};
+    Span<bt_data> mCustomAdvertising  = {};
     Span<bt_data> mCustomScanResponse = {};
 #endif
 

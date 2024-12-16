@@ -58,7 +58,7 @@ CHIP_ERROR RestartAdvertising()
     ReturnErrorOnFailure(MapErrorZephyr(bt_le_adv_stop()));
     VerifyOrReturnError(!sys_slist_is_empty(&sRequests), CHIP_NO_ERROR);
 
-    const Request & top          = ToRequest(sys_slist_peek_head(&sRequests));
+    const Request & top    = ToRequest(sys_slist_peek_head(&sRequests));
     bt_le_adv_param params = BT_LE_ADV_PARAM_INIT(top.options, top.minInterval, top.maxInterval, nullptr);
     params.id              = sBtId;
     const int result = bt_le_adv_start(&params, top.advertisingData.data(), top.advertisingData.size(), top.scanResponseData.data(),
