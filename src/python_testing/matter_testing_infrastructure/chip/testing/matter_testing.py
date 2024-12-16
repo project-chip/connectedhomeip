@@ -39,7 +39,7 @@ from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial
 from itertools import chain
-from typing import Any, Iterable, List, Optional, Tuple, Dict
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from chip.tlv import float32, uint
 
