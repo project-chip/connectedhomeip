@@ -138,6 +138,12 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
         }
 
         auto & oldAddress = results[insertAtIndex].address;
+
+        if (oldAddress == result.address) {
+            // this address is already in our list.
+            return false;
+        }
+
         auto oldScore     = Dnssd::IPAddressSorter::ScoreIpAddress(oldAddress.GetIPAddress(), oldAddress.GetInterface());
         if (newScore > oldScore)
         {
@@ -150,6 +156,9 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
     {
         return false;
     }
+
+    // we can insert IF AND ONLY IF we are not duplicating an existing entry
+    // TODO: implement
 
     // Move the following valid entries one level down.
     for (auto i = count; i > insertAtIndex; i--)
