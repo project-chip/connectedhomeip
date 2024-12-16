@@ -102,6 +102,11 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicates)
     Impl::NodeLookupResults results;
     ASSERT_EQ(results.count, 0);
 
+    // The order below is VERY explicit to test both before and after inserts
+    //   - low first
+    //   - high (to be before low)
+    //   - medium (to be after high, even though before low)
+
     ResolveResult lowResult;
     lowResult.address = GetAddressWithLowScore();
 
@@ -119,25 +124,25 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicates)
     ASSERT_EQ(results.count, 1);
 
     // we CAN insert a different one
-    results.UpdateResults(mediumResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
+    results.UpdateResults(highResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
     ASSERT_EQ(results.count, 2);
 
     // extra insertions of the same address should NOT make a difference
     results.UpdateResults(lowResult, Dnssd::IPAddressSorter::IpScore::kUniqueLocal);
     ASSERT_EQ(results.count, 2);
-    results.UpdateResults(mediumResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
+    results.UpdateResults(highResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
     ASSERT_EQ(results.count, 2);
 
     // we CAN insert a different one
-    results.UpdateResults(highResult, Dnssd::IPAddressSorter::IpScore::kLinkLocal);
+    results.UpdateResults(mediumResult, Dnssd::IPAddressSorter::IpScore::kLinkLocal);
     ASSERT_EQ(results.count, 3);
 
     // re-insertin any of these should not make a difference
     results.UpdateResults(lowResult, Dnssd::IPAddressSorter::IpScore::kUniqueLocal);
     ASSERT_EQ(results.count, 3);
-    results.UpdateResults(mediumResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
+    results.UpdateResults(highResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
     ASSERT_EQ(results.count, 3);
-    results.UpdateResults(highResult, Dnssd::IPAddressSorter::IpScore::kLinkLocal);
+    results.UpdateResults(mediumResult, Dnssd::IPAddressSorter::IpScore::kLinkLocal);
     ASSERT_EQ(results.count, 3);
 }
 
