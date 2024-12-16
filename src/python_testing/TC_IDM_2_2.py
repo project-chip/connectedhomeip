@@ -222,7 +222,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         asserts.assert_in(Clusters.Objects.Descriptor, read_request[0].keys(), "Descriptor cluster not in output")
         asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList,
-                            read_request[0][Clusters.Objects.Descriptor], "AttributeList not in output")
+                          read_request[0][Clusters.Objects.Descriptor], "AttributeList not in output")
         asserts.assert_equal(sorted(all_attributes[0][Clusters.Descriptor]
                              [Clusters.Descriptor.Attributes.ServerList]),
                              sorted([x.id for x in read_request[0]]))
