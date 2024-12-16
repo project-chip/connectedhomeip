@@ -22,6 +22,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
+#import "MTRProductIdentity.h"
 
 using namespace chip::Tracing::DarwinFramework;
 
@@ -187,16 +188,3 @@ void MTRDeviceControllerDelegateBridge::SetDeviceNodeID(chip::NodeId deviceNodeI
 {
     mDeviceNodeId = deviceNodeId;
 }
-
-@implementation MTRProductIdentity
-
-- (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID
-{
-    if (self = [super init]) {
-        _vendorID = vendorID;
-        _productID = productID;
-    }
-    return self;
-}
-
-@end

@@ -17,21 +17,21 @@
 
 #import <Matter/MTRDeviceType.h>
 
+#import "MTRDefines_Internal.h"
 #import "MTRDeviceTypeMetadata.h"
 #import "MTRLogging_Internal.h"
 
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
 using namespace chip;
 
+MTR_DIRECT_MEMBERS
 @implementation MTRDeviceType
 
-- (nullable instancetype)initWithDeviceTypeID:(NSNumber *)id name:(NSString *)name isUtility:(BOOL)isUtility
+- (instancetype)initWithDeviceTypeID:(NSNumber *)id name:(NSString *)name isUtility:(BOOL)isUtility
 {
-    if (!(self = [super init])) {
-        return nil;
-    }
-
+    self = [super init];
     _id = id;
     _name = name;
     _isUtility = isUtility;
@@ -50,10 +50,37 @@ using namespace chip;
         return nil;
     }
 
-    return [[MTRDeviceType alloc]
-        initWithDeviceTypeID:deviceTypeID
-                        name:[NSString stringWithUTF8String:deviceTypeData->name]
-                   isUtility:(deviceTypeData->deviceClass != MTRDeviceTypeClass::Simple)];
+    auto * name = [[NSString alloc] initWithBytesNoCopy:(void *) deviceTypeData->name
+                                                 length:strlen(deviceTypeData->name)
+                                               encoding:NSUTF8StringEncoding
+                                           freeWhenDone:NO];
+
+    return [[MTRDeviceType alloc] initWithDeviceTypeID:deviceTypeID
+                                                  name:name
+                                             isUtility:(deviceTypeData->deviceClass != MTRDeviceTypeClass::Simple)];
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return self; // immutable
+}
+
+- (NSUInteger)hash
+{
+    return _id.hash;
+}
+
+- (BOOL)isEqual:(id)object
+{
+    VerifyOrReturnValue([object class] == [self class], NO);
+    MTRDeviceType * other = object;
+    return [_id isEqual:other->_id];
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@ 0x%" PRIx32 " (%@)>",
+                     self.class, _id.unsignedIntValue, _name];
 }
 
 @end
