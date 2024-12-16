@@ -139,12 +139,13 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
 
         auto & oldAddress = results[insertAtIndex].address;
 
-        if (oldAddress == result.address) {
+        if (oldAddress == result.address)
+        {
             // this address is already in our list.
             return false;
         }
 
-        auto oldScore     = Dnssd::IPAddressSorter::ScoreIpAddress(oldAddress.GetIPAddress(), oldAddress.GetInterface());
+        auto oldScore = Dnssd::IPAddressSorter::ScoreIpAddress(oldAddress.GetIPAddress(), oldAddress.GetInterface());
         if (newScore > oldScore)
         {
             // This is a score update, it will replace a previous entry.
