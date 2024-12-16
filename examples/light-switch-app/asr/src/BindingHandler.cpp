@@ -216,7 +216,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aB
     }
     else if (aBinding.type == MATTER_UNICAST_BINDING && !data->IsGroup)
     {
-        if (peer_device == nullptr)
+        if (deviceProxy == nullptr)
         {
             ChipLogProgress(NotSpecified, "Binding to self");
             return;
