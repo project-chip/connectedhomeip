@@ -102,14 +102,14 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicatesWhenFull)
     for (auto i = 0; i < kNumberOfAvailableSlots; i++)
     {
         ResolveResult result;
-        result.address = GetAddressWithLowScore(i + 10);
+        result.address = GetAddressWithLowScore(static_cast<uint16_t>(i + 10));
         ASSERT_TRUE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kUniqueLocal));
     }
     ASSERT_EQ(results.count, kNumberOfAvailableSlots);
 
     // Adding another one should fail as there is no more room
     ResolveResult result;
-    result.address = GetAddressWithLowScore(5);
+    result.address = GetAddressWithLowScore(static_cast<uint16_t>(5));
     ASSERT_FALSE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kUniqueLocal));
     ASSERT_EQ(results.count, kNumberOfAvailableSlots);
 
@@ -186,7 +186,7 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicates)
 TEST(TestAddressResolveDefaultImpl, TestLookupResult)
 {
     ResolveResult lowResult;
-    lowResult.address = GetAddressWithLowScore(1);
+    lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(1));
 
     ResolveResult mediumResult;
     mediumResult.address = GetAddressWithMediumScore();
@@ -233,7 +233,7 @@ TEST(TestAddressResolveDefaultImpl, TestLookupResult)
     for (auto i = 0; i < kNumberOfAvailableSlots; i++)
     {
         // Set up UNIQUE addresses to not apply dedup here
-        lowResult.address = GetAddressWithLowScore(i + 10);
+        lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(i + 10));
         handle.LookupResult(lowResult);
     }
 
@@ -242,7 +242,7 @@ TEST(TestAddressResolveDefaultImpl, TestLookupResult)
     {
         EXPECT_TRUE(handle.HasLookupResult());
         outResult = handle.TakeLookupResult();
-        EXPECT_EQ(GetAddressWithLowScore(i + 10), outResult.address);
+        EXPECT_EQ(GetAddressWithLowScore(static_cast<uint16_t>(i + 10)), outResult.address);
     }
 
     // Check that the results has been consumed properly.
@@ -253,7 +253,7 @@ TEST(TestAddressResolveDefaultImpl, TestLookupResult)
     // Fill all the possible slots by giving it 2 times more results than the available slots.
     for (auto i = 0; i < kNumberOfAvailableSlots * 2; i++)
     {
-        lowResult.address = GetAddressWithLowScore(i + 1000);
+        lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(i + 1000));
         handle.LookupResult(lowResult);
     }
 
@@ -262,7 +262,7 @@ TEST(TestAddressResolveDefaultImpl, TestLookupResult)
     {
         EXPECT_TRUE(handle.HasLookupResult());
         outResult = handle.TakeLookupResult();
-        EXPECT_EQ(GetAddressWithLowScore(i + 1000), outResult.address);
+        EXPECT_EQ(GetAddressWithLowScore(static_cast<uint16_t>(i + 1000)), outResult.address);
     }
 
     // Check that the results has been consumed properly.
@@ -287,7 +287,7 @@ TEST(TestAddressResolveDefaultImpl, TestLookupResult)
     // Fill all the possible slots.
     for (auto i = 0; i < kNumberOfAvailableSlots; i++)
     {
-        lowResult.address = GetAddressWithLowScore(i + 10);
+        lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(i + 10));
         handle.LookupResult(lowResult);
     }
 
@@ -314,7 +314,7 @@ TEST(TestAddressResolveDefaultImpl, TestLookupResult)
             EXPECT_TRUE(handle.HasLookupResult());
             outResult = handle.TakeLookupResult();
             // - 2 because we start from 2 at the top for the high and medium slots
-            EXPECT_EQ(GetAddressWithLowScore(i + 10 - 2), outResult.address);
+            EXPECT_EQ(GetAddressWithLowScore(static_cast<uint16_t>(i + 10 - 2)), outResult.address);
         }
     }
 
