@@ -50,10 +50,6 @@ declare_args() {
   #       if the cluster build targets are decoupled as stand-alone units.
   time_sync_enable_tsc_feature = 1
 
-  # Controls whether the device commissioning process requires the user to
-  # acknowledge terms and conditions during commissioning.
-  chip_terms_and_conditions_required = false
-
   # Systems that can spare a bit of RAM for InteractionModelEngine/delegate
   # pointers should do so (allows InteractionModelEngine decoupling and less usage
   # of global pointers)
