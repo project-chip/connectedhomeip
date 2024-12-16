@@ -20,6 +20,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MTRDeviceController;
+@class MTRDeviceTypeRevision;
+@class MTRMetrics;
+@class MTRProductIdentity;
+
 typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
     MTRCommissioningStatusUnknown = 0,
     MTRCommissioningStatusSuccess = 1,
@@ -28,22 +33,6 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
         ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 3,
 } MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-
-/**
- * A representation of a (vendor, product) pair that identifies a specific product.
- */
-MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-@interface MTRProductIdentity : NSObject
-
-@property (nonatomic, copy, readonly) NSNumber * vendorID;
-
-@property (nonatomic, copy, readonly) NSNumber * productID;
-
-- (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID;
-@end
-
-@class MTRDeviceController;
-@class MTRMetrics;
 
 /**
  * The protocol definition for the MTRDeviceControllerDelegate.

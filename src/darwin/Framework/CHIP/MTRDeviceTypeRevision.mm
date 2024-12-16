@@ -14,12 +14,15 @@
  *    limitations under the License.
  */
 
+#import "MTRDeviceTypeRevision.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceType.h"
 #import "MTRLogging_Internal.h"
-#import <Matter/MTRDeviceTypeRevision.h>
+#import "MTRStructsObjc.h"
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
 using namespace chip;
@@ -29,6 +32,9 @@ MTR_DIRECT_MEMBERS
 
 - (nullable instancetype)initWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision
 {
+    VerifyOrReturnValue(deviceTypeID != nil, nil);
+    VerifyOrReturnValue(revision != nil, nil);
+
     auto deviceTypeIDValue = deviceTypeID.unsignedLongLongValue;
     if (!CanCastTo<DeviceTypeId>(deviceTypeIDValue)) {
         MTR_LOG_ERROR("MTRDeviceTypeRevision provided too-large device type ID: 0x%llx", deviceTypeIDValue);
@@ -50,17 +56,24 @@ MTR_DIRECT_MEMBERS
     return [self initInternalWithDeviceTypeID:[deviceTypeID copy] revision:[revision copy]];
 }
 
+- (instancetype)initWithDeviceTypeStruct:(MTRDescriptorClusterDeviceTypeStruct *)deviceTypeStruct
+{
+    return [self initWithDeviceTypeID:deviceTypeStruct.deviceType revision:deviceTypeStruct.revision];
+}
+
 // initInternalWithDeviceTypeID:revision assumes that the device type ID and device
 // revision have already been validated and, if needed, copied from the input.
 - (instancetype)initInternalWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision
 {
-    if (!(self = [super init])) {
-        return nil;
-    }
-
+    self = [super init];
     _deviceTypeID = deviceTypeID;
     _deviceTypeRevision = revision;
     return self;
+}
+
+- (MTRDeviceType *)typeInformation
+{
+    return [MTRDeviceType deviceTypeForID:_deviceTypeID];
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -83,6 +96,13 @@ MTR_DIRECT_MEMBERS
 - (NSUInteger)hash
 {
     return _deviceTypeID.unsignedLongValue ^ _deviceTypeRevision.unsignedShortValue;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@ 0x%" PRIx32 " (%@) rev %d>",
+                     self.class, _deviceTypeID.unsignedIntValue,
+                     self.typeInformation.name ?: @"???", _deviceTypeRevision.unsignedIntValue];
 }
 
 @end

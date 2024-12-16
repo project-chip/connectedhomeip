@@ -62,6 +62,7 @@
 #import <Matter/MTROTAProviderDelegate.h>
 #import <Matter/MTROnboardingPayloadParser.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
+#import <Matter/MTRProductIdentity.h>
 #import <Matter/MTRQRCodeSetupPayloadParser.h>
 #import <Matter/MTRServerAttribute.h>
 #import <Matter/MTRServerCluster.h>
