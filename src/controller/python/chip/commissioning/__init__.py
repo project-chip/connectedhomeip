@@ -82,6 +82,11 @@ class Parameters:
     thread_credentials: bytes
     failsafe_expiry_length_seconds: int = 600
 
+@dataclasses.dataclass
+class TermsAndConditionsParameters:
+    version: int
+    user_response: int
+
 
 class NetworkCommissioningFeatureMap(enum.IntEnum):
     WIFI_NETWORK_FEATURE_MAP = 1
