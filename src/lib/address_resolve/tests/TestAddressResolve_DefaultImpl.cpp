@@ -14,14 +14,13 @@
  *    limitations under the License.
  */
 
-#include "transport/raw/PeerAddress.h"
 #include <pw_unit_test/framework.h>
 
-#include <inet/IPAddress.h>
 #include <lib/address_resolve/AddressResolve_DefaultImpl.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/IPAddressSorter.h>
 #include <lib/support/StringBuilder.h>
+#include <transport/raw/PeerAddress.h>
 
 using namespace chip;
 using namespace chip::AddressResolve;
