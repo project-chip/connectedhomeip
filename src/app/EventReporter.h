@@ -16,14 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- *
- * @brief
- *   Define EventReporter interface. Event reproter is used by EventManagement to notify that events are ready to be reported.
- *   Usually this is implemented by the Reporting Engine to find the proper ReadHandlers and deliver the events.
- *
- */
 #pragma once
 
 #include <app/ConcreteEventPath.h>
@@ -32,13 +24,17 @@
 namespace chip {
 namespace app {
 
+/**
+ *   Define EventReporter interface. Event reporter is used by EventManagement to notify that events are ready to be reported.
+ *   Usually this is implemented by the Reporting Engine to find the proper ReadHandlers and deliver the events.
+ *
+ */
 class EventReporter
 {
 public:
     virtual ~EventReporter() = default;
 
     /**
-     * @brief
      *  Notify of a new event generated.
      *
      * @param[in] aPath          The path to the event.
