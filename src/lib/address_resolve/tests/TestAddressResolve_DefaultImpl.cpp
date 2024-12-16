@@ -95,6 +95,43 @@ Transport::PeerAddress GetAddressWithHighScore(uint16_t port = CHIP_PORT, Inet::
     return Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
 }
 
+TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicatesWhenFull) {
+    Impl::NodeLookupResults results;
+    ASSERT_EQ(results.count, 0);
+
+    for (auto i = 0; i < kNumberOfAvailableSlots; i++)
+    {
+        ResolveResult result;
+        result.address = GetAddressWithLowScore(i + 10);
+        ASSERT_TRUE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kUniqueLocal));
+    }
+    ASSERT_EQ(results.count, kNumberOfAvailableSlots);
+
+    // Adding another one should fail as there is no more room
+    ResolveResult result;
+    result.address = GetAddressWithLowScore(5);
+    ASSERT_FALSE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kUniqueLocal));
+    ASSERT_EQ(results.count, kNumberOfAvailableSlots);
+
+    // however one with higher priority should work
+    result.address = GetAddressWithHighScore();
+    ASSERT_TRUE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast));
+    ASSERT_EQ(results.count, kNumberOfAvailableSlots);
+
+    // however not duplicate
+    ASSERT_FALSE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast));
+    ASSERT_EQ(results.count, kNumberOfAvailableSlots);
+
+    // another higher priority one
+    result.address = GetAddressWithMediumScore();
+    ASSERT_TRUE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kLinkLocal));
+    ASSERT_EQ(results.count, kNumberOfAvailableSlots);
+
+    // however not duplicate
+    ASSERT_FALSE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kLinkLocal));
+    ASSERT_EQ(results.count, kNumberOfAvailableSlots);
+}
+
 TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicates)
 {
     static_assert(Impl::kNodeLookupResultsLen >= 3, "Test uses 3 address slots");

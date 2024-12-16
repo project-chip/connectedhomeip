@@ -157,8 +157,9 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
         return false;
     }
 
-    // we can insert IF AND ONLY IF we are not duplicating an existing entry
-    // TODO: implement
+    // we are guaranteed no duplicates here:
+    // - insertAtIndex MUST be with some score that is `< newScore`, so all
+    //   addresses with a `newScore` were duplicate-checked
 
     // Move the following valid entries one level down.
     for (auto i = count; i > insertAtIndex; i--)
