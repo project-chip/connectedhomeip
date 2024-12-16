@@ -79,7 +79,7 @@ def get_outdated_clusters(data: object, xml_clusters: dict, args) -> list[Cluste
             if args.cluster_id is not None and cluster['code'] != args.cluster_id:
                 continue
             for attribute in cluster.get("attributes", []):
-                if attribute.get("name") != "ClusterRevision" or attribute.get("storageOption") != "RAM":
+                if attribute.get("name") != "ClusterRevision" or attribute.get("storageOption") == "External":
                     continue
                 try:
                     cluster_revision = int(attribute.get("defaultValue"))
