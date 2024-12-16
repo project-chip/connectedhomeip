@@ -29,7 +29,7 @@ using namespace chip::AddressResolve;
 namespace pw {
 
 template <>
-StatusWithSize ToString<Transport::PeerAddress>(const Transport::PeerAddress& addr, pw::span<char> buffer)
+StatusWithSize ToString<Transport::PeerAddress>(const Transport::PeerAddress & addr, pw::span<char> buffer)
 {
     char buff[Transport::PeerAddress::kMaxToStringSize];
     addr.ToString(buff);
@@ -95,7 +95,8 @@ Transport::PeerAddress GetAddressWithHighScore(uint16_t port = CHIP_PORT, Inet::
     return Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
 }
 
-TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicatesWhenFull) {
+TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicatesWhenFull)
+{
     Impl::NodeLookupResults results;
     ASSERT_EQ(results.count, 0);
 
