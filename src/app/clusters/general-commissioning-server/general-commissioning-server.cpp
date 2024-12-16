@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,20 +21,29 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include "general-commissioning-server.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/reporting/reporting.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
-#include <lib/support/Span.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
 #include <tracing/macros.h>
+#include <transport/SecureSession.h>
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#include <app/server/TermsAndConditionsManager.h>  //nogncheck
+#include <app/server/TermsAndConditionsProvider.h> //nogncheck
+#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -42,6 +51,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralCommissioning;
 using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 using namespace chip::DeviceLayer;
+using chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum;
 using Transport::SecureSession;
 using Transport::Session;
 
@@ -95,6 +105,58 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     case SupportsConcurrentConnection::Id: {
         return ReadSupportsConcurrentConnection(aEncoder);
     }
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    case TCAcceptedVersion::Id: {
+        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+        Optional<TermsAndConditions> outTermsAndConditions;
+
+        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(tcProvider->GetAcceptance(outTermsAndConditions));
+
+        return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
+    }
+    case TCMinRequiredVersion::Id: {
+        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+        Optional<TermsAndConditions> outTermsAndConditions;
+
+        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(tcProvider->GetRequirements(outTermsAndConditions));
+
+        return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
+    }
+    case TCAcknowledgements::Id: {
+        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+        Optional<TermsAndConditions> outTermsAndConditions;
+
+        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(tcProvider->GetAcceptance(outTermsAndConditions));
+
+        return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetValue());
+    }
+    case TCAcknowledgementsRequired::Id: {
+        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+        bool acknowledgementsRequired;
+
+        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(tcProvider->GetAcknowledgementsRequired(acknowledgementsRequired));
+
+        return aEncoder.Encode(acknowledgementsRequired);
+    }
+    case TCUpdateDeadline::Id: {
+        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+        Optional<uint32_t> outUpdateAcceptanceDeadline;
+
+        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        ReturnErrorOnFailure(tcProvider->GetUpdateAcceptanceDeadline(outUpdateAcceptanceDeadline));
+
+        if (!outUpdateAcceptanceDeadline.HasValue())
+        {
+            return aEncoder.EncodeNull();
+        }
+
+        return aEncoder.Encode(outUpdateAcceptanceDeadline.Value());
+    }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     default: {
         break;
     }
@@ -143,6 +205,73 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(Attr
 
     return aEncoder.Encode(supportsConcurrentConnection);
 }
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+typedef struct sTermsAndConditionsState
+{
+    Optional<TermsAndConditions> acceptance;
+    bool acknowledgementsRequired;
+    Optional<TermsAndConditions> requirements;
+    Optional<uint32_t> updateAcceptanceDeadline;
+} TermsAndConditionsState;
+
+CHIP_ERROR GetTermsAndConditionsAttributeState(TermsAndConditionsProvider * tcProvider,
+                                               TermsAndConditionsState & outTermsAndConditionsState)
+{
+    TermsAndConditionsState termsAndConditionsState;
+
+    ReturnErrorOnFailure(tcProvider->GetAcceptance(termsAndConditionsState.acceptance));
+    ReturnErrorOnFailure(tcProvider->GetAcknowledgementsRequired(termsAndConditionsState.acknowledgementsRequired));
+    ReturnErrorOnFailure(tcProvider->GetRequirements(termsAndConditionsState.requirements));
+    ReturnErrorOnFailure(tcProvider->GetUpdateAcceptanceDeadline(termsAndConditionsState.updateAcceptanceDeadline));
+
+    outTermsAndConditionsState = termsAndConditionsState;
+    return CHIP_NO_ERROR;
+}
+
+void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsState & initialState,
+                                                       const TermsAndConditionsState & updatedState)
+{
+    // Notify on TCAcknowledgementsRequired change
+    if (initialState.acknowledgementsRequired != updatedState.acknowledgementsRequired)
+    {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcknowledgementsRequired::Id);
+    }
+
+    // Notify on TCAcceptedVersion change
+    if ((initialState.acceptance.HasValue() != updatedState.acceptance.HasValue()) ||
+        (initialState.acceptance.HasValue() &&
+         (initialState.acceptance.Value().GetVersion() != updatedState.acceptance.Value().GetVersion())))
+    {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcceptedVersion::Id);
+    }
+
+    // Notify on TCAcknowledgements change
+    if ((initialState.acceptance.HasValue() != updatedState.acceptance.HasValue()) ||
+        (initialState.acceptance.HasValue() &&
+         (initialState.acceptance.Value().GetValue() != updatedState.acceptance.Value().GetValue())))
+    {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcknowledgements::Id);
+    }
+
+    // Notify on TCRequirements change
+    if ((initialState.requirements.HasValue() != updatedState.requirements.HasValue()) ||
+        (initialState.requirements.HasValue() &&
+         (initialState.requirements.Value().GetVersion() != updatedState.requirements.Value().GetVersion() ||
+          initialState.requirements.Value().GetValue() != updatedState.requirements.Value().GetValue())))
+    {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCMinRequiredVersion::Id);
+    }
+
+    // Notify on TCUpdateDeadline change
+    if ((initialState.updateAcceptanceDeadline.HasValue() != updatedState.updateAcceptanceDeadline.HasValue()) ||
+        (initialState.updateAcceptanceDeadline.HasValue() &&
+         (initialState.updateAcceptanceDeadline.Value() != updatedState.updateAcceptanceDeadline.Value())))
+    {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCUpdateDeadline::Id);
+    }
+}
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
 } // anonymous namespace
 
@@ -218,60 +347,115 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     auto & failSafe               = Server::GetInstance().GetFailSafeContext();
     auto & fabricTable            = Server::GetInstance().GetFabricTable();
 
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
     Commands::CommissioningCompleteResponse::Type response;
+
+    // Fail-safe must be armed
     if (!failSafe.IsFailSafeArmed())
     {
         response.errorCode = CommissioningErrorEnum::kNoFailSafe;
+        commandObj->AddResponse(commandPath, response);
+        return true;
     }
-    else
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+
+    // Ensure required terms and conditions have been accepted, then attempt to commit
+    if (nullptr != tcProvider)
     {
-        SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
-        // If not a CASE session, or the fabric does not match the fail-safe,
-        // error out.
-        if (handle->GetSessionType() != Session::SessionType::kSecure ||
-            handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE ||
-            !failSafe.MatchesFabricIndex(commandObj->GetAccessingFabricIndex()))
+        Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
+        Optional<TermsAndConditions> acceptedTermsAndConditionsMaybe;
+
+        CheckSuccess(tcProvider->GetRequirements(requiredTermsAndConditionsMaybe), Failure);
+        CheckSuccess(tcProvider->GetAcceptance(acceptedTermsAndConditionsMaybe), Failure);
+
+        if (requiredTermsAndConditionsMaybe.HasValue() && !acceptedTermsAndConditionsMaybe.HasValue())
         {
-            response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
-            ChipLogError(FailSafe, "GeneralCommissioning: Got commissioning complete in invalid security context");
+            response.errorCode = CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
+            commandObj->AddResponse(commandPath, response);
+            return true;
+        }
+
+        if (requiredTermsAndConditionsMaybe.HasValue() && acceptedTermsAndConditionsMaybe.HasValue())
+        {
+            TermsAndConditions requiredTermsAndConditions = requiredTermsAndConditionsMaybe.Value();
+            TermsAndConditions acceptedTermsAndConditions = acceptedTermsAndConditionsMaybe.Value();
+
+            if (!requiredTermsAndConditions.ValidateVersion(acceptedTermsAndConditions))
+            {
+                response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
+                commandObj->AddResponse(commandPath, response);
+                return true;
+            }
+
+            if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
+            {
+                response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
+                commandObj->AddResponse(commandPath, response);
+                return true;
+            }
+        }
+
+        if (failSafe.UpdateTermsAndConditionsHasBeenInvoked())
+        {
+            // Commit terms and conditions acceptance on commissioning complete
+            err = tcProvider->CommitAcceptance();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit terms and conditions: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+            else
+            {
+                ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully committed terms and conditions");
+            }
+            CheckSuccess(err, Failure);
+        }
+    }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+
+    SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
+
+    // Ensure it's a valid CASE session
+    if ((handle->GetSessionType() != Session::SessionType::kSecure) ||
+        (handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE) ||
+        (!failSafe.MatchesFabricIndex(commandObj->GetAccessingFabricIndex())))
+    {
+        response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
+        ChipLogError(FailSafe, "GeneralCommissioning: Got commissioning complete in invalid security context");
+        commandObj->AddResponse(commandPath, response);
+        return true;
+    }
+
+    // Handle NOC commands
+    if (failSafe.NocCommandHasBeenInvoked())
+    {
+        err = fabricTable.CommitPendingFabricData();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT, err.Format());
+            // CommitPendingFabricData reverts on error, no need to revert explicitly
         }
         else
         {
-            if (failSafe.NocCommandHasBeenInvoked())
-            {
-                CHIP_ERROR err = fabricTable.CommitPendingFabricData();
-                if (err != CHIP_NO_ERROR)
-                {
-                    // No need to revert on error: CommitPendingFabricData always reverts if not fully successful.
-                    ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT,
-                                 err.Format());
-                }
-                else
-                {
-                    ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully commited pending fabric data");
-                }
-                CheckSuccess(err, Failure);
-            }
-
-            /*
-             * Pass fabric of commissioner to DeviceControlSvr.
-             * This allows device to send messages back to commissioner.
-             * Once bindings are implemented, this may no longer be needed.
-             */
-            failSafe.DisarmFailSafe();
-            CheckSuccess(
-                devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
-                Failure);
-
-            Breadcrumb::Set(commandPath.mEndpointId, 0);
-            response.errorCode = CommissioningErrorEnum::kOk;
+            ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully committed pending fabric data");
         }
+        CheckSuccess(err, Failure);
     }
 
-    commandObj->AddResponse(commandPath, response);
+    // Disarm the fail-safe and notify the DeviceControlServer
+    failSafe.DisarmFailSafe();
+    err = devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex());
+    CheckSuccess(err, Failure);
 
+    Breadcrumb::Set(commandPath.mEndpointId, 0);
+    response.errorCode = CommissioningErrorEnum::kOk;
+
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
@@ -328,6 +512,77 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     return true;
 }
 
+bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData)
+{
+    MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    auto & failSafeContext                  = Server::GetInstance().GetFailSafeContext();
+    TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+
+    if (nullptr == tcProvider)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
+        return true;
+    }
+
+    Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
+    Optional<TermsAndConditions> previousAcceptedTermsAndConditionsMaybe;
+    CheckSuccess(tcProvider->GetRequirements(requiredTermsAndConditionsMaybe), Failure);
+    CheckSuccess(tcProvider->GetAcceptance(previousAcceptedTermsAndConditionsMaybe), Failure);
+    TermsAndConditions acceptedTermsAndConditions = TermsAndConditions(commandData.TCUserResponse, commandData.TCVersion);
+    Optional<TermsAndConditions> acceptedTermsAndConditionsPresent = Optional<TermsAndConditions>(acceptedTermsAndConditions);
+
+    Commands::SetTCAcknowledgementsResponse::Type response;
+
+    if (requiredTermsAndConditionsMaybe.HasValue())
+    {
+        TermsAndConditions requiredTermsAndConditions = requiredTermsAndConditionsMaybe.Value();
+
+        if (!requiredTermsAndConditions.ValidateVersion(acceptedTermsAndConditions))
+        {
+            response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
+            commandObj->AddResponse(commandPath, response);
+            return true;
+        }
+
+        if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
+        {
+            response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
+            commandObj->AddResponse(commandPath, response);
+            return true;
+        }
+    }
+
+    if (previousAcceptedTermsAndConditionsMaybe != acceptedTermsAndConditionsPresent)
+    {
+        TermsAndConditionsState initialState, updatedState;
+        CheckSuccess(GetTermsAndConditionsAttributeState(tcProvider, initialState), Failure);
+        CheckSuccess(tcProvider->SetAcceptance(acceptedTermsAndConditionsPresent), Failure);
+        CheckSuccess(GetTermsAndConditionsAttributeState(tcProvider, updatedState), Failure);
+        NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
+
+        // Commit or defer based on fail-safe state
+        if (!failSafeContext.IsFailSafeArmed())
+        {
+            CheckSuccess(tcProvider->CommitAcceptance(), Failure);
+        }
+        else
+        {
+            failSafeContext.SetUpdateTermsAndConditionsHasBeenInvoked();
+        }
+    }
+
+    response.errorCode = CommissioningErrorEnum::kOk;
+    commandObj->AddResponse(commandPath, response);
+    return true;
+
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    return true;
+}
+
 namespace {
 void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -335,16 +590,59 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
     {
         // Spec says to reset Breadcrumb attribute to 0.
         Breadcrumb::Set(0, 0);
+
+        if (event->FailSafeTimerExpired.updateTermsAndConditionsHasBeenInvoked)
+        {
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+            // Clear terms and conditions acceptance on failsafe timer expiration
+            TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+            TermsAndConditionsState initialState, updatedState;
+            VerifyOrReturn(nullptr != tcProvider);
+            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
+            VerifyOrReturn(CHIP_NO_ERROR == tcProvider->RevertAcceptance());
+            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
+            NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        }
     }
 }
 
 } // anonymous namespace
+
+class GeneralCommissioningFabricTableDelegate : public chip::FabricTable::Delegate
+{
+public:
+    // Gets called when a fabric is deleted
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
+        // related data on the node which was created since it was commissioned.
+        if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            ChipLogProgress(Zcl, "general-commissioning-server: Last Fabric index 0x%x was removed",
+                            static_cast<unsigned>(fabricIndex));
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+            TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+            TermsAndConditionsState initialState, updatedState;
+            VerifyOrReturn(nullptr != tcProvider);
+            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
+            VerifyOrReturn(CHIP_NO_ERROR == tcProvider->ResetAcceptance());
+            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
+            NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        }
+    }
+};
 
 void MatterGeneralCommissioningPluginServerInitCallback()
 {
     Breadcrumb::Set(0, 0);
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
+
+    static GeneralCommissioningFabricTableDelegate generalCommissioningFabricTableDelegate;
+    Server::GetInstance().GetFabricTable().AddFabricDelegate(&generalCommissioningFabricTableDelegate);
 }
 
 namespace chip {

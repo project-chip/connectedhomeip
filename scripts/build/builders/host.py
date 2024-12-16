@@ -324,7 +324,8 @@ class HostBuilder(GnBuilder):
                  chip_casting_simplified: Optional[bool] = None,
                  data_model_interface: Optional[str] = None,
                  chip_data_model_check_die_on_failure: Optional[bool] = None,
-                 disable_shell=False
+                 disable_shell=False,
+                 terms_and_conditions_required: Optional[bool] = None,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -455,6 +456,12 @@ class HostBuilder(GnBuilder):
 
         if chip_casting_simplified is not None:
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
+
+        if terms_and_conditions_required is not None:
+            if terms_and_conditions_required:
+                self.extra_gn_options.append('chip_terms_and_conditions_required=true')
+            else:
+                self.extra_gn_options.append('chip_terms_and_conditions_required=false')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
