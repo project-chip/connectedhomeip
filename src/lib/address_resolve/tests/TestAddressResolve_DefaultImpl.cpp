@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+#include "lib/dnssd/IPAddressSorter.h"
 #include <pw_unit_test/framework.h>
 
 #include <lib/address_resolve/AddressResolve_DefaultImpl.h>
@@ -64,6 +65,52 @@ Transport::PeerAddress GetAddressWithHighScore(uint16_t port = CHIP_PORT, Inet::
         ChipLogError(NotSpecified, "!!!!!!!! IP Parse failure");
     }
     return Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
+}
+
+TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicates)
+{
+    static_assert(Impl::kNodeLookupResultsLen >= 3, "Test uses 3 address slots");
+
+    Impl::NodeLookupResults results;
+    ASSERT_EQ(results.count, 0);
+
+    ResolveResult lowResult;
+    lowResult.address = GetAddressWithLowScore();
+
+    ResolveResult mediumResult;
+    mediumResult.address = GetAddressWithMediumScore();
+
+    ResolveResult highResult;
+    highResult.address = GetAddressWithHighScore();
+
+    results.UpdateResults(lowResult, Dnssd::IPAddressSorter::IpScore::kUniqueLocal);
+    ASSERT_EQ(results.count, 1);
+
+    // same address again. we should not actually insert it!
+    results.UpdateResults(lowResult, Dnssd::IPAddressSorter::IpScore::kUniqueLocal);
+    ASSERT_EQ(results.count, 1);
+
+    // we CAN insert a different one
+    results.UpdateResults(mediumResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
+    ASSERT_EQ(results.count, 2);
+
+    // extra insertions of the same address should NOT make a difference
+    results.UpdateResults(lowResult, Dnssd::IPAddressSorter::IpScore::kUniqueLocal);
+    ASSERT_EQ(results.count, 2);
+    results.UpdateResults(mediumResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
+    ASSERT_EQ(results.count, 2);
+
+    // we CAN insert a different one
+    results.UpdateResults(highResult, Dnssd::IPAddressSorter::IpScore::kLinkLocal);
+    ASSERT_EQ(results.count, 3);
+
+    // re-insertin any of these should not make a difference
+    results.UpdateResults(lowResult, Dnssd::IPAddressSorter::IpScore::kUniqueLocal);
+    ASSERT_EQ(results.count, 3);
+    results.UpdateResults(mediumResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
+    ASSERT_EQ(results.count, 3);
+    results.UpdateResults(highResult, Dnssd::IPAddressSorter::IpScore::kLinkLocal);
+    ASSERT_EQ(results.count, 3);
 }
 
 TEST(TestAddressResolveDefaultImpl, TestLookupResult)
