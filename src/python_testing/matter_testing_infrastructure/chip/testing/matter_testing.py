@@ -633,7 +633,7 @@ class PIXITDefinition:
     pixit_type: PIXITType
     description: str
     required: bool = True
-    default: Any = None
+    default: Optional[Any] = None
 
     @staticmethod
     def is_pixit(arg_name: str) -> bool:
