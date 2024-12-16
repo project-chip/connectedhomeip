@@ -51,17 +51,6 @@
 
 namespace {
 
-enum class Sigma1Tags : uint8_t
-{
-    kInitiatorRandom    = 1,
-    kInitiatorSessionId = 2,
-    kDestinationId      = 3,
-    kInitiatorPubKey    = 4,
-    kInitiatorMRPParams = 5,
-    kResumptionID       = 6,
-    kResume1MIC         = 7,
-};
-
 enum class TBEDataTags : uint8_t
 {
     kSenderNOC    = 1,
@@ -78,6 +67,17 @@ enum class TBSDataTags : uint8_t
     kReceiverPubKey = 4,
 };
 
+enum class Sigma1Tags : uint8_t
+{
+    kInitiatorRandom    = 1,
+    kInitiatorSessionId = 2,
+    kDestinationId      = 3,
+    kInitiatorPubKey    = 4,
+    kInitiatorMRPParams = 5,
+    kResumptionID       = 6,
+    kResume1MIC         = 7,
+};
+
 enum class Sigma2Tags : uint8_t
 {
     kResponderRandom    = 1,
@@ -89,7 +89,6 @@ enum class Sigma2Tags : uint8_t
 
 enum class Sigma2ResTags : uint8_t
 {
-
     kResumptionID       = 1,
     kSigma2ResumeMIC    = 2,
     kResponderSessionID = 3,
@@ -790,7 +789,7 @@ CHIP_ERROR CASESession::SendSigma1()
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
 
     // Struct that will be used as input to EncodeSigma1() method
-    EncodeSigma1Inputs encodeSigma1Params;
+    EncodeSigma1Inputs encodeSigma1Inputs;
 
     // Lookup fabric info.
     const auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
@@ -798,17 +797,17 @@ CHIP_ERROR CASESession::SendSigma1()
 
     // Validate that we have a session ID allocated.
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    encodeSigma1Params.initiatorSessionId = GetLocalSessionId().Value();
+    encodeSigma1Inputs.initiatorSessionId = GetLocalSessionId().Value();
 
     // Generate an ephemeral keypair
     mEphemeralKey = mFabricsTable->AllocateEphemeralKeypairForCASE();
     VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_NO_MEMORY);
     ReturnErrorOnFailure(mEphemeralKey->Initialize(ECPKeyTarget::ECDH));
-    encodeSigma1Params.pEphPubKey = &mEphemeralKey->Pubkey();
+    encodeSigma1Inputs.pEphPubKey = &mEphemeralKey->Pubkey();
 
     // Fill in the random value
     ReturnErrorOnFailure(DRBG_get_bytes(mInitiatorRandom, sizeof(mInitiatorRandom)));
-    encodeSigma1Params.initiatorRandom = ByteSpan(mInitiatorRandom);
+    encodeSigma1Inputs.initiatorRandom = ByteSpan(mInitiatorRandom);
 
     // Generate a Destination Identifier based on the node we are attempting to reach
     {
@@ -822,13 +821,13 @@ CHIP_ERROR CASESession::SendSigma1()
         Credentials::P256PublicKeySpan rootPubKeySpan{ rootPubKey.ConstBytes() };
 
         MutableByteSpan destinationIdSpan(destinationIdentifier);
-        ReturnErrorOnFailure(GenerateCaseDestinationId(ByteSpan(mIPK), encodeSigma1Params.initiatorRandom, rootPubKeySpan, fabricId,
+        ReturnErrorOnFailure(GenerateCaseDestinationId(ByteSpan(mIPK), encodeSigma1Inputs.initiatorRandom, rootPubKeySpan, fabricId,
                                                        mPeerNodeId, destinationIdSpan));
-        encodeSigma1Params.destinationId = destinationIdSpan;
+        encodeSigma1Inputs.destinationId = destinationIdSpan;
     }
 
     VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    encodeSigma1Params.initiatorMrpConfig = &mLocalMRPConfig.Value();
+    encodeSigma1Inputs.initiatorMrpConfig = &mLocalMRPConfig.Value();
 
     // Try to find persistent session, and resume it.
     if (mSessionResumptionStorage != nullptr)
@@ -838,18 +837,18 @@ CHIP_ERROR CASESession::SendSigma1()
         if (err == CHIP_NO_ERROR)
         {
             // Found valid resumption state, try to resume the session.
-            encodeSigma1Params.resumptionId = mResumeResumptionId;
-            MutableByteSpan resumeMICSpan(encodeSigma1Params.initiatorResume1MIC);
-            ReturnErrorOnFailure(GenerateSigmaResumeMIC(encodeSigma1Params.initiatorRandom, encodeSigma1Params.resumptionId,
+            encodeSigma1Inputs.resumptionId = mResumeResumptionId;
+            MutableByteSpan resumeMICSpan(encodeSigma1Inputs.initiatorResume1MIC);
+            ReturnErrorOnFailure(GenerateSigmaResumeMIC(encodeSigma1Inputs.initiatorRandom, encodeSigma1Inputs.resumptionId,
                                                         ByteSpan(kKDFS1RKeyInfo), ByteSpan(kResume1MIC_Nonce), resumeMICSpan));
 
-            encodeSigma1Params.initiatorResumeMICSpan     = resumeMICSpan;
-            encodeSigma1Params.sessionResumptionRequested = true;
+            encodeSigma1Inputs.initiatorResumeMICSpan     = resumeMICSpan;
+            encodeSigma1Inputs.sessionResumptionRequested = true;
         }
     }
 
     // Encode Sigma1 in CHIP TLV Format
-    ReturnErrorOnFailure(EncodeSigma1(msg_R1, encodeSigma1Params));
+    ReturnErrorOnFailure(EncodeSigma1(msg_R1, encodeSigma1Inputs));
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg_R1->Start(), msg_R1->DataLength() }));
 
@@ -857,7 +856,7 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(mExchangeCtxt.Value()->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma1, std::move(msg_R1),
                                                             SendFlags(SendMessageFlags::kExpectResponse)));
 
-    if (encodeSigma1Params.sessionResumptionRequested)
+    if (encodeSigma1Inputs.sessionResumptionRequested)
     {
         mState = State::kSentSigma1Resume;
 
