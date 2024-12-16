@@ -210,8 +210,8 @@ rt_executable("all_cluster_app") {
     sources += [ "${common_example_dir}/wifi_connect/source/WifiConnect.cpp" ]
   }
 
-  if(chip_enable_ble){
-    defines += ["APP_BT_DEVICE_NAME=\"NXP-AllClustersApp\""]
+  if (chip_enable_ble) {
+    defines += [ "APP_BT_DEVICE_NAME=\"NXP-AllClustersApp\"" ]
   }
 
   # In case a dedicated assert function needs to be supported the flag sdk_fsl_assert_support should be set to false
