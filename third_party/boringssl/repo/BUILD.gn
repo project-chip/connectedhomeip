@@ -41,12 +41,28 @@ all_sources = crypto_sources
 
 all_headers = crypto_headers
 
+# Core BoringSSL library used by the SDK
 static_library("boringssl") {
   cflags = [ "-O2" ]
 
   public = all_headers
 
   sources = all_sources
+
+  public_configs = [ ":boringssl_config" ]
+
+  # The disable-warnings config should not be a public config, since
+  # that would make it apply to compilations of anything that depends
+  # on boringssl, not just boringssl itself.
+  configs += [ ":boringssl_config_disable_warnings" ]
+}
+
+# Extended version of BoringSSL with additional SSL sources (for optional tools)
+static_library("boringssl_with_ssl_sources") {
+  cflags = [ "-O2" ]
+
+  public = crypto_headers + ssl_headers
+  sources = crypto_sources + ssl_sources
 
   public_configs = [ ":boringssl_config" ]
 
