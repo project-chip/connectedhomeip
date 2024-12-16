@@ -55,6 +55,8 @@ config("openthread_rt1060_config") {
       "OPENTHREAD_CONFIG_MULTICAST_DNS_ENABLE=1",
       "OPENTHREAD_CONFIG_MULTICAST_DNS_PUBLIC_API_ENABLE=1",
       "OT_APP_BR_LWIP_HOOKS_EN=1",
+      "OPENTHREAD_CONFIG_RADIO_LINK_TREL_ENABLE=1",
+      "OPENTHREAD_CONFIG_DNS_UPSTREAM_QUERY_ENABLE=1",
     ]
 
     if (nxp_enable_matter_cli) {
@@ -101,6 +103,8 @@ source_set("libopenthread-rt1060") {
       "${openthread_nxp_root}/src/common/br/mdns_socket.c",
       "${openthread_nxp_root}/src/common/br/udp_plat.c",
       "${openthread_nxp_root}/src/common/br/utils.c",
+      "${openthread_nxp_root}/src/common/br/trel_plat.c",
+      "${openthread_nxp_root}/src/common/br/dns_upstream_resolver.c",
     ]
 
     if (nxp_enable_matter_cli) {
