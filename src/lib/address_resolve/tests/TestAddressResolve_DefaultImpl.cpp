@@ -49,7 +49,7 @@ constexpr uint8_t kNumberOfAvailableSlots = CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESU
 /// Since for various tests we check filling the cache with values, we allow
 /// unique address generation by varying the `idx` parameter
 ///
-/// @param idx - a value to generate a unique IP address (in case we do not wand dedups)
+/// @param idx - a value to generate a unique IP address (in case we do not want dedups to happen)
 /// @param port - port in case some tests would like to vary it. Required for PeerAddress
 /// @param interfaceId - interface required for PeerAddress
 Transport::PeerAddress GetAddressWithLowScore(uint16_t idx = 4, uint16_t port = CHIP_PORT,
