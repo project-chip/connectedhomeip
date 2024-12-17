@@ -105,13 +105,11 @@ config NET_PKT_TX_COUNT
     default 8
 
 config NET_BUF_RX_COUNT
-    default 4 if PM
-    default 16 if SOC_RISCV_TELINK_TL321X
+    default 12 if PM || SOC_RISCV_TELINK_TL321X
     default 32
 
 config NET_BUF_TX_COUNT
-    default 4 if PM
-    default 16 if SOC_RISCV_TELINK_TL321X
+    default 12 if PM || SOC_RISCV_TELINK_TL321X
     default 32
 
 config GPIO
@@ -407,9 +405,11 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  within range [-JITTER; +JITTER].
 
 config NET_MGMT_EVENT_STACK_SIZE
+    int
 	default 1250
 
 config IPC_SERVICE_BACKEND_ICMSG_WQ_STACK_SIZE
+    int
 	default 2304 if TELINK_W91_IPC_DISPATCHER
 
 endif # CHIP_WIFI
