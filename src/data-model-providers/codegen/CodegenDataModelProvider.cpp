@@ -438,7 +438,7 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
         }
     }
 
-    InitDataModel();
+    InitDataModelForTesting();
 
     return CHIP_NO_ERROR;
 }
@@ -882,7 +882,7 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, commandId);
 }
 
-void CodegenDataModelProvider::InitDataModel()
+void CodegenDataModelProvider::InitDataModelForTesting()
 {
     // Call the Ember-specific InitDataModelHandler
     InitDataModelHandler();

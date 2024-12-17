@@ -148,9 +148,9 @@ public:
     }
 
 protected:
-    // Since the current unit tests do not involve any cluster implementations, we override InitDataModel
+    // Since the current unit tests do not involve any cluster implementations, we override InitDataModelForTesting
     // to do nothing, thereby preventing calls to the Ember-specific InitDataModelHandler.
-    void InitDataModel() override {}
+    void InitDataModelForTesting() override {}
 };
 
 class TestServerCommandDispatch : public chip::Test::AppContext
