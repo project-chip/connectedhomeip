@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 
-#include "transport/raw/PeerAddress.h"
 #include <lib/address_resolve/AddressResolve_DefaultImpl.h>
 
 #include <lib/address_resolve/TracingStructs.h>
 #include <tracing/macros.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace AddressResolve {
