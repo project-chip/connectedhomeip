@@ -37,6 +37,8 @@
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 #include "esp_heap_caps.h"
+#include <lib/support/CHIPMemString.h>
+#include <string.h>
 #include <system/SystemTimer.h>
 #include <tracing/macros.h>
 #include <tracing/metric_event.h>
@@ -53,6 +55,9 @@ constexpr MetricKey kMetricHeapInternalLargestBlock = "internal_largest_free";
 constexpr MetricKey kMetricHeapExternalFree = "external_free";
 constexpr MetricKey kMetricHeapExternalMinFree = "external_min_free";
 constexpr MetricKey kMetricHeapExternalLargestBlock = "external_largest_block";
+
+// Task runtime
+constexpr MetricKey kMetricTaskName = "runtime";
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 using namespace ::chip::DeviceLayer::Internal;
@@ -489,11 +494,62 @@ void ESP32Utils::LogHeapInfo()
     {
         ESP_LOGE(TAG, "Failed to register callback. Error: 0x%08x", err);
     }
-    // Log immediately
     LogHeapDataCallback(&SystemLayer(), nullptr);
 
     // Start the periodic logging using SystemLayer
     SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL), LogHeapDataCallback, nullptr);
+}
+
+
+const char * StateToString(eTaskState state)
+{
+    switch (state)
+    {
+    case eRunning:
+        return "Running";
+    case eReady:
+        return "Ready";
+    case eBlocked:
+        return "Blocked";
+    case eSuspended:
+        return "Suspended";
+    case eDeleted:
+        return "Deleted";
+    default:
+        return "Unknown";
+    }
+}
+
+CHIP_ERROR ESP32Utils::LogTaskSnapshotInfo()
+{
+#ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
+    uint32_t arraySize = uxTaskGetNumberOfTasks();
+
+    chip::Platform::ScopedMemoryBuffer<TaskStatus_t> taskStatusArray;
+    VerifyOrReturnError(taskStatusArray.Calloc(arraySize), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t dummyRunTimeCounter;
+    arraySize = uxTaskGetSystemState(taskStatusArray.Get(), arraySize, &dummyRunTimeCounter);
+
+    auto GenerateMetricName = [&](const char * task_name, const char * suffix) {
+        std::string metricName = task_name;
+        metricName += "_";
+        metricName += suffix;
+        return metricName;
+    };
+
+    for (int i = 0; i < arraySize; i++)
+    {
+        TaskStatus_t task = taskStatusArray[i];
+        MATTER_TRACE_INSTANT(GenerateMetricName(task.pcTaskName, "state").c_str(), StateToString(task.eCurrentState));
+        MATTER_TRACE_INSTANT(GenerateMetricName(task.pcTaskName, "stack_start_address").c_str(),
+                             std::to_string(reinterpret_cast<uintptr_t>(task.pxStackBase)).c_str());
+#ifdef CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
+        MATTER_LOG_METRIC(kMetricTaskName, static_cast<uint32_t>(task.ulRunTimeCounter));
+#endif // CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
+    }
+#endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
+    return CHIP_NO_ERROR;
 }
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 

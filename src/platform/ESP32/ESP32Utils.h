@@ -51,6 +51,7 @@ public:
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     static void LogHeapInfo();
+    static CHIP_ERROR LogTaskSnapshotInfo();
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
     static CHIP_ERROR MapError(esp_err_t error);
