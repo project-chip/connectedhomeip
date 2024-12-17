@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/Iterators.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -279,23 +280,6 @@ DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath
     return entry;
 }
 
-// TODO: DeviceTypeEntry content is IDENTICAL to EmberAfDeviceType, so centralizing
-//       to a common type is probably better. Need to figure out dependencies since
-//       this would make ember return datamodel-provider types.
-//       See: https://github.com/project-chip/connectedhomeip/issues/35889
-std::optional<DataModel::DeviceTypeEntry> DeviceTypeEntryFromEmber(const EmberAfDeviceType * other)
-{
-    if (other == nullptr)
-    {
-        return std::nullopt;
-    }
-
-    return DataModel::DeviceTypeEntry{
-        .deviceTypeId       = other->deviceId,
-        .deviceTypeRevision = other->deviceVersion,
-    };
-}
-
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
 std::optional<DataModel::EndpointInfo> GetEndpointInfoAtIndex(uint16_t endpointIndex)
@@ -387,6 +371,30 @@ std::optional<unsigned> FindNextSemanticTagIndex(EndpointId endpoint, const Data
     }
     return std::nullopt;
 }
+
+class DeviceTypeEntryIterator : public DataModel::ElementIterator<DataModel::DeviceTypeEntry>
+{
+public:
+    DeviceTypeEntryIterator(Span<const EmberAfDeviceType> values) : mDeviceTypes(values) {}
+
+    std::optional<DataModel::DeviceTypeEntry> Next() override
+    {
+        if (mDeviceTypes.empty())
+        {
+            return std::nullopt;
+        }
+
+        auto result = DataModel::DeviceTypeEntry{
+            .deviceTypeId       = mDeviceTypes.front().deviceId,
+            .deviceTypeRevision = mDeviceTypes.front().deviceVersion,
+        };
+        mDeviceTypes = mDeviceTypes.SubSpan(1);
+        return result;
+    }
+
+private:
+    Span<const EmberAfDeviceType> mDeviceTypes;
+};
 
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
@@ -868,43 +876,54 @@ void CodegenDataModelProvider::InitDataModelForTesting()
     InitDataModelHandler();
 }
 
-std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
+std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>>
+CodegenDataModelProvider::GetDeviceTypes(EndpointId endpointId)
 {
     // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
     // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
     // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
     //
     // Not actually needed for `First`, however this makes First and Next consistent.
-    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
+    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpointId);
     if (!endpoint_index.has_value())
+    {
+        return nullptr;
+    }
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    return std::make_unique<DeviceTypeEntryIterator>(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
+}
+
+std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
+{
+    std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>> it = GetDeviceTypes(endpoint);
+    if (it.get() == nullptr)
     {
         return std::nullopt;
     }
 
-    CHIP_ERROR err                            = CHIP_NO_ERROR;
-    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
-    SpanSearchValue<chip::Span<const EmberAfDeviceType>> searchable(&deviceTypes);
-
-    return DeviceTypeEntryFromEmber(searchable.First<ByDeviceType>(mDeviceTypeIterationHint).Value());
+    return it->Next();
 }
 
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
                                                                                    const DataModel::DeviceTypeEntry & previous)
 {
-    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
-    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
-    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
-    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
-    if (!endpoint_index.has_value())
+    /// TEMPORARY SLOW usage...
+    std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>> it = GetDeviceTypes(endpoint);
+    if (it.get() == nullptr)
     {
         return std::nullopt;
     }
 
-    CHIP_ERROR err                                  = CHIP_NO_ERROR;
-    chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
-    SpanSearchValue<chip::Span<const EmberAfDeviceType>> searchable(&deviceTypes);
+    for (auto entry = it->Next(); entry.has_value(); entry = it->Next())
+    {
+        if (*entry == previous)
+        {
+            break;
+        }
+    }
 
-    return DeviceTypeEntryFromEmber(searchable.Next<ByDeviceType>(previous, mDeviceTypeIterationHint).Value());
+    return it->Next();
 }
 
 std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetFirstSemanticTag(EndpointId endpoint)

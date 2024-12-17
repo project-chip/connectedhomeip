@@ -155,6 +155,9 @@ public:
                                                         CommandHandler * handler) override;
 
     /// attribute tree iteration
+    std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) override;
+    
+    
     DataModel::EndpointEntry FirstEndpoint() override;
     DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
     std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
