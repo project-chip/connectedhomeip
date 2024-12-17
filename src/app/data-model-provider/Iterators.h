@@ -48,7 +48,7 @@ public:
     ///
     /// Returns true if the seek was successful and the element is found.
     /// Returns false otherwise and the iterator will be invalidated (next will return std::nullopt)
-    virtual bool Seek(const T& value) = 0;
+    virtual bool SeekTo(const T& value) = 0;
 
 };
 

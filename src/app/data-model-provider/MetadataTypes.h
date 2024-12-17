@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "app/data-model-provider/Iterators.h"
 #include <cstdint>
 #include <optional>
 
@@ -178,7 +179,23 @@ struct DeviceTypeEntry
 class ProviderMetadataTree
 {
 public:
+    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+
     virtual ~ProviderMetadataTree() = default;
+
+    /////////////////////// Iterators implementation ////////////////////////
+    virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints() = 0;
+    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) = 0;
+    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId) = 0;
+
+    virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId) = 0;
+    virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId) = 0;
+
+    virtual std::unique_ptr<MetaDataIterator<AttributeId, AttributeInfo>> GetAttributes(ConcreteClusterPath clusterPath) = 0;
+    virtual std::unique_ptr<MetaDataIterator<CommandId, CommandInfo>> GetAcceptedCommands(ConcreteClusterPath clusterPath) = 0;
+    virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath) = 0;
+
+
 
     // This iteration will list all the endpoints in the data model
     virtual EndpointEntry FirstEndpoint()                              = 0;
@@ -191,7 +208,6 @@ public:
     virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
 
     // This iteration describes semantic tags registered on an endpoint
-    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
     virtual std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint)                              = 0;
     virtual std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) = 0;
 
