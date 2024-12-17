@@ -9524,7 +9524,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _name = @"";
 
-        _presets = [MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct new];
+        _settings = [MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct new];
     }
     return self;
 }
@@ -9535,14 +9535,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.presetID = self.presetID;
     other.name = self.name;
-    other.presets = self.presets;
+    other.settings = self.settings;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetID:%@; name:%@; presets:%@; >", NSStringFromClass([self class]), _presetID, _name, _presets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetID:%@; name:%@; settings:%@; >", NSStringFromClass([self class]), _presetID, _name, _settings];
     return descriptionString;
 }
 

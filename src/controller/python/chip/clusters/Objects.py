@@ -46302,12 +46302,12 @@ class CameraAvSettingsUserLevelManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="presetID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
-                        ClusterObjectFieldDescriptor(Label="presets", Tag=2, Type=CameraAvSettingsUserLevelManagement.Structs.MPTZStruct),
+                        ClusterObjectFieldDescriptor(Label="settings", Tag=2, Type=CameraAvSettingsUserLevelManagement.Structs.MPTZStruct),
                     ])
 
             presetID: 'uint' = 0
             name: 'str' = ""
-            presets: 'CameraAvSettingsUserLevelManagement.Structs.MPTZStruct' = field(default_factory=lambda: CameraAvSettingsUserLevelManagement.Structs.MPTZStruct())
+            settings: 'CameraAvSettingsUserLevelManagement.Structs.MPTZStruct' = field(default_factory=lambda: CameraAvSettingsUserLevelManagement.Structs.MPTZStruct())
 
         @dataclass
         class ViewportStruct(ClusterObject):

@@ -9859,7 +9859,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   struct MPTZPresetStruct {
     int8u presetID = 0;
     char_string<32> name = 1;
-    MPTZStruct presets = 2;
+    MPTZStruct settings = 2;
   }
 
   struct ViewportStruct {

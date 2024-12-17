@@ -17703,21 +17703,21 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
                     *aError = err;
                     return nil;
                 }
-                newElement_0.presets = [MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct new];
-                if (entry_0.presets.pan.HasValue()) {
-                    newElement_0.presets.pan = [NSNumber numberWithShort:entry_0.presets.pan.Value()];
+                newElement_0.settings = [MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct new];
+                if (entry_0.settings.pan.HasValue()) {
+                    newElement_0.settings.pan = [NSNumber numberWithShort:entry_0.settings.pan.Value()];
                 } else {
-                    newElement_0.presets.pan = nil;
+                    newElement_0.settings.pan = nil;
                 }
-                if (entry_0.presets.tilt.HasValue()) {
-                    newElement_0.presets.tilt = [NSNumber numberWithShort:entry_0.presets.tilt.Value()];
+                if (entry_0.settings.tilt.HasValue()) {
+                    newElement_0.settings.tilt = [NSNumber numberWithShort:entry_0.settings.tilt.Value()];
                 } else {
-                    newElement_0.presets.tilt = nil;
+                    newElement_0.settings.tilt = nil;
                 }
-                if (entry_0.presets.zoom.HasValue()) {
-                    newElement_0.presets.zoom = [NSNumber numberWithUnsignedChar:entry_0.presets.zoom.Value()];
+                if (entry_0.settings.zoom.HasValue()) {
+                    newElement_0.settings.zoom = [NSNumber numberWithUnsignedChar:entry_0.settings.zoom.Value()];
                 } else {
-                    newElement_0.presets.zoom = nil;
+                    newElement_0.settings.zoom = nil;
                 }
                 [array_0 addObject:newElement_0];
             }

@@ -26,7 +26,7 @@ Git: 1.4-267-gc3d95b5c9
     <cluster code="0x0552"/>
     <item fieldId="0" name="PresetID" type="int8u"/>
     <item fieldId="1" name="Name" type="char_string" length="32"/>
-    <item fieldId="2" name="Presets" type="MPTZStruct"/>
+    <item fieldId="2" name="Settings" type="MPTZStruct"/>
   </struct>
 
   <struct name="MPTZStruct" apiMaturity="provisional">

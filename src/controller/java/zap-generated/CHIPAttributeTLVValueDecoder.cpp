@@ -41709,60 +41709,60 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_presetID, newElement_0_presetID);
                 jobject newElement_0_name;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name, newElement_0_name));
-                jobject newElement_0_presets;
-                jobject newElement_0_presets_pan;
-                if (!entry_0.presets.pan.HasValue())
+                jobject newElement_0_settings;
+                jobject newElement_0_settings_pan;
+                if (!entry_0.settings.pan.HasValue())
                 {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_presets_pan);
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_settings_pan);
                 }
                 else
                 {
-                    jobject newElement_0_presets_panInsideOptional;
-                    std::string newElement_0_presets_panInsideOptionalClassName     = "java/lang/Integer";
-                    std::string newElement_0_presets_panInsideOptionalCtorSignature = "(I)V";
-                    jint jninewElement_0_presets_panInsideOptional = static_cast<jint>(entry_0.presets.pan.Value());
+                    jobject newElement_0_settings_panInsideOptional;
+                    std::string newElement_0_settings_panInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_0_settings_panInsideOptionalCtorSignature = "(I)V";
+                    jint jninewElement_0_settings_panInsideOptional = static_cast<jint>(entry_0.settings.pan.Value());
                     chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_0_presets_panInsideOptionalClassName.c_str(),
-                        newElement_0_presets_panInsideOptionalCtorSignature.c_str(), jninewElement_0_presets_panInsideOptional,
-                        newElement_0_presets_panInsideOptional);
-                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_presets_panInsideOptional,
-                                                                      newElement_0_presets_pan);
+                        newElement_0_settings_panInsideOptionalClassName.c_str(),
+                        newElement_0_settings_panInsideOptionalCtorSignature.c_str(), jninewElement_0_settings_panInsideOptional,
+                        newElement_0_settings_panInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_settings_panInsideOptional,
+                                                                      newElement_0_settings_pan);
                 }
-                jobject newElement_0_presets_tilt;
-                if (!entry_0.presets.tilt.HasValue())
+                jobject newElement_0_settings_tilt;
+                if (!entry_0.settings.tilt.HasValue())
                 {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_presets_tilt);
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_settings_tilt);
                 }
                 else
                 {
-                    jobject newElement_0_presets_tiltInsideOptional;
-                    std::string newElement_0_presets_tiltInsideOptionalClassName     = "java/lang/Integer";
-                    std::string newElement_0_presets_tiltInsideOptionalCtorSignature = "(I)V";
-                    jint jninewElement_0_presets_tiltInsideOptional = static_cast<jint>(entry_0.presets.tilt.Value());
+                    jobject newElement_0_settings_tiltInsideOptional;
+                    std::string newElement_0_settings_tiltInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_0_settings_tiltInsideOptionalCtorSignature = "(I)V";
+                    jint jninewElement_0_settings_tiltInsideOptional = static_cast<jint>(entry_0.settings.tilt.Value());
                     chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_0_presets_tiltInsideOptionalClassName.c_str(),
-                        newElement_0_presets_tiltInsideOptionalCtorSignature.c_str(), jninewElement_0_presets_tiltInsideOptional,
-                        newElement_0_presets_tiltInsideOptional);
-                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_presets_tiltInsideOptional,
-                                                                      newElement_0_presets_tilt);
+                        newElement_0_settings_tiltInsideOptionalClassName.c_str(),
+                        newElement_0_settings_tiltInsideOptionalCtorSignature.c_str(), jninewElement_0_settings_tiltInsideOptional,
+                        newElement_0_settings_tiltInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_settings_tiltInsideOptional,
+                                                                      newElement_0_settings_tilt);
                 }
-                jobject newElement_0_presets_zoom;
-                if (!entry_0.presets.zoom.HasValue())
+                jobject newElement_0_settings_zoom;
+                if (!entry_0.settings.zoom.HasValue())
                 {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_presets_zoom);
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_settings_zoom);
                 }
                 else
                 {
-                    jobject newElement_0_presets_zoomInsideOptional;
-                    std::string newElement_0_presets_zoomInsideOptionalClassName     = "java/lang/Integer";
-                    std::string newElement_0_presets_zoomInsideOptionalCtorSignature = "(I)V";
-                    jint jninewElement_0_presets_zoomInsideOptional = static_cast<jint>(entry_0.presets.zoom.Value());
+                    jobject newElement_0_settings_zoomInsideOptional;
+                    std::string newElement_0_settings_zoomInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_0_settings_zoomInsideOptionalCtorSignature = "(I)V";
+                    jint jninewElement_0_settings_zoomInsideOptional = static_cast<jint>(entry_0.settings.zoom.Value());
                     chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_0_presets_zoomInsideOptionalClassName.c_str(),
-                        newElement_0_presets_zoomInsideOptionalCtorSignature.c_str(), jninewElement_0_presets_zoomInsideOptional,
-                        newElement_0_presets_zoomInsideOptional);
-                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_presets_zoomInsideOptional,
-                                                                      newElement_0_presets_zoom);
+                        newElement_0_settings_zoomInsideOptionalClassName.c_str(),
+                        newElement_0_settings_zoomInsideOptionalCtorSignature.c_str(), jninewElement_0_settings_zoomInsideOptional,
+                        newElement_0_settings_zoomInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_settings_zoomInsideOptional,
+                                                                      newElement_0_settings_zoom);
                 }
 
                 {
@@ -41787,8 +41787,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0_presets = env->NewObject(MPTZStructStructClass_2, MPTZStructStructCtor_2, newElement_0_presets_pan,
-                                                          newElement_0_presets_tilt, newElement_0_presets_zoom);
+                    newElement_0_settings =
+                        env->NewObject(MPTZStructStructClass_2, MPTZStructStructCtor_2, newElement_0_settings_pan,
+                                       newElement_0_settings_tilt, newElement_0_settings_zoom);
                 }
 
                 {
@@ -41818,7 +41819,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_0 = env->NewObject(MPTZPresetStructStructClass_1, MPTZPresetStructStructCtor_1,
-                                                  newElement_0_presetID, newElement_0_name, newElement_0_presets);
+                                                  newElement_0_presetID, newElement_0_name, newElement_0_settings);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

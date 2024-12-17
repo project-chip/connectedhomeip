@@ -25,13 +25,13 @@ import matter.tlv.TlvWriter
 class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
   val presetID: UByte,
   val name: String,
-  val presets: CameraAvSettingsUserLevelManagementClusterMPTZStruct,
+  val settings: CameraAvSettingsUserLevelManagementClusterMPTZStruct,
 ) {
   override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {\n")
     append("\tpresetID : $presetID\n")
     append("\tname : $name\n")
-    append("\tpresets : $presets\n")
+    append("\tsettings : $settings\n")
     append("}\n")
   }
 
@@ -40,7 +40,7 @@ class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PRESET_ID), presetID)
       put(ContextSpecificTag(TAG_NAME), name)
-      presets.toTlv(ContextSpecificTag(TAG_PRESETS), this)
+      settings.toTlv(ContextSpecificTag(TAG_SETTINGS), this)
       endStructure()
     }
   }
@@ -48,7 +48,7 @@ class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
   companion object {
     private const val TAG_PRESET_ID = 0
     private const val TAG_NAME = 1
-    private const val TAG_PRESETS = 2
+    private const val TAG_SETTINGS = 2
 
     fun fromTlv(
       tlvTag: Tag,
@@ -57,15 +57,15 @@ class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
       tlvReader.enterStructure(tlvTag)
       val presetID = tlvReader.getUByte(ContextSpecificTag(TAG_PRESET_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val presets =
+      val settings =
         CameraAvSettingsUserLevelManagementClusterMPTZStruct.fromTlv(
-          ContextSpecificTag(TAG_PRESETS),
+          ContextSpecificTag(TAG_SETTINGS),
           tlvReader,
         )
 
       tlvReader.exitContainer()
 
-      return CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(presetID, name, presets)
+      return CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(presetID, name, settings)
     }
   }
 }

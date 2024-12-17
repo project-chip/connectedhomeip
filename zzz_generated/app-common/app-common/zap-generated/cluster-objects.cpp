@@ -30367,7 +30367,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kPresetID), presetID);
     encoder.Encode(to_underlying(Fields::kName), name);
-    encoder.Encode(to_underlying(Fields::kPresets), presets);
+    encoder.Encode(to_underlying(Fields::kSettings), settings);
     return encoder.Finalize();
 }
 
@@ -30393,9 +30393,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, name);
         }
-        else if (__context_tag == to_underlying(Fields::kPresets))
+        else if (__context_tag == to_underlying(Fields::kSettings))
         {
-            err = DataModel::Decode(reader, presets);
+            err = DataModel::Decode(reader, settings);
         }
         else
         {
