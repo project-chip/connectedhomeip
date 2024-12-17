@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -211,6 +211,7 @@ chip_test_suite("tests") {
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
     "TestDefaultSafeAttributePersistenceProvider.cpp",
+    "TestDefaultTermsAndConditionsProvider.cpp",
     "TestDefaultThreadNetworkDirectoryStorage.cpp",
     "TestEcosystemInformationCluster.cpp",
     "TestEventLoggingNoUTCTime.cpp",
@@ -252,6 +253,8 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server:terms_and_conditions",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
