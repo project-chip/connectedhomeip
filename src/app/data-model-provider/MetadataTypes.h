@@ -197,18 +197,22 @@ public:
     //  - Lookups should be performed using `Get...` and `SeekTo`.
     //
     /////////////////////////////////////////////////////////////////////////
-    virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints() = 0;
-    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) = 0;
-    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId) = 0;
+    virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints() { return nullptr; }
+    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) { return nullptr; }
+    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId) { return nullptr; }
 
-    virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId) = 0;
-    virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId) = 0;
+    virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId) { return nullptr; }
+    virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId) { return nullptr; }
 
-    virtual std::unique_ptr<MetaDataIterator<AttributeId, AttributeInfo>> GetAttributes(ConcreteClusterPath clusterPath) = 0;
-    virtual std::unique_ptr<MetaDataIterator<CommandId, CommandInfo>> GetAcceptedCommands(ConcreteClusterPath clusterPath) = 0;
-    virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath) = 0;
-
-
+    virtual std::unique_ptr<MetaDataIterator<AttributeId, AttributeInfo>> GetAttributes(ConcreteClusterPath clusterPath)
+    {
+        return nullptr;
+    }
+    virtual std::unique_ptr<MetaDataIterator<CommandId, CommandInfo>> GetAcceptedCommands(ConcreteClusterPath clusterPath)
+    {
+        return nullptr;
+    }
+    virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath) { return nullptr; }
 
     // This iteration will list all the endpoints in the data model
     virtual EndpointEntry FirstEndpoint()                              = 0;

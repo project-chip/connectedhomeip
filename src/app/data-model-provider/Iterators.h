@@ -71,6 +71,20 @@ public:
     virtual std::optional<Meta> GetMetadata() = 0;
 };
 
+template<typename T>
+class NullFastForwardIterator: public FastForwardIterator<T> {
+public:
+    std::optional<T> Nest() override { return std::nullopt; }
+    bool SeekTo(const T& value) override { return false; }
+};
+
+/// Null iterator, generally just used for tests
+template<typename T, typename Meta>
+class NullMetadataIterator: public NullFastForwardIterator<T> {
+public:
+    std::optional<Meta> GetMetadata() override { return std::nullopt; }
+};
+
 } // DataModel
 } // namespace app
 } // namespace chip
