@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "transport/raw/PeerAddress.h"
 #include <lib/address_resolve/AddressResolve_DefaultImpl.h>
 
 #include <lib/address_resolve/TracingStructs.h>
@@ -128,6 +129,17 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
 
 bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd::IPAddressSorter::IpScore newScore)
 {
+    Transport::PeerAddress addressWithAdjustedInterface = result.address;
+    if (!addressWithAdjustedInterface.GetIPAddress().IsIPv6LinkLocal())
+    {
+        // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
+        // For all other addresses, we should rely on the device's routing table to route messages sent.
+        // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
+        // mDNS advertisements are not usually received on the same interface the peer is reachable on.
+        addressWithAdjustedInterface.SetInterface(Inet::InterfaceId::Null());
+        ChipLogDetail(Discovery, "Lookup clearing interface for non LL address");
+    }
+
     uint8_t insertAtIndex = 0;
     for (; insertAtIndex < kNodeLookupResultsLen; insertAtIndex++)
     {
@@ -139,7 +151,7 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
 
         auto & oldAddress = results[insertAtIndex].address;
 
-        if (oldAddress == result.address)
+        if (oldAddress == addressWithAdjustedInterface)
         {
             // this address is already in our list.
             return false;
@@ -179,17 +191,9 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
         count++;
     }
 
-    auto & updatedResult = results[insertAtIndex];
-    updatedResult        = result;
-    if (!updatedResult.address.GetIPAddress().IsIPv6LinkLocal())
-    {
-        // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
-        // For all other addresses, we should rely on the device's routing table to route messages sent.
-        // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
-        // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-        updatedResult.address.SetInterface(Inet::InterfaceId::Null());
-        ChipLogDetail(Discovery, "Lookup clearing interface for non LL address");
-    }
+    auto & updatedResult  = results[insertAtIndex];
+    updatedResult         = result;
+    updatedResult.address = addressWithAdjustedInterface;
 
     return true;
 }
