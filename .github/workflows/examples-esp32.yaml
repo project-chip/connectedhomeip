@@ -83,7 +83,6 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
                         --target esp32-m5stack-all-clusters-minimal \
-                        --target esp32-m5stack-all-clusters-rpc-ipv6only \
                         --pregen-dir ./zzz_pregenerated \
                         build \
                         --copy-artifacts-to out/artifacts \
