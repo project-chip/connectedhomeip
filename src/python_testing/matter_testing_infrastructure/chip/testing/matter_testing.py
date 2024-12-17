@@ -39,7 +39,7 @@ from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial
 from itertools import chain
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple
 
 from chip.tlv import float32, uint
 
@@ -1190,7 +1190,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         try:
             fn = getattr(self, pixits_name)
             return fn()
-        except AttributeError as e:
+        except AttributeError:
             return []
 
     def get_test_steps(self, test: str) -> list[TestStep]:
