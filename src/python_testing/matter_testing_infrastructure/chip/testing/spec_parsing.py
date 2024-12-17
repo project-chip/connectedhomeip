@@ -15,15 +15,16 @@
 #    limitations under the License.
 #
 
-import glob
+import importlib
+import importlib.resources as pkg_resources
 import logging
-import os
 import typing
 import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Callable, Optional
+from importlib.abc import Traversable
+from typing import Callable, Optional, Union
 
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
@@ -512,56 +513,83 @@ class PrebuiltDataModelDirectory(Enum):
     k1_4 = auto()
     kMaster = auto()
 
-
-class DataModelLevel(str, Enum):
-    kCluster = 'clusters'
-    kDeviceType = 'device_types'
-
-
-def _get_data_model_root() -> str:
-    """Attempts to find ${CHIP_ROOT}/data_model or equivalent."""
-
-    # Since this class is generally in a module, we have to rely on being bootstrapped or
-    # we use CWD if we cannot
-    choices = [os.getcwd()]
-
-    if 'PW_PROJECT_ROOT' in os.environ:
-        choices.insert(0, os.environ['PW_PROJECT_ROOT'])
-
-    for c in choices:
-        data_model_path = os.path.join(c, 'data_model')
-        if os.path.exists(os.path.join(data_model_path, 'master', 'scraper_version')):
-            return data_model_path
-    raise FileNotFoundError('Cannot find a CHIP_ROOT/data_model path. Tried %r as prefixes.' % choices)
+    @property
+    def dirname(self):
+        if self == PrebuiltDataModelDirectory.k1_3:
+            return "1.3"
+        if self == PrebuiltDataModelDirectory.k1_4:
+            return "1.4"
+        if self == PrebuiltDataModelDirectory.kMaster:
+            return "master"
+        raise KeyError("Invalid enum: %r" % self)
 
 
-def get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
-    if data_model_directory == PrebuiltDataModelDirectory.k1_3:
-        return os.path.join(_get_data_model_root(), '1.3', data_model_level)
-    elif data_model_directory == PrebuiltDataModelDirectory.k1_4:
-        return os.path.join(_get_data_model_root(), '1.4', data_model_level)
-    elif data_model_directory == PrebuiltDataModelDirectory.kMaster:
-        return os.path.join(_get_data_model_root(), 'master', data_model_level)
+class DataModelLevel(Enum):
+    kCluster = auto()
+    kDeviceType = auto()
+
+    @property
+    def dirname(self):
+        if self == DataModelLevel.kCluster:
+            return "clusters"
+        if self == DataModelLevel.kDeviceType:
+            return "device_types"
+        raise KeyError("Invalid enum: %r" % self)
+
+
+def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], data_model_level: DataModelLevel = DataModelLevel.kCluster) -> Traversable:
+    """
+    Get the directory of the data model for a specific version and level from the installed package.
+
+
+    `data_model_directory` given as a path MUST be of type Traversable (often `pathlib.Path(somepathstring)`).
+    If `data_model_directory` is given as a Traversable, it is returned directly WITHOUT using the data_model_level at all.
+    """
+    # If it's a prebuilt directory, build the path based on the version and data model level
+    if isinstance(data_model_directory, PrebuiltDataModelDirectory):
+        return pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+            'data_model').joinpath(data_model_directory.dirname).joinpath(data_model_level.dirname)
     else:
         return data_model_directory
 
 
-def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
-    dir = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
+def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> typing.Tuple[dict[int, dict], list]:
+    """
+    Build XML clusters from the specified data model directory.
+    This function supports both pre-built locations and full paths.
+
+    `data_model_directory`` given as a path MUST be of type Traversable (often `pathlib.Path(somepathstring)`).
+    If data_model_directory is a Travesable, it is assumed to already contain `clusters` (i.e. be a directory
+    with all XML files in it)
+    """
 
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
     ids_by_name: dict[str, int] = {}
     problems: list[ProblemNotice] = []
-    files = glob.glob(f'{dir}/*.xml')
-    if not files:
-        raise SpecParsingException(f'No data model files found in specified directory {dir}')
 
-    for xml in files:
-        logging.info(f'Parsing file {xml}')
-        tree = ElementTree.parse(f'{xml}')
-        root = tree.getroot()
-        add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
+    top = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
+    logging.info("Reading XML clusters from %r", top)
+
+    found_xmls = 0
+    for f in top.iterdir():
+        if not f.name.endswith('.xml'):
+            logging.info("Ignoring non-XML file %s", f.name)
+            continue
+
+        logging.info('Parsing file %s', f.name)
+        found_xmls += 1
+        with f.open("r", encoding="utf8") as file:
+            root = ElementTree.parse(file).getroot()
+            add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
+
+    # For now we assume even a single XML means the directory was probaly OK
+    # we may increase this later as most our data model directories are larger
+    #
+    # Intent here is to make user aware of typos in paths instead of silently having
+    # empty parsing
+    if found_xmls < 1:
+        raise SpecParsingException(f'No data model files found in specified directory {top:!r}')
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
@@ -721,7 +749,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure
             xml_clusters[id] = new
 
 
-def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNotice], dict[int, XmlDeviceType]]:
+def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
     device_types: dict[int, XmlDeviceType] = {}
     device = root.iter('deviceType')
@@ -793,17 +821,26 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
-    dir = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+    top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems = []
-    for xml in glob.glob(f"{dir}/*.xml"):
-        logging.info(f'Parsing file {xml}')
-        tree = ElementTree.parse(f'{xml}')
-        root = tree.getroot()
-        tmp_device_types, tmp_problems = parse_single_device_type(root)
-        problems = problems + tmp_problems
-        device_types.update(tmp_device_types)
+
+    found_xmls = 0
+
+    for file in top.iterdir():
+        if not file.name.endswith('.xml'):
+            continue
+        logging.info('Parsing file %r / %s', top, file.name)
+        found_xmls += 1
+        with file.open('r', encoding="utf8") as xml:
+            root = ElementTree.parse(xml).getroot()
+            tmp_device_types, tmp_problems = parse_single_device_type(root)
+            problems = problems + tmp_problems
+            device_types.update(tmp_device_types)
+
+    if found_xmls < 1:
+        logging.warning("No XML files found in the specified device type directory: %r", top)
 
     if -1 not in device_types.keys():
         raise ConformanceException("Base device type not found in device type xml data")

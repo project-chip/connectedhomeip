@@ -1124,6 +1124,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.current_step_index = 0
         self.step_start_time = datetime.now(timezone.utc)
         self.step_skipped = False
+        self.global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
+            None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
+        # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
+        # Because setup_class can be called before commissioning, this variable is lazy-initialized
+        # where the read is deferred until the first guard function call that requires global attributes.
+        self.stored_global_wildcard = None
 
     def setup_test(self):
         self.current_step_index = 0
@@ -1454,6 +1460,66 @@ class MatterBaseTest(base_test.BaseTestClass):
         if not pics_condition:
             self.mark_current_step_skipped()
         return pics_condition
+
+    async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
+        """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
+           returns False using attributes against attributes_list, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("1")
+              if self.attribute_guard(condition1_needs_to_be_true_to_execute):
+                  # do the test for step 1
+
+              self.step("2")
+              if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2 if condition not met
+           """
+        if self.stored_global_wildcard is None:
+            self.stored_global_wildcard = await self.global_wildcard
+        attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
+        if not attr_condition:
+            self.mark_current_step_skipped()
+        return attr_condition
+
+    async def command_guard(self, endpoint: int, command: ClusterObjects.ClusterCommand):
+        """Similar to attribute_guard above, except checks a condition and if False marks the test step as skipped and
+           returns False using command id against AcceptedCmdsList, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("1")
+              if self.command_guard(condition1_needs_to_be_true_to_execute):
+                  # do the test for step 1
+
+              self.step("2")
+              if self.command_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2 if condition not met
+           """
+        if self.stored_global_wildcard is None:
+            self.stored_global_wildcard = await self.global_wildcard
+        cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
+        if not cmd_condition:
+            self.mark_current_step_skipped()
+        return cmd_condition
+
+    async def feature_guard(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature_int: IntFlag):
+        """Similar to command_guard and attribute_guard above, except checks a condition and if False marks the test step as skipped and
+           returns False using feature id against feature_map, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("1")
+              if self.feature_guard(condition1_needs_to_be_true_to_execute):
+                  # do the test for step 1
+
+              self.step("2")
+              if self.feature_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2 if condition not met
+           """
+        if self.stored_global_wildcard is None:
+            self.stored_global_wildcard = await self.global_wildcard
+        feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
+        if not feat_condition:
+            self.mark_current_step_skipped()
+        return feat_condition
 
     def mark_current_step_skipped(self):
         try:
@@ -2103,6 +2169,41 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
         notify the test harness that the test is not applicable to this node and the test will not be run.
     """
     return partial(_has_attribute, attribute=attribute)
+
+
+def _has_command(wildcard, endpoint, command: ClusterObjects.ClusterCommand) -> bool:
+    cluster = get_cluster_from_command(command)
+    try:
+        cmd_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AcceptedCommandList]
+        if not isinstance(cmd_list, list):
+            asserts.fail(
+                f"Failed to read mandatory AcceptedCommandList command value for cluster {cluster} on endpoint {endpoint}: {cmd_list}.")
+        return command.command_id in cmd_list
+    except KeyError:
+        return False
+
+
+def has_command(command: ClusterObjects.ClusterCommand) -> EndpointCheckFunction:
+    """ EndpointCheckFunction that can be passed as a parameter to the run_if_endpoint_matches decorator.
+
+        Use this function with the run_if_endpoint_matches decorator to run this test on all endpoints with
+        the specified attribute. For example, given a device with the following conformance
+
+        EP0: cluster A, B, C
+        EP1: cluster D with command d, E
+        EP2, cluster D with command d
+        EP3, cluster D without command d
+
+        And the following test specification:
+        @run_if_endpoint_matches(has_command(Clusters.D.Commands.d))
+        test_mytest(self):
+            ...
+
+        If you run this test with --endpoint 1 or --endpoint 2, the test will be run. If you run this test
+        with any other --endpoint the run_if_endpoint_matches decorator will call the on_skip function to
+        notify the test harness that the test is not applicable to this node and the test will not be run.
+    """
+    return partial(_has_command, command=command)
 
 
 def _has_feature(wildcard, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
