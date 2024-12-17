@@ -102,6 +102,9 @@ Transport::PeerAddress GetAddressWithHighScore(uint16_t port = CHIP_PORT, Inet::
     return Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
 }
 
+#if CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS >= 3
+
+// test requires at least 3 slots: for high, medium and low
 TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicatesWhenFull)
 {
     Impl::NodeLookupResults results;
@@ -140,8 +143,7 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicatesWhenFull)
     ASSERT_EQ(results.count, kNumberOfAvailableSlots);
 }
 
-#if CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS >= 3
-
+// test requires at least 3 slots: for high, medium and low
 TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicates)
 {
     static_assert(Impl::kNodeLookupResultsLen >= 3, "Test uses 3 address slots");
