@@ -132,7 +132,7 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicatesWhenFull)
     ASSERT_EQ(results.count, kNumberOfAvailableSlots);
 }
 
-#if CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+#if CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS >= 3
 
 TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicates)
 {
