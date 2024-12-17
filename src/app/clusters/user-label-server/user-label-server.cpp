@@ -151,7 +151,14 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         ReturnErrorOnFailure(aDecoder.Decode(entry));
         VerifyOrReturnError(IsValidLabelEntry(entry), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-        return provider->AppendUserLabel(endpoint, entry);
+        // Append the single user label entry
+        CHIP_ERROR err = provider->AppendUserLabel(endpoint, entry);
+        if (err == CHIP_ERROR_NO_MEMORY)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+        }
+        
+        return err;
     }
 
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
