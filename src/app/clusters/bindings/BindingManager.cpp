@@ -67,7 +67,8 @@ BindingManager BindingManager::sBindingManager;
 
 CHIP_ERROR BindingManager::UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId)
 {
-    if (!IsSelfNodeId(ScopedNodeId(nodeId, fabricIndex))) {
+    if (!IsSelfNodeId(ScopedNodeId(nodeId, fabricIndex)))
+    {
         return EstablishConnection(ScopedNodeId(nodeId, fabricIndex));
     }
     return CHIP_NO_ERROR;
