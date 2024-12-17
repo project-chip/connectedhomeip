@@ -157,7 +157,7 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         {
             return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
         }
-        
+
         return err;
     }
 
