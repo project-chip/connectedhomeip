@@ -202,30 +202,6 @@ public:
         SetCallback(nullptr);
     }
 
-    void MessageSizeTest(TCPImpl & tcp, const IPAddress & addr)
-    {
-        chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(messageSize_TEST, sizeof(messageSize_TEST));
-        ASSERT_FALSE(buffer.IsNull());
-
-        PacketHeader header;
-        header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
-
-        SetCallback([](const uint8_t * message, size_t length, int count, void * data) { return memcmp(message, data, length); },
-                    const_cast<void *>(static_cast<const void *>(PAYLOAD)));
-
-        CHIP_ERROR err = header.EncodeBeforeData(buffer);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        // Should be able to send a message to itself by just calling send.
-        err = tcp.SendMessage(Transport::PeerAddress::TCP(addr, gChipTCPPort), std::move(buffer));
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });
-        EXPECT_EQ(mReceiveHandlerCallCount, 1);
-
-        SetCallback(nullptr);
-    }
-
     void ConnectTest(TCPImpl & tcp, const IPAddress & addr)
     {
         // Connect and wait for seeing active connection
