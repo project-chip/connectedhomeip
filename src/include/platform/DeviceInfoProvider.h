@@ -100,8 +100,7 @@ public:
      *                      The size of the list cannot exceed `kMaxUserLabelListLength`.
      *
      * @return CHIP_NO_ERROR on success.
-     * @return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if no previous value exists.
-     * @return CHIP_ERROR if an error occurs while storing or deleting labels.
+     * @return CHIP_ERROR if an error occurs.
      */
     CHIP_ERROR SetUserLabelList(EndpointId endpoint, const AttributeList<UserLabelType, kMaxUserLabelListLength> & labelList);
 
