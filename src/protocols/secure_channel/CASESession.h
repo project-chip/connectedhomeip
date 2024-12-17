@@ -231,7 +231,7 @@ protected:
         uint8_t responderRandom[kSigmaParamRandomNumberSize];
         uint16_t responderSessionId;
         const Crypto::P256PublicKey * pEphPubKey = nullptr;
-        Platform::ScopedMemoryBuffer<uint8_t> msg_R2_Encrypted;
+        Platform::ScopedMemoryBuffer<uint8_t> msgR2Encrypted;
         size_t encrypted2Length = 0;
         const ReliableMessageProtocolConfig * responderMrpConfig;
     };
@@ -331,8 +331,8 @@ private:
 
     CHIP_ERROR PrepareSigma2(EncodeSigma2Inputs & output);
     CHIP_ERROR PrepareSigma2Resume(EncodeSigma2ResInputs & output);
-    CHIP_ERROR SendSigma2(System::PacketBufferHandle & msg_R2);
-    CHIP_ERROR SendSigma2Resume(System::PacketBufferHandle & msg_R2_resume);
+    CHIP_ERROR SendSigma2(System::PacketBufferHandle && msg_R2);
+    CHIP_ERROR SendSigma2Resume(System::PacketBufferHandle && msg_R2_resume);
 
     CHIP_ERROR HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma2(System::PacketBufferHandle && msg);
