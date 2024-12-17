@@ -64,7 +64,7 @@ constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageCounter  = 18;
 
-const char PAYLOAD[] = "Hello!";
+const char PAYLOAD[]          = "Hello!";
 const char messageSize_TEST[] = "\x00\x00\x00\x00";
 
 class MockTransportMgrDelegate : public chip::TransportMgrDelegate
