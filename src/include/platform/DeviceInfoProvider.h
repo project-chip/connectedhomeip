@@ -97,7 +97,6 @@ public:
      *
      * @param[in] endpoint The endpoint ID associated with the user label list.
      * @param[in] labelList The new list of user labels to store.
-     *                      The size of the list cannot exceed `kMaxUserLabelListLength`.
      *
      * @return CHIP_NO_ERROR on success.
      * @return CHIP_ERROR if an error occurs.
