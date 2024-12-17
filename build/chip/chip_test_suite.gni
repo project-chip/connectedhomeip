@@ -93,6 +93,10 @@ template("chip_test_suite") {
     } else {
       public_deps += [ "${chip_root}/src/platform/logging:default" ]
     }
+
+    if (chip_device_platform == "esp32") {
+      complete_static_lib = true
+    }
   }
 
   # Build a source_set or a flashable executable for each individual unit test source, which also includes the common files.

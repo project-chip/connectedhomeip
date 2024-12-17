@@ -23,7 +23,6 @@
 #include <EnergyEvseManager.h>
 #include <EnergyTimeUtils.h>
 
-#include <EnergyTimeUtils.h>
 #include <FakeReadings.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>

@@ -39,6 +39,25 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234 --passcode 20202021
+#       --bool-arg unified_fabric_sync_app:true
+#       --string-arg th_fsa_app_path:examples/fabric-admin/scripts/fabric-sync-app.py
+#       --string-arg th_fsa_admin_path:${FABRIC_ADMIN_APP}
+#       --string-arg th_fsa_bridge_path:${FABRIC_BRIDGE_APP}
+#       --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID}
+#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -322,8 +341,12 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
                 f"If using FabricSync Admin, you may type:\n"
                 f">>> fabricsync add-bridge <desired_node_id> {params.setupPinCode} <th_host_ip> {self.th_fsa_bridge_port}")
         else:
-            self.dut_fsa_stdin.write(
-                f"fabricsync add-bridge 10 {params.setupPinCode} {self.th_fsa_bridge_address} {self.th_fsa_bridge_port}\n")
+            if self.user_params.get("unified_fabric_sync_app"):
+                self.dut_fsa_stdin.write(
+                    f"app add-bridge 10 {params.setupPinCode} {self.th_fsa_bridge_address} {self.th_fsa_bridge_port}\n")
+            else:
+                self.dut_fsa_stdin.write(
+                    f"fabricsync add-bridge 10 {params.setupPinCode} {self.th_fsa_bridge_address} {self.th_fsa_bridge_port}\n")
             self.dut_fsa_stdin.flush()
             # Wait for the commissioning to complete.
             await asyncio.sleep(5)
@@ -347,7 +370,10 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
                 f"If using FabricSync Admin, you may type:\n"
                 f">>> fabricsync sync-device {th_fsa_bridge_th_server_endpoint}")
         else:
-            self.dut_fsa_stdin.write(f"fabricsync sync-device {th_fsa_bridge_th_server_endpoint}\n")
+            if self.user_params.get("unified_fabric_sync_app"):
+                self.dut_fsa_stdin.write(f"app sync-device {th_fsa_bridge_th_server_endpoint}\n")
+            else:
+                self.dut_fsa_stdin.write(f"fabricsync sync-device {th_fsa_bridge_th_server_endpoint}\n")
             self.dut_fsa_stdin.flush()
             # Wait for the synchronization to complete.
             await asyncio.sleep(5)
