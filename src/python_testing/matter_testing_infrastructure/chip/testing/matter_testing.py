@@ -1936,6 +1936,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
+    config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
@@ -1969,6 +1970,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              type=str,
                              metavar='test_a test_b...',
                              help='A list of tests in the test class to execute.')
+    basic_group.add_argument('--fail-on-skipped', action="store_true", default=False,
+                             help="Fail the test if any test cases are skipped")
     basic_group.add_argument('--trace-to', nargs="*", default=[],
                              help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
     basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
@@ -2510,6 +2513,8 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
             try:
                 runner.run()
                 ok = runner.results.is_all_pass and ok
+                if matter_test_config.fail_on_skipped_tests and runner.results.skipped:
+                    ok = False
             except TimeoutError:
                 ok = False
             except signals.TestAbortAll:
