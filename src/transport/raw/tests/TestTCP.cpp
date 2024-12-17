@@ -65,6 +65,7 @@ constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageCounter  = 18;
 
 const char PAYLOAD[] = "Hello!";
+const char messageSize_TEST[] = "\x00\x00\x00\x00";
 
 class MockTransportMgrDelegate : public chip::TransportMgrDelegate
 {
@@ -180,6 +181,30 @@ public:
     void SingleMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
         chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+        ASSERT_FALSE(buffer.IsNull());
+
+        PacketHeader header;
+        header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
+
+        SetCallback([](const uint8_t * message, size_t length, int count, void * data) { return memcmp(message, data, length); },
+                    const_cast<void *>(static_cast<const void *>(PAYLOAD)));
+
+        CHIP_ERROR err = header.EncodeBeforeData(buffer);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        // Should be able to send a message to itself by just calling send.
+        err = tcp.SendMessage(Transport::PeerAddress::TCP(addr, gChipTCPPort), std::move(buffer));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });
+        EXPECT_EQ(mReceiveHandlerCallCount, 1);
+
+        SetCallback(nullptr);
+    }
+
+    void MessageSizeTest(TCPImpl & tcp, const IPAddress & addr)
+    {
+        chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(messageSize_TEST, sizeof(messageSize_TEST));
         ASSERT_FALSE(buffer.IsNull());
 
         PacketHeader header;
@@ -607,6 +632,32 @@ TEST_F(TestTCP, HandleConnCloseCalledTest6)
     IPAddress addr;
     IPAddress::FromString("::1", addr);
     HandleConnCloseTest(addr);
+}
+
+TEST_F(TestTCP, MessageSizeTest)
+{
+    TCPImpl tcp;
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+
+    gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
+
+    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, gChipTCPPort);
+    void * state                        = TestAccess::FindActiveConnection(tcp, lPeerAddress);
+    ASSERT_NE(state, nullptr);
+    TCPEndPoint * lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_NE(lEndPoint, nullptr);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(messageSize_TEST, sizeof(messageSize_TEST));
+    ASSERT_NE(&buf, nullptr);
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
 TEST_F(TestTCP, CheckProcessReceivedBuffer)
