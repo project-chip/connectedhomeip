@@ -132,6 +132,8 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicatesWhenFull)
     ASSERT_EQ(results.count, kNumberOfAvailableSlots);
 }
 
+#if CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+
 TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicates)
 {
     static_assert(Impl::kNodeLookupResultsLen >= 3, "Test uses 3 address slots");
@@ -182,6 +184,8 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicates)
     results.UpdateResults(mediumResult, Dnssd::IPAddressSorter::IpScore::kLinkLocal);
     ASSERT_EQ(results.count, 3);
 }
+
+#endif
 
 TEST(TestAddressResolveDefaultImpl, TestLookupResult)
 {
