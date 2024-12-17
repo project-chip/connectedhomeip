@@ -37,6 +37,9 @@ public:
 
 /// An iterator that supports seeking to a specific location.
 ///
+/// These iterators MUST return data in a predictable/consistent order
+/// so that SeekTo can be used for resuming iterations.
+///
 /// Useful to directly locate a specific element in an iteration.
 template<typename T>
 class FastForwardIterator : public ElementIterator<T> {

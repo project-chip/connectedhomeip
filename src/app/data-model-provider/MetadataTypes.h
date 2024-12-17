@@ -184,6 +184,19 @@ public:
     virtual ~ProviderMetadataTree() = default;
 
     /////////////////////// Iterators implementation ////////////////////////
+    // LIFETIME
+    //
+    //  - the iterators are guaranteed valid IF AND ONLY IF the underlying provider
+    //    tree has not changed structure.
+    //  - in particular this means that these iterators SHOULD only used within one
+    //    tight loop/operation within event loop processing and SHOULD NOT be
+    //    stored for use across execution boundaries
+    //
+    // PERFORMANCE
+    //
+    //  - Lookups should be performed using `Get...` and `SeekTo`.
+    //
+    /////////////////////////////////////////////////////////////////////////
     virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints() = 0;
     virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) = 0;
     virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId) = 0;
