@@ -187,6 +187,12 @@ public:
 
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
+protected:
+    // Temporary hack for a test: Initializes the data model for testing purposes only.
+    // This method serves as a placeholder and should NOT be used outside of specific tests.
+    // It is expected to be removed or replaced with a proper implementation in the future.TODO:(#36837).
+    virtual void InitDataModelForTesting();
+
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
