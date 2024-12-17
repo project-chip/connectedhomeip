@@ -81,8 +81,9 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/SafeAttributePersistenceProvider.cpp
         ${CHIP_APP_BASE_DIR}/StorageDelegateWrapper.cpp
         ${CHIP_APP_BASE_DIR}/server/AclStorage.cpp
-        ${CHIP_APP_BASE_DIR}/server/DefaultAclStorage.cpp
         ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
+        ${CHIP_APP_BASE_DIR}/server/DefaultAclStorage.cpp
+        ${CHIP_APP_BASE_DIR}/server/DefaultTermsAndConditionsProvider.cpp
         ${CHIP_APP_BASE_DIR}/server/Dnssd.cpp
         ${CHIP_APP_BASE_DIR}/server/EchoHandler.cpp
         ${CHIP_APP_BASE_DIR}/server/OnboardingCodesUtil.cpp

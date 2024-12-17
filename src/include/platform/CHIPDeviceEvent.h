@@ -534,6 +534,7 @@ struct ChipDeviceEvent final
             FabricIndex fabricIndex;
             bool addNocCommandHasBeenInvoked;
             bool updateNocCommandHasBeenInvoked;
+            bool updateTermsAndConditionsHasBeenInvoked;
         } FailSafeTimerExpired;
 
         struct

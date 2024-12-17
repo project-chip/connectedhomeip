@@ -55,3 +55,35 @@ tests:
               ]
       response:
           error: CONSTRAINT_ERROR
+
+    - label: "Attempt to write a large label list"
+      command: "writeAttribute"
+      attribute: "LabelList"
+      arguments:
+          value: [
+                  # Example repeated user labels to blow up the maximum allowed
+                  { Label: "roomName", Value: "master bedroom 1" },
+                  { Label: "orientation", Value: "east" },
+                  { Label: "floor", Value: "2" },
+                  { Label: "roomType", Value: "bedroom" },
+                  { Label: "someKey5", Value: "someVal5" },
+                  { Label: "someKey6", Value: "someVal6" },
+                  { Label: "someKey7", Value: "someVal7" },
+                  { Label: "someKey8", Value: "someVal8" },
+                  { Label: "someKey9", Value: "someVal9" },
+                  { Label: "someKey10", Value: "someVal10" },
+                  { Label: "someKey11", Value: "someVal11" },
+                  { Label: "someKey12", Value: "someVal12" },
+                  { Label: "someKey13", Value: "someVal13" },
+                  { Label: "someKey14", Value: "someVal14" },
+                  { Label: "someKey15", Value: "someVal15" },
+                  { Label: "someKey16", Value: "someVal16" },
+                  { Label: "someKey17", Value: "someVal17" },
+                  { Label: "someKey18", Value: "someVal18" },
+                  { Label: "someKey19", Value: "someVal19" },
+                  { Label: "someKey20", Value: "someVal20" },
+              ]
+      response:
+          # When the cluster runs out of capacity to store these entries,
+          # we expect a FAILURE get returned.
+          error: FAILURE

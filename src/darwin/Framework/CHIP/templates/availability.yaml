@@ -9874,44 +9874,6 @@
                   - RequiredTCNotAccepted
                   - TCAcknowledgementsNotReceived
                   - TCMinVersionNotMet
-          RVCCleanMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Min
-                  - Max
-                  - Night
-                  - Day
-                  - Vacation
-          RVCOperationalState:
-              # Not clear whether these will stay in the XML
-              ErrorStateEnum:
-                  - NoError
-                  - UnableToStartOrResume
-                  - UnableToCompleteOperation
-                  - CommandInvalidInState
-              OperationalStateEnum:
-                  - Stopped
-                  - Running
-                  - Paused
-                  - Error
-          RVCRunMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
       bitmaps:
           AccessControl:
               # Targeting 1.4
@@ -10008,8 +9970,12 @@
                   - XY
                   - ColorTemperature
 
-- release: "Future"
-  versions: "future"
+- release: "8377F965-9A14-4120-AAC4-4F296BA64949"
+  versions:
+      iOS: "18.4"
+      macOS: "15.4"
+      watchOS: "11.4"
+      tvOS: "18.4"
   introduced:
       clusters:
           - DishwasherAlarm
@@ -10366,11 +10332,24 @@
               - NumberOfRinsesEnum
           LaundryWasherMode:
               - ModeTag
+          OvenCavityOperationalState:
+              - ErrorStateEnum
+              - OperationalStateEnum
           RefrigeratorAndTemperatureControlledCabinetMode:
               - ModeTag
       enum values:
           DishwasherMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - Normal
                   - Heavy
                   - Light
@@ -10396,16 +10375,57 @@
                   - Max
           LaundryWasherMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - Normal
                   - Delicate
                   - Heavy
                   - Whites
           MicrowaveOvenMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - Normal
                   - Defrost
+          OvenCavityOperationalState:
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
           OvenMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - Bake
                   - Convection
                   - Grill
@@ -10418,10 +10438,53 @@
                   - Steam
           RefrigeratorAndTemperatureControlledCabinetMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - RapidCool
                   - RapidFreeze
+          RVCCleanMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Vacation
+          RVCOperationalState:
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
           RVCRunMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - Mapping
       bitmaps:
           DishwasherAlarm:
@@ -10499,77 +10562,6 @@
               SetCookingParameters:
                   # wattSettingIndex is provisional because WATTS is provisional in Matter 1.4
                   - wattSettingIndex
-      enums:
-          OvenCavityOperationalState:
-              # Not clear whether these will stay in the XML
-              - ErrorStateEnum
-              - OperationalStateEnum
-      enum values:
-          DishwasherMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
-          LaundryWasherMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
-          MicrowaveOvenMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
-          OvenMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
-          RefrigeratorAndTemperatureControlledCabinetMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
       bitmap values:
           DishwasherAlarm:
               AlarmBitmap:
@@ -10632,3 +10624,6 @@
               # The one bit in this bitmap is marked X in the spec, but we can't have
               # an empty bitmap.
               - Feature
+
+- release: "Future"
+  versions: "future"
