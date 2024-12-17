@@ -106,7 +106,7 @@ def stash_globally(o: object) -> str:
     return id
 
 
-def unstash_globally(id: str) -> object:
+def unstash_globally(id: str) -> Any:
     return _GLOBAL_DATA.get(id)
 
 
@@ -205,7 +205,7 @@ def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
     return datetime.fromtimestamp(seconds, timezone.utc) + timedelta(milliseconds=millis)
 
 
-def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
+def compare_time(received: int, offset: timedelta = timedelta(), utc: Optional[int] = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
     if utc is None:
         utc = utc_time_in_matter_epoch()
 
@@ -243,7 +243,7 @@ class EventChangeCallback:
         """This class creates a queue to store received event callbacks, that can be checked by the test script
            expected_cluster: is the cluster from which the events are expected
         """
-        self._q = queue.Queue()
+        self._q: queue.Queue = queue.Queue()
         self._expected_cluster = expected_cluster
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
@@ -637,6 +637,9 @@ class MatterTestConfig:
     # This allows cert tests to be run without re-commissioning for RR-1.1.
     maximize_cert_chains: bool = True
 
+    # By default, let's set validity to 10 years
+    certificate_validity_period = int(timedelta(days=10*365).total_seconds())
+
     qr_code_content: List[str] = field(default_factory=list)
     manual_code: List[str] = field(default_factory=list)
 
@@ -822,6 +825,27 @@ class ProblemNotice:
 
 
 @dataclass
+class SetupParameters:
+    passcode: int
+    vendor_id: int = 0xFFF1
+    product_id: int = 0x8001
+    discriminator: int = 3840
+    custom_flow: int = 0
+    capabilities: int = 0b0100
+    version: int = 0
+
+    @property
+    def qr_code(self):
+        return SetupPayload().GenerateQrCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                             self.custom_flow, self.capabilities, self.version)
+
+    @property
+    def manual_code(self):
+        return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                                        self.custom_flow, self.capabilities, self.version)
+
+
+@dataclass
 class SetupPayloadInfo:
     filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
     filter_value: int = 0
@@ -866,6 +890,7 @@ class MatterStackState:
                 "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
             ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex=self._config.root_of_trust_index)
             ca.maximizeCertChains = self._config.maximize_cert_chains
+            ca.certificateValidityPeriodSec = self._config.certificate_validity_period
             ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
         elif (len(self._certificate_authority_manager.activeCaList[0].adminList) == 0):
             self._logger.warn("Didn't find any FabricAdmins in storage -- creating a new one...")
@@ -955,7 +980,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         steps = self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
-    def get_defined_test_steps(self, test: str) -> list[TestStep]:
+    def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
         steps_name = f'steps_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, steps_name)
@@ -975,7 +1000,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         pics = self._get_defined_pics(test)
         return [] if pics is None else pics
 
-    def _get_defined_pics(self, test: str) -> list[TestStep]:
+    def _get_defined_pics(self, test: str) -> Optional[list[str]]:
         steps_name = f'pics_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, steps_name)
@@ -1072,7 +1097,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return unstash_globally(self.user_params.get("matter_test_config"))
 
     @property
-    def default_controller(self) -> ChipDeviceCtrl:
+    def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
         return unstash_globally(self.user_params.get("default_controller"))
 
     @property
@@ -1099,6 +1124,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.current_step_index = 0
         self.step_start_time = datetime.now(timezone.utc)
         self.step_skipped = False
+        self.global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
+            None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
+        # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
+        # Because setup_class can be called before commissioning, this variable is lazy-initialized
+        # where the read is deferred until the first guard function call that requires global attributes.
+        self.stored_global_wildcard = None
 
     def setup_test(self):
         self.current_step_index = 0
@@ -1141,8 +1172,12 @@ class MatterBaseTest(base_test.BaseTestClass):
     def is_pics_sdk_ci_only(self) -> bool:
         return self.check_pics('PICS_SDK_CI_ONLY')
 
-    async def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int, timeout: int = 900) -> CustomCommissioningParameters:
+    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if node_id is None:
+            node_id = self.dut_node_id
         try:
             commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=timeout, iteration=1000,
                                                                           discriminator=rnd_discriminator, option=1)
@@ -1153,20 +1188,19 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.fail(e.status, 'Failed to open commissioning window')
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
         data = result[endpoint]
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            #endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
             endpoint = self.get_endpoint()
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
@@ -1192,14 +1226,13 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_expect_error(
             self, cluster: object, attribute: object,
-            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
+            error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            #endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
             endpoint = self.get_endpoint()
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
@@ -1218,7 +1251,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: object, endpoint_id: int = None, expect_success: bool = True) -> Status:
+    async def write_single_attribute(self, attribute_value: object, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
         """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
 
         If `endpoint_id` is None, the default DUT endpoint for the test is selected.
@@ -1240,7 +1273,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             timedRequestTimeoutMs: typing.Union[None, int] = None,
             payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
@@ -1248,7 +1281,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            #endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
             endpoint = self.get_endpoint()
 
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
@@ -1428,6 +1460,66 @@ class MatterBaseTest(base_test.BaseTestClass):
         if not pics_condition:
             self.mark_current_step_skipped()
         return pics_condition
+
+    async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
+        """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
+           returns False using attributes against attributes_list, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("1")
+              if self.attribute_guard(condition1_needs_to_be_true_to_execute):
+                  # do the test for step 1
+
+              self.step("2")
+              if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2 if condition not met
+           """
+        if self.stored_global_wildcard is None:
+            self.stored_global_wildcard = await self.global_wildcard
+        attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
+        if not attr_condition:
+            self.mark_current_step_skipped()
+        return attr_condition
+
+    async def command_guard(self, endpoint: int, command: ClusterObjects.ClusterCommand):
+        """Similar to attribute_guard above, except checks a condition and if False marks the test step as skipped and
+           returns False using command id against AcceptedCmdsList, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("1")
+              if self.command_guard(condition1_needs_to_be_true_to_execute):
+                  # do the test for step 1
+
+              self.step("2")
+              if self.command_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2 if condition not met
+           """
+        if self.stored_global_wildcard is None:
+            self.stored_global_wildcard = await self.global_wildcard
+        cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
+        if not cmd_condition:
+            self.mark_current_step_skipped()
+        return cmd_condition
+
+    async def feature_guard(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature_int: IntFlag):
+        """Similar to command_guard and attribute_guard above, except checks a condition and if False marks the test step as skipped and
+           returns False using feature id against feature_map, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("1")
+              if self.feature_guard(condition1_needs_to_be_true_to_execute):
+                  # do the test for step 1
+
+              self.step("2")
+              if self.feature_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2 if condition not met
+           """
+        if self.stored_global_wildcard is None:
+            self.stored_global_wildcard = await self.global_wildcard
+        feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
+        if not feat_condition:
+            self.mark_current_step_skipped()
+        return feat_condition
 
     def mark_current_step_skipped(self):
         try:
@@ -1842,7 +1934,6 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = [] if args.tests is None else args.tests
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
-    #config.endpoint = args.endpoint
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
 
@@ -2080,6 +2171,41 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
     return partial(_has_attribute, attribute=attribute)
 
 
+def _has_command(wildcard, endpoint, command: ClusterObjects.ClusterCommand) -> bool:
+    cluster = get_cluster_from_command(command)
+    try:
+        cmd_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AcceptedCommandList]
+        if not isinstance(cmd_list, list):
+            asserts.fail(
+                f"Failed to read mandatory AcceptedCommandList command value for cluster {cluster} on endpoint {endpoint}: {cmd_list}.")
+        return command.command_id in cmd_list
+    except KeyError:
+        return False
+
+
+def has_command(command: ClusterObjects.ClusterCommand) -> EndpointCheckFunction:
+    """ EndpointCheckFunction that can be passed as a parameter to the run_if_endpoint_matches decorator.
+
+        Use this function with the run_if_endpoint_matches decorator to run this test on all endpoints with
+        the specified attribute. For example, given a device with the following conformance
+
+        EP0: cluster A, B, C
+        EP1: cluster D with command d, E
+        EP2, cluster D with command d
+        EP3, cluster D without command d
+
+        And the following test specification:
+        @run_if_endpoint_matches(has_command(Clusters.D.Commands.d))
+        test_mytest(self):
+            ...
+
+        If you run this test with --endpoint 1 or --endpoint 2, the test will be run. If you run this test
+        with any other --endpoint the run_if_endpoint_matches decorator will call the on_skip function to
+        notify the test harness that the test is not applicable to this node and the test will not be run.
+    """
+    return partial(_has_command, command=command)
+
+
 def _has_feature(wildcard, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
     try:
         feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
@@ -2191,8 +2317,6 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
     """
     def run_if_endpoint_matches_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
-            asserts.assert_false(self.get_test_pics(self.current_test_info.name),
-                                 "pics_ method supplied for run_if_endpoint_matches.")
             runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(self, accept_function), timeout=60)
             should_run_test = asyncio.run(runner_with_timeout)
             if not should_run_test:

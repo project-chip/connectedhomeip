@@ -104,7 +104,7 @@ static void rsi_wireless_driver_task_wrapper(void * argument)
 
 static void DHCPTimerEventHandler(void * arg)
 {
-    WifiEvent event = WifiEvent::kStationDhcpPoll;
+    WifiPlatformEvent event = WifiPlatformEvent::kStationDhcpPoll;
     sl_matter_wifi_post_event(event);
 }
 
@@ -154,7 +154,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
     uint8_t rssi;
     ap->security = wfx_rsi.sec.security;
     ap->chan     = wfx_rsi.ap_chan;
-    memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_LEN);
+    memcpy(&ap->bssid[0], wfx_rsi.ap_mac.data(), kWifiMacAddressLength);
     status = rsi_wlan_get(RSI_RSSI, &rssi, sizeof(rssi));
     if (status == RSI_SUCCESS)
     {
@@ -262,7 +262,7 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
      */
     ChipLogProgress(DeviceLayer, "wfx_rsi_join_cb: success");
     memset(&temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
-    WifiEvent event = WifiEvent::kStationConnect;
+    WifiPlatformEvent event = WifiPlatformEvent::kStationConnect;
     sl_matter_wifi_post_event(event);
     wfx_rsi.join_retries = 0;
 }
@@ -284,7 +284,7 @@ static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
 
     wfx_rsi.dev_state.Clear(WifiState::kStationConnecting).Clear(WifiState::kStationConnected);
 
-    WifiEvent event = WifiEvent::kStationStartJoin;
+    WifiPlatformEvent event = WifiPlatformEvent::kStationStartJoin;
     sl_matter_wifi_post_event(event);
 }
 /*************************************************************************************
@@ -375,17 +375,17 @@ static int32_t sl_matter_wifi_init(void)
     /* initializes wlan radio parameters and WLAN supplicant parameters.
      */
     (void) rsi_wlan_radio_init(); /* Required so we can get MAC address */
-    if ((status = rsi_wlan_get(RSI_MAC_ADDRESS, &wfx_rsi.sta_mac.octet[0], RESP_BUFF_SIZE)) != RSI_SUCCESS)
+    if ((status = rsi_wlan_get(RSI_MAC_ADDRESS, wfx_rsi.sta_mac.data(), RESP_BUFF_SIZE)) != RSI_SUCCESS)
     {
         ChipLogError(DeviceLayer, "rsi_wlan_get(RSI_MAC_ADDRESS) failed: %ld", status);
         return status;
     }
 
-    ChipLogDetail(DeviceLayer, "MAC: %02x:%02x:%02x %02x:%02x:%02x", wfx_rsi.sta_mac.octet[0], wfx_rsi.sta_mac.octet[1],
-                  wfx_rsi.sta_mac.octet[2], wfx_rsi.sta_mac.octet[3], wfx_rsi.sta_mac.octet[4], wfx_rsi.sta_mac.octet[5]);
+    ChipLogDetail(DeviceLayer, "MAC: %02x:%02x:%02x %02x:%02x:%02x", wfx_rsi.sta_mac.at(0), wfx_rsi.sta_mac.at(1),
+                  wfx_rsi.sta_mac.at(2), wfx_rsi.sta_mac.at(3), wfx_rsi.sta_mac.at(4), wfx_rsi.sta_mac.at(5));
 
     // Create the message queue
-    sWifiEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WifiEvent), NULL);
+    sWifiEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WifiPlatformEvent), NULL);
     if (sWifiEventQueue == NULL)
     {
         return SL_STATUS_ALLOCATION_FAILED;
@@ -451,7 +451,7 @@ static void wfx_rsi_save_ap_info(void) // translation
     }
     wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
     wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
-    memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_LEN);
+    memcpy(wfx_rsi.ap_mac.data(), &rsp.scan_info->bssid[0], kWifiMacAddressLength);
 
     switch (rsp.scan_info->security_mode)
     {
@@ -563,7 +563,7 @@ void NotifyConnectivity(void)
 {
     if (!hasNotifiedWifiConnectivity)
     {
-        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
+        NotifyConnection(wfx_rsi.ap_mac);
         hasNotifiedWifiConnectivity = true;
     }
 }
@@ -590,7 +590,7 @@ void HandleDHCPPolling(void)
     }
     else if (dhcp_state == DHCP_OFF)
     {
-        wfx_ip_changed_notify(IP_STATUS_FAIL);
+        NotifyIPv4Change(false);
         hasNotifiedIPV4 = false;
     }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
@@ -599,9 +599,9 @@ void HandleDHCPPolling(void)
      */
     if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
     {
-        wfx_ipv6_notify(GET_IPV6_SUCCESS);
-        hasNotifiedIPV6 = true;
-        WifiEvent event = WifiEvent::kStationDhcpDone;
+        NotifyIPv6Change(true);
+        hasNotifiedIPV6         = true;
+        WifiPlatformEvent event = WifiPlatformEvent::kStationDhcpDone;
         sl_matter_wifi_post_event(event);
         NotifyConnectivity();
     }
@@ -609,11 +609,11 @@ void HandleDHCPPolling(void)
 
 /** ResetDHCPNotificationFlags
  *  @brief Reset the flags that are used to notify the application about DHCP connectivity
- *         and emits a WifiEvent::kStationDoDhcp event to trigger DHCP polling checks. Helper function for ProcessEvent.
+ *         and emits a WifiPlatformEvent::kStationDoDhcp event to trigger DHCP polling checks. Helper function for ProcessEvent.
  */
 void ResetDHCPNotificationFlags(void)
 {
-    WifiEvent outEvent;
+    WifiPlatformEvent outEvent;
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
     hasNotifiedIPV4 = false;
@@ -621,11 +621,11 @@ void ResetDHCPNotificationFlags(void)
     hasNotifiedIPV6             = false;
     hasNotifiedWifiConnectivity = false;
 
-    outEvent = WifiEvent::kStationDoDhcp;
+    outEvent = WifiPlatformEvent::kStationDoDhcp;
     sl_matter_wifi_post_event(outEvent);
 }
 
-void sl_matter_wifi_post_event(WifiEvent event)
+void sl_matter_wifi_post_event(WifiPlatformEvent event)
 {
     sl_status_t status = osMessageQueuePut(sWifiEventQueue, &event, 0, 0);
 
@@ -645,43 +645,38 @@ void sl_matter_wifi_post_event(WifiEvent event)
  *
  * @param event The input Wi-Fi event to be processed.
  */
-void ProcessEvent(WifiEvent event)
+void ProcessEvent(WifiPlatformEvent event)
 {
     // Process event
     switch (event)
     {
-    case WifiEvent::kStationConnect: {
-        ChipLogDetail(DeviceLayer, "WifiEvent::kStationConnect");
+    case WifiPlatformEvent::kStationConnect: {
+        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationConnect");
         wfx_rsi.dev_state.Set(WifiState::kStationConnected);
         ResetDHCPNotificationFlags();
         wfx_lwip_set_sta_link_up();
-        /* We need to get AP Mac - TODO */
-        // Uncomment once the hook into MATTER is moved to IP connectivty instead
-        // of AP connectivity.
-        // wfx_connected_notify(0, &wfx_rsi.ap_mac); // This
-        // is independant of IP connectivity.
     }
     break;
-    case WifiEvent::kStationDisconnect: {
-        ChipLogDetail(DeviceLayer, "WifiEvent::kStationDisconnect");
+    case WifiPlatformEvent::kStationDisconnect: {
+        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationDisconnect");
         // TODO: This event is not being posted anywhere, seems to be a dead code or we are missing something
         WifiStateFlags flagsToClear = WifiStateFlags(WifiState::kStationReady, WifiState::kStationConnecting,
                                                      WifiState::kStationConnected, WifiState::kStationDhcpDone);
         wfx_rsi.dev_state.Clear(flagsToClear);
         /* TODO: Implement disconnect notify */
         ResetDHCPNotificationFlags();
-        wfx_lwip_set_sta_link_down(); // Internally dhcpclient_poll(netif) ->
-                                      // wfx_ip_changed_notify(0) for IPV4
+        wfx_lwip_set_sta_link_down();
+
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-        wfx_ip_changed_notify(IP_STATUS_FAIL);
+        NotifyIPv4Change(false);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-        wfx_ipv6_notify(GET_IPV6_FAIL);
+        NotifyIPv6Change(false);
     }
     break;
-    case WifiEvent::kAPStart:
+    case WifiPlatformEvent::kAPStart:
         // TODO: Currently unimplemented
         break;
-    case WifiEvent::kScan: {
+    case WifiPlatformEvent::kScan: {
 #ifdef SL_WFX_CONFIG_SCAN
         rsi_rsp_scan_t scan_rsp = { 0 };
         memset(&scan_rsp, 0, sizeof(scan_rsp));
@@ -720,9 +715,9 @@ void ProcessEvent(WifiEvent event)
             ap.security = static_cast<wfx_sec_t>(scan->security_mode);
             ap.rssi     = (-1) * scan->rssi_val;
 
-            configASSERT(sizeof(ap.bssid) == BSSID_LEN);
-            configASSERT(sizeof(scan->bssid) == BSSID_LEN);
-            memcpy(ap.bssid, scan->bssid, BSSID_LEN);
+            configASSERT(sizeof(ap.bssid) == kWifiMacAddressLength);
+            configASSERT(sizeof(scan->bssid) == kWifiMacAddressLength);
+            memcpy(ap.bssid, scan->bssid, kWifiMacAddressLength);
             (*wfx_rsi.scan_cb)(&ap);
 
             // no ssid filter set, return all results
@@ -746,22 +741,22 @@ void ProcessEvent(WifiEvent event)
 #endif /* SL_WFX_CONFIG_SCAN */
     }
     break;
-    case WifiEvent::kStationStartJoin: {
+    case WifiPlatformEvent::kStationStartJoin: {
         // saving the AP related info
         wfx_rsi_save_ap_info();
         // Joining to the network
         sl_wifi_platform_join_network();
     }
     break;
-    case WifiEvent::kStationDoDhcp: {
+    case WifiPlatformEvent::kStationDoDhcp: {
         StartDHCPTimer(WFX_RSI_DHCP_POLL_INTERVAL);
     }
     break;
-    case WifiEvent::kStationDhcpDone: {
+    case WifiPlatformEvent::kStationDhcpDone: {
         CancelDHCPTimer();
     }
     break;
-    case WifiEvent::kStationDhcpPoll: {
+    case WifiPlatformEvent::kStationDhcpPoll: {
         HandleDHCPPolling();
     }
     break;
@@ -790,7 +785,7 @@ void sl_matter_wifi_task(void * arg)
         ChipLogError(DeviceLayer, "sl_matter_wifi_task: sl_matter_wifi_init failed: %ld", rsi_status);
         return;
     }
-    WifiEvent event;
+    WifiPlatformEvent event;
     sl_matter_lwip_start();
     sl_matter_wifi_task_started();
 
@@ -831,7 +826,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
                     wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
     wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone, WifiState::kStationReady);
-    wfx_ip_changed_notify(IP_STATUS_SUCCESS);
+    NotifyIPv4Change(true);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 

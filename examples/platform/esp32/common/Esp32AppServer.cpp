@@ -23,9 +23,9 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
@@ -152,7 +152,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     if (sAppDelegate != nullptr)
     {
         initParams.appDelegate = sAppDelegate;

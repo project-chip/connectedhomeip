@@ -27,6 +27,7 @@ import click
 import coloredlogs
 from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
+from java.bdx_test import BDXTest
 from java.commissioning_test import CommissioningTest
 from java.discover_test import DiscoverTest
 from java.im_test import IMTest
@@ -80,6 +81,37 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
                 raise FileNotFoundError(f"{app} not found")
         app_args = [app] + shlex.split(app_args)
         logging.info(f"Execute: {app_args}")
+
+        if '--crash_log' in app_args:
+            index = app_args.index('--crash_log')
+            fileName = app_args[index + 1]
+            logging.info(f"Crash Log FileName: {fileName}")
+            f = open(fileName, 'w')
+            for i in range(1, 1000):
+                data = "%d\n" % i
+                f.write(data)
+            f.close()
+
+        if '--network_diagnostics_log' in app_args:
+            index = app_args.index('--network_diagnostics_log')
+            fileName = app_args[index + 1]
+            logging.info(f"Network Diag Log FileName: {fileName}")
+            f = open(fileName, 'w')
+            for i in range(1, 500):
+                data = "%d\n" % i
+                f.write(data)
+            f.close()
+
+        if '--end_user_support_log' in app_args:
+            index = app_args.index('--end_user_support_log')
+            fileName = app_args[index + 1]
+            logging.info(f"EndUser Support Log FileName: {fileName}")
+            f = open(fileName, 'w')
+            for i in range(1, 10):
+                data = "%d\n" % i
+                f.write(data)
+            f.close()
+
         app_process = subprocess.Popen(
             app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
         DumpProgramOutputToQueue(
@@ -117,6 +149,16 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         logging.info("Testing IM")
 
         test = IMTest(log_cooking_threads, log_queue, command, tool_args)
+        try:
+            test.RunTest()
+        except Exception as e:
+            logging.error(e)
+            sys.exit(1)
+
+    elif tool_cluster == 'bdx':
+        logging.info("Testing BDX")
+
+        test = BDXTest(log_cooking_threads, log_queue, command, tool_args)
         try:
             test.RunTest()
         except Exception as e:

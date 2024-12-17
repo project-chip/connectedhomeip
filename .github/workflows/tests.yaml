@@ -50,7 +50,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:93
+            image: ghcr.io/project-chip/chip-build:94
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -457,7 +457,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:93
+            image: ghcr.io/project-chip/chip-build:94
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -496,6 +496,7 @@ jobs:
                       --target linux-x64-network-manager-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-fabric-admin-rpc-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang \
+                      --target linux-x64-fabric-sync-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-python-bindings \
                       build \
@@ -513,6 +514,7 @@ jobs:
                   echo "NETWORK_MANAGEMENT_APP: out/linux-x64-network-manager-ipv6only-no-ble-no-wifi-tsan-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
                   echo "FABRIC_ADMIN_APP: out/linux-x64-fabric-admin-rpc-ipv6only-no-ble-no-wifi-clang/fabric-admin" >> /tmp/test_env.yaml
                   echo "FABRIC_BRIDGE_APP: out/linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang/fabric-bridge-app" >> /tmp/test_env.yaml
+                  echo "FABRIC_SYNC_APP: out/linux-x64-fabric-sync-ipv6only-no-ble-no-wifi-clang/fabric-sync" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: out/linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml

@@ -135,7 +135,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     if (params.dataModelProvider == nullptr)
     {
         ChipLogError(AppServer, "Device Controller Factory requires a `dataModelProvider` value.");
-        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance()`");
+        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance(...)`");
     }
 
     VerifyOrReturnError(params.dataModelProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -252,15 +252,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     chip::app::InteractionModelEngine * interactionModelEngine = chip::app::InteractionModelEngine::GetInstance();
 
-    // Note placement of this BEFORE `InitDataModelHandler` since InitDataModelHandler may
-    // rely on ember (does emberAfInit() and configure which may load data from NVM).
-    //
-    // Expected forward path is that we will move move and more things inside datamodel
-    // provider (e.g. storage settings) so we want datamodelprovider available before
-    // `InitDataModelHandler`.
+    // Initialize the data model now that everything cluster implementations might
+    // depend on is initalized.
     interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
-
-    InitDataModelHandler();
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 
