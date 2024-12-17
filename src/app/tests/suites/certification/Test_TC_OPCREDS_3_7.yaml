@@ -96,7 +96,7 @@ tests:
 
       # verification: "Verify that the DUT responds with the CSRResponse command."
     - label:
-          "Step 4.1: Read the commissioner root certificate from TH2's fabric.
+          "Step 4: Read the commissioner root certificate from TH2's fabric.
           Save RCAC as Root_CA_Certificate_TH2"
       identity: "beta"
       cluster: "CommissionerCommands"
@@ -108,7 +108,7 @@ tests:
 
       # verification: ""
     - label:
-          "Step 4.2: TH2 generates the NOC, the Root CA Certificate and ICAC
+          "Step 4.1: TH2 generates the NOC, the Root CA Certificate and ICAC
           using the CSR elements from Step 3 and selects an IPK, all for use by
           TH2. Save ICAC as Intermediate_Certificate_TH2. Save NOC as
           Node_Operational_Certificate_TH2. Save IPK as IPK_TH2. Extract the
@@ -132,7 +132,8 @@ tests:
                 saveAs: IPK_TH2
 
       # verification: ""
-    - label: "Step 5.1: Read the commissioner node ID from TH2"
+    - label: 
+          "Step 5: Read the commissioner node ID from TH2"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "GetCommissionerNodeId"
@@ -143,8 +144,7 @@ tests:
 
       # verification: ""
     - label:
-          "Step 5.2: TH1 sends AddTrustedRootCertificate command to DUT with
-          RootCACertificate set to Root_CA_Certificate_TH2"
+          "Step 5.1: TH1 sends TH2 root certificate to DUT in the AddTrustedRootCertificate chain."
       identity: "alpha"
       command: "AddTrustedRootCertificate"
       cluster: "Operational Credentials"
