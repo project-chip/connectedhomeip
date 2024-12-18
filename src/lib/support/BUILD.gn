@@ -333,6 +333,10 @@ static_library("support") {
   if (chip_config_memory_debug_dmalloc) {
     libs += [ "dmallocthcxx" ]
   }
+
+  if (chip_device_platform == "esp32" || chip_device_platform == "openiotsdk") {
+    defines = [ "CONFIG_NON_POSIX_GETOPT_LONG" ]
+  }
 }
 
 source_set("test_utils") {

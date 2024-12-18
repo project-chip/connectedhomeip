@@ -713,21 +713,6 @@
 #endif
 
 /**
- * @def CHIP_CONFIG_NON_POSIX_LONG_OPT
- *
- * @brief Some platforms have a version of getopt_long that behaves differently from the
- * POSIX version. Set CHIP_CONFIG_NON_POSIX_LONG_OPT to 1 if the platform's implementation of
- * getopt_long differs from POSIX in the following ways (as is the case for ESP32 and OpenIoT):
- *     (a) Sets optopt to '?' when encountering an unknown short option, instead of setting it
- *         to the actual value of the character it encountered.
- *     (b) Treats an unknown long option like a series of short options.
- *     (c) Does not always permute argv to put the nonoptions at the end.
- */
-#ifndef CHIP_CONFIG_NON_POSIX_LONG_OPT
-#define CHIP_CONFIG_NON_POSIX_LONG_OPT 0
-#endif
-
-/**
  * @def CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking Matter unauthenticated
