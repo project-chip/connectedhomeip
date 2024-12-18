@@ -114,20 +114,15 @@ private:
     SingleLinkedListNode<AttributePathParams> * mpAttributePath;
     ConcreteAttributePath mOutputPath;
 
-    // Iterator is expected to be positioned on the FIRST element right after
-    // the constructor. Since Next requires a session, we defer the first Next call
-    // to the first public API call
-    bool mStartWithNext = true;
-
     /// this is to be called on EVERY public API to preserve
     /// API invariants (behave as if NEXT is called in the constructor)
     void EnsureFirstNextCalled(SearchSession & session)
     {
-        if (!mStartWithNext)
+        if (!mOutputPath.mNeedsInitialization)
         {
             return;
         }
-        mStartWithNext = false;
+        mOutputPath.mNeedsInitialization = false;
         (void) Next(session); // NOTE: ignored return code
     }
 

@@ -53,6 +53,12 @@ struct ConcreteClusterPath
     // memory to put it here.  But we don't initialize it, because that
     // increases codesize for the non-consumers.
     bool mExpanded; // NOTE: in between larger members, NOT initialized (see above)
+
+    // Another "free" storage to avoid having extra storage in AttributePathExpandIterator
+    // for figuring out if `Next` is to be called.
+    // Same logic as expanded (not initialized to not incur cust for non-consumers)
+    bool mNeedsInitialization;
+
     ClusterId mClusterId = 0;
 };
 

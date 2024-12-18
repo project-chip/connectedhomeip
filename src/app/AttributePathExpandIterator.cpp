@@ -27,10 +27,11 @@ namespace app {
 
 AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * provider,
                                                          SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModelProvider(provider),
-    mpAttributePath(attributePath), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
+    mDataModelProvider(provider), mpAttributePath(attributePath),
+    mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
 {
-    mOutputPath.mExpanded = true; // this is reset in 'next' if needed
+    mOutputPath.mNeedsInitialization = true; // Ensure a Next is called on all public API
+    mOutputPath.mExpanded            = true; // this is reset in 'next' if needed
 }
 
 bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
@@ -244,12 +245,14 @@ bool AttributePathExpandIterator::Next(SearchSession & session)
         {
             return true;
         }
-        mpAttributePath       = mpAttributePath->mpNext;
-        mOutputPath           = ConcreteReadAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId);
-        mOutputPath.mExpanded = true; // this is reset to false on advancement if needed
+        mpAttributePath                  = mpAttributePath->mpNext;
+        mOutputPath                      = ConcreteReadAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId);
+        mOutputPath.mNeedsInitialization = false; // it is final
+        mOutputPath.mExpanded            = true;  // this is reset to false on advancement if needed
     }
 
-    mOutputPath = ConcreteReadAttributePath();
+    mOutputPath                      = ConcreteReadAttributePath();
+    mOutputPath.mNeedsInitialization = false; // it is final
     return false;
 }
 
