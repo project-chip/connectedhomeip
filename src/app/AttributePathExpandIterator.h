@@ -86,7 +86,7 @@ public:
      * Fills the aPath with the path the iterator currently points to.
      * Returns false if the iterator is not pointing to a valid path (i.e. it has exhausted the cluster info).
      */
-    bool Get(SearchSession &session, ConcreteAttributePath & aPath)
+    bool Get(SearchSession & session, ConcreteAttributePath & aPath)
     {
         EnsureFirstNextCalled(session);
         aPath = mOutputPath;
@@ -103,7 +103,7 @@ public:
     void ResetCurrentCluster(SearchSession & session);
 
     /** Start iterating over the given `paths` */
-    inline void ResetTo(SearchSession &session, SingleLinkedListNode<AttributePathParams> * paths)
+    inline void ResetTo(SearchSession & session, SingleLinkedListNode<AttributePathParams> * paths)
     {
         EnsureFirstNextCalled(session);
         *this = AttributePathExpandIterator(mDataModelProvider, paths);
@@ -121,14 +121,15 @@ private:
 
     /// this is to be called on EVERY public API to preserve
     /// API invariants (behave as if NEXT is called in the constructor)
-    void EnsureFirstNextCalled(SearchSession &session) {
-        if (!mStartWithNext) {
+    void EnsureFirstNextCalled(SearchSession & session)
+    {
+        if (!mStartWithNext)
+        {
             return;
         }
         mStartWithNext = false;
-        (void)Next(session); // NOTE: ignored return code
+        (void) Next(session); // NOTE: ignored return code
     }
-
 
     /// Move to the next endpoint/cluster/attribute triplet that is valid given
     /// the current mOutputPath and mpAttributePath
