@@ -29,9 +29,11 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // Attribute writes have asserted this already, but this assert should catch
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
-
-    InteractionModelEngine::GetInstance()->GetDataModelProvider()->Temporary_ReportAttributeChanged(
-        AttributePathParams(endpoint, clusterId, attributeId));
+    auto * engine = InteractionModelEngine::GetInstance();
+    VerifyOrReturn(engine);
+    auto * dataModelProvider = engine->GetDataModelProvider();
+    VerifyOrReturn(dataModelProvider);
+    dataModelProvider->Temporary_ReportAttributeChanged(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
 void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
@@ -39,8 +41,11 @@ void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
     // Attribute writes have asserted this already, but this assert should catch
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
-
-    InteractionModelEngine::GetInstance()->GetDataModelProvider()->Temporary_ReportAttributeChanged(
+    auto * engine = InteractionModelEngine::GetInstance();
+    VerifyOrReturn(engine);
+    auto * dataModelProvider = engine->GetDataModelProvider();
+    VerifyOrReturn(dataModelProvider);
+    dataModelProvider->Temporary_ReportAttributeChanged(
         AttributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId));
 }
 
@@ -49,6 +54,9 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
     // Attribute writes have asserted this already, but this assert should catch
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
-
-    InteractionModelEngine::GetInstance()->GetDataModelProvider()->Temporary_ReportAttributeChanged(AttributePathParams(endpoint));
+    auto * engine = InteractionModelEngine::GetInstance();
+    VerifyOrReturn(engine);
+    auto * dataModelProvider = engine->GetDataModelProvider();
+    VerifyOrReturn(dataModelProvider);
+    dataModelProvider->Temporary_ReportAttributeChanged(AttributePathParams(endpoint));
 }
