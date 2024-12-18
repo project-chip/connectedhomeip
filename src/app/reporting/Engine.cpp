@@ -1131,7 +1131,7 @@ CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Engine::NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesWritten)
+CHIP_ERROR Engine::NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesConsumed)
 {
     // If we literally have no read handlers right now that care about any events,
     // we don't need to call schedule run for event.
@@ -1169,7 +1169,7 @@ CHIP_ERROR Engine::NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesW
         return CHIP_NO_ERROR;
     }
 
-    return ScheduleBufferPressureEventDelivery(aBytesWritten);
+    return ScheduleBufferPressureEventDelivery(aBytesConsumed);
 }
 
 void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)

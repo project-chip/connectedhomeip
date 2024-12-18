@@ -125,7 +125,7 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
 
     mMonotonicStartupTime = aMonotonicStartupTime;
 
-    // Should remove using the global instance and rely only on passed in variable.
+    // TODO(#36890): Should remove using the global instance and rely only on passed in variable.
     if (apEventReporter == nullptr)
     {
         mpEventReporter = &InteractionModelEngine::GetInstance()->GetReportingEngine();
@@ -500,10 +500,7 @@ exit:
                       opts.mTimestamp.mType == Timestamp::Type::kSystem ? "Sys" : "Epoch", ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
-        if (mpEventReporter)
-        {
-            err = mpEventReporter->NewEventGenerated(opts.mPath, mBytesWritten);
-        }
+        err = mpEventReporter->NewEventGenerated(opts.mPath, mBytesWritten);
     }
 
     return err;

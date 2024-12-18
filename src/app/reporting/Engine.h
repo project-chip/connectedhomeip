@@ -179,10 +179,10 @@ private:
                                    const ConcreteReadAttributePath & aPath);
 
     /**
-     *  EventReporter implementations.
+     *  EventReporter implementation.
      *
      */
-    CHIP_ERROR NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesWritten) override;
+    CHIP_ERROR NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesConsumed) override;
 
     /**
      * Send Report via ReadHandler

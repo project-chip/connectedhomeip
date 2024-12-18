@@ -25,8 +25,7 @@ namespace chip {
 namespace app {
 
 /**
- *   Define EventReporter interface. Event reporter is used by EventManagement to notify that events are ready to be reported.
- *   Usually this is implemented by the Reporting Engine to find the proper ReadHandlers and deliver the events.
+ *   Interface that EventManagement can use to notify when events are generated and may need reporting.
  *
  */
 class EventReporter
@@ -35,12 +34,12 @@ public:
     virtual ~EventReporter() = default;
 
     /**
-     *  Notify of a new event generated.
+     *  Notify that an event was generated.
      *
-     * @param[in] aPath          The path to the event.
-     * @param[in] aBytesWritten  Bytes that the event is written into the buffer in EventManagement.
+     * @param[in] aPath           The path that identifies the kind of event that was generated.
+     * @param[in] aBytesConsumed  The number of bytes needed to store the event in EventManagement.
      */
-    CHIP_ERROR virtual NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesWritten) = 0;
+    CHIP_ERROR virtual NewEventGenerated(ConcreteEventPath & aPath, uint32_t  aBytesConsumed) = 0;
 };
 
 } // namespace app

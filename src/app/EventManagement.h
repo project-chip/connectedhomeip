@@ -226,8 +226,7 @@ public:
      *                                   time 0" for cases when we use
      *                                   system-time event timestamps.
      *
-     * @param[in] apEventReporter       Event reporter to deliver the event, default is the reporting
-     *                                   engine in InteractionModelEngine.
+     * @param[in] apEventReporter       Event reporter to be notified when events are generated.
      *
      */
     void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
