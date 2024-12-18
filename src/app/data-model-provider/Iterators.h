@@ -77,7 +77,7 @@ template <typename T>
 class NullFastForwardIterator : public FastForwardIterator<T>
 {
 public:
-    std::optional<T> Nest() override { return std::nullopt; }
+    std::optional<T> Next() override { return std::nullopt; }
     bool SeekTo(const T & value) override { return false; }
 };
 
