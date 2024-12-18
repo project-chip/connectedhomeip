@@ -141,6 +141,12 @@ public:
     ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
     ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override {}
+
+    // NULL implementations
+    std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) override
+    {
+        return std::make_unique<DataModel::NullElementIterator<DataModel::DeviceTypeEntry>>();
+    }
 };
 
 } // namespace DataModelTests

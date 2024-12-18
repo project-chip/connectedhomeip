@@ -207,10 +207,7 @@ public:
     {
         return std::make_unique<NullMetadataIterator<EndpointId, EndpointInfo>>();
     }
-    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId)
-    {
-        return std::make_unique<NullElementIterator<DeviceTypeEntry>>();
-    }
+    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) = 0;
     virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId)
     {
         return std::make_unique<NullElementIterator<SemanticTag>>();
