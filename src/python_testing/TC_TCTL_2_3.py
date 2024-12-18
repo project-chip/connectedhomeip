@@ -68,8 +68,8 @@ class TC_TCTL_2_3(MatterBaseTest):
         self.step(2)
         if self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SelectedTemperatureLevel):
             selected_temp = await self.read_single_attribute_check_success(
-                cluster=Clusters.Objects.TemperatureControl,
-                attribute=Clusters.TemperatureControl.Attributes.SelectedTemperatureLevel
+                cluster=cluster,
+                attribute=cluster.Attributes.SelectedTemperatureLevel
             )
             asserts.assert_true(0 <= selected_temp <= 31,
                                 f"SelectedTemperatureLevel {selected_temp} is out of range [0-31]")
@@ -78,8 +78,8 @@ class TC_TCTL_2_3(MatterBaseTest):
         self.step(3)
         if self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SupportedTemperatureLevels):
             supported_temps = await self.read_single_attribute_check_success(
-                cluster=Clusters.Objects.TemperatureControl,
-                attribute=Clusters.TemperatureControl.Attributes.SupportedTemperatureLevels
+                cluster=cluster,
+                attribute=cluster.Attributes.SupportedTemperatureLevels
             )
             asserts.assert_true(isinstance(supported_temps, list),
                                 "SupportedTemperatureLevels should be a list")
