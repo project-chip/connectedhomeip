@@ -628,6 +628,7 @@ class MatterTestConfig:
     timeout: typing.Union[int, None] = None
     endpoint: typing.Union[int, None] = 0
     app_pid: int = 0
+    fail_on_skipped_tests: bool = False
 
     commissioning_method: Optional[str] = None
     discriminators: List[int] = field(default_factory=list)
