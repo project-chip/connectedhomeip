@@ -74,18 +74,19 @@ public:
 };
 
 template <typename T>
-class NullFastForwardIterator : public FastForwardIterator<T>
+class NullElementIterator : public ElementIterator<T>
 {
 public:
     std::optional<T> Next() override { return std::nullopt; }
-    bool SeekTo(const T & value) override { return false; }
 };
 
 /// Null iterator, generally just used for tests
 template <typename T, typename Meta>
-class NullMetadataIterator : public NullFastForwardIterator<T>
+class NullMetadataIterator : public MetaDataIterator<T, Meta>
 {
 public:
+    std::optional<T> Next() override { return std::nullopt; }
+    bool SeekTo(const T & value) override { return false; }
     std::optional<Meta> GetMetadata() override { return std::nullopt; }
 };
 

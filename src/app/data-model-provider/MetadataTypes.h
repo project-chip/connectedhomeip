@@ -17,6 +17,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <optional>
 
 #include <access/Privilege.h>
@@ -192,27 +193,51 @@ public:
     //    tight loop/operation within event loop processing and SHOULD NOT be
     //    stored for use across execution boundaries
     //
+    // RETURN VALUES
+    //
+    //  - These MUST NOT return null pointer. Use NullIterators if empty data sets
+    //    are to be returned.
+    //
     // PERFORMANCE
     //
     //  - Lookups should be performed using `Get...` and `SeekTo`.
     //
     /////////////////////////////////////////////////////////////////////////
-    virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints() { return nullptr; }
-    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) { return nullptr; }
-    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId) { return nullptr; }
+    virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints()
+    {
+        return std::make_unique<NullMetadataIterator<EndpointId, EndpointInfo>>();
+    }
+    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId)
+    {
+        return std::make_unique<NullElementIterator<DeviceTypeEntry>>();
+    }
+    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId)
+    {
+        return std::make_unique<NullElementIterator<SemanticTag>>();
+    }
 
-    virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId) { return nullptr; }
-    virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId) { return nullptr; }
+    virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId)
+    {
+        return std::make_unique<NullMetadataIterator<ClusterId, ClusterInfo>>();
+    }
+
+    virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId)
+    {
+        return std::make_unique<NullElementIterator<ClusterId>>();
+    }
 
     virtual std::unique_ptr<MetaDataIterator<AttributeId, AttributeInfo>> GetAttributes(ConcreteClusterPath clusterPath)
     {
-        return nullptr;
+        return std::make_unique<NullMetadataIterator<AttributeId, AttributeInfo>>();
     }
     virtual std::unique_ptr<MetaDataIterator<CommandId, CommandInfo>> GetAcceptedCommands(ConcreteClusterPath clusterPath)
     {
-        return nullptr;
+        return std::make_unique<NullMetadataIterator<CommandId, CommandInfo>>();
     }
-    virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath) { return nullptr; }
+    virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath)
+    {
+        return std::make_unique<NullElementIterator<CommandId>>();
+    }
 
     // This iteration will list all the endpoints in the data model
     virtual EndpointEntry FirstEndpoint()                              = 0;

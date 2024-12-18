@@ -156,11 +156,6 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 {
     CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
         auto it = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetDeviceTypes(endpoint);
-        if (!it)
-        {
-            return CHIP_NO_ERROR;
-        }
-
         for (auto deviceType = it->Next(); deviceType.has_value(); deviceType = it->Next())
         {
             Descriptor::Structs::DeviceTypeStruct::Type deviceStruct;

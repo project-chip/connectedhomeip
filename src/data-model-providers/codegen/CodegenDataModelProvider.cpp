@@ -887,7 +887,7 @@ CodegenDataModelProvider::GetDeviceTypes(EndpointId endpointId)
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpointId);
     if (!endpoint_index.has_value())
     {
-        return nullptr;
+        return std::make_unique<DataModel::NullElementIterator<DataModel::DeviceTypeEntry>>();
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
