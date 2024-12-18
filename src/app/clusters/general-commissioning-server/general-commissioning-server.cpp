@@ -90,7 +90,9 @@ private:
     void HandleArmFailSafe(HandlerContext & ctx, const Commands::ArmFailSafe::DecodableType & commandData);
     void HandleCommissioningComplete(HandlerContext & ctx, const Commands::CommissioningComplete::DecodableType & commandData);
     void HandleSetRegulatoryConfig(HandlerContext & ctx, const Commands::SetRegulatoryConfig::DecodableType & commandData);
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     void HandleSetTCAcknowledgements(HandlerContext & ctx, const Commands::SetTCAcknowledgements::DecodableType & commandData);
+#endif
 };
 
 GeneralCommissioningGlobalInstance gGeneralCommissioningInstance;
@@ -194,16 +196,16 @@ CHIP_ERROR GeneralCommissioningGlobalInstance::ReadIfSupported(CHIP_ERROR (Confi
 
 CHIP_ERROR GeneralCommissioningGlobalInstance::ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder)
 {
-    BasicCommissioningInfo::TypeInfo::Type basicCommissioningInfo;
+    BasicCommissioningInfo::TypeInfo::Type info;
 
     // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
     // the CommissioningParameters at the beginning of commissioning flow.
-    basicCommissioningInfo.failSafeExpiryLengthSeconds  = CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC;
-    basicCommissioningInfo.maxCumulativeFailsafeSeconds = CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC;
+    info.failSafeExpiryLengthSeconds  = CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC;
+    info.maxCumulativeFailsafeSeconds = CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC;
     static_assert(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC >= CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC,
                   "Max cumulative failsafe seconds must be larger than failsafe expiry length seconds");
 
-    return aEncoder.Encode(basicCommissioningInfo);
+    return aEncoder.Encode(info);
 }
 
 CHIP_ERROR GeneralCommissioningGlobalInstance::ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder)
@@ -238,11 +240,13 @@ void GeneralCommissioningGlobalInstance::InvokeCommand(HandlerContext & handlerC
             [this](HandlerContext & ctx, const auto & commandData) { HandleSetRegulatoryConfig(ctx, commandData); });
         break;
 
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     case Commands::SetTCAcknowledgements::Id:
         CommandHandlerInterface::HandleCommand<Commands::SetTCAcknowledgements::DecodableType>(
             handlerContext,
             [this](HandlerContext & ctx, const auto & commandData) { HandleSetTCAcknowledgements(ctx, commandData); });
         break;
+#endif
     }
 }
 
@@ -319,9 +323,6 @@ void GeneralCommissioningGlobalInstance::HandleArmFailSafe(HandlerContext & ctx,
     MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
-
-    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
-                    static_cast<unsigned>(commandData.expiryLengthSeconds));
 
     /*
      * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
@@ -530,12 +531,12 @@ void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContex
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 void GeneralCommissioningGlobalInstance::HandleSetTCAcknowledgements(
     HandlerContext & ctx, const Commands::SetTCAcknowledgements::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
 
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     auto & failSafeContext                  = Server::GetInstance().GetFailSafeContext();
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
 
@@ -594,8 +595,8 @@ void GeneralCommissioningGlobalInstance::HandleSetTCAcknowledgements(
 
     response.errorCode = CommissioningErrorEnum::kOk;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
 void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
 {
@@ -628,6 +629,7 @@ public:
     // Gets called when a fabric is deleted
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
         // related data on the node which was created since it was commissioned.
         if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
@@ -635,7 +637,6 @@ public:
             ChipLogProgress(Zcl, "general-commissioning-server: Last Fabric index 0x%x was removed",
                             static_cast<unsigned>(fabricIndex));
 
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
             TermsAndConditionsState initialState, updatedState;
             VerifyOrReturn(nullptr != tcProvider);
@@ -643,8 +644,8 @@ public:
             VerifyOrReturn(CHIP_NO_ERROR == tcProvider->ResetAcceptance());
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
             NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     }
 };
 
