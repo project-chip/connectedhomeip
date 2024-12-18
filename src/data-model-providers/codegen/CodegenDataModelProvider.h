@@ -157,6 +157,7 @@ public:
     /// attribute tree iteration
     std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) override;
     std::unique_ptr<DataModel::ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId) override;
+    std::unique_ptr<DataModel::ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId) override;
 
     DataModel::EndpointEntry FirstEndpoint() override;
     DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
@@ -166,9 +167,6 @@ public:
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
     std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;
-
-    ConcreteClusterPath FirstClientCluster(EndpointId endpoint) override;
-    ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) override;
 
     DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;

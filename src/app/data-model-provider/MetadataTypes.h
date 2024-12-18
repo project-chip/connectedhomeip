@@ -203,21 +203,19 @@ public:
     //  - Lookups should be performed using `Get...` and `SeekTo`.
     //
     /////////////////////////////////////////////////////////////////////////
+    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) = 0;
+    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId)    = 0;
+    virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId)    = 0;
+
+    // TODO: below items MUST transition to pure virtual and have implementations everywhere
     virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints()
     {
         return std::make_unique<NullMetadataIterator<EndpointId, EndpointInfo>>();
     }
-    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) = 0;
-    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId)    = 0;
 
     virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId)
     {
         return std::make_unique<NullMetadataIterator<ClusterId, ClusterInfo>>();
-    }
-
-    virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId)
-    {
-        return std::make_unique<NullElementIterator<ClusterId>>();
     }
 
     virtual std::unique_ptr<MetaDataIterator<AttributeId, AttributeInfo>> GetAttributes(ConcreteClusterPath clusterPath)
@@ -243,12 +241,6 @@ public:
     virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
     virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
     virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
-
-    // This iteration will list all client clusters on a given endpoint
-    // As the client cluster is only a client without any attributes/commands,
-    // these functions only return the cluster path.
-    virtual ConcreteClusterPath FirstClientCluster(EndpointId endpoint)               = 0;
-    virtual ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) = 0;
 
     // Attribute iteration and accessors provide cluster-level access over
     // attributes

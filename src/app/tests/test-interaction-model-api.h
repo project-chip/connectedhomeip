@@ -110,14 +110,13 @@ public:
     std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
                                                         chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
+    std::unique_ptr<DataModel::ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId) override;
     DataModel::EndpointEntry FirstEndpoint() override;
     DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
     std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
     std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;
-    ConcreteClusterPath FirstClientCluster(EndpointId endpoint) override;
-    ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) override;
     DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
     std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;

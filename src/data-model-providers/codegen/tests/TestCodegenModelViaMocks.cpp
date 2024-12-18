@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "pw_unit_test/framework.h"
 #include <pw_unit_test/framework.h>
 
 #include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
@@ -1079,53 +1080,33 @@ TEST(TestCodegenModelViaMocks, IterateOverClientClusters)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    EXPECT_FALSE(model.FirstClientCluster(kEndpointIdThatIsMissing).HasValidIds());
-    EXPECT_FALSE(model.FirstClientCluster(kInvalidEndpointId).HasValidIds());
-    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kInvalidEndpointId, 123)).HasValidIds());
-    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).HasValidIds());
-    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kMockEndpoint1, 981u)).HasValidIds());
+    EXPECT_FALSE(model.GetClientClusters(kEndpointIdThatIsMissing)->Next().has_value());
+    EXPECT_FALSE(model.GetClientClusters(kInvalidEndpointId)->Next().has_value());
 
     // mock endpoint 1 has 2 mock client clusters: 3 and 4
-    ConcreteClusterPath path = model.FirstClientCluster(kMockEndpoint1);
-    ASSERT_TRUE(path.HasValidIds());
-    EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
-    EXPECT_EQ(path.mClusterId, MockClusterId(3));
+    auto it        = model.GetClientClusters(kMockEndpoint1);
+    auto clusterId = it->Next();
+    ASSERT_TRUE(clusterId.has_value());
+    EXPECT_EQ(*clusterId, MockClusterId(3)); // NOLINT(bugprone-unchecked-optional-access)
 
-    path = model.NextClientCluster(path);
-    ASSERT_TRUE(path.HasValidIds());
-    EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
-    EXPECT_EQ(path.mClusterId, MockClusterId(4));
+    clusterId = it->Next();
+    ASSERT_TRUE(clusterId.has_value());
+    EXPECT_EQ(*clusterId, MockClusterId(4)); // NOLINT(bugprone-unchecked-optional-access)
 
-    path = model.NextClientCluster(path);
-    EXPECT_FALSE(path.HasValidIds());
+    clusterId = it->Next();
+    EXPECT_FALSE(clusterId.has_value());
 
     // mock endpoint 2 has 1 mock client clusters: 3(has server side at the same time) and 4
-    path = model.FirstClientCluster(kMockEndpoint2);
-    for (uint16_t clusterId = 3; clusterId <= 4; clusterId++)
+    it        = model.GetClientClusters(kMockEndpoint2);
+    clusterId = it->Next();
+    for (uint16_t expectedId = 3; expectedId <= 4; expectedId++)
     {
-        ASSERT_TRUE(path.HasValidIds());
-        EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
-        EXPECT_EQ(path.mClusterId, MockClusterId(clusterId));
-        path = model.NextClientCluster(path);
-    }
-    EXPECT_FALSE(path.HasValidIds());
+        ASSERT_TRUE(clusterId.has_value());
+        EXPECT_EQ(*clusterId, MockClusterId(expectedId)); // NOLINT(bugprone-unchecked-optional-access)
 
-    // repeat calls should work
-    for (int i = 0; i < 10; i++)
-    {
-        path = model.FirstClientCluster(kMockEndpoint1);
-        ASSERT_TRUE(path.HasValidIds());
-        EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
-        EXPECT_EQ(path.mClusterId, MockClusterId(3));
+        clusterId = it->Next();
     }
-
-    for (int i = 0; i < 10; i++)
-    {
-        ConcreteClusterPath nextPath = model.NextClientCluster(path);
-        ASSERT_TRUE(nextPath.HasValidIds());
-        EXPECT_EQ(nextPath.mEndpointId, kMockEndpoint1);
-        EXPECT_EQ(nextPath.mClusterId, MockClusterId(4));
-    }
+    ASSERT_FALSE(clusterId.has_value());
 }
 
 TEST(TestCodegenModelViaMocks, IterateOverAttributes)

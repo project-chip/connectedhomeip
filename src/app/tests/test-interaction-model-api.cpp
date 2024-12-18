@@ -179,14 +179,9 @@ std::optional<ClusterInfo> TestImCustomDataModel::GetServerClusterInfo(const Con
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetServerClusterInfo(path);
 }
 
-ConcreteClusterPath TestImCustomDataModel::FirstClientCluster(EndpointId endpoint)
+std::unique_ptr<DataModel::ElementIterator<ClusterId>> TestImCustomDataModel::GetClientClusters(EndpointId endpointId)
 {
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstClientCluster(endpoint);
-}
-
-ConcreteClusterPath TestImCustomDataModel::NextClientCluster(const ConcreteClusterPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextClientCluster(before);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetClientClusters(endpointId);
 }
 
 AttributeEntry TestImCustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)

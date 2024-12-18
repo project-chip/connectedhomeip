@@ -183,12 +183,11 @@ CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, 
         }
         else
         {
-            ConcreteClusterPath clusterPath =
-                InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstClientCluster(endpoint);
-            while (clusterPath.HasValidIds())
+            auto it = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetClientClusters(endpoint);
+
+            for (auto clusterID = it->Next(); clusterID.has_value(); clusterID = it->Next())
             {
-                ReturnErrorOnFailure(encoder.Encode(clusterPath.mClusterId));
-                clusterPath = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextClientCluster(clusterPath);
+                ReturnErrorOnFailure(encoder.Encode(*clusterID));
             }
         }
 
