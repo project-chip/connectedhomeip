@@ -1,7 +1,7 @@
-This is a test driver for the Matter unit tests to be run on an EFR32 device.
-It builds a set of test binaries, each of which contains one directory of unit tests
-that can be flashed onto a device and run. The device is controlled using the included
-RPCs through the python test runner.
+This is a test driver for the Matter unit tests to be run on an EFR32 device. It
+builds a set of test binaries, each of which contains one directory of unit
+tests that can be flashed onto a device and run. The device is controlled using
+the included RPCs through the python test runner.
 
 -   [Prerequisites](#prerequisites)
 -   [Building The Unit Tests](#building-the-unit-tests)
@@ -48,6 +48,6 @@ The unit tests can be built using gn and ninja:
 
 ## Running The Unit Tests
 
-The unit tests can be run using the test runner python script:
-    
-    python py/pw_test_runner/pw_test_runner.py -d /dev/ttyACM1 -f out/debug/tests -o out.log
+The unit tests can be run using the test runner python script:   
+ python py/pw_test_runner/pw_test_runner.py -d /dev/ttyACM1 -f out/debug/tests -o
+out.log
