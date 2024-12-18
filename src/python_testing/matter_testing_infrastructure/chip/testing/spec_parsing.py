@@ -571,7 +571,6 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     top = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
     logging.info("Reading XML clusters from %r", top)
 
-    # Early return if no XML files are found
     found_xmls = 0
     for f in top.iterdir():
         if not f.name.endswith('.xml'):
