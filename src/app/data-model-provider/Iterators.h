@@ -24,8 +24,9 @@ namespace DataModel {
 
 /// Supports one-way iteration over a specific element list.
 ///
-template<typename T>
-class ElementIterator {
+template <typename T>
+class ElementIterator
+{
 public:
     virtual ~ElementIterator() = default;
 
@@ -41,8 +42,9 @@ public:
 /// so that SeekTo can be used for resuming iterations.
 ///
 /// Useful to directly locate a specific element in an iteration.
-template<typename T>
-class FastForwardIterator : public ElementIterator<T> {
+template <typename T>
+class FastForwardIterator : public ElementIterator<T>
+{
 public:
     virtual ~FastForwardIterator() = default;
 
@@ -51,14 +53,14 @@ public:
     ///
     /// Returns true if the seek was successful and the element is found.
     /// Returns false otherwise and the iterator will be invalidated (next will return std::nullopt)
-    virtual bool SeekTo(const T& value) = 0;
-
+    virtual bool SeekTo(const T & value) = 0;
 };
 
 /// An iterator that also supports returning extra associated
 /// metadata.
-template<typename T, typename Meta>
-class MetaDataIterator : public FastForwardIterator<T> {
+template <typename T, typename Meta>
+class MetaDataIterator : public FastForwardIterator<T>
+{
 public:
     virtual ~MetaDataIterator() = default;
 
@@ -71,20 +73,22 @@ public:
     virtual std::optional<Meta> GetMetadata() = 0;
 };
 
-template<typename T>
-class NullFastForwardIterator: public FastForwardIterator<T> {
+template <typename T>
+class NullFastForwardIterator : public FastForwardIterator<T>
+{
 public:
     std::optional<T> Nest() override { return std::nullopt; }
-    bool SeekTo(const T& value) override { return false; }
+    bool SeekTo(const T & value) override { return false; }
 };
 
 /// Null iterator, generally just used for tests
-template<typename T, typename Meta>
-class NullMetadataIterator: public NullFastForwardIterator<T> {
+template <typename T, typename Meta>
+class NullMetadataIterator : public NullFastForwardIterator<T>
+{
 public:
     std::optional<Meta> GetMetadata() override { return std::nullopt; }
 };
 
-} // DataModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip
