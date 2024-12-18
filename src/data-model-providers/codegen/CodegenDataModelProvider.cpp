@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/support/ScopedBuffer.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -128,11 +129,6 @@ struct ByDeviceType
 const CommandId * AcceptedCommands(const EmberAfCluster & cluster)
 {
     return cluster.acceptedCommandList;
-}
-
-const CommandId * GeneratedCommands(const EmberAfCluster & cluster)
-{
-    return cluster.generatedCommandList;
 }
 
 /// Load the cluster information into the specified destination
@@ -418,6 +414,50 @@ private:
     uint16_t mMetadataIndex = kInvalidIndex;
 
     static constexpr uint16_t kInvalidIndex = std::numeric_limits<uint16_t>::max();
+};
+
+class GeneratedCommandsIterator : public DataModel::ElementIterator<CommandId>
+{
+public:
+    GeneratedCommandsIterator(const CommandId * commands) : mCommands(commands) {}
+
+    std::optional<CommandId> Next() override
+    {
+        VerifyOrReturnValue(mCommands != nullptr, std::nullopt);
+        VerifyOrReturnValue(*mCommands != kInvalidCommandId, std::nullopt);
+
+        auto id = *mCommands;
+        ++mCommands;
+        return id;
+    }
+
+private:
+    const CommandId * mCommands;
+};
+
+class AllocatedGeneratedCommandsIterator : public DataModel::ElementIterator<CommandId>
+{
+public:
+    AllocatedGeneratedCommandsIterator(CommandId * commands, size_t size) : mCommands(commands), mSize(size) {}
+    ~AllocatedGeneratedCommandsIterator() override { Platform::Impl::PlatformMemoryManagement::MemoryFree(mCommands); }
+
+    AllocatedGeneratedCommandsIterator(const AllocatedGeneratedCommandsIterator &)             = delete;
+    AllocatedGeneratedCommandsIterator & operator=(const AllocatedGeneratedCommandsIterator &) = delete;
+
+    std::optional<CommandId> Next() override
+    {
+        VerifyOrReturnValue(mCommands != nullptr, std::nullopt);
+        VerifyOrReturnValue(mIndex < mSize, std::nullopt);
+
+        auto id = mCommands[mIndex];
+        ++mIndex;
+        return id;
+    }
+
+private:
+    CommandId * mCommands;
+    const size_t mSize;
+    size_t mIndex = 0;
 };
 
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
@@ -806,26 +846,85 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
     return CommandEntryFrom(path, commandId).info;
 }
 
-ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const ConcreteClusterPath & path)
+std::unique_ptr<DataModel::ElementIterator<CommandId>>
+CodegenDataModelProvider::GetGeneratedCommands(ConcreteClusterPath clusterPath)
 {
-    EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateGeneratedCommands);
-    CommandId commandId =
-        FindCommand(ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId), handlerFinder,
-                    detail::EnumeratorCommandFinder::Operation::kFindFirst, mGeneratedCommandsIterator, GeneratedCommands);
+    // we should FIND the handler and allocate things (if needed)
+    // OR return metadata items
+    CommandHandlerInterface * interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(clusterPath.mEndpointId, clusterPath.mClusterId);
 
-    VerifyOrReturnValue(commandId != kInvalidCommandId, kInvalidCommandPath);
-    return ConcreteCommandPath(path.mEndpointId, path.mClusterId, commandId);
-}
+    if (interface != nullptr)
+    {
+        // maybe we have actual generated commands here ...
+        size_t commandCount = 0;
+        CHIP_ERROR err      = interface->EnumerateGeneratedCommands(
+            clusterPath,
+            [](CommandId commandId, void * context) -> Loop {
+                (*reinterpret_cast<size_t *>(context))++;
+                return Loop::Continue;
+            },
+            reinterpret_cast<void *>(&commandCount));
 
-ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const ConcreteCommandPath & before)
-{
-    EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateGeneratedCommands);
+        if (err == CHIP_NO_ERROR)
+        {
+            typedef struct
+            {
+                Platform::ScopedMemoryBuffer<CommandId> commands;
+                size_t index;
+                size_t maxSize;
+            } FetchData;
 
-    CommandId commandId = FindCommand(before, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindNext,
-                                      mGeneratedCommandsIterator, GeneratedCommands);
+            FetchData data;
+            data.index   = 0;
+            data.maxSize = commandCount;
 
-    VerifyOrReturnValue(commandId != kInvalidCommandId, kInvalidCommandPath);
-    return ConcreteCommandPath(before.mEndpointId, before.mClusterId, commandId);
+            if (!data.commands.Alloc(commandCount))
+            {
+                ChipLogError(DataManagement, "Out of memory reading generated commands");
+                return std::make_unique<GeneratedCommandsIterator>(nullptr);
+            }
+
+            err = interface->EnumerateGeneratedCommands(
+                clusterPath,
+                [](CommandId commandId, void * context) -> Loop {
+                    auto data = reinterpret_cast<FetchData *>(context);
+
+                    if (data->index < data->maxSize)
+                    {
+                        data->commands[data->index] = commandId;
+                    }
+                    data->index++;
+                    return Loop::Continue;
+                },
+                reinterpret_cast<void *>(&data));
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "Error fetching commands from CHI");
+                return std::make_unique<GeneratedCommandsIterator>(nullptr);
+            }
+
+            if (data.index != data.maxSize)
+            {
+                ChipLogError(DataManagement, "Command size mismatch: command list is not deterministic");
+                return std::make_unique<GeneratedCommandsIterator>(nullptr);
+            }
+
+            return std::make_unique<AllocatedGeneratedCommandsIterator>(data.commands.Release(), data.maxSize);
+        }
+
+        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            // hard failure, we cannot return anything
+            return std::make_unique<GeneratedCommandsIterator>(nullptr);
+        }
+    }
+
+    const EmberAfCluster * cluster = FindServerCluster(clusterPath);
+    VerifyOrReturnValue(cluster != nullptr, std::make_unique<GeneratedCommandsIterator>(nullptr));
+
+    return std::make_unique<GeneratedCommandsIterator>(cluster->generatedCommandList);
 }
 
 void CodegenDataModelProvider::InitDataModelForTesting()

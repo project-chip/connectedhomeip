@@ -174,6 +174,11 @@ std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpoints();
 }
 
+std::unique_ptr<DataModel::ElementIterator<CommandId>> TestImCustomDataModel::GetGeneratedCommands(ConcreteClusterPath clusterPath)
+{
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetGeneratedCommands(clusterPath);
+}
+
 AttributeEntry TestImCustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAttribute(cluster);
@@ -202,16 +207,6 @@ CommandEntry TestImCustomDataModel::NextAcceptedCommand(const ConcreteCommandPat
 std::optional<CommandInfo> TestImCustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAcceptedCommandInfo(path);
-}
-
-ConcreteCommandPath TestImCustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstGeneratedCommand(cluster);
-}
-
-ConcreteCommandPath TestImCustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextGeneratedCommand(before);
 }
 
 } // namespace app

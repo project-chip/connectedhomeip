@@ -159,6 +159,7 @@ public:
     std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) override;
     std::unique_ptr<DataModel::ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId) override;
     std::unique_ptr<DataModel::ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId) override;
+    std::unique_ptr<DataModel::ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath) override;
 
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
@@ -171,9 +172,6 @@ public:
     DataModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
     DataModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
     std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
-
-    ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
-    ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
 
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 

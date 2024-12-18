@@ -207,6 +207,7 @@ public:
     virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId)    = 0;
     virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId)    = 0;
     virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints()              = 0;
+    virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath) = 0;
 
     // TODO: below items MUST transition to pure virtual and have implementations everywhere
 
@@ -222,10 +223,6 @@ public:
     virtual std::unique_ptr<MetaDataIterator<CommandId, CommandInfo>> GetAcceptedCommands(ConcreteClusterPath clusterPath)
     {
         return std::make_unique<NullMetadataIterator<CommandId, CommandInfo>>();
-    }
-    virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath)
-    {
-        return std::make_unique<NullElementIterator<CommandId>>();
     }
 
     // This iteration will list all server clusters on a given endpoint
@@ -243,11 +240,6 @@ public:
     virtual CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster)              = 0;
     virtual CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before)                = 0;
     virtual std::optional<CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) = 0;
-
-    // "generated" commands are purely for reporting what types of command ids can be
-    // returned as responses.
-    virtual ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) = 0;
-    virtual ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before)   = 0;
 
     /// Workaround function to report attribute change.
     ///
