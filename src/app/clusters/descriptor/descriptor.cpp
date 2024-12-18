@@ -21,6 +21,8 @@
  ***************************************************************************/
 
 #include "descriptor.h"
+#include "lib/core/CHIPError.h"
+#include "lib/support/logging/TextOnlyLogging.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -86,69 +88,94 @@ CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, Attri
 
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    auto endpointInfo = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpointInfo(endpoint);
     if (endpoint == 0x00)
     {
-        err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-            auto endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstEndpoint();
-            while (endpointEntry.IsValid())
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+            auto endpoints = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpoints();
+            for (auto id = endpoints->Next(); id.has_value(); id = endpoints->Next())
             {
-                if (endpointEntry.id != 0)
+                if (*id == 0)
                 {
-                    ReturnErrorOnFailure(encoder.Encode(endpointEntry.id));
+                    continue;
                 }
-                endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextEndpoint(endpointEntry.id);
+                ReturnErrorOnFailure(encoder.Encode(*id));
             }
             return CHIP_NO_ERROR;
         });
     }
-    else if (endpointInfo.has_value() && endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily)
+
+    auto endpoints = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpoints();
+
+    VerifyOrReturnError(endpoints->SeekTo(endpoint), CHIP_ERROR_KEY_NOT_FOUND);
+
+    auto endpointInfo = endpoints->GetMetadata();
+    // if SEEK returns true, metadata MUST be valid
+    VerifyOrReturnError(endpointInfo.has_value(), CHIP_ERROR_INTERNAL);
+
+    if (endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily)
     {
-        err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
-            auto endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstEndpoint();
-            while (endpointEntry.IsValid())
+        return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+            auto endpoints = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpoints();
+
+            for (auto id = endpoints->Next(); id.has_value(); id = endpoints->Next())
             {
-                EndpointId parentEndpointId = endpointEntry.info.parentId;
+                std::optional<DataModel::EndpointInfo> info = endpoints->GetMetadata();
+
+                if (!info.has_value())
+                {
+                    // this is a bug probably
+                    ChipLogError(InteractionModel, "Failed to fetch info for endpoint %d", *id);
+                    break;
+                }
+
+                EndpointId parentEndpointId = info->parentId;
                 while (parentEndpointId != chip::kInvalidEndpointId)
                 {
                     if (parentEndpointId == endpoint)
                     {
-                        ReturnErrorOnFailure(encoder.Encode(endpointEntry.id));
+                        ReturnErrorOnFailure(encoder.Encode(*id));
                         break;
                     }
-                    auto parentEndpointInfo =
-                        InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpointInfo(parentEndpointId);
-                    if (!parentEndpointInfo.has_value())
+                    //
+                    auto endpoints2 = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpoints();
+                    if (!endpoints2->SeekTo(parentEndpointId))
                     {
+                        // this is a logic error ...
+                        ChipLogError(InteractionModel, "Failed to seek to parent endpoint %d", parentEndpointId);
                         break;
                     }
-                    parentEndpointId = parentEndpointInfo->parentId;
+                    info = endpoints2->GetMetadata();
+                    if (!info.has_value())
+                    {
+                        ChipLogError(InteractionModel, "Failed to fetch info for parent endpoint %d", parentEndpointId);
+                        break;
+                    }
+                    parentEndpointId = info->parentId;
                 }
-                endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextEndpoint(endpointEntry.id);
             }
 
             return CHIP_NO_ERROR;
         });
     }
-    else if (endpointInfo.has_value() && endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kTree)
+
+    if (endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kTree)
     {
-        err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
-            auto endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstEndpoint();
-            while (endpointEntry.IsValid())
+        return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+            auto endpoints = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpoints();
+            for (auto id = endpoints->Next(); id.has_value(); id = endpoints->Next())
             {
-                if (endpointEntry.info.parentId == endpoint)
+                std::optional<DataModel::EndpointInfo> info = endpoints->GetMetadata();
+                if (info.has_value() && info->parentId == endpoint)
                 {
-                    ReturnErrorOnFailure(encoder.Encode(endpointEntry.id));
+                    ReturnErrorOnFailure(encoder.Encode(*id));
                 }
-                endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextEndpoint(endpointEntry.id);
             }
             return CHIP_NO_ERROR;
         });
     }
 
-    return err;
+    ChipLogError(InteractionModel, "Unknown composition pattern: %d", endpoint);
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
