@@ -507,7 +507,6 @@ std::unique_ptr<DataModel::ElementIterator<CommandId>> CustomDataModel::GetGener
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetGeneratedCommands(clusterPath);
 }
 
-
 AttributeEntry CustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAttribute(cluster);

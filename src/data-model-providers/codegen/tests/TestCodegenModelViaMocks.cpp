@@ -889,7 +889,6 @@ void WriteLe16(void * buffer, uint16_t value)
     chip::Encoding::LittleEndian::Write16(p, value);
 }
 
-
 class TestCodegenModelViaMocks : public ::testing::Test
 {
 public:
@@ -1368,7 +1367,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
 
     // should be able to iterate over valid paths
     auto iter = model.GetGeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
-    auto id = iter->Next();
+    auto id   = iter->Next();
     ASSERT_TRUE(id.has_value());
     EXPECT_EQ(*id, 2u);
 
@@ -1380,7 +1379,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
     ASSERT_FALSE(id.has_value());
 
     iter = model.GetGeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
-    id = iter->Next();
+    id   = iter->Next();
     ASSERT_TRUE(id.has_value());
     EXPECT_EQ(*id, 4u);
 }
@@ -1428,7 +1427,7 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
     EXPECT_FALSE(entry.IsValid());
 
     auto iter = model.GetGeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
-    auto id = iter->Next();
+    auto id   = iter->Next();
     ASSERT_TRUE(id.has_value());
     EXPECT_EQ(*id, 33u);
     id = iter->Next();

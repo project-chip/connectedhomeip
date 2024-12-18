@@ -203,10 +203,10 @@ public:
     //  - Lookups should be performed using `Get...` and `SeekTo`.
     //
     /////////////////////////////////////////////////////////////////////////
-    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) = 0;
-    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId)    = 0;
-    virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId)    = 0;
-    virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints()              = 0;
+    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId)           = 0;
+    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId)              = 0;
+    virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId)              = 0;
+    virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints()                        = 0;
     virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath) = 0;
 
     // TODO: below items MUST transition to pure virtual and have implementations everywhere
