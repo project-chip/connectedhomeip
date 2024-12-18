@@ -27,7 +27,6 @@
 #include <app/data-model-provider/Provider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
-#include <app/util/DataModelHandler.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
@@ -170,17 +169,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err = mAttributePersister.Init(mDeviceStorage));
     SetSafeAttributePersistenceProvider(&mAttributePersister);
 
-    // SetDataModelProvider() actually initializes/starts the provider.  We need
-    // to preserve the following ordering guarantees:
-    //
-    // 1) Provider initialization (under SetDataModelProvider) happens after
-    //    SetSafeAttributePersistenceProvider, since the provider can then use
-    //    the safe persistence provider to implement and initialize its own attribute persistence logic.
-    // 2) For now, provider initialization happens before InitDataModelHandler(), which depends
-    //    on atttribute persistence being already set up before it runs.  Longer-term, the logic from
-    //    InitDataModelHandler should just move into the codegen provider.
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
-
     {
         FabricTable::InitParams fabricTableInitParams;
         fabricTableInitParams.storage             = mDeviceStorage;
@@ -302,8 +290,22 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-    // This initializes clusters, so should come after lower level initialization.
-    InitDataModelHandler();
+    // SetDataModelProvider() initializes and starts the provider, which in turn
+    // triggers the initialization of cluster implementations. This callsite is
+    // critical because it ensures that cluster-level initialization occurs only
+    // after all necessary low-level dependencies have been set up.
+    //
+    // Ordering guarantees:
+    // 1) Provider initialization (under SetDataModelProvider) must happen after
+    //    SetSafeAttributePersistenceProvider to ensure the provider can leverage
+    //    the safe persistence provider for attribute persistence logic.
+    // 2) It must occur after all low-level components that cluster implementations
+    //    might depend on have been initialized, as they rely on these components
+    //    during their own initialization.
+    //
+    // This remains the single point of entry to ensure that all cluster-level
+    // initialization is performed in the correct order.
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);
