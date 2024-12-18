@@ -18,6 +18,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
 
+extern WfxRsi_t wfx_rsi;
+
 namespace {
 
 // Thread for the WLAN RSI
@@ -34,6 +36,19 @@ constexpr osThreadAttr_t kWlanTaskAttr = { .name       = "wlan_rsi",
                                            .priority   = osPriorityAboveNormal7 };
 
 } // namespace
+
+CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & address)
+{
+    VerifyOrReturnError(address.size() >= kWifiMacAddressLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+#ifdef SL_WFX_CONFIG_SOFTAP
+    chip::ByteSpan byteSpan((interface == SL_WFX_SOFTAP_INTERFACE) ? wfx_rsi.softap_mac : wfx_rsi.sta_mac);
+#else
+    chip::ByteSpan byteSpan(wfx_rsi.sta_mac);
+#endif
+
+    return CopySpanToMutableSpan(byteSpan, address);
+}
 
 /*********************************************************************
  * @fn  sl_status_t wfx_wifi_start(void)
@@ -80,25 +95,6 @@ void wfx_enable_sta_mode(void)
 bool wfx_is_sta_mode_enabled(void)
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationMode);
-}
-
-/*********************************************************************
- * @fn  void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t *addr)
- * @brief
- *      get the wifi mac address
- * @param[in]  Interface:
- * @param[in]  addr : address
- * @return
- *       None
- ***********************************************************************/
-void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
-{
-    VerifyOrReturn(addr != nullptr);
-#ifdef SL_WFX_CONFIG_SOFTAP
-    *addr = (interface == SL_WFX_SOFTAP_INTERFACE) ? wfx_rsi.softap_mac : wfx_rsi.sta_mac;
-#else
-    *addr = wfx_rsi.sta_mac;
-#endif
 }
 
 /*********************************************************************
@@ -160,7 +156,7 @@ sl_status_t wfx_connect_to_ap(void)
     VerifyOrReturnError(wfx_rsi.sec.ssid_length <= WFX_MAX_SSID_LENGTH, SL_STATUS_HAS_OVERFLOWED);
     ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
 
-    WifiEvent event = WifiEvent::kStationStartJoin;
+    WifiPlatformEvent event = WifiPlatformEvent::kStationStartJoin;
     sl_matter_wifi_post_event(event);
     return SL_STATUS_OK;
 }
@@ -327,7 +323,7 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
     VerifyOrReturnError(wfx_rsi.scan_ssid != nullptr, false);
     chip::Platform::CopyString(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length, ssid);
 
-    WifiEvent event = WifiEvent::kScan;
+    WifiPlatformEvent event = WifiPlatformEvent::kScan;
     sl_matter_wifi_post_event(event);
 
     return true;
