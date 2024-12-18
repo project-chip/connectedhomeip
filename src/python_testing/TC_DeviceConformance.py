@@ -30,7 +30,7 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --tests test_TC_IDM_10_2
+#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -273,6 +273,35 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         return success, problems
 
+    def check_device_type_revisions(self) -> tuple[bool, list[ProblemNotice]]:
+        success = True
+        problems = []
+
+        def record_error(location, problem):
+            nonlocal success
+            problems.append(ProblemNotice("IDM-10.6", location, ProblemSeverity.ERROR, problem, ""))
+            success = False
+
+        for endpoint_id, endpoint in self.endpoints.items():
+            if Clusters.Descriptor not in endpoint:
+                # Descriptor cluster presence checked in 10.5
+                continue
+
+            standard_device_types = [x for x in endpoint[Clusters.Descriptor]
+                                     [Clusters.Descriptor.Attributes.DeviceTypeList] if device_type_id_type(x.deviceType) == DeviceTypeIdType.kStandard]
+            for device_type in standard_device_types:
+                device_type_id = device_type.deviceType
+                if device_type_id not in self.xml_device_types.keys():
+                    # problem recorded in 10.5
+                    continue
+                expected_revision = self.xml_device_types[device_type_id].revision
+                actual_revision = device_type.revision
+                if expected_revision != actual_revision:
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id)
+                    record_error(
+                        location, f"Expected Device type revision for device type {device_type_id} {self.xml_device_types[device_type_id].name} on endpoint {endpoint_id} does not match revision on DUT. Expected: {expected_revision} DUT: {actual_revision}")
+        return success, problems
+
     def check_device_type(self, fail_on_extra_clusters: bool = True, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
         problems = []
@@ -310,13 +339,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                 if device_type_id not in self.xml_device_types.keys():
                     record_error(location=location, problem='Unknown device type ID in standard range')
                     continue
-
-                if device_type_id not in self.xml_device_types.keys():
-                    location = DeviceTypePathLocation(device_type_id=device_type_id)
-                    record_error(location=location, problem='Unknown device type')
-                    continue
-
-                # TODO: check revision. Possibly in another test?
 
                 xml_device = self.xml_device_types[device_type_id]
                 # IDM 10.1 checks individual clusters for validity,
@@ -384,6 +406,12 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
+
+    def test_TC_IDM_10_6(self):
+        success, problems = self.check_device_type_revisions()
+        self.problems.extend(problems)
+        if not success:
+            self.fail_current_test("Problems with Device type revisions on one or more endpoints")
 
 
 if __name__ == "__main__":
