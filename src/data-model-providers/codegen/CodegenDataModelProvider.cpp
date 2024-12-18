@@ -564,21 +564,18 @@ DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId 
     return FirstServerClusterEntry(endpointId, endpoint, 0, mServerClusterIterationHint);
 }
 
-std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id,
-                                                                      ClusterSide side) const
+std::optional<unsigned> CodegenDataModelProvider::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint,
+                                                                            ClusterId id) const
 {
     const unsigned clusterCount = endpoint->clusterCount;
-    unsigned hint               = side == ClusterSide::kServer ? mServerClusterIterationHint : mClientClusterIterationHint;
+    unsigned hint               = mServerClusterIterationHint;
 
-    if (hint < clusterCount)
+    if (mServerClusterIterationHint < clusterCount)
     {
         const EmberAfCluster & cluster = endpoint->cluster[hint];
-        if (((side == ClusterSide::kServer) && cluster.IsServer()) || ((side == ClusterSide::kClient) && cluster.IsClient()))
+        if (cluster.IsServer() && (cluster.clusterId == id))
         {
-            if (cluster.clusterId == id)
-            {
-                return std::make_optional(hint);
-            }
+            return std::make_optional(hint);
         }
     }
 
@@ -588,7 +585,7 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const Embe
     for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
     {
         const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (((side == ClusterSide::kServer) && !cluster.IsServer()) || ((side == ClusterSide::kClient) && !cluster.IsClient()))
+        if (!cluster.IsServer())
         {
             continue;
         }
@@ -611,7 +608,7 @@ DataModel::ClusterEntry CodegenDataModelProvider::NextServerCluster(const Concre
     VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
     VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
 
-    std::optional<unsigned> cluster_idx = TryFindClusterIndex(endpoint, before.mClusterId, ClusterSide::kServer);
+    std::optional<unsigned> cluster_idx = TryFindServerClusterIndex(endpoint, before.mClusterId);
     if (!cluster_idx.has_value())
     {
         return DataModel::ClusterEntry::kInvalid;

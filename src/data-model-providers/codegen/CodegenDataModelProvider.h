@@ -192,7 +192,6 @@ private:
     // To avoid N^2 iterations, cache a hint of where something is positioned
     uint16_t mEndpointIterationHint      = 0;
     unsigned mServerClusterIterationHint = 0;
-    unsigned mClientClusterIterationHint = 0;
     unsigned mAttributeIterationHint     = 0;
     EmberCommandListIterator mAcceptedCommandsIterator;
     EmberCommandListIterator mGeneratedCommandsIterator;
@@ -205,12 +204,6 @@ private:
         const EmberAfCluster * cluster;
 
         ClusterReference(const ConcreteClusterPath p, const EmberAfCluster * c) : path(p), cluster(c) {}
-    };
-
-    enum class ClusterSide : uint8_t
-    {
-        kServer,
-        kClient,
     };
 
     std::optional<ClusterReference> mPreviouslyFoundCluster;
@@ -228,7 +221,7 @@ private:
     std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, AttributeId id) const;
 
     /// Find the index of the given cluster id
-    std::optional<unsigned> TryFindClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id, ClusterSide clusterSide) const;
+    std::optional<unsigned> TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id) const;
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
