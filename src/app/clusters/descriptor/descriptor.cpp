@@ -104,11 +104,11 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
         });
     }
 
-    auto endpoints = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpoints();
+    auto endpointsIterator = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpoints();
 
-    VerifyOrReturnError(endpoints->SeekTo(endpoint), CHIP_ERROR_KEY_NOT_FOUND);
+    VerifyOrReturnError(endpointsIterator->SeekTo(endpoint), CHIP_ERROR_KEY_NOT_FOUND);
 
-    auto endpointInfo = endpoints->GetMetadata();
+    auto endpointInfo = endpointsIterator->GetMetadata();
     // if SEEK returns true, metadata MUST be valid
     VerifyOrReturnError(endpointInfo.has_value(), CHIP_ERROR_INTERNAL);
 
