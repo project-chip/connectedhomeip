@@ -19,9 +19,9 @@
 #include "BekenAppServer.h"
 #include "CHIPDeviceManager.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <platform/Beken/NetworkCommissioningDriver.h>
 
 using namespace chip;

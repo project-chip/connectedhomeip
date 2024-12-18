@@ -17,8 +17,8 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/codegen-data-model-provider/tests/EmberInvokeOverride.h>
-#include <app/codegen-data-model-provider/tests/EmberReadWriteOverride.h>
+#include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
+#include <data-model-providers/codegen/tests/EmberReadWriteOverride.h>
 
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
@@ -34,7 +34,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
-#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/StringBuilderAdapters.h>
@@ -51,6 +50,7 @@
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
 #include <app/util/odd-sized-integers.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
@@ -74,6 +74,9 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::Globals::Attributes;
 
 using chip::Protocols::InteractionModel::Status;
+
+// Mock function for linking
+void InitDataModelHandler() {}
 
 namespace {
 

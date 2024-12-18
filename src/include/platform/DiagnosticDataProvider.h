@@ -33,11 +33,7 @@ namespace DeviceLayer {
 
 // Maximum length of vendor defined name or prefix of the software thread that is
 // static for the duration of the thread.
-#if defined(CONFIG_THREAD_MAX_NAME_LEN)
-static constexpr size_t kMaxThreadNameLength = CONFIG_THREAD_MAX_NAME_LEN - 1;
-#else
 static constexpr size_t kMaxThreadNameLength = 8;
-#endif
 // 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
 inline constexpr size_t kMaxHardwareAddrSize = 8;
 

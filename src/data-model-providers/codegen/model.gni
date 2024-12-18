@@ -25,20 +25,20 @@ import("//build_overrides/chip.gni")
 # be cleanly built as a stand-alone and instead have to be imported as part of
 # a different data model or compilation unit.
 codegen_data_model_SOURCES = [
-  "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider.cpp",
-  "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider.h",
-  "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider_Read.cpp",
-  "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider_Write.cpp",
-  "${chip_root}/src/app/codegen-data-model-provider/EmberAttributeDataBuffer.cpp",
-  "${chip_root}/src/app/codegen-data-model-provider/EmberAttributeDataBuffer.h",
-  "${chip_root}/src/app/codegen-data-model-provider/EmberMetadata.cpp",
-  "${chip_root}/src/app/codegen-data-model-provider/EmberMetadata.h",
-  "${chip_root}/src/app/codegen-data-model-provider/Instance.cpp",
+  "${chip_root}/src/data-model-providers/codegen/CodegenDataModelProvider.cpp",
+  "${chip_root}/src/data-model-providers/codegen/CodegenDataModelProvider.h",
+  "${chip_root}/src/data-model-providers/codegen/CodegenDataModelProvider_Read.cpp",
+  "${chip_root}/src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp",
+  "${chip_root}/src/data-model-providers/codegen/EmberAttributeDataBuffer.cpp",
+  "${chip_root}/src/data-model-providers/codegen/EmberAttributeDataBuffer.h",
+  "${chip_root}/src/data-model-providers/codegen/EmberMetadata.cpp",
+  "${chip_root}/src/data-model-providers/codegen/EmberMetadata.h",
+  "${chip_root}/src/data-model-providers/codegen/Instance.cpp",
 ]
 
 codegen_data_model_PUBLIC_DEPS = [
   "${chip_root}/src/app/common:attribute-type",
   "${chip_root}/src/app/data-model-provider",
-  "${chip_root}/src/app/codegen-data-model-provider:instance-header",
+  "${chip_root}/src/data-model-providers/codegen:instance-header",
   "${chip_root}/src/app/util/persistence",
 ]

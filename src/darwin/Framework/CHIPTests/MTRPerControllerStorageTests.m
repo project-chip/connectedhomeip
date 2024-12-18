@@ -1692,6 +1692,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [self waitForExpectations:@[ newDeviceSubscriptionExpectation ] timeout:60];
     if (!disableStorageBehaviorOptimization) {
         [self waitForExpectations:@[ newDeviceGotClusterDataPersisted ] timeout:60];
+        newDelegate.onClusterDataPersisted = nil;
     }
     newDelegate.onReportEnd = nil;
 
@@ -1951,6 +1952,128 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [controller shutdown];
 
     [operationalBrowser shutdown];
+}
+
+- (void)test014_TestDataStoreMTRDeviceInvalidateFlush
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = [MTRDeviceStorageBehaviorConfiguration configurationWithDefaultStorageBehavior];
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer
+                                            storageBehaviorConfiguration:storageBehaviorConfiguration];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(17);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+
+    delegate.skipSetupSubscription = YES;
+
+    // Read the base storage key count (case session resumption etc.)
+    NSUInteger baseStorageKeyCount = storageDelegate.count;
+
+    [device setDelegate:delegate queue:queue];
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(1) attributeID:@(1)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : @(1),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(1),
+        }
+    } ];
+
+    // Inject first report as priming report, which gets persisted immediately
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+
+    // No additional entries immediately after injected report
+    XCTAssertEqual(storageDelegate.count, baseStorageKeyCount);
+
+    sleep(1);
+
+    // Verify priming report persisted before hitting storage delay
+    XCTAssertGreaterThan(storageDelegate.count, baseStorageKeyCount);
+    // Now set the base count to the after-priming number
+    baseStorageKeyCount = storageDelegate.count;
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport2 = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(2) attributeID:@(2)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : @(2),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(2),
+        }
+    } ];
+
+    // Inject second report with different cluster
+    [device unitTestInjectAttributeReport:attributeReport2 fromSubscription:YES];
+
+    sleep(1);
+
+    // No additional entries a second after report - under storage delay
+    XCTAssertEqual(storageDelegate.count, baseStorageKeyCount);
+
+    // Immediately shut down controller and force flush to storage
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    // Make sure there are more than base count entries
+    XCTAssertGreaterThan(storageDelegate.count, baseStorageKeyCount);
+
+    // Now restart controller to decommission the device
+    controller = [self startControllerWithRootKeys:rootKeys
+                                   operationalKeys:operationalKeys
+                                          fabricID:fabricID
+                                            nodeID:nodeID
+                                           storage:storageDelegate
+                                             error:&error
+                                 certificateIssuer:&certificateIssuer
+                      storageBehaviorConfiguration:storageBehaviorConfiguration];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
 }
 
 // TODO: This might want to go in a separate test file, with some shared setup
