@@ -108,7 +108,7 @@ TEST(TestAttributePathExpandIterator, TestAllWildcard)
     app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), &clusInfo);
     auto session = iter.PrepareSearch();
 
-    for (; iter.Get(path); iter.Next(session))
+    for (; iter.Get(session, path); iter.Next(session))
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
@@ -134,7 +134,7 @@ TEST(TestAttributePathExpandIterator, TestWildcardEndpoint)
     app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), &clusInfo);
     auto session = iter.PrepareSearch();
 
-    for (; iter.Get(path); iter.Next(session))
+    for (; iter.Get(session, path); iter.Next(session))
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
@@ -162,7 +162,7 @@ TEST(TestAttributePathExpandIterator, TestWildcardCluster)
     size_t index = 0;
     app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), &clusInfo);
     auto session = iter.PrepareSearch();
-    for (; iter.Get(path); iter.Next(session))
+    for (; iter.Get(session, path); iter.Next(session))
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
@@ -191,7 +191,7 @@ TEST(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMet
     app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), &clusInfo);
     auto session = iter.PrepareSearch();
 
-    for (; iter.Get(path); iter.Next(session))
+    for (; iter.Get(session, path); iter.Next(session))
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
@@ -224,7 +224,7 @@ TEST(TestAttributePathExpandIterator, TestWildcardAttribute)
     app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), &clusInfo);
     auto session = iter.PrepareSearch();
 
-    for (; iter.Get(path); iter.Next(session))
+    for (; iter.Get(session, path); iter.Next(session))
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
@@ -251,7 +251,7 @@ TEST(TestAttributePathExpandIterator, TestNoWildcard)
     app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), &clusInfo);
     auto session = iter.PrepareSearch();
 
-    for (; iter.Get(path); iter.Next(session))
+    for (; iter.Get(session, path); iter.Next(session))
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
@@ -367,7 +367,7 @@ TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
     app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), &clusInfo1);
     auto session = iter.PrepareSearch();
 
-    for (; iter.Get(path); iter.Next(session))
+    for (; iter.Get(session, path); iter.Next(session))
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));

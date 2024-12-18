@@ -29,15 +29,8 @@ AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * p
                                                          SingleLinkedListNode<AttributePathParams> * attributePath) :
     mDataModelProvider(provider), mpAttributePath(attributePath),
     mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
-
 {
     mOutputPath.mExpanded = true; // this is reset in 'next' if needed
-
-    // Make the iterator ready to emit the first valid path in the list.
-    // TODO: the bool return value here is completely unchecked
-    // TODO: this extra search session is COMPLETELY wasteful
-    SearchSession session = PrepareSearch();
-    Next(session);
 }
 
 bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
@@ -178,10 +171,11 @@ std::optional<ClusterId> AttributePathExpandIterator::NextEndpointId(SearchSessi
 
 void AttributePathExpandIterator::ResetCurrentCluster(SearchSession & session)
 {
+    EnsureFirstNextCalled(session);
+
     // If this is a null iterator, or the attribute id of current cluster info is not a wildcard attribute id, then this function
     // will do nothing, since we won't be expanding the wildcard attribute ids under a cluster.
     VerifyOrReturn(mpAttributePath != nullptr && mpAttributePath->mValue.HasWildcardAttributeId());
-
     // Reset path expansion to ask for the first attribute of the current cluster
     mOutputPath.mAttributeId = kInvalidAttributeId;
     mOutputPath.mExpanded    = true; // we know this is a wildcard attribute
@@ -243,6 +237,7 @@ bool AttributePathExpandIterator::AdvanceOutputPath(SearchSession & session)
 
 bool AttributePathExpandIterator::Next(SearchSession & session)
 {
+    EnsureFirstNextCalled(session);
     while (mpAttributePath != nullptr)
     {
         if (AdvanceOutputPath(session))

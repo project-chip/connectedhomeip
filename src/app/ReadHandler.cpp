@@ -511,7 +511,9 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
     if (CHIP_END_OF_TLV == err)
     {
         mManagementCallback.GetInteractionModelEngine()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
-        mAttributePathExpandIterator.ResetTo(mpAttributePathList);
+
+        auto session = mAttributePathExpandIterator.PrepareSearch();
+        mAttributePathExpandIterator.ResetTo(session, mpAttributePathList);
         err = CHIP_NO_ERROR;
     }
     return err;
@@ -854,7 +856,9 @@ void ReadHandler::PersistSubscription()
 
 void ReadHandler::ResetPathIterator()
 {
-    mAttributePathExpandIterator.ResetTo(mpAttributePathList);
+
+    auto session = mAttributePathExpandIterator.PrepareSearch();
+    mAttributePathExpandIterator.ResetTo(session, mpAttributePathList);
     mAttributeEncoderState.Reset();
 }
 
@@ -873,7 +877,8 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
     // TODO (#16699): Currently we can only guarantee the reports generated from a single path in the request are consistent. The
     // data might be inconsistent if the user send a request with two paths from the same cluster. We need to clearify the behavior
     // or make it consistent.
-    if (mAttributePathExpandIterator.Get(path) &&
+    auto session = mAttributePathExpandIterator.PrepareSearch();
+    if (mAttributePathExpandIterator.Get(session, path) &&
         (aAttributeChanged.HasWildcardEndpointId() || aAttributeChanged.mEndpointId == path.mEndpointId) &&
         (aAttributeChanged.HasWildcardClusterId() || aAttributeChanged.mClusterId == path.mClusterId))
     {
@@ -883,7 +888,6 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
         // If we're currently in the middle of generating reports for a given cluster and that in turn is marked dirty, let's reset
         // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
         // the state of the cluster as present on the server
-        auto session = mAttributePathExpandIterator.PrepareSearch();
         mAttributePathExpandIterator.ResetCurrentCluster(session);
         mAttributeEncoderState.Reset();
     }
