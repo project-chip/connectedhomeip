@@ -550,26 +550,6 @@ std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>
     return std::make_unique<EndpointIterator>(mEndpointIterationHint);
 }
 
-std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointId id) const
-{
-    const uint16_t lastEndpointIndex = emberAfEndpointCount();
-
-    if ((mEndpointIterationHint < lastEndpointIndex) && emberAfEndpointIndexIsEnabled(mEndpointIterationHint) &&
-        (id == emberAfEndpointFromIndex(mEndpointIterationHint)))
-    {
-        return std::make_optional(mEndpointIterationHint);
-    }
-
-    // Linear search, this may be slow
-    uint16_t idx = emberAfIndexFromEndpoint(id);
-    if (idx == kEmberInvalidEndpointIndex)
-    {
-        return std::nullopt;
-    }
-
-    return std::make_optional<unsigned>(idx);
-}
-
 DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId endpointId)
 {
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);

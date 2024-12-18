@@ -219,9 +219,6 @@ private:
     /// Find the index of the given cluster id
     std::optional<unsigned> TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id) const;
 
-    /// Find the index of the given endpoint id
-    std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
-
     using CommandListGetter = const CommandId *(const EmberAfCluster &);
 
     CommandId FindCommand(const ConcreteCommandPath & path, detail::EnumeratorCommandFinder & handlerFinder,
