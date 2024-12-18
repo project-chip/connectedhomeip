@@ -7709,6 +7709,11 @@ endpoint 0 {
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
+    callback attribute TCAcceptedVersion;
+    callback attribute TCMinRequiredVersion;
+    callback attribute TCAcknowledgements;
+    callback attribute TCAcknowledgementsRequired;
+    callback attribute TCUpdateDeadline;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7721,6 +7726,7 @@ endpoint 0 {
     handle command SetRegulatoryConfigResponse;
     handle command CommissioningComplete;
     handle command CommissioningCompleteResponse;
+    handle command SetTCAcknowledgements;
   }
 
   server cluster NetworkCommissioning {
