@@ -1,2 +1,7 @@
 dependencies:
-    espressif/led_strip: "^1.0.0-alpha"
+    espressif/led_strip:
+        matches:
+            - if: "target != esp32c61"
+              version: "^1.0.0-alpha"
+            - if: "target in [esp32c61]"
+              version: "^2.5.0"

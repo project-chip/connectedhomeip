@@ -20,6 +20,7 @@
 #pragma once
 
 #include "driver/gpio.h"
+#include "led_strip.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -62,6 +63,8 @@ private:
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM || CONFIG_DEVICE_TYPE_ESP32_C6_DEVKITC
     uint16_t mHue;       // mHue [0, 360]
     uint8_t mSaturation; // mSaturation [0, 100]
+#elif CONFIG_DEVICE_TYPE_ESP32_C61_DEVKITC
+    led_strip_handle_t mStrip;
 #endif
     gpio_num_t mGPIONum;
     int mVLED1;

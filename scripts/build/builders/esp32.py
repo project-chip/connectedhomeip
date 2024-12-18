@@ -26,6 +26,7 @@ class Esp32Board(Enum):
     M5Stack = auto()
     C3DevKit = auto()
     QEMU = auto()
+    C61DevKit = auto()
 
 
 class Esp32App(Enum):
@@ -107,6 +108,8 @@ class Esp32App(Enum):
             return self == Esp32App.TESTS
         elif board == Esp32Board.C3DevKit:
             return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
+        elif board == Esp32Board.C61DevKit:
+            return self == Esp32App.ALL_CLUSTERS or self == Esp32App.LIGHT
         else:
             return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
 
@@ -141,6 +144,8 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
             return 'sdkconfig{}.defaults'.format(rpc)
     elif board == Esp32Board.C3DevKit:
         return 'sdkconfig{}.defaults.esp32c3'.format(rpc)
+    elif board == Esp32Board.C61DevKit:
+        return 'sdkconfig{}.defaults.esp32c61'.format(rpc)
     else:
         raise Exception('Unknown board type')
 
