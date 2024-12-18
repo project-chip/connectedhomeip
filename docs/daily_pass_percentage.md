@@ -1,13 +1,13 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| darwin                                  |          60 |
-| unit-integration-tests                  |         100 |
-| zap                                     |         100 |
+| zap                                     |          38 |
+| darwin                                  |          54 |
+| tests                                   |          92 |
 | build-example-telink                    |         100 |
 | build-example-esp32                     |         100 |
 | build-example-ti-cc13xx-26xx            |         100 |
-| build-example-ti-cc32xx                 |         100 |
+| unit-integration-tests                  |         100 |
 | tv-casting-example-darwin               |         100 |
 | build-example-efr32                     |         100 |
 | build-example-nrf-connect-sdk           |         100 |
@@ -15,10 +15,9 @@
 | build-example-linux-arm                 |         100 |
 | minimal-build-linux-configure           |         100 |
 | build-example-qpg                       |         100 |
+| build-example-ti-cc32xx                 |         100 |
 | build-example-nuttx                     |         100 |
 | documentation-build                     |         100 |
-| run-misspell                            |         100 |
-| tests                                   |         100 |
 | build-example-linux-standalone          |         100 |
 | validate-gradle-wrapper                 |         100 |
 | build-chef-ci-examples-on-all-platforms |         100 |
