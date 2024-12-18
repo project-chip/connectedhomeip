@@ -640,6 +640,8 @@ class TestMatterTestingSupport(MatterBaseTest):
 
     def test_parse_matter_test_args(self):
         args = [
+            # Verify that it is possible to pass multiple test cases at once
+            "--tests", "TC_1 TC_2",
             # Verify that values are appended to a single argument
             "--int-arg", "PIXIT.TEST.DEC:42",
             "--int-arg", "PIXIT.TEST.HEX:0x1234",
@@ -650,6 +652,7 @@ class TestMatterTestingSupport(MatterBaseTest):
         ]
 
         parsed = parse_matter_test_args(args)
+        asserts.assert_equal(parsed.tests, ["TC_1", "TC_2"])
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.DEC"), 42)
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.HEX"), 0x1234)
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.STR.MULTI.1"), "foo")

@@ -1932,7 +1932,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
-    config.tests = [] if args.tests is None else args.tests
+    config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
@@ -1963,12 +1963,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
 
-    basic_group.add_argument('--tests',
-                             '--test_case',
-                             action="store",
-                             nargs='+',
-                             type=str,
-                             metavar='test_a test_b...',
+    basic_group.add_argument('--tests', '--test-case', action='append', nargs='+', type=str, metavar='test_NAME',
                              help='A list of tests in the test class to execute.')
     basic_group.add_argument('--fail-on-skipped', action="store_true", default=False,
                              help="Fail the test if any test cases are skipped")
@@ -2059,17 +2054,17 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                               help='Path to chip-tool credentials file root')
 
     args_group = parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
-    args_group.add_argument('--int-arg', nargs='*', action='append', type=int_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--int-arg', nargs='+', action='append', type=int_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
-    args_group.add_argument('--bool-arg', nargs='*', action='append', type=bool_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--bool-arg', nargs='+', action='append', type=bool_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an boolean value (e.g. true/false or 0/1)")
-    args_group.add_argument('--float-arg', nargs='*', action='append', type=float_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--float-arg', nargs='+', action='append', type=float_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for a floating point value (e.g. -2.1 or 6.022e23)")
-    args_group.add_argument('--string-arg', nargs='*', action='append', type=str_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--string-arg', nargs='+', action='append', type=str_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for a string value")
-    args_group.add_argument('--json-arg', nargs='*', action='append', type=json_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--json-arg', nargs='+', action='append', type=json_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for JSON stored as a list or dict")
-    args_group.add_argument('--hex-arg', nargs='*', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--hex-arg', nargs='+', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
     if not argv:
