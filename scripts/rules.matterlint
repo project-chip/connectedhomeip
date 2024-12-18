@@ -66,6 +66,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/media-playback-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/messages-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/mode-base-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/mode-select-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/push-av-stream-transport-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/network-commissioning-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/occupancy-sensing-cluster.xml";
