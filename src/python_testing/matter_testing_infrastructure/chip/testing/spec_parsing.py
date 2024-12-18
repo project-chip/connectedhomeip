@@ -536,7 +536,7 @@ class DataModelLevel(Enum):
             return "device_types"
         raise KeyError("Invalid enum: %r" % self)
 
-    
+
 def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], data_model_level: DataModelLevel = DataModelLevel.kCluster) -> Traversable:
     """
     Get the directory of the data model for a specific version and level from the installed package.
@@ -551,7 +551,6 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     # If it's a prebuilt directory, build the path based on the version and data model level
     return pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
         'data_model').joinpath(data_model_directory.dirname).joinpath(data_model_level.dirname)
-
 
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> typing.Tuple[dict[int, dict], list]:
@@ -615,7 +614,6 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
         remove_problem(CommandPathLocation(endpoint_id=0, cluster_id=action_id, command_id=c))
 
     combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
-
 
     # TODO: All these fixups should be removed BEFORE SVE if at all possible
     # Workaround for Color Control cluster - the spec uses a non-standard conformance. Set all to optional now, will need
