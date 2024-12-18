@@ -610,32 +610,6 @@ TEST_F(TestTCP, HandleConnCloseCalledTest6)
     HandleConnCloseTest(addr);
 }
 
-TEST_F(TestTCP, MessageSizeTest)
-{
-    TCPImpl tcp;
-
-    IPAddress addr;
-    IPAddress::FromString("::1", addr);
-
-    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
-    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
-
-    gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
-
-    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, gChipTCPPort);
-    void * state                        = TestAccess::FindActiveConnection(tcp, lPeerAddress);
-    ASSERT_NE(state, nullptr);
-    TCPEndPoint * lEndPoint = TestAccess::GetEndpoint(state);
-    ASSERT_NE(lEndPoint, nullptr);
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(messageSize_TEST, sizeof(messageSize_TEST));
-    ASSERT_NE(&buf, nullptr);
-    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(buf));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-}
-
 TEST_F(TestTCP, CheckProcessReceivedBuffer)
 {
     TCPImpl tcp;
@@ -659,6 +633,12 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestData testData[2];
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, testData);
+
+    // Test a single packet buffer with zero message size.
+    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(messageSize_TEST, 4);
+    ASSERT_NE(&buf, nullptr);
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
