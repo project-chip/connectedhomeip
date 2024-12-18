@@ -367,7 +367,7 @@ TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
     app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), &clusInfo1);
     auto session = iter.PrepareSearch();
 
-    for (;iter.Get(path); iter.Next(session))
+    for (; iter.Get(path); iter.Next(session))
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));

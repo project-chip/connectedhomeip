@@ -80,7 +80,7 @@ public:
      *
      * Returns false if AttributePathExpandIteratorDataModeDataModel has exhausted all paths in the given AttributePathParams list.
      */
-    bool Next(SearchSession &session);
+    bool Next(SearchSession & session);
 
     /**
      * Fills the aPath with the path the iterator currently points to.
@@ -99,7 +99,7 @@ public:
      * When attributes are changed in the middle of expanding a wildcard attribute, we need to reset the iterator, to provide the
      * client with a consistent state of the cluster.
      */
-    void ResetCurrentCluster(SearchSession &session);
+    void ResetCurrentCluster(SearchSession & session);
 
     /** Start iterating over the given `paths` */
     inline void ResetTo(SingleLinkedListNode<AttributePathParams> * paths)
@@ -116,7 +116,7 @@ private:
     /// the current mOutputPath and mpAttributePath
     ///
     /// returns true if such a next value was found.
-    bool AdvanceOutputPath(SearchSession &session);
+    bool AdvanceOutputPath(SearchSession & session);
 
     /// Get the next attribute ID in mOutputPath(endpoint/cluster) if one is available.
     /// Will start from the beginning if current mOutputPath.mAttributeId is kInvalidAttributeId
@@ -136,7 +136,7 @@ private:
     /// Will start from the beginning if current mOutputPath.mEndpointId is kInvalidEndpointId
     ///
     /// Respects path expansion/values in mpAttributePath
-    std::optional<ClusterId> NextEndpointId(SearchSession &session);
+    std::optional<ClusterId> NextEndpointId(SearchSession & session);
 
     /// Checks if the given attributeId is valid for the current mOutputPath(endpoint/cluster)
     ///
