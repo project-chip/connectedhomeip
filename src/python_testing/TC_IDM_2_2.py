@@ -232,28 +232,26 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         ### AttributePath = [[]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(5, "Send Request Message to read all attributes from all clusters on all endpoints")
-        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [()])
+        read_request = await self.default_controller.Read(self.dut_node_id, [()])
 
         # NOTE: This is checked in its entirety in IDM-10.1
-
-        parts_list_a = read_request[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        parts_list_a = read_request.attributes[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
         parts_list_b = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
         asserts.assert_equal(parts_list_a, parts_list_b, "Parts list is not the expected value")
 
-        for endpoint in read_request:
-            returned_clusters = sorted([x.id for x in read_request[endpoint]])
-            server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
+        for endpoint in read_request.attributes:
+            returned_clusters = sorted([x.id for x in read_request.attributes[endpoint]])
+            server_list = sorted(read_request.attributes[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
             asserts.assert_equal(returned_clusters, server_list)
 
-        # for endpoint in read_request:
-        #     for cluster in read_request[endpoint]:
-        #         # Endpoint 1 seems an issue with ModeSelect (ServerList has an extra 4293984257)
-        #         if endpoint != 1 or (cluster != Clusters.ModeSelect or True):
-        #             returned_attrs = sorted([x.attribute_id for x in read_request[endpoint]
-        #                                     [cluster].keys() if x != Clusters.Attribute.DataVersion])
-        #             attr_list = sorted([x for x in read_request[endpoint][cluster][cluster.Attributes.AttributeList]
-        #                                if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
-        #             asserts.assert_equal(returned_attrs, attr_list, f"Mismatch for {cluster} at endpoint {endpoint}")
+        for endpoint in read_request.tlvAttributes:
+            for cluster in read_request.tlvAttributes[endpoint]:
+                returned_attrs = sorted([x for x in read_request.tlvAttributes[endpoint][cluster].keys()])
+                attr_list = sorted([x for x in read_request.tlvAttributes[endpoint][cluster]
+                                    [ClusterObjects.ALL_CLUSTERS[cluster].Attributes.AttributeList.attribute_id]
+                                    if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
+                asserts.assert_equal(returned_attrs, attr_list,
+                                     f"Mismatch for {cluster} ({ClusterObjects.ALL_CLUSTERS[cluster]}) at endpoint {endpoint}")
 
         # Step 6
         # TH sends the Read Request Message to the DUT to read a global attribute from all clusters at all Endpoints
