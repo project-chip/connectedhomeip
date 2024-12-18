@@ -72,6 +72,8 @@ static_library("chip-tool-utils") {
     "commands/common/RemoteDataModelLogger.h",
     "commands/dcl/DCLClient.cpp",
     "commands/dcl/DCLClient.h",
+    "commands/dcl/DisplayTermsAndConditions.cpp",
+    "commands/dcl/DisplayTermsAndConditions.h",
     "commands/dcl/HTTPSRequest.cpp",
     "commands/dcl/HTTPSRequest.h",
     "commands/dcl/JsonSchemaMacros.cpp",

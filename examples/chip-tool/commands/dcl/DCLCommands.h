@@ -19,6 +19,7 @@
 #include "../common/Command.h"
 
 #include "DCLClient.h"
+#include "DisplayTermsAndConditions.h"
 
 class DCLCommandBase : public Command
 {
@@ -137,4 +138,65 @@ public:
         ChipLogProgress(chipTool, "%s", tc.toStyledString().c_str());
         return CHIP_NO_ERROR;
     }
+};
+
+class DCLTCDisplayByPayloadCommand : public DCLPayloadCommandBase
+{
+public:
+    DCLTCDisplayByPayloadCommand() : DCLPayloadCommandBase("tc-display-by-payload")
+    {
+        AddArgument("country-code", &mCountryCode,
+                    "The country code to retrieve terms and conditions for. Defaults to the country configured in the DCL.");
+        AddArgument("language-code", &mLanguageCode,
+                    "The language code to retrieve terms and conditions for. Defaults to the language configured for the chosen "
+                    "country in the DCL.");
+    }
+
+    CHIP_ERROR RunCommand(chip::tool::dcl::DCLClient & client)
+    {
+        Json::Value tc;
+        ReturnErrorOnFailure(client.TermsAndConditions(mPayload, tc));
+        VerifyOrReturnError(tc != Json::nullValue, CHIP_NO_ERROR);
+
+        uint16_t version      = 0;
+        uint16_t userResponse = 0;
+        ReturnErrorOnFailure(chip::tool::dcl::DisplayTermsAndConditions(tc, version, userResponse, mCountryCode, mLanguageCode));
+
+        ChipLogProgress(chipTool, "\nTerms and conditions\n\tRevision    : %u\n\tUserResponse: %u", version, userResponse);
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    chip::Optional<char *> mCountryCode;
+    chip::Optional<char *> mLanguageCode;
+};
+
+class DCLTCDisplayCommand : public DCLIdsCommandBase
+{
+public:
+    DCLTCDisplayCommand() : DCLIdsCommandBase("tc-display")
+    {
+        AddArgument("country-code", &mCountryCode,
+                    "The country code to retrieve terms and conditions for. Defaults to the country configured in the DCL.");
+        AddArgument("language-code", &mLanguageCode,
+                    "The language code to retrieve terms and conditions for. Defaults to the language configured for the chosen "
+                    "country in the DCL.");
+    }
+    CHIP_ERROR RunCommand(chip::tool::dcl::DCLClient & client)
+    {
+        Json::Value tc;
+        ReturnErrorOnFailure(client.TermsAndConditions(static_cast<chip::VendorId>(mVendorId), mProductId, tc));
+        VerifyOrReturnError(tc != Json::nullValue, CHIP_NO_ERROR);
+
+        uint16_t version      = 0;
+        uint16_t userResponse = 0;
+        ReturnErrorOnFailure(chip::tool::dcl::DisplayTermsAndConditions(tc, version, userResponse, mCountryCode, mLanguageCode));
+
+        ChipLogProgress(chipTool, "\nTerms and conditions\n\tRevision    : %u\n\tUserResponse: %u", version, userResponse);
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    chip::Optional<char *> mCountryCode;
+    chip::Optional<char *> mLanguageCode;
 };

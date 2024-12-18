@@ -25,10 +25,12 @@ void registerCommandsDCL(Commands & commands)
 {
     const char * clusterName      = "DCL";
     commands_list clusterCommands = {
-        make_unique<DCLModelCommand>(),          //
-        make_unique<DCLModelByPayloadCommand>(), //
-        make_unique<DCLTCCommand>(),             //
-        make_unique<DCLTCByPayloadCommand>(),    //
+        make_unique<DCLModelCommand>(),              //
+        make_unique<DCLModelByPayloadCommand>(),     //
+        make_unique<DCLTCCommand>(),                 //
+        make_unique<DCLTCByPayloadCommand>(),        //
+        make_unique<DCLTCDisplayCommand>(),          //
+        make_unique<DCLTCDisplayByPayloadCommand>(), //
     };
 
     commands.RegisterCommandSet(clusterName, clusterCommands, "Commands to interact with the DCL.");
