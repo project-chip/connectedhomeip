@@ -63,7 +63,7 @@ class TC_VALCC_3_2(MatterBaseTest):
             TestStep(7, "Send Close command", "DUT returns SUCCESS"),
             TestStep(8, "Wait until TH receives the following reports (ordering does not matter): TargetState set to NULL, TargetLevel set to NULL, CurrentState set to Closed, CurrentLevel set to 0",
                      "Expected reports are received"),
-            TestStep(6, "Read CurrentState, CurrentLevel, TargetState and TargetLevel attributes",
+            TestStep(9, "Read CurrentState, CurrentLevel, TargetState and TargetLevel attributes",
                      "CurrentState is Closed, CurrentLevel is 0, TargetState is NULL, TargetLevel is NULL"),
         ]
         return steps
