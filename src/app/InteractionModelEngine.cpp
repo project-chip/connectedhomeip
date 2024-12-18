@@ -585,9 +585,11 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             AttributePathExpandIterator pathIterator(GetDataModelProvider(), &paramsList);
             ConcreteAttributePath readPath;
 
+            auto session = pathIterator.PrepareSearch();
+
             // The definition of "valid path" is "path exists and ACL allows access". The "path exists" part is handled by
             // AttributePathExpandIterator. So we just need to check the ACL bits.
-            for (; pathIterator.Get(readPath); pathIterator.Next())
+            for (; pathIterator.Get(readPath); pathIterator.Next(session))
             {
                 // leave requestPath.entityId optional value unset to indicate wildcard
                 Access::RequestPath requestPath{ .cluster     = readPath.mClusterId,

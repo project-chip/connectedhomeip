@@ -313,8 +313,9 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
 #endif
 
         // For each path included in the interested path of the read handler...
+        auto session = apReadHandler->GetAttributePathExpandIterator()->PrepareSearch();
         for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
-             apReadHandler->GetAttributePathExpandIterator()->Next())
+             apReadHandler->GetAttributePathExpandIterator()->Next(session))
         {
             if (!apReadHandler->IsPriming())
             {
@@ -1206,6 +1207,6 @@ void Engine::MarkDirty(const AttributePathParams & path)
 
 // TODO: MatterReportingAttributeChangeCallback should just live in libCHIP, It does not depend on any
 // app-specific generated bits.
-void __attribute__((weak))
-MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+void __attribute__((weak)) MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                  chip::AttributeId attributeId)
 {}

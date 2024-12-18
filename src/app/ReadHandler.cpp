@@ -883,7 +883,8 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
         // If we're currently in the middle of generating reports for a given cluster and that in turn is marked dirty, let's reset
         // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
         // the state of the cluster as present on the server
-        mAttributePathExpandIterator.ResetCurrentCluster();
+        auto session = mAttributePathExpandIterator.PrepareSearch();
+        mAttributePathExpandIterator.ResetCurrentCluster(session);
         mAttributeEncoderState.Reset();
     }
 

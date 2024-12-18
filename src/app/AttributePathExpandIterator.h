@@ -56,12 +56,31 @@ class AttributePathExpandIterator
 public:
     AttributePathExpandIterator(DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath);
 
+    /** A struct that MUST be aquired for Next() to be called
+     *
+     * NOTE: Next() can be only called during single-loop and this session
+     *       MUST NOT be stored outside of a local stack frame
+     *
+     * Using a search session initializes caches for searching endpoints/clusters/attributes
+     */
+    struct SearchSession
+    {
+        std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>> endpoints;
+    };
+
+    /**
+     * Prepare a search session so that `Next` can be called.
+     *
+     * NOTE: Returned value MUST NOT be stored outside a single Next() loop.
+     */
+    SearchSession PrepareSearch();
+
     /**
      * Proceed the iterator to the next attribute path in the given cluster info.
      *
      * Returns false if AttributePathExpandIteratorDataModeDataModel has exhausted all paths in the given AttributePathParams list.
      */
-    bool Next();
+    bool Next(SearchSession &session);
 
     /**
      * Fills the aPath with the path the iterator currently points to.
@@ -80,7 +99,7 @@ public:
      * When attributes are changed in the middle of expanding a wildcard attribute, we need to reset the iterator, to provide the
      * client with a consistent state of the cluster.
      */
-    void ResetCurrentCluster();
+    void ResetCurrentCluster(SearchSession &session);
 
     /** Start iterating over the given `paths` */
     inline void ResetTo(SingleLinkedListNode<AttributePathParams> * paths)
@@ -97,7 +116,7 @@ private:
     /// the current mOutputPath and mpAttributePath
     ///
     /// returns true if such a next value was found.
-    bool AdvanceOutputPath();
+    bool AdvanceOutputPath(SearchSession &session);
 
     /// Get the next attribute ID in mOutputPath(endpoint/cluster) if one is available.
     /// Will start from the beginning if current mOutputPath.mAttributeId is kInvalidAttributeId
@@ -117,7 +136,7 @@ private:
     /// Will start from the beginning if current mOutputPath.mEndpointId is kInvalidEndpointId
     ///
     /// Respects path expansion/values in mpAttributePath
-    std::optional<ClusterId> NextEndpointId();
+    std::optional<ClusterId> NextEndpointId(SearchSession &session);
 
     /// Checks if the given attributeId is valid for the current mOutputPath(endpoint/cluster)
     ///
