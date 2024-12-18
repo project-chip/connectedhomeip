@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <cstdint>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -40,6 +39,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SpanSearchValue.h>
 
+#include <cstdint>
 #include <limits>
 #include <memory>
 #include <optional>
