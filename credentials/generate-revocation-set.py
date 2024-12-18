@@ -99,19 +99,10 @@ def parse_vid_pid_from_distinguished_name(distinguished_name):
 
 
 def get_akid(cert: x509.Certificate) -> Optional[bytes]:
-    try:
-        return cert.extensions.get_extension_for_oid(x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
-    except Exception:
-        logging.warning("AKID not found in certificate")
-        return None
-
+    return cert.extensions.get_extension_for_oid(x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
 
 def get_skid(cert: x509.Certificate) -> Optional[bytes]:
-    try:
-        return cert.extensions.get_extension_for_oid(x509.OID_SUBJECT_KEY_IDENTIFIER).value.key_identifier
-    except Exception:
-        logging.warning("SKID not found in certificate")
-        return None
+    return cert.extensions.get_extension_for_oid(x509.OID_SUBJECT_KEY_IDENTIFIER).value.key_identifier
 
 def verify_cert(cert: x509.Certificate, root: x509.Certificate) -> bool:
     '''
@@ -405,8 +396,7 @@ class RESTDCLDClient(DCLDClientInterface):
         rest_node_url: str
             RESTful API URL
         '''
-
-        if not re.match(r"^https://.*\.dcl\.csa-iot\.org$", rest_node_url):
+        if not re.match(r"^https://(on|on.test-net)\.dcl\.csa-iot\.(org|org/)$", rest_node_url):
             raise ValueError(f"Invalid RESTful API URL: {rest_node_url}")
 
         self.rest_node_url = rest_node_url
