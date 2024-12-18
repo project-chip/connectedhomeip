@@ -15,7 +15,7 @@
  */
 #pragma once
 
-#include <app/SafeAttributePersistenceProvider.h>
+#include <app/StorageDelegateWrapper.h>
 #include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -31,39 +31,19 @@ namespace app {
  * of this class, since it can't be constructed automatically without knowing
  * what PersistentStorageDelegate is to be used.
  */
-class DefaultAttributePersistenceProvider : public AttributePersistenceProvider, public SafeAttributePersistenceProvider
+class DefaultAttributePersistenceProvider : protected StorageDelegateWrapper, public AttributePersistenceProvider
 {
 public:
-    DefaultAttributePersistenceProvider() {}
+    DefaultAttributePersistenceProvider() = default;
 
-    // Passed-in storage must outlive this object.
-    CHIP_ERROR Init(PersistentStorageDelegate * storage)
-    {
-        if (storage == nullptr)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        mStorage = storage;
-        return CHIP_NO_ERROR;
-    }
-
-    void Shutdown() {}
+    CHIP_ERROR Init(PersistentStorageDelegate * storage) { return StorageDelegateWrapper::Init(storage); }
 
     // AttributePersistenceProvider implementation.
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
                          MutableByteSpan & aValue) override;
 
-    // SafeAttributePersistenceProvider implementation.
-    CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
-    CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) override;
-
-protected:
-    PersistentStorageDelegate * mStorage;
-
 private:
-    CHIP_ERROR InternalWriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
-    CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue);
     CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType, size_t aExpectedSize,
                                  MutableByteSpan & aValue);
 };
