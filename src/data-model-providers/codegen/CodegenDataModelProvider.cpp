@@ -858,7 +858,8 @@ CodegenDataModelProvider::GetDeviceTypes(EndpointId endpointId)
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpointId);
     if (!endpoint_index.has_value())
     {
-        return std::make_unique<DataModel::NullElementIterator<DataModel::DeviceTypeEntry>>();
+        // do not use the NULL iterator to save flash on what classs are instantiated
+        return std::make_unique<DeviceTypeEntryIterator>(Span<EmberAfDeviceType>());
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
