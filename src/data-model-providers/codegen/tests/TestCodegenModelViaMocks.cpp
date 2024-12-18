@@ -909,20 +909,20 @@ TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
     ASSERT_EQ(endpoints->Next(), kMockEndpoint1);
     std::optional<EndpointInfo> info = endpoints->GetMetadata();
     ASSERT_TRUE(info.has_value());
-    EXPECT_EQ(info->parentId, kInvalidEndpointId);
-    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily);
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);                                // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily); // NOLINT(bugprone-unchecked-optional-access)
 
     ASSERT_EQ(endpoints->Next(), kMockEndpoint2);
     info = endpoints->GetMetadata();
     ASSERT_TRUE(info.has_value());
-    EXPECT_EQ(info->parentId, kInvalidEndpointId);
-    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kTree);
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);                          // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kTree); // NOLINT(bugprone-unchecked-optional-access)
 
     ASSERT_EQ(endpoints->Next(), kMockEndpoint3);
     info = endpoints->GetMetadata();
     ASSERT_TRUE(info.has_value());
-    EXPECT_EQ(info->parentId, kInvalidEndpointId);
-    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily);
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);                                // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily); // NOLINT(bugprone-unchecked-optional-access)
 
     // end of iteration
     ASSERT_FALSE(endpoints->Next().has_value());
@@ -933,29 +933,33 @@ TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
     ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint2));
     ASSERT_EQ(endpoints->Next(), kMockEndpoint3);
     info = endpoints->GetMetadata();
-    EXPECT_EQ(info->parentId, kInvalidEndpointId);
-    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily);
+    ASSERT_TRUE(info.has_value());
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);                                // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily); // NOLINT(bugprone-unchecked-optional-access)
 
     endpoints = model.GetEndpoints();
     ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint2));
     ASSERT_EQ(endpoints->Next(), kMockEndpoint3);
     info = endpoints->GetMetadata();
-    EXPECT_EQ(info->parentId, kInvalidEndpointId);
-    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily);
+    ASSERT_TRUE(info.has_value());
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);                                // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily); // NOLINT(bugprone-unchecked-optional-access)
 
     endpoints = model.GetEndpoints();
     ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint1));
     ASSERT_EQ(endpoints->Next(), kMockEndpoint2);
     info = endpoints->GetMetadata();
-    EXPECT_EQ(info->parentId, kInvalidEndpointId);
-    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kTree);
+    ASSERT_TRUE(info.has_value());
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);                          // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kTree); // NOLINT(bugprone-unchecked-optional-access)
 
     endpoints = model.GetEndpoints();
     ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint1));
     ASSERT_EQ(endpoints->Next(), kMockEndpoint2);
     info = endpoints->GetMetadata();
-    EXPECT_EQ(info->parentId, kInvalidEndpointId);
-    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kTree);
+    ASSERT_TRUE(info.has_value());
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);                          // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kTree); // NOLINT(bugprone-unchecked-optional-access)
 
     endpoints = model.GetEndpoints();
     ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint3));
