@@ -599,13 +599,10 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     # Actions cluster - all commands - these need to be listed in the ActionsList attribute to be supported.
     #                                  We do not currently have a test for this. Please see https://github.com/CHIP-Specifications/chip-test-plans/issues/3646.
 
-
-    # Continue the rest of the processing for known problems
     def remove_problem(location: typing.Union[CommandPathLocation, FeaturePathLocation]):
         nonlocal problems
         problems = [p for p in problems if p.location != location]
 
-    # Marking conformance as optional for certain clusters
     descriptor_id = Clusters.Descriptor.id
     code = 'TAGLIST'
     mask = clusters[descriptor_id].feature_map[code]
