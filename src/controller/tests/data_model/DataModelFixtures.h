@@ -125,8 +125,6 @@ public:
     DataModel::EndpointEntry FirstEndpoint() override;
     DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
     std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
-    std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint) override;
-    std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) override;
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
     std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;
@@ -146,6 +144,11 @@ public:
     std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) override
     {
         return std::make_unique<DataModel::NullElementIterator<DataModel::DeviceTypeEntry>>();
+    }
+
+    std::unique_ptr<DataModel::ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId) override
+    {
+        return std::make_unique<DataModel::NullElementIterator<SemanticTag>>();
     }
 };
 

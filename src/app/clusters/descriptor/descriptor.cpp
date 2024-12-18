@@ -75,11 +75,10 @@ CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeVa
 CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
-        auto tag = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetFirstSemanticTag(endpoint);
-        while (tag.has_value())
+        auto it = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetSemanticTags(endpoint);
+        for (auto tag = it->Next(); tag.has_value(); tag = it->Next())
         {
             ReturnErrorOnFailure(encoder.Encode(tag.value()));
-            tag = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNextSemanticTag(endpoint, tag.value());
         }
         return CHIP_NO_ERROR;
     });

@@ -156,14 +156,12 @@ public:
 
     /// attribute tree iteration
     std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) override;
+    std::unique_ptr<DataModel::ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId) override;
 
     DataModel::EndpointEntry FirstEndpoint() override;
     DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
     std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
     bool EndpointExists(EndpointId endpoint) override;
-
-    std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint) override;
-    std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) override;
 
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
@@ -198,8 +196,6 @@ private:
     unsigned mServerClusterIterationHint = 0;
     unsigned mClientClusterIterationHint = 0;
     unsigned mAttributeIterationHint     = 0;
-    unsigned mDeviceTypeIterationHint    = 0;
-    unsigned mSemanticTagIterationHint   = 0;
     EmberCommandListIterator mAcceptedCommandsIterator;
     EmberCommandListIterator mGeneratedCommandsIterator;
 

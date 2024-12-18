@@ -164,17 +164,6 @@ std::optional<DataModel::EndpointInfo> TestImCustomDataModel::GetEndpointInfo(En
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpointInfo(endpoint);
 }
 
-std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetFirstSemanticTag(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetNextSemanticTag(EndpointId endpoint,
-                                                                                          const SemanticTag & previous)
-{
-    return std::nullopt;
-}
-
 ClusterEntry TestImCustomDataModel::FirstServerCluster(EndpointId endpoint)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstServerCluster(endpoint);

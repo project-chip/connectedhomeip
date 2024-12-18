@@ -208,10 +208,7 @@ public:
         return std::make_unique<NullMetadataIterator<EndpointId, EndpointInfo>>();
     }
     virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) = 0;
-    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId)
-    {
-        return std::make_unique<NullElementIterator<SemanticTag>>();
-    }
+    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId) = 0;
 
     virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId)
     {
@@ -241,10 +238,6 @@ public:
     virtual EndpointEntry NextEndpoint(EndpointId before)              = 0;
     virtual std::optional<EndpointInfo> GetEndpointInfo(EndpointId id) = 0;
     virtual bool EndpointExists(EndpointId id);
-
-    // This iteration describes semantic tags registered on an endpoint
-    virtual std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint)                              = 0;
-    virtual std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) = 0;
 
     // This iteration will list all server clusters on a given endpoint
     virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;

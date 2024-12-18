@@ -2744,7 +2744,10 @@ TEST(TestCodegenModelViaMocks, SemanticTagIteration)
     CodegenDataModelProviderWithContext model;
 
     // Mock endpoint 1 has 3 semantic tags
-    std::optional<DataModel::Provider::SemanticTag> tag = model.GetFirstSemanticTag(kMockEndpoint1);
+    auto it = model.GetSemanticTags(kMockEndpoint1);
+    ASSERT_TRUE(it.get() != nullptr);
+
+    std::optional<DataModel::Provider::SemanticTag> tag = it->Next();
     ASSERT_TRUE(tag.has_value());
     EXPECT_EQ(tag->mfgCode, MakeNullable(VendorId::TestVendor1));         // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(tag->namespaceID, kNamespaceID1);                           // NOLINT(bugprone-unchecked-optional-access)
@@ -2752,32 +2755,9 @@ TEST(TestCodegenModelViaMocks, SemanticTagIteration)
     ASSERT_TRUE(tag->label.HasValue() && (!tag->label.Value().IsNull())); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_TRUE(
         tag->label.Value().Value().data_equal(CharSpan::fromCharString(kLabel1))); // NOLINT(bugprone-unchecked-optional-access)
-    tag = model.GetNextSemanticTag(kMockEndpoint1, *tag);                          // NOLINT(bugprone-unchecked-optional-access)
-    ASSERT_TRUE(tag.has_value());                                                  // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_TRUE(tag->mfgCode.IsNull());                                            // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(tag->namespaceID, kNamespaceID2);                                    // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(tag->tag, kTag2);                                                    // NOLINT(bugprone-unchecked-optional-access)
-    ASSERT_TRUE(tag->label.HasValue() && (!tag->label.Value().IsNull()));          // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_TRUE(
-        tag->label.Value().Value().data_equal(CharSpan::fromCharString(kLabel2))); // NOLINT(bugprone-unchecked-optional-access)
-    tag = model.GetNextSemanticTag(kMockEndpoint1, *tag);                          // NOLINT(bugprone-unchecked-optional-access)
-    ASSERT_TRUE(tag.has_value());                                                  // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(tag->mfgCode, MakeNullable(VendorId::TestVendor3));                  // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(tag->namespaceID, kNamespaceID3);                                    // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(tag->tag, kTag3);                                                    // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_FALSE(tag->label.HasValue());                                           // NOLINT(bugprone-unchecked-optional-access)
-    tag = model.GetNextSemanticTag(kMockEndpoint1, *tag);                          // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_FALSE(tag.has_value());
 
-    // out of order query works
-    DataModel::Provider::SemanticTag existTag = {
-        .mfgCode     = MakeNullable(VendorId::TestVendor1),
-        .namespaceID = kNamespaceID1,
-        .tag         = kTag1,
-        .label       = MakeOptional(MakeNullable(CharSpan::fromCharString(kLabel1))),
-    };
-    tag = model.GetNextSemanticTag(kMockEndpoint1, existTag);
-    ASSERT_TRUE(tag.has_value());
+    tag = it->Next();
+    ASSERT_TRUE(tag.has_value());                                         // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_TRUE(tag->mfgCode.IsNull());                                   // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(tag->namespaceID, kNamespaceID2);                           // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(tag->tag, kTag2);                                           // NOLINT(bugprone-unchecked-optional-access)
@@ -2785,12 +2765,17 @@ TEST(TestCodegenModelViaMocks, SemanticTagIteration)
     EXPECT_TRUE(
         tag->label.Value().Value().data_equal(CharSpan::fromCharString(kLabel2))); // NOLINT(bugprone-unchecked-optional-access)
 
-    // invalid query fails
-    existTag.tag = kTag2;
-    tag          = model.GetNextSemanticTag(kMockEndpoint1, existTag);
-    ASSERT_FALSE(tag.has_value());
+    tag = it->Next();
+    ASSERT_TRUE(tag.has_value());                                 // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->mfgCode, MakeNullable(VendorId::TestVendor3)); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->namespaceID, kNamespaceID3);                   // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(tag->tag, kTag3);                                   // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_FALSE(tag->label.HasValue());                          // NOLINT(bugprone-unchecked-optional-access)
+
+    EXPECT_FALSE(it->Next().has_value());
 
     // empty endpoint works
-    tag = model.GetFirstSemanticTag(kMockEndpoint2);
-    ASSERT_FALSE(tag.has_value());
+    it = model.GetSemanticTags(kMockEndpoint2);
+    ASSERT_TRUE(it.get() != nullptr);
+    EXPECT_FALSE(it->Next().has_value());
 }

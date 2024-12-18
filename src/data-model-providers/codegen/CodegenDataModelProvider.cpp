@@ -39,6 +39,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SpanSearchValue.h>
 
+#include <memory>
 #include <optional>
 #include <variant>
 
@@ -320,58 +321,6 @@ DataModel::EndpointEntry FirstEndpointEntry(unsigned start_index, uint16_t & fou
     return DataModel::EndpointEntry::kInvalid;
 }
 
-bool operator==(const DataModel::Provider::SemanticTag & tagA, const DataModel::Provider::SemanticTag & tagB)
-{
-    // Label is an optional and nullable value of CharSpan. Optional and Nullable have overload for ==,
-    // But `==` is deleted for CharSpan. Here we only check whether the string is the same.
-    if (tagA.label.HasValue() != tagB.label.HasValue())
-    {
-        return false;
-    }
-    if (tagA.label.HasValue())
-    {
-        if (tagA.label.Value().IsNull() != tagB.label.Value().IsNull())
-        {
-            return false;
-        }
-        if (!tagA.label.Value().IsNull())
-        {
-            if (!tagA.label.Value().Value().data_equal(tagB.label.Value().Value()))
-            {
-                return false;
-            }
-        }
-    }
-    return (tagA.tag == tagB.tag) && (tagA.mfgCode == tagB.mfgCode) && (tagA.namespaceID == tagB.namespaceID);
-}
-
-std::optional<unsigned> FindNextSemanticTagIndex(EndpointId endpoint, const DataModel::Provider::SemanticTag & previous,
-                                                 unsigned hintWherePreviousMayBe)
-{
-    DataModel::Provider::SemanticTag hintTag;
-    // Check whether the hint is the previous tag
-    if (GetSemanticTagForEndpointAtIndex(endpoint, hintWherePreviousMayBe, hintTag) == CHIP_NO_ERROR)
-    {
-        if (previous == hintTag)
-        {
-            return std::make_optional(hintWherePreviousMayBe + 1);
-        }
-    }
-    // If the hint is not the previous tag, iterate over all the tags to find the index for the previous tag
-    unsigned index = 0;
-    // Ensure that the next index is in the range
-    while (GetSemanticTagForEndpointAtIndex(endpoint, index + 1, hintTag) == CHIP_NO_ERROR &&
-           GetSemanticTagForEndpointAtIndex(endpoint, index, hintTag) == CHIP_NO_ERROR)
-    {
-        if (previous == hintTag)
-        {
-            return std::make_optional(index + 1);
-        }
-        index++;
-    }
-    return std::nullopt;
-}
-
 class DeviceTypeEntryIterator : public DataModel::ElementIterator<DataModel::DeviceTypeEntry>
 {
 public:
@@ -394,6 +343,29 @@ public:
 
 private:
     Span<const EmberAfDeviceType> mDeviceTypes;
+};
+
+class SemanticTagIterator : public DataModel::ElementIterator<DataModel::Provider::SemanticTag>
+{
+public:
+    SemanticTagIterator(EndpointId endpointId) : mEndpointId(endpointId) {}
+
+    std::optional<DataModel::Provider::SemanticTag> Next() override
+    {
+        DataModel::Provider::SemanticTag tag;
+
+        if (GetSemanticTagForEndpointAtIndex(mEndpointId, mIndex, tag) == CHIP_NO_ERROR)
+        {
+            mIndex++;
+            return tag;
+        }
+        return std::nullopt;
+    }
+
+private:
+    const EndpointId mEndpointId;
+    size_t mIndex = 0;
+
 };
 
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
@@ -894,28 +866,9 @@ CodegenDataModelProvider::GetDeviceTypes(EndpointId endpointId)
     return std::make_unique<DeviceTypeEntryIterator>(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
 }
 
-std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetFirstSemanticTag(EndpointId endpoint)
+std::unique_ptr<DataModel::ElementIterator<DataModel::Provider::SemanticTag>> CodegenDataModelProvider::GetSemanticTags(EndpointId endpointId) 
 {
-    Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
-    // we start at the beginning
-    mSemanticTagIterationHint = 0;
-    if (GetSemanticTagForEndpointAtIndex(endpoint, 0, tag) == CHIP_NO_ERROR)
-    {
-        return std::make_optional(tag);
-    }
-    return std::nullopt;
-}
-
-std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetNextSemanticTag(EndpointId endpoint,
-                                                                                             const SemanticTag & previous)
-{
-    Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
-    std::optional<unsigned> idx = FindNextSemanticTagIndex(endpoint, previous, mSemanticTagIterationHint);
-    if (idx.has_value() && GetSemanticTagForEndpointAtIndex(endpoint, *idx, tag) == CHIP_NO_ERROR)
-    {
-        return std::make_optional(tag);
-    }
-    return std::nullopt;
+    return std::make_unique<SemanticTagIterator>(endpointId);
 }
 
 } // namespace app
