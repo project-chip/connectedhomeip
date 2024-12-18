@@ -153,16 +153,12 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                                         CommandHandler * handler) override;
+    std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>> GetEndpoints() override;
 
     /// attribute tree iteration
     std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) override;
     std::unique_ptr<DataModel::ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId) override;
     std::unique_ptr<DataModel::ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId) override;
-
-    DataModel::EndpointEntry FirstEndpoint() override;
-    DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
-    std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
-    bool EndpointExists(EndpointId endpoint) override;
 
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;

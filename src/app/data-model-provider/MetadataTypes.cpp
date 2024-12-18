@@ -32,19 +32,6 @@ const ClusterEntry ClusterEntry::kInvalid{
 
 const EndpointEntry EndpointEntry::kInvalid{ .id = kInvalidEndpointId, .info = EndpointInfo(kInvalidEndpointId) };
 
-// A default implementation if just first/next exist
-bool ProviderMetadataTree::EndpointExists(EndpointId endpoint)
-{
-    for (EndpointEntry ep = FirstEndpoint(); ep.IsValid(); ep = NextEndpoint(ep.id))
-    {
-        if (ep.id == endpoint)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
 } // namespace DataModel
 } // namespace app
 } // namespace chip

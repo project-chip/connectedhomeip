@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <cstdint>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -39,6 +40,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SpanSearchValue.h>
 
+#include <limits>
 #include <memory>
 #include <optional>
 #include <variant>
@@ -281,29 +283,6 @@ std::optional<DataModel::EndpointInfo> GetEndpointInfoAtIndex(uint16_t endpointI
     return std::nullopt;
 }
 
-DataModel::EndpointEntry FirstEndpointEntry(unsigned start_index, uint16_t & found_index)
-{
-    // find the first enabled index after the start index
-    const uint16_t lastEndpointIndex = emberAfEndpointCount();
-    for (uint16_t endpoint_idx = static_cast<uint16_t>(start_index); endpoint_idx < lastEndpointIndex; endpoint_idx++)
-    {
-        if (emberAfEndpointIndexIsEnabled(endpoint_idx))
-        {
-            found_index                            = endpoint_idx;
-            DataModel::EndpointEntry endpointEntry = DataModel::EndpointEntry::kInvalid;
-            endpointEntry.id                       = emberAfEndpointFromIndex(endpoint_idx);
-            auto endpointInfo                      = GetEndpointInfoAtIndex(endpoint_idx);
-            // The endpoint info should have value as this endpoint should be valid at this time
-            VerifyOrDie(endpointInfo.has_value());
-            endpointEntry.info = endpointInfo.value();
-            return endpointEntry;
-        }
-    }
-
-    // No enabled endpoint found. Give up
-    return DataModel::EndpointEntry::kInvalid;
-}
-
 class DeviceTypeEntryIterator : public DataModel::ElementIterator<DataModel::DeviceTypeEntry>
 {
 public:
@@ -377,6 +356,68 @@ public:
 
 private:
     Span<const EmberAfCluster> mClusters;
+};
+
+class EndpointIterator : public DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>
+{
+public:
+    EndpointIterator(uint16_t & hint) : mIterationHint(hint) {}
+
+    std::optional<EndpointId> Next() override
+    {
+        const uint16_t lastEndpointIndex = emberAfEndpointCount();
+
+        for (; mIndex < lastEndpointIndex; mIndex++)
+        {
+            if (!emberAfEndpointIndexIsEnabled(mIndex))
+            {
+                continue;
+            }
+
+            mMetadataIndex = mIndex;
+            mIterationHint = mIndex;
+            mIndex++;
+            return emberAfEndpointFromIndex(mMetadataIndex);
+        }
+        mMetadataIndex = kInvalidIndex;
+        return std::nullopt;
+    }
+
+    bool SeekTo(const EndpointId & id) override
+    {
+        // the only speedup if is hint matches somehow
+        const uint16_t lastEndpointIndex = emberAfEndpointCount();
+        const uint16_t hint              = mIterationHint;
+
+        if ((hint < lastEndpointIndex) && (emberAfEndpointFromIndex(hint) == id))
+        {
+            mMetadataIndex = hint;
+            mIndex         = hint + 1;
+            return true;
+        }
+        // not found. Just seek until found
+        mIndex = 0;
+        for (auto search_id = Next(); search_id.has_value(); search_id = Next())
+        {
+            if (*search_id == id)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    std::optional<DataModel::EndpointInfo> GetMetadata() override
+    {
+        VerifyOrReturnValue(mMetadataIndex != kInvalidIndex, std::nullopt);
+        return GetEndpointInfoAtIndex(mMetadataIndex);
+    }
+
+private:
+    uint16_t & mIterationHint;
+    uint16_t mIndex         = 0;
+    uint16_t mMetadataIndex = kInvalidIndex;
+
+    static constexpr uint16_t kInvalidIndex = std::numeric_limits<uint16_t>::max();
 };
 
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
@@ -504,24 +545,9 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
     return std::nullopt;
 }
 
-bool CodegenDataModelProvider::EndpointExists(EndpointId endpoint)
+std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>> CodegenDataModelProvider::GetEndpoints()
 {
-    return (emberAfIndexFromEndpoint(endpoint) != kEmberInvalidEndpointIndex);
-}
-
-std::optional<DataModel::EndpointInfo> CodegenDataModelProvider::GetEndpointInfo(EndpointId endpoint)
-{
-    std::optional<unsigned> endpoint_idx = TryFindEndpointIndex(endpoint);
-    if (endpoint_idx.has_value())
-    {
-        return GetEndpointInfoAtIndex(static_cast<uint16_t>(*endpoint_idx));
-    }
-    return std::nullopt;
-}
-
-DataModel::EndpointEntry CodegenDataModelProvider::FirstEndpoint()
-{
-    return FirstEndpointEntry(0, mEndpointIterationHint);
+    return std::make_unique<EndpointIterator>(mEndpointIterationHint);
 }
 
 std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointId id) const
@@ -542,16 +568,6 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
     }
 
     return std::make_optional<unsigned>(idx);
-}
-
-DataModel::EndpointEntry CodegenDataModelProvider::NextEndpoint(EndpointId before)
-{
-    std::optional<unsigned> before_idx = TryFindEndpointIndex(before);
-    if (!before_idx.has_value())
-    {
-        return DataModel::EndpointEntry::kInvalid;
-    }
-    return FirstEndpointEntry(*before_idx + 1, mEndpointIterationHint);
 }
 
 DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId endpointId)

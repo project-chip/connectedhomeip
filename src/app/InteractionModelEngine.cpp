@@ -112,9 +112,10 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
         return MayHaveAccessibleEventPathForEndpoint(aProvider, aEventPath.mEndpointId, aEventPath, subjectDescriptor);
     }
 
-    for (DataModel::EndpointEntry ep = aProvider->FirstEndpoint(); ep.IsValid(); ep = aProvider->NextEndpoint(ep.id))
+    auto endpoints = aProvider->GetEndpoints();
+    for (auto id = endpoints->Next(); id.has_value(); id = endpoints->Next())
     {
-        if (MayHaveAccessibleEventPathForEndpoint(aProvider, ep.id, aEventPath, subjectDescriptor))
+        if (MayHaveAccessibleEventPathForEndpoint(aProvider, *id, aEventPath, subjectDescriptor))
         {
             return true;
         }
@@ -1799,9 +1800,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 
     // At this point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
     // is invalid
-    for (DataModel::EndpointEntry ep = provider->FirstEndpoint(); ep.IsValid(); ep = provider->NextEndpoint(ep.id))
+    auto endpoints = provider->GetEndpoints();
+    for (auto id = endpoints->Next(); id.has_value(); id = endpoints->Next())
     {
-        if (ep.id == aCommandPath.mEndpointId)
+        if (*id == aCommandPath.mEndpointId)
         {
             // endpoint exists, so cluster is invalid
             return Protocols::InteractionModel::Status::UnsupportedCluster;

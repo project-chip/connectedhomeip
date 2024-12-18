@@ -206,12 +206,9 @@ public:
     virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId) = 0;
     virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId)    = 0;
     virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId)    = 0;
+    virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints() = 0;
 
     // TODO: below items MUST transition to pure virtual and have implementations everywhere
-    virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints()
-    {
-        return std::make_unique<NullMetadataIterator<EndpointId, EndpointInfo>>();
-    }
 
     virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId)
     {
@@ -230,12 +227,6 @@ public:
     {
         return std::make_unique<NullElementIterator<CommandId>>();
     }
-
-    // This iteration will list all the endpoints in the data model
-    virtual EndpointEntry FirstEndpoint()                              = 0;
-    virtual EndpointEntry NextEndpoint(EndpointId before)              = 0;
-    virtual std::optional<EndpointInfo> GetEndpointInfo(EndpointId id) = 0;
-    virtual bool EndpointExists(EndpointId id);
 
     // This iteration will list all server clusters on a given endpoint
     virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;

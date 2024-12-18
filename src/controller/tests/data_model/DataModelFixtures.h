@@ -123,9 +123,8 @@ public:
                                                         chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     std::unique_ptr<DataModel::ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId) override;
-    DataModel::EndpointEntry FirstEndpoint() override;
-    DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
-    std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
+    std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>> GetEndpoints() override;
+
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
     std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;

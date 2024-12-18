@@ -897,64 +897,69 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
     CodegenDataModelProviderWithContext model;
 
     // This iteration relies on the hard-coding that occurs when mock_ember is used
-    EndpointEntry ep = model.FirstEndpoint();
-    EXPECT_EQ(ep.id, kMockEndpoint1);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamily);
-    ep = model.NextEndpoint(kMockEndpoint1);
-    EXPECT_EQ(ep.id, kMockEndpoint2);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTree);
-    ep = model.NextEndpoint(kMockEndpoint2);
-    EXPECT_EQ(ep.id, kMockEndpoint3);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamily);
-    ep = model.NextEndpoint(kMockEndpoint3);
-    EXPECT_EQ(ep.id, kInvalidEndpointId);
+    auto endpoints = model.GetEndpoints();
 
-    /// Some out of order requests should work as well
-    ep = model.NextEndpoint(kMockEndpoint2);
-    EXPECT_EQ(ep.id, kMockEndpoint3);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamily);
-    ep = model.NextEndpoint(kMockEndpoint2);
-    EXPECT_EQ(ep.id, kMockEndpoint3);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamily);
-    ep = model.NextEndpoint(kMockEndpoint1);
-    EXPECT_EQ(ep.id, kMockEndpoint2);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTree);
-    ep = model.NextEndpoint(kMockEndpoint1);
-    EXPECT_EQ(ep.id, kMockEndpoint2);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTree);
-    ep = model.NextEndpoint(kMockEndpoint2);
-    EXPECT_EQ(ep.id, kMockEndpoint3);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamily);
-    ep = model.NextEndpoint(kMockEndpoint1);
-    EXPECT_EQ(ep.id, kMockEndpoint2);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kTree);
-    ep = model.NextEndpoint(kMockEndpoint3);
-    EXPECT_EQ(ep.id, kInvalidEndpointId);
-    ep = model.NextEndpoint(kMockEndpoint3);
-    EXPECT_EQ(ep.id, kInvalidEndpointId);
-    ep = model.FirstEndpoint();
-    EXPECT_EQ(ep.id, kMockEndpoint1);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamily);
-    ep = model.FirstEndpoint();
-    EXPECT_EQ(ep.id, kMockEndpoint1);
-    EXPECT_EQ(ep.info.parentId, kInvalidEndpointId);
-    EXPECT_EQ(ep.info.compositionPattern, EndpointCompositionPattern::kFullFamily);
+    ASSERT_EQ(endpoints->Next(), kMockEndpoint1);
+    std::optional<EndpointInfo> info = endpoints->GetMetadata();
+    ASSERT_TRUE(info.has_value());
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily);
+
+    ASSERT_EQ(endpoints->Next(), kMockEndpoint2);
+    info = endpoints->GetMetadata();
+    ASSERT_TRUE(info.has_value());
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kTree);
+
+    ASSERT_EQ(endpoints->Next(), kMockEndpoint3);
+    info = endpoints->GetMetadata();
+    ASSERT_TRUE(info.has_value());
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily);
+
+    // end of iteration
+    ASSERT_FALSE(endpoints->Next().has_value());
+    ASSERT_FALSE(endpoints->GetMetadata().has_value());
+
+    /// SEEK should work
+    endpoints = model.GetEndpoints();
+    ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint2));
+    ASSERT_EQ(endpoints->Next(), kMockEndpoint3);
+    info = endpoints->GetMetadata();
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily);
+
+    endpoints = model.GetEndpoints();
+    ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint2));
+    ASSERT_EQ(endpoints->Next(), kMockEndpoint3);
+    info = endpoints->GetMetadata();
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kFullFamily);
+
+    endpoints = model.GetEndpoints();
+    ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint1));
+    ASSERT_EQ(endpoints->Next(), kMockEndpoint2);
+    info = endpoints->GetMetadata();
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kTree);
+
+    endpoints = model.GetEndpoints();
+    ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint1));
+    ASSERT_EQ(endpoints->Next(), kMockEndpoint2);
+    info = endpoints->GetMetadata();
+    EXPECT_EQ(info->parentId, kInvalidEndpointId);
+    EXPECT_EQ(info->compositionPattern, EndpointCompositionPattern::kTree);
+
+    endpoints = model.GetEndpoints();
+    ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint3));
+    ASSERT_FALSE(endpoints->Next().has_value());
 
     // invalid endpoiunts
-    ep = model.NextEndpoint(kInvalidEndpointId);
-    EXPECT_EQ(ep.id, kInvalidEndpointId);
-    ep = model.NextEndpoint(987u);
-    EXPECT_EQ(ep.id, kInvalidEndpointId);
+    endpoints = model.GetEndpoints();
+    ASSERT_FALSE(endpoints->SeekTo(kInvalidEndpointId));
+
+    endpoints = model.GetEndpoints();
+    ASSERT_FALSE(endpoints->SeekTo(986u));
 }
 
 TEST(TestCodegenModelViaMocks, GetEndpointInfo)
@@ -962,27 +967,39 @@ TEST(TestCodegenModelViaMocks, GetEndpointInfo)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    std::optional<EndpointInfo> info = model.GetEndpointInfo(kMockEndpoint1);
+    auto endpoints = model.GetEndpoints();
+    ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint1));
+
+    std::optional<EndpointInfo> info = endpoints->GetMetadata();
     ASSERT_TRUE(info.has_value());
     EXPECT_EQ(info->parentId, kInvalidEndpointId); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->compositionPattern,            // NOLINT(bugprone-unchecked-optional-access)
               EndpointCompositionPattern::kFullFamily);
-    info = model.GetEndpointInfo(kMockEndpoint2);
+
+    endpoints = model.GetEndpoints();
+    ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint2));
+
+    info = endpoints->GetMetadata();
     ASSERT_TRUE(info.has_value());
     EXPECT_EQ(info->parentId, kInvalidEndpointId); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->compositionPattern,            // NOLINT(bugprone-unchecked-optional-access)
               EndpointCompositionPattern::kTree);
-    info = model.GetEndpointInfo(kMockEndpoint3);
+
+    endpoints = model.GetEndpoints();
+    ASSERT_TRUE(endpoints->SeekTo(kMockEndpoint3));
+    info = endpoints->GetMetadata();
     ASSERT_TRUE(info.has_value());
     EXPECT_EQ(info->parentId, kInvalidEndpointId); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->compositionPattern,            // NOLINT(bugprone-unchecked-optional-access)
               EndpointCompositionPattern::kFullFamily);
 
     // invalid endpoiunts
-    info = model.GetEndpointInfo(kInvalidEndpointId);
-    EXPECT_FALSE(info.has_value());
-    info = model.GetEndpointInfo(987u);
-    EXPECT_FALSE(info.has_value());
+    endpoints = model.GetEndpoints();
+    ASSERT_FALSE(endpoints->SeekTo(kInvalidEndpointId));
+    EXPECT_FALSE(endpoints->GetMetadata().has_value());
+
+    ASSERT_FALSE(endpoints->SeekTo(987u));
+    EXPECT_FALSE(endpoints->GetMetadata().has_value());
 }
 
 TEST(TestCodegenModelViaMocks, IterateOverServerClusters)

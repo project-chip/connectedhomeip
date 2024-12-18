@@ -149,21 +149,6 @@ std::optional<ActionReturnStatus> TestImCustomDataModel::Invoke(const InvokeRequ
     return std::make_optional<ActionReturnStatus>(CHIP_ERROR_NOT_IMPLEMENTED);
 }
 
-DataModel::EndpointEntry TestImCustomDataModel::FirstEndpoint()
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstEndpoint();
-}
-
-DataModel::EndpointEntry TestImCustomDataModel::NextEndpoint(EndpointId before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextEndpoint(before);
-}
-
-std::optional<DataModel::EndpointInfo> TestImCustomDataModel::GetEndpointInfo(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpointInfo(endpoint);
-}
-
 ClusterEntry TestImCustomDataModel::FirstServerCluster(EndpointId endpoint)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstServerCluster(endpoint);
@@ -182,6 +167,11 @@ std::optional<ClusterInfo> TestImCustomDataModel::GetServerClusterInfo(const Con
 std::unique_ptr<DataModel::ElementIterator<ClusterId>> TestImCustomDataModel::GetClientClusters(EndpointId endpointId)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetClientClusters(endpointId);
+}
+
+std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>> TestImCustomDataModel::GetEndpoints()
+{
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpoints();
 }
 
 AttributeEntry TestImCustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)

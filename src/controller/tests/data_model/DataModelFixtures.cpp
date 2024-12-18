@@ -477,21 +477,6 @@ std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & 
     return std::nullopt; // handler status is set by the dispatch
 }
 
-DataModel::EndpointEntry CustomDataModel::FirstEndpoint()
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstEndpoint();
-}
-
-DataModel::EndpointEntry CustomDataModel::NextEndpoint(EndpointId before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextEndpoint(before);
-}
-
-std::optional<DataModel::EndpointInfo> CustomDataModel::GetEndpointInfo(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpointInfo(endpoint);
-}
-
 ClusterEntry CustomDataModel::FirstServerCluster(EndpointId endpoint)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstServerCluster(endpoint);
@@ -510,6 +495,11 @@ std::optional<ClusterInfo> CustomDataModel::GetServerClusterInfo(const ConcreteC
 std::unique_ptr<DataModel::ElementIterator<ClusterId>> CustomDataModel::GetClientClusters(EndpointId endpointId)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetClientClusters(endpointId);
+}
+
+std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>> CustomDataModel::GetEndpoints()
+{
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpoints();
 }
 
 AttributeEntry CustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
