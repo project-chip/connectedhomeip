@@ -536,21 +536,22 @@ class DataModelLevel(Enum):
             return "device_types"
         raise KeyError("Invalid enum: %r" % self)
 
-
+    
 def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], data_model_level: DataModelLevel = DataModelLevel.kCluster) -> Traversable:
     """
     Get the directory of the data model for a specific version and level from the installed package.
 
-
     `data_model_directory` given as a path MUST be of type Traversable (often `pathlib.Path(somepathstring)`).
     If `data_model_directory` is given as a Traversable, it is returned directly WITHOUT using the data_model_level at all.
     """
-    # If it's a prebuilt directory, build the path based on the version and data model level
-    if isinstance(data_model_directory, PrebuiltDataModelDirectory):
-        return pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
-            'data_model').joinpath(data_model_directory.dirname).joinpath(data_model_level.dirname)
-    else:
+    # Early return if data_model_directory is already a Traversable type
+    if not isinstance(data_model_directory, PrebuiltDataModelDirectory):
         return data_model_directory
+
+    # If it's a prebuilt directory, build the path based on the version and data model level
+    return pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+        'data_model').joinpath(data_model_directory.dirname).joinpath(data_model_level.dirname)
+
 
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> typing.Tuple[dict[int, dict], list]:
@@ -559,7 +560,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     This function supports both pre-built locations and full paths.
 
     `data_model_directory`` given as a path MUST be of type Traversable (often `pathlib.Path(somepathstring)`).
-    If data_model_directory is a Travesable, it is assumed to already contain `clusters` (i.e. be a directory
+    If data_model_directory is a Traversable, it is assumed to already contain `clusters` (i.e. be a directory
     with all XML files in it)
     """
 
@@ -571,6 +572,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     top = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
     logging.info("Reading XML clusters from %r", top)
 
+    # Early return if no XML files are found
     found_xmls = 0
     for f in top.iterdir():
         if not f.name.endswith('.xml'):
@@ -597,21 +599,26 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     # Actions cluster - all commands - these need to be listed in the ActionsList attribute to be supported.
     #                                  We do not currently have a test for this. Please see https://github.com/CHIP-Specifications/chip-test-plans/issues/3646.
 
+
+    # Continue the rest of the processing for known problems
     def remove_problem(location: typing.Union[CommandPathLocation, FeaturePathLocation]):
         nonlocal problems
         problems = [p for p in problems if p.location != location]
 
+    # Marking conformance as optional for certain clusters
     descriptor_id = Clusters.Descriptor.id
     code = 'TAGLIST'
     mask = clusters[descriptor_id].feature_map[code]
     clusters[descriptor_id].features[mask].conformance = optional()
     remove_problem(FeaturePathLocation(endpoint_id=0, cluster_id=descriptor_id, feature_code=code))
+
     action_id = Clusters.Actions.id
     for c in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[action_id]:
         clusters[action_id].accepted_commands[c].conformance = optional()
         remove_problem(CommandPathLocation(endpoint_id=0, cluster_id=action_id, command_id=c))
 
     combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
+
 
     # TODO: All these fixups should be removed BEFORE SVE if at all possible
     # Workaround for Color Control cluster - the spec uses a non-standard conformance. Set all to optional now, will need
