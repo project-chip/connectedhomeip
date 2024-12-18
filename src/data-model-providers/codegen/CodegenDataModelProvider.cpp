@@ -844,20 +844,8 @@ void CodegenDataModelProvider::InitDataModelForTesting()
 std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>>
 CodegenDataModelProvider::GetDeviceTypes(EndpointId endpointId)
 {
-    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
-    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
-    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
-    //
-    // Not actually needed for `First`, however this makes First and Next consistent.
-    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpointId);
-    if (!endpoint_index.has_value())
-    {
-        // do not use the NULL iterator to save flash on what classs are instantiated
-        return std::make_unique<DeviceTypeEntryIterator>(Span<EmberAfDeviceType>());
-    }
-
     CHIP_ERROR err = CHIP_NO_ERROR;
-    return std::make_unique<DeviceTypeEntryIterator>(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
+    return std::make_unique<DeviceTypeEntryIterator>(emberAfDeviceTypeListFromEndpoint(endpointId, err));
 }
 
 std::unique_ptr<DataModel::ElementIterator<DataModel::Provider::SemanticTag>>
