@@ -24,6 +24,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
@@ -32,7 +33,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -56,13 +57,16 @@ class TC_TCTL_2_3(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.TemperatureControl, Clusters.TemperatureControl.Bitmaps.Feature.kTemperatureLevel))
     async def test_TC_TCTL_2_3(self):
+        self.endpoint = self.get_endpoint()
+        cluster = Clusters.TemperatureControl
+        attributes = cluster.Attributes
         self.step(1)
 
         # Step 2: Read SelectedTemperatureLevel attribute
         self.step(2)
-        if self.check_pics("TCTL.S.A0004"):  # SelectedTemperatureLevel attribute
+        if self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SelectedTemperatureLevel):
             selected_temp = await self.read_single_attribute_check_success(
                 cluster=Clusters.Objects.TemperatureControl,
                 attribute=Clusters.TemperatureControl.Attributes.SelectedTemperatureLevel
@@ -72,7 +76,7 @@ class TC_TCTL_2_3(MatterBaseTest):
 
         # Step 3: Read SupportedTemperatureLevels attribute
         self.step(3)
-        if self.check_pics("TCTL.S.A0005"):  # SupportedTemperatureLevels attribute
+        if self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SupportedTemperatureLevels):
             supported_temps = await self.read_single_attribute_check_success(
                 cluster=Clusters.Objects.TemperatureControl,
                 attribute=Clusters.TemperatureControl.Attributes.SupportedTemperatureLevels
