@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include "app/data-model-provider/Iterators.h"
 #include <cstdint>
 #include <optional>
 
@@ -26,6 +25,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model-provider/Iterators.h>
 #include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
