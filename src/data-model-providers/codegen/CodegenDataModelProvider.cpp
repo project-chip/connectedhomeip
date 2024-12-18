@@ -888,13 +888,12 @@ CodegenDataModelProvider::GetGeneratedCommands(ConcreteClusterPath clusterPath)
             err = interface->EnumerateGeneratedCommands(
                 clusterPath,
                 [](CommandId commandId, void * context) -> Loop {
-                    auto data = reinterpret_cast<FetchData *>(context);
-
-                    if (data->index < data->maxSize)
+                    auto fetchData = reinterpret_cast<FetchData *>(context);
+                    if (fetchData->index < fetchData->maxSize)
                     {
-                        data->commands[data->index] = commandId;
+                        fetchData->commands[fetchData->index] = commandId;
                     }
-                    data->index++;
+                    fetchData->index++;
                     return Loop::Continue;
                 },
                 reinterpret_cast<void *>(&data));
