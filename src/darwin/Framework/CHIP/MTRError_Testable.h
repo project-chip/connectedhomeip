@@ -1,6 +1,5 @@
-/*
+/**
  *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,24 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/core/CHIPPersistentStorageDelegate.h"
-#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
-#include <app/codegen-data-model-provider/Instance.h>
 
-namespace chip {
-namespace app {
+#import <Foundation/Foundation.h>
+#import <Matter/MTRError.h>
 
-DataModel::Provider * CodegenDataModelProviderInstance(PersistentStorageDelegate * delegate)
-{
-    static CodegenDataModelProvider gCodegenModel;
+#import "MTRDefines_Internal.h"
 
-    if (delegate != nullptr)
-    {
-        gCodegenModel.SetPersistentStorageDelegate(delegate);
-    }
+NS_ASSUME_NONNULL_BEGIN
 
-    return &gCodegenModel;
-}
+MTR_TESTABLE
+@interface MTRError : NSObject
 
-} // namespace app
-} // namespace chip
++ (NSError *)errorWithCode:(MTRErrorCode)code;
+
+// For tests only, since we can't use CHIP_ERROR from there.  The "code"s used
+// here are integer representations of CHIP_ERROR.  Otherwise these functions
+// are just like errorForCHIPErrorCode and errorToCHIPErrorCode.
++ (NSError *)errorForCHIPIntegerCode:(uint32_t)code;
++ (uint32_t)errorToCHIPIntegerCode:(NSError * _Nullable)error;
+
+@end
+
+NS_ASSUME_NONNULL_END

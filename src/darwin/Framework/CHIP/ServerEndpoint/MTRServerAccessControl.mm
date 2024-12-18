@@ -93,7 +93,7 @@ class AccessControlDelegate : public AccessControl::Delegate {
                 }
                 break;
             default:
-                MTR_LOG_ERROR("Uknown granted privilege %u, ignoring", grant.grantedPrivilege);
+                MTR_LOG_ERROR("Unknown granted privilege %u, ignoring", grant.grantedPrivilege);
                 break;
             }
 
