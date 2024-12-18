@@ -392,7 +392,7 @@ public:
         if ((hint < lastEndpointIndex) && (emberAfEndpointFromIndex(hint) == id))
         {
             mMetadataIndex = hint;
-            mIndex         = hint + 1;
+            mIndex         = static_cast<uint16_t>(hint + 1);
             return true;
         }
         // not found. Just seek until found
