@@ -18,10 +18,10 @@
 
 #include <pw_unit_test/framework.h>
 
-#include "app-common/zap-generated/ids/Clusters.h"
-#include "app/ClusterStateCache.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/BufferedReadCallback.h>
+#include <app/ClusterStateCache.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
@@ -30,6 +30,7 @@
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TimeUtils.h>
@@ -144,6 +145,7 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
