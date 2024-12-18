@@ -12780,7 +12780,7 @@ class ChipClusters:
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
-                "commandName": "MptzSetPosition",
+                "commandName": "MPTZSetPosition",
                 "args": {
                     "pan": "int",
                     "tilt": "int",
@@ -12789,7 +12789,7 @@ class ChipClusters:
             },
             0x00000001: {
                 "commandId": 0x00000001,
-                "commandName": "MptzRelativeMove",
+                "commandName": "MPTZRelativeMove",
                 "args": {
                     "panDelta": "int",
                     "tiltDelta": "int",
@@ -12798,14 +12798,14 @@ class ChipClusters:
             },
             0x00000002: {
                 "commandId": 0x00000002,
-                "commandName": "MptzMoveToPreset",
+                "commandName": "MPTZMoveToPreset",
                 "args": {
                     "presetID": "int",
                 },
             },
             0x00000003: {
                 "commandId": 0x00000003,
-                "commandName": "MptzSavePreset",
+                "commandName": "MPTZSavePreset",
                 "args": {
                     "presetID": "int",
                     "name": "str",
@@ -12813,14 +12813,14 @@ class ChipClusters:
             },
             0x00000004: {
                 "commandId": 0x00000004,
-                "commandName": "MptzRemovePreset",
+                "commandName": "MPTZRemovePreset",
                 "args": {
                     "presetID": "int",
                 },
             },
             0x00000005: {
                 "commandId": 0x00000005,
-                "commandName": "DptzSetViewport",
+                "commandName": "DPTZSetViewport",
                 "args": {
                     "videoStreamID": "int",
                     "viewport": "ViewportStruct",
@@ -12828,7 +12828,7 @@ class ChipClusters:
             },
             0x00000006: {
                 "commandId": 0x00000006,
-                "commandName": "DptzRelativeMove",
+                "commandName": "DPTZRelativeMove",
                 "args": {
                     "videoStreamID": "int",
                     "deltaX": "int",
@@ -12839,7 +12839,7 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "MptzPosition",
+                "attributeName": "MPTZPosition",
                 "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
@@ -12851,13 +12851,13 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "MptzPresets",
+                "attributeName": "MPTZPresets",
                 "attributeId": 0x00000002,
                 "type": "",
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "DptzRelativeMove",
+                "attributeName": "DPTZRelativeMove",
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,

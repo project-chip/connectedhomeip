@@ -7925,20 +7925,20 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster CameraAVSettingsUserLevelManagement attributes
-        case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMptzPositionID:
-            result = @"MptzPosition";
+        case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMPTZPositionID:
+            result = @"MPTZPosition";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMaxPresetsID:
             result = @"MaxPresets";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMptzPresetsID:
-            result = @"MptzPresets";
+        case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMPTZPresetsID:
+            result = @"MPTZPresets";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeDptzRelativeMoveID:
-            result = @"DptzRelativeMove";
+        case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeDPTZRelativeMoveID:
+            result = @"DPTZRelativeMove";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeZoomMaxID:
@@ -10888,32 +10888,32 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         switch (commandID) {
 
-        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMptzSetPositionID:
-            result = @"MptzSetPosition";
+        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMPTZSetPositionID:
+            result = @"MPTZSetPosition";
             break;
 
-        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMptzRelativeMoveID:
-            result = @"MptzRelativeMove";
+        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMPTZRelativeMoveID:
+            result = @"MPTZRelativeMove";
             break;
 
-        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMptzMoveToPresetID:
-            result = @"MptzMoveToPreset";
+        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMPTZMoveToPresetID:
+            result = @"MPTZMoveToPreset";
             break;
 
-        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMptzSavePresetID:
-            result = @"MptzSavePreset";
+        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMPTZSavePresetID:
+            result = @"MPTZSavePreset";
             break;
 
-        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMptzRemovePresetID:
-            result = @"MptzRemovePreset";
+        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMPTZRemovePresetID:
+            result = @"MPTZRemovePreset";
             break;
 
-        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandDptzSetViewportID:
-            result = @"DptzSetViewport";
+        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandDPTZSetViewportID:
+            result = @"DPTZSetViewport";
             break;
 
-        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandDptzRelativeMoveID:
-            result = @"DptzRelativeMove";
+        case MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandDPTZRelativeMoveID:
+            result = @"DPTZRelativeMove";
             break;
 
         default:

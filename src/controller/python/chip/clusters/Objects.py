@@ -46239,10 +46239,10 @@ class CameraAvSettingsUserLevelManagement(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="mptzPosition", Tag=0x00000000, Type=typing.Optional[CameraAvSettingsUserLevelManagement.Structs.MPTZStruct]),
+                ClusterObjectFieldDescriptor(Label="MPTZPosition", Tag=0x00000000, Type=typing.Optional[CameraAvSettingsUserLevelManagement.Structs.MPTZStruct]),
                 ClusterObjectFieldDescriptor(Label="maxPresets", Tag=0x00000001, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="mptzPresets", Tag=0x00000002, Type=typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]]),
-                ClusterObjectFieldDescriptor(Label="dptzRelativeMove", Tag=0x00000003, Type=typing.Optional[typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="MPTZPresets", Tag=0x00000002, Type=typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]]),
+                ClusterObjectFieldDescriptor(Label="DPTZRelativeMove", Tag=0x00000003, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="zoomMax", Tag=0x00000004, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="tiltMin", Tag=0x00000005, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="tiltMax", Tag=0x00000006, Type=typing.Optional[int]),
@@ -46255,10 +46255,10 @@ class CameraAvSettingsUserLevelManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    mptzPosition: typing.Optional[CameraAvSettingsUserLevelManagement.Structs.MPTZStruct] = None
+    MPTZPosition: typing.Optional[CameraAvSettingsUserLevelManagement.Structs.MPTZStruct] = None
     maxPresets: typing.Optional[uint] = None
-    mptzPresets: typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]] = None
-    dptzRelativeMove: typing.Optional[typing.List[uint]] = None
+    MPTZPresets: typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]] = None
+    DPTZRelativeMove: typing.Optional[typing.List[uint]] = None
     zoomMax: typing.Optional[uint] = None
     tiltMin: typing.Optional[int] = None
     tiltMax: typing.Optional[int] = None
@@ -46328,7 +46328,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
 
     class Commands:
         @dataclass
-        class MptzSetPosition(ClusterCommand):
+        class MPTZSetPosition(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000552
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
@@ -46348,7 +46348,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             zoom: typing.Optional[uint] = None
 
         @dataclass
-        class MptzRelativeMove(ClusterCommand):
+        class MPTZRelativeMove(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000552
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
@@ -46368,7 +46368,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             zoomDelta: typing.Optional[int] = None
 
         @dataclass
-        class MptzMoveToPreset(ClusterCommand):
+        class MPTZMoveToPreset(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000552
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
@@ -46384,7 +46384,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             presetID: uint = 0
 
         @dataclass
-        class MptzSavePreset(ClusterCommand):
+        class MPTZSavePreset(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000552
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
@@ -46402,7 +46402,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             name: str = ""
 
         @dataclass
-        class MptzRemovePreset(ClusterCommand):
+        class MPTZRemovePreset(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000552
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
@@ -46418,7 +46418,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             presetID: uint = 0
 
         @dataclass
-        class DptzSetViewport(ClusterCommand):
+        class DPTZSetViewport(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000552
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
@@ -46436,7 +46436,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             viewport: CameraAvSettingsUserLevelManagement.Structs.ViewportStruct = field(default_factory=lambda: CameraAvSettingsUserLevelManagement.Structs.ViewportStruct())
 
         @dataclass
-        class DptzRelativeMove(ClusterCommand):
+        class DPTZRelativeMove(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000552
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
@@ -46459,7 +46459,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
 
     class Attributes:
         @dataclass
-        class MptzPosition(ClusterAttributeDescriptor):
+        class MPTZPosition(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000552
@@ -46491,7 +46491,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             value: typing.Optional[uint] = None
 
         @dataclass
-        class MptzPresets(ClusterAttributeDescriptor):
+        class MPTZPresets(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000552
@@ -46507,7 +46507,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             value: typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]] = None
 
         @dataclass
-        class DptzRelativeMove(ClusterAttributeDescriptor):
+        class DPTZRelativeMove(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000552

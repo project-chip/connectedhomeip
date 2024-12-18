@@ -7056,21 +7056,21 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace CameraAvSettingsUserLevelManagement {
 namespace Attributes {
 
-namespace MptzPosition {
+namespace MPTZPosition {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace MptzPosition
+} // namespace MPTZPosition
 
 namespace MaxPresets {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace MaxPresets
 
-namespace MptzPresets {
+namespace MPTZPresets {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace MptzPresets
+} // namespace MPTZPresets
 
-namespace DptzRelativeMove {
+namespace DPTZRelativeMove {
 static constexpr AttributeId Id = 0x00000003;
-} // namespace DptzRelativeMove
+} // namespace DPTZRelativeMove
 
 namespace ZoomMax {
 static constexpr AttributeId Id = 0x00000004;

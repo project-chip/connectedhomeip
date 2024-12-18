@@ -18773,28 +18773,28 @@ public class ClusterReadMapping {
           readCameraAvSettingsUserLevelManagementMaxPresetsCommandParams
         );
         result.put("readMaxPresetsAttribute", readCameraAvSettingsUserLevelManagementMaxPresetsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvSettingsUserLevelManagementMptzPresetsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvSettingsUserLevelManagementMptzPresetsAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readCameraAvSettingsUserLevelManagementMPTZPresetsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCameraAvSettingsUserLevelManagementMPTZPresetsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster).readMptzPresetsAttribute(
-              (ChipClusters.CameraAvSettingsUserLevelManagementCluster.MptzPresetsAttributeCallback) callback
+            ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster).readMPTZPresetsAttribute(
+              (ChipClusters.CameraAvSettingsUserLevelManagementCluster.MPTZPresetsAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedCameraAvSettingsUserLevelManagementClusterMptzPresetsAttributeCallback(),
-          readCameraAvSettingsUserLevelManagementMptzPresetsCommandParams
+          () -> new ClusterInfoMapping.DelegatedCameraAvSettingsUserLevelManagementClusterMPTZPresetsAttributeCallback(),
+          readCameraAvSettingsUserLevelManagementMPTZPresetsCommandParams
         );
-        result.put("readMptzPresetsAttribute", readCameraAvSettingsUserLevelManagementMptzPresetsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvSettingsUserLevelManagementDptzRelativeMoveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvSettingsUserLevelManagementDptzRelativeMoveAttributeInteractionInfo = new InteractionInfo(
+        result.put("readMPTZPresetsAttribute", readCameraAvSettingsUserLevelManagementMPTZPresetsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCameraAvSettingsUserLevelManagementDPTZRelativeMoveAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster).readDptzRelativeMoveAttribute(
-              (ChipClusters.CameraAvSettingsUserLevelManagementCluster.DptzRelativeMoveAttributeCallback) callback
+            ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster).readDPTZRelativeMoveAttribute(
+              (ChipClusters.CameraAvSettingsUserLevelManagementCluster.DPTZRelativeMoveAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedCameraAvSettingsUserLevelManagementClusterDptzRelativeMoveAttributeCallback(),
-          readCameraAvSettingsUserLevelManagementDptzRelativeMoveCommandParams
+          () -> new ClusterInfoMapping.DelegatedCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveAttributeCallback(),
+          readCameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams
         );
-        result.put("readDptzRelativeMoveAttribute", readCameraAvSettingsUserLevelManagementDptzRelativeMoveAttributeInteractionInfo);
+        result.put("readDPTZRelativeMoveAttribute", readCameraAvSettingsUserLevelManagementDPTZRelativeMoveAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvSettingsUserLevelManagementZoomMaxCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvSettingsUserLevelManagementZoomMaxAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

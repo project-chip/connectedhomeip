@@ -2146,43 +2146,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRCameraAVSettingsUserLevelManagementClusterMptzSetPositionParams (InternalMethods)
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRCameraAVSettingsUserLevelManagementClusterMptzRelativeMoveParams (InternalMethods)
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRCameraAVSettingsUserLevelManagementClusterMptzMoveToPresetParams (InternalMethods)
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRCameraAVSettingsUserLevelManagementClusterMptzSavePresetParams (InternalMethods)
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRCameraAVSettingsUserLevelManagementClusterMptzRemovePresetParams (InternalMethods)
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRCameraAVSettingsUserLevelManagementClusterDptzSetViewportParams (InternalMethods)
+@interface MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRCameraAVSettingsUserLevelManagementClusterDptzRelativeMoveParams (InternalMethods)
+@interface MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

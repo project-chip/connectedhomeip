@@ -14163,19 +14163,19 @@ private:
 | Cluster CameraAvSettingsUserLevelManagement                         | 0x0552 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * MptzSetPosition                                                   |   0x00 |
-| * MptzRelativeMove                                                  |   0x01 |
-| * MptzMoveToPreset                                                  |   0x02 |
-| * MptzSavePreset                                                    |   0x03 |
-| * MptzRemovePreset                                                  |   0x04 |
-| * DptzSetViewport                                                   |   0x05 |
-| * DptzRelativeMove                                                  |   0x06 |
+| * MPTZSetPosition                                                   |   0x00 |
+| * MPTZRelativeMove                                                  |   0x01 |
+| * MPTZMoveToPreset                                                  |   0x02 |
+| * MPTZSavePreset                                                    |   0x03 |
+| * MPTZRemovePreset                                                  |   0x04 |
+| * DPTZSetViewport                                                   |   0x05 |
+| * DPTZRelativeMove                                                  |   0x06 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * MptzPosition                                                      | 0x0000 |
+| * MPTZPosition                                                      | 0x0000 |
 | * MaxPresets                                                        | 0x0001 |
-| * MptzPresets                                                       | 0x0002 |
-| * DptzRelativeMove                                                  | 0x0003 |
+| * MPTZPresets                                                       | 0x0002 |
+| * DPTZRelativeMove                                                  | 0x0003 |
 | * ZoomMax                                                           | 0x0004 |
 | * TiltMin                                                           | 0x0005 |
 | * TiltMax                                                           | 0x0006 |
@@ -14191,13 +14191,13 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command MptzSetPosition
+ * Command MPTZSetPosition
  */
-class CameraAvSettingsUserLevelManagementMptzSetPosition : public ClusterCommand
+class CameraAvSettingsUserLevelManagementMPTZSetPosition : public ClusterCommand
 {
 public:
-    CameraAvSettingsUserLevelManagementMptzSetPosition(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("mptz-set-position", credsIssuerConfig)
+    CameraAvSettingsUserLevelManagementMPTZSetPosition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("mptzset-position", credsIssuerConfig)
     {
         AddArgument("Pan", INT16_MIN, INT16_MAX, &mRequest.pan);
         AddArgument("Tilt", INT16_MIN, INT16_MAX, &mRequest.tilt);
@@ -14209,7 +14209,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzSetPosition::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -14220,7 +14220,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzSetPosition::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -14229,17 +14229,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzSetPosition::Type mRequest;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::Type mRequest;
 };
 
 /*
- * Command MptzRelativeMove
+ * Command MPTZRelativeMove
  */
-class CameraAvSettingsUserLevelManagementMptzRelativeMove : public ClusterCommand
+class CameraAvSettingsUserLevelManagementMPTZRelativeMove : public ClusterCommand
 {
 public:
-    CameraAvSettingsUserLevelManagementMptzRelativeMove(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("mptz-relative-move", credsIssuerConfig)
+    CameraAvSettingsUserLevelManagementMPTZRelativeMove(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("mptzrelative-move", credsIssuerConfig)
     {
         AddArgument("PanDelta", INT16_MIN, INT16_MAX, &mRequest.panDelta);
         AddArgument("TiltDelta", INT16_MIN, INT16_MAX, &mRequest.tiltDelta);
@@ -14251,7 +14251,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzRelativeMove::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -14262,7 +14262,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzRelativeMove::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -14271,17 +14271,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzRelativeMove::Type mRequest;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::Type mRequest;
 };
 
 /*
- * Command MptzMoveToPreset
+ * Command MPTZMoveToPreset
  */
-class CameraAvSettingsUserLevelManagementMptzMoveToPreset : public ClusterCommand
+class CameraAvSettingsUserLevelManagementMPTZMoveToPreset : public ClusterCommand
 {
 public:
-    CameraAvSettingsUserLevelManagementMptzMoveToPreset(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("mptz-move-to-preset", credsIssuerConfig)
+    CameraAvSettingsUserLevelManagementMPTZMoveToPreset(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("mptzmove-to-preset", credsIssuerConfig)
     {
         AddArgument("PresetID", 0, UINT8_MAX, &mRequest.presetID);
         ClusterCommand::AddArguments();
@@ -14291,7 +14291,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzMoveToPreset::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -14302,7 +14302,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzMoveToPreset::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -14311,17 +14311,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzMoveToPreset::Type mRequest;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::Type mRequest;
 };
 
 /*
- * Command MptzSavePreset
+ * Command MPTZSavePreset
  */
-class CameraAvSettingsUserLevelManagementMptzSavePreset : public ClusterCommand
+class CameraAvSettingsUserLevelManagementMPTZSavePreset : public ClusterCommand
 {
 public:
-    CameraAvSettingsUserLevelManagementMptzSavePreset(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("mptz-save-preset", credsIssuerConfig)
+    CameraAvSettingsUserLevelManagementMPTZSavePreset(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("mptzsave-preset", credsIssuerConfig)
     {
         AddArgument("PresetID", 0, UINT8_MAX, &mRequest.presetID);
         AddArgument("Name", &mRequest.name);
@@ -14332,7 +14332,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzSavePreset::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -14343,7 +14343,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzSavePreset::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -14352,17 +14352,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzSavePreset::Type mRequest;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::Type mRequest;
 };
 
 /*
- * Command MptzRemovePreset
+ * Command MPTZRemovePreset
  */
-class CameraAvSettingsUserLevelManagementMptzRemovePreset : public ClusterCommand
+class CameraAvSettingsUserLevelManagementMPTZRemovePreset : public ClusterCommand
 {
 public:
-    CameraAvSettingsUserLevelManagementMptzRemovePreset(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("mptz-remove-preset", credsIssuerConfig)
+    CameraAvSettingsUserLevelManagementMPTZRemovePreset(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("mptzremove-preset", credsIssuerConfig)
     {
         AddArgument("PresetID", 0, UINT8_MAX, &mRequest.presetID);
         ClusterCommand::AddArguments();
@@ -14372,7 +14372,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzRemovePreset::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -14383,7 +14383,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzRemovePreset::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -14392,17 +14392,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzRemovePreset::Type mRequest;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::Type mRequest;
 };
 
 /*
- * Command DptzSetViewport
+ * Command DPTZSetViewport
  */
-class CameraAvSettingsUserLevelManagementDptzSetViewport : public ClusterCommand
+class CameraAvSettingsUserLevelManagementDPTZSetViewport : public ClusterCommand
 {
 public:
-    CameraAvSettingsUserLevelManagementDptzSetViewport(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("dptz-set-viewport", credsIssuerConfig), mComplex_Viewport(&mRequest.viewport)
+    CameraAvSettingsUserLevelManagementDPTZSetViewport(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("dptzset-viewport", credsIssuerConfig), mComplex_Viewport(&mRequest.viewport)
     {
         AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
         AddArgument("Viewport", &mComplex_Viewport);
@@ -14413,7 +14413,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DptzSetViewport::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -14424,7 +14424,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DptzSetViewport::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -14433,18 +14433,18 @@ public:
     }
 
 private:
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DptzSetViewport::Type mRequest;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Type mRequest;
     TypedComplexArgument<chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::ViewportStruct::Type> mComplex_Viewport;
 };
 
 /*
- * Command DptzRelativeMove
+ * Command DPTZRelativeMove
  */
-class CameraAvSettingsUserLevelManagementDptzRelativeMove : public ClusterCommand
+class CameraAvSettingsUserLevelManagementDPTZRelativeMove : public ClusterCommand
 {
 public:
-    CameraAvSettingsUserLevelManagementDptzRelativeMove(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("dptz-relative-move", credsIssuerConfig)
+    CameraAvSettingsUserLevelManagementDPTZRelativeMove(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("dptzrelative-move", credsIssuerConfig)
     {
         AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
         AddArgument("DeltaX", INT16_MIN, INT16_MAX, &mRequest.deltaX);
@@ -14457,7 +14457,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DptzRelativeMove::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -14468,7 +14468,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DptzRelativeMove::Id;
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -14477,7 +14477,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DptzRelativeMove::Type mRequest;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -27323,21 +27323,21 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         // Commands
         //
         make_unique<ClusterCommand>(Id, credsIssuerConfig),                                  //
-        make_unique<CameraAvSettingsUserLevelManagementMptzSetPosition>(credsIssuerConfig),  //
-        make_unique<CameraAvSettingsUserLevelManagementMptzRelativeMove>(credsIssuerConfig), //
-        make_unique<CameraAvSettingsUserLevelManagementMptzMoveToPreset>(credsIssuerConfig), //
-        make_unique<CameraAvSettingsUserLevelManagementMptzSavePreset>(credsIssuerConfig),   //
-        make_unique<CameraAvSettingsUserLevelManagementMptzRemovePreset>(credsIssuerConfig), //
-        make_unique<CameraAvSettingsUserLevelManagementDptzSetViewport>(credsIssuerConfig),  //
-        make_unique<CameraAvSettingsUserLevelManagementDptzRelativeMove>(credsIssuerConfig), //
+        make_unique<CameraAvSettingsUserLevelManagementMPTZSetPosition>(credsIssuerConfig),  //
+        make_unique<CameraAvSettingsUserLevelManagementMPTZRelativeMove>(credsIssuerConfig), //
+        make_unique<CameraAvSettingsUserLevelManagementMPTZMoveToPreset>(credsIssuerConfig), //
+        make_unique<CameraAvSettingsUserLevelManagementMPTZSavePreset>(credsIssuerConfig),   //
+        make_unique<CameraAvSettingsUserLevelManagementMPTZRemovePreset>(credsIssuerConfig), //
+        make_unique<CameraAvSettingsUserLevelManagementDPTZSetViewport>(credsIssuerConfig),  //
+        make_unique<CameraAvSettingsUserLevelManagementDPTZRelativeMove>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "mptz-position", Attributes::MptzPosition::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "mptzposition", Attributes::MPTZPosition::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "max-presets", Attributes::MaxPresets::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "mptz-presets", Attributes::MptzPresets::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "dptz-relative-move", Attributes::DptzRelativeMove::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "mptzpresets", Attributes::MPTZPresets::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "dptzrelative-move", Attributes::DPTZRelativeMove::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "zoom-max", Attributes::ZoomMax::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "tilt-min", Attributes::TiltMin::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "tilt-max", Attributes::TiltMax::Id, credsIssuerConfig),                            //
@@ -27350,14 +27350,14 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type>>(
-            Id, "mptz-position", Attributes::MptzPosition::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            Id, "mptzposition", Attributes::MPTZPosition::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "max-presets", 0, UINT8_MAX, Attributes::MaxPresets::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Type>>>(
-            Id, "mptz-presets", Attributes::MptzPresets::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            Id, "mptzpresets", Attributes::MPTZPresets::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
-            Id, "dptz-relative-move", Attributes::DptzRelativeMove::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            Id, "dptzrelative-move", Attributes::DPTZRelativeMove::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "zoom-max", 0, UINT8_MAX, Attributes::ZoomMax::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
         make_unique<WriteAttribute<int16_t>>(Id, "tilt-min", INT16_MIN, INT16_MAX, Attributes::TiltMin::Id,
@@ -27380,10 +27380,10 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "mptz-position", Attributes::MptzPosition::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "mptzposition", Attributes::MPTZPosition::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "max-presets", Attributes::MaxPresets::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "mptz-presets", Attributes::MptzPresets::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "dptz-relative-move", Attributes::DptzRelativeMove::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "mptzpresets", Attributes::MPTZPresets::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "dptzrelative-move", Attributes::DPTZRelativeMove::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "zoom-max", Attributes::ZoomMax::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "tilt-min", Attributes::TiltMin::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "tilt-max", Attributes::TiltMax::Id, credsIssuerConfig),                            //

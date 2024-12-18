@@ -14538,57 +14538,57 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterCameraAVSettingsUserLevelManagement : MTRGenericBaseCluster
 
 /**
- * Command MptzSetPosition
+ * Command MPTZSetPosition
  *
  * This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ.
  */
-- (void)mptzSetPositionWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzSetPositionParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)mptzSetPositionWithCompletion:(MTRStatusCompletion)completion
+- (void)MPTZSetPositionWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)MPTZSetPositionWithCompletion:(MTRStatusCompletion)completion
     MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command MptzRelativeMove
+ * Command MPTZRelativeMove
  *
  * This command SHALL move the device by the delta values relative to the currently defined position.
  */
-- (void)mptzRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzRelativeMoveParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)mptzRelativeMoveWithCompletion:(MTRStatusCompletion)completion
+- (void)MPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)MPTZRelativeMoveWithCompletion:(MTRStatusCompletion)completion
     MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command MptzMoveToPreset
+ * Command MPTZMoveToPreset
  *
  * This command SHALL move the camera to the positions specified by the Preset passed.
  */
-- (void)mptzMoveToPresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzMoveToPresetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)MPTZMoveToPresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command MptzSavePreset
+ * Command MPTZSavePreset
  *
  * This command allows creating a new preset or updating the values of an existing one.
  */
-- (void)mptzSavePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzSavePresetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)MPTZSavePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command MptzRemovePreset
+ * Command MPTZRemovePreset
  *
  * This command SHALL remove a preset entry from the PresetMptzTable.
  */
-- (void)mptzRemovePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzRemovePresetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)MPTZRemovePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command DptzSetViewport
+ * Command DPTZSetViewport
  *
  * This command allows for setting the digital viewport for a specific Video Stream.
  */
-- (void)dptzSetViewportWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDptzSetViewportParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)DPTZSetViewportWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command DptzRelativeMove
+ * Command DPTZRelativeMove
  *
  * This command SHALL change the viewports location by the amount specified in a relative fashion.
  */
-- (void)dptzRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDptzRelativeMoveParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)DPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeMptzPositionWithCompletion:(void (^)(MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeMptzPositionWithParams:(MTRSubscribeParams *)params
+- (void)readAttributeMPTZPositionWithCompletion:(void (^)(MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeMPTZPositionWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeMptzPositionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeMPTZPositionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeMaxPresetsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeMaxPresetsWithParams:(MTRSubscribeParams *)params
@@ -14596,17 +14596,17 @@ MTR_PROVISIONALLY_AVAILABLE
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeMaxPresetsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeMptzPresetsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeMptzPresetsWithParams:(MTRSubscribeParams *)params
+- (void)readAttributeMPTZPresetsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeMPTZPresetsWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeMptzPresetsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeMPTZPresetsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeDptzRelativeMoveWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeDptzRelativeMoveWithParams:(MTRSubscribeParams *)params
+- (void)readAttributeDPTZRelativeMoveWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeDPTZRelativeMoveWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeDptzRelativeMoveWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeDPTZRelativeMoveWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeZoomMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeZoomMaxWithParams:(MTRSubscribeParams *)params

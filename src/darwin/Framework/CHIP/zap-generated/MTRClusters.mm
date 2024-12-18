@@ -19748,14 +19748,14 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterCameraAVSettingsUserLevelManagement
 
-- (void)mptzSetPositionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)MPTZSetPositionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    [self mptzSetPositionWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+    [self MPTZSetPositionWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)mptzSetPositionWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzSetPositionParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)MPTZSetPositionWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRCameraAVSettingsUserLevelManagementClusterMptzSetPositionParams
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams
             alloc] init];
     }
 
@@ -19765,7 +19765,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MptzSetPosition::Type;
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -19779,14 +19779,14 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)mptzRelativeMoveWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)MPTZRelativeMoveWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    [self mptzRelativeMoveWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+    [self MPTZRelativeMoveWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)mptzRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzRelativeMoveParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)MPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRCameraAVSettingsUserLevelManagementClusterMptzRelativeMoveParams
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams
             alloc] init];
     }
 
@@ -19796,7 +19796,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MptzRelativeMove::Type;
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -19810,10 +19810,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)mptzMoveToPresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzMoveToPresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)MPTZMoveToPresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRCameraAVSettingsUserLevelManagementClusterMptzMoveToPresetParams
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams
             alloc] init];
     }
 
@@ -19823,7 +19823,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MptzMoveToPreset::Type;
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -19837,10 +19837,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)mptzSavePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzSavePresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)MPTZSavePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRCameraAVSettingsUserLevelManagementClusterMptzSavePresetParams
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams
             alloc] init];
     }
 
@@ -19850,7 +19850,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MptzSavePreset::Type;
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -19864,10 +19864,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)mptzRemovePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzRemovePresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)MPTZRemovePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRCameraAVSettingsUserLevelManagementClusterMptzRemovePresetParams
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams
             alloc] init];
     }
 
@@ -19877,7 +19877,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MptzRemovePreset::Type;
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -19891,10 +19891,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)dptzSetViewportWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDptzSetViewportParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)DPTZSetViewportWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRCameraAVSettingsUserLevelManagementClusterDptzSetViewportParams
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams
             alloc] init];
     }
 
@@ -19904,7 +19904,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = CameraAvSettingsUserLevelManagement::Commands::DptzSetViewport::Type;
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -19918,10 +19918,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)dptzRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDptzRelativeMoveParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)DPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRCameraAVSettingsUserLevelManagementClusterDptzRelativeMoveParams
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams
             alloc] init];
     }
 
@@ -19931,7 +19931,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = CameraAvSettingsUserLevelManagement::Commands::DptzRelativeMove::Type;
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -19945,9 +19945,9 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMptzPositionWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMPTZPositionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMptzPositionID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMPTZPositionID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxPresetsWithParams:(MTRReadParams * _Nullable)params
@@ -19955,14 +19955,14 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMaxPresetsID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMptzPresetsWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMPTZPresetsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMptzPresetsID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMPTZPresetsID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeDptzRelativeMoveWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDPTZRelativeMoveWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeDptzRelativeMoveID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeDPTZRelativeMoveID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeZoomMaxWithParams:(MTRReadParams * _Nullable)params

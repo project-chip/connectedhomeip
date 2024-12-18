@@ -11396,7 +11396,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRCameraAVSettingsUserLevelManagementClusterMptzSetPositionParams : NSObject <NSCopying>
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nullable pan MTR_PROVISIONALLY_AVAILABLE;
 
@@ -11430,7 +11430,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRCameraAVSettingsUserLevelManagementClusterMptzRelativeMoveParams : NSObject <NSCopying>
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nullable panDelta MTR_PROVISIONALLY_AVAILABLE;
 
@@ -11464,7 +11464,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRCameraAVSettingsUserLevelManagementClusterMptzMoveToPresetParams : NSObject <NSCopying>
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull presetID MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -11494,7 +11494,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRCameraAVSettingsUserLevelManagementClusterMptzSavePresetParams : NSObject <NSCopying>
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nullable presetID MTR_PROVISIONALLY_AVAILABLE;
 
@@ -11526,7 +11526,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRCameraAVSettingsUserLevelManagementClusterMptzRemovePresetParams : NSObject <NSCopying>
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull presetID MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -11556,7 +11556,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRCameraAVSettingsUserLevelManagementClusterDptzSetViewportParams : NSObject <NSCopying>
+@interface MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull videoStreamID MTR_PROVISIONALLY_AVAILABLE;
 
@@ -11588,7 +11588,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRCameraAVSettingsUserLevelManagementClusterDptzRelativeMoveParams : NSObject <NSCopying>
+@interface MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull videoStreamID MTR_PROVISIONALLY_AVAILABLE;
 

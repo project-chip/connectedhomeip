@@ -20462,7 +20462,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvSettingsUserLevelManagementClusterMptzPositionAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.MptzPositionAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvSettingsUserLevelManagementClusterMPTZPositionAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.MPTZPositionAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20483,7 +20483,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvSettingsUserLevelManagementClusterMptzPresetsAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.MptzPresetsAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvSettingsUserLevelManagementClusterMPTZPresetsAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.MPTZPresetsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20504,7 +20504,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvSettingsUserLevelManagementClusterDptzRelativeMoveAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.DptzRelativeMoveAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.DPTZRelativeMoveAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -30014,20 +30014,20 @@ public class ClusterInfoMapping {
 
     Map<String, InteractionInfo> cameraAvSettingsUserLevelManagementClusterInteractionInfoMap = new LinkedHashMap<>();
 
-    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementmptzSetPositionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementMPTZSetPositionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementmptzSetPositionpanCommandParameterInfo = new CommandParameterInfo("pan", Optional.class, Integer.class);
-    cameraAvSettingsUserLevelManagementmptzSetPositionCommandParams.put("pan",cameraAvSettingsUserLevelManagementmptzSetPositionpanCommandParameterInfo);
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZSetPositionpanCommandParameterInfo = new CommandParameterInfo("pan", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZSetPositionCommandParams.put("pan",cameraAvSettingsUserLevelManagementMPTZSetPositionpanCommandParameterInfo);
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementmptzSetPositiontiltCommandParameterInfo = new CommandParameterInfo("tilt", Optional.class, Integer.class);
-    cameraAvSettingsUserLevelManagementmptzSetPositionCommandParams.put("tilt",cameraAvSettingsUserLevelManagementmptzSetPositiontiltCommandParameterInfo);
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZSetPositiontiltCommandParameterInfo = new CommandParameterInfo("tilt", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZSetPositionCommandParams.put("tilt",cameraAvSettingsUserLevelManagementMPTZSetPositiontiltCommandParameterInfo);
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementmptzSetPositionzoomCommandParameterInfo = new CommandParameterInfo("zoom", Optional.class, Integer.class);
-    cameraAvSettingsUserLevelManagementmptzSetPositionCommandParams.put("zoom",cameraAvSettingsUserLevelManagementmptzSetPositionzoomCommandParameterInfo);
-    InteractionInfo cameraAvSettingsUserLevelManagementmptzSetPositionInteractionInfo = new InteractionInfo(
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZSetPositionzoomCommandParameterInfo = new CommandParameterInfo("zoom", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZSetPositionCommandParams.put("zoom",cameraAvSettingsUserLevelManagementMPTZSetPositionzoomCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementMPTZSetPositionInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
-        .mptzSetPosition((DefaultClusterCallback) callback
+        .MPTZSetPosition((DefaultClusterCallback) callback
         , (Optional<Integer>)
         commandArguments.get("pan")
         , (Optional<Integer>)
@@ -30037,24 +30037,24 @@ public class ClusterInfoMapping {
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        cameraAvSettingsUserLevelManagementmptzSetPositionCommandParams
+        cameraAvSettingsUserLevelManagementMPTZSetPositionCommandParams
     );
-    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("mptzSetPosition", cameraAvSettingsUserLevelManagementmptzSetPositionInteractionInfo);
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("MPTZSetPosition", cameraAvSettingsUserLevelManagementMPTZSetPositionInteractionInfo);
 
-    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementmptzRelativeMoveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementMPTZRelativeMoveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementmptzRelativeMovepanDeltaCommandParameterInfo = new CommandParameterInfo("panDelta", Optional.class, Integer.class);
-    cameraAvSettingsUserLevelManagementmptzRelativeMoveCommandParams.put("panDelta",cameraAvSettingsUserLevelManagementmptzRelativeMovepanDeltaCommandParameterInfo);
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZRelativeMovepanDeltaCommandParameterInfo = new CommandParameterInfo("panDelta", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZRelativeMoveCommandParams.put("panDelta",cameraAvSettingsUserLevelManagementMPTZRelativeMovepanDeltaCommandParameterInfo);
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementmptzRelativeMovetiltDeltaCommandParameterInfo = new CommandParameterInfo("tiltDelta", Optional.class, Integer.class);
-    cameraAvSettingsUserLevelManagementmptzRelativeMoveCommandParams.put("tiltDelta",cameraAvSettingsUserLevelManagementmptzRelativeMovetiltDeltaCommandParameterInfo);
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZRelativeMovetiltDeltaCommandParameterInfo = new CommandParameterInfo("tiltDelta", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZRelativeMoveCommandParams.put("tiltDelta",cameraAvSettingsUserLevelManagementMPTZRelativeMovetiltDeltaCommandParameterInfo);
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementmptzRelativeMovezoomDeltaCommandParameterInfo = new CommandParameterInfo("zoomDelta", Optional.class, Integer.class);
-    cameraAvSettingsUserLevelManagementmptzRelativeMoveCommandParams.put("zoomDelta",cameraAvSettingsUserLevelManagementmptzRelativeMovezoomDeltaCommandParameterInfo);
-    InteractionInfo cameraAvSettingsUserLevelManagementmptzRelativeMoveInteractionInfo = new InteractionInfo(
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZRelativeMovezoomDeltaCommandParameterInfo = new CommandParameterInfo("zoomDelta", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZRelativeMoveCommandParams.put("zoomDelta",cameraAvSettingsUserLevelManagementMPTZRelativeMovezoomDeltaCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementMPTZRelativeMoveInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
-        .mptzRelativeMove((DefaultClusterCallback) callback
+        .MPTZRelativeMove((DefaultClusterCallback) callback
         , (Optional<Integer>)
         commandArguments.get("panDelta")
         , (Optional<Integer>)
@@ -30064,38 +30064,38 @@ public class ClusterInfoMapping {
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        cameraAvSettingsUserLevelManagementmptzRelativeMoveCommandParams
+        cameraAvSettingsUserLevelManagementMPTZRelativeMoveCommandParams
     );
-    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("mptzRelativeMove", cameraAvSettingsUserLevelManagementmptzRelativeMoveInteractionInfo);
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("MPTZRelativeMove", cameraAvSettingsUserLevelManagementMPTZRelativeMoveInteractionInfo);
 
-    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementmptzMoveToPresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementMPTZMoveToPresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementmptzMoveToPresetpresetIDCommandParameterInfo = new CommandParameterInfo("presetID", Integer.class, Integer.class);
-    cameraAvSettingsUserLevelManagementmptzMoveToPresetCommandParams.put("presetID",cameraAvSettingsUserLevelManagementmptzMoveToPresetpresetIDCommandParameterInfo);
-    InteractionInfo cameraAvSettingsUserLevelManagementmptzMoveToPresetInteractionInfo = new InteractionInfo(
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZMoveToPresetpresetIDCommandParameterInfo = new CommandParameterInfo("presetID", Integer.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZMoveToPresetCommandParams.put("presetID",cameraAvSettingsUserLevelManagementMPTZMoveToPresetpresetIDCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementMPTZMoveToPresetInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
-        .mptzMoveToPreset((DefaultClusterCallback) callback
+        .MPTZMoveToPreset((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("presetID")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        cameraAvSettingsUserLevelManagementmptzMoveToPresetCommandParams
+        cameraAvSettingsUserLevelManagementMPTZMoveToPresetCommandParams
     );
-    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("mptzMoveToPreset", cameraAvSettingsUserLevelManagementmptzMoveToPresetInteractionInfo);
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("MPTZMoveToPreset", cameraAvSettingsUserLevelManagementMPTZMoveToPresetInteractionInfo);
 
-    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementmptzSavePresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementMPTZSavePresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementmptzSavePresetpresetIDCommandParameterInfo = new CommandParameterInfo("presetID", Optional.class, Integer.class);
-    cameraAvSettingsUserLevelManagementmptzSavePresetCommandParams.put("presetID",cameraAvSettingsUserLevelManagementmptzSavePresetpresetIDCommandParameterInfo);
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZSavePresetpresetIDCommandParameterInfo = new CommandParameterInfo("presetID", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZSavePresetCommandParams.put("presetID",cameraAvSettingsUserLevelManagementMPTZSavePresetpresetIDCommandParameterInfo);
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementmptzSavePresetnameCommandParameterInfo = new CommandParameterInfo("name", String.class, String.class);
-    cameraAvSettingsUserLevelManagementmptzSavePresetCommandParams.put("name",cameraAvSettingsUserLevelManagementmptzSavePresetnameCommandParameterInfo);
-    InteractionInfo cameraAvSettingsUserLevelManagementmptzSavePresetInteractionInfo = new InteractionInfo(
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZSavePresetnameCommandParameterInfo = new CommandParameterInfo("name", String.class, String.class);
+    cameraAvSettingsUserLevelManagementMPTZSavePresetCommandParams.put("name",cameraAvSettingsUserLevelManagementMPTZSavePresetnameCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementMPTZSavePresetInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
-        .mptzSavePreset((DefaultClusterCallback) callback
+        .MPTZSavePreset((DefaultClusterCallback) callback
         , (Optional<Integer>)
         commandArguments.get("presetID")
         , (String)
@@ -30103,36 +30103,36 @@ public class ClusterInfoMapping {
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        cameraAvSettingsUserLevelManagementmptzSavePresetCommandParams
+        cameraAvSettingsUserLevelManagementMPTZSavePresetCommandParams
     );
-    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("mptzSavePreset", cameraAvSettingsUserLevelManagementmptzSavePresetInteractionInfo);
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("MPTZSavePreset", cameraAvSettingsUserLevelManagementMPTZSavePresetInteractionInfo);
 
-    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementmptzRemovePresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementMPTZRemovePresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementmptzRemovePresetpresetIDCommandParameterInfo = new CommandParameterInfo("presetID", Integer.class, Integer.class);
-    cameraAvSettingsUserLevelManagementmptzRemovePresetCommandParams.put("presetID",cameraAvSettingsUserLevelManagementmptzRemovePresetpresetIDCommandParameterInfo);
-    InteractionInfo cameraAvSettingsUserLevelManagementmptzRemovePresetInteractionInfo = new InteractionInfo(
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZRemovePresetpresetIDCommandParameterInfo = new CommandParameterInfo("presetID", Integer.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZRemovePresetCommandParams.put("presetID",cameraAvSettingsUserLevelManagementMPTZRemovePresetpresetIDCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementMPTZRemovePresetInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
-        .mptzRemovePreset((DefaultClusterCallback) callback
+        .MPTZRemovePreset((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("presetID")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        cameraAvSettingsUserLevelManagementmptzRemovePresetCommandParams
+        cameraAvSettingsUserLevelManagementMPTZRemovePresetCommandParams
     );
-    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("mptzRemovePreset", cameraAvSettingsUserLevelManagementmptzRemovePresetInteractionInfo);
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("MPTZRemovePreset", cameraAvSettingsUserLevelManagementMPTZRemovePresetInteractionInfo);
 
-    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementdptzSetViewportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementDPTZSetViewportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementdptzSetViewportvideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Integer.class, Integer.class);
-    cameraAvSettingsUserLevelManagementdptzSetViewportCommandParams.put("videoStreamID",cameraAvSettingsUserLevelManagementdptzSetViewportvideoStreamIDCommandParameterInfo);
+    CommandParameterInfo cameraAvSettingsUserLevelManagementDPTZSetViewportvideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Integer.class, Integer.class);
+    cameraAvSettingsUserLevelManagementDPTZSetViewportCommandParams.put("videoStreamID",cameraAvSettingsUserLevelManagementDPTZSetViewportvideoStreamIDCommandParameterInfo);
 
-    InteractionInfo cameraAvSettingsUserLevelManagementdptzSetViewportInteractionInfo = new InteractionInfo(
+    InteractionInfo cameraAvSettingsUserLevelManagementDPTZSetViewportInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
-        .dptzSetViewport((DefaultClusterCallback) callback
+        .DPTZSetViewport((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("videoStreamID")
         , (ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct)
@@ -30140,27 +30140,27 @@ public class ClusterInfoMapping {
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        cameraAvSettingsUserLevelManagementdptzSetViewportCommandParams
+        cameraAvSettingsUserLevelManagementDPTZSetViewportCommandParams
     );
-    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("dptzSetViewport", cameraAvSettingsUserLevelManagementdptzSetViewportInteractionInfo);
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("DPTZSetViewport", cameraAvSettingsUserLevelManagementDPTZSetViewportInteractionInfo);
 
-    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementdptzRelativeMoveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementdptzRelativeMovevideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Integer.class, Integer.class);
-    cameraAvSettingsUserLevelManagementdptzRelativeMoveCommandParams.put("videoStreamID",cameraAvSettingsUserLevelManagementdptzRelativeMovevideoStreamIDCommandParameterInfo);
+    CommandParameterInfo cameraAvSettingsUserLevelManagementDPTZRelativeMovevideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Integer.class, Integer.class);
+    cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams.put("videoStreamID",cameraAvSettingsUserLevelManagementDPTZRelativeMovevideoStreamIDCommandParameterInfo);
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementdptzRelativeMovedeltaXCommandParameterInfo = new CommandParameterInfo("deltaX", Optional.class, Integer.class);
-    cameraAvSettingsUserLevelManagementdptzRelativeMoveCommandParams.put("deltaX",cameraAvSettingsUserLevelManagementdptzRelativeMovedeltaXCommandParameterInfo);
+    CommandParameterInfo cameraAvSettingsUserLevelManagementDPTZRelativeMovedeltaXCommandParameterInfo = new CommandParameterInfo("deltaX", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams.put("deltaX",cameraAvSettingsUserLevelManagementDPTZRelativeMovedeltaXCommandParameterInfo);
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementdptzRelativeMovedeltaYCommandParameterInfo = new CommandParameterInfo("deltaY", Optional.class, Integer.class);
-    cameraAvSettingsUserLevelManagementdptzRelativeMoveCommandParams.put("deltaY",cameraAvSettingsUserLevelManagementdptzRelativeMovedeltaYCommandParameterInfo);
+    CommandParameterInfo cameraAvSettingsUserLevelManagementDPTZRelativeMovedeltaYCommandParameterInfo = new CommandParameterInfo("deltaY", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams.put("deltaY",cameraAvSettingsUserLevelManagementDPTZRelativeMovedeltaYCommandParameterInfo);
 
-    CommandParameterInfo cameraAvSettingsUserLevelManagementdptzRelativeMovezoomDeltaCommandParameterInfo = new CommandParameterInfo("zoomDelta", Optional.class, Integer.class);
-    cameraAvSettingsUserLevelManagementdptzRelativeMoveCommandParams.put("zoomDelta",cameraAvSettingsUserLevelManagementdptzRelativeMovezoomDeltaCommandParameterInfo);
-    InteractionInfo cameraAvSettingsUserLevelManagementdptzRelativeMoveInteractionInfo = new InteractionInfo(
+    CommandParameterInfo cameraAvSettingsUserLevelManagementDPTZRelativeMovezoomDeltaCommandParameterInfo = new CommandParameterInfo("zoomDelta", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams.put("zoomDelta",cameraAvSettingsUserLevelManagementDPTZRelativeMovezoomDeltaCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementDPTZRelativeMoveInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
-        .dptzRelativeMove((DefaultClusterCallback) callback
+        .DPTZRelativeMove((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("videoStreamID")
         , (Optional<Integer>)
@@ -30172,9 +30172,9 @@ public class ClusterInfoMapping {
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        cameraAvSettingsUserLevelManagementdptzRelativeMoveCommandParams
+        cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams
     );
-    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("dptzRelativeMove", cameraAvSettingsUserLevelManagementdptzRelativeMoveInteractionInfo);
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("DPTZRelativeMove", cameraAvSettingsUserLevelManagementDPTZRelativeMoveInteractionInfo);
 
     commandMap.put("cameraAvSettingsUserLevelManagement", cameraAvSettingsUserLevelManagementClusterInteractionInfoMap);
 

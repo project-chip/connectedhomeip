@@ -1894,33 +1894,33 @@ static constexpr CommandId Id = 0x0000000C;
 namespace CameraAvSettingsUserLevelManagement {
 namespace Commands {
 
-namespace MptzSetPosition {
+namespace MPTZSetPosition {
 static constexpr CommandId Id = 0x00000000;
-} // namespace MptzSetPosition
+} // namespace MPTZSetPosition
 
-namespace MptzRelativeMove {
+namespace MPTZRelativeMove {
 static constexpr CommandId Id = 0x00000001;
-} // namespace MptzRelativeMove
+} // namespace MPTZRelativeMove
 
-namespace MptzMoveToPreset {
+namespace MPTZMoveToPreset {
 static constexpr CommandId Id = 0x00000002;
-} // namespace MptzMoveToPreset
+} // namespace MPTZMoveToPreset
 
-namespace MptzSavePreset {
+namespace MPTZSavePreset {
 static constexpr CommandId Id = 0x00000003;
-} // namespace MptzSavePreset
+} // namespace MPTZSavePreset
 
-namespace MptzRemovePreset {
+namespace MPTZRemovePreset {
 static constexpr CommandId Id = 0x00000004;
-} // namespace MptzRemovePreset
+} // namespace MPTZRemovePreset
 
-namespace DptzSetViewport {
+namespace DPTZSetViewport {
 static constexpr CommandId Id = 0x00000005;
-} // namespace DptzSetViewport
+} // namespace DPTZSetViewport
 
-namespace DptzRelativeMove {
+namespace DPTZRelativeMove {
 static constexpr CommandId Id = 0x00000006;
-} // namespace DptzRelativeMove
+} // namespace DPTZRelativeMove
 
 } // namespace Commands
 } // namespace CameraAvSettingsUserLevelManagement

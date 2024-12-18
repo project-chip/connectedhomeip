@@ -42583,45 +42583,45 @@ namespace ViewportStruct = Clusters::detail::Structs::ViewportStruct;
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace MptzSetPosition {
+namespace MPTZSetPosition {
 struct Type;
 struct DecodableType;
-} // namespace MptzSetPosition
+} // namespace MPTZSetPosition
 
-namespace MptzRelativeMove {
+namespace MPTZRelativeMove {
 struct Type;
 struct DecodableType;
-} // namespace MptzRelativeMove
+} // namespace MPTZRelativeMove
 
-namespace MptzMoveToPreset {
+namespace MPTZMoveToPreset {
 struct Type;
 struct DecodableType;
-} // namespace MptzMoveToPreset
+} // namespace MPTZMoveToPreset
 
-namespace MptzSavePreset {
+namespace MPTZSavePreset {
 struct Type;
 struct DecodableType;
-} // namespace MptzSavePreset
+} // namespace MPTZSavePreset
 
-namespace MptzRemovePreset {
+namespace MPTZRemovePreset {
 struct Type;
 struct DecodableType;
-} // namespace MptzRemovePreset
+} // namespace MPTZRemovePreset
 
-namespace DptzSetViewport {
+namespace DPTZSetViewport {
 struct Type;
 struct DecodableType;
-} // namespace DptzSetViewport
+} // namespace DPTZSetViewport
 
-namespace DptzRelativeMove {
+namespace DPTZRelativeMove {
 struct Type;
 struct DecodableType;
-} // namespace DptzRelativeMove
+} // namespace DPTZRelativeMove
 
 } // namespace Commands
 
 namespace Commands {
-namespace MptzSetPosition {
+namespace MPTZSetPosition {
 enum class Fields : uint8_t
 {
     kPan  = 0,
@@ -42633,7 +42633,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MptzSetPosition::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MPTZSetPosition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     Optional<int16_t> pan;
@@ -42650,7 +42650,7 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MptzSetPosition::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MPTZSetPosition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     Optional<int16_t> pan;
@@ -42658,8 +42658,8 @@ public:
     Optional<uint8_t> zoom;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MptzSetPosition
-namespace MptzRelativeMove {
+}; // namespace MPTZSetPosition
+namespace MPTZRelativeMove {
 enum class Fields : uint8_t
 {
     kPanDelta  = 0,
@@ -42671,7 +42671,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MptzRelativeMove::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MPTZRelativeMove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     Optional<int16_t> panDelta;
@@ -42688,7 +42688,7 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MptzRelativeMove::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MPTZRelativeMove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     Optional<int16_t> panDelta;
@@ -42696,8 +42696,8 @@ public:
     Optional<int8_t> zoomDelta;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MptzRelativeMove
-namespace MptzMoveToPreset {
+}; // namespace MPTZRelativeMove
+namespace MPTZMoveToPreset {
 enum class Fields : uint8_t
 {
     kPresetID = 0,
@@ -42707,7 +42707,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MptzMoveToPreset::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MPTZMoveToPreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     uint8_t presetID = static_cast<uint8_t>(0);
@@ -42722,14 +42722,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MptzMoveToPreset::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MPTZMoveToPreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     uint8_t presetID = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MptzMoveToPreset
-namespace MptzSavePreset {
+}; // namespace MPTZMoveToPreset
+namespace MPTZSavePreset {
 enum class Fields : uint8_t
 {
     kPresetID = 0,
@@ -42740,7 +42740,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MptzSavePreset::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MPTZSavePreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     Optional<uint8_t> presetID;
@@ -42756,15 +42756,15 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MptzSavePreset::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MPTZSavePreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     Optional<uint8_t> presetID;
     chip::CharSpan name;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MptzSavePreset
-namespace MptzRemovePreset {
+}; // namespace MPTZSavePreset
+namespace MPTZRemovePreset {
 enum class Fields : uint8_t
 {
     kPresetID = 0,
@@ -42774,7 +42774,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MptzRemovePreset::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MPTZRemovePreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     uint8_t presetID = static_cast<uint8_t>(0);
@@ -42789,14 +42789,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MptzRemovePreset::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MPTZRemovePreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     uint8_t presetID = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MptzRemovePreset
-namespace DptzSetViewport {
+}; // namespace MPTZRemovePreset
+namespace DPTZSetViewport {
 enum class Fields : uint8_t
 {
     kVideoStreamID = 0,
@@ -42807,7 +42807,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::DptzSetViewport::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DPTZSetViewport::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
@@ -42823,15 +42823,15 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::DptzSetViewport::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DPTZSetViewport::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
     Structs::ViewportStruct::DecodableType viewport;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace DptzSetViewport
-namespace DptzRelativeMove {
+}; // namespace DPTZSetViewport
+namespace DPTZRelativeMove {
 enum class Fields : uint8_t
 {
     kVideoStreamID = 0,
@@ -42844,7 +42844,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::DptzRelativeMove::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DPTZRelativeMove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
@@ -42862,7 +42862,7 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::DptzRelativeMove::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DPTZRelativeMove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
@@ -42871,12 +42871,12 @@ public:
     Optional<int8_t> zoomDelta;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace DptzRelativeMove
+}; // namespace DPTZRelativeMove
 } // namespace Commands
 
 namespace Attributes {
 
-namespace MptzPosition {
+namespace MPTZPosition {
 struct TypeInfo
 {
     using Type             = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type;
@@ -42884,10 +42884,10 @@ struct TypeInfo
     using DecodableArgType = const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MptzPosition::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MPTZPosition::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace MptzPosition
+} // namespace MPTZPosition
 namespace MaxPresets {
 struct TypeInfo
 {
@@ -42900,7 +42900,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxPresets
-namespace MptzPresets {
+namespace MPTZPresets {
 struct TypeInfo
 {
     using Type =
@@ -42911,11 +42911,11 @@ struct TypeInfo
         chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MptzPresets::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MPTZPresets::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace MptzPresets
-namespace DptzRelativeMove {
+} // namespace MPTZPresets
+namespace DPTZRelativeMove {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::List<const uint16_t>;
@@ -42923,10 +42923,10 @@ struct TypeInfo
     using DecodableArgType = const chip::app::DataModel::DecodableList<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DptzRelativeMove::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DPTZRelativeMove::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace DptzRelativeMove
+} // namespace DPTZRelativeMove
 namespace ZoomMax {
 struct TypeInfo
 {
@@ -43026,10 +43026,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::MptzPosition::TypeInfo::DecodableType mptzPosition;
+        Attributes::MPTZPosition::TypeInfo::DecodableType MPTZPosition;
         Attributes::MaxPresets::TypeInfo::DecodableType maxPresets = static_cast<uint8_t>(0);
-        Attributes::MptzPresets::TypeInfo::DecodableType mptzPresets;
-        Attributes::DptzRelativeMove::TypeInfo::DecodableType dptzRelativeMove;
+        Attributes::MPTZPresets::TypeInfo::DecodableType MPTZPresets;
+        Attributes::DPTZRelativeMove::TypeInfo::DecodableType DPTZRelativeMove;
         Attributes::ZoomMax::TypeInfo::DecodableType zoomMax = static_cast<uint8_t>(0);
         Attributes::TiltMin::TypeInfo::DecodableType tiltMin = static_cast<int16_t>(0);
         Attributes::TiltMax::TypeInfo::DecodableType tiltMax = static_cast<int16_t>(0);

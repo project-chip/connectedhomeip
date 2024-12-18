@@ -18803,27 +18803,27 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case CameraAvSettingsUserLevelManagement::Id: {
         switch (path.mAttributeId)
         {
-        case CameraAvSettingsUserLevelManagement::Attributes::MptzPosition::Id: {
+        case CameraAvSettingsUserLevelManagement::Attributes::MPTZPosition::Id: {
             chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MptzPosition", 1, value);
+            return DataModelLogger::LogValue("MPTZPosition", 1, value);
         }
         case CameraAvSettingsUserLevelManagement::Attributes::MaxPresets::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxPresets", 1, value);
         }
-        case CameraAvSettingsUserLevelManagement::Attributes::MptzPresets::Id: {
+        case CameraAvSettingsUserLevelManagement::Attributes::MPTZPresets::Id: {
             chip::app::DataModel::DecodableList<
                 chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MptzPresets", 1, value);
+            return DataModelLogger::LogValue("MPTZPresets", 1, value);
         }
-        case CameraAvSettingsUserLevelManagement::Attributes::DptzRelativeMove::Id: {
+        case CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::Id: {
             chip::app::DataModel::DecodableList<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DptzRelativeMove", 1, value);
+            return DataModelLogger::LogValue("DPTZRelativeMove", 1, value);
         }
         case CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::Id: {
             uint8_t value;

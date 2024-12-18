@@ -17644,8 +17644,8 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
 {
     using namespace Clusters::CameraAvSettingsUserLevelManagement;
     switch (aAttributeId) {
-    case Attributes::MptzPosition::Id: {
-        using TypeInfo = Attributes::MptzPosition::TypeInfo;
+    case Attributes::MPTZPosition::Id: {
+        using TypeInfo = Attributes::MPTZPosition::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17681,8 +17681,8 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-    case Attributes::MptzPresets::Id: {
-        using TypeInfo = Attributes::MptzPresets::TypeInfo;
+    case Attributes::MPTZPresets::Id: {
+        using TypeInfo = Attributes::MPTZPresets::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17730,8 +17730,8 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
         }
         return value;
     }
-    case Attributes::DptzRelativeMove::Id: {
-        using TypeInfo = Attributes::DptzRelativeMove::TypeInfo;
+    case Attributes::DPTZRelativeMove::Id: {
+        using TypeInfo = Attributes::DPTZRelativeMove::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

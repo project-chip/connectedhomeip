@@ -45,39 +45,39 @@ class CameraAvSettingsUserLevelManagementCluster(
   private val controller: MatterController,
   private val endpointId: UShort,
 ) {
-  class MptzPositionAttribute(val value: CameraAvSettingsUserLevelManagementClusterMPTZStruct?)
+  class MPTZPositionAttribute(val value: CameraAvSettingsUserLevelManagementClusterMPTZStruct?)
 
-  sealed class MptzPositionAttributeSubscriptionState {
+  sealed class MPTZPositionAttributeSubscriptionState {
     data class Success(val value: CameraAvSettingsUserLevelManagementClusterMPTZStruct?) :
-      MptzPositionAttributeSubscriptionState()
+      MPTZPositionAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : MptzPositionAttributeSubscriptionState()
+    data class Error(val exception: Exception) : MPTZPositionAttributeSubscriptionState()
 
-    object SubscriptionEstablished : MptzPositionAttributeSubscriptionState()
+    object SubscriptionEstablished : MPTZPositionAttributeSubscriptionState()
   }
 
-  class MptzPresetsAttribute(
+  class MPTZPresetsAttribute(
     val value: List<CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct>?
   )
 
-  sealed class MptzPresetsAttributeSubscriptionState {
+  sealed class MPTZPresetsAttributeSubscriptionState {
     data class Success(
       val value: List<CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct>?
-    ) : MptzPresetsAttributeSubscriptionState()
+    ) : MPTZPresetsAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : MptzPresetsAttributeSubscriptionState()
+    data class Error(val exception: Exception) : MPTZPresetsAttributeSubscriptionState()
 
-    object SubscriptionEstablished : MptzPresetsAttributeSubscriptionState()
+    object SubscriptionEstablished : MPTZPresetsAttributeSubscriptionState()
   }
 
-  class DptzRelativeMoveAttribute(val value: List<UShort>?)
+  class DPTZRelativeMoveAttribute(val value: List<UShort>?)
 
-  sealed class DptzRelativeMoveAttributeSubscriptionState {
-    data class Success(val value: List<UShort>?) : DptzRelativeMoveAttributeSubscriptionState()
+  sealed class DPTZRelativeMoveAttributeSubscriptionState {
+    data class Success(val value: List<UShort>?) : DPTZRelativeMoveAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : DptzRelativeMoveAttributeSubscriptionState()
+    data class Error(val exception: Exception) : DPTZRelativeMoveAttributeSubscriptionState()
 
-    object SubscriptionEstablished : DptzRelativeMoveAttributeSubscriptionState()
+    object SubscriptionEstablished : DPTZRelativeMoveAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -120,7 +120,7 @@ class CameraAvSettingsUserLevelManagementCluster(
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
 
-  suspend fun mptzSetPosition(
+  suspend fun MPTZSetPosition(
     pan: Short?,
     tilt: Short?,
     zoom: UByte?,
@@ -152,7 +152,7 @@ class CameraAvSettingsUserLevelManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun mptzRelativeMove(
+  suspend fun MPTZRelativeMove(
     panDelta: Short?,
     tiltDelta: Short?,
     zoomDelta: Byte?,
@@ -184,7 +184,7 @@ class CameraAvSettingsUserLevelManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun mptzMoveToPreset(presetID: UByte, timedInvokeTimeout: Duration? = null) {
+  suspend fun MPTZMoveToPreset(presetID: UByte, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()
@@ -205,7 +205,7 @@ class CameraAvSettingsUserLevelManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun mptzSavePreset(presetID: UByte?, name: String, timedInvokeTimeout: Duration? = null) {
+  suspend fun MPTZSavePreset(presetID: UByte?, name: String, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 3u
 
     val tlvWriter = TlvWriter()
@@ -229,7 +229,7 @@ class CameraAvSettingsUserLevelManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun mptzRemovePreset(presetID: UByte, timedInvokeTimeout: Duration? = null) {
+  suspend fun MPTZRemovePreset(presetID: UByte, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 4u
 
     val tlvWriter = TlvWriter()
@@ -250,7 +250,7 @@ class CameraAvSettingsUserLevelManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun dptzSetViewport(
+  suspend fun DPTZSetViewport(
     videoStreamID: UShort,
     viewport: CameraAvSettingsUserLevelManagementClusterViewportStruct,
     timedInvokeTimeout: Duration? = null,
@@ -278,7 +278,7 @@ class CameraAvSettingsUserLevelManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun dptzRelativeMove(
+  suspend fun DPTZRelativeMove(
     videoStreamID: UShort,
     deltaX: Short?,
     deltaY: Short?,
@@ -314,7 +314,7 @@ class CameraAvSettingsUserLevelManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun readMptzPositionAttribute(): MptzPositionAttribute {
+  suspend fun readMPTZPositionAttribute(): MPTZPositionAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
@@ -347,13 +347,13 @@ class CameraAvSettingsUserLevelManagementCluster(
         null
       }
 
-    return MptzPositionAttribute(decodedValue)
+    return MPTZPositionAttribute(decodedValue)
   }
 
-  suspend fun subscribeMptzPositionAttribute(
+  suspend fun subscribeMPTZPositionAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<MptzPositionAttributeSubscriptionState> {
+  ): Flow<MPTZPositionAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
       listOf(
@@ -372,7 +372,7 @@ class CameraAvSettingsUserLevelManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            MptzPositionAttributeSubscriptionState.Error(
+            MPTZPositionAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -396,10 +396,10 @@ class CameraAvSettingsUserLevelManagementCluster(
               null
             }
 
-          decodedValue?.let { emit(MptzPositionAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(MPTZPositionAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(MptzPositionAttributeSubscriptionState.SubscriptionEstablished)
+          emit(MPTZPositionAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -496,7 +496,7 @@ class CameraAvSettingsUserLevelManagementCluster(
     }
   }
 
-  suspend fun readMptzPresetsAttribute(): MptzPresetsAttribute {
+  suspend fun readMPTZPresetsAttribute(): MPTZPresetsAttribute {
     val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
@@ -540,13 +540,13 @@ class CameraAvSettingsUserLevelManagementCluster(
         null
       }
 
-    return MptzPresetsAttribute(decodedValue)
+    return MPTZPresetsAttribute(decodedValue)
   }
 
-  suspend fun subscribeMptzPresetsAttribute(
+  suspend fun subscribeMPTZPresetsAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<MptzPresetsAttributeSubscriptionState> {
+  ): Flow<MPTZPresetsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
       listOf(
@@ -565,7 +565,7 @@ class CameraAvSettingsUserLevelManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            MptzPresetsAttributeSubscriptionState.Error(
+            MPTZPresetsAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -600,16 +600,16 @@ class CameraAvSettingsUserLevelManagementCluster(
               null
             }
 
-          decodedValue?.let { emit(MptzPresetsAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(MPTZPresetsAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(MptzPresetsAttributeSubscriptionState.SubscriptionEstablished)
+          emit(MPTZPresetsAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readDptzRelativeMoveAttribute(): DptzRelativeMoveAttribute {
+  suspend fun readDPTZRelativeMoveAttribute(): DPTZRelativeMoveAttribute {
     val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
@@ -648,13 +648,13 @@ class CameraAvSettingsUserLevelManagementCluster(
         null
       }
 
-    return DptzRelativeMoveAttribute(decodedValue)
+    return DPTZRelativeMoveAttribute(decodedValue)
   }
 
-  suspend fun subscribeDptzRelativeMoveAttribute(
+  suspend fun subscribeDPTZRelativeMoveAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<DptzRelativeMoveAttributeSubscriptionState> {
+  ): Flow<DPTZRelativeMoveAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
       listOf(
@@ -673,7 +673,7 @@ class CameraAvSettingsUserLevelManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            DptzRelativeMoveAttributeSubscriptionState.Error(
+            DPTZRelativeMoveAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -705,10 +705,10 @@ class CameraAvSettingsUserLevelManagementCluster(
               null
             }
 
-          decodedValue?.let { emit(DptzRelativeMoveAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(DPTZRelativeMoveAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(DptzRelativeMoveAttributeSubscriptionState.SubscriptionEstablished)
+          emit(DPTZRelativeMoveAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

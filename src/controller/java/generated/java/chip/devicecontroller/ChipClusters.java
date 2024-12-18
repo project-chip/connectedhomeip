@@ -61582,11 +61582,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void mptzSetPosition(DefaultClusterCallback callback, Optional<Integer> pan, Optional<Integer> tilt, Optional<Integer> zoom) {
-      mptzSetPosition(callback, pan, tilt, zoom, 0);
+    public void MPTZSetPosition(DefaultClusterCallback callback, Optional<Integer> pan, Optional<Integer> tilt, Optional<Integer> zoom) {
+      MPTZSetPosition(callback, pan, tilt, zoom, 0);
     }
 
-    public void mptzSetPosition(DefaultClusterCallback callback, Optional<Integer> pan, Optional<Integer> tilt, Optional<Integer> zoom, int timedInvokeTimeoutMs) {
+    public void MPTZSetPosition(DefaultClusterCallback callback, Optional<Integer> pan, Optional<Integer> tilt, Optional<Integer> zoom, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -61610,11 +61610,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void mptzRelativeMove(DefaultClusterCallback callback, Optional<Integer> panDelta, Optional<Integer> tiltDelta, Optional<Integer> zoomDelta) {
-      mptzRelativeMove(callback, panDelta, tiltDelta, zoomDelta, 0);
+    public void MPTZRelativeMove(DefaultClusterCallback callback, Optional<Integer> panDelta, Optional<Integer> tiltDelta, Optional<Integer> zoomDelta) {
+      MPTZRelativeMove(callback, panDelta, tiltDelta, zoomDelta, 0);
     }
 
-    public void mptzRelativeMove(DefaultClusterCallback callback, Optional<Integer> panDelta, Optional<Integer> tiltDelta, Optional<Integer> zoomDelta, int timedInvokeTimeoutMs) {
+    public void MPTZRelativeMove(DefaultClusterCallback callback, Optional<Integer> panDelta, Optional<Integer> tiltDelta, Optional<Integer> zoomDelta, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -61638,11 +61638,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void mptzMoveToPreset(DefaultClusterCallback callback, Integer presetID) {
-      mptzMoveToPreset(callback, presetID, 0);
+    public void MPTZMoveToPreset(DefaultClusterCallback callback, Integer presetID) {
+      MPTZMoveToPreset(callback, presetID, 0);
     }
 
-    public void mptzMoveToPreset(DefaultClusterCallback callback, Integer presetID, int timedInvokeTimeoutMs) {
+    public void MPTZMoveToPreset(DefaultClusterCallback callback, Integer presetID, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -61658,11 +61658,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void mptzSavePreset(DefaultClusterCallback callback, Optional<Integer> presetID, String name) {
-      mptzSavePreset(callback, presetID, name, 0);
+    public void MPTZSavePreset(DefaultClusterCallback callback, Optional<Integer> presetID, String name) {
+      MPTZSavePreset(callback, presetID, name, 0);
     }
 
-    public void mptzSavePreset(DefaultClusterCallback callback, Optional<Integer> presetID, String name, int timedInvokeTimeoutMs) {
+    public void MPTZSavePreset(DefaultClusterCallback callback, Optional<Integer> presetID, String name, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -61682,11 +61682,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void mptzRemovePreset(DefaultClusterCallback callback, Integer presetID) {
-      mptzRemovePreset(callback, presetID, 0);
+    public void MPTZRemovePreset(DefaultClusterCallback callback, Integer presetID) {
+      MPTZRemovePreset(callback, presetID, 0);
     }
 
-    public void mptzRemovePreset(DefaultClusterCallback callback, Integer presetID, int timedInvokeTimeoutMs) {
+    public void MPTZRemovePreset(DefaultClusterCallback callback, Integer presetID, int timedInvokeTimeoutMs) {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -61702,11 +61702,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void dptzSetViewport(DefaultClusterCallback callback, Integer videoStreamID, ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport) {
-      dptzSetViewport(callback, videoStreamID, viewport, 0);
+    public void DPTZSetViewport(DefaultClusterCallback callback, Integer videoStreamID, ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport) {
+      DPTZSetViewport(callback, videoStreamID, viewport, 0);
     }
 
-    public void dptzSetViewport(DefaultClusterCallback callback, Integer videoStreamID, ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport, int timedInvokeTimeoutMs) {
+    public void DPTZSetViewport(DefaultClusterCallback callback, Integer videoStreamID, ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport, int timedInvokeTimeoutMs) {
       final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -61726,11 +61726,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void dptzRelativeMove(DefaultClusterCallback callback, Integer videoStreamID, Optional<Integer> deltaX, Optional<Integer> deltaY, Optional<Integer> zoomDelta) {
-      dptzRelativeMove(callback, videoStreamID, deltaX, deltaY, zoomDelta, 0);
+    public void DPTZRelativeMove(DefaultClusterCallback callback, Integer videoStreamID, Optional<Integer> deltaX, Optional<Integer> deltaY, Optional<Integer> zoomDelta) {
+      DPTZRelativeMove(callback, videoStreamID, deltaX, deltaY, zoomDelta, 0);
     }
 
-    public void dptzRelativeMove(DefaultClusterCallback callback, Integer videoStreamID, Optional<Integer> deltaX, Optional<Integer> deltaY, Optional<Integer> zoomDelta, int timedInvokeTimeoutMs) {
+    public void DPTZRelativeMove(DefaultClusterCallback callback, Integer videoStreamID, Optional<Integer> deltaX, Optional<Integer> deltaY, Optional<Integer> zoomDelta, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -61758,15 +61758,15 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public interface MptzPositionAttributeCallback extends BaseAttributeCallback {
+    public interface MPTZPositionAttributeCallback extends BaseAttributeCallback {
       void onSuccess(ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct value);
     }
 
-    public interface MptzPresetsAttributeCallback extends BaseAttributeCallback {
+    public interface MPTZPresetsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct> value);
     }
 
-    public interface DptzRelativeMoveAttributeCallback extends BaseAttributeCallback {
+    public interface DPTZRelativeMoveAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Integer> value);
     }
 
@@ -61786,8 +61786,8 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public void readMptzPositionAttribute(
-        MptzPositionAttributeCallback callback) {
+    public void readMPTZPositionAttribute(
+        MPTZPositionAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_POSITION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -61799,8 +61799,8 @@ public class ChipClusters {
         }, MPTZ_POSITION_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMptzPositionAttribute(
-        MptzPositionAttributeCallback callback, int minInterval, int maxInterval) {
+    public void subscribeMPTZPositionAttribute(
+        MPTZPositionAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_POSITION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
@@ -61838,8 +61838,8 @@ public class ChipClusters {
         }, MAX_PRESETS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMptzPresetsAttribute(
-        MptzPresetsAttributeCallback callback) {
+    public void readMPTZPresetsAttribute(
+        MPTZPresetsAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_PRESETS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -61851,8 +61851,8 @@ public class ChipClusters {
         }, MPTZ_PRESETS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMptzPresetsAttribute(
-        MptzPresetsAttributeCallback callback, int minInterval, int maxInterval) {
+    public void subscribeMPTZPresetsAttribute(
+        MPTZPresetsAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_PRESETS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
@@ -61864,8 +61864,8 @@ public class ChipClusters {
         }, MPTZ_PRESETS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readDptzRelativeMoveAttribute(
-        DptzRelativeMoveAttributeCallback callback) {
+    public void readDPTZRelativeMoveAttribute(
+        DPTZRelativeMoveAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -61877,8 +61877,8 @@ public class ChipClusters {
         }, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeDptzRelativeMoveAttribute(
-        DptzRelativeMoveAttributeCallback callback, int minInterval, int maxInterval) {
+    public void subscribeDPTZRelativeMoveAttribute(
+        DPTZRelativeMoveAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {

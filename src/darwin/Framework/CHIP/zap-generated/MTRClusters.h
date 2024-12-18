@@ -6796,25 +6796,25 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterCameraAVSettingsUserLevelManagement : MTRGenericCluster
 
-- (void)mptzSetPositionWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzSetPositionParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)mptzSetPositionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)MPTZSetPositionWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)MPTZSetPositionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
     MTR_PROVISIONALLY_AVAILABLE;
-- (void)mptzRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzRelativeMoveParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)mptzRelativeMoveWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)MPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)MPTZRelativeMoveWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
     MTR_PROVISIONALLY_AVAILABLE;
-- (void)mptzMoveToPresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzMoveToPresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)mptzSavePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzSavePresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)mptzRemovePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMptzRemovePresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)dptzSetViewportWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDptzSetViewportParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)dptzRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDptzRelativeMoveParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)MPTZMoveToPresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)MPTZSavePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)MPTZRemovePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)DPTZSetViewportWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)DPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMptzPositionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMPTZPositionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxPresetsWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMptzPresetsWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMPTZPresetsWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeDptzRelativeMoveWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDPTZRelativeMoveWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeZoomMaxWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 

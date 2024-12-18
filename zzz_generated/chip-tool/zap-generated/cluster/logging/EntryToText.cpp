@@ -4270,14 +4270,14 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MptzPosition::Id:
-            return "MptzPosition";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MPTZPosition::Id:
+            return "MPTZPosition";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MaxPresets::Id:
             return "MaxPresets";
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MptzPresets::Id:
-            return "MptzPresets";
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::DptzRelativeMove::Id:
-            return "DptzRelativeMove";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MPTZPresets::Id:
+            return "MPTZPresets";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::Id:
+            return "DPTZRelativeMove";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::Id:
             return "ZoomMax";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::TiltMin::Id:
@@ -5722,20 +5722,20 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
     case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzSetPosition::Id:
-            return "MptzSetPosition";
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzRelativeMove::Id:
-            return "MptzRelativeMove";
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzMoveToPreset::Id:
-            return "MptzMoveToPreset";
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzSavePreset::Id:
-            return "MptzSavePreset";
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzRemovePreset::Id:
-            return "MptzRemovePreset";
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DptzSetViewport::Id:
-            return "DptzSetViewport";
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DptzRelativeMove::Id:
-            return "DptzRelativeMove";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::Id:
+            return "MPTZSetPosition";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::Id:
+            return "MPTZRelativeMove";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::Id:
+            return "MPTZMoveToPreset";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::Id:
+            return "MPTZSavePreset";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::Id:
+            return "MPTZRemovePreset";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Id:
+            return "DPTZSetViewport";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::Id:
+            return "DPTZRelativeMove";
         default:
             return "Unknown";
         }

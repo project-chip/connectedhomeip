@@ -5742,16 +5742,16 @@ static BOOL AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(Att
 {
     using namespace Clusters::CameraAvSettingsUserLevelManagement;
     switch (aAttributeId) {
-    case Attributes::MptzPosition::Id: {
+    case Attributes::MPTZPosition::Id: {
         return YES;
     }
     case Attributes::MaxPresets::Id: {
         return YES;
     }
-    case Attributes::MptzPresets::Id: {
+    case Attributes::MPTZPresets::Id: {
         return YES;
     }
-    case Attributes::DptzRelativeMove::Id: {
+    case Attributes::DPTZRelativeMove::Id: {
         return YES;
     }
     case Attributes::ZoomMax::Id: {

@@ -30409,7 +30409,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
-namespace MptzSetPosition {
+namespace MPTZSetPosition {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -30452,8 +30452,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace MptzSetPosition.
-namespace MptzRelativeMove {
+} // namespace MPTZSetPosition.
+namespace MPTZRelativeMove {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -30496,8 +30496,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace MptzRelativeMove.
-namespace MptzMoveToPreset {
+} // namespace MPTZRelativeMove.
+namespace MPTZMoveToPreset {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -30530,8 +30530,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace MptzMoveToPreset.
-namespace MptzSavePreset {
+} // namespace MPTZMoveToPreset.
+namespace MPTZSavePreset {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -30569,8 +30569,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace MptzSavePreset.
-namespace MptzRemovePreset {
+} // namespace MPTZSavePreset.
+namespace MPTZRemovePreset {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -30603,8 +30603,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace MptzRemovePreset.
-namespace DptzSetViewport {
+} // namespace MPTZRemovePreset.
+namespace DPTZSetViewport {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -30642,8 +30642,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace DptzSetViewport.
-namespace DptzRelativeMove {
+} // namespace DPTZSetViewport.
+namespace DPTZRelativeMove {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -30691,7 +30691,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace DptzRelativeMove.
+} // namespace DPTZRelativeMove.
 } // namespace Commands
 
 namespace Attributes {
@@ -30699,14 +30699,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::MptzPosition::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, mptzPosition);
+    case Attributes::MPTZPosition::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, MPTZPosition);
     case Attributes::MaxPresets::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxPresets);
-    case Attributes::MptzPresets::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, mptzPresets);
-    case Attributes::DptzRelativeMove::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dptzRelativeMove);
+    case Attributes::MPTZPresets::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, MPTZPresets);
+    case Attributes::DPTZRelativeMove::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, DPTZRelativeMove);
     case Attributes::ZoomMax::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, zoomMax);
     case Attributes::TiltMin::TypeInfo::GetAttributeId():

@@ -17382,10 +17382,10 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            MptzPosition(0L),
+            MPTZPosition(0L),
             MaxPresets(1L),
-            MptzPresets(2L),
-            DptzRelativeMove(3L),
+            MPTZPresets(2L),
+            DPTZRelativeMove(3L),
             ZoomMax(4L),
             TiltMin(5L),
             TiltMax(6L),
@@ -17437,13 +17437,13 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            MptzSetPosition(0L),
-            MptzRelativeMove(1L),
-            MptzMoveToPreset(2L),
-            MptzSavePreset(3L),
-            MptzRemovePreset(4L),
-            DptzSetViewport(5L),
-            DptzRelativeMove(6L),;
+            MPTZSetPosition(0L),
+            MPTZRelativeMove(1L),
+            MPTZMoveToPreset(2L),
+            MPTZSavePreset(3L),
+            MPTZRemovePreset(4L),
+            DPTZSetViewport(5L),
+            DPTZRelativeMove(6L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -17461,119 +17461,119 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum MptzSetPositionCommandField {Pan(0),Tilt(1),Zoom(2),;
+        }public enum MPTZSetPositionCommandField {Pan(0),Tilt(1),Zoom(2),;
                     private final int id;
-                    MptzSetPositionCommandField(int id) {
+                    MPTZSetPositionCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static MptzSetPositionCommandField value(int id) throws NoSuchFieldError {
-                        for (MptzSetPositionCommandField field : MptzSetPositionCommandField.values()) {
+                    public static MPTZSetPositionCommandField value(int id) throws NoSuchFieldError {
+                        for (MPTZSetPositionCommandField field : MPTZSetPositionCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum MptzRelativeMoveCommandField {PanDelta(0),TiltDelta(1),ZoomDelta(2),;
+                }public enum MPTZRelativeMoveCommandField {PanDelta(0),TiltDelta(1),ZoomDelta(2),;
                     private final int id;
-                    MptzRelativeMoveCommandField(int id) {
+                    MPTZRelativeMoveCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static MptzRelativeMoveCommandField value(int id) throws NoSuchFieldError {
-                        for (MptzRelativeMoveCommandField field : MptzRelativeMoveCommandField.values()) {
+                    public static MPTZRelativeMoveCommandField value(int id) throws NoSuchFieldError {
+                        for (MPTZRelativeMoveCommandField field : MPTZRelativeMoveCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum MptzMoveToPresetCommandField {PresetID(0),;
+                }public enum MPTZMoveToPresetCommandField {PresetID(0),;
                     private final int id;
-                    MptzMoveToPresetCommandField(int id) {
+                    MPTZMoveToPresetCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static MptzMoveToPresetCommandField value(int id) throws NoSuchFieldError {
-                        for (MptzMoveToPresetCommandField field : MptzMoveToPresetCommandField.values()) {
+                    public static MPTZMoveToPresetCommandField value(int id) throws NoSuchFieldError {
+                        for (MPTZMoveToPresetCommandField field : MPTZMoveToPresetCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum MptzSavePresetCommandField {PresetID(0),Name(1),;
+                }public enum MPTZSavePresetCommandField {PresetID(0),Name(1),;
                     private final int id;
-                    MptzSavePresetCommandField(int id) {
+                    MPTZSavePresetCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static MptzSavePresetCommandField value(int id) throws NoSuchFieldError {
-                        for (MptzSavePresetCommandField field : MptzSavePresetCommandField.values()) {
+                    public static MPTZSavePresetCommandField value(int id) throws NoSuchFieldError {
+                        for (MPTZSavePresetCommandField field : MPTZSavePresetCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum MptzRemovePresetCommandField {PresetID(0),;
+                }public enum MPTZRemovePresetCommandField {PresetID(0),;
                     private final int id;
-                    MptzRemovePresetCommandField(int id) {
+                    MPTZRemovePresetCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static MptzRemovePresetCommandField value(int id) throws NoSuchFieldError {
-                        for (MptzRemovePresetCommandField field : MptzRemovePresetCommandField.values()) {
+                    public static MPTZRemovePresetCommandField value(int id) throws NoSuchFieldError {
+                        for (MPTZRemovePresetCommandField field : MPTZRemovePresetCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum DptzSetViewportCommandField {VideoStreamID(0),Viewport(1),;
+                }public enum DPTZSetViewportCommandField {VideoStreamID(0),Viewport(1),;
                     private final int id;
-                    DptzSetViewportCommandField(int id) {
+                    DPTZSetViewportCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static DptzSetViewportCommandField value(int id) throws NoSuchFieldError {
-                        for (DptzSetViewportCommandField field : DptzSetViewportCommandField.values()) {
+                    public static DPTZSetViewportCommandField value(int id) throws NoSuchFieldError {
+                        for (DPTZSetViewportCommandField field : DPTZSetViewportCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum DptzRelativeMoveCommandField {VideoStreamID(0),DeltaX(1),DeltaY(2),ZoomDelta(3),;
+                }public enum DPTZRelativeMoveCommandField {VideoStreamID(0),DeltaX(1),DeltaY(2),ZoomDelta(3),;
                     private final int id;
-                    DptzRelativeMoveCommandField(int id) {
+                    DPTZRelativeMoveCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static DptzRelativeMoveCommandField value(int id) throws NoSuchFieldError {
-                        for (DptzRelativeMoveCommandField field : DptzRelativeMoveCommandField.values()) {
+                    public static DPTZRelativeMoveCommandField value(int id) throws NoSuchFieldError {
+                        for (DPTZRelativeMoveCommandField field : DPTZRelativeMoveCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

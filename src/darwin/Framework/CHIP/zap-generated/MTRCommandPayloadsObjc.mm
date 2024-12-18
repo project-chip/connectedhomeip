@@ -33191,7 +33191,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterMptzSetPositionParams
+@implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -33209,7 +33209,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterMptzSetPositionParams alloc] init];
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams alloc] init];
 
     other.pan = self.pan;
     other.tilt = self.tilt;
@@ -33228,11 +33228,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterMptzSetPositionParams (InternalMethods)
+@implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzSetPosition::Type encodableStruct;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::Type encodableStruct;
     ListFreer listFreer;
     {
         if (self.pan != nil) {
@@ -33291,7 +33291,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterMptzRelativeMoveParams
+@implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -33309,7 +33309,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterMptzRelativeMoveParams alloc] init];
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams alloc] init];
 
     other.panDelta = self.panDelta;
     other.tiltDelta = self.tiltDelta;
@@ -33328,11 +33328,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterMptzRelativeMoveParams (InternalMethods)
+@implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzRelativeMove::Type encodableStruct;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::Type encodableStruct;
     ListFreer listFreer;
     {
         if (self.panDelta != nil) {
@@ -33391,7 +33391,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterMptzMoveToPresetParams
+@implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -33405,7 +33405,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterMptzMoveToPresetParams alloc] init];
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams alloc] init];
 
     other.presetID = self.presetID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -33422,11 +33422,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterMptzMoveToPresetParams (InternalMethods)
+@implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzMoveToPreset::Type encodableStruct;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.presetID = self.presetID.unsignedCharValue;
@@ -33470,7 +33470,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterMptzSavePresetParams
+@implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -33486,7 +33486,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterMptzSavePresetParams alloc] init];
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams alloc] init];
 
     other.presetID = self.presetID;
     other.name = self.name;
@@ -33504,11 +33504,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterMptzSavePresetParams (InternalMethods)
+@implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzSavePreset::Type encodableStruct;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::Type encodableStruct;
     ListFreer listFreer;
     {
         if (self.presetID != nil) {
@@ -33558,7 +33558,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterMptzRemovePresetParams
+@implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -33572,7 +33572,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterMptzRemovePresetParams alloc] init];
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams alloc] init];
 
     other.presetID = self.presetID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -33589,11 +33589,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterMptzRemovePresetParams (InternalMethods)
+@implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MptzRemovePreset::Type encodableStruct;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.presetID = self.presetID.unsignedCharValue;
@@ -33637,7 +33637,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterDptzSetViewportParams
+@implementation MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -33653,7 +33653,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterDptzSetViewportParams alloc] init];
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams alloc] init];
 
     other.videoStreamID = self.videoStreamID;
     other.viewport = self.viewport;
@@ -33671,11 +33671,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterDptzSetViewportParams (InternalMethods)
+@implementation MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DptzSetViewport::Type encodableStruct;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.videoStreamID = self.videoStreamID.unsignedShortValue;
@@ -33725,7 +33725,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterDptzRelativeMoveParams
+@implementation MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -33745,7 +33745,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterDptzRelativeMoveParams alloc] init];
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams alloc] init];
 
     other.videoStreamID = self.videoStreamID;
     other.deltaX = self.deltaX;
@@ -33765,11 +33765,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterDptzRelativeMoveParams (InternalMethods)
+@implementation MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DptzRelativeMove::Type encodableStruct;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.videoStreamID = self.videoStreamID.unsignedShortValue;
