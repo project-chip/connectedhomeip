@@ -365,7 +365,6 @@ public:
 private:
     const EndpointId mEndpointId;
     size_t mIndex = 0;
-
 };
 
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
@@ -866,7 +865,8 @@ CodegenDataModelProvider::GetDeviceTypes(EndpointId endpointId)
     return std::make_unique<DeviceTypeEntryIterator>(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
 }
 
-std::unique_ptr<DataModel::ElementIterator<DataModel::Provider::SemanticTag>> CodegenDataModelProvider::GetSemanticTags(EndpointId endpointId) 
+std::unique_ptr<DataModel::ElementIterator<DataModel::Provider::SemanticTag>>
+CodegenDataModelProvider::GetSemanticTags(EndpointId endpointId)
 {
     return std::make_unique<SemanticTagIterator>(endpointId);
 }
