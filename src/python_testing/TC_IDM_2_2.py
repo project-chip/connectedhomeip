@@ -169,10 +169,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal({0}, read_request.keys(), "Endpoint 0 not in output")
         asserts.assert_equal({Clusters.Descriptor}, read_request[0].keys(), "Descriptor cluster not in output")
         # asserts.assert_equal(sorted(attribute_ids), sorted(returned_attributes), "Expected attribute list doesn't match")
-        # asserts.assert_in(Clusters.Objects.Descriptor, read_request[0].keys(), "Descriptor cluster not in output")
-        # asserts.assert_in(Clusters.Objects.Descriptor.Attributes.ServerList,
-        #                   read_request[0][Clusters.Objects.Descriptor], "ServerList not in output")
-
+        
         # Step 2
         # TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint
         # AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID]]
@@ -244,6 +241,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             server_list = sorted(read_request.attributes[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
             asserts.assert_equal(returned_clusters, server_list)
 
+        # TODO: Make this check centralized (move to its own method)
         for endpoint in read_request.tlvAttributes:
             for cluster in read_request.tlvAttributes[endpoint]:
                 returned_attrs = sorted([x for x in read_request.tlvAttributes[endpoint][cluster].keys()])
@@ -258,21 +256,36 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # AttributePath = [[Attribute = Specific Global Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(6, "Send Request Message to read one global attribute from all clusters on all endpoints")
-        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor.Attributes.AttributeList])
-        attribute_path_2 = AttributePath(
+
+        attribute_path = AttributePath(
             EndpointId=None,
             ClusterId=None,
             AttributeId=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
 
-        read_request = await self.default_controller.ReadAttribute(
+        read_request = await self.default_controller.Read(
             self.dut_node_id,
-            [attribute_path_2]
+            [attribute_path]
         )
 
-        for endpoint in read_request:
-            asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
+        returned_clusters = []
+        for endpoint in read_request.attributes:
+
+            endpoint_clusters = list(read_request.tlvAttributes[endpoint].keys())
+            standard_clusters = [x for x in endpoint_clusters if global_attribute_ids.cluster_id_type(x)
+                                 == global_attribute_ids.ClusterIdType.kStandard]
+            returned_clusters.extend(standard_clusters)
+            asserts.assert_in(Clusters.Objects.Descriptor, read_request.attributes[endpoint].keys(), "Descriptor cluster not in output")
             asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList,
-                              read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
+                              read_request.attributes[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
+        for endpoint in read_request.tlvAttributes:
+            cluster_list = read_request.tlvAttributes[endpoint]
+            for cluster in cluster_list:
+                asserts.assert_equal(list(read_request.tlvAttributes[endpoint][cluster]),
+                                     [global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID])
+                asserts.assert_true(
+                    set([int(x) for x in global_attribute_ids.GlobalAttributeIds]).issubset(
+                        set(read_request.tlvAttributes[endpoint][cluster][global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID])),
+                        "Missing global attributes in output")
 
         # Step 7
         # TH sends the Read Request Message to the DUT to read all attributes from a cluster at all Endpoints
