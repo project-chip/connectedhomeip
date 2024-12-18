@@ -320,7 +320,7 @@ Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAtt
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
-Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned endpointIndex, CHIP_ERROR & err)
+Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(chip::EndpointId endpointIndex, CHIP_ERROR & err)
 {
     err = CHIP_ERROR_NOT_IMPLEMENTED;
     return Span<const EmberAfDeviceType>();
