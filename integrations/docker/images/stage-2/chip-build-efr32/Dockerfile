@@ -13,8 +13,8 @@ RUN set -x \
     && : # last line
 
 
-# Download Simplicity SDK v2024.6.2 (36e12f0)
-RUN wget https://github.com/SiliconLabs/simplicity_sdk/releases/download/v2024.6.2/gecko-sdk.zip -O /tmp/simplicity_sdk.zip \
+# Download Simplicity SDK v2024.12.0 (8627f84)
+RUN wget https://github.com/SiliconLabs/simplicity_sdk/releases/download/v2024.12.0/gecko-sdk.zip -O /tmp/simplicity_sdk.zip \
     && unzip /tmp/simplicity_sdk.zip -d /tmp/simplicity_sdk \
     && rm -rf /tmp/simplicity_sdk.zip \
     # Deleting files that are not needed to save space
@@ -35,8 +35,8 @@ RUN git clone --depth=1 --single-branch --branch=2.10.3 https://github.com/Silic
     rm -rf .git examples \
     && : # last line
 
-# Clone WiSeConnect SDK v3.3.3 (a6390dd)
-RUN git clone --depth=1 --single-branch --branch=v3.3.3 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
+# Clone WiSeConnect SDK v3.4.0 (9f6db89)
+RUN git clone --depth=1 --single-branch --branch=v3.4.0 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
     cd /tmp/wifi_sdk && \
     rm -rf .git examples components/device/stm32 \
     && : # last line
