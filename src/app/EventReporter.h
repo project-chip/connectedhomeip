@@ -39,7 +39,7 @@ public:
      * @param[in] aPath           The path that identifies the kind of event that was generated.
      * @param[in] aBytesConsumed  The number of bytes needed to store the event in EventManagement.
      */
-    CHIP_ERROR virtual NewEventGenerated(ConcreteEventPath & aPath, uint32_t  aBytesConsumed) = 0;
+    CHIP_ERROR virtual NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesConsumed) = 0;
 };
 
 } // namespace app
