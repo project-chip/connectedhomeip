@@ -27,8 +27,8 @@ namespace app {
 
 AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * provider,
                                                          SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModelProvider(provider),
-    mpAttributePath(attributePath), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
+    mDataModelProvider(provider), mpAttributePath(attributePath),
+    mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
 
 {
     mOutputPath.mExpanded = true; // this is reset in 'next' if needed
@@ -159,11 +159,20 @@ AttributePathExpandIterator::SearchSession AttributePathExpandIterator::PrepareS
 
 std::optional<ClusterId> AttributePathExpandIterator::NextEndpointId(SearchSession & session)
 {
-    if ((mOutputPath.mEndpointId == kInvalidEndpointId) && !mpAttributePath->mValue.HasWildcardEndpointId())
+    if (mOutputPath.mEndpointId == kInvalidEndpointId)
     {
-        // use existing value, we are not wildcarding
-        return mpAttributePath->mValue.mEndpointId;
+        if (!mpAttributePath->mValue.HasWildcardEndpointId())
+        {
+            // use existing value, we are not wildcarding
+            return mpAttributePath->mValue.mEndpointId;
+        }
+        // start a new iteration
+        session.endpoints = mDataModelProvider->GetEndpoints();
     }
+
+    // to advance, we need to be asked for wildcards
+    VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
+
     return session.endpoints->Next();
 }
 
