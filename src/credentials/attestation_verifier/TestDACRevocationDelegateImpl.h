@@ -52,6 +52,10 @@ public:
     // This can be used to skip the revocation check
     void ClearDeviceAttestationRevocationSetPath();
 
+    // Set JSON data directly for unit test purposes.
+    CHIP_ERROR SetDeviceAttestationRevocationData(const std::string & jsonData);
+    void ClearDeviceAttestationRevocationData();
+
 private:
     enum class KeyIdType : uint8_t
     {
@@ -83,6 +87,7 @@ private:
     bool IsCertificateRevoked(const ByteSpan & certDer);
 
     std::string mDeviceAttestationRevocationSetPath;
+    std::string mRevocationData; // Stores direct JSON data
 };
 
 } // namespace Credentials

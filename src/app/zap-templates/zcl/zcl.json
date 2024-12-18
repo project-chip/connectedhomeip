@@ -314,6 +314,9 @@
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",
+            "PIROccupiedToUnoccupiedDelay",
+            "UltrasonicOccupiedToUnoccupiedDelay",
+            "PhysicalContactOccupiedToUnoccupiedDelay",
             "FeatureMap"
         ],
         "Operational Credentials": [

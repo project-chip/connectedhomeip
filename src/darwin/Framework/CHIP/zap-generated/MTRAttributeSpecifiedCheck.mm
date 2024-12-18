@@ -1794,12 +1794,6 @@ static BOOL AttributeIsSpecifiedInOvenModeCluster(AttributeId aAttributeId)
     case Attributes::CurrentMode::Id: {
         return YES;
     }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
-        return YES;
-    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1902,12 +1896,6 @@ static BOOL AttributeIsSpecifiedInLaundryWasherModeCluster(AttributeId aAttribut
     case Attributes::CurrentMode::Id: {
         return YES;
     }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
-        return YES;
-    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1936,12 +1924,6 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAndTemperatureControlledCabinetMod
         return YES;
     }
     case Attributes::CurrentMode::Id: {
-        return YES;
-    }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2143,12 +2125,6 @@ static BOOL AttributeIsSpecifiedInDishwasherModeCluster(AttributeId aAttributeId
         return YES;
     }
     case Attributes::CurrentMode::Id: {
-        return YES;
-    }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

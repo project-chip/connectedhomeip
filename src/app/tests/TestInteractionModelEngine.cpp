@@ -39,8 +39,8 @@
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #include <app/SimpleSubscriptionResumptionStorage.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
 namespace {
 
 class NullReadHandlerCallback : public chip::app::ReadHandler::ManagementCallback
