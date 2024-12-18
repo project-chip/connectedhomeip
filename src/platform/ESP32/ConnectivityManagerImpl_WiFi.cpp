@@ -52,9 +52,9 @@ using namespace ::chip::System;
 using chip::DeviceLayer::Internal::ESP32Utils;
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-static int max_rssi     = -100;
-static int current_rssi = 1;
-static int min_rssi     = 0;
+static int max_rssi                                   = -100;
+static int current_rssi                               = 1;
+static int min_rssi                                   = 0;
 constexpr chip::Tracing::MetricKey kMetricWiFiMaxRSSI = "max_rssi";
 constexpr chip::Tracing::MetricKey kMetricWiFiMinRSSI = "min_rssi";
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE

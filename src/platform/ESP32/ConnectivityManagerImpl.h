@@ -179,7 +179,6 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-
     friend ConnectivityManager & ConnectivityMgr(void);
     friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 

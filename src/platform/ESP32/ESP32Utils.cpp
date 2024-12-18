@@ -47,13 +47,13 @@ using namespace chip::DeviceLayer;
 using namespace chip::Tracing;
 
 // Heap Diagnostics (internal)
-constexpr MetricKey kMetricHeapInternalFree = "internal_free";
-constexpr MetricKey kMetricHeapInternalMinFree = "internal_min_free";
+constexpr MetricKey kMetricHeapInternalFree         = "internal_free";
+constexpr MetricKey kMetricHeapInternalMinFree      = "internal_min_free";
 constexpr MetricKey kMetricHeapInternalLargestBlock = "internal_largest_free";
 
 // Heap Diagnostics (external)
-constexpr MetricKey kMetricHeapExternalFree = "external_free";
-constexpr MetricKey kMetricHeapExternalMinFree = "external_min_free";
+constexpr MetricKey kMetricHeapExternalFree         = "external_free";
+constexpr MetricKey kMetricHeapExternalMinFree      = "external_min_free";
 constexpr MetricKey kMetricHeapExternalLargestBlock = "external_largest_block";
 
 // Task runtime
@@ -482,8 +482,7 @@ void LogHeapDataCallback(chip::System::Layer * systemLayer, void * appState)
 void FailedAllocCallback(size_t size, uint32_t caps, const char * function_name)
 {
     MATTER_TRACE_COUNTER("Failed_memory_allocations");
-    ESP_LOGE(TAG, "Memory allocation failed!");
-    ESP_LOGE(TAG, "Requested Size: %zu, Caps: %lu, Function: %s", size, caps, function_name);
+    ChipLogError(DeviceLayer, "Memory allocation failed!");
 }
 
 // Function to initialize and start periodic heap logging
@@ -492,14 +491,13 @@ void ESP32Utils::LogHeapInfo()
     esp_err_t err = heap_caps_register_failed_alloc_callback(FailedAllocCallback);
     if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "Failed to register callback. Error: 0x%08x", err);
+        ChipLogError(DeviceLayer, "Failed to register callback. Error: 0x%08x", err);
     }
     LogHeapDataCallback(&SystemLayer(), nullptr);
 
     // Start the periodic logging using SystemLayer
     SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL), LogHeapDataCallback, nullptr);
 }
-
 
 const char * StateToString(eTaskState state)
 {
