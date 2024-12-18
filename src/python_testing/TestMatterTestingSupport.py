@@ -641,7 +641,7 @@ class TestMatterTestingSupport(MatterBaseTest):
     def test_parse_matter_test_args(self):
         args = [
             # Verify that it is possible to pass multiple test cases at once
-            "--tests", "TC_1 TC_2",
+            "--tests", "TC_1", "TC_2",
             # Verify that values are appended to a single argument
             "--int-arg", "PIXIT.TEST.DEC:42",
             "--int-arg", "PIXIT.TEST.HEX:0x1234",
