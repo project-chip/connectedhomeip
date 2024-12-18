@@ -20,6 +20,8 @@
  * @brief Implementation for the Descriptor Server Cluster
  ***************************************************************************/
 
+#include "descriptor.h"
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -32,7 +34,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "descriptor.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -155,16 +156,18 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
-        Descriptor::Structs::DeviceTypeStruct::Type deviceStruct;
-
-        auto deviceType = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstDeviceType(endpoint);
-
-        while (deviceType.has_value())
+        auto it = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetDeviceTypes(endpoint);
+        if (!it)
         {
+            return CHIP_NO_ERROR;
+        }
+
+        for (auto deviceType = it->Next(); deviceType.has_value(); deviceType = it->Next())
+        {
+            Descriptor::Structs::DeviceTypeStruct::Type deviceStruct;
             deviceStruct.deviceType = deviceType->deviceTypeId;
             deviceStruct.revision   = deviceType->deviceTypeRevision;
             ReturnErrorOnFailure(encoder.Encode(deviceStruct));
-            deviceType = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextDeviceType(endpoint, *deviceType);
         }
 
         return CHIP_NO_ERROR;

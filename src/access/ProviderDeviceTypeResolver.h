@@ -31,8 +31,12 @@ public:
 
     bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
     {
-        app::DataModel::Provider * model = mModelGetter();
-        for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type))
+        auto it = mModelGetter()->GetDeviceTypes(endpoint);
+        if (!it)
+        {
+            return false;
+        }
+        for (auto type = it->Next(); type.has_value(); type = it->Next())
         {
             if (type->deviceTypeId == deviceType)
             {

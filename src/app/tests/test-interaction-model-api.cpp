@@ -164,17 +164,6 @@ std::optional<DataModel::EndpointInfo> TestImCustomDataModel::GetEndpointInfo(En
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpointInfo(endpoint);
 }
 
-std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::FirstDeviceType(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::NextDeviceType(EndpointId endpoint,
-                                                                                const DataModel::DeviceTypeEntry & previous)
-{
-    return std::nullopt;
-}
-
 std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetFirstSemanticTag(EndpointId endpoint)
 {
     return std::nullopt;

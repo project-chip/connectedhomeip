@@ -894,38 +894,6 @@ CodegenDataModelProvider::GetDeviceTypes(EndpointId endpointId)
     return std::make_unique<DeviceTypeEntryIterator>(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
 }
 
-std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
-{
-    std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>> it = GetDeviceTypes(endpoint);
-    if (it.get() == nullptr)
-    {
-        return std::nullopt;
-    }
-
-    return it->Next();
-}
-
-std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
-                                                                                   const DataModel::DeviceTypeEntry & previous)
-{
-    /// TEMPORARY SLOW usage...
-    std::unique_ptr<DataModel::ElementIterator<DataModel::DeviceTypeEntry>> it = GetDeviceTypes(endpoint);
-    if (it.get() == nullptr)
-    {
-        return std::nullopt;
-    }
-
-    for (auto entry = it->Next(); entry.has_value(); entry = it->Next())
-    {
-        if (*entry == previous)
-        {
-            break;
-        }
-    }
-
-    return it->Next();
-}
-
 std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetFirstSemanticTag(EndpointId endpoint)
 {
     Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
