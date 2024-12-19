@@ -608,7 +608,6 @@ public:
         mAttestationNonce.ClearValue();
         mWiFiCreds.ClearValue();
         mCountryCode.ClearValue();
-        mTermsAndConditionsAcknowledgement.ClearValue();
         mThreadOperationalDataset.ClearValue();
         mNOCChainGenerationParameters.ClearValue();
         mRootCert.ClearValue();
