@@ -135,11 +135,10 @@ class TC_ICDM_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_ICDM_2_1(self):
+        self.endpoint = self.get_endpoint()
 
         cluster = Clusters.Objects.IcdManagement
         attributes = cluster.Attributes
-
-        attribute_list = await self._read_icdm_attribute_expect_success(attribute=attributes.AttributeList)
 
         # Commissioning
         self.step("1a")
@@ -150,7 +149,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ActiveModeThreshold
         self.step(2)
-        if attributes.ActiveModeThreshold.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ActiveModeThreshold):
             activeModeThreshold = await self._read_icdm_attribute_expect_success(
                 attributes.ActiveModeThreshold)
             # Verify ActiveModeThreshold is not bigger than uint16
@@ -167,7 +166,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ActiveModeDuration
         self.step(3)
-        if attributes.ActiveModeDuration.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ActiveModeDuration):
             activeModeDuration = await self._read_icdm_attribute_expect_success(
                 attributes.ActiveModeDuration)
             # Verify ActiveModeDuration is not bigger than uint32
@@ -179,7 +178,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate IdleModeDuration
         self.step(4)
-        if attributes.IdleModeDuration.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.IdleModeDuration):
             idleModeDuration = await self._read_icdm_attribute_expect_success(
                 attributes.IdleModeDuration)
             # Verify IdleModeDuration is not bigger than uint32
@@ -195,7 +194,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ClientsSupportedPerFabric
         self.step(5)
-        if attributes.ClientsSupportedPerFabric.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ClientsSupportedPerFabric):
             clientsSupportedPerFabric = await self._read_icdm_attribute_expect_success(
                 attributes.ClientsSupportedPerFabric)
 
@@ -208,7 +207,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate RegisteredClients
         self.step(6)
-        if attributes.RegisteredClients.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.RegisteredClients):
             registeredClients = await self._read_icdm_attribute_expect_success(
                 attributes.RegisteredClients)
 
@@ -217,7 +216,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ICDCounter
         self.step(7)
-        if attributes.ICDCounter.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ICDCounter):
             icdCounter = await self._read_icdm_attribute_expect_success(
                 attributes.ICDCounter)
             # Verify ICDCounter is not bigger than uint32
@@ -226,7 +225,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate UserActiveModeTriggerHint
         self.step(8)
-        if attributes.UserActiveModeTriggerHint.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerHint):
             userActiveModeTriggerHint = await self._read_icdm_attribute_expect_success(
                 attributes.UserActiveModeTriggerHint)
 
@@ -243,7 +242,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Valdate UserActiveModeTriggerInstruction
         self.step(9)
-        if attributes.UserActiveModeTriggerInstruction.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerInstruction):
             userActiveModeTriggerInstruction = await self._read_icdm_attribute_expect_success(
                 attributes.UserActiveModeTriggerInstruction)
 
@@ -275,7 +274,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Verify OperatingMode
         self.step(10)
-        if attributes.OperatingMode.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperatingMode):
             operatingMode = await self._read_icdm_attribute_expect_success(
                 attributes.OperatingMode)
 
@@ -286,7 +285,7 @@ class TC_ICDM_2_1(MatterBaseTest):
                 operatingMode, modes.kUnknownEnumValue, "OperatingMode can only have 0 and 1 as valid values")
 
         self.step(11)
-        if attributes.MaximumCheckInBackOff.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.MaximumCheckInBackOff):
             maximumCheckInBackOff = await self._read_icdm_attribute_expect_success(attributes.MaximumCheckInBackOff)
 
             asserts.assert_true(self.is_valid_uint32_value(maximumCheckInBackOff),
