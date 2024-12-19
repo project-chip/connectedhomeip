@@ -1070,7 +1070,7 @@ TEST_F(TestCodegenModelViaMocks, GetServerClusterInfo)
     chip::Test::ResetVersion();
 
     ASSERT_FALSE(model.GetServerClusters(kInvalidEndpointId)->SeekTo(kInvalidClusterId));
-    ASSERT_FALSE(model.GetServerClusters(kInvalidEndpointId)->SeekTo( MockClusterId(1)));
+    ASSERT_FALSE(model.GetServerClusters(kInvalidEndpointId)->SeekTo(MockClusterId(1)));
     ASSERT_FALSE(model.GetServerClusters(kMockEndpoint1)->SeekTo(kInvalidClusterId));
     ASSERT_FALSE(model.GetServerClusters(kMockEndpoint1)->SeekTo(MockClusterId(10)));
 

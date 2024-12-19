@@ -483,7 +483,8 @@ std::unique_ptr<DataModel::ElementIterator<ClusterId>> CustomDataModel::GetClien
 }
 
 std::unique_ptr<DataModel::MetaDataIterator<ClusterId, DataModel::ClusterInfo>>
-    CustomDataModel::GetServerClusters(EndpointId endpointId) {
+CustomDataModel::GetServerClusters(EndpointId endpointId)
+{
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetServerClusters(endpointId);
 }
 

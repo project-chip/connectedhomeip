@@ -394,8 +394,8 @@ public:
             if (mClusters.front().IsServer())
             {
                 mCurrentMetadata = mClusters.data();
-                mIterationHint = mIndex++;
-                mClusters      = mClusters.SubSpan(1);
+                mIterationHint   = mIndex++;
+                mClusters        = mClusters.SubSpan(1);
 
                 return mCurrentMetadata->clusterId;
             }
@@ -413,8 +413,8 @@ public:
             if (mClusters[mIterationHint].clusterId == id)
             {
                 mCurrentMetadata = &mClusters[mIterationHint];
-                mIndex    = mIterationHint + 1;
-                mClusters = mClusters.SubSpan(mIterationHint + 1);
+                mIndex           = mIterationHint + 1;
+                mClusters        = mClusters.SubSpan(mIterationHint + 1);
                 return true;
             }
         }
@@ -448,7 +448,7 @@ public:
 private:
     EndpointId mEndpointId;
     Span<const EmberAfCluster> mClusters;
-    const EmberAfCluster *mCurrentMetadata = nullptr; // metadata after we called Next()
+    const EmberAfCluster * mCurrentMetadata = nullptr; // metadata after we called Next()
     unsigned & mIterationHint;
     unsigned mIndex = 0;
 };

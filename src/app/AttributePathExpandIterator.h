@@ -146,7 +146,7 @@ private:
     /// Will start from the beginning if current mOutputPath.mClusterId is kInvalidClusterId
     ///
     /// Respects path expansion/values in mpAttributePath
-    std::optional<ClusterId> NextClusterId(SearchSession &session);
+    std::optional<ClusterId> NextClusterId(SearchSession & session);
 
     /// Get the next endpoint ID in mOutputPath if one is available.
     /// Will start from the beginning if current mOutputPath.mEndpointId is kInvalidEndpointId

@@ -171,7 +171,8 @@ TestImCustomDataModel::GetAcceptedCommands(ConcreteClusterPath clusterPath)
 }
 
 std::unique_ptr<DataModel::MetaDataIterator<ClusterId, DataModel::ClusterInfo>>
-    TestImCustomDataModel::GetServerClusters(EndpointId endpointId) {
+TestImCustomDataModel::GetServerClusters(EndpointId endpointId)
+{
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetServerClusters(endpointId);
 }
 
