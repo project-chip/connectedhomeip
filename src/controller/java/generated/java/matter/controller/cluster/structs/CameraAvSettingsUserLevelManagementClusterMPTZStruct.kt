@@ -56,9 +56,9 @@ class CameraAvSettingsUserLevelManagementClusterMPTZStruct(
   }
 
   companion object {
-    private const val TAG_PAN = 2
-    private const val TAG_TILT = 3
-    private const val TAG_ZOOM = 4
+    private const val TAG_PAN = 0
+    private const val TAG_TILT = 1
+    private const val TAG_ZOOM = 2
 
     fun fromTlv(
       tlvTag: Tag,

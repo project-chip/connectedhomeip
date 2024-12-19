@@ -46285,9 +46285,9 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="pan", Tag=2, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="tilt", Tag=3, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="zoom", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="pan", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="tilt", Tag=1, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="zoom", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             pan: 'typing.Optional[int]' = None
