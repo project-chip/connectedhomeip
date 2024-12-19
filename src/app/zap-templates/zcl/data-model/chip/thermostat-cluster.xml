@@ -309,6 +309,9 @@ limitations under the License.
       <feature bit="8" code="PRES" name="Presets" summary="Thermostat supports setpoint presets">
         <optionalConform/>
       </feature>
+      <feature bit="9" code="TEVT" name="Events" summary="Thermostat supports events">
+        <optionalConform/>
+      </feature>
     </features>
     <!-- Attributes -->
     <attribute side="server" code="0x0000" name="LocalTemperature" define="LOCAL_TEMPERATURE" type="temperature" reportable="true" isNullable="true">
@@ -675,17 +678,97 @@ limitations under the License.
     <command code="0xFD" source="server" name="AtomicResponse" optional="true">
       <description>Returns the status of an atomic write</description>
       <arg id="0" name="StatusCode" type="status"/>
-      <arg id="0" name="AttributeStatus" array="true" type="AtomicAttributeStatusStruct"/>
-      <arg id="0" name="Timeout" type="int16u" optional="true"/>
+      <arg id="1" name="AttributeStatus" array="true" type="AtomicAttributeStatusStruct"/>
+      <arg id="2" name="Timeout" type="int16u" optional="true"/>
     </command>
 
     <command code="0xFE" source="client" name="AtomicRequest" optional="true" response="AtomicResponse">
       <description>Begins, Commits or Cancels an atomic write</description>
       <access op="invoke" privilege="manage"/>
       <arg id="0" name="RequestType" type="AtomicRequestTypeEnum"/>
-      <arg id="0" name="AttributeRequests" array="true" type="attrib_id"/>
-      <arg id="0" name="Timeout" type="int16u" optional="true"/>
+      <arg id="1" name="AttributeRequests" array="true" type="attrib_id"/>
+      <arg id="2" name="Timeout" type="int16u" optional="true"/>
     </command>
 
+
+    <event code="0x0000" name="SystemModeChange" priority="info" side="server" apiMaturity="provisional">
+      <description>This event SHALL be generated when the SystemMode attribute changes.</description>
+      <field id="0" name="PreviousSystemMode" type="SystemModeEnum"/>
+      <field id="1" name="CurrentSystemMode" type="SystemModeEnum"/>
+      <mandatoryConform>
+        <feature name="TEVT"/>
+      </mandatoryConform>
+    </event>
+
+    <event code="0x0001" name="LocalTemperatureChange" priority="info" side="server" apiMaturity="provisional">
+      <description>This field SHALL indicate the current value of the LocalTemperature attribute.</description>
+      <field id="0" name="CurrentLocalTemperature" type="temperature"/>
+      <mandatoryConform>
+        <feature name="TEVT"/>
+        <notTerm>
+          <feature name="LTNE"/>
+        </notTerm>
+      </mandatoryConform>
+    </event>
+
+
+    <event code="0x0002" name="OccupancyChange" priority="info" side="server" apiMaturity="provisional">
+      <description>This event SHALL be generated when the Occupancy attribute changes.</description>
+      <field id="0" name="PreviousOccupancy" type="OccupancyBitmap"/>
+      <field id="1" name="CurrentOccupancy" type="OccupancyBitmap"/>
+      <mandatoryConform>
+        <feature name="TEVT"/>
+        <feature name="OCC"/>
+      </mandatoryConform>
+    </event>
+
+    <event code="0x0003" name="SetpointChange" priority="info" side="server" apiMaturity="provisional">
+      <description>This event SHALL be generated when the value of any of the OccupiedHeatingSetpoint, UnoccupiedHeatingSetpoint>>, OccupiedCoolingSetpoint, or UnoccupiedCoolingSetpoint attributes is changed</description>
+      <field id="0" name="SystemMode" type="SystemModeEnum"/>
+      <field id="1" name="Occupancy" type="OccupancyBitmap"/>
+      <field id="2" name="PreviousSetpoint" type="temperature"/>
+      <field id="3" name="CurrentSetpoint" type="temperature"/>
+      <mandatoryConform>
+        <feature name="TEVT"/>
+      </mandatoryConform>
+    </event>
+
+    <event code="0x0004" name="RunningStateChange" priority="info" side="server" apiMaturity="provisional">
+      <description>This event SHALL be generated when the ThermostatRunningState attribute changes.</description>
+      <field id="0" name="PreviousRunningState" type="RelayStateBitmap"/>
+      <field id="1" name="CurrentRunningState" type="RelayStateBitmap"/>
+      <mandatoryConform>
+        <feature name="TEVT"/>
+      </mandatoryConform>
+    </event>
+
+    <event code="0x0005" name="RunningModeChange" priority="info" side="server" apiMaturity="provisional">
+      <description>This event SHALL be generated when the ThermostatRunningMode attribute changes.</description>
+      <field id="0" name="PreviousRunningMode" type="ThermostatRunningModeEnum"/>
+      <field id="1" name="CurrentRunningMode" type="ThermostatRunningModeEnum"/>
+      <mandatoryConform>
+        <feature name="TEVT"/>
+      </mandatoryConform>
+    </event>
+
+    <event code="0x0006" name="ActiveScheduleChange" priority="info" side="server" apiMaturity="provisional">
+      <description>This event SHALL be generated when the ActiveScheduleHandle attribute changes.</description>
+      <field id="0" name="PreviousScheduleHandle" type="octet_string"/>
+      <field id="1" name="CurrentScheduleHandle" type="octet_string"/>
+      <mandatoryConform>
+        <feature name="TEVT"/>
+        <feature name="MSCH"/>
+      </mandatoryConform>
+    </event>
+
+    <event code="0x0007" name="ActivePresetChange" priority="info" side="server" apiMaturity="provisional">
+      <description>This event SHALL be generated when the ActivePresetHandle attribute changes.</description>
+      <field id="0" name="PreviousPresetHandle" type="octet_string"/>
+      <field id="1" name="CurrentPresetHandle" type="octet_string"/>
+      <mandatoryConform>
+        <feature name="TEVT"/>
+        <feature name="PRES"/>
+      </mandatoryConform>
+    </event>
   </cluster>
 </configurator>
