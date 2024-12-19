@@ -140,6 +140,8 @@ public:
 private:
     Delegate * mDelegate;
     static Instance instance;
+    static constexpr size_t kMaxEndpointList = 256u;
+    static constexpr size_t kMaxActionList   = 256u;
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
