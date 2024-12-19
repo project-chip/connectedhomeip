@@ -20,8 +20,17 @@ cd /tmp
 rm -rf connectedhomeip
 git clone --recurse-submodules https://github.com/project-chip/connectedhomeip.git
 cd connectedhomeip
+# Generate coverage report
 ./scripts/build_coverage.sh 2>&1 | tee /tmp/matter_build.log
+
+# Generate Example Conformance Report
+python3 scripts/examples/conformance_report.py
+
 cd out/coverage/coverage
+
+# Copy conformance report
+cp /tmp/comformance_report/conformance_report.html html
+
 gcloud app deploy webapp_config.yaml 2>&1 | tee /tmp/matter_publish.log
 versions=$(gcloud app versions list \
     --service default \
