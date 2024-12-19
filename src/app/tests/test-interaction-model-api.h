@@ -113,6 +113,8 @@ public:
     std::unique_ptr<DataModel::ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId) override;
     std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>> GetEndpoints() override;
     std::unique_ptr<DataModel::ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath) override;
+    std::unique_ptr<DataModel::MetaDataIterator<CommandId, DataModel::CommandInfo>>
+    GetAcceptedCommands(ConcreteClusterPath clusterPath) override;
 
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
@@ -120,9 +122,6 @@ public:
     DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
     std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
-    DataModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
-    DataModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
-    std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override {}
 
     // NULL implementations

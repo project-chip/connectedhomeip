@@ -1721,13 +1721,23 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
         return status;
     }
 
-    status = CheckCommandAccess(request);
+    auto commands = mDataModelProvider->GetAcceptedCommands(request.path);
+
+    VerifyOrReturnValue(commands->SeekTo(request.path.mCommandId), Status::InvalidCommand);
+    std::optional<DataModel::CommandInfo> metadata = commands->GetMetadata();
+
+    // Internal error: successful seek should GUARANTEE metadata availability
+    VerifyOrReturnValue(metadata.has_value(), Status::Failure);
+
+    status = CheckCommandAccess(request, metadata);
     VerifyOrReturnValue(status == Status::Success, status);
 
-    return CheckCommandFlags(request);
+    return CheckCommandFlags(request, *metadata);
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest)
+Protocols::InteractionModel::Status
+InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest,
+                                           const std::optional<DataModel::CommandInfo> & aCommandMetadata)
 {
     if (aRequest.subjectDescriptor == nullptr)
     {
@@ -1738,9 +1748,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
                                      .endpoint    = aRequest.path.mEndpointId,
                                      .requestType = Access::RequestType::kCommandInvokeRequest,
                                      .entityId    = aRequest.path.mCommandId };
-    std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
     Access::Privilege minimumRequiredPrivilege =
-        commandInfo.has_value() ? commandInfo->invokePrivilege : Access::Privilege::kOperate;
+        aCommandMetadata.has_value() ? aCommandMetadata->invokePrivilege : Access::Privilege::kOperate;
 
     CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, minimumRequiredPrivilege);
     if (err != CHIP_NO_ERROR)
@@ -1755,14 +1764,13 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest,
+                                                                              const DataModel::CommandInfo & aCommandMetadata)
 {
-    std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
     // This is checked by previous validations, so it should not happen
-    VerifyOrDie(commandInfo.has_value());
 
-    const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
-    const bool commandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
+    const bool commandNeedsTimedInvoke = aCommandMetadata.flags.Has(DataModel::CommandQualityFlags::kTimed);
+    const bool commandIsFabricScoped   = aCommandMetadata.flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
 
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
     {
@@ -1788,8 +1796,11 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistence(const ConcreteCommandPath & aCommandPath)
 {
     auto provider = GetDataModelProvider();
-    if (provider->GetAcceptedCommandInfo(aCommandPath).has_value())
+    auto commands = provider->GetAcceptedCommands(aCommandPath);
+
+    if (commands->SeekTo(aCommandPath.mCommandId))
     {
+        // if we can seek to it, it is found and valid
         return Protocols::InteractionModel::Status::Success;
     }
 

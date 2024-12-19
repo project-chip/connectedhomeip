@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "pw_unit_test/framework.h"
 #include <pw_unit_test/framework.h>
 
 #include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
@@ -1267,63 +1268,37 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
     CodegenDataModelProviderWithContext model;
 
     // invalid paths should return in "no more data"
-    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).path.HasValidIds());
-    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).path.HasValidIds());
-    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).path.HasValidIds());
-    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).path.HasValidIds());
+    ASSERT_FALSE(model.GetAcceptedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)))->Next().has_value());
+    ASSERT_FALSE(model.GetAcceptedCommands(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1)))->Next().has_value());
+    ASSERT_FALSE(model.GetAcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10)))->Next().has_value());
+    ASSERT_FALSE(model.GetAcceptedCommands(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId))->Next().has_value());
 
     // should be able to iterate over valid paths
-    CommandEntry entry = model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-    EXPECT_EQ(entry.path.mCommandId, 1u);
+    auto commands = model.GetAcceptedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
+    ASSERT_TRUE(commands);
 
-    entry = model.NextAcceptedCommand(entry.path);
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-    EXPECT_EQ(entry.path.mCommandId, 2u);
+    auto commandId = commands->Next();
+    ASSERT_TRUE(commandId.has_value());
+    EXPECT_EQ(*commandId, 1u);
 
-    entry = model.NextAcceptedCommand(entry.path);
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-    EXPECT_EQ(entry.path.mCommandId, 23u);
+    commandId = commands->Next();
+    ASSERT_TRUE(commandId.has_value());
+    EXPECT_EQ(*commandId, 2u);
 
-    entry = model.NextAcceptedCommand(entry.path);
-    ASSERT_FALSE(entry.path.HasValidIds());
+    commandId = commands->Next();
+    ASSERT_TRUE(commandId.has_value());
+    EXPECT_EQ(*commandId, 23u);
 
-    // attempt some out-of-order requests as well
-    entry = model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(3));
-    EXPECT_EQ(entry.path.mCommandId, 11u);
+    commandId = commands->Next();
+    EXPECT_FALSE(commandId.has_value());
 
-    for (int i = 0; i < 10; i++)
-    {
-        entry = model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 2));
-        ASSERT_TRUE(entry.path.HasValidIds());
-        EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-        EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-        EXPECT_EQ(entry.path.mCommandId, 23u);
-    }
+    // Another cluster
+    commands = model.GetAcceptedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
+    ASSERT_TRUE(commands);
 
-    for (int i = 0; i < 10; i++)
-    {
-        entry = model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1));
-        ASSERT_TRUE(entry.path.HasValidIds());
-        EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-        EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-        EXPECT_EQ(entry.path.mCommandId, 2u);
-    }
-
-    for (int i = 0; i < 10; i++)
-    {
-        entry = model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(3), 10));
-        EXPECT_FALSE(entry.path.HasValidIds());
-    }
+    commandId = commands->Next();
+    ASSERT_TRUE(commandId.has_value());
+    EXPECT_EQ(*commandId, 11u);
 }
 
 TEST_F(TestCodegenModelViaMocks, AcceptedCommandInfo)
@@ -1331,31 +1306,21 @@ TEST_F(TestCodegenModelViaMocks, AcceptedCommandInfo)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    // invalid paths should return in "no more data"
-    ASSERT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 1)).has_value());
-    ASSERT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kInvalidEndpointId, MockClusterId(1), 1)).has_value());
-    ASSERT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(10), 1)).has_value());
-    ASSERT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, kInvalidClusterId, 1)).has_value());
-    ASSERT_FALSE(
-        model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), kInvalidCommandId)).has_value());
+    CommandId testCommands[] = { 1, 23 };
 
-    std::optional<CommandInfo> info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1u));
-    ASSERT_TRUE(info.has_value());
+    for (CommandId commandId : testCommands)
+    {
+        auto commands = model.GetAcceptedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
+        ASSERT_TRUE(commands);
+        EXPECT_TRUE(commands->SeekTo(commandId));
+        EXPECT_TRUE(commands->GetMetadata().has_value());
+    }
 
-    info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 2u));
-    ASSERT_TRUE(info.has_value());
-
-    info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1u));
-    ASSERT_TRUE(info.has_value());
-
-    info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1u));
-    ASSERT_TRUE(info.has_value());
-
-    info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 23u));
-    ASSERT_TRUE(info.has_value());
-
-    info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1234u));
-    ASSERT_FALSE(info.has_value());
+    // invalid command: 1234
+    auto commands = model.GetAcceptedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
+    ASSERT_TRUE(commands);
+    EXPECT_FALSE(commands->SeekTo(1234u));
+    EXPECT_FALSE(commands->GetMetadata().has_value());
 }
 
 TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
@@ -1373,11 +1338,11 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
     auto iter = model.GetGeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
     auto id   = iter->Next();
     ASSERT_TRUE(id.has_value());
-    EXPECT_EQ(*id, 2u);
+    EXPECT_EQ(*id, 2u); // NOLINT(bugprone-unchecked-optional-access)
 
     id = iter->Next();
     ASSERT_TRUE(id.has_value());
-    EXPECT_EQ(*id, 10u);
+    EXPECT_EQ(*id, 10u); // NOLINT(bugprone-unchecked-optional-access)
 
     id = iter->Next();
     ASSERT_FALSE(id.has_value());
@@ -1385,7 +1350,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
     iter = model.GetGeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
     id   = iter->Next();
     ASSERT_TRUE(id.has_value());
-    EXPECT_EQ(*id, 4u);
+    EXPECT_EQ(*id, 4u); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
@@ -1399,17 +1364,17 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
     CustomListCommandHandler handler(MakeOptional(kMockEndpoint1), MockClusterId(1));
 
     // At this point, without overrides, there should be no accepted/generated commands
-    EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
+    EXPECT_FALSE(model.GetAcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)))->Next().has_value());
     EXPECT_FALSE(model.GetGeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)))->Next().has_value());
-    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
+    EXPECT_FALSE(model.GetAcceptedCommands(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234))->Next().has_value());
 
     handler.SetOverrideAccepted(true);
     handler.SetOverrideGenerated(true);
 
     // with overrides, the list is still empty ...
-    EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
+    EXPECT_FALSE(model.GetAcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)))->Next().has_value());
     EXPECT_FALSE(model.GetGeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)))->Next().has_value());
-    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
+    EXPECT_FALSE(model.GetAcceptedCommands(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234))->Next().has_value());
 
     // set some overrides
     handler.AcceptedVec().push_back(1234);
@@ -1419,28 +1384,25 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
 
     DataModel::CommandEntry entry;
 
-    entry = model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
-    EXPECT_TRUE(entry.IsValid());
-    EXPECT_EQ(entry.path, ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234));
+    auto acceptedCommands = model.GetAcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
+    auto id               = acceptedCommands->Next();
+    ASSERT_TRUE(id.has_value());
+    EXPECT_EQ(*id, 1234u); // NOLINT(bugprone-unchecked-optional-access)
 
-    entry = model.NextAcceptedCommand(entry.path);
-    EXPECT_TRUE(entry.IsValid());
-    EXPECT_EQ(entry.path, ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 999));
+    id = acceptedCommands->Next();
+    ASSERT_TRUE(id.has_value());
+    EXPECT_EQ(*id, 999u); // NOLINT(bugprone-unchecked-optional-access)
 
-    entry = model.NextAcceptedCommand(entry.path);
-    EXPECT_FALSE(entry.IsValid());
+    id = acceptedCommands->Next();
+    EXPECT_FALSE(id.has_value());
 
     auto iter = model.GetGeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
-    auto id   = iter->Next();
+    id        = iter->Next();
     ASSERT_TRUE(id.has_value());
-    EXPECT_EQ(*id, 33u);
+    EXPECT_EQ(*id, 33u); // NOLINT(bugprone-unchecked-optional-access)
+
     id = iter->Next();
     ASSERT_FALSE(id.has_value());
-
-    // Command finding should work
-    EXPECT_TRUE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
-    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 88)).has_value());
-    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 33)).has_value());
 }
 
 TEST_F(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
