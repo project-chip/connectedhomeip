@@ -255,7 +255,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
     @ async_test_body
     async def test_TC_TSTAT_4_2(self):
-        #super().setup_class()
+        # super().setup_class()
 
         endpoint = self.get_endpoint()
 
@@ -265,7 +265,6 @@ class TC_TSTAT_4_2(MatterBaseTest):
         logger.info("Commissioning under second controller")
         params = await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
-
 
         secondary_authority = self.certificate_authority_manager.NewCertificateAuthority()
         secondary_fabric_admin = secondary_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
@@ -371,7 +370,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 for preset in test_presets:
                     preset.builtIn = NullValue
 
-                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint, supportsCool=supportsCool, supportsHeat=supportsHeat))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint,
+                                    supportsCool=supportsCool, supportsHeat=supportsHeat))
 
                 await self.send_atomic_request_begin_command()
 
@@ -408,7 +408,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 if len(builtInPresets) > 0:
                     builtInPresets[0].builtIn = NullValue
 
-                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint, supportsCool=supportsCool, supportsHeat=supportsHeat))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint,
+                                    supportsCool=supportsCool, supportsHeat=supportsHeat))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
@@ -533,7 +534,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 await self.send_atomic_request_begin_command()
 
                 # Write to the presets attribute after adding a preset with builtIn set to True
-                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint, builtIn=True, supportsCool=supportsCool, supportsHeat=supportsHeat))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint,
+                                    builtIn=True, supportsCool=supportsCool, supportsHeat=supportsHeat))
 
                 status = await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
 
@@ -616,7 +618,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             presets_without_name_support = list(preset for preset in test_presets if preset.presetScenario in availableScenarios)
 
             if len(presets_without_name_support) == 0 and len(availableScenarios) > 0:
-                new_preset = self.make_preset(availableScenarios[0], coolSetpoint, heatSetpoint, builtIn=True, supportsCool=supportsCool, supportsHeat=supportsHeat)
+                new_preset = self.make_preset(availableScenarios[0], coolSetpoint, heatSetpoint,
+                                              builtIn=True, supportsCool=supportsCool, supportsHeat=supportsHeat)
                 test_presets.append(new_preset)
                 presets_without_name_support = [new_preset]
 
@@ -645,7 +648,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Write to the presets attribute with a new valid preset added
                 test_presets = copy.deepcopy(current_presets)
-                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint, supportsCool=supportsCool, supportsHeat=supportsHeat))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint,
+                                    supportsCool=supportsCool, supportsHeat=supportsHeat))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
@@ -706,7 +710,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 presetScenario for presetScenario in cluster.Enums.PresetScenarioEnum if presetScenario not in supportedScenarios)
             if len(unavailableScenarios) > 0:
                 test_presets = current_presets.copy()
-                test_presets.append(self.make_preset(unavailableScenarios[0], coolSetpoint, heatSetpoint, name="Preset", supportsCool=supportsCool, supportsHeat=supportsHeat))
+                test_presets.append(self.make_preset(
+                    unavailableScenarios[0], coolSetpoint, heatSetpoint, name="Preset", supportsCool=supportsCool, supportsHeat=supportsHeat))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
@@ -761,7 +766,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                             presetsAddedForScenario = presetsAddedForScenario + 1
 
                     while presetsAddedForScenario < presetType.numberOfPresets:
-                        testPresets.append(self.make_preset(scenario, coolSetpoint, heatSetpoint, supportsCool=supportsCool, supportsHeat=supportsHeat))
+                        testPresets.append(self.make_preset(scenario, coolSetpoint, heatSetpoint,
+                                           supportsCool=supportsCool, supportsHeat=supportsHeat))
                         presetsAddedForScenario = presetsAddedForScenario + 1
 
                 # Send the AtomicRequest begin command
