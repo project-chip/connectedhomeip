@@ -150,8 +150,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         # Gathering Accepted and Generated Commands and associated ids
         commands = RVCRun_cluster.Commands
         RVCRun_accptcmd_list = attributes.AcceptedCommandList
-        accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_accptcmd_list)
-        chg_mode_cmd_id = commands.ChangeToMode.command_id
 
         if not await self.command_guard(endpoint=self.endpoint, command=commands.ChangeToMode):
             asserts.fail("Change To Mode receiving commands needs to be supported")

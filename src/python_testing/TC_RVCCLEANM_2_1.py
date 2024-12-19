@@ -103,7 +103,6 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
 
         # Gathering Accepted and Generated Commands and associated ids
         commands = RVCClean_cluster.Commands
-        RVCClean_accptcmd_list = attributes.AcceptedCommandList
         RVCClean_gencmd_list = attributes.GeneratedCommandList
         generated_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCClean_cluster, attribute=RVCClean_gencmd_list)
         chg_rsp_cmd_id = commands.ChangeToModeResponse.command_id
