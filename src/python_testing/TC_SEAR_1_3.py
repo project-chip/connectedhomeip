@@ -97,8 +97,6 @@ class TC_SEAR_1_3(MatterBaseTest):
                 asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
             self.app_pipe = self.app_pipe + str(app_pid)
 
-        features = await self.read_sear_attribute_expect_success(endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.FeatureMap)
-
         self.print_step(1, "Commissioning, already done")
 
         # Ensure that the device is in the correct state
@@ -165,7 +163,7 @@ class TC_SEAR_1_3(MatterBaseTest):
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            if bool(features & Clusters.ServiceArea.Bitmaps.Feature.kSelectWhileRunning):
+            if await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.ServiceArea, feature_int=Clusters.ServiceArea.Bitmaps.Feature.kSelectWhileRunning):
                 await self.send_cmd_select_areas_expect_response(step=15, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kSuccess)
             else:
                 await self.send_cmd_select_areas_expect_response(step=15, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kInvalidInMode)

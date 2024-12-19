@@ -95,19 +95,14 @@ class TC_SEAR_1_6(MatterBaseTest):
             self.app_pipe = self.app_pipe + str(app_pid)
 
         attributes = Clusters.ServiceArea.Attributes
-        attribute_list = await self.read_sear_attribute_expect_success(
-            endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AttributeList)
-        SupportedAreas = attributes.SupportedAreas.attribute_id
-        SelectedAreas = attributes.SelectedAreas.attribute_id
-        Progress = attributes.Progress.attribute_id
 
-        if SupportedAreas not in attribute_list:
+        if not await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SupportedAreas):
             asserts.fail("Supported areas attribute required in attribute list to run test")
 
-        if SelectedAreas not in attribute_list:
+        if not await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SelectedAreas):
             asserts.fail("Selected areas attribute required in attribute list to run test")
 
-        if Progress not in attribute_list:
+        if not await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.Progress):
             asserts.fail("Progress attribute required in attribute list to run test")
 
         self.print_step(1, "Commissioning, already done")
