@@ -93,7 +93,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId(SearchSe
     auto id = session.attributes->Next();
     if (id.has_value())
     {
-        return *id;
+        return id;
     }
 
     // Finished the data model, start with global attributes
