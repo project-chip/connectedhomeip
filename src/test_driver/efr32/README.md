@@ -4,8 +4,9 @@ tests that can be flashed onto a device and run. The device is controlled using
 the included RPCs through the python test runner.
 
 -   [Prerequisites](#prerequisites)
--   [Building The Unit Tests](#building-the-unit-tests)
--   [Running The Unit Tests](#running-the-unit-tests)
+-   [Building the Unit Tests](#building-the-unit-tests)
+-   [Building and Installing the Runner](#building-and-installing-the-runner)
+-   [Running the Unit Tests](#running-the-unit-tests)
 
 ## Prerequisites
 
@@ -36,7 +37,7 @@ the included RPCs through the python test runner.
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
-## Building The Unit Tests
+## Building the Unit Tests
 
 The unit tests can be built using gn and ninja:
 
@@ -53,7 +54,7 @@ The python wheels for the runner can be built and installed like this:
     ninja -C out/debug runner
     pip3 install out/debug/chip_pw_test_runner_wheels/*.whl --force-reinstall
 
-## Running The Unit Tests
+## Running the Unit Tests
 
 The unit tests can be run using the test runner python script:
 
