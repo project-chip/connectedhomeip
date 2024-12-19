@@ -205,8 +205,8 @@ public:
 
             AddArgument("require-tc-acknowledgements", 0, 1, &mRequireTCAcknowledgements,
                         "Indicates whether Terms and Conditions acknowledgements are required during commissioning. If set to "
-                        "true, the commissioner must provide valid T&C acknowledgements or the commissioning will fail. If false, "
-                        "the T&C acknowledgement step will be skipped.");
+                        "true, the tc-acknowledgements and tc-acknowledgements-version arguments must be provided for the "
+                        "commissioning to succeed. If false, the T&C acknowledgement step will be skipped.");
 
             AddArgument("tc-acknowledgements", 0, UINT16_MAX, &mTCAcknowledgements,
                         "Bit-field value indicating which Terms and Conditions have been accepted by the user. This value is sent "
