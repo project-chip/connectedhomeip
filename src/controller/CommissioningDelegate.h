@@ -71,7 +71,6 @@ enum CommissioningStage : uint8_t
     kICDSendStayActive,                       ///< Send Keep Alive to ICD
     /// Send ScanNetworks (0x31:0) command to the device.
     /// ScanNetworks can happen anytime after kArmFailsafe.
-    /// However, the cirque tests fail if it is earlier in the list
     kScanNetworks,
     /// Waiting for the higher layer to provide network credentials before continuing the workflow.
     /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
