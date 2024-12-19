@@ -153,7 +153,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_accptcmd_list)
         chg_mode_cmd_id = commands.ChangeToMode.command_id
 
-        if chg_mode_cmd_id not in accepted_cmd_list:
+        if not await self.command_guard(endpoint=self.endpoint, command=commands.ChangeToMode):
             asserts.fail("Change To Mode receiving commands needs to be supported")
 
         asserts.assert_true(self.check_pics("RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED"),
