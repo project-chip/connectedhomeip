@@ -81,9 +81,10 @@ struct CopyAndAdjustDeltaTimeContext
 };
 
 CHIP_ERROR EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
-                           CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
-                           MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-                           System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter)
+                                 CircularEventBuffer * apCircularEventBuffer,
+                                 const LogStorageResources * const apLogStorageResources,
+                                 MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+                                 System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter)
 {
     VerifyOrReturnError(apEventReporter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aNumBuffers != 0, CHIP_ERROR_INVALID_ARGUMENT);

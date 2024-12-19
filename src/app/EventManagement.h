@@ -231,10 +231,10 @@ public:
      * @return CHIP_ERROR               CHIP Error Code
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
-              const LogStorageResources * const apLogStorageResources,
-              MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-              System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
+                    CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
+                    MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+                    System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter);
 
     static EventManagement & GetInstance();
 

@@ -285,9 +285,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         };
 
         err = app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                         &logStorageResources[0], &sGlobalEventIdCounter,
-                                                         std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp),
-                                                         &app::InteractionModelEngine::GetInstance()->GetReportingEngine());
+                                                       &logStorageResources[0], &sGlobalEventIdCounter,
+                                                       std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp),
+                                                       &app::InteractionModelEngine::GetInstance()->GetReportingEngine());
 
         SuccessOrExit(err);
     }
