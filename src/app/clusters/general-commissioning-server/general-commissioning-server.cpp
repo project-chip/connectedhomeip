@@ -90,7 +90,9 @@ private:
     void HandleArmFailSafe(HandlerContext & ctx, const Commands::ArmFailSafe::DecodableType & commandData);
     void HandleCommissioningComplete(HandlerContext & ctx, const Commands::CommissioningComplete::DecodableType & commandData);
     void HandleSetRegulatoryConfig(HandlerContext & ctx, const Commands::SetRegulatoryConfig::DecodableType & commandData);
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     void HandleSetTCAcknowledgements(HandlerContext & ctx, const Commands::SetTCAcknowledgements::DecodableType & commandData);
+#endif
 };
 
 GeneralCommissioningGlobalInstance gGeneralCommissioningInstance;
@@ -238,11 +240,13 @@ void GeneralCommissioningGlobalInstance::InvokeCommand(HandlerContext & handlerC
             [this](HandlerContext & ctx, const auto & commandData) { HandleSetRegulatoryConfig(ctx, commandData); });
         break;
 
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     case Commands::SetTCAcknowledgements::Id:
         CommandHandlerInterface::HandleCommand<Commands::SetTCAcknowledgements::DecodableType>(
             handlerContext,
             [this](HandlerContext & ctx, const auto & commandData) { HandleSetTCAcknowledgements(ctx, commandData); });
         break;
+#endif
     }
 }
 
@@ -320,6 +324,9 @@ void GeneralCommissioningGlobalInstance::HandleArmFailSafe(HandlerContext & ctx,
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
 
+    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
+                    static_cast<unsigned>(commandData.expiryLengthSeconds));
+
     /*
      * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
      * If the fail-safe timer was not currently armed, then the fail-safe timer SHALL be armed.
@@ -374,6 +381,8 @@ void GeneralCommissioningGlobalInstance::HandleCommissioningComplete(
     DeviceControlServer * devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     auto & failSafe               = Server::GetInstance().GetFailSafeContext();
     auto & fabricTable            = Server::GetInstance().GetFabricTable();
+
+    ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
     Commands::CommissioningCompleteResponse::Type response;
 
@@ -492,6 +501,7 @@ void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContex
 
     if (countryCode.size() != ConfigurationManager::kMaxLocationLength)
     {
+        ChipLogError(Zcl, "Invalid country code: '%.*s'", static_cast<int>(countryCode.size()), countryCode.data());
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
         return;
     }
@@ -527,12 +537,12 @@ void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContex
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 void GeneralCommissioningGlobalInstance::HandleSetTCAcknowledgements(
     HandlerContext & ctx, const Commands::SetTCAcknowledgements::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
 
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     auto & failSafeContext                  = Server::GetInstance().GetFailSafeContext();
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
 
@@ -591,8 +601,8 @@ void GeneralCommissioningGlobalInstance::HandleSetTCAcknowledgements(
 
     response.errorCode = CommissioningErrorEnum::kOk;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
 void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
 {
@@ -625,6 +635,7 @@ public:
     // Gets called when a fabric is deleted
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
         // related data on the node which was created since it was commissioned.
         if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
@@ -632,7 +643,6 @@ public:
             ChipLogProgress(Zcl, "general-commissioning-server: Last Fabric index 0x%x was removed",
                             static_cast<unsigned>(fabricIndex));
 
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
             TermsAndConditionsState initialState, updatedState;
             VerifyOrReturn(nullptr != tcProvider);
@@ -640,8 +650,8 @@ public:
             VerifyOrReturn(CHIP_NO_ERROR == tcProvider->ResetAcceptance());
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
             NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     }
 };
 
