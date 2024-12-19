@@ -13874,6 +13874,39 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         switch (eventID) {
 
+            // Cluster Thermostat events
+        case MTREventIDTypeClusterThermostatEventSystemModeChangeID:
+            result = @"SystemModeChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventLocalTemperatureChangeID:
+            result = @"LocalTemperatureChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventOccupancyChangeID:
+            result = @"OccupancyChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventSetpointChangeID:
+            result = @"SetpointChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventRunningStateChangeID:
+            result = @"RunningStateChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventRunningModeChangeID:
+            result = @"RunningModeChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventActiveScheduleChangeID:
+            result = @"ActiveScheduleChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventActivePresetChangeID:
+            result = @"ActivePresetChange";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
             break;

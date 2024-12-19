@@ -3926,6 +3926,187 @@ static id _Nullable DecodeEventPayloadForThermostatCluster(EventId aEventId, TLV
 {
     using namespace Clusters::Thermostat;
     switch (aEventId) {
+    case Events::SystemModeChange::Id: {
+        Events::SystemModeChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterSystemModeChangeEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousSystemMode)];
+            value.previousSystemMode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentSystemMode)];
+            value.currentSystemMode = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::LocalTemperatureChange::Id: {
+        Events::LocalTemperatureChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterLocalTemperatureChangeEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithShort:cppValue.currentLocalTemperature];
+            value.currentLocalTemperature = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::OccupancyChange::Id: {
+        Events::OccupancyChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterOccupancyChangeEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.previousOccupancy.Raw()];
+            value.previousOccupancy = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.currentOccupancy.Raw()];
+            value.currentOccupancy = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::SetpointChange::Id: {
+        Events::SetpointChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterSetpointChangeEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.systemMode)];
+            value.systemMode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.occupancy.Raw()];
+            value.occupancy = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithShort:cppValue.previousSetpoint];
+            value.previousSetpoint = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithShort:cppValue.currentSetpoint];
+            value.currentSetpoint = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::RunningStateChange::Id: {
+        Events::RunningStateChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterRunningStateChangeEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.previousRunningState.Raw()];
+            value.previousRunningState = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.currentRunningState.Raw()];
+            value.currentRunningState = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::RunningModeChange::Id: {
+        Events::RunningModeChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterRunningModeChangeEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousRunningMode)];
+            value.previousRunningMode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentRunningMode)];
+            value.currentRunningMode = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::ActiveScheduleChange::Id: {
+        Events::ActiveScheduleChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterActiveScheduleChangeEvent new];
+
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.previousScheduleHandle);
+            value.previousScheduleHandle = memberValue;
+        } while (0);
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.currentScheduleHandle);
+            value.currentScheduleHandle = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::ActivePresetChange::Id: {
+        Events::ActivePresetChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterActivePresetChangeEvent new];
+
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.previousPresetHandle);
+            value.previousPresetHandle = memberValue;
+        } while (0);
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.currentPresetHandle);
+            value.currentPresetHandle = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }

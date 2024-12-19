@@ -30696,6 +30696,7 @@ class Thermostat(Cluster):
             kLocalTemperatureNotExposed = 0x40
             kMatterScheduleConfiguration = 0x80
             kPresets = 0x100
+            kEvents = 0x200
 
         class HVACSystemTypeBitmap(IntFlag):
             kCoolingStage = 0x3
@@ -32064,6 +32065,177 @@ class Thermostat(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+    class Events:
+        @dataclass
+        class SystemModeChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousSystemMode", Tag=0, Type=Thermostat.Enums.SystemModeEnum),
+                        ClusterObjectFieldDescriptor(Label="currentSystemMode", Tag=1, Type=Thermostat.Enums.SystemModeEnum),
+                    ])
+
+            previousSystemMode: Thermostat.Enums.SystemModeEnum = 0
+            currentSystemMode: Thermostat.Enums.SystemModeEnum = 0
+
+        @dataclass
+        class LocalTemperatureChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="currentLocalTemperature", Tag=0, Type=int),
+                    ])
+
+            currentLocalTemperature: int = 0
+
+        @dataclass
+        class OccupancyChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousOccupancy", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="currentOccupancy", Tag=1, Type=uint),
+                    ])
+
+            previousOccupancy: uint = 0
+            currentOccupancy: uint = 0
+
+        @dataclass
+        class SetpointChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=0, Type=Thermostat.Enums.SystemModeEnum),
+                        ClusterObjectFieldDescriptor(Label="occupancy", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="previousSetpoint", Tag=2, Type=int),
+                        ClusterObjectFieldDescriptor(Label="currentSetpoint", Tag=3, Type=int),
+                    ])
+
+            systemMode: Thermostat.Enums.SystemModeEnum = 0
+            occupancy: uint = 0
+            previousSetpoint: int = 0
+            currentSetpoint: int = 0
+
+        @dataclass
+        class RunningStateChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousRunningState", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="currentRunningState", Tag=1, Type=uint),
+                    ])
+
+            previousRunningState: uint = 0
+            currentRunningState: uint = 0
+
+        @dataclass
+        class RunningModeChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousRunningMode", Tag=0, Type=Thermostat.Enums.ThermostatRunningModeEnum),
+                        ClusterObjectFieldDescriptor(Label="currentRunningMode", Tag=1, Type=Thermostat.Enums.ThermostatRunningModeEnum),
+                    ])
+
+            previousRunningMode: Thermostat.Enums.ThermostatRunningModeEnum = 0
+            currentRunningMode: Thermostat.Enums.ThermostatRunningModeEnum = 0
+
+        @dataclass
+        class ActiveScheduleChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousScheduleHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="currentScheduleHandle", Tag=1, Type=bytes),
+                    ])
+
+            previousScheduleHandle: bytes = b""
+            currentScheduleHandle: bytes = b""
+
+        @dataclass
+        class ActivePresetChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousPresetHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="currentPresetHandle", Tag=1, Type=bytes),
+                    ])
+
+            previousPresetHandle: bytes = b""
+            currentPresetHandle: bytes = b""
 
 
 @dataclass

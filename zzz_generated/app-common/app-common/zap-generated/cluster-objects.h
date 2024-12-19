@@ -30007,6 +30007,299 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace SystemModeChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPreviousSystemMode = 0,
+    kCurrentSystemMode  = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SystemModeChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    SystemModeEnum previousSystemMode = static_cast<SystemModeEnum>(0);
+    SystemModeEnum currentSystemMode  = static_cast<SystemModeEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SystemModeChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    SystemModeEnum previousSystemMode = static_cast<SystemModeEnum>(0);
+    SystemModeEnum currentSystemMode  = static_cast<SystemModeEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SystemModeChange
+namespace LocalTemperatureChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kCurrentLocalTemperature = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::LocalTemperatureChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    int16_t currentLocalTemperature = static_cast<int16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::LocalTemperatureChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    int16_t currentLocalTemperature = static_cast<int16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace LocalTemperatureChange
+namespace OccupancyChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPreviousOccupancy = 0,
+    kCurrentOccupancy  = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OccupancyChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    chip::BitMask<OccupancyBitmap> previousOccupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+    chip::BitMask<OccupancyBitmap> currentOccupancy  = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OccupancyChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    chip::BitMask<OccupancyBitmap> previousOccupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+    chip::BitMask<OccupancyBitmap> currentOccupancy  = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace OccupancyChange
+namespace SetpointChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kSystemMode       = 0,
+    kOccupancy        = 1,
+    kPreviousSetpoint = 2,
+    kCurrentSetpoint  = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SetpointChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    SystemModeEnum systemMode                = static_cast<SystemModeEnum>(0);
+    chip::BitMask<OccupancyBitmap> occupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+    int16_t previousSetpoint                 = static_cast<int16_t>(0);
+    int16_t currentSetpoint                  = static_cast<int16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SetpointChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    SystemModeEnum systemMode                = static_cast<SystemModeEnum>(0);
+    chip::BitMask<OccupancyBitmap> occupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+    int16_t previousSetpoint                 = static_cast<int16_t>(0);
+    int16_t currentSetpoint                  = static_cast<int16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SetpointChange
+namespace RunningStateChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPreviousRunningState = 0,
+    kCurrentRunningState  = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::RunningStateChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    chip::BitMask<RelayStateBitmap> previousRunningState = static_cast<chip::BitMask<RelayStateBitmap>>(0);
+    chip::BitMask<RelayStateBitmap> currentRunningState  = static_cast<chip::BitMask<RelayStateBitmap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::RunningStateChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    chip::BitMask<RelayStateBitmap> previousRunningState = static_cast<chip::BitMask<RelayStateBitmap>>(0);
+    chip::BitMask<RelayStateBitmap> currentRunningState  = static_cast<chip::BitMask<RelayStateBitmap>>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace RunningStateChange
+namespace RunningModeChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPreviousRunningMode = 0,
+    kCurrentRunningMode  = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::RunningModeChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    ThermostatRunningModeEnum previousRunningMode = static_cast<ThermostatRunningModeEnum>(0);
+    ThermostatRunningModeEnum currentRunningMode  = static_cast<ThermostatRunningModeEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::RunningModeChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    ThermostatRunningModeEnum previousRunningMode = static_cast<ThermostatRunningModeEnum>(0);
+    ThermostatRunningModeEnum currentRunningMode  = static_cast<ThermostatRunningModeEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace RunningModeChange
+namespace ActiveScheduleChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPreviousScheduleHandle = 0,
+    kCurrentScheduleHandle  = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ActiveScheduleChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    chip::ByteSpan previousScheduleHandle;
+    chip::ByteSpan currentScheduleHandle;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ActiveScheduleChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    chip::ByteSpan previousScheduleHandle;
+    chip::ByteSpan currentScheduleHandle;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ActiveScheduleChange
+namespace ActivePresetChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPreviousPresetHandle = 0,
+    kCurrentPresetHandle  = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ActivePresetChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    chip::ByteSpan previousPresetHandle;
+    chip::ByteSpan currentPresetHandle;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ActivePresetChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    chip::ByteSpan previousPresetHandle;
+    chip::ByteSpan currentPresetHandle;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ActivePresetChange
+} // namespace Events
 } // namespace Thermostat
 namespace FanControl {
 

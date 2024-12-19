@@ -9364,6 +9364,14 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * SystemModeChange                                                  | 0x0000 |
+| * LocalTemperatureChange                                            | 0x0001 |
+| * OccupancyChange                                                   | 0x0002 |
+| * SetpointChange                                                    | 0x0003 |
+| * RunningStateChange                                                | 0x0004 |
+| * RunningModeChange                                                 | 0x0005 |
+| * ActiveScheduleChange                                              | 0x0006 |
+| * ActivePresetChange                                                | 0x0007 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -23420,8 +23428,24 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                      //
+        make_unique<ReadEvent>(Id, "system-mode-change", Events::SystemModeChange::Id, credsIssuerConfig),                  //
+        make_unique<ReadEvent>(Id, "local-temperature-change", Events::LocalTemperatureChange::Id, credsIssuerConfig),      //
+        make_unique<ReadEvent>(Id, "occupancy-change", Events::OccupancyChange::Id, credsIssuerConfig),                     //
+        make_unique<ReadEvent>(Id, "setpoint-change", Events::SetpointChange::Id, credsIssuerConfig),                       //
+        make_unique<ReadEvent>(Id, "running-state-change", Events::RunningStateChange::Id, credsIssuerConfig),              //
+        make_unique<ReadEvent>(Id, "running-mode-change", Events::RunningModeChange::Id, credsIssuerConfig),                //
+        make_unique<ReadEvent>(Id, "active-schedule-change", Events::ActiveScheduleChange::Id, credsIssuerConfig),          //
+        make_unique<ReadEvent>(Id, "active-preset-change", Events::ActivePresetChange::Id, credsIssuerConfig),              //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeEvent>(Id, "system-mode-change", Events::SystemModeChange::Id, credsIssuerConfig),             //
+        make_unique<SubscribeEvent>(Id, "local-temperature-change", Events::LocalTemperatureChange::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "occupancy-change", Events::OccupancyChange::Id, credsIssuerConfig),                //
+        make_unique<SubscribeEvent>(Id, "setpoint-change", Events::SetpointChange::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeEvent>(Id, "running-state-change", Events::RunningStateChange::Id, credsIssuerConfig),         //
+        make_unique<SubscribeEvent>(Id, "running-mode-change", Events::RunningModeChange::Id, credsIssuerConfig),           //
+        make_unique<SubscribeEvent>(Id, "active-schedule-change", Events::ActiveScheduleChange::Id, credsIssuerConfig),     //
+        make_unique<SubscribeEvent>(Id, "active-preset-change", Events::ActivePresetChange::Id, credsIssuerConfig),         //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);

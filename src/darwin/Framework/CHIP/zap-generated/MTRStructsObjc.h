@@ -1767,6 +1767,55 @@ MTR_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct", 
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterSystemModeChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull previousSystemMode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull currentSystemMode MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterLocalTemperatureChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull currentLocalTemperature MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterOccupancyChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull previousOccupancy MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull currentOccupancy MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterSetpointChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull systemMode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull occupancy MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull previousSetpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull currentSetpoint MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterRunningStateChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull previousRunningState MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull currentRunningState MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterRunningModeChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull previousRunningMode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull currentRunningMode MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterActiveScheduleChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull previousScheduleHandle MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull currentScheduleHandle MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterActivePresetChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull previousPresetHandle MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull currentPresetHandle MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTROccupancySensingClusterHoldTimeLimitsStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull holdTimeMin MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull holdTimeMax MTR_PROVISIONALLY_AVAILABLE;

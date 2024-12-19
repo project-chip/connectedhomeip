@@ -8525,6 +8525,206 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Events::SystemModeChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PreviousSystemMode", indent + 1, value.previousSystemMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousSystemMode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("CurrentSystemMode", indent + 1, value.currentSystemMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'CurrentSystemMode'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Events::LocalTemperatureChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("CurrentLocalTemperature", indent + 1, value.currentLocalTemperature);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'CurrentLocalTemperature'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Events::OccupancyChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PreviousOccupancy", indent + 1, value.previousOccupancy);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousOccupancy'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("CurrentOccupancy", indent + 1, value.currentOccupancy);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'CurrentOccupancy'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Events::SetpointChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SystemMode", indent + 1, value.systemMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SystemMode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Occupancy", indent + 1, value.occupancy);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Occupancy'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PreviousSetpoint", indent + 1, value.previousSetpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousSetpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("CurrentSetpoint", indent + 1, value.currentSetpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'CurrentSetpoint'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Events::RunningStateChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PreviousRunningState", indent + 1, value.previousRunningState);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousRunningState'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("CurrentRunningState", indent + 1, value.currentRunningState);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'CurrentRunningState'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Events::RunningModeChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PreviousRunningMode", indent + 1, value.previousRunningMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousRunningMode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("CurrentRunningMode", indent + 1, value.currentRunningMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'CurrentRunningMode'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Events::ActiveScheduleChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PreviousScheduleHandle", indent + 1, value.previousScheduleHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousScheduleHandle'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("CurrentScheduleHandle", indent + 1, value.currentScheduleHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'CurrentScheduleHandle'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Events::ActivePresetChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PreviousPresetHandle", indent + 1, value.previousPresetHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousPresetHandle'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("CurrentPresetHandle", indent + 1, value.currentPresetHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'CurrentPresetHandle'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const OccupancySensing::Events::OccupancyChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -20997,6 +21197,52 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TurbineOperation", 1, value);
+        }
+        }
+        break;
+    }
+    case Thermostat::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case Thermostat::Events::SystemModeChange::Id: {
+            chip::app::Clusters::Thermostat::Events::SystemModeChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SystemModeChange", 1, value);
+        }
+        case Thermostat::Events::LocalTemperatureChange::Id: {
+            chip::app::Clusters::Thermostat::Events::LocalTemperatureChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LocalTemperatureChange", 1, value);
+        }
+        case Thermostat::Events::OccupancyChange::Id: {
+            chip::app::Clusters::Thermostat::Events::OccupancyChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OccupancyChange", 1, value);
+        }
+        case Thermostat::Events::SetpointChange::Id: {
+            chip::app::Clusters::Thermostat::Events::SetpointChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SetpointChange", 1, value);
+        }
+        case Thermostat::Events::RunningStateChange::Id: {
+            chip::app::Clusters::Thermostat::Events::RunningStateChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RunningStateChange", 1, value);
+        }
+        case Thermostat::Events::RunningModeChange::Id: {
+            chip::app::Clusters::Thermostat::Events::RunningModeChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RunningModeChange", 1, value);
+        }
+        case Thermostat::Events::ActiveScheduleChange::Id: {
+            chip::app::Clusters::Thermostat::Events::ActiveScheduleChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveScheduleChange", 1, value);
+        }
+        case Thermostat::Events::ActivePresetChange::Id: {
+            chip::app::Clusters::Thermostat::Events::ActivePresetChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActivePresetChange", 1, value);
         }
         }
         break;

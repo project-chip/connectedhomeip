@@ -633,6 +633,44 @@ static constexpr EventId Id = 0x00000010;
 } // namespace Events
 } // namespace PumpConfigurationAndControl
 
+namespace Thermostat {
+namespace Events {
+
+namespace SystemModeChange {
+static constexpr EventId Id = 0x00000000;
+} // namespace SystemModeChange
+
+namespace LocalTemperatureChange {
+static constexpr EventId Id = 0x00000001;
+} // namespace LocalTemperatureChange
+
+namespace OccupancyChange {
+static constexpr EventId Id = 0x00000002;
+} // namespace OccupancyChange
+
+namespace SetpointChange {
+static constexpr EventId Id = 0x00000003;
+} // namespace SetpointChange
+
+namespace RunningStateChange {
+static constexpr EventId Id = 0x00000004;
+} // namespace RunningStateChange
+
+namespace RunningModeChange {
+static constexpr EventId Id = 0x00000005;
+} // namespace RunningModeChange
+
+namespace ActiveScheduleChange {
+static constexpr EventId Id = 0x00000006;
+} // namespace ActiveScheduleChange
+
+namespace ActivePresetChange {
+static constexpr EventId Id = 0x00000007;
+} // namespace ActivePresetChange
+
+} // namespace Events
+} // namespace Thermostat
+
 namespace OccupancySensing {
 namespace Events {
 

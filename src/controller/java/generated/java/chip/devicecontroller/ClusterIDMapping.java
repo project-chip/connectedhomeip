@@ -11660,7 +11660,15 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            SystemModeChange(0L),
+            LocalTemperatureChange(1L),
+            OccupancyChange(2L),
+            SetpointChange(3L),
+            RunningStateChange(4L),
+            RunningModeChange(5L),
+            ActiveScheduleChange(6L),
+            ActivePresetChange(7L),;
             private final long id;
             Event(long id) {
                 this.id = id;
