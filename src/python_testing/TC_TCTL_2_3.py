@@ -56,9 +56,9 @@ class TC_TCTL_2_3(MatterBaseTest):
                      "Verify that the DUT response contains the value of _SelectedTemperatureLevel_ with a range of 0 to 31"),
             TestStep(3, "TH reads from the DUT the SupportedTemperatureLevels attribute and verifies string lengths",
                      ("Verify that the DUT response contains a _SupportedTemperatureLevels_ list\n\n"
-                      "* List length hast to be equal or less than 32 \n"
+                      "* List length has to be equal or less than 32 \n"
                       "* Each temperature level should be a string\n"
-                      "* Length of each temperature level string should be equal or less than 16\n")),
+                      "* Length of each temperature level string has to be equal or less than 16\n")),
         ]
         return steps
 
