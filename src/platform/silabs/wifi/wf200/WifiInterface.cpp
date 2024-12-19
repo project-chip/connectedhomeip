@@ -310,6 +310,13 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
     // SSID Max Length that is supported by the Wi-Fi SDK is 32
     VerifyOrReturnError(ssid.size() <= WFX_MAX_SSID_LENGTH, CHIP_ERROR_INVALID_STRING_LENGTH);
 
+    // Make sure memory is cleared before starting a new scan
+    if (scan_ssid)
+    {
+        chip::Platform::MemoryFree(scan_ssid);
+        scan_ssid = nullptr;
+    }
+
     if (ssid.empty())
     {
         scan_ssid_length = 0;
@@ -1232,7 +1239,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
      */
     uint8_t ip4_addr[4];
 
-    ip4_addr[0] = (ip) &0xFF;
+    ip4_addr[0] = (ip) & 0xFF;
     ip4_addr[1] = (ip >> 8) & 0xFF;
     ip4_addr[2] = (ip >> 16) & 0xFF;
     ip4_addr[3] = (ip >> 24) & 0xFF;

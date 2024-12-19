@@ -699,7 +699,8 @@ void ProcessEvent(WifiPlatformEvent event)
             chip::ByteSpan requestedSsid(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length);
             if (!requestedSsid.empty() && !requestedSsid.data_equal(scannedSsid))
             {
-                continue; // we found the targeted ssid.
+                // Scanned SSID entry does not match the requested SSID. Continue to the next.
+                continue;
             }
 
             // TODO: convert security mode from RSI to WFX
@@ -810,7 +811,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[0] = (ip) & 0xFF;
     wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
     wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
