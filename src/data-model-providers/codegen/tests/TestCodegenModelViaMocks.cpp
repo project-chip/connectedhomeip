@@ -1266,7 +1266,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
 
     auto commandId = commands->Next();
     ASSERT_TRUE(commandId.has_value());
-    EXPECT_EQ(*commandId, 1u);
+    EXPECT_EQ(*commandId, 1u); // NOLINT(bugprone-unchecked-optional-access)
 
     commandId = commands->Next();
     ASSERT_TRUE(commandId.has_value());
