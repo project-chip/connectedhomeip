@@ -26,6 +26,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/util/DataModelHandler.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
@@ -416,6 +417,8 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 #endif
         }
     }
+
+    InitDataModelForTesting();
 
     return CHIP_NO_ERROR;
 }
@@ -857,6 +860,12 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
 
     VerifyOrReturnValue(commandId != kInvalidCommandId, kInvalidCommandPath);
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, commandId);
+}
+
+void CodegenDataModelProvider::InitDataModelForTesting()
+{
+    // Call the Ember-specific InitDataModelHandler
+    InitDataModelHandler();
 }
 
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
