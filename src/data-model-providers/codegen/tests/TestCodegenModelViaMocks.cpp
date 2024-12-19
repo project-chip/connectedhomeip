@@ -1030,23 +1030,23 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
 
     auto id = clusters->Next();
     ASSERT_TRUE(id.has_value());
-    EXPECT_EQ(*id, MockClusterId(1));
+    EXPECT_EQ(*id, MockClusterId(1)); // NOLINT(bugprone-unchecked-optional-access)
 
     auto info = clusters->GetMetadata();
     ASSERT_TRUE(info.has_value());
-    EXPECT_EQ(info->dataVersion, 0u);
-    EXPECT_EQ(info->flags.Raw(), 0u);
+    EXPECT_EQ(info->dataVersion, 0u); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->flags.Raw(), 0u); // NOLINT(bugprone-unchecked-optional-access)
 
     chip::Test::BumpVersion();
 
     id = clusters->Next();
     ASSERT_TRUE(id.has_value());
-    EXPECT_EQ(*id, MockClusterId(2));
+    EXPECT_EQ(*id, MockClusterId(2)); // NOLINT(bugprone-unchecked-optional-access)
 
     info = clusters->GetMetadata();
     ASSERT_TRUE(info.has_value());
-    EXPECT_EQ(info->dataVersion, 1u);
-    EXPECT_EQ(info->flags.Raw(), 0u);
+    EXPECT_EQ(info->dataVersion, 1u); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->flags.Raw(), 0u); // NOLINT(bugprone-unchecked-optional-access)
 
     EXPECT_FALSE(clusters->Next().has_value());
 
@@ -1056,7 +1056,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
     {
         id = clusters->Next();
         ASSERT_TRUE(id.has_value());
-        EXPECT_EQ(*id, MockClusterId(clusterId));
+        EXPECT_EQ(*id, MockClusterId(clusterId)); // NOLINT(bugprone-unchecked-optional-access)
     }
     EXPECT_FALSE(clusters->Next().has_value());
 }
@@ -1153,42 +1153,42 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
 
     auto id = attributes->Next();
     ASSERT_TRUE(id.has_value());
-    EXPECT_EQ(*id, ClusterRevision::Id);
+    EXPECT_EQ(*id, ClusterRevision::Id); // NOLINT(bugprone-unchecked-optional-access)
 
     auto meta = attributes->GetMetadata();
-    ASSERT_TRUE(meta);
-    ASSERT_FALSE(meta->flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(meta.has_value());
+    ASSERT_FALSE(meta->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 
     id = attributes->Next();
     ASSERT_TRUE(id.has_value());
-    EXPECT_EQ(*id, FeatureMap::Id);
+    EXPECT_EQ(*id, FeatureMap::Id); // NOLINT(bugprone-unchecked-optional-access)
 
     meta = attributes->GetMetadata();
-    ASSERT_TRUE(meta);
-    ASSERT_FALSE(meta->flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(meta.has_value());
+    ASSERT_FALSE(meta->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 
     id = attributes->Next();
     ASSERT_TRUE(id.has_value());
-    EXPECT_EQ(*id, MockAttributeId(1));
+    EXPECT_EQ(*id, MockAttributeId(1)); // NOLINT(bugprone-unchecked-optional-access)
 
     meta = attributes->GetMetadata();
-    ASSERT_TRUE(meta);
-    ASSERT_FALSE(meta->flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(meta.has_value());
+    ASSERT_FALSE(meta->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 
     id = attributes->Next();
     ASSERT_TRUE(id.has_value());
-    EXPECT_EQ(*id, MockAttributeId(2));
+    EXPECT_EQ(*id, MockAttributeId(2)); // NOLINT(bugprone-unchecked-optional-access)
 
     meta = attributes->GetMetadata();
     ASSERT_TRUE(meta);
-    ASSERT_TRUE(meta->flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(meta->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 
     // iterator ends and stays invalidated
     for (int i = 0; i < 10; i++)
     {
         id = attributes->Next();
         ASSERT_FALSE(id.has_value());
-        ASSERT_FALSE(attributes->GetMetadata().has_value());
+        ASSERT_FALSE(attributes->GetMetadata().has_value()); // NOLINT(bugprone-unchecked-optional-access)
     }
 }
 
@@ -1270,11 +1270,11 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
 
     commandId = commands->Next();
     ASSERT_TRUE(commandId.has_value());
-    EXPECT_EQ(*commandId, 2u);
+    EXPECT_EQ(*commandId, 2u); // NOLINT(bugprone-unchecked-optional-access)
 
     commandId = commands->Next();
     ASSERT_TRUE(commandId.has_value());
-    EXPECT_EQ(*commandId, 23u);
+    EXPECT_EQ(*commandId, 23u); // NOLINT(bugprone-unchecked-optional-access)
 
     commandId = commands->Next();
     EXPECT_FALSE(commandId.has_value());
@@ -1285,7 +1285,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
 
     commandId = commands->Next();
     ASSERT_TRUE(commandId.has_value());
-    EXPECT_EQ(*commandId, 11u);
+    EXPECT_EQ(*commandId, 11u); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestCodegenModelViaMocks, AcceptedCommandInfo)
