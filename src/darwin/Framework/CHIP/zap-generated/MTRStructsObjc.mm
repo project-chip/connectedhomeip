@@ -7491,7 +7491,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _previousSystemMode = @(0);
+        _previousSystemMode = nil;
 
         _currentSystemMode = @(0);
     }
@@ -7548,7 +7548,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _previousOccupancy = @(0);
+        _previousOccupancy = nil;
 
         _currentOccupancy = @(0);
     }
@@ -7582,7 +7582,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _occupancy = @(0);
 
-        _previousSetpoint = @(0);
+        _previousSetpoint = nil;
 
         _currentSetpoint = @(0);
     }
@@ -7614,7 +7614,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _previousRunningState = @(0);
+        _previousRunningState = nil;
 
         _currentRunningState = @(0);
     }
@@ -7644,7 +7644,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _previousRunningMode = @(0);
+        _previousRunningMode = nil;
 
         _currentRunningMode = @(0);
     }
@@ -7674,7 +7674,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _previousScheduleHandle = [NSData data];
+        _previousScheduleHandle = nil;
 
         _currentScheduleHandle = [NSData data];
     }
@@ -7704,7 +7704,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _previousPresetHandle = [NSData data];
+        _previousPresetHandle = nil;
 
         _currentPresetHandle = [NSData data];
     }

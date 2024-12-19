@@ -3936,8 +3936,12 @@ static id _Nullable DecodeEventPayloadForThermostatCluster(EventId aEventId, TLV
         __auto_type * value = [MTRThermostatClusterSystemModeChangeEvent new];
 
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousSystemMode)];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousSystemMode.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousSystemMode.Value())];
+            } else {
+                memberValue = nil;
+            }
             value.previousSystemMode = memberValue;
         } while (0);
         do {
@@ -3975,8 +3979,12 @@ static id _Nullable DecodeEventPayloadForThermostatCluster(EventId aEventId, TLV
         __auto_type * value = [MTRThermostatClusterOccupancyChangeEvent new];
 
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:cppValue.previousOccupancy.Raw()];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousOccupancy.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.previousOccupancy.Value().Raw()];
+            } else {
+                memberValue = nil;
+            }
             value.previousOccupancy = memberValue;
         } while (0);
         do {
@@ -4007,8 +4015,12 @@ static id _Nullable DecodeEventPayloadForThermostatCluster(EventId aEventId, TLV
             value.occupancy = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithShort:cppValue.previousSetpoint];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousSetpoint.HasValue()) {
+                memberValue = [NSNumber numberWithShort:cppValue.previousSetpoint.Value()];
+            } else {
+                memberValue = nil;
+            }
             value.previousSetpoint = memberValue;
         } while (0);
         do {
@@ -4029,8 +4041,12 @@ static id _Nullable DecodeEventPayloadForThermostatCluster(EventId aEventId, TLV
         __auto_type * value = [MTRThermostatClusterRunningStateChangeEvent new];
 
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedShort:cppValue.previousRunningState.Raw()];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousRunningState.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.previousRunningState.Value().Raw()];
+            } else {
+                memberValue = nil;
+            }
             value.previousRunningState = memberValue;
         } while (0);
         do {
@@ -4051,8 +4067,12 @@ static id _Nullable DecodeEventPayloadForThermostatCluster(EventId aEventId, TLV
         __auto_type * value = [MTRThermostatClusterRunningModeChangeEvent new];
 
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousRunningMode)];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousRunningMode.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousRunningMode.Value())];
+            } else {
+                memberValue = nil;
+            }
             value.previousRunningMode = memberValue;
         } while (0);
         do {
@@ -4073,8 +4093,12 @@ static id _Nullable DecodeEventPayloadForThermostatCluster(EventId aEventId, TLV
         __auto_type * value = [MTRThermostatClusterActiveScheduleChangeEvent new];
 
         do {
-            NSData * _Nonnull memberValue;
-            memberValue = AsData(cppValue.previousScheduleHandle);
+            NSData * _Nullable memberValue;
+            if (cppValue.previousScheduleHandle.HasValue()) {
+                memberValue = AsData(cppValue.previousScheduleHandle.Value());
+            } else {
+                memberValue = nil;
+            }
             value.previousScheduleHandle = memberValue;
         } while (0);
         do {
@@ -4095,8 +4119,12 @@ static id _Nullable DecodeEventPayloadForThermostatCluster(EventId aEventId, TLV
         __auto_type * value = [MTRThermostatClusterActivePresetChangeEvent new];
 
         do {
-            NSData * _Nonnull memberValue;
-            memberValue = AsData(cppValue.previousPresetHandle);
+            NSData * _Nullable memberValue;
+            if (cppValue.previousPresetHandle.HasValue()) {
+                memberValue = AsData(cppValue.previousPresetHandle.Value());
+            } else {
+                memberValue = nil;
+            }
             value.previousPresetHandle = memberValue;
         } while (0);
         do {

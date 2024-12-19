@@ -17,13 +17,14 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatClusterActivePresetChangeEvent(
-  val previousPresetHandle: ByteArray,
+  val previousPresetHandle: Optional<ByteArray>,
   val currentPresetHandle: ByteArray,
 ) {
   override fun toString(): String = buildString {
@@ -36,7 +37,10 @@ class ThermostatClusterActivePresetChangeEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE), previousPresetHandle)
+      if (previousPresetHandle.isPresent) {
+        val optpreviousPresetHandle = previousPresetHandle.get()
+        put(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE), optpreviousPresetHandle)
+      }
       put(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE), currentPresetHandle)
       endStructure()
     }
@@ -49,7 +53,11 @@ class ThermostatClusterActivePresetChangeEvent(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterActivePresetChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val previousPresetHandle =
-        tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE))
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE)))
+        } else {
+          Optional.empty()
+        }
       val currentPresetHandle =
         tlvReader.getByteArray(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE))
 

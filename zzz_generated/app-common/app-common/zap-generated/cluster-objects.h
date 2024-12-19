@@ -30025,8 +30025,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    SystemModeEnum previousSystemMode = static_cast<SystemModeEnum>(0);
-    SystemModeEnum currentSystemMode  = static_cast<SystemModeEnum>(0);
+    Optional<SystemModeEnum> previousSystemMode;
+    SystemModeEnum currentSystemMode = static_cast<SystemModeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -30038,8 +30038,8 @@ public:
     static constexpr EventId GetEventId() { return Events::SystemModeChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    SystemModeEnum previousSystemMode = static_cast<SystemModeEnum>(0);
-    SystemModeEnum currentSystemMode  = static_cast<SystemModeEnum>(0);
+    Optional<SystemModeEnum> previousSystemMode;
+    SystemModeEnum currentSystemMode = static_cast<SystemModeEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30094,8 +30094,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    chip::BitMask<OccupancyBitmap> previousOccupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
-    chip::BitMask<OccupancyBitmap> currentOccupancy  = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+    Optional<chip::BitMask<OccupancyBitmap>> previousOccupancy;
+    chip::BitMask<OccupancyBitmap> currentOccupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -30107,8 +30107,8 @@ public:
     static constexpr EventId GetEventId() { return Events::OccupancyChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::BitMask<OccupancyBitmap> previousOccupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
-    chip::BitMask<OccupancyBitmap> currentOccupancy  = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+    Optional<chip::BitMask<OccupancyBitmap>> previousOccupancy;
+    chip::BitMask<OccupancyBitmap> currentOccupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30134,8 +30134,8 @@ public:
 
     SystemModeEnum systemMode                = static_cast<SystemModeEnum>(0);
     chip::BitMask<OccupancyBitmap> occupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
-    int16_t previousSetpoint                 = static_cast<int16_t>(0);
-    int16_t currentSetpoint                  = static_cast<int16_t>(0);
+    Optional<int16_t> previousSetpoint;
+    int16_t currentSetpoint = static_cast<int16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -30149,8 +30149,8 @@ public:
 
     SystemModeEnum systemMode                = static_cast<SystemModeEnum>(0);
     chip::BitMask<OccupancyBitmap> occupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
-    int16_t previousSetpoint                 = static_cast<int16_t>(0);
-    int16_t currentSetpoint                  = static_cast<int16_t>(0);
+    Optional<int16_t> previousSetpoint;
+    int16_t currentSetpoint = static_cast<int16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30172,8 +30172,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    chip::BitMask<RelayStateBitmap> previousRunningState = static_cast<chip::BitMask<RelayStateBitmap>>(0);
-    chip::BitMask<RelayStateBitmap> currentRunningState  = static_cast<chip::BitMask<RelayStateBitmap>>(0);
+    Optional<chip::BitMask<RelayStateBitmap>> previousRunningState;
+    chip::BitMask<RelayStateBitmap> currentRunningState = static_cast<chip::BitMask<RelayStateBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -30185,8 +30185,8 @@ public:
     static constexpr EventId GetEventId() { return Events::RunningStateChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::BitMask<RelayStateBitmap> previousRunningState = static_cast<chip::BitMask<RelayStateBitmap>>(0);
-    chip::BitMask<RelayStateBitmap> currentRunningState  = static_cast<chip::BitMask<RelayStateBitmap>>(0);
+    Optional<chip::BitMask<RelayStateBitmap>> previousRunningState;
+    chip::BitMask<RelayStateBitmap> currentRunningState = static_cast<chip::BitMask<RelayStateBitmap>>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30208,8 +30208,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    ThermostatRunningModeEnum previousRunningMode = static_cast<ThermostatRunningModeEnum>(0);
-    ThermostatRunningModeEnum currentRunningMode  = static_cast<ThermostatRunningModeEnum>(0);
+    Optional<ThermostatRunningModeEnum> previousRunningMode;
+    ThermostatRunningModeEnum currentRunningMode = static_cast<ThermostatRunningModeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -30221,8 +30221,8 @@ public:
     static constexpr EventId GetEventId() { return Events::RunningModeChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    ThermostatRunningModeEnum previousRunningMode = static_cast<ThermostatRunningModeEnum>(0);
-    ThermostatRunningModeEnum currentRunningMode  = static_cast<ThermostatRunningModeEnum>(0);
+    Optional<ThermostatRunningModeEnum> previousRunningMode;
+    ThermostatRunningModeEnum currentRunningMode = static_cast<ThermostatRunningModeEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30244,7 +30244,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    chip::ByteSpan previousScheduleHandle;
+    Optional<chip::ByteSpan> previousScheduleHandle;
     chip::ByteSpan currentScheduleHandle;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -30257,7 +30257,7 @@ public:
     static constexpr EventId GetEventId() { return Events::ActiveScheduleChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::ByteSpan previousScheduleHandle;
+    Optional<chip::ByteSpan> previousScheduleHandle;
     chip::ByteSpan currentScheduleHandle;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -30280,7 +30280,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    chip::ByteSpan previousPresetHandle;
+    Optional<chip::ByteSpan> previousPresetHandle;
     chip::ByteSpan currentPresetHandle;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -30293,7 +30293,7 @@ public:
     static constexpr EventId GetEventId() { return Events::ActivePresetChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::ByteSpan previousPresetHandle;
+    Optional<chip::ByteSpan> previousPresetHandle;
     chip::ByteSpan currentPresetHandle;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

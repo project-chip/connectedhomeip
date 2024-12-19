@@ -692,7 +692,7 @@ limitations under the License.
 
     <event code="0x0000" name="SystemModeChange" priority="info" side="server" apiMaturity="provisional">
       <description>This event SHALL be generated when the SystemMode attribute changes.</description>
-      <field id="0" name="PreviousSystemMode" type="SystemModeEnum"/>
+      <field id="0" name="PreviousSystemMode" type="SystemModeEnum" optional="true"/>
       <field id="1" name="CurrentSystemMode" type="SystemModeEnum"/>
       <mandatoryConform>
         <feature name="TEVT"/>
@@ -712,7 +712,7 @@ limitations under the License.
 
     <event code="0x0002" name="OccupancyChange" priority="info" side="server" apiMaturity="provisional">
       <description>This event SHALL be generated when the Occupancy attribute changes.</description>
-      <field id="0" name="PreviousOccupancy" type="OccupancyBitmap"/>
+      <field id="0" name="PreviousOccupancy" type="OccupancyBitmap" optional="true"/>
       <field id="1" name="CurrentOccupancy" type="OccupancyBitmap"/>
       <mandatoryConform>
         <feature name="TEVT"/>
@@ -724,7 +724,7 @@ limitations under the License.
       <description>This event SHALL be generated when the value of any of the OccupiedHeatingSetpoint, UnoccupiedHeatingSetpoint>>, OccupiedCoolingSetpoint, or UnoccupiedCoolingSetpoint attributes is changed</description>
       <field id="0" name="SystemMode" type="SystemModeEnum"/>
       <field id="1" name="Occupancy" type="OccupancyBitmap"/>
-      <field id="2" name="PreviousSetpoint" type="temperature"/>
+      <field id="2" name="PreviousSetpoint" type="temperature" optional="true"/>
       <field id="3" name="CurrentSetpoint" type="temperature"/>
       <mandatoryConform>
         <feature name="TEVT"/>
@@ -733,7 +733,7 @@ limitations under the License.
 
     <event code="0x0004" name="RunningStateChange" priority="info" side="server" apiMaturity="provisional">
       <description>This event SHALL be generated when the ThermostatRunningState attribute changes.</description>
-      <field id="0" name="PreviousRunningState" type="RelayStateBitmap"/>
+      <field id="0" name="PreviousRunningState" type="RelayStateBitmap" optional="true"/>
       <field id="1" name="CurrentRunningState" type="RelayStateBitmap"/>
       <mandatoryConform>
         <feature name="TEVT"/>
@@ -742,7 +742,7 @@ limitations under the License.
 
     <event code="0x0005" name="RunningModeChange" priority="info" side="server" apiMaturity="provisional">
       <description>This event SHALL be generated when the ThermostatRunningMode attribute changes.</description>
-      <field id="0" name="PreviousRunningMode" type="ThermostatRunningModeEnum"/>
+      <field id="0" name="PreviousRunningMode" type="ThermostatRunningModeEnum" optional="true"/>
       <field id="1" name="CurrentRunningMode" type="ThermostatRunningModeEnum"/>
       <mandatoryConform>
         <feature name="TEVT"/>
@@ -751,7 +751,7 @@ limitations under the License.
 
     <event code="0x0006" name="ActiveScheduleChange" priority="info" side="server" apiMaturity="provisional">
       <description>This event SHALL be generated when the ActiveScheduleHandle attribute changes.</description>
-      <field id="0" name="PreviousScheduleHandle" type="octet_string"/>
+      <field id="0" name="PreviousScheduleHandle" type="octet_string" optional="true"/>
       <field id="1" name="CurrentScheduleHandle" type="octet_string"/>
       <mandatoryConform>
         <feature name="TEVT"/>
@@ -761,7 +761,7 @@ limitations under the License.
 
     <event code="0x0007" name="ActivePresetChange" priority="info" side="server" apiMaturity="provisional">
       <description>This event SHALL be generated when the ActivePresetHandle attribute changes.</description>
-      <field id="0" name="PreviousPresetHandle" type="octet_string"/>
+      <field id="0" name="PreviousPresetHandle" type="octet_string" optional="true"/>
       <field id="1" name="CurrentPresetHandle" type="octet_string"/>
       <mandatoryConform>
         <feature name="TEVT"/>

@@ -5826,13 +5826,13 @@ public static class PumpConfigurationAndControlClusterTurbineOperationEvent {
   }
 }
 public static class ThermostatClusterSystemModeChangeEvent {
-  public Integer previousSystemMode;
+  public Optional<Integer> previousSystemMode;
   public Integer currentSystemMode;
   private static final long PREVIOUS_SYSTEM_MODE_ID = 0L;
   private static final long CURRENT_SYSTEM_MODE_ID = 1L;
 
   public ThermostatClusterSystemModeChangeEvent(
-    Integer previousSystemMode,
+    Optional<Integer> previousSystemMode,
     Integer currentSystemMode
   ) {
     this.previousSystemMode = previousSystemMode;
@@ -5841,7 +5841,7 @@ public static class ThermostatClusterSystemModeChangeEvent {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PREVIOUS_SYSTEM_MODE_ID, new UIntType(previousSystemMode)));
+    values.add(new StructElement(PREVIOUS_SYSTEM_MODE_ID, previousSystemMode.<BaseTLVType>map((nonOptionalpreviousSystemMode) -> new UIntType(nonOptionalpreviousSystemMode)).orElse(new EmptyType())));
     values.add(new StructElement(CURRENT_SYSTEM_MODE_ID, new UIntType(currentSystemMode)));
 
     return new StructType(values);
@@ -5851,13 +5851,13 @@ public static class ThermostatClusterSystemModeChangeEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer previousSystemMode = null;
+    Optional<Integer> previousSystemMode = Optional.empty();
     Integer currentSystemMode = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PREVIOUS_SYSTEM_MODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          previousSystemMode = castingValue.value(Integer.class);
+          previousSystemMode = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == CURRENT_SYSTEM_MODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5933,13 +5933,13 @@ public static class ThermostatClusterLocalTemperatureChangeEvent {
   }
 }
 public static class ThermostatClusterOccupancyChangeEvent {
-  public Integer previousOccupancy;
+  public Optional<Integer> previousOccupancy;
   public Integer currentOccupancy;
   private static final long PREVIOUS_OCCUPANCY_ID = 0L;
   private static final long CURRENT_OCCUPANCY_ID = 1L;
 
   public ThermostatClusterOccupancyChangeEvent(
-    Integer previousOccupancy,
+    Optional<Integer> previousOccupancy,
     Integer currentOccupancy
   ) {
     this.previousOccupancy = previousOccupancy;
@@ -5948,7 +5948,7 @@ public static class ThermostatClusterOccupancyChangeEvent {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PREVIOUS_OCCUPANCY_ID, new UIntType(previousOccupancy)));
+    values.add(new StructElement(PREVIOUS_OCCUPANCY_ID, previousOccupancy.<BaseTLVType>map((nonOptionalpreviousOccupancy) -> new UIntType(nonOptionalpreviousOccupancy)).orElse(new EmptyType())));
     values.add(new StructElement(CURRENT_OCCUPANCY_ID, new UIntType(currentOccupancy)));
 
     return new StructType(values);
@@ -5958,13 +5958,13 @@ public static class ThermostatClusterOccupancyChangeEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer previousOccupancy = null;
+    Optional<Integer> previousOccupancy = Optional.empty();
     Integer currentOccupancy = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PREVIOUS_OCCUPANCY_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          previousOccupancy = castingValue.value(Integer.class);
+          previousOccupancy = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == CURRENT_OCCUPANCY_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5996,7 +5996,7 @@ public static class ThermostatClusterOccupancyChangeEvent {
 public static class ThermostatClusterSetpointChangeEvent {
   public Integer systemMode;
   public Integer occupancy;
-  public Integer previousSetpoint;
+  public Optional<Integer> previousSetpoint;
   public Integer currentSetpoint;
   private static final long SYSTEM_MODE_ID = 0L;
   private static final long OCCUPANCY_ID = 1L;
@@ -6006,7 +6006,7 @@ public static class ThermostatClusterSetpointChangeEvent {
   public ThermostatClusterSetpointChangeEvent(
     Integer systemMode,
     Integer occupancy,
-    Integer previousSetpoint,
+    Optional<Integer> previousSetpoint,
     Integer currentSetpoint
   ) {
     this.systemMode = systemMode;
@@ -6019,7 +6019,7 @@ public static class ThermostatClusterSetpointChangeEvent {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(SYSTEM_MODE_ID, new UIntType(systemMode)));
     values.add(new StructElement(OCCUPANCY_ID, new UIntType(occupancy)));
-    values.add(new StructElement(PREVIOUS_SETPOINT_ID, new IntType(previousSetpoint)));
+    values.add(new StructElement(PREVIOUS_SETPOINT_ID, previousSetpoint.<BaseTLVType>map((nonOptionalpreviousSetpoint) -> new IntType(nonOptionalpreviousSetpoint)).orElse(new EmptyType())));
     values.add(new StructElement(CURRENT_SETPOINT_ID, new IntType(currentSetpoint)));
 
     return new StructType(values);
@@ -6031,7 +6031,7 @@ public static class ThermostatClusterSetpointChangeEvent {
     }
     Integer systemMode = null;
     Integer occupancy = null;
-    Integer previousSetpoint = null;
+    Optional<Integer> previousSetpoint = Optional.empty();
     Integer currentSetpoint = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SYSTEM_MODE_ID) {
@@ -6047,7 +6047,7 @@ public static class ThermostatClusterSetpointChangeEvent {
       } else if (element.contextTagNum() == PREVIOUS_SETPOINT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
           IntType castingValue = element.value(IntType.class);
-          previousSetpoint = castingValue.value(Integer.class);
+          previousSetpoint = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == CURRENT_SETPOINT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
@@ -6085,13 +6085,13 @@ public static class ThermostatClusterSetpointChangeEvent {
   }
 }
 public static class ThermostatClusterRunningStateChangeEvent {
-  public Integer previousRunningState;
+  public Optional<Integer> previousRunningState;
   public Integer currentRunningState;
   private static final long PREVIOUS_RUNNING_STATE_ID = 0L;
   private static final long CURRENT_RUNNING_STATE_ID = 1L;
 
   public ThermostatClusterRunningStateChangeEvent(
-    Integer previousRunningState,
+    Optional<Integer> previousRunningState,
     Integer currentRunningState
   ) {
     this.previousRunningState = previousRunningState;
@@ -6100,7 +6100,7 @@ public static class ThermostatClusterRunningStateChangeEvent {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PREVIOUS_RUNNING_STATE_ID, new UIntType(previousRunningState)));
+    values.add(new StructElement(PREVIOUS_RUNNING_STATE_ID, previousRunningState.<BaseTLVType>map((nonOptionalpreviousRunningState) -> new UIntType(nonOptionalpreviousRunningState)).orElse(new EmptyType())));
     values.add(new StructElement(CURRENT_RUNNING_STATE_ID, new UIntType(currentRunningState)));
 
     return new StructType(values);
@@ -6110,13 +6110,13 @@ public static class ThermostatClusterRunningStateChangeEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer previousRunningState = null;
+    Optional<Integer> previousRunningState = Optional.empty();
     Integer currentRunningState = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PREVIOUS_RUNNING_STATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          previousRunningState = castingValue.value(Integer.class);
+          previousRunningState = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == CURRENT_RUNNING_STATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6146,13 +6146,13 @@ public static class ThermostatClusterRunningStateChangeEvent {
   }
 }
 public static class ThermostatClusterRunningModeChangeEvent {
-  public Integer previousRunningMode;
+  public Optional<Integer> previousRunningMode;
   public Integer currentRunningMode;
   private static final long PREVIOUS_RUNNING_MODE_ID = 0L;
   private static final long CURRENT_RUNNING_MODE_ID = 1L;
 
   public ThermostatClusterRunningModeChangeEvent(
-    Integer previousRunningMode,
+    Optional<Integer> previousRunningMode,
     Integer currentRunningMode
   ) {
     this.previousRunningMode = previousRunningMode;
@@ -6161,7 +6161,7 @@ public static class ThermostatClusterRunningModeChangeEvent {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PREVIOUS_RUNNING_MODE_ID, new UIntType(previousRunningMode)));
+    values.add(new StructElement(PREVIOUS_RUNNING_MODE_ID, previousRunningMode.<BaseTLVType>map((nonOptionalpreviousRunningMode) -> new UIntType(nonOptionalpreviousRunningMode)).orElse(new EmptyType())));
     values.add(new StructElement(CURRENT_RUNNING_MODE_ID, new UIntType(currentRunningMode)));
 
     return new StructType(values);
@@ -6171,13 +6171,13 @@ public static class ThermostatClusterRunningModeChangeEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer previousRunningMode = null;
+    Optional<Integer> previousRunningMode = Optional.empty();
     Integer currentRunningMode = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PREVIOUS_RUNNING_MODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          previousRunningMode = castingValue.value(Integer.class);
+          previousRunningMode = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == CURRENT_RUNNING_MODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6207,13 +6207,13 @@ public static class ThermostatClusterRunningModeChangeEvent {
   }
 }
 public static class ThermostatClusterActiveScheduleChangeEvent {
-  public byte[] previousScheduleHandle;
+  public Optional<byte[]> previousScheduleHandle;
   public byte[] currentScheduleHandle;
   private static final long PREVIOUS_SCHEDULE_HANDLE_ID = 0L;
   private static final long CURRENT_SCHEDULE_HANDLE_ID = 1L;
 
   public ThermostatClusterActiveScheduleChangeEvent(
-    byte[] previousScheduleHandle,
+    Optional<byte[]> previousScheduleHandle,
     byte[] currentScheduleHandle
   ) {
     this.previousScheduleHandle = previousScheduleHandle;
@@ -6222,7 +6222,7 @@ public static class ThermostatClusterActiveScheduleChangeEvent {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PREVIOUS_SCHEDULE_HANDLE_ID, new ByteArrayType(previousScheduleHandle)));
+    values.add(new StructElement(PREVIOUS_SCHEDULE_HANDLE_ID, previousScheduleHandle.<BaseTLVType>map((nonOptionalpreviousScheduleHandle) -> new ByteArrayType(nonOptionalpreviousScheduleHandle)).orElse(new EmptyType())));
     values.add(new StructElement(CURRENT_SCHEDULE_HANDLE_ID, new ByteArrayType(currentScheduleHandle)));
 
     return new StructType(values);
@@ -6232,13 +6232,13 @@ public static class ThermostatClusterActiveScheduleChangeEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    byte[] previousScheduleHandle = null;
+    Optional<byte[]> previousScheduleHandle = Optional.empty();
     byte[] currentScheduleHandle = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PREVIOUS_SCHEDULE_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          previousScheduleHandle = castingValue.value(byte[].class);
+          previousScheduleHandle = Optional.of(castingValue.value(byte[].class));
         }
       } else if (element.contextTagNum() == CURRENT_SCHEDULE_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -6258,7 +6258,7 @@ public static class ThermostatClusterActiveScheduleChangeEvent {
     StringBuilder output = new StringBuilder();
     output.append("ThermostatClusterActiveScheduleChangeEvent {\n");
     output.append("\tpreviousScheduleHandle: ");
-    output.append(Arrays.toString(previousScheduleHandle));
+    output.append(previousScheduleHandle.isPresent() ? Arrays.toString(previousScheduleHandle.get()) : "");
     output.append("\n");
     output.append("\tcurrentScheduleHandle: ");
     output.append(Arrays.toString(currentScheduleHandle));
@@ -6268,13 +6268,13 @@ public static class ThermostatClusterActiveScheduleChangeEvent {
   }
 }
 public static class ThermostatClusterActivePresetChangeEvent {
-  public byte[] previousPresetHandle;
+  public Optional<byte[]> previousPresetHandle;
   public byte[] currentPresetHandle;
   private static final long PREVIOUS_PRESET_HANDLE_ID = 0L;
   private static final long CURRENT_PRESET_HANDLE_ID = 1L;
 
   public ThermostatClusterActivePresetChangeEvent(
-    byte[] previousPresetHandle,
+    Optional<byte[]> previousPresetHandle,
     byte[] currentPresetHandle
   ) {
     this.previousPresetHandle = previousPresetHandle;
@@ -6283,7 +6283,7 @@ public static class ThermostatClusterActivePresetChangeEvent {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PREVIOUS_PRESET_HANDLE_ID, new ByteArrayType(previousPresetHandle)));
+    values.add(new StructElement(PREVIOUS_PRESET_HANDLE_ID, previousPresetHandle.<BaseTLVType>map((nonOptionalpreviousPresetHandle) -> new ByteArrayType(nonOptionalpreviousPresetHandle)).orElse(new EmptyType())));
     values.add(new StructElement(CURRENT_PRESET_HANDLE_ID, new ByteArrayType(currentPresetHandle)));
 
     return new StructType(values);
@@ -6293,13 +6293,13 @@ public static class ThermostatClusterActivePresetChangeEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    byte[] previousPresetHandle = null;
+    Optional<byte[]> previousPresetHandle = Optional.empty();
     byte[] currentPresetHandle = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PREVIOUS_PRESET_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          previousPresetHandle = castingValue.value(byte[].class);
+          previousPresetHandle = Optional.of(castingValue.value(byte[].class));
         }
       } else if (element.contextTagNum() == CURRENT_PRESET_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -6319,7 +6319,7 @@ public static class ThermostatClusterActivePresetChangeEvent {
     StringBuilder output = new StringBuilder();
     output.append("ThermostatClusterActivePresetChangeEvent {\n");
     output.append("\tpreviousPresetHandle: ");
-    output.append(Arrays.toString(previousPresetHandle));
+    output.append(previousPresetHandle.isPresent() ? Arrays.toString(previousPresetHandle.get()) : "");
     output.append("\n");
     output.append("\tcurrentPresetHandle: ");
     output.append(Arrays.toString(currentPresetHandle));

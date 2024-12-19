@@ -17,13 +17,14 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatClusterActiveScheduleChangeEvent(
-  val previousScheduleHandle: ByteArray,
+  val previousScheduleHandle: Optional<ByteArray>,
   val currentScheduleHandle: ByteArray,
 ) {
   override fun toString(): String = buildString {
@@ -36,7 +37,10 @@ class ThermostatClusterActiveScheduleChangeEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE), previousScheduleHandle)
+      if (previousScheduleHandle.isPresent) {
+        val optpreviousScheduleHandle = previousScheduleHandle.get()
+        put(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE), optpreviousScheduleHandle)
+      }
       put(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE), currentScheduleHandle)
       endStructure()
     }
@@ -49,7 +53,11 @@ class ThermostatClusterActiveScheduleChangeEvent(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterActiveScheduleChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val previousScheduleHandle =
-        tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE)))
+        } else {
+          Optional.empty()
+        }
       val currentScheduleHandle =
         tlvReader.getByteArray(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE))
 

@@ -32081,11 +32081,11 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="previousSystemMode", Tag=0, Type=Thermostat.Enums.SystemModeEnum),
+                        ClusterObjectFieldDescriptor(Label="previousSystemMode", Tag=0, Type=typing.Optional[Thermostat.Enums.SystemModeEnum]),
                         ClusterObjectFieldDescriptor(Label="currentSystemMode", Tag=1, Type=Thermostat.Enums.SystemModeEnum),
                     ])
 
-            previousSystemMode: Thermostat.Enums.SystemModeEnum = 0
+            previousSystemMode: typing.Optional[Thermostat.Enums.SystemModeEnum] = None
             currentSystemMode: Thermostat.Enums.SystemModeEnum = 0
 
         @dataclass
@@ -32121,11 +32121,11 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="previousOccupancy", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="previousOccupancy", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="currentOccupancy", Tag=1, Type=uint),
                     ])
 
-            previousOccupancy: uint = 0
+            previousOccupancy: typing.Optional[uint] = None
             currentOccupancy: uint = 0
 
         @dataclass
@@ -32144,13 +32144,13 @@ class Thermostat(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="systemMode", Tag=0, Type=Thermostat.Enums.SystemModeEnum),
                         ClusterObjectFieldDescriptor(Label="occupancy", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="previousSetpoint", Tag=2, Type=int),
+                        ClusterObjectFieldDescriptor(Label="previousSetpoint", Tag=2, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="currentSetpoint", Tag=3, Type=int),
                     ])
 
             systemMode: Thermostat.Enums.SystemModeEnum = 0
             occupancy: uint = 0
-            previousSetpoint: int = 0
+            previousSetpoint: typing.Optional[int] = None
             currentSetpoint: int = 0
 
         @dataclass
@@ -32167,11 +32167,11 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="previousRunningState", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="previousRunningState", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="currentRunningState", Tag=1, Type=uint),
                     ])
 
-            previousRunningState: uint = 0
+            previousRunningState: typing.Optional[uint] = None
             currentRunningState: uint = 0
 
         @dataclass
@@ -32188,11 +32188,11 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="previousRunningMode", Tag=0, Type=Thermostat.Enums.ThermostatRunningModeEnum),
+                        ClusterObjectFieldDescriptor(Label="previousRunningMode", Tag=0, Type=typing.Optional[Thermostat.Enums.ThermostatRunningModeEnum]),
                         ClusterObjectFieldDescriptor(Label="currentRunningMode", Tag=1, Type=Thermostat.Enums.ThermostatRunningModeEnum),
                     ])
 
-            previousRunningMode: Thermostat.Enums.ThermostatRunningModeEnum = 0
+            previousRunningMode: typing.Optional[Thermostat.Enums.ThermostatRunningModeEnum] = None
             currentRunningMode: Thermostat.Enums.ThermostatRunningModeEnum = 0
 
         @dataclass
@@ -32209,11 +32209,11 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="previousScheduleHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="previousScheduleHandle", Tag=0, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="currentScheduleHandle", Tag=1, Type=bytes),
                     ])
 
-            previousScheduleHandle: bytes = b""
+            previousScheduleHandle: typing.Optional[bytes] = None
             currentScheduleHandle: bytes = b""
 
         @dataclass
@@ -32230,11 +32230,11 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="previousPresetHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="previousPresetHandle", Tag=0, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="currentPresetHandle", Tag=1, Type=bytes),
                     ])
 
-            previousPresetHandle: bytes = b""
+            previousPresetHandle: typing.Optional[bytes] = None
             currentPresetHandle: bytes = b""
 
 

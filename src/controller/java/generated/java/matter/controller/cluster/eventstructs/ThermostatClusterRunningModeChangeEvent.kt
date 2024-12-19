@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
@@ -23,7 +24,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatClusterRunningModeChangeEvent(
-  val previousRunningMode: UByte,
+  val previousRunningMode: Optional<UByte>,
   val currentRunningMode: UByte,
 ) {
   override fun toString(): String = buildString {
@@ -36,7 +37,10 @@ class ThermostatClusterRunningModeChangeEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_PREVIOUS_RUNNING_MODE), previousRunningMode)
+      if (previousRunningMode.isPresent) {
+        val optpreviousRunningMode = previousRunningMode.get()
+        put(ContextSpecificTag(TAG_PREVIOUS_RUNNING_MODE), optpreviousRunningMode)
+      }
       put(ContextSpecificTag(TAG_CURRENT_RUNNING_MODE), currentRunningMode)
       endStructure()
     }
@@ -48,7 +52,12 @@ class ThermostatClusterRunningModeChangeEvent(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterRunningModeChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val previousRunningMode = tlvReader.getUByte(ContextSpecificTag(TAG_PREVIOUS_RUNNING_MODE))
+      val previousRunningMode =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_RUNNING_MODE))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_PREVIOUS_RUNNING_MODE)))
+        } else {
+          Optional.empty()
+        }
       val currentRunningMode = tlvReader.getUByte(ContextSpecificTag(TAG_CURRENT_RUNNING_MODE))
 
       tlvReader.exitContainer()

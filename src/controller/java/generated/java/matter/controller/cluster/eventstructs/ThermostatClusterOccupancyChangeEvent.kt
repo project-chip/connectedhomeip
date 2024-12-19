@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
@@ -23,7 +24,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatClusterOccupancyChangeEvent(
-  val previousOccupancy: UByte,
+  val previousOccupancy: Optional<UByte>,
   val currentOccupancy: UByte,
 ) {
   override fun toString(): String = buildString {
@@ -36,7 +37,10 @@ class ThermostatClusterOccupancyChangeEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_PREVIOUS_OCCUPANCY), previousOccupancy)
+      if (previousOccupancy.isPresent) {
+        val optpreviousOccupancy = previousOccupancy.get()
+        put(ContextSpecificTag(TAG_PREVIOUS_OCCUPANCY), optpreviousOccupancy)
+      }
       put(ContextSpecificTag(TAG_CURRENT_OCCUPANCY), currentOccupancy)
       endStructure()
     }
@@ -48,7 +52,12 @@ class ThermostatClusterOccupancyChangeEvent(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterOccupancyChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val previousOccupancy = tlvReader.getUByte(ContextSpecificTag(TAG_PREVIOUS_OCCUPANCY))
+      val previousOccupancy =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_OCCUPANCY))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_PREVIOUS_OCCUPANCY)))
+        } else {
+          Optional.empty()
+        }
       val currentOccupancy = tlvReader.getUByte(ContextSpecificTag(TAG_CURRENT_OCCUPANCY))
 
       tlvReader.exitContainer()
