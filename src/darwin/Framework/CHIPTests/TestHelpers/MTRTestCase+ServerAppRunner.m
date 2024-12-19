@@ -61,7 +61,7 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
         @"--passcode",
         [NSString stringWithFormat:@"%llu", passcode.unsignedLongLongValue],
         @"--KVS",
-        [NSString stringWithFormat:@"/tmp/chip-%@-kvs%u", name, uniqueIndex],
+        [NSString stringWithFormat:@"/tmp/xctest-%d-chip-%@-kvs%u", getpid(), name, uniqueIndex],
         @"--product-id",
         [NSString stringWithFormat:@"%u", parsedPayload.productID.unsignedShortValue],
     ];

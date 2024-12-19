@@ -17,12 +17,12 @@
  */
 #include <DeviceInfoProviderImpl.h>
 #include <OTAConfig.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <platform/bouffalolab/common/PlatformManagerImpl.h>
 #include <system/SystemClock.h>
 
@@ -246,7 +246,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;

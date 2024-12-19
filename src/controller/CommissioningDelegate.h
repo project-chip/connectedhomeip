@@ -36,8 +36,7 @@ enum CommissioningStage : uint8_t
 {
     kError,
     kSecurePairing,              ///< Establish a PASE session with the device
-    kReadCommissioningInfo,      ///< Query General Commissioning Attributes, Network Features and Time Synchronization Cluster
-    kReadCommissioningInfo2,     ///< Query SupportsConcurrentConnection, ICD state, check for matching fabric
+    kReadCommissioningInfo,      ///< Query Attributes relevant to commissioning (can perform multiple read interactions)
     kArmFailsafe,                ///< Send ArmFailSafe (0x30:0) command to the device
     kConfigRegulatory,           ///< Send SetRegulatoryConfig (0x30:2) command to the device
     kConfigureUTCTime,           ///< SetUTCTime if the DUT has a time cluster
@@ -55,7 +54,7 @@ enum CommissioningStage : uint8_t
     kSendTrustedRootCert,        ///< Send AddTrustedRootCertificate (0x3E:11) command to the device
     kSendNOC,                    ///< Send AddNOC (0x3E:6) command to the device
     kConfigureTrustedTimeSource, ///< Configure a trusted time source if one is required and available (must be done after SendNOC)
-    kICDGetRegistrationInfo,     ///< Waiting for the higher layer to provide ICD registraion informations.
+    kICDGetRegistrationInfo,     ///< Waiting for the higher layer to provide ICD registration informations.
     kICDRegistration,            ///< Register for ICD management
     kWiFiNetworkSetup,           ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
     kThreadNetworkSetup,         ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
@@ -163,7 +162,7 @@ public:
     }
 
     // Value to determine whether the node supports Concurrent Connections as read from the GeneralCommissioning cluster.
-    // In the AutoCommissioner, this is automatically set from from the kReadCommissioningInfo2 stage.
+    // In the AutoCommissioner, this is automatically set from from the kReadCommissioningInfo stage.
     Optional<bool> GetSupportsConcurrentConnection() const { return mSupportsConcurrentConnection; }
 
     // The country code to be used for the node, if set.
@@ -691,7 +690,7 @@ struct OperationalNodeFoundData
 struct NetworkClusterInfo
 {
     EndpointId endpoint = kInvalidEndpointId;
-    app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime;
+    app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime = 0;
 };
 struct NetworkClusters
 {
@@ -788,8 +787,7 @@ class CommissioningDelegate
 public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
-     * kReadCommissioningInfo: Reported together with ReadCommissioningInfo2
-     * kReadCommissioningInfo2: ReadCommissioningInfo
+     * kReadCommissioningInfo: ReadCommissioningInfo
      * kArmFailsafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kConfigureUTCTime: None

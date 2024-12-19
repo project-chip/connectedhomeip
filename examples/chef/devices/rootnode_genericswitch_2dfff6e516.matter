@@ -1252,7 +1252,7 @@ cluster GeneralDiagnostics = 51 {
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** Request a variable length payload response. */
-  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+  command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.

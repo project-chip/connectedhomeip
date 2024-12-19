@@ -359,8 +359,6 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
         }
-        return CommissioningStage::kReadCommissioningInfo2;
-    case CommissioningStage::kReadCommissioningInfo2:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
@@ -764,9 +762,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         ChipLogProgress(Controller, "Successfully finished commissioning step '%s'", StageToString(report.stageCompleted));
         switch (report.stageCompleted)
         {
-        case CommissioningStage::kReadCommissioningInfo:
-            break;
-        case CommissioningStage::kReadCommissioningInfo2: {
+        case CommissioningStage::kReadCommissioningInfo: {
             mDeviceCommissioningInfo = report.Get<ReadCommissioningInfo>();
 
             if (!mParams.GetFailsafeTimerSeconds().HasValue() && mDeviceCommissioningInfo.general.recommendedFailsafe > 0)

@@ -22,8 +22,9 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -31,6 +32,23 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --string-arg th_server_app_path:${ALL_CLUSTERS_APP} dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --bool-arg unified_fabric_sync_app:true
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -138,17 +156,18 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             f">>> pairing onnetwork 111 {setup_params.passcode}")
 
     def steps_TC_MCORE_FS_1_5(self) -> list[TestStep]:
-        steps = [TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
-                 TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
-                 TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
-                 TestStep(4, "TH uses DUT to open commissioning window to TH_SERVER"),
-                 TestStep(5, "TH commissions TH_SERVER"),
-                 TestStep(6, "TH subscribes to AdministratorCommissioning attributes on DUT_FSA for the newly added endpoint identified in step 3"),
-                 TestStep(7, "TH opens commissioning window to TH_SERVER directly (not using DUT)"),
-                 TestStep(8, "TH reads CurrentFabricIndex attributes on OperationalCredentials cluster from TH_SERVER directly (not using DUT_FSA)"),
-                 TestStep(9, "TH reads AdministratorCommissioning from TH_SERVER directly (not using DUT)"),
-                 TestStep(10, "TH waits up to 10 seconds for subscription report from the AdministratorCommissioning attribute (from step 6) to reflect values from previous step")]
-        return steps
+        return [
+            TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
+            TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
+            TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
+            TestStep(4, "TH uses DUT to open commissioning window to TH_SERVER"),
+            TestStep(5, "TH commissions TH_SERVER"),
+            TestStep(6, "TH subscribes to AdministratorCommissioning attributes on DUT_FSA for the newly added endpoint identified in step 3"),
+            TestStep(7, "TH opens commissioning window to TH_SERVER directly (not using DUT)"),
+            TestStep(8, "TH reads CurrentFabricIndex attributes on OperationalCredentials cluster from TH_SERVER directly (not using DUT_FSA)"),
+            TestStep(9, "TH reads AdministratorCommissioning from TH_SERVER directly (not using DUT)"),
+            TestStep(10, "TH waits up to 10 seconds for subscription report from the AdministratorCommissioning attribute (from step 6) to reflect values from previous step"),
+        ]
 
     # This test has some manual steps, so we need a longer timeout. Test typically runs under 1 mins so 3 mins should
     # be enough time for test to run
@@ -172,7 +191,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             nodeid=self.dut_node_id,
             attributes=parts_list_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
-            keepSubscriptions=False
+            keepSubscriptions=True
         )
 
         parts_list_queue = queue.Queue()
@@ -188,8 +207,10 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         if not self.is_pics_sdk_ci_only:
             self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
         else:
-            self.dut_fsa_stdin.write(
-                f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
+            if self.user_params.get("unified_fabric_sync_app"):
+                self.dut_fsa_stdin.write(f"app pair-device 2 {self.th_server_setup_params.qr_code}\n")
+            else:
+                self.dut_fsa_stdin.write(f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
             self.dut_fsa_stdin.flush()
             # Wait for the commissioning to complete.
             await asyncio.sleep(5)
@@ -248,6 +269,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         await self.default_controller.CommissionOnNetwork(nodeId=self.th_server_local_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
 
         self.step(6)
+        max_report_interval_sec = 10
         cadmin_subscription_contents = [
             (newly_added_endpoint, Clusters.AdministratorCommissioning)
         ]
@@ -255,7 +277,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             nodeid=self.dut_node_id,
             attributes=cadmin_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
-            keepSubscriptions=False
+            keepSubscriptions=True
         )
 
         cadmin_queue = queue.Queue()
@@ -263,7 +285,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         cadmin_attribute_handler = AttributeChangeAccumulator(
             name=self.default_controller.name, expected_attribute=Clusters.AdministratorCommissioning.Attributes.WindowStatus, output=cadmin_queue)
         self._cadmin_subscription.SetAttributeUpdateCallback(cadmin_attribute_handler)
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         self.step(7)
         await self.default_controller.OpenCommissioningWindow(nodeid=self.th_server_local_nodeid, timeout=180, iteration=1000, discriminator=3840, option=1)
@@ -281,7 +303,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
                              current_fabric_index, "AdminFabricIndex is unexpected")
 
         self.step(10)
-        report_waiting_timeout_delay_sec = 10
+        report_waiting_timeout_delay_sec = max_report_interval_sec + 1
         logging.info("Waiting for update to AdministratorCommissioning attributes.")
         start_time = time.time()
         elapsed = 0
