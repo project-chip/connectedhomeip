@@ -81,7 +81,6 @@ enum CommissioningStage : uint8_t
                                       ///< the primary network config later.
     kRemoveWiFiNetworkConfig,         ///< Remove Wi-Fi network config.
     kRemoveThreadNetworkConfig,       ///< Remove Thread network config.
-    kGetTCAcknowledgments,            ///< Waiting for the higher layer to provide terms and conditions acknowledgements.
     kConfigureTCAcknowledgments,      ///< Send SetTCAcknowledgements (0x30:6) command to the device
     kCleanup,                         ///< Call delegates with status, free memory, clear timers and state
 };

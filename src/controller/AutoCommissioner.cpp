@@ -363,8 +363,6 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
-        return CommissioningStage::kGetTCAcknowledgments;
-    case CommissioningStage::kGetTCAcknowledgments:
         return CommissioningStage::kConfigureTCAcknowledgments;
     case CommissioningStage::kConfigureTCAcknowledgments:
         if (mDeviceCommissioningInfo.requiresUTC)

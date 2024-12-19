@@ -708,25 +708,6 @@ public:
 
     /**
      * @brief
-     *   This function is called by the upper layer application to indicate that the required terms and conditions
-     *   acknowledgements have been set. This function should be called after the terms and conditions bitmask and version
-     *   have been defined using the appropriate configuration macros and the application has gathered the necessary
-     *   acknowledgements from the user.
-     *
-     * The upper layer application should call this method once it has successfully presented and obtained acknowledgements
-     * for the required terms and conditions from the user. This indicates that the commissioning process can advance to the
-     * next stage.
-     *
-     * When the terms and conditions acknowledgements process is completed, this function will signal the readiness to proceed
-     * to the next step in the commissioning process.
-     *
-     * @return CHIP_ERROR   The return status. Returns CHIP_ERROR_INCORRECT_STATE if the function is called when the device
-     *                      is not in the correct state to accept terms and conditions acknowledgements.
-     */
-    CHIP_ERROR TermsAndConditionsAcknowledgementsReady();
-
-    /**
-     * @brief
      *  This function returns the current CommissioningStage for this commissioner.
      */
     CommissioningStage GetCommissioningStage() { return mCommissioningStage; }

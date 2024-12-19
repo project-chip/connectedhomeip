@@ -2886,16 +2886,6 @@ CHIP_ERROR DeviceCommissioner::ICDRegistrationInfoReady()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::TermsAndConditionsAcknowledgementsReady()
-{
-    VerifyOrReturnError(mCommissioningStage == CommissioningStage::kGetTCAcknowledgments, CHIP_ERROR_INCORRECT_STATE);
-
-    // need to advance to next step
-    CommissioningStageComplete(CHIP_NO_ERROR);
-
-    return CHIP_NO_ERROR;
-}
-
 void DeviceCommissioner::OnNetworkConfigResponse(void * context,
                                                  const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
 {
@@ -3233,19 +3223,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
-    case CommissioningStage::kGetTCAcknowledgments: {
-        ChipLogProgress(Controller, "Get Terms and Conditions Acknowledgments");
-
-        // If terms and conditions acknowledgements are not required, or have already been provided, then proceed
-        if (!params.GetRequireTermsAndConditionsAcknowledgement() || params.GetTermsAndConditionsAcknowledgement().HasValue())
-        {
-            TermsAndConditionsAcknowledgementsReady();
-            return;
-        }
-
-        ChipLogProgress(Controller, "Waiting for Terms and Conditions");
-        break;
-    }
     case CommissioningStage::kConfigureTCAcknowledgments: {
         ChipLogProgress(Controller, "Setting Terms and Conditions");
 
