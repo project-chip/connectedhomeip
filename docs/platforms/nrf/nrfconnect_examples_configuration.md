@@ -196,11 +196,12 @@ intervals:
 
 #### Onboarding payload delivered over NFC
 
-You can configure the Matter protocol to use an NFC tag for delivering the onboarding payload, instead
-of using a QR code, which is the default configuration.
+You can configure the Matter protocol to use an NFC tag for delivering the
+onboarding payload, instead of using a QR code, which is the default
+configuration.
 
-To enable sharing the onboarding payload in an NFC tag, set
-the `CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD` option.
+To enable sharing the onboarding payload in an NFC tag, set the
+`CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD` option.
 
 #### Factory reset behavior
 
