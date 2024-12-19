@@ -24,6 +24,7 @@
  */
 
 #include "InteractionModelEngine.h"
+#include "app/ConcreteClusterPath.h"
 
 #include <cinttypes>
 
@@ -89,14 +90,14 @@ bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, Endp
                                                                aSubjectDescriptor);
     }
 
-    DataModel::ClusterEntry clusterEntry = aProvider->FirstServerCluster(aEventPath.mEndpointId);
-    while (clusterEntry.IsValid())
+    auto clusters = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetServerClusters(aEventPath.mEndpointId);
+    for (auto id = clusters->Next(); id.has_value(); id = clusters->Next())
     {
-        if (MayHaveAccessibleEventPathForEndpointAndCluster(clusterEntry.path, aEventPath, aSubjectDescriptor))
+        ConcreteClusterPath clusterPath(aEventPath.mEndpointId, *id);
+        if (MayHaveAccessibleEventPathForEndpointAndCluster(clusterPath, aEventPath, aSubjectDescriptor))
         {
             return true;
         }
-        clusterEntry = aProvider->NextServerCluster(clusterEntry.path);
     }
 
     return false;
@@ -1805,22 +1806,15 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
     }
 
     // We failed, figure out why ...
-    //
-    if (provider->GetServerClusterInfo(aCommandPath).has_value())
+    if (provider->GetServerClusters(aCommandPath.mEndpointId)->SeekTo(aCommandPath.mClusterId))
     {
         return Protocols::InteractionModel::Status::UnsupportedCommand; // cluster exists, so command is invalid
     }
 
-    // At this point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
-    // is invalid
-    auto endpoints = provider->GetEndpoints();
-    for (auto id = endpoints->Next(); id.has_value(); id = endpoints->Next())
+    if (provider->GetEndpoints()->SeekTo(aCommandPath.mEndpointId))
     {
-        if (*id == aCommandPath.mEndpointId)
-        {
-            // endpoint exists, so cluster is invalid
-            return Protocols::InteractionModel::Status::UnsupportedCluster;
-        }
+        // endpoint exists, so cluster is invalid
+        return Protocols::InteractionModel::Status::UnsupportedCluster;
     }
 
     // endpoint not found

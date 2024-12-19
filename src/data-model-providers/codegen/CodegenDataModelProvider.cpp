@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/support/ScopedBuffer.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -38,6 +37,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/SpanSearchValue.h>
 
 #include <cstdint>
@@ -79,65 +79,6 @@ std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteC
     // TODO: set entry flags:
     //   info->flags.Set(ClusterQualityFlags::kDiagnosticsData)
     return info;
-}
-
-/// Converts a EmberAfCluster into a ClusterEntry
-std::variant<CHIP_ERROR, DataModel::ClusterEntry> ClusterEntryFrom(EndpointId endpointId, const EmberAfCluster & cluster)
-{
-    ConcreteClusterPath clusterPath(endpointId, cluster.clusterId);
-    auto info = LoadClusterInfo(clusterPath, cluster);
-
-    if (CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&info))
-    {
-        return *err;
-    }
-
-    if (DataModel::ClusterInfo * infoValue = std::get_if<DataModel::ClusterInfo>(&info))
-    {
-        return DataModel::ClusterEntry{
-            .path = clusterPath,
-            .info = *infoValue,
-        };
-    }
-    return CHIP_ERROR_INCORRECT_STATE;
-}
-
-/// Finds the first server cluster entry for the given endpoint data starting at [start_index]
-///
-/// Returns an invalid entry if no more server clusters are found
-DataModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const EmberAfEndpointType * endpoint, unsigned start_index,
-                                                unsigned & found_index)
-{
-    for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
-    {
-        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (!cluster.IsServer())
-        {
-            continue;
-        }
-
-        found_index = cluster_idx;
-        auto entry  = ClusterEntryFrom(endpointId, cluster);
-
-        if (DataModel::ClusterEntry * entryValue = std::get_if<DataModel::ClusterEntry>(&entry))
-        {
-            return *entryValue;
-        }
-
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        if (CHIP_ERROR * errValue = std::get_if<CHIP_ERROR>(&entry))
-        {
-            ChipLogError(AppServer, "Failed to load cluster entry: %" CHIP_ERROR_FORMAT, errValue->Format());
-        }
-        else
-        {
-            // Should NOT be possible: entryFrom has only 2 variants
-            ChipLogError(AppServer, "Failed to load cluster entry, UNKNOWN entry return type");
-        }
-#endif
-    }
-
-    return DataModel::ClusterEntry::kInvalid;
 }
 
 /// Load the attribute information into the specified destination
@@ -428,6 +369,90 @@ private:
     CommandId * mCommands;
 };
 
+class ServerClusterIterator : public DataModel::MetaDataIterator<ClusterId, DataModel::ClusterInfo>
+{
+public:
+    static std::unique_ptr<ServerClusterIterator> NullIterator(unsigned & hint)
+    {
+        return std::make_unique<ServerClusterIterator>(kInvalidEndpointId, Span<const EmberAfCluster>(), hint);
+    }
+
+    ServerClusterIterator(EndpointId endpointId, Span<const EmberAfCluster> clusters, unsigned & hint) :
+        mEndpointId(endpointId), mClusters(clusters), mIterationHint(hint)
+    {}
+
+    std::optional<ClusterId> Next() override
+    {
+        while (true)
+        {
+            if (mClusters.empty())
+            {
+                mCurrentMetadata = nullptr;
+                return std::nullopt;
+            }
+
+            if (mClusters.front().IsServer())
+            {
+                mCurrentMetadata = mClusters.data();
+                mIterationHint = mIndex++;
+                mClusters      = mClusters.SubSpan(1);
+
+                return mCurrentMetadata->clusterId;
+            }
+            mIndex++;
+            mClusters = mClusters.SubSpan(1);
+        }
+    }
+
+    bool SeekTo(const ClusterId & id) override
+    {
+        // the only speedup if is hint matches somehow
+        if (mIterationHint < mClusters.size())
+        {
+            // maybe valid ... check
+            if (mClusters[mIterationHint].clusterId == id)
+            {
+                mCurrentMetadata = &mClusters[mIterationHint];
+                mIndex    = mIterationHint + 1;
+                mClusters = mClusters.SubSpan(mIterationHint + 1);
+                return true;
+            }
+        }
+
+        // not found. Just seek until found
+        mIndex = 0;
+        for (auto search_id = Next(); search_id.has_value(); search_id = Next())
+        {
+            if (*search_id == id)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    std::optional<DataModel::ClusterInfo> GetMetadata() override
+    {
+        VerifyOrReturnValue(mCurrentMetadata != nullptr, std::nullopt);
+
+        ConcreteClusterPath clusterPath(mEndpointId, mCurrentMetadata->clusterId);
+        auto info = LoadClusterInfo(clusterPath, *mCurrentMetadata);
+
+        if (DataModel::ClusterInfo * infoValue = std::get_if<DataModel::ClusterInfo>(&info))
+        {
+            return *infoValue;
+        }
+        return std::nullopt;
+    }
+
+private:
+    EndpointId mEndpointId;
+    Span<const EmberAfCluster> mClusters;
+    const EmberAfCluster *mCurrentMetadata = nullptr; // metadata after we called Next()
+    unsigned & mIterationHint;
+    unsigned mIndex = 0;
+};
+
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 } // namespace
@@ -558,88 +583,17 @@ std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>
     return std::make_unique<EndpointIterator>(mEndpointIterationHint);
 }
 
-DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId endpointId)
+std::unique_ptr<DataModel::MetaDataIterator<ClusterId, DataModel::ClusterInfo>>
+CodegenDataModelProvider::GetServerClusters(EndpointId endpointId)
 {
+
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
-    VerifyOrReturnValue(endpoint != nullptr, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint != nullptr, ServerClusterIterator::NullIterator(mServerClusterIterationHint));
+    VerifyOrReturnValue(endpoint->clusterCount > 0, ServerClusterIterator::NullIterator(mServerClusterIterationHint));
+    VerifyOrReturnValue(endpoint->cluster != nullptr, ServerClusterIterator::NullIterator(mServerClusterIterationHint));
 
-    return FirstServerClusterEntry(endpointId, endpoint, 0, mServerClusterIterationHint);
-}
-
-std::optional<unsigned> CodegenDataModelProvider::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint,
-                                                                            ClusterId id) const
-{
-    const unsigned clusterCount = endpoint->clusterCount;
-    unsigned hint               = mServerClusterIterationHint;
-
-    if (mServerClusterIterationHint < clusterCount)
-    {
-        const EmberAfCluster & cluster = endpoint->cluster[hint];
-        if (cluster.IsServer() && (cluster.clusterId == id))
-        {
-            return std::make_optional(hint);
-        }
-    }
-
-    // linear search, this may be slow
-    // does NOT use emberAfClusterIndex to not iterate over endpoints as we have
-    // already found the correct endpoint
-    for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
-    {
-        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (!cluster.IsServer())
-        {
-            continue;
-        }
-        if (cluster.clusterId == id)
-        {
-            return std::make_optional(cluster_idx);
-        }
-    }
-
-    return std::nullopt;
-}
-
-DataModel::ClusterEntry CodegenDataModelProvider::NextServerCluster(const ConcreteClusterPath & before)
-{
-    // TODO: This search still seems slow (ember will loop). Should use index hints as long
-    //       as ember API supports it
-    const EmberAfEndpointType * endpoint = emberAfFindEndpointType(before.mEndpointId);
-
-    VerifyOrReturnValue(endpoint != nullptr, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
-
-    std::optional<unsigned> cluster_idx = TryFindServerClusterIndex(endpoint, before.mClusterId);
-    if (!cluster_idx.has_value())
-    {
-        return DataModel::ClusterEntry::kInvalid;
-    }
-
-    return FirstServerClusterEntry(before.mEndpointId, endpoint, *cluster_idx + 1, mServerClusterIterationHint);
-}
-
-std::optional<DataModel::ClusterInfo> CodegenDataModelProvider::GetServerClusterInfo(const ConcreteClusterPath & path)
-{
-    const EmberAfCluster * cluster = FindServerCluster(path);
-
-    VerifyOrReturnValue(cluster != nullptr, std::nullopt);
-
-    auto info = LoadClusterInfo(path, *cluster);
-
-    if (CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&info))
-    {
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to load cluster info: %" CHIP_ERROR_FORMAT, err->Format());
-#else
-        (void) err->Format();
-#endif
-        return std::nullopt;
-    }
-
-    return std::make_optional(std::get<DataModel::ClusterInfo>(info));
+    return std::make_unique<ServerClusterIterator>(
+        endpointId, Span<const EmberAfCluster>(endpoint->cluster, endpoint->clusterCount), mServerClusterIterationHint);
 }
 
 std::unique_ptr<DataModel::ElementIterator<ClusterId>> CodegenDataModelProvider::GetClientClusters(EndpointId endpointId)

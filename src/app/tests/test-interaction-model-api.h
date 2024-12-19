@@ -115,10 +115,9 @@ public:
     std::unique_ptr<DataModel::ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath) override;
     std::unique_ptr<DataModel::MetaDataIterator<CommandId, DataModel::CommandInfo>>
     GetAcceptedCommands(ConcreteClusterPath clusterPath) override;
+    std::unique_ptr<DataModel::MetaDataIterator<ClusterId, DataModel::ClusterInfo>>
+    GetServerClusters(EndpointId endpointId) override;
 
-    DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
-    DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
-    std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;
     DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
     std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;

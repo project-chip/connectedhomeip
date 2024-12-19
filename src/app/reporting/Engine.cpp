@@ -51,13 +51,13 @@ using Protocols::InteractionModel::Status;
 
 Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
 {
-    if (!model->GetServerClusterInfo(eventPath).has_value())
+    auto clusters = model->GetServerClusters(eventPath.mEndpointId);
+    if (clusters->SeekTo(eventPath.mClusterId))
     {
-        auto endpoints = model->GetEndpoints();
-        return endpoints->SeekTo(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
+        return Status::Success;
     }
 
-    return Status::Success;
+    return model->GetEndpoints()->SeekTo(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
 }
 
 /// Returns the status of ACL validation.
@@ -149,9 +149,16 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     readRequest.path              = path;
 
     DataVersion version = 0;
-    if (std::optional<DataModel::ClusterInfo> clusterInfo = dataModel->GetServerClusterInfo(path); clusterInfo.has_value())
+    auto clusters       = dataModel->GetServerClusters(path.mEndpointId);
+    if (clusters->SeekTo(path.mClusterId))
     {
-        version = clusterInfo->dataVersion;
+        std::optional<DataModel::ClusterInfo> clusterInfo = clusters->GetMetadata();
+
+        // NOTE: API contract says this should always be true if seek succeeded.
+        if (clusterInfo.has_value())
+        {
+            version = clusterInfo->dataVersion;
+        }
     }
     else
     {
@@ -209,7 +216,14 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
 bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
 {
-    std::optional<DataModel::ClusterInfo> info = dataModel->GetServerClusterInfo(path);
+    auto clusters = dataModel->GetServerClusters(path.mEndpointId);
+    if (!clusters->SeekTo(path.mClusterId))
+    {
+        return false;
+    }
+
+    std::optional<DataModel::ClusterInfo> info = clusters->GetMetadata();
+    // NOTE: API contract says this is always true...
     if (!info.has_value())
     {
         return false;
@@ -1207,6 +1221,6 @@ void Engine::MarkDirty(const AttributePathParams & path)
 
 // TODO: MatterReportingAttributeChangeCallback should just live in libCHIP, It does not depend on any
 // app-specific generated bits.
-void __attribute__((weak))
-MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+void __attribute__((weak)) MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                  chip::AttributeId attributeId)
 {}

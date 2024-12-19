@@ -199,23 +199,13 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server)
 {
     CHIP_ERROR err = aEncoder.EncodeList([&endpoint, server](const auto & encoder) -> CHIP_ERROR {
-        if (server)
-        {
-            auto clusterEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstServerCluster(endpoint);
-            while (clusterEntry.IsValid())
-            {
-                ReturnErrorOnFailure(encoder.Encode(clusterEntry.path.mClusterId));
-                clusterEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextServerCluster(clusterEntry.path);
-            }
-        }
-        else
-        {
-            auto it = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetClientClusters(endpoint);
+        std::unique_ptr<DataModel::ElementIterator<ClusterId>> it = server
+            ? InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetServerClusters(endpoint)
+            : InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetClientClusters(endpoint);
 
-            for (auto clusterID = it->Next(); clusterID.has_value(); clusterID = it->Next())
-            {
-                ReturnErrorOnFailure(encoder.Encode(*clusterID));
-            }
+        for (auto clusterID = it->Next(); clusterID.has_value(); clusterID = it->Next())
+        {
+            ReturnErrorOnFailure(encoder.Encode(*clusterID));
         }
 
         return CHIP_NO_ERROR;

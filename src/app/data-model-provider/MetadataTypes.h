@@ -209,23 +209,12 @@ public:
     virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints()                                     = 0;
     virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath)              = 0;
     virtual std::unique_ptr<MetaDataIterator<CommandId, CommandInfo>> GetAcceptedCommands(ConcreteClusterPath clusterPath) = 0;
-
-    // TODO: below items MUST transition to pure virtual and have implementations everywhere
-
-    virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId)
-    {
-        return std::make_unique<NullMetadataIterator<ClusterId, ClusterInfo>>();
-    }
+    virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId)             = 0;
 
     virtual std::unique_ptr<MetaDataIterator<AttributeId, AttributeInfo>> GetAttributes(ConcreteClusterPath clusterPath)
     {
         return std::make_unique<NullMetadataIterator<AttributeId, AttributeInfo>>();
     }
-
-    // This iteration will list all server clusters on a given endpoint
-    virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
-    virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
-    virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
 
     // Attribute iteration and accessors provide cluster-level access over
     // attributes

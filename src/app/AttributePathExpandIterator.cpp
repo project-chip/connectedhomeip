@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/DataModelTypes.h"
 #include <app/AttributePathExpandIterator.h>
 
 #include <app/GlobalAttributes.h>
@@ -26,8 +27,8 @@ namespace app {
 
 AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * provider,
                                                          SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModelProvider(provider),
-    mpAttributePath(attributePath), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
+    mDataModelProvider(provider), mpAttributePath(attributePath),
+    mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
 {
     mOutputPath.mNeedsInitialization = true; // Ensure a Next is called on all public API
     mOutputPath.mExpanded            = true; // this is reset in 'next' if needed
@@ -104,31 +105,22 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
     return GlobalAttributesNotInMetadata[0];
 }
 
-std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
+std::optional<ClusterId> AttributePathExpandIterator::NextClusterId(SearchSession & session)
 {
-
     if (mOutputPath.mClusterId == kInvalidClusterId)
     {
-        if (mpAttributePath->mValue.HasWildcardClusterId())
+        if (!mpAttributePath->mValue.HasWildcardClusterId())
         {
-            ClusterEntry entry = mDataModelProvider->FirstServerCluster(mOutputPath.mEndpointId);
-            return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
+            return mpAttributePath->mValue.mClusterId;
         }
 
-        // only return a cluster if it is valid
-        const ConcreteClusterPath clusterPath(mOutputPath.mEndpointId, mpAttributePath->mValue.mClusterId);
-        if (!mDataModelProvider->GetServerClusterInfo(clusterPath).has_value())
-        {
-            return std::nullopt;
-        }
-
-        return mpAttributePath->mValue.mClusterId;
+        // restart iteration over the clusters of the current endpoint
+        session.clusters = mDataModelProvider->GetServerClusters(mOutputPath.mEndpointId);
     }
 
     VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardClusterId(), std::nullopt);
 
-    ClusterEntry entry = mDataModelProvider->NextServerCluster(mOutputPath);
-    return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
+    return session.clusters->Next();
 }
 
 AttributePathExpandIterator::SearchSession AttributePathExpandIterator::PrepareSearch()
@@ -144,6 +136,20 @@ AttributePathExpandIterator::SearchSession AttributePathExpandIterator::PrepareS
         if (!session.endpoints->SeekTo(mOutputPath.mEndpointId))
         {
             ChipLogError(InteractionModel, "Endpoint id %d is not valid anymore", mOutputPath.mEndpointId);
+        }
+    }
+
+    if (mOutputPath.mEndpointId != kInvalidEndpointId)
+    {
+        session.clusters = mDataModelProvider->GetServerClusters(mOutputPath.mEndpointId);
+        if (mOutputPath.mClusterId != kInvalidClusterId)
+        {
+            // we are already positioned on a specific cluster, so start from there
+            if (!session.clusters->SeekTo(mOutputPath.mClusterId))
+            {
+                ChipLogError(InteractionModel, "Cluster id %d is not valid anymore (in endpoint %d)", mOutputPath.mClusterId,
+                             mOutputPath.mEndpointId);
+            }
         }
     }
 
@@ -214,7 +220,7 @@ bool AttributePathExpandIterator::AdvanceOutputPath(SearchSession & session)
         // no valid attribute, try to advance the cluster, see if a suitable one exists
         if (mOutputPath.mEndpointId != kInvalidEndpointId)
         {
-            std::optional<ClusterId> nextCluster = NextClusterId();
+            std::optional<ClusterId> nextCluster = NextClusterId(session);
             if (nextCluster.has_value())
             {
                 mOutputPath.mClusterId   = *nextCluster;

@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include "app/data-model-provider/MetadataTypes.h"
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/Provider.h>
@@ -66,6 +67,7 @@ public:
     struct SearchSession
     {
         std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>> endpoints;
+        std::unique_ptr<DataModel::MetaDataIterator<ClusterId, DataModel::ClusterInfo>> clusters;
     };
 
     /**
@@ -144,7 +146,7 @@ private:
     /// Will start from the beginning if current mOutputPath.mClusterId is kInvalidClusterId
     ///
     /// Respects path expansion/values in mpAttributePath
-    std::optional<ClusterId> NextClusterId();
+    std::optional<ClusterId> NextClusterId(SearchSession &session);
 
     /// Get the next endpoint ID in mOutputPath if one is available.
     /// Will start from the beginning if current mOutputPath.mEndpointId is kInvalidEndpointId

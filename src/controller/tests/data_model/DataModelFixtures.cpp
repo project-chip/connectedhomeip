@@ -477,24 +477,14 @@ std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & 
     return std::nullopt; // handler status is set by the dispatch
 }
 
-ClusterEntry CustomDataModel::FirstServerCluster(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstServerCluster(endpoint);
-}
-
-ClusterEntry CustomDataModel::NextServerCluster(const ConcreteClusterPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextServerCluster(before);
-}
-
-std::optional<ClusterInfo> CustomDataModel::GetServerClusterInfo(const ConcreteClusterPath & path)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetServerClusterInfo(path);
-}
-
 std::unique_ptr<DataModel::ElementIterator<ClusterId>> CustomDataModel::GetClientClusters(EndpointId endpointId)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetClientClusters(endpointId);
+}
+
+std::unique_ptr<DataModel::MetaDataIterator<ClusterId, DataModel::ClusterInfo>>
+    CustomDataModel::GetServerClusters(EndpointId endpointId) {
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetServerClusters(endpointId);
 }
 
 std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>> CustomDataModel::GetEndpoints()

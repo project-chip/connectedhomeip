@@ -28,6 +28,7 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/LinkedList.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
@@ -35,6 +36,18 @@
 using namespace chip;
 using namespace chip::Test;
 using namespace chip::app;
+namespace pw {
+
+template <>
+StatusWithSize ToString<ConcreteAttributePath>(const ConcreteAttributePath & p, pw::span<char> buffer)
+{
+    return pw::string::Format(buffer,
+                              "ConcreteAttributePath<" ChipLogFormatMEI "/" ChipLogFormatMEI "/" ChipLogFormatMEI
+                              ", expanded: %s, needsInit: %s>",
+                              ChipLogValueMEI(p.mEndpointId), ChipLogValueMEI(p.mClusterId), ChipLogValueMEI(p.mAttributeId),
+                              p.mExpanded ? "true" : "false", p.mNeedsInitialization ? "true" : "false");
+}
+} // namespace pw
 
 namespace {
 
