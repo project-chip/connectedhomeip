@@ -1,9 +1,9 @@
-import subprocess
-import os
-import csv
 import argparse
-import re
+import csv
 import glob
+import os
+import re
+import subprocess
 from datetime import datetime
 
 # Constants for default values
