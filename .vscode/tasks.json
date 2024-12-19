@@ -106,12 +106,6 @@
         {
             "label": "Build ESP32 Unit Tests (QEMU)",
             "type": "shell",
-            "command": "source scripts/activate.sh; scripts/build/build_examples.py --target esp32-qemu-tests build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Rebuild ESP32 Unit Tests (QEMU)",
-            "type": "shell",
             "command": "source scripts/activate.sh; src/test_driver/esp32/clean.sh; scripts/build/build_examples.py --target esp32-qemu-tests build",
             "problemMatcher": []
         },
