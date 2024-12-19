@@ -18,10 +18,10 @@
 
 import string
 from dataclasses import dataclass
+
 import chip.clusters as Clusters
 from chip.clusters import Attribute
 from MockTestRunner import MockTestRunner
-
 
 c = Clusters.IcdManagement
 attr = c.Attributes

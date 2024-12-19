@@ -17,7 +17,8 @@
 #
 
 import sys
-from common_icdm_data import ICDMData, run_tests, c
+
+from common_icdm_data import ICDMData, c, run_tests
 
 TEST_CASES = [
     # Validate that the test script can succeed with the minimum set of PICS
