@@ -93,22 +93,10 @@ tests:
                 saveAs: NOCSRElements
               - name: "AttestationSignature"
                 saveAs: attestationSignature
-
-      # verification: "Verify that the DUT responds with the CSRResponse command."
+      
+      # verification: "Verify TH2 generates the NOC, Root CA Certificate, and ICAC, and selects the IPK and certificates are saved correctly."
     - label:
-          "Step 4: Read the commissioner root certificate from TH2's fabric.
-          Save RCAC as Root_CA_Certificate_TH2"
-      identity: "beta"
-      cluster: "CommissionerCommands"
-      command: "GetCommissionerRootCertificate"
-      response:
-          values:
-              - name: "RCAC"
-                saveAs: Root_CA_Certificate_TH2
-
-      # verification: ""
-    - label:
-          "Step 4.1: TH2 generates the NOC, the Root CA Certificate and ICAC
+          "Step 4: TH2 generates the NOC, the Root CA Certificate and ICAC
           using the CSR elements from Step 3 and selects an IPK, all for use by
           TH2. Save ICAC as Intermediate_Certificate_TH2. Save NOC as
           Node_Operational_Certificate_TH2. Save IPK as IPK_TH2. Extract the
@@ -131,18 +119,19 @@ tests:
               - name: "IPK"
                 saveAs: IPK_TH2
 
-      # verification: ""
-    - label: 
-          "Step 5: Read the commissioner node ID from TH2"
+      # verification: "Verify that the commissioner root certificate is retrieved from TH2 and saved as Root_CA_Certificate_TH2"
+    - label:
+          "StepN 5: Retrieve the the commissioner root certificate from TH2.
+          Save RCAC as Root_CA_Certificate_TH2"
       identity: "beta"
       cluster: "CommissionerCommands"
-      command: "GetCommissionerNodeId"
+      command: "GetCommissionerRootCertificate"
       response:
           values:
-              - name: "nodeId"
-                saveAs: Commissioner_Node_Id_TH2
+              - name: "RCAC"
+                saveAs: Root_CA_Certificate_TH2
 
-      # verification: ""
+      # verification: "Verify that the AddTrustedRootCertificate comand is sent and completes"
     - label:
           "Step 5.1: TH1 sends TH2 root certificate to DUT in the AddTrustedRootCertificate chain."
       identity: "alpha"
@@ -153,9 +142,20 @@ tests:
               - name: "RootCACertificate"
                 value: Root_CA_Certificate_TH2
 
-      # verification: "Verify that AddTrustedRootCertificate command succeeds by sending the status code as SUCCESS"
+      # verification: "Verify the commissioner node ID is retrieved from TH2 and saved as Commissioner_Node_Id_TH2"
+    - label: 
+          "Step 6: Retrieve the commissioner node ID from TH2"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: Commissioner_Node_Id_TH2
+
+      # verification: "Verify AddNOC command is sent to DUT with the correct NOC, ICAC, and IPK certificates. Verify status code is 0 (OK)"
     - label:
-          "Step 6: TH1 sends the AddNOC command to DUT with the following
+          "Step 6.1: TH1 sends the AddNOC command to DUT with the following
           fields: NOCValue as Node_Operational_Certificate_TH2. ICACValue as
           Intermediate_Certificate_TH2. IpkValue as IPK_TH2. CaseAdminSubject as
           the NodeID of TH2. AdminVendorId as the Vendor ID of TH2."
