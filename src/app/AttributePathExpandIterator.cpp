@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/AttributePathExpandIterator.h>
 
 #include <app/GlobalAttributes.h>
