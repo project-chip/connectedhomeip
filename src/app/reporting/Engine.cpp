@@ -77,7 +77,13 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
                              .requestType = RequestType::kAttributeReadRequest,
                              .entityId    = path.mAttributeId };
 
-    std::optional<DataModel::AttributeInfo> info = dataModel->GetAttributeInfo(path);
+    std::optional<DataModel::AttributeInfo> info;
+
+    auto attributes = dataModel->GetAttributes(path);
+    if (attributes->SeekTo(path.mAttributeId))
+    {
+        info = attributes->GetMetadata();
+    }
 
     // If the attribute exists, we know whether it is readable (readPrivilege has value)
     // and what the required access privilege is. However for attributes missing from the metatada

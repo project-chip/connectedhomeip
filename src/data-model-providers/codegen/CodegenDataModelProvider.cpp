@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/util/attribute-metadata.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -61,62 +62,6 @@ struct ByDeviceType
         return (instance.deviceId == id.deviceTypeId) && (instance.deviceVersion == id.deviceTypeRevision);
     }
 };
-
-/// Load the cluster information into the specified destination
-std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster)
-{
-    DataVersion * versionPtr = emberAfDataVersionStorage(path);
-    if (versionPtr == nullptr)
-    {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI, static_cast<int>(path.mEndpointId),
-                     ChipLogValueMEI(cluster.clusterId));
-#endif
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
-    DataModel::ClusterInfo info(*versionPtr);
-    // TODO: set entry flags:
-    //   info->flags.Set(ClusterQualityFlags::kDiagnosticsData)
-    return info;
-}
-
-/// Load the attribute information into the specified destination
-///
-/// `info` is assumed to be default-constructed/clear (i.e. this sets flags, but does not reset them).
-void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttributeMetadata & attribute,
-                       DataModel::AttributeInfo * info)
-{
-    info->readPrivilege = RequiredPrivilege::ForReadAttribute(path);
-    if (!attribute.IsReadOnly())
-    {
-        info->writePrivilege = RequiredPrivilege::ForWriteAttribute(path);
-    }
-
-    info->flags.Set(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
-    info->flags.Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
-
-    // NOTE: we do NOT provide additional info for:
-    //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
-    //    - IsSingleton spec defines it for CLUSTERS where as we have it for ATTRIBUTES
-    //    - Several specification flags are not available (reportable, quieter reporting,
-    //      fixed, source attribution)
-
-    // TODO: Set additional flags:
-    // info->flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
-    // info->flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
-    // info->flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
-}
-
-DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
-{
-    DataModel::AttributeEntry entry;
-
-    entry.path = ConcreteAttributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
-    LoadAttributeInfo(entry.path, attribute, &entry.info);
-
-    return entry;
-}
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
@@ -436,19 +381,121 @@ public:
         VerifyOrReturnValue(mCurrentMetadata != nullptr, std::nullopt);
 
         ConcreteClusterPath clusterPath(mEndpointId, mCurrentMetadata->clusterId);
-        auto info = LoadClusterInfo(clusterPath, *mCurrentMetadata);
 
-        if (DataModel::ClusterInfo * infoValue = std::get_if<DataModel::ClusterInfo>(&info))
+        DataVersion * versionPtr = emberAfDataVersionStorage(clusterPath);
+        if (versionPtr == nullptr)
         {
-            return *infoValue;
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+            ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI,
+                         static_cast<int>(clusterPath.mEndpointId), ChipLogValueMEI(clusterPath.mClusterId));
+#endif
+            return std::nullopt;
         }
-        return std::nullopt;
+
+        DataModel::ClusterInfo info(*versionPtr);
+        // TODO: set entry flags:
+        //   info->flags.Set(ClusterQualityFlags::kDiagnosticsData)
+        return info;
     }
 
 private:
     EndpointId mEndpointId;
     Span<const EmberAfCluster> mClusters;
     const EmberAfCluster * mCurrentMetadata = nullptr; // metadata after we called Next()
+    unsigned & mIterationHint;
+    unsigned mIndex = 0;
+};
+
+class AttributeIterator : public DataModel::MetaDataIterator<AttributeId, DataModel::AttributeInfo>
+{
+public:
+    static std::unique_ptr<AttributeIterator> NullIterator(unsigned & hint)
+    {
+        return std::make_unique<AttributeIterator>(ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId),
+                                                   Span<const EmberAfAttributeMetadata>(), hint);
+    }
+
+    AttributeIterator(const ConcreteClusterPath & clusterPath, Span<const EmberAfAttributeMetadata> clusters, unsigned & hint) :
+        mClusterPath(clusterPath), mAttributes(clusters), mIterationHint(hint)
+    {}
+
+    std::optional<AttributeId> Next() override
+    {
+        if (mAttributes.empty())
+        {
+            mCurrentMetadata = nullptr;
+            return std::nullopt;
+        }
+
+        mCurrentMetadata = mAttributes.data();
+        mIterationHint   = mIndex++;
+        mAttributes      = mAttributes.SubSpan(1);
+
+        return mCurrentMetadata->attributeId;
+    }
+
+    bool SeekTo(const AttributeId & id) override
+    {
+        // the only speedup if is hint matches somehow
+        if (mIterationHint < mAttributes.size())
+        {
+            // maybe valid ... check
+            if (mAttributes[mIterationHint].attributeId == id)
+            {
+                mCurrentMetadata = &mAttributes[mIterationHint];
+                mIndex           = mIterationHint + 1;
+                mAttributes      = mAttributes.SubSpan(mIterationHint + 1);
+                return true;
+            }
+        }
+
+        // not found. Just seek until found
+        mIndex = 0;
+        for (auto search_id = Next(); search_id.has_value(); search_id = Next())
+        {
+            if (*search_id == id)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    std::optional<DataModel::AttributeInfo> GetMetadata() override
+    {
+        VerifyOrReturnValue(mCurrentMetadata != nullptr, std::nullopt);
+
+        ConcreteAttributePath attributePath(mClusterPath.mEndpointId, mClusterPath.mClusterId, mCurrentMetadata->attributeId);
+        DataModel::AttributeInfo info;
+
+        info.readPrivilege = RequiredPrivilege::ForReadAttribute(attributePath);
+        if (!mCurrentMetadata->IsReadOnly())
+        {
+            info.writePrivilege = RequiredPrivilege::ForWriteAttribute(attributePath);
+        }
+
+        info.flags.Set(DataModel::AttributeQualityFlags::kListAttribute,
+                       (mCurrentMetadata->attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
+        info.flags.Set(DataModel::AttributeQualityFlags::kTimed, mCurrentMetadata->MustUseTimedWrite());
+
+        // NOTE: we do NOT provide additional info for:
+        //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
+        //    - IsSingleton spec defines it for CLUSTERS where as we have it for ATTRIBUTES
+        //    - Several specification flags are not available (reportable, quieter reporting,
+        //      fixed, source attribution)
+
+        // TODO: Set additional flags:
+        // info->flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
+        // info->flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
+        // info->flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
+
+        return info;
+    }
+
+private:
+    ConcreteClusterPath mClusterPath;
+    Span<const EmberAfAttributeMetadata> mAttributes;
+    const EmberAfAttributeMetadata * mCurrentMetadata = nullptr; // metadata after we called Next()
     unsigned & mIterationHint;
     unsigned mIndex = 0;
 };
@@ -607,39 +654,17 @@ std::unique_ptr<DataModel::ElementIterator<ClusterId>> CodegenDataModelProvider:
     return std::make_unique<ClientClusterIdIterator>(Span(endpoint->cluster, endpoint->clusterCount));
 }
 
-DataModel::AttributeEntry CodegenDataModelProvider::FirstAttribute(const ConcreteClusterPath & path)
+std::unique_ptr<DataModel::MetaDataIterator<AttributeId, DataModel::AttributeInfo>>
+CodegenDataModelProvider::GetAttributes(ConcreteClusterPath clusterPath)
 {
-    const EmberAfCluster * cluster = FindServerCluster(path);
+    const EmberAfCluster * cluster = FindServerCluster(clusterPath);
 
-    VerifyOrReturnValue(cluster != nullptr, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributeCount > 0, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributes != nullptr, DataModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster != nullptr, AttributeIterator::NullIterator(mAttributeIterationHint));
+    VerifyOrReturnValue(cluster->attributeCount > 0, AttributeIterator::NullIterator(mAttributeIterationHint));
+    VerifyOrReturnValue(cluster->attributes != nullptr, AttributeIterator::NullIterator(mAttributeIterationHint));
 
-    mAttributeIterationHint = 0;
-    return AttributeEntryFrom(path, cluster->attributes[0]);
-}
-
-std::optional<unsigned> CodegenDataModelProvider::TryFindAttributeIndex(const EmberAfCluster * cluster, AttributeId id) const
-{
-    const unsigned attributeCount = cluster->attributeCount;
-
-    // attempt to find this based on the embedded hint
-    if ((mAttributeIterationHint < attributeCount) && (cluster->attributes[mAttributeIterationHint].attributeId == id))
-    {
-        return std::make_optional(mAttributeIterationHint);
-    }
-
-    // linear search is required. This may be slow
-    for (unsigned attribute_idx = 0; attribute_idx < attributeCount; attribute_idx++)
-    {
-
-        if (cluster->attributes[attribute_idx].attributeId == id)
-        {
-            return std::make_optional(attribute_idx);
-        }
-    }
-
-    return std::nullopt;
+    return std::make_unique<AttributeIterator>(
+        clusterPath, Span<const EmberAfAttributeMetadata>(cluster->attributes, cluster->attributeCount), mAttributeIterationHint);
 }
 
 const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const ConcreteClusterPath & path)
@@ -658,51 +683,6 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
         mEmberMetadataStructureGeneration = emberAfMetadataStructureGeneration();
     }
     return cluster;
-}
-
-DataModel::AttributeEntry CodegenDataModelProvider::NextAttribute(const ConcreteAttributePath & before)
-{
-    const EmberAfCluster * cluster = FindServerCluster(before);
-    VerifyOrReturnValue(cluster != nullptr, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributeCount > 0, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributes != nullptr, DataModel::AttributeEntry::kInvalid);
-
-    // find the given attribute in the list and then return the next one
-    std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, before.mAttributeId);
-    if (!attribute_idx.has_value())
-    {
-        return DataModel::AttributeEntry::kInvalid;
-    }
-
-    unsigned next_idx = *attribute_idx + 1;
-    if (next_idx < cluster->attributeCount)
-    {
-        mAttributeIterationHint = next_idx;
-        return AttributeEntryFrom(before, cluster->attributes[next_idx]);
-    }
-
-    // iteration complete
-    return DataModel::AttributeEntry::kInvalid;
-}
-
-std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeInfo(const ConcreteAttributePath & path)
-{
-    const EmberAfCluster * cluster = FindServerCluster(path);
-
-    VerifyOrReturnValue(cluster != nullptr, std::nullopt);
-    VerifyOrReturnValue(cluster->attributeCount > 0, std::nullopt);
-    VerifyOrReturnValue(cluster->attributes != nullptr, std::nullopt);
-
-    std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, path.mAttributeId);
-
-    if (!attribute_idx.has_value())
-    {
-        return std::nullopt;
-    }
-
-    DataModel::AttributeInfo info;
-    LoadAttributeInfo(path, cluster->attributes[*attribute_idx], &info);
-    return std::make_optional(info);
 }
 
 std::unique_ptr<DataModel::ElementIterator<CommandId>>

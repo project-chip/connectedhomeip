@@ -20,6 +20,7 @@
 
 #include <app/GlobalAttributes.h>
 #include <lib/support/CodeUtils.h>
+#include <optional>
 
 using namespace chip::app::DataModel;
 
@@ -47,31 +48,26 @@ bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
         break;
     }
 
-    const ConcreteAttributePath attributePath(mOutputPath.mEndpointId, mOutputPath.mClusterId, attributeId);
-    return mDataModelProvider->GetAttributeInfo(attributePath).has_value();
+    return mDataModelProvider->GetAttributes(mOutputPath)->SeekTo(attributeId);
 }
 
-std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
+std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId(SearchSession & session)
 {
     if (mOutputPath.mAttributeId == kInvalidAttributeId)
     {
-        if (mpAttributePath->mValue.HasWildcardAttributeId())
+        if (!mpAttributePath->mValue.HasWildcardAttributeId())
         {
-            AttributeEntry entry = mDataModelProvider->FirstAttribute(mOutputPath);
-            return entry.IsValid()                                         //
-                ? entry.path.mAttributeId                                  //
-                : Clusters::Globals::Attributes::GeneratedCommandList::Id; //
-        }
-
-        // We allow fixed attribute IDs if and only if they are valid:
-        //    - they may be GLOBAL attributes OR
-        //    - they are valid attributes for this cluster
-        if (IsValidAttributeId(mpAttributePath->mValue.mAttributeId))
-        {
+            // We allow fixed attribute IDs if and only if they are valid:
+            //    - they may be GLOBAL attributes OR
+            //    - they are valid attributes for this cluster
+            if (!IsValidAttributeId(mpAttributePath->mValue.mAttributeId))
+            {
+                return std::nullopt;
+            }
             return mpAttributePath->mValue.mAttributeId;
         }
 
-        return std::nullopt;
+        session.attributes = mDataModelProvider->GetAttributes(mOutputPath);
     }
 
     // advance the existing attribute id if it can be advanced
@@ -95,10 +91,10 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
         return std::nullopt;
     }
 
-    AttributeEntry entry = mDataModelProvider->NextAttribute(mOutputPath);
-    if (entry.IsValid())
+    auto id = session.attributes->Next();
+    if (id.has_value())
     {
-        return entry.path.mAttributeId;
+        return *id;
     }
 
     // Finished the data model, start with global attributes
@@ -152,6 +148,23 @@ AttributePathExpandIterator::SearchSession AttributePathExpandIterator::PrepareS
                 ChipLogError(InteractionModel,
                              "Cluster id " ChipLogFormatMEI " is not valid anymore (in endpoint " ChipLogFormatMEI ")",
                              ChipLogValueMEI(mOutputPath.mClusterId), ChipLogValueMEI(mOutputPath.mEndpointId));
+            }
+        }
+    }
+
+    if ((mOutputPath.mEndpointId != kInvalidEndpointId) && (mOutputPath.mClusterId != kInvalidClusterId))
+    {
+        session.attributes = mDataModelProvider->GetAttributes(mOutputPath);
+        if (mOutputPath.mAttributeId != kInvalidAttributeId)
+        {
+            // we are already positioned on a specific cluster, so start from there
+            if (!session.attributes->SeekTo(mOutputPath.mAttributeId))
+            {
+                ChipLogError(InteractionModel,
+                             "Attribute id " ChipLogFormatMEI " is not valid anymore (in " ChipLogFormatMEI "/" ChipLogFormatMEI
+                             ")",
+                             ChipLogValueMEI(mOutputPath.mAttributeId), ChipLogValueMEI(mOutputPath.mEndpointId),
+                             ChipLogValueMEI(mOutputPath.mClusterId));
             }
         }
     }
@@ -212,7 +225,7 @@ bool AttributePathExpandIterator::AdvanceOutputPath(SearchSession & session)
         if (mOutputPath.mClusterId != kInvalidClusterId)
         {
 
-            std::optional<AttributeId> nextAttribute = NextAttributeId();
+            std::optional<AttributeId> nextAttribute = NextAttributeId(session);
             if (nextAttribute.has_value())
             {
                 mOutputPath.mAttributeId = *nextAttribute;

@@ -210,17 +210,7 @@ public:
     virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath)              = 0;
     virtual std::unique_ptr<MetaDataIterator<CommandId, CommandInfo>> GetAcceptedCommands(ConcreteClusterPath clusterPath) = 0;
     virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId)             = 0;
-
-    virtual std::unique_ptr<MetaDataIterator<AttributeId, AttributeInfo>> GetAttributes(ConcreteClusterPath clusterPath)
-    {
-        return std::make_unique<NullMetadataIterator<AttributeId, AttributeInfo>>();
-    }
-
-    // Attribute iteration and accessors provide cluster-level access over
-    // attributes
-    virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)                = 0;
-    virtual AttributeEntry NextAttribute(const ConcreteAttributePath & before)                = 0;
-    virtual std::optional<AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) = 0;
+    virtual std::unique_ptr<MetaDataIterator<AttributeId, AttributeInfo>> GetAttributes(ConcreteClusterPath clusterPath)   = 0;
 
     /// Workaround function to report attribute change.
     ///

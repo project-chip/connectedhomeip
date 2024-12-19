@@ -110,7 +110,13 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
         return std::nullopt;
     }
 
-    auto info = mDataModelProvider->GetAttributeInfo(path);
+    auto attributes = mDataModelProvider->GetAttributes(path);
+    if (!attributes->SeekTo(path.mAttributeId))
+    {
+        return std::nullopt;
+    }
+
+    auto info = attributes->GetMetadata();
     if (!info.has_value())
     {
         return std::nullopt;

@@ -109,10 +109,8 @@ public:
     GetAcceptedCommands(ConcreteClusterPath clusterPath) override;
     std::unique_ptr<DataModel::MetaDataIterator<ClusterId, DataModel::ClusterInfo>>
     GetServerClusters(EndpointId endpointId) override;
-
-    DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
-    DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
-    std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
+    std::unique_ptr<DataModel::MetaDataIterator<AttributeId, DataModel::AttributeInfo>>
+    GetAttributes(ConcreteClusterPath clusterPath) override;
 
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
@@ -151,9 +149,6 @@ private:
     ///
     /// Effectively the same as `emberAfFindServerCluster` except with some caching capabilities
     const EmberAfCluster * FindServerCluster(const ConcreteClusterPath & path);
-
-    /// Find the index of the given attribute id
-    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, AttributeId id) const;
 };
 
 } // namespace app

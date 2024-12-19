@@ -176,19 +176,10 @@ TestImCustomDataModel::GetServerClusters(EndpointId endpointId)
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetServerClusters(endpointId);
 }
 
-AttributeEntry TestImCustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
+std::unique_ptr<DataModel::MetaDataIterator<AttributeId, DataModel::AttributeInfo>>
+TestImCustomDataModel::GetAttributes(ConcreteClusterPath clusterPath)
 {
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAttribute(cluster);
-}
-
-AttributeEntry TestImCustomDataModel::NextAttribute(const ConcreteAttributePath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextAttribute(before);
-}
-
-std::optional<AttributeInfo> TestImCustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAttributeInfo(path);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAttributes(clusterPath);
 }
 
 } // namespace app

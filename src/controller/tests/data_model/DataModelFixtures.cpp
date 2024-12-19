@@ -503,19 +503,10 @@ std::unique_ptr<MetaDataIterator<CommandId, CommandInfo>> CustomDataModel::GetAc
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAcceptedCommands(clusterPath);
 }
 
-AttributeEntry CustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
+std::unique_ptr<DataModel::MetaDataIterator<AttributeId, DataModel::AttributeInfo>>
+CustomDataModel::GetAttributes(ConcreteClusterPath clusterPath)
 {
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAttribute(cluster);
-}
-
-AttributeEntry CustomDataModel::NextAttribute(const ConcreteAttributePath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextAttribute(before);
-}
-
-std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAttributeInfo(path);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAttributes(clusterPath);
 }
 
 } // namespace app

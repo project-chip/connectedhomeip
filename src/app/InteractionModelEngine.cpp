@@ -1565,7 +1565,7 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNo
 
 bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath & path)
 {
-    return GetDataModelProvider()->GetAttributeInfo(path).has_value();
+    return GetDataModelProvider()->GetAttributes(path)->SeekTo(path.mAttributeId);
 }
 
 void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths)

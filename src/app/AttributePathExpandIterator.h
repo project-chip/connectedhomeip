@@ -68,6 +68,7 @@ public:
     {
         std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>> endpoints;
         std::unique_ptr<DataModel::MetaDataIterator<ClusterId, DataModel::ClusterInfo>> clusters;
+        std::unique_ptr<DataModel::MetaDataIterator<AttributeId, DataModel::AttributeInfo>> attributes;
     };
 
     /**
@@ -140,7 +141,7 @@ private:
     /// Respects path expansion/values in mpAttributePath
     ///
     /// Handles Global attributes (which are returned at the end)
-    std::optional<AttributeId> NextAttributeId();
+    std::optional<AttributeId> NextAttributeId(SearchSession & session);
 
     /// Get the next cluster ID in mOutputPath(endpoint) if one is available.
     /// Will start from the beginning if current mOutputPath.mClusterId is kInvalidClusterId
