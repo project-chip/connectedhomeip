@@ -94,11 +94,11 @@ tests:
               - name: "AttestationSignature"
                 saveAs: attestationSignature
       
-      # verification: "Verify TH2 generates the NOC, Root CA Certificate, and ICAC, and selects the IPK and certificates are saved correctly."
+      # verification: "Verify TH2 generates the NOC, Root CA Certificate, and ICAC, and certificates are saved correctly."
     - label:
           "Step 4: TH2 generates the NOC, the Root CA Certificate and ICAC
-          using the CSR elements from Step 3 and selects an IPK, all for use by
-          TH2. Save ICAC as Intermediate_Certificate_TH2. Save NOC as
+          using the CSR elements from Step 3.
+          Save ICAC as Intermediate_Certificate_TH2. Save NOC as
           Node_Operational_Certificate_TH2. Save IPK as IPK_TH2. Extract the
           RCAC public key and save as Root_Public_Key_TH2."
       identity: "beta"
