@@ -58,10 +58,13 @@ public:
      * This must be called if StartLogCollection happens successfully and a valid sessionHandle has been
      * returned from StartLogCollection.
      *
-     * @param[in] sessionHandle  The unique handle for this log session returned from a call to StartLogCollection.
+     * @note New implementations should override the two-argument version instead, as it is the primary
+     *       method invoked during log collection.
      *
+     * @param[in] sessionHandle  The unique handle for this log session returned from a call to StartLogCollection.
+     * @return CHIP_ERROR_NOT_IMPLEMENTED by default unless overridden.
      */
-    virtual CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle) = 0;
+    virtual CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * Called to end log collection for the log session identified by sessionHandle.
@@ -74,9 +77,7 @@ public:
      * @param[in] sessionHandle  The unique handle for this log session returned from a call to StartLogCollection.
      * @param[in] error          A CHIP_ERROR value indicating the reason for ending the log collection.
      *                           It is permissible to pass CHIP_NO_ERROR to indicate normal termination.
-     * @note Derived classes can override this method to handle additional termination logic specific to their
-     *       implementation. If not overridden, this default implementation calls EndLogCollection with only
-     *       sessionHandle.
+     * @return CHIP_ERROR_NOT_IMPLEMENTED by default unless overridden.
      *
      */
     virtual CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error)
