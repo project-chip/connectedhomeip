@@ -46,8 +46,15 @@ The unit tests can be built using gn and ninja:
     gn gen out/debug
     ninja -C out/debug
 
+## Building and Installing the Runner
+
+The python wheels for the runner can be built and installed like this:
+
+    ninja -C out/debug runner
+    pip3 install out/debug/chip_pw_test_runner_wheels/*.whl --force-reinstall
+
 ## Running The Unit Tests
 
-The unit tests can be run using the test runner python script:  
- python py/pw_test_runner/pw_test_runner.py -d /dev/ttyACM1 -f out/debug/tests -o
-out.log
+The unit tests can be run using the test runner python script:
+
+    python -m py.pw_test_runner.pw_test_runner -d /dev/ttyACM1 -f out/debug/tests -o out.log
