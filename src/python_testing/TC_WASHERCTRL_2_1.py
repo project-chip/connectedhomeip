@@ -40,7 +40,7 @@ import random
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, run_if_endpoint_matches, has_feature
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -58,6 +58,8 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
     def pics_TC_WASHERCTRL_2_1(self) -> list[str]:
         pics = [
             "WASHERCTRL.S.F00",
+            "WASHERCTRL.S.A0000",
+            "WASHERCTRL.S.A0001"
         ]
         return pics
 
@@ -65,17 +67,23 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done",
                      is_commissioning=True),
-            TestStep(2, "TH reads from the DUT the SpinSpeeds attribute"),
-            TestStep(3, "TH reads from the DUT the SpinSpeedCurrent attribute"),
-            TestStep(4, "TH writes a supported SpinSpeedCurrent attribute that is a valid index into the list"
-                        + "of spin speeds (0 to numSpinSpeeds - 1)"),
-            TestStep(5, "After a few seconds, TH reads from the DUT the SpinSpeedCurrent attribute"),
-            TestStep(6, "TH writes an unsupported SpinSpeedCurrent attribute that is other than 0 to DUT")
+            TestStep(2, description="TH reads from the DUT the SpinSpeeds attribute",
+                     expectation="Verify that the DUT response contains a list of strings. The maximum size of the list is 16."),
+            TestStep(3, description="TH reads from the DUT the SpinSpeedCurrent attribute",
+                     expectation="Verify that the DUT response contains a uint8 with value between 0 and numSpinSpeeds-1 inclusive."),
+            TestStep(4, description="TH writes a supported SpinSpeedCurrent attribute that is a valid index into the list"
+                     + "of spin speeds (0 to numSpinSpeeds - 1)",
+                     expectation="Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(5, description="After a few seconds, TH reads from the DUT the SpinSpeedCurrent attribute",
+                     expectation="Value is the same as was written in step 4"),
+            TestStep(6, description="TH writes an unsupported SpinSpeedCurrent attribute that is other than 0 to DUT",
+                     expectation="Verify that the DUT response contains Status CONSTRAINT_ERROR response")
         ]
 
         return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.LaundryWasherControls,
+                                         Clusters.LaundryWasherControls.Bitmaps.Feature.kSpin))
     async def test_TC_WASHERCTRL_2_1(self):
 
         endpoint = self.get_endpoint(default=1)
