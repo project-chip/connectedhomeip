@@ -16,20 +16,16 @@
  */
 #pragma once
 
-#include "access/SubjectDescriptor.h"
-#include "app/EventPathParams.h"
-#include "lib/core/CHIPError.h"
-#include <lib/core/TLVReader.h>
-#include <lib/core/TLVWriter.h>
-
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
-
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Context.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVWriter.h>
 
 namespace chip {
 namespace app {
