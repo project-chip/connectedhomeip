@@ -74,7 +74,7 @@ CHIP_ERROR Instance::ReadActionListAttribute(const AttributeValueEncoder::ListEn
         ChipLogError(Zcl, "Actions delegate is null!!!");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    for (uint16_t i = 0; true; i++)
+    for (uint16_t i = 0; i <= kMaxActionList; i++)
     {
         ActionStructStorage action;
 
@@ -96,7 +96,7 @@ CHIP_ERROR Instance::ReadEndpointListAttribute(const AttributeValueEncoder::List
         ChipLogError(Zcl, "Actions delegate is null!!!");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    for (uint16_t i = 0; true; i++)
+    for (uint16_t i = 0; i <= kMaxEndpointList; i++)
     {
         EndpointListStorage epList;
 
@@ -129,15 +129,11 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     {
     case ActionList::Id: {
         Instance * d = this;
-        CHIP_ERROR err =
-            aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR { return d->ReadActionListAttribute(encoder); });
-        return err;
+        return aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR { return d->ReadActionListAttribute(encoder); });
     }
     case EndpointLists::Id: {
         Instance * d = this;
-        CHIP_ERROR err =
-            aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR { return d->ReadEndpointListAttribute(encoder); });
-        return err;
+        return aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR { return d->ReadEndpointListAttribute(encoder); });
     }
     default:
         break;
