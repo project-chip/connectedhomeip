@@ -94,7 +94,7 @@ def parse_test_logs(test_log_paths):
             if "Problem: ProblemSeverity.ERROR" in line:
                 try:
                     error_details = "\n".join(
-                        ["  " + re.sub(r"^\[.*?\]\[.*?\]\[.*?\]", "", l).strip() for l in output_lines[i:i+8]]
+                        ["  " + re.sub(r"^\[.*?\]\[.*?\]\[.*?\]", "", error_line).strip() for error_line in output_lines[i:i+8]]
                     )
                     failures.append(error_details + "\n")
                 except IndexError:
@@ -146,7 +146,7 @@ def run_tests(tests, executable_paths, tmp_results_dir, skip_testing):
                     result.check_returncode()  # Raise an exception if the command returned a non-zero exit code
                     print(f"    - Test PASSED. Logs written to {test_output_path}")
             except subprocess.CalledProcessError as e:
-                print(f"    - Test FAILED. Logs written to {test_output_path}")
+                print(f"    - Test FAILED. Logs written to {test_output_path}: {e}")
             except Exception as e:
                 print(f"Error running test for {app_name}: {e}")
 
