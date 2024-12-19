@@ -9851,9 +9851,9 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   }
 
   struct MPTZStruct {
-    optional int16s pan = 2;
-    optional int16s tilt = 3;
-    optional int8u zoom = 4;
+    optional int16s pan = 0;
+    optional int16s tilt = 1;
+    optional int8u zoom = 2;
   }
 
   struct MPTZPresetStruct {

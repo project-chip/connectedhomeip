@@ -14106,9 +14106,9 @@ public static class CameraAvSettingsUserLevelManagementClusterMPTZStruct {
   public Optional<Integer> pan;
   public Optional<Integer> tilt;
   public Optional<Integer> zoom;
-  private static final long PAN_ID = 2L;
-  private static final long TILT_ID = 3L;
-  private static final long ZOOM_ID = 4L;
+  private static final long PAN_ID = 0L;
+  private static final long TILT_ID = 1L;
+  private static final long ZOOM_ID = 2L;
 
   public CameraAvSettingsUserLevelManagementClusterMPTZStruct(
     Optional<Integer> pan,

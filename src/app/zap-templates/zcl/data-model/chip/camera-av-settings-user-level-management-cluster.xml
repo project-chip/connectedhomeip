@@ -31,9 +31,9 @@ Git: 1.4-444-g6d595e737
 
   <struct name="MPTZStruct" apiMaturity="provisional">
     <cluster code="0x0552"/>
-    <item fieldId="2" name="Pan" type="int16s" optional="true" default="0" min="-180" max="180"/>
-    <item fieldId="3" name="Tilt" type="int16s" optional="true" default="0" min="-180" max="180"/>
-    <item fieldId="4" name="Zoom" type="int8u" optional="true" default="1" min="1"/>
+    <item fieldId="0" name="Pan" type="int16s" optional="true" default="0" min="-180" max="180"/>
+    <item fieldId="1" name="Tilt" type="int16s" optional="true" default="0" min="-180" max="180"/>
+    <item fieldId="2" name="Zoom" type="int8u" optional="true" default="1" min="1"/>
   </struct>
 
   <cluster apiMaturity="provisional">

@@ -42530,9 +42530,9 @@ namespace Structs {
 namespace MPTZStruct {
 enum class Fields : uint8_t
 {
-    kPan  = 2,
-    kTilt = 3,
-    kZoom = 4,
+    kPan  = 0,
+    kTilt = 1,
+    kZoom = 2,
 };
 
 struct Type
