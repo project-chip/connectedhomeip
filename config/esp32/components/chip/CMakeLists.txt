@@ -310,6 +310,10 @@ if (CONFIG_CHIP_DEVICE_ENABLE_DYNAMIC_SERVER)
     chip_gn_arg_append("chip_build_controller_dynamic_server" "true")
 endif()
 
+if (CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS)
+    chip_gn_arg_append("icd_max_notification_subscribers" ${CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS})
+endif()
+
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 
