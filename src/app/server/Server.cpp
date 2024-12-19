@@ -284,9 +284,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             { &sCritEventBuffer[0], sizeof(sCritEventBuffer), app::PriorityLevel::Critical }
         };
 
-        app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                 &logStorageResources[0], &sGlobalEventIdCounter,
-                                                 std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
+        err = app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
+                                                         &logStorageResources[0], &sGlobalEventIdCounter,
+                                                         std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp),
+                                                         &app::InteractionModelEngine::GetInstance()->GetReportingEngine());
+
+        SuccessOrExit(err);
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
