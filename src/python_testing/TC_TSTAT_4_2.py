@@ -255,8 +255,6 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
     @ async_test_body
     async def test_TC_TSTAT_4_2(self):
-        # super().setup_class()
-
         endpoint = self.get_endpoint()
 
         self.step("1")
@@ -269,8 +267,6 @@ class TC_TSTAT_4_2(MatterBaseTest):
         secondary_authority = self.certificate_authority_manager.NewCertificateAuthority()
         secondary_fabric_admin = secondary_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
         secondary_controller = secondary_fabric_admin.NewController(nodeId=112233)
-
-        accepted_cmd_list = await self.read_tstat_attribute_expect_success(attribute=cluster.Attributes.AcceptedCommandList)
 
         await secondary_controller.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
