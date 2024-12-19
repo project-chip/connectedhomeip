@@ -2740,14 +2740,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterOvenModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterOvenModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -2881,14 +2873,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterLaundryWasherModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -2926,14 +2910,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeCurrentModeID:
             result = @"CurrentMode";
-            break;
-
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeOnModeID:
-            result = @"OnMode";
             break;
 
         case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeGeneratedCommandListID:
@@ -3196,14 +3172,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterDishwasherModeAttributeCurrentModeID:
             result = @"CurrentMode";
-            break;
-
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeOnModeID:
-            result = @"OnMode";
             break;
 
         case MTRAttributeIDTypeClusterDishwasherModeAttributeGeneratedCommandListID:
@@ -9324,20 +9292,12 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         switch (commandID) {
 
-        case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandPauseID:
-            result = @"Pause";
-            break;
-
         case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandStopID:
             result = @"Stop";
             break;
 
         case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandStartID:
             result = @"Start";
-            break;
-
-        case MTRCommandIDTypeClusterOvenCavityOperationalStateCommandResumeID:
-            result = @"Resume";
             break;
 
         default:

@@ -452,8 +452,7 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
         publisher->mState = State::kInitialized;
 
         // Post an event that will start advertising
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type = DeviceLayer::DeviceEventType::kDnssdInitialized;
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kDnssdInitialized };
 
         CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
         if (error != CHIP_NO_ERROR)
@@ -477,9 +476,8 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
         // Restore dnssd state before restart, also needs to call ChipDnssdShutdown()
         publisher->Shutdown();
 
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded;
-        error      = DeviceLayer::PlatformMgr().PostEvent(&event);
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded };
+        error = DeviceLayer::PlatformMgr().PostEvent(&event);
 
         if (error != CHIP_NO_ERROR)
         {

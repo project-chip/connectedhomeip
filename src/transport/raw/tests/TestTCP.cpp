@@ -64,7 +64,8 @@ constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageCounter  = 18;
 
-const char PAYLOAD[] = "Hello!";
+const char PAYLOAD[]          = "Hello!";
+const char messageSize_TEST[] = "\x00\x00\x00\x00";
 
 class MockTransportMgrDelegate : public chip::TransportMgrDelegate
 {
@@ -632,6 +633,12 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestData testData[2];
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, testData);
+
+    // Test a single packet buffer with zero message size.
+    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(messageSize_TEST, 4);
+    ASSERT_NE(&buf, nullptr);
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
