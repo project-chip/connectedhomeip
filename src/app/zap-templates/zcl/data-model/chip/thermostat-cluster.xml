@@ -690,7 +690,6 @@ limitations under the License.
       <arg id="2" name="Timeout" type="int16u" optional="true"/>
     </command>
 
-
     <event code="0x0000" name="SystemModeChange" priority="info" side="server" apiMaturity="provisional">
       <description>This event SHALL be generated when the SystemMode attribute changes.</description>
       <field id="0" name="PreviousSystemMode" type="SystemModeEnum"/>
@@ -710,7 +709,6 @@ limitations under the License.
         </notTerm>
       </mandatoryConform>
     </event>
-
 
     <event code="0x0002" name="OccupancyChange" priority="info" side="server" apiMaturity="provisional">
       <description>This event SHALL be generated when the Occupancy attribute changes.</description>
