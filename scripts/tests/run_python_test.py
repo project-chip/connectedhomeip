@@ -215,8 +215,13 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             app_process.p.stdin.close()
         app_pid = app_process.p.pid
 
-    script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-                      '--log-format', '%(message)s', "--app-pid", str(app_pid)] + shlex.split(script_args)
+    script_command = [
+        script,
+        "--fail-on-skipped",
+        "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+        "--log-format", '%(message)s',
+        "--app-pid", str(app_pid),
+    ] + shlex.split(script_args)
 
     if script_gdb:
         #
