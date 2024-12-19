@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${LIGHTING_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -35,9 +35,9 @@
 # === END CI TEST ARGUMENTS ===
 #
 
+import asyncio
 import logging
 import subprocess
-from time import sleep
 
 import chip.clusters as Clusters
 import psutil
@@ -123,7 +123,7 @@ class TC_DGSW_2_2(MatterBaseTest):
         await self.send_software_fault_event(endpoint, app_pid)
 
         # Allow some time for the event to be processed
-        sleep(1)
+        await asyncio.sleep(1)
 
         # Read the SoftwareFault events
         software_fault_events = await self.read_software_fault_events(endpoint)
