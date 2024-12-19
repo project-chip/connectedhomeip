@@ -71,7 +71,7 @@ def get_documentation_file_path():
     Returns the path to the documentation file.
     """
     chip_root = get_chip_root()
-    documentation_file = os.path.join(chip_root, 'docs', 'spec_clusters.md')
+    documentation_file = os.path.join(chip_root, 'docs', 'ids_and_codes', 'spec_clusters.md')
     if not os.path.exists(documentation_file):
         raise FileNotFoundError(f"Documentation file does not exist: {documentation_file}")
     return documentation_file

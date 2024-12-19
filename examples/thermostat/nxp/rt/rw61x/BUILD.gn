@@ -145,6 +145,22 @@ rt_executable("thermostat") {
     "../../common/main/main.cpp",
   ]
 
+  if (chip_enable_ble) {
+    defines += [ "APP_BT_DEVICE_NAME=\"NXP-ThermostatApp\"" ]
+    include_dirs += [ "${common_example_dir}/app_ble/include" ]
+    if (ble_adv_data_custom) {
+      # to customize BLE advertising data
+      defines += [ "CONFIG_CHIP_CUSTOM_BLE_ADV_DATA=1" ]
+      include_dirs += [ "${chip_root}/src/platform/nxp/common/ble_zephyr" ]
+      sources += [ "../../common/main/BleZephyrManagerApp.cpp" ]
+    } else {
+      # Empty implementation, default matter advertising data
+      sources += [
+        "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
+      ]
+    }
+  }
+
   if (chip_with_diag_logs_demo) {
     include_dirs += [
       "${common_example_dir}/diagnostic_logs/include",

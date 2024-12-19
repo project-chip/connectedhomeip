@@ -32,13 +32,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-import time
-
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
+                                         async_test_body, default_matter_test_main)
 from mobly import asserts
 
 
@@ -52,15 +49,23 @@ class TC_VALCC_3_3(MatterBaseTest):
 
     def steps_TC_VALCC_3_3(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read AttributeList attribute"),
-            TestStep(3, "Read DefaultOpenLevel attribute, if supported"),
-            TestStep(4, "Send Open command"),
-            TestStep(5, "Read TargetLevel attribute"),
-            TestStep(6, "Read CurrentLevel attribute"),
-            TestStep(7, "Send Close command"),
-            TestStep(8, "Read TargetLevel attribute"),
-            TestStep(9, "Read CurrentLevel attribute"),
+            TestStep(1, "Commission DUT if required", is_commissioning=True),
+            TestStep(2, "Read AttributeList attribute", "Verify that the DUT response contains the AttributeList attribute."),
+            TestStep(3, "If the DefaultOpenLevel is not supported, skip all remaining steps in this test"),
+            TestStep(4, "TH reads from the DUT the DefaultOpenLevel attribute. Store the value as defaultOpenLevel."),
+            TestStep(5, "Set up a subscription to all attributes on the DUT", "Subscription is successful"),
+            TestStep(6, "Send a close command to the DUT and wait until the CurrentState is reported as closed", "DUT returns SUCCESS"),
+            # TODO: this test should probably SET the default open attribute as well and un-set it at the end, so we're not testing against the default.
+            TestStep(7, "Send Open command with no fields populated", "DUT returns SUCCESS"),
+            TestStep(8, "Wait until TH receives the following reports (ordering does not matter): TargetState set to NULL, TargetLevel set to NULL, CurrentState set to Open, CurrentLevel set to defaultOpenLevel",
+                     "Expected attribute reports are received"),
+            TestStep(9, "Read CurrentState and TargetState attribute", "CurrentState is Open, TargetState is NULL"),
+            TestStep(10, "Read CurrentLevel and TargetLevel attribute", "CurrentLevel is defaultOpenLevel, TargetLevel is NULL"),
+            TestStep(11, "Send Close command", "DUT returns SUCCESS"),
+            TestStep(12, "Wait until TH receives the following reports (ordering does not matter): TargetState set to NULL, TargetLevel set to NULL, CurrentState set to Closed, CurrentLevel set to 0",
+                     "Expected attribute reports are received"),
+            TestStep(13, "Read CurrentState and TargetState attribute", "CurrentState is Closed, TargetState is NULL"),
+            TestStep(14, "Read CurrentLevel and TargetLevel attribute", "CurrentLevel is 0, TargetLevel is NULL"),
         ]
         return steps
 
@@ -82,78 +87,75 @@ class TC_VALCC_3_3(MatterBaseTest):
         attribute_list = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         self.step(3)
-        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
-            defaultOpenLevel = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenLevel)
-        else:
-            logging.info("Test step skipped")
+        if attributes.DefaultOpenLevel.attribute_id not in attribute_list:
+            asserts.skip('Endpoint does not match test requirements')
 
         self.step(4)
-        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
-            try:
-                await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(), endpoint=endpoint)
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-                pass
-        else:
-            logging.info("Test step skipped")
+        default_open_level = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenLevel)
 
         self.step(5)
-        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
-            target_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetLevel)
-
-            asserts.assert_true(target_level_dut is not NullValue, "TargetLevel is null")
-            asserts.assert_equal(target_level_dut, defaultOpenLevel, "TargetLevel is not the expected value")
-        else:
-            logging.info("Test step skipped")
+        cluster = Clusters.ValveConfigurationAndControl
+        attributes = cluster.Attributes
+        attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
+        await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(6)
-        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
-            current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
-            asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
-
-            while current_level_dut != defaultOpenLevel:
-                time.sleep(1)
-
-                current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
-                asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
-
-            asserts.assert_equal(current_level_dut, defaultOpenLevel, "CurrentLevel is not the expected value")
-        else:
-            logging.info("Test step skipped")
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        await self.send_single_cmd(cmd=cluster.Commands.Close(), endpoint=endpoint)
+        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        if current_state_dut != cluster.Enums.ValveStateEnum.kClosed:
+            current_state_closed = AttributeValue(
+                endpoint_id=endpoint, attribute=attributes.CurrentState, value=cluster.Enums.ValveStateEnum.kClosed)
+            attribute_subscription.await_all_final_values_reported(
+                expected_final_values=[current_state_closed], timeout_sec=timeout)
 
         self.step(7)
-        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
-            try:
-                await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Close(), endpoint=endpoint)
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-                pass
-        else:
-            logging.info("Test step skipped")
+        attribute_subscription.reset()
+        await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(), endpoint=endpoint)
 
         self.step(8)
-        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
-            target_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetLevel)
-
-            asserts.assert_true(target_level_dut is not NullValue, "TargetLevel is null")
-            asserts.assert_equal(target_level_dut, 0, "TargetLevel is not the expected value")
-        else:
-            logging.info("Test step skipped")
+        expected_final_state = [AttributeValue(endpoint_id=endpoint, attribute=attributes.TargetState, value=NullValue),
+                                AttributeValue(endpoint_id=endpoint, attribute=attributes.CurrentState,
+                                               value=cluster.Enums.ValveStateEnum.kOpen),
+                                AttributeValue(endpoint_id=endpoint, attribute=attributes.TargetLevel, value=NullValue),
+                                AttributeValue(endpoint_id=endpoint, attribute=attributes.CurrentLevel, value=default_open_level)]
+        attribute_subscription.await_all_final_values_reported(expected_final_values=expected_final_state, timeout_sec=timeout)
 
         self.step(9)
-        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
-            current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
-            asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
+        target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        asserts.assert_equal(current_state_dut, cluster.Enums.ValveStateEnum.kOpen, "CurrentState is not open")
+        asserts.assert_equal(target_state_dut, NullValue, "TargetState is not null")
 
-            while current_level_dut is Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kTransitioning:
-                time.sleep(1)
+        self.step(10)
+        target_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetLevel)
+        current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
+        asserts.assert_equal(current_level_dut, default_open_level, "CurrentLevel is not defaultOpenLevel")
+        asserts.assert_equal(target_level_dut, NullValue, "TargetLevel is not null")
 
-                current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
-                asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
+        self.step(11)
+        attribute_subscription.reset()
+        await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Close(), endpoint=endpoint)
 
-            asserts.assert_equal(current_level_dut, 0, "CurrentLevel is not the expected value")
-        else:
-            logging.info("Test step skipped")
+        self.step(12)
+        expected_final_state = [AttributeValue(endpoint_id=endpoint, attribute=attributes.TargetState, value=NullValue),
+                                AttributeValue(endpoint_id=endpoint, attribute=attributes.CurrentState,
+                                               value=cluster.Enums.ValveStateEnum.kClosed),
+                                AttributeValue(endpoint_id=endpoint, attribute=attributes.TargetLevel, value=NullValue),
+                                AttributeValue(endpoint_id=endpoint, attribute=attributes.CurrentLevel, value=0)]
+        attribute_subscription.await_all_final_values_reported(expected_final_values=expected_final_state, timeout_sec=timeout)
+
+        self.step(13)
+        target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        asserts.assert_equal(current_state_dut, cluster.Enums.ValveStateEnum.kClosed, "CurrentState is not open")
+        asserts.assert_equal(target_state_dut, NullValue, "TargetState is not null")
+
+        self.step(14)
+        target_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetLevel)
+        current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
+        asserts.assert_equal(current_level_dut, 0, "CurrentLevel is not 0")
+        asserts.assert_equal(target_level_dut, NullValue, "TargetLevel is not null")
 
 
 if __name__ == "__main__":
