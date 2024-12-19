@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "lib/core/DataModelTypes.h"
+#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/AttributePathExpandIterator.h>
 
 #include <app/GlobalAttributes.h>
@@ -27,8 +28,8 @@ namespace app {
 
 AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * provider,
                                                          SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModelProvider(provider),
-    mpAttributePath(attributePath), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
+    mDataModelProvider(provider), mpAttributePath(attributePath),
+    mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
 {
     mOutputPath.mNeedsInitialization = true; // Ensure a Next is called on all public API
     mOutputPath.mExpanded            = true; // this is reset in 'next' if needed
@@ -135,7 +136,8 @@ AttributePathExpandIterator::SearchSession AttributePathExpandIterator::PrepareS
         // we are already positioned on a specific endpoint, so start from there
         if (!session.endpoints->SeekTo(mOutputPath.mEndpointId))
         {
-            ChipLogError(InteractionModel, "Endpoint id %d is not valid anymore", mOutputPath.mEndpointId);
+            ChipLogError(InteractionModel, "Endpoint id " ChipLogFormatMEI " is not valid anymore",
+                         ChipLogValueMEI(mOutputPath.mEndpointId));
         }
     }
 
@@ -147,8 +149,9 @@ AttributePathExpandIterator::SearchSession AttributePathExpandIterator::PrepareS
             // we are already positioned on a specific cluster, so start from there
             if (!session.clusters->SeekTo(mOutputPath.mClusterId))
             {
-                ChipLogError(InteractionModel, "Cluster id %d is not valid anymore (in endpoint %d)", mOutputPath.mClusterId,
-                             mOutputPath.mEndpointId);
+                ChipLogError(InteractionModel,
+                             "Cluster id " ChipLogFormatMEI " is not valid anymore (in endpoint " ChipLogFormatMEI ")",
+                             ChipLogValueMEI(mOutputPath.mClusterId), ChipLogValueMEI(mOutputPath.mEndpointId));
             }
         }
     }
