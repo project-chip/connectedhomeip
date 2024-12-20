@@ -145,7 +145,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
             self.app_pipe = self.app_pipe + str(app_pid)
 
         RVCRun_cluster = Clusters.RvcRunMode
-        attributes = RVCRun_cluster.Attributes
         commands = RVCRun_cluster.Commands
 
         if not await self.command_guard(endpoint=self.endpoint, command=commands.ChangeToMode):
