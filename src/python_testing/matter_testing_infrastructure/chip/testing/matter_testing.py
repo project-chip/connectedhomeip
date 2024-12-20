@@ -673,8 +673,8 @@ class MatterTestConfig:
     trace_to: List[str] = field(default_factory=list)
 
     # Accepted Terms and Conditions if used
-    tc_version: int = None
-    tc_user_response: int = None
+    tc_version_to_simulate: int = None
+    tc_user_response_to_simulate: int = None
 
 
 class ClusterMapper:
@@ -1960,8 +1960,8 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
 
-    config.tc_version = args.tc_version
-    config.tc_user_response = args.tc_user_response
+    config.tc_version_to_simulate = args.tc_version_to_simulate
+    config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
 
     # Accumulate all command-line-passed named args
     all_global_args = []
@@ -2374,9 +2374,10 @@ class CommissionDeviceTest(MatterBaseTest):
 
         info = instance.get_setup_payload_info()[i]
 
-        if conf.tc_version is not None and conf.tc_user_response is not None:
-            logging.debug(f"Setting TC Acknowledgements to version {conf.tc_version} with user response {conf.tc_user_response}.")
-            dev_ctrl.SetTCAcknowledgements(conf.tc_version, conf.tc_user_response)
+        if conf.tc_version_to_simulate is not None and conf.tc_user_response_to_simulate is not None:
+            logging.debug(
+                f"Setting TC Acknowledgements to version {conf.tc_version_to_simulate} with user response {conf.tc_user_response_to_simulate}.")
+            dev_ctrl.SetTCAcknowledgements(conf.tc_version_to_simulate, conf.tc_user_response_to_simulate)
             dev_ctrl.SetTCRequired(True)
         else:
             dev_ctrl.SetTCRequired(False)
