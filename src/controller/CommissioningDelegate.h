@@ -779,7 +779,9 @@ struct ICDManagementClusterInfo
 
 struct ReadCommissioningInfo
 {
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
     app::ClusterStateCache const * attributes = nullptr;
+#endif
     NetworkClusters network;
     BasicClusterInfo basic;
     GeneralCommissioningInfo general;
