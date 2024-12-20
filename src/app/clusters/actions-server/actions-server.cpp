@@ -32,53 +32,80 @@ using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
-Instance Instance::instance;
-Instance * Instance::GetInstance()
+static constexpr size_t kActionsDelegateTableSize =
+    MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+namespace {
+Delegate * gDelegateTable[kActionsDelegateTableSize] = { nullptr };
+
+Delegate * GetDelegate(EndpointId endpoint)
 {
-    return &instance;
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Actions::Id, MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kActionsDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
-void Instance::OnStateChanged(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState)
+} // namespace
+
+ActionsServer ActionsServer::sInstance;
+
+void ActionsServer::SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Actions::Id, MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
+    if (ep < kActionsDelegateTableSize)
+    {
+        gDelegateTable[ep] = delegate;
+    }
+}
+
+ActionsServer & ActionsServer::Instance()
+{
+    return sInstance;
+}
+
+void ActionsServer::OnStateChanged(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState)
 {
     ChipLogProgress(Zcl, "ActionsServer: OnStateChanged");
 
-    // Record StateChanged event
+    // Generate StateChanged event
     EventNumber eventNumber;
     Events::StateChanged::Type event{ actionId, invokeId, actionState };
 
     if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
     {
-        ChipLogError(Zcl, "ActionsServer: Failed to record OnStateChanged event");
+        ChipLogError(Zcl, "ActionsServer: Failed to generate OnStateChanged event");
     }
 }
 
-void Instance::OnActionFailed(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState,
-                              ActionErrorEnum actionError)
+void ActionsServer::OnActionFailed(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState,
+                                   ActionErrorEnum actionError)
 {
     ChipLogProgress(Zcl, "ActionsServer: OnActionFailed");
 
-    // Record ActionFailed event
+    // Generate ActionFailed event
     EventNumber eventNumber;
     Events::ActionFailed::Type event{ actionId, invokeId, actionState, actionError };
 
     if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
     {
-        ChipLogError(Zcl, "ActionsServer: Failed to record OnActionFailed event");
+        ChipLogError(Zcl, "ActionsServer: Failed to generate OnActionFailed event");
     }
 }
 
-CHIP_ERROR Instance::ReadActionListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder)
+CHIP_ERROR ActionsServer::ReadActionListAttribute(const ConcreteReadAttributePath & aPath,
+                                                  const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    if (GetInstance()->mDelegate == nullptr)
+    Delegate * delegate = GetDelegate(aPath.mEndpointId);
+    if (delegate == nullptr)
     {
         ChipLogError(Zcl, "Actions delegate is null!!!");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    for (uint16_t i = 0; i <= kMaxActionList; i++)
+    for (uint16_t i = 0; i <= kMaxActionListLength; i++)
     {
         ActionStructStorage action;
 
-        CHIP_ERROR err = GetInstance()->mDelegate->ReadActionAtIndex(i, action);
+        CHIP_ERROR err = delegate->ReadActionAtIndex(i, action);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             return CHIP_NO_ERROR;
@@ -89,18 +116,20 @@ CHIP_ERROR Instance::ReadActionListAttribute(const AttributeValueEncoder::ListEn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::ReadEndpointListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder)
+CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributePath & aPath,
+                                                    const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    if (GetInstance()->mDelegate == nullptr)
+    Delegate * delegate = GetDelegate(aPath.mEndpointId);
+    if (delegate == nullptr)
     {
         ChipLogError(Zcl, "Actions delegate is null!!!");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    for (uint16_t i = 0; i <= kMaxEndpointList; i++)
+    for (uint16_t i = 0; i <= kMaxEndpointListLength; i++)
     {
         EndpointListStorage epList;
 
-        CHIP_ERROR err = GetInstance()->mDelegate->ReadEndpointListAtIndex(i, epList);
+        CHIP_ERROR err = delegate->ReadEndpointListAtIndex(i, epList);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             return CHIP_NO_ERROR;
@@ -111,29 +140,19 @@ CHIP_ERROR Instance::ReadEndpointListAttribute(const AttributeValueEncoder::List
     return CHIP_NO_ERROR;
 }
 
-void Instance::SetDefaultDelegate(Delegate * aDelegate)
-{
-    if (aDelegate == nullptr)
-    {
-        ChipLogError(Zcl, "Cannot set empty delegate!!!");
-        return;
-    }
-    mDelegate = aDelegate;
-}
-
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ActionsServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Actions::Id);
 
     switch (aPath.mAttributeId)
     {
     case ActionList::Id: {
-        Instance * d = this;
-        return aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR { return d->ReadActionListAttribute(encoder); });
+        return aEncoder.EncodeList(
+            [this, aPath](const auto & encoder) -> CHIP_ERROR { return this->ReadActionListAttribute(aPath, encoder); });
     }
     case EndpointLists::Id: {
-        Instance * d = this;
-        return aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR { return d->ReadEndpointListAttribute(encoder); });
+        return aEncoder.EncodeList(
+            [this, aPath](const auto & encoder) -> CHIP_ERROR { return this->ReadEndpointListAttribute(aPath, encoder); });
     }
     default:
         break;
@@ -141,18 +160,19 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     return CHIP_NO_ERROR;
 }
 
-bool Instance::FindActionIdInActionList(uint16_t actionId)
+bool ActionsServer::FindActionIdInActionList(EndpointId endpointId, uint16_t actionId)
 {
-    if (GetInstance()->mDelegate == nullptr)
+    Delegate * delegate = GetDelegate(endpointId);
+    if (delegate == nullptr)
     {
         ChipLogError(Zcl, "Actions delegate is null!!!");
         return false;
     }
-    return GetInstance()->mDelegate->FindActionIdInActionList(actionId);
+    return delegate->FindActionIdInActionList(actionId);
 }
 
 template <typename RequestT, typename FuncT>
-void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
+void ActionsServer::HandleCommand(HandlerContext & handlerContext, FuncT func)
 {
     if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
     {
@@ -172,8 +192,7 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
             return;
         }
 
-        uint16_t actionId = requestPayload.actionID;
-        if (!GetInstance()->FindActionIdInActionList(actionId))
+        if (FindActionIdInActionList(handlerContext.mRequestPath.mEndpointId, requestPayload.actionID))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::NotFound);
             return;
@@ -183,113 +202,125 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
     }
 }
 
-void Instance::HandleInstantAction(HandlerContext & ctx, const Commands::InstantAction::DecodableType & commandData)
+void ActionsServer::HandleInstantAction(HandlerContext & ctx, const Commands::InstantAction::DecodableType & commandData)
 {
     uint16_t actionId           = commandData.actionID;
     Optional<uint32_t> invokeId = commandData.invokeID;
-    Status status               = GetInstance()->mDelegate->HandleInstantAction(actionId, invokeId);
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandleInstantAction(actionId, invokeId);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void Instance::HandleInstantActionWithTransition(HandlerContext & ctx,
-                                                 const Commands::InstantActionWithTransition::DecodableType & commandData)
+void ActionsServer::HandleInstantActionWithTransition(HandlerContext & ctx,
+                                                      const Commands::InstantActionWithTransition::DecodableType & commandData)
 {
     uint16_t actionId           = commandData.actionID;
     Optional<uint32_t> invokeId = commandData.invokeID;
     uint16_t transitionTime     = commandData.transitionTime;
-    Status status               = GetInstance()->mDelegate->HandleInstantActionWithTransition(actionId, transitionTime, invokeId);
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandleInstantActionWithTransition(actionId, transitionTime, invokeId);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void Instance::HandleStartAction(HandlerContext & ctx, const Commands::StartAction::DecodableType & commandData)
+void ActionsServer::HandleStartAction(HandlerContext & ctx, const Commands::StartAction::DecodableType & commandData)
 {
     uint16_t actionId           = commandData.actionID;
     Optional<uint32_t> invokeId = commandData.invokeID;
-    Status status               = GetInstance()->mDelegate->HandleStartAction(actionId, invokeId);
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandleStartAction(actionId, invokeId);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void Instance::HandleStartActionWithDuration(HandlerContext & ctx,
-                                             const Commands::StartActionWithDuration::DecodableType & commandData)
-{
-    uint16_t actionId           = commandData.actionID;
-    Optional<uint32_t> invokeId = commandData.invokeID;
-    uint32_t duration           = commandData.duration;
-    Status status               = GetInstance()->mDelegate->HandleStartActionWithDuration(actionId, duration, invokeId);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void Instance::HandleStopAction(HandlerContext & ctx, const Commands::StopAction::DecodableType & commandData)
-{
-    uint16_t actionId           = commandData.actionID;
-    Optional<uint32_t> invokeId = commandData.invokeID;
-    Status status               = GetInstance()->mDelegate->HandleStopAction(actionId, invokeId);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void Instance::HandlePauseAction(HandlerContext & ctx, const Commands::PauseAction::DecodableType & commandData)
-{
-    uint16_t actionId           = commandData.actionID;
-    Optional<uint32_t> invokeId = commandData.invokeID;
-    Status status               = GetInstance()->mDelegate->HandlePauseAction(actionId, invokeId);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void Instance::HandlePauseActionWithDuration(HandlerContext & ctx,
-                                             const Commands::PauseActionWithDuration::DecodableType & commandData)
+void ActionsServer::HandleStartActionWithDuration(HandlerContext & ctx,
+                                                  const Commands::StartActionWithDuration::DecodableType & commandData)
 {
     uint16_t actionId           = commandData.actionID;
     Optional<uint32_t> invokeId = commandData.invokeID;
     uint32_t duration           = commandData.duration;
-    Status status               = GetInstance()->mDelegate->HandlePauseActionWithDuration(actionId, duration, invokeId);
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandleStartActionWithDuration(actionId, duration, invokeId);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void Instance::HandleResumeAction(HandlerContext & ctx, const Commands::ResumeAction::DecodableType & commandData)
+void ActionsServer::HandleStopAction(HandlerContext & ctx, const Commands::StopAction::DecodableType & commandData)
 {
     uint16_t actionId           = commandData.actionID;
     Optional<uint32_t> invokeId = commandData.invokeID;
-    Status status               = GetInstance()->mDelegate->HandleResumeAction(actionId, invokeId);
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandleStopAction(actionId, invokeId);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void Instance::HandleEnableAction(HandlerContext & ctx, const Commands::EnableAction::DecodableType & commandData)
+void ActionsServer::HandlePauseAction(HandlerContext & ctx, const Commands::PauseAction::DecodableType & commandData)
 {
     uint16_t actionId           = commandData.actionID;
     Optional<uint32_t> invokeId = commandData.invokeID;
-    Status status               = GetInstance()->mDelegate->HandleEnableAction(actionId, invokeId);
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandlePauseAction(actionId, invokeId);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void Instance::HandleEnableActionWithDuration(HandlerContext & ctx,
-                                              const Commands::EnableActionWithDuration::DecodableType & commandData)
-{
-    uint16_t actionId           = commandData.actionID;
-    Optional<uint32_t> invokeId = commandData.invokeID;
-    uint32_t duration           = commandData.duration;
-    Status status               = GetInstance()->mDelegate->HandleEnableActionWithDuration(actionId, duration, invokeId);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void Instance::HandleDisableAction(HandlerContext & ctx, const Commands::DisableAction::DecodableType & commandData)
-{
-    uint16_t actionId           = commandData.actionID;
-    Optional<uint32_t> invokeId = commandData.invokeID;
-    Status status               = GetInstance()->mDelegate->HandleDisableAction(actionId, invokeId);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void Instance::HandleDisableActionWithDuration(HandlerContext & ctx,
-                                               const Commands::DisableActionWithDuration::DecodableType & commandData)
+void ActionsServer::HandlePauseActionWithDuration(HandlerContext & ctx,
+                                                  const Commands::PauseActionWithDuration::DecodableType & commandData)
 {
     uint16_t actionId           = commandData.actionID;
     Optional<uint32_t> invokeId = commandData.invokeID;
     uint32_t duration           = commandData.duration;
-    Status status               = GetInstance()->mDelegate->HandleDisableActionWithDuration(actionId, duration, invokeId);
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandlePauseActionWithDuration(actionId, duration, invokeId);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void Instance::InvokeCommand(HandlerContext & handlerContext)
+void ActionsServer::HandleResumeAction(HandlerContext & ctx, const Commands::ResumeAction::DecodableType & commandData)
+{
+    uint16_t actionId           = commandData.actionID;
+    Optional<uint32_t> invokeId = commandData.invokeID;
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandleResumeAction(actionId, invokeId);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+}
+
+void ActionsServer::HandleEnableAction(HandlerContext & ctx, const Commands::EnableAction::DecodableType & commandData)
+{
+    uint16_t actionId           = commandData.actionID;
+    Optional<uint32_t> invokeId = commandData.invokeID;
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandleEnableAction(actionId, invokeId);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+}
+
+void ActionsServer::HandleEnableActionWithDuration(HandlerContext & ctx,
+                                                   const Commands::EnableActionWithDuration::DecodableType & commandData)
+{
+    uint16_t actionId           = commandData.actionID;
+    Optional<uint32_t> invokeId = commandData.invokeID;
+    uint32_t duration           = commandData.duration;
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandleEnableActionWithDuration(actionId, duration, invokeId);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+}
+
+void ActionsServer::HandleDisableAction(HandlerContext & ctx, const Commands::DisableAction::DecodableType & commandData)
+{
+    uint16_t actionId           = commandData.actionID;
+    Optional<uint32_t> invokeId = commandData.invokeID;
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandleDisableAction(actionId, invokeId);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+}
+
+void ActionsServer::HandleDisableActionWithDuration(HandlerContext & ctx,
+                                                    const Commands::DisableActionWithDuration::DecodableType & commandData)
+{
+    uint16_t actionId           = commandData.actionID;
+    Optional<uint32_t> invokeId = commandData.invokeID;
+    uint32_t duration           = commandData.duration;
+    Delegate * delegate         = GetDelegate(ctx.mRequestPath.mEndpointId);
+    Status status               = delegate->HandleDisableActionWithDuration(actionId, duration, invokeId);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+}
+
+void ActionsServer::InvokeCommand(HandlerContext & handlerContext)
 {
     switch (handlerContext.mRequestPath.mCommandId)
     {
@@ -350,6 +381,6 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 }
 void MatterActionsPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().Register(Instance::GetInstance());
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(Instance::GetInstance());
+    AttributeAccessInterfaceRegistry::Instance().Register(&ActionsServer::Instance());
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&ActionsServer::Instance());
 }
