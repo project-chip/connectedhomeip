@@ -146,10 +146,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
 
         RVCRun_cluster = Clusters.RvcRunMode
         attributes = RVCRun_cluster.Attributes
-
-        # Gathering Accepted and Generated Commands and associated ids
         commands = RVCRun_cluster.Commands
-        RVCRun_accptcmd_list = attributes.AcceptedCommandList
 
         if not await self.command_guard(endpoint=self.endpoint, command=commands.ChangeToMode):
             asserts.fail("Change To Mode receiving commands needs to be supported")
