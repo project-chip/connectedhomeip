@@ -6,7 +6,6 @@ import re
 import subprocess
 from datetime import datetime
 
-
 # Constants for default values
 DEFAULT_TARGETS = [
     "linux-x64-air-purifier-no-ble",
