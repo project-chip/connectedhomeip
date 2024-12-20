@@ -1138,19 +1138,15 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
 
         return NextStep::Create<Step>(Step::kSendSigma2);
     }
-    else
-    {
-        ChipLogError(SecureChannel, "CASE failed to match destination ID with local fabrics");
-        ChipLogByteSpan(SecureChannel, parsedSigma1.destinationId);
 
-        // FindLocalNodeFromDestinationId returns CHIP_ERROR_KEY_NOT_FOUND if Sigma1's DestinationId does not match any
-        // candidateDestinationId, this will trigger a status Report with ProtocolCode = NoSharedTrustRoots.
+    ChipLogError(SecureChannel, "CASE failed to match destination ID with local fabrics");
+    ChipLogByteSpan(SecureChannel, parsedSigma1.destinationId);
 
-        // Returning a CHIP_ERROR variant that will trigger a corresponding Status Report.
-        return NextStep::Create<CHIP_ERROR>(err);
-    }
+    // FindLocalNodeFromDestinationId returns CHIP_ERROR_KEY_NOT_FOUND if Sigma1's DestinationId does not match any
+    // candidateDestinationId, this will trigger a status Report with ProtocolCode = NoSharedTrustRoots.
 
-    return NextStep::Create<CHIP_ERROR>(CHIP_NO_ERROR);
+    // Returning a CHIP_ERROR variant that will trigger a corresponding Status Report.
+    return NextStep::Create<CHIP_ERROR>(err);
 }
 
 CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResumeInputs & outSigma2ResData)
