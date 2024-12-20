@@ -36,16 +36,16 @@ class Delegate;
 
 struct ActionStructStorage : public Structs::ActionStruct::Type
 {
-    ActionStructStorage() : mActionName(mBuffer, sizeof(mBuffer)){};
+    ActionStructStorage() : mActionName(mBuffer){};
 
-    ActionStructStorage(uint16_t action, CharSpan actionName, ActionTypeEnum actionType, uint16_t epListID,
+    ActionStructStorage(uint16_t action, const CharSpan & actionName, ActionTypeEnum actionType, uint16_t epListID,
                         BitMask<CommandBits> commands, ActionStateEnum actionState) :
-        mActionName(mBuffer, sizeof(mBuffer))
+        mActionName(mBuffer)
     {
         Set(action, actionName, actionType, epListID, commands, actionState);
     }
 
-    ActionStructStorage(const ActionStructStorage & action) : mActionName(mBuffer, sizeof(mBuffer)) { *this = action; }
+    ActionStructStorage(const ActionStructStorage & action) : mActionName(mBuffer) { *this = action; }
 
     ActionStructStorage & operator=(const ActionStructStorage & action)
     {
@@ -53,8 +53,8 @@ struct ActionStructStorage : public Structs::ActionStruct::Type
         return *this;
     }
 
-    void Set(uint16_t action, CharSpan actionName, ActionTypeEnum actionType, uint16_t epListID, BitMask<CommandBits> commands,
-             ActionStateEnum actionState)
+    void Set(uint16_t action, const CharSpan & actionName, ActionTypeEnum actionType, uint16_t epListID,
+             BitMask<CommandBits> commands, ActionStateEnum actionState)
     {
         actionID          = action;
         type              = actionType;
@@ -72,16 +72,16 @@ private:
 
 struct EndpointListStorage : public Structs::EndpointListStruct::Type
 {
-    EndpointListStorage() : mEpListName(mBuffer, sizeof(mBuffer)){};
+    EndpointListStorage() : mEpListName(mBuffer){};
 
-    EndpointListStorage(uint16_t epListId, CharSpan epListName, EndpointListTypeEnum epListType,
-                        DataModel::List<const EndpointId> endpointList) :
-        mEpListName(mBuffer, sizeof(mBuffer))
+    EndpointListStorage(uint16_t epListId, const CharSpan & epListName, EndpointListTypeEnum epListType,
+                        const DataModel::List<const EndpointId> & endpointList) :
+        mEpListName(mBuffer)
     {
         Set(epListId, epListName, epListType, endpointList);
     }
 
-    EndpointListStorage(const EndpointListStorage & epList) : mEpListName(mBuffer, sizeof(mBuffer)) { *this = epList; }
+    EndpointListStorage(const EndpointListStorage & epList) : mEpListName(mBuffer) { *this = epList; }
 
     EndpointListStorage & operator=(const EndpointListStorage & epList)
     {
@@ -89,8 +89,8 @@ struct EndpointListStorage : public Structs::EndpointListStruct::Type
         return *this;
     }
 
-    void Set(uint16_t epListId, CharSpan epListName, EndpointListTypeEnum epListType,
-             DataModel::List<const EndpointId> endpointList)
+    void Set(uint16_t epListId, const CharSpan & epListName, EndpointListTypeEnum epListType,
+             const DataModel::List<const EndpointId> & endpointList)
     {
         endpointListID = epListId;
         type           = epListType;
@@ -112,14 +112,15 @@ private:
     Span<const EndpointId> mEpListSpan;
 };
 
-class Instance : public AttributeAccessInterface, public CommandHandlerInterface
+class ActionsServer : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     // Register for the Actions cluster on all endpoints.
-    Instance() :
+    ActionsServer() :
         AttributeAccessInterface(Optional<EndpointId>::Missing(), Actions::Id),
         CommandHandlerInterface(Optional<EndpointId>::Missing(), Actions::Id)
     {}
+    static ActionsServer & Instance();
 
     /**
      * @brief
@@ -134,20 +135,20 @@ public:
     void OnActionFailed(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState,
                         ActionErrorEnum actionError);
 
-    static Instance * GetInstance();
-    void SetDefaultDelegate(Delegate * aDelegate);
+    static void SetDefaultDelegate(EndpointId endpointId, Delegate * aDelegate);
 
 private:
-    Delegate * mDelegate;
-    static Instance instance;
-    static constexpr size_t kMaxEndpointList = 256u;
-    static constexpr size_t kMaxActionList   = 256u;
+    static ActionsServer sInstance;
+    static constexpr size_t kMaxEndpointListLength = 256u;
+    static constexpr size_t kMaxActionListLength   = 256u;
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-    CHIP_ERROR ReadActionListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
-    CHIP_ERROR ReadEndpointListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
-    bool FindActionIdInActionList(uint16_t actionId);
+    CHIP_ERROR ReadActionListAttribute(const ConcreteReadAttributePath & aPath,
+                                       const AttributeValueEncoder::ListEncodeHelper & encoder);
+    CHIP_ERROR ReadEndpointListAttribute(const ConcreteReadAttributePath & aPath,
+                                         const AttributeValueEncoder::ListEncodeHelper & encoder);
+    bool FindActionIdInActionList(EndpointId endpointId, uint16_t actionId);
 
     // CommandHandlerInterface
     template <typename RequestT, typename FuncT>
