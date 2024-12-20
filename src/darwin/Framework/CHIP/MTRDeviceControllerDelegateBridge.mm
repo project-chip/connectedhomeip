@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,6 +17,7 @@
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTREndpointInfo_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
@@ -25,6 +25,30 @@
 #import "MTRProductIdentity.h"
 
 using namespace chip::Tracing::DarwinFramework;
+
+@implementation MTRCommissioneeInfo
+
+- (instancetype)initWithCommissioningInfo:(const chip::Controller::ReadCommissioningInfo &)info
+{
+    self = [super init];
+    _productIdentity = [[MTRProductIdentity alloc] initWithVendorID:@(info.basic.vendorId) productID:@(info.basic.productId)];
+
+    // TODO: We should probably hold onto our MTRCommissioningParameters so we can look at `readEndpointInformation`
+    // instead of just reading whatever Descriptor cluster information happens to be in the cache.
+    auto * endpoints = [MTREndpointInfo endpointsFromAttributeCache:info.attributes];
+    if (endpoints.count > 0) {
+        _endpointsById = endpoints;
+    }
+
+    return self;
+}
+
+- (MTREndpointInfo *)rootEndpoint
+{
+    return self.endpointsById[@0];
+}
+
+@end
 
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)
@@ -125,20 +149,21 @@ void MTRDeviceControllerDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
 void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
 {
     MTRDeviceController * strongController = mController;
-
-    chip::VendorId vendorId = info.basic.vendorId;
-    uint16_t productId = info.basic.productId;
-
-    MTR_LOG("%@ DeviceControllerDelegate Read Commissioning Info. VendorId %u ProductId %u", strongController, vendorId, productId);
-
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if (strongDelegate && mQueue && strongController) {
-        if ([strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
-            dispatch_async(mQueue, ^{
-                auto * info = [[MTRProductIdentity alloc] initWithVendorID:@(vendorId) productID:@(productId)];
-                [strongDelegate controller:strongController readCommissioningInfo:info];
-            });
-        }
+    VerifyOrReturn(strongDelegate && mQueue);
+
+    // TODO: These checks are pointless since currently mController == mDelegate
+    BOOL wantCommissioneeInfo = [strongDelegate respondsToSelector:@selector(controller:readCommissioneeInfo:)];
+    BOOL wantProductIdentity = [strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)];
+    if (wantCommissioneeInfo || wantProductIdentity) {
+        auto * commissioneeInfo = [[MTRCommissioneeInfo alloc] initWithCommissioningInfo:info];
+        dispatch_async(mQueue, ^{
+            if (wantCommissioneeInfo) { // prefer the newer delegate method over the deprecated one
+                [strongDelegate controller:strongController readCommissioneeInfo:commissioneeInfo];
+            } else if (wantProductIdentity) {
+                [strongDelegate controller:strongController readCommissioningInfo:commissioneeInfo.productIdentity];
+            }
+        });
     }
 }
 

@@ -52,6 +52,7 @@
 #import <Matter/MTRDeviceType.h>
 #import <Matter/MTRDeviceTypeRevision.h>
 #import <Matter/MTRDiagnosticLogsType.h>
+#import <Matter/MTREndpointInfo.h>
 #import <Matter/MTRError.h>
 #import <Matter/MTRFabricInfo.h>
 #import <Matter/MTRKeypair.h>
