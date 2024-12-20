@@ -30,7 +30,7 @@ BufferWriter & BufferWriter::Put(const void * buf, size_t len)
 {
     size_t available = Available();
 
-    if (available > 0)
+    if (available > 0 && buf != nullptr)
     {
         memmove(mBuf + mNeeded, buf, available < len ? available : len);
     }
