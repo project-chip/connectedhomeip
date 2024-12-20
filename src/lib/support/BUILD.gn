@@ -335,6 +335,7 @@ static_library("support") {
   }
 
   if (chip_device_platform == "esp32" || chip_device_platform == "openiotsdk") {
+    # Has non-posix implementation of getopt_long.
     defines = [ "CONFIG_NON_POSIX_GETOPT_LONG" ]
   }
 }
