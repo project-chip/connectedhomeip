@@ -50,7 +50,24 @@ public:
     static CHIP_ERROR InitWiFiStack(void);
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    static void LogHeapInfo();
+    /**
+     * @brief Logs the current heap usage information.
+     *
+     * This function logs details about the current heap usage and can optionally set up
+     * a periodic timer to log heap usage at regular intervals.
+     *
+     * @param setTimer Indicates whether to set a periodic timer for logging. Default is false.
+     */
+    static void LogHeapInfo(bool setTimer = false);
+
+    /**
+     * @brief Captures and logs information about the current task snapshots.
+     *
+     * This function retrieves a snapshot of all running tasks and logs details about
+     * their states.
+     *
+     * @return CHIP_ERROR Returns a CHIP_ERROR code indicating the success or failure of the operation.
+     */
     static CHIP_ERROR LogTaskSnapshotInfo();
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 

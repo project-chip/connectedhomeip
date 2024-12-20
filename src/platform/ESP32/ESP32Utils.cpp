@@ -64,7 +64,7 @@ using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 
 #ifndef CONFIG_HEAP_LOG_INTERVAL
-#define CONFIG_HEAP_LOG_INTERVAL 300000
+#define CONFIG_HEAP_LOG_INTERVAL 86400000
 #endif // CONFIG_HEAP_LOG_INTERVAL
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -453,6 +453,7 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
 void LogHeapDataCallback(chip::System::Layer * systemLayer, void * appState)
 {
     // Internal RAM (default heap)
@@ -473,10 +474,18 @@ void LogHeapDataCallback(chip::System::Layer * systemLayer, void * appState)
     MATTER_LOG_METRIC(kMetricHeapExternalFree, external_free);
     MATTER_LOG_METRIC(kMetricHeapExternalMinFree, external_min_free);
     MATTER_LOG_METRIC(kMetricHeapExternalLargestBlock, external_largest_free_block);
-#endif
+#endif // CONFIG_SPIRAM
 
-    // Reschedule the timer for the next interval
-    systemLayer->StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL), LogHeapDataCallback, nullptr);
+    if (appState != nullptr)
+    {
+        static bool setTimer = static_cast<bool *>(appState);
+        CHIP_ERROR err =
+            SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL), LogHeapDataCallback, &setTimer);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to reschedule heap log timer");
+        }
+    }
 }
 
 void FailedAllocCallback(size_t size, uint32_t caps, const char * function_name)
@@ -486,17 +495,37 @@ void FailedAllocCallback(size_t size, uint32_t caps, const char * function_name)
 }
 
 // Function to initialize and start periodic heap logging
-void ESP32Utils::LogHeapInfo()
+void ESP32Utils::LogHeapInfo(bool setTimer)
 {
+    if (CONFIG_HEAP_LOG_INTERVAL <= 0)
+    {
+        setTimer = false;
+        return;
+    }
+
+    static bool timerState = setTimer;
+
+    if (!setTimer)
+    {
+        SystemLayer().CancelTimer(LogHeapDataCallback, &timerState);
+    }
+
     esp_err_t err = heap_caps_register_failed_alloc_callback(FailedAllocCallback);
     if (err != ESP_OK)
     {
         ChipLogError(DeviceLayer, "Failed to register callback. Error: 0x%08x", err);
     }
-    LogHeapDataCallback(&SystemLayer(), nullptr);
 
-    // Start the periodic logging using SystemLayer
-    SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL), LogHeapDataCallback, nullptr);
+    LogHeapDataCallback(&SystemLayer(), &timerState);
+    if (setTimer)
+    {
+        CHIP_ERROR error = SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL),
+                                                    LogHeapDataCallback, &timerState);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to schedule heap log timer. Error: %s", chip::ErrorStr(error));
+        }
+    }
 }
 
 const char * StateToString(eTaskState state)
