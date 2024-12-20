@@ -102,6 +102,7 @@ struct EmberAfLevelControlState
     CallbackScheduleState callbackSchedule;
     QuieterReportingAttribute<uint8_t> quietCurrentLevel{ DataModel::NullNullable };
     QuieterReportingAttribute<uint16_t> quietRemainingTime{ DataModel::MakeNullable<uint16_t>(0) };
+    bool commandIsOnOff; // tracks transitions triggered by the on/off cluster
 };
 
 static EmberAfLevelControlState stateTable[kLevelControlStateTableSize];
@@ -110,7 +111,7 @@ static EmberAfLevelControlState * getState(EndpointId endpoint);
 
 static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
                                  DataModel::Nullable<uint16_t> transitionTimeDs, chip::Optional<BitMask<OptionsBitmap>> optionsMask,
-                                 chip::Optional<BitMask<OptionsBitmap>> optionsOverride, uint16_t storedLevel);
+                                 chip::Optional<BitMask<OptionsBitmap>> optionsOverride, uint16_t storedLevel, bool commandIsOnOff);
 static void moveHandler(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, MoveModeEnum moveMode,
                         DataModel::Nullable<uint8_t> rate, chip::Optional<BitMask<OptionsBitmap>> optionsMask,
                         chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
@@ -258,7 +259,7 @@ public:
         {
             moveToLevelHandler(
                 endpoint, Commands::MoveToLevel::Id, level, DataModel::MakeNullable(static_cast<uint16_t>(timeMs / 100)),
-                chip::Optional<BitMask<OptionsBitmap>>(1), chip::Optional<BitMask<OptionsBitmap>>(1), INVALID_STORED_LEVEL);
+                chip::Optional<BitMask<OptionsBitmap>>(1), chip::Optional<BitMask<OptionsBitmap>>(1), INVALID_STORED_LEVEL, false);
         }
 
         return CHIP_NO_ERROR;
@@ -499,6 +500,11 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
             }
         }
 
+        // "clear" the stored command.
+        state->commandId = Commands::Stop::Id;
+        // since the transition is complete, clear the tracking of commands from the OnOff cluster.
+        state->commandIsOnOff = false;
+
         state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
     }
@@ -695,7 +701,7 @@ Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::Decodable
 
     return moveToLevelHandler(endpointId, Commands::MoveToLevel::Id, level, transitionTime,
                               Optional<BitMask<OptionsBitmap>>(optionsMask), Optional<BitMask<OptionsBitmap>>(optionsOverride),
-                              INVALID_STORED_LEVEL); // Don't revert to the stored level
+                              INVALID_STORED_LEVEL, false); // Don't revert to the stored level
 }
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
@@ -734,7 +740,7 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(CommandHandler * com
     Status status =
         moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime,
                            Optional<BitMask<OptionsBitmap>>(optionsMask), Optional<BitMask<OptionsBitmap>>(optionsOverride),
-                           INVALID_STORED_LEVEL); // Don't revert to the stored level
+                           INVALID_STORED_LEVEL, false); // Don't revert to the stored level
 
     commandObj->AddStatus(commandPath, status);
 
@@ -870,7 +876,7 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(CommandHandler * commandObj
 
 static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
                                  DataModel::Nullable<uint16_t> transitionTimeDs, chip::Optional<BitMask<OptionsBitmap>> optionsMask,
-                                 chip::Optional<BitMask<OptionsBitmap>> optionsOverride, uint16_t storedLevel)
+                                 chip::Optional<BitMask<OptionsBitmap>> optionsOverride, uint16_t storedLevel, bool commandIsOnOff)
 {
     EmberAfLevelControlState * state = getState(endpoint);
     DataModel::Nullable<uint8_t> currentLevel;
@@ -907,7 +913,8 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
         return Status::Failure;
     }
 
-    state->commandId = commandId;
+    state->commandId      = commandId;
+    state->commandIsOnOff = commandIsOnOff;
 
     // Move To Level commands cause the device to move from its current level to
     // the specified level at the specified rate.
@@ -1097,6 +1104,9 @@ static void moveHandler(CommandHandler * commandObj, const ConcreteCommandPath &
 
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
+    // the moveHandler is only called for commands that are triggered by this cluster and therefore
+    // the current command is _not_ coming from the OnOff cluster.
+    state->commandIsOnOff = false;
 
     state->eventDurationMs = eventDuration;
     status                 = Attributes::CurrentLevel::Get(endpoint, currentLevel);
@@ -1337,6 +1347,7 @@ static void stopHandler(CommandHandler * commandObj, const ConcreteCommandPath &
     cancelEndpointTimerCallback(endpoint);
     SetCurrentLevelQuietReport(endpoint, state, state->quietCurrentLevel.value(), true /*isEndOfTransition*/);
     writeRemainingTime(endpoint, 0);
+    state->commandIsOnOff = false;
 
 send_default_response:
     commandObj->AddStatus(commandPath, status);
@@ -1425,22 +1436,55 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     transitionTime.SetNull();
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
 
+    // Check if we're already performing an on/off transition.
+    if (state->commandIsOnOff)
+    {
+        if (!newValue && (state->moveToLevel == minimumLevelAllowedForTheDevice))
+        {
+            // new state should be 'OFF' and we're already performing the 'OFF' transition
+            return;
+        }
+        if (newValue && (state->moveToLevel != minimumLevelAllowedForTheDevice))
+        {
+            // new state should be 'ON' and we're already performing the 'ON' transition
+            return;
+        }
+        if (!newValue && (state->moveToLevel != minimumLevelAllowedForTheDevice))
+        {
+            // new state should be 'OFF' but we're performing an 'ON' transition.
+            // prevent that the current dimming level (used by the transition effect)
+            // is being stored as "temporary new level"
+            temporaryCurrentLevelCache.SetNonNull(state->moveToLevel);
+        }
+        if ((newValue) && (state->moveToLevel == minimumLevelAllowedForTheDevice))
+        {
+            // new state should be 'ON' but we're performing an 'OFF' transition.
+            // in this case - without intercepting this sequence - the ON transition would
+            // restart at the minimum level.
+            resolvedLevel.SetNonNull(state->storedLevel);
+        }
+    }
+
     if (newValue)
     {
         // If newValue is OnOff::Commands::On::Id...
         // "Set CurrentLevel to minimum level allowed for the device."
-        status = SetCurrentLevelQuietReport(endpoint, state, minimumLevelAllowedForTheDevice, false /*isEndOfTransition*/);
-        if (status != Status::Success)
+        // ... except if an On/Off transition is already in progress, then don't manipulate the
+        // current level but instead just adjust the "moveTo" direction.
+        if (!state->commandIsOnOff)
         {
-            ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
-            return;
+            status = SetCurrentLevelQuietReport(endpoint, state, minimumLevelAllowedForTheDevice, false /*isEndOfTransition*/);
+            if (status != Status::Success)
+            {
+                ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
+                return;
+            }
         }
 
         // "Move CurrentLevel to OnLevel, or to the stored level if OnLevel is not
         // defined, over the time period OnOffTransitionTime."
         moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, resolvedLevel.Value(), transitionTime, chip::NullOptional,
-                           chip::NullOptional,
-                           INVALID_STORED_LEVEL); // Don't revert to stored level
+                           chip::NullOptional, INVALID_STORED_LEVEL, true); // Don't revert to stored level
     }
     else
     {
@@ -1451,13 +1495,13 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         {
             // If OnLevel is defined, don't revert to stored level.
             moveToLevelHandler(endpoint, Commands::MoveToLevelWithOnOff::Id, minimumLevelAllowedForTheDevice, transitionTime,
-                               chip::NullOptional, chip::NullOptional, INVALID_STORED_LEVEL);
+                               chip::NullOptional, chip::NullOptional, INVALID_STORED_LEVEL, true);
         }
         else
         {
             // If OnLevel is not defined, set the CurrentLevel to the stored level.
             moveToLevelHandler(endpoint, Commands::MoveToLevelWithOnOff::Id, minimumLevelAllowedForTheDevice, transitionTime,
-                               chip::NullOptional, chip::NullOptional, temporaryCurrentLevelCache.Value());
+                               chip::NullOptional, chip::NullOptional, temporaryCurrentLevelCache.Value(), true);
         }
     }
 }
@@ -1590,6 +1634,23 @@ bool LevelControlHasFeature(EndpointId endpoint, Feature feature)
     success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == Status::Success);
 
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
+}
+
+bool LevelControlIsOnOffTransitionActive(chip::EndpointId endpoint, bool * const targetState)
+{
+    bool isActive                    = false;
+    EmberAfLevelControlState * state = getState(endpoint);
+    if (state == nullptr)
+    {
+        ChipLogProgress(Zcl, "ERR: Level control cluster not available on ep%d", endpoint);
+        return isActive;
+    }
+    isActive = state->commandIsOnOff;
+    if (isActive)
+    {
+        *targetState = state->moveToLevel != state->minLevel;
+    }
+    return isActive;
 }
 
 void MatterLevelControlPluginServerInitCallback() {}
