@@ -84,6 +84,7 @@ config HEAP_MEM_POOL_SIZE
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
     default 20716 if SOC_RISCV_TELINK_TL321X || SOC_SERIES_RISCV_TELINK_B9X_RETENTION
+    default 16384 if SOC_RISCV_TELINK_TL721X
     default 12288
 
 config NET_IPV6_MLD
@@ -166,7 +167,7 @@ config BT_GATT_CACHING
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X
-    default 1010 if BT_TLX
+    default 1352 if BT_TLX
     default 2048 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
