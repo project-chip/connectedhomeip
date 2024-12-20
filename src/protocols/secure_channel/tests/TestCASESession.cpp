@@ -928,13 +928,6 @@ TEST_F(TestCASESession, EncodeSigma1Test)
     }
 
     {
-        System::PacketBufferHandle nonEmptyMsg = System::PacketBufferHandle::New(100);
-
-        // EncodeSigma1 should fail when the packetBufferHandle passed to it is not empty
-        EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, CASESessionAccess::EncodeSigma1(nonEmptyMsg, encodeParams));
-    }
-
-    {
         System::PacketBufferHandle msg1;
 
         // Round Trip Test: Encode Sigma1, Parse it then verify parsed values
@@ -967,7 +960,7 @@ TEST_F(TestCASESession, EncodeSigma1Test)
                   CHIP_NO_ERROR);
 
         encodeParams.resumptionId               = ByteSpan(resumptionId.data(), resumptionId.size());
-        encodeParams.initiatorResumeMICSpan     = ByteSpan(encodeParams.initiatorResume1MICBuffer);
+        encodeParams.initiatorResumeMIC         = ByteSpan(encodeParams.initiatorResume1MICBuffer);
         encodeParams.sessionResumptionRequested = true;
 
         System::PacketBufferHandle msg2;
@@ -990,7 +983,7 @@ TEST_F(TestCASESession, EncodeSigma1Test)
             ByteSpan(encodeParams.initiatorEphPubKey->ConstBytes(), encodeParams.initiatorEphPubKey->Length())));
 
         EXPECT_TRUE(parseParams.resumptionId.data_equal(encodeParams.resumptionId));
-        EXPECT_TRUE(parseParams.initiatorResumeMICSpan.data_equal(encodeParams.initiatorResumeMICSpan));
+        EXPECT_TRUE(parseParams.initiatorResumeMIC.data_equal(encodeParams.initiatorResumeMIC));
         EXPECT_TRUE(parseParams.initiatorMrpParamsPresent);
     }
     // Release EphemeralKeyPair
@@ -1024,13 +1017,6 @@ TEST_F(TestCASESession, EncodeSigma2Test)
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2(msg, encodeParams));
         // EncodeSigma2 frees msgR2Encrypted after encoding it
         encodeParams.msgR2Encrypted.Alloc(encodeParams.encrypted2Length);
-    }
-
-    {
-        System::PacketBufferHandle nonEmptyMsg = System::PacketBufferHandle::New(100);
-
-        // EncodeSigma2 should fail when the packetBufferHandle passed to it is not empty
-        EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, CASESessionAccess::EncodeSigma2(nonEmptyMsg, encodeParams));
     }
 
     {
@@ -1104,13 +1090,6 @@ TEST_F(TestCASESession, EncodeSigma2ResumeTest)
     {
         System::PacketBufferHandle msg;
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2Resume(msg, encodeParams));
-    }
-
-    {
-        System::PacketBufferHandle nonEmptyMsg = System::PacketBufferHandle::New(100);
-
-        // EncodeSigma2Resume should fail when the packetBufferHandle passed to it is not empty
-        EXPECT_EQ(CHIP_ERROR_INCORRECT_STATE, CASESessionAccess::EncodeSigma2Resume(nonEmptyMsg, encodeParams));
     }
 
     {

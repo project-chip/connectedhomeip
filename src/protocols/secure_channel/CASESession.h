@@ -210,7 +210,7 @@ protected:
         ByteSpan destinationId;
         bool sessionResumptionRequested = false;
         ByteSpan resumptionId;
-        ByteSpan initiatorResumeMICSpan;
+        ByteSpan initiatorResumeMIC;
     };
 
     struct EncodeSigma1Inputs : Sigma1Param
@@ -251,12 +251,11 @@ protected:
      * @brief  Encodes a Sigma1 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
      *outparam.
      *
-     * @param outMsg     PacketBufferHandle passed by reference. The handle must be empty prior to calling this method,
-     *              as a new buffer will be allocated and assigned to it within the method.
+     * @param outMsg     PacketBufferHandle passed by reference. A new buffer will be allocated and assigned to it within the
+     *method.
      *
      * @param inParam a struct containing all the values that will be encoded into TLV format
      *
-     * @note the passed PacketBufferHandle `outMsg` must not be holding an existing PacketBuffer.
      **/
     static CHIP_ERROR EncodeSigma1(System::PacketBufferHandle & outMsg, EncodeSigma1Inputs & inParam);
 
@@ -274,7 +273,7 @@ protected:
      * These values will be valid as long as the buffer that the passed-in tlvReader is reading from is valid.
      *
      * On success, either the sessionResumptionRequested field will be set to true
-     * and the resumptionID and initiatorResumeMICSpan fields will be set to
+     * and the resumptionID and initiatorResumeMIC fields will be set to
      * valid values, or the sessionResumptionRequested field will be set to false.
      */
     CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma1 & parsedMessage);
@@ -283,12 +282,11 @@ protected:
      * @brief  Encodes a Sigma2 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
      *outparam.
      *
-     * @param outMsg     PacketBufferHandle passed by reference. The handle must be empty prior to calling this method,
-     *              as a new buffer will be allocated and assigned to it within the method.
+     * @param outMsg     PacketBufferHandle passed by reference. A new buffer will be allocated and assigned to it within the
+     *method.
      *
      * @param inParam a struct containing all the values that will be encoded into TLV format
      *
-     * @note the passed PacketBufferHandle `outMsg` must be in a null state.
      **/
 
     static CHIP_ERROR EncodeSigma2(System::PacketBufferHandle & outMsg, EncodeSigma2Inputs & inParam);
@@ -297,12 +295,11 @@ protected:
      * @brief  Encodes a Sigma2_Resume message into TLV format and allocates a buffer for it, which is owned by the
      *PacketBufferHandle outparam.
      *
-     * @param outMsg     PacketBufferHandle passed by reference. The handle must be empty prior to calling this method,
-     *              as a new buffer will be allocated and assigned to it within the method.
+     * @param outMsg     PacketBufferHandle passed by reference. A new buffer will be allocated and assigned to it within the
+     *method.
      *
      * @param inParam a struct containing all the values that will be encoded into TLV format
      *
-     * @note the passed PacketBufferHandle `outMsg` must be in a null state.
      **/
     static CHIP_ERROR EncodeSigma2Resume(System::PacketBufferHandle & outMsg, EncodeSigma2ResumeInputs & inParam);
 

@@ -853,7 +853,7 @@ CHIP_ERROR CASESession::SendSigma1()
             ReturnErrorOnFailure(GenerateSigmaResumeMIC(encodeSigma1Inputs.initiatorRandom, encodeSigma1Inputs.resumptionId,
                                                         ByteSpan(kKDFS1RKeyInfo), ByteSpan(kResume1MIC_Nonce), resumeMICSpan));
 
-            encodeSigma1Inputs.initiatorResumeMICSpan     = resumeMICSpan;
+            encodeSigma1Inputs.initiatorResumeMIC         = resumeMICSpan;
             encodeSigma1Inputs.sessionResumptionRequested = true;
         }
     }
@@ -897,8 +897,6 @@ CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, EncodeSig
 {
     MATTER_TRACE_SCOPE("EncodeSigma1", "CASESession");
 
-    // The API Contract requires the passed PacketBufferHandle to be empty
-    VerifyOrReturnError(msg.IsNull(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(input.initiatorEphPubKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t dataLen = EstimateStructOverhead(kSigmaParamRandomNumberSize,                 // initiatorRandom
@@ -932,7 +930,7 @@ CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, EncodeSig
     if (input.sessionResumptionRequested)
     {
         ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma1Tags::kResumptionID), input.resumptionId));
-        ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma1Tags::kResume1MIC), input.initiatorResumeMICSpan));
+        ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma1Tags::kResume1MIC), input.initiatorResumeMIC));
     }
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
@@ -1110,7 +1108,7 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
         parsedSigma1.resumptionId.size() == SessionResumptionStorage::kResumptionIdSize &&
         CHIP_NO_ERROR ==
             TryResumeSession(SessionResumptionStorage::ConstResumptionIdView(parsedSigma1.resumptionId.data()),
-                             parsedSigma1.initiatorResumeMICSpan, parsedSigma1.initiatorRandom))
+                             parsedSigma1.initiatorResumeMIC, parsedSigma1.initiatorRandom))
     {
         std::copy(parsedSigma1.initiatorRandom.begin(), parsedSigma1.initiatorRandom.end(), mInitiatorRandom);
         std::copy(parsedSigma1.resumptionId.begin(), parsedSigma1.resumptionId.end(), mResumeResumptionId.begin());
@@ -1175,8 +1173,6 @@ CHIP_ERROR CASESession::EncodeSigma2Resume(System::PacketBufferHandle & msgR2Res
 {
     MATTER_TRACE_SCOPE("EncodeSigma2Resume", "CASESession");
 
-    // The API Contract requires the passed PacketBufferHandle to be empty
-    VerifyOrReturnError(msgR2Resume.IsNull(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(input.responderMrpConfig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t maxDatalLen = EstimateStructOverhead(SessionResumptionStorage::kResumptionIdSize, // resumptionID
@@ -1338,8 +1334,6 @@ CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & outSigma2Data)
 
 CHIP_ERROR CASESession::EncodeSigma2(System::PacketBufferHandle & msgR2, EncodeSigma2Inputs & input)
 {
-    // The API Contract requires the passed PacketBufferHandle to be empty
-    VerifyOrReturnError(msgR2.IsNull(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(input.responderEphPubKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(input.msgR2Encrypted, CHIP_ERROR_INCORRECT_STATE);
     // Check if length of msgR2Encrypted is set and is at least larger than the MIC length
@@ -2351,8 +2345,8 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     if (err == CHIP_NO_ERROR && tlvReader.GetTag() == AsTlvContextTag(Sigma1Tags::kResume1MIC))
     {
         resume1MICTagFound = true;
-        ReturnErrorOnFailure(tlvReader.GetByteView(outParsedSigma1.initiatorResumeMICSpan));
-        VerifyOrReturnError(outParsedSigma1.initiatorResumeMICSpan.size() == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
+        ReturnErrorOnFailure(tlvReader.GetByteView(outParsedSigma1.initiatorResumeMIC));
+        VerifyOrReturnError(outParsedSigma1.initiatorResumeMIC.size() == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
                             CHIP_ERROR_INVALID_CASE_PARAMETER);
         err = tlvReader.Next();
     }
