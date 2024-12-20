@@ -55,14 +55,8 @@ constexpr int kListenBacklogSize = 2;
 
 TCPBase::~TCPBase()
 {
-    if (mListenSocket != nullptr)
-    {
-        // endpoint is only non null if it is initialized and listening
-        mListenSocket->Free();
-        mListenSocket = nullptr;
-    }
-
-    CloseActiveConnections();
+    // Call Close to free the listening socket and close all active connections.
+    Close();
 }
 
 void TCPBase::CloseActiveConnections()
@@ -125,6 +119,9 @@ void TCPBase::Close()
         mListenSocket->Free();
         mListenSocket = nullptr;
     }
+
+    CloseActiveConnections();
+
     mState = TCPState::kNotReady;
 }
 
@@ -343,7 +340,15 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             // We have not yet received the complete message.
             return CHIP_NO_ERROR;
         }
+
         state->mReceived.Consume(kPacketSizeBytes);
+
+        if (messageSize == 0)
+        {
+            // No payload but considered a valid message. Return success to keep the connection alive.
+            return CHIP_NO_ERROR;
+        }
+
         ReturnErrorOnFailure(ProcessSingleMessage(peerAddress, state, messageSize));
     }
 
