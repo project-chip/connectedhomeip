@@ -298,7 +298,7 @@
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [
             "thread-network-diagnostics-server"
         ],
-        "THREAD_NETWORK_DIRECTORY_CLUSTER": ["thread-network-directory-server"],
+        "THREAD_NETWORK_DIRECTORY_CLUSTER": ["thread-network-directory"],
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
@@ -318,7 +318,7 @@
         "WEB_RTC_PROVIDER_CLUSTER": [],
         "WEBRTC_REQUESTOR_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
-        "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
+        "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
         "WATER_HEATER_MANAGEMENT_CLUSTER": ["water-heater-management-server"],
         "WATER_HEATER_MODE_CLUSTER": ["mode-base-server"],

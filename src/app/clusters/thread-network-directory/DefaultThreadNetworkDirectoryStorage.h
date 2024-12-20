@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryStorage.h>
+#include <app/clusters/thread-network-directory/ThreadNetworkDirectoryStorage.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/Pool.h>
 

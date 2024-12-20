@@ -16,7 +16,7 @@
  */
 
 #include "DefaultThreadNetworkDirectoryStorage.h"
-#include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
+#include <app/clusters/thread-network-directory/DefaultThreadNetworkDirectoryStorage.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 

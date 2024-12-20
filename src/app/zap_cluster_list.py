@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Parses a ZAP input file and outputs directories to compile."""
+"""Parses a ZAP input file and outputs targets to compile."""
 
 import argparse
 import json
@@ -12,10 +12,10 @@ import typing
 def get_cluster_sources(clusters: typing.Set[str],
                         source_map: typing.Dict[str,
                                                 typing.List[str]], side: str):
-    """Returns a list of cluster source directories for the given clusters.
+    """Returns a list of cluster targets for the given clusters.
 
     Returns:
-      The set of source directories to build.
+      The set of targets to build.
     """
 
     cluster_sources: typing.Set[str] = set()
@@ -25,7 +25,7 @@ def get_cluster_sources(clusters: typing.Set[str],
             raise ValueError("Unhandled %s cluster: %s"
                              " (hint: add to src/app/zap_cluster_list.json)" % (side, cluster))
 
-        cluster_sources.update(source_map[cluster])
+        cluster_sources.update(["%s:%s" % (dir, side) for dir in source_map[cluster]])
 
     return cluster_sources
 
@@ -33,7 +33,7 @@ def get_cluster_sources(clusters: typing.Set[str],
 def dump_zapfile_clusters(zap_file_path: pathlib.Path,
                           implementation_data_path: pathlib.Path,
                           external_clusters: typing.List[str]):
-    """Prints all of the source directories to build for a given ZAP file.
+    """Prints all of the targets to build for a given ZAP file.
 
     Arguments:
       zap_file_path - Path to the ZAP input file.

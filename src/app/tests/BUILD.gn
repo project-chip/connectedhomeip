@@ -74,19 +74,6 @@ source_set("ota-requestor-test-srcs") {
   ]
 }
 
-source_set("thread-network-directory-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.cpp",
-    "${chip_root}/src/app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h",
-    "${chip_root}/src/app/clusters/thread-network-directory-server/ThreadNetworkDirectoryStorage.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/lib/core",
-  ]
-}
-
 source_set("time-sync-data-provider-test-srcs") {
   sources = [ "${chip_root}/src/app/clusters/time-synchronization-server/TimeSyncDataProvider.cpp" ]
 
@@ -244,10 +231,10 @@ chip_test_suite("tests") {
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":power-cluster-test-srcs",
-    ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/thread-network-directory:server",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/icd/client:handler",
