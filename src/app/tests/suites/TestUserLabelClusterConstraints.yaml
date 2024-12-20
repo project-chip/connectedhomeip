@@ -85,5 +85,5 @@ tests:
               ]
       response:
           # When the cluster runs out of capacity to store these entries,
-          # we expect a FAILURE get returned.
-          error: FAILURE
+          # we expect a RESOURCE_EXHAUSTED get returned.
+          error: RESOURCE_EXHAUSTED

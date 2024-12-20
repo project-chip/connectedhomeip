@@ -64,7 +64,6 @@ CONFIG_FREERTOS_ENABLE_BACKWARD_COMPATIBILITY=y
 
 # Disable STA and AP for ESP32H2
 CONFIG_ENABLE_WIFI_STATION=n
-CONFIG_ENABLE_WIFI_AP=n
 # Enable this to avoid implicit declaration of function 'esp_send_assoc_resp'
 CONFIG_ESP_WIFI_SOFTAP_SUPPORT=y
 
