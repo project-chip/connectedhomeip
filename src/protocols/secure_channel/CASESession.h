@@ -191,7 +191,7 @@ public:
     bool InvokeBackgroundWorkWatchdog();
 
 protected:
-    // Helper Enum for usage in HandleSigma1_and_SendSigma2
+    // Helper Enum for use in HandleSigma1_and_SendSigma2
     enum class Step : uint8_t
     {
         kNone,
@@ -199,10 +199,7 @@ protected:
         kSendSigma2Resume,
         kSendStatusReport
     };
-
-    Step mNextStep = Step::kNone;
-
-    // This struct  only serves as a base struct for EncodeSigma1 and ParseSigma1
+    // This struct  only serves as a base struct for EncodedSigma1Inputs and ParsedSigma1
     struct Sigma1Param
     {
         ByteSpan initiatorRandom;
@@ -215,9 +212,9 @@ protected:
 
     struct EncodeSigma1Inputs : Sigma1Param
     {
-        const Crypto::P256PublicKey * pEphPubKey                 = nullptr;
+        const Crypto::P256PublicKey * initiatorEphPubKey         = nullptr;
         const ReliableMessageProtocolConfig * initiatorMrpConfig = nullptr;
-        uint8_t initiatorResume1MIC[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
+        uint8_t initiatorResume1MICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
     };
 
     struct ParsedSigma1 : Sigma1Param
@@ -230,32 +227,35 @@ protected:
     {
         uint8_t responderRandom[kSigmaParamRandomNumberSize];
         uint16_t responderSessionId;
-        const Crypto::P256PublicKey * pEphPubKey = nullptr;
+        const Crypto::P256PublicKey * responderEphPubKey = nullptr;
+        // ScopedMemoryBufferWithSize is not used for msgR2Encrypted since encrypted2Length might differ from the allocated buffer
+        // size
         Platform::ScopedMemoryBuffer<uint8_t> msgR2Encrypted;
         size_t encrypted2Length = 0;
         const ReliableMessageProtocolConfig * responderMrpConfig;
     };
 
-    struct EncodeSigma2ResInputs
+    struct EncodeSigma2ResumeInputs
     {
         ByteSpan resumptionId;
-        uint8_t sigma2ResumeMIC[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
-        MutableByteSpan resumeMICSpan{ sigma2ResumeMIC };
+        uint8_t sigma2ResumeMICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
+        MutableByteSpan resumeMICSpan{ sigma2ResumeMICBuffer };
         uint16_t responderSessionId;
         const ReliableMessageProtocolConfig * responderMrpConfig;
     };
 
     /**
-     * @brief  Encodes a Sigma1 message into TLV format and allocates a buffer for it within the provided PacketBufferHandle.
+     * @brief  Encodes a Sigma1 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
+     *outparam.
      *
      * @param outMsg     PacketBufferHandle passed by reference. The handle must be empty prior to calling this method,
      *              as a new buffer will be allocated and assigned to it within the method.
      *
      * @param inParam a struct containing all the values that will be encoded into TLV format
      *
-     * @note the passed PacketBufferHandle `outMsg` must be in a null state.
+     * @note the passed PacketBufferHandle `outMsg` must not be holding an existing PacketBuffer.
      **/
-    CHIP_ERROR EncodeSigma1(System::PacketBufferHandle & outMsg, EncodeSigma1Inputs & inParam);
+    static CHIP_ERROR EncodeSigma1(System::PacketBufferHandle & outMsg, EncodeSigma1Inputs & inParam);
 
     /**
      * Parse a sigma1 message.  This function will return success only if the
@@ -264,19 +264,21 @@ protected:
      *   * The required tags are present.
      *   * The values for the tags that are present satisfy schema requirements
      *     (e.g. constraints on octet string lengths)
-     *   * Either resumptionID and initiatorResume1MIC are both present or both
+     *   * Either resumptionID and initiatorResume1MICBuffer are both present or both
      *     absent.
      *
      * On success, the members of outParam will be set to the values corresponding to the message.
+     * These values will be valid as long as the buffer that the passed-in tlvReader is reading from is valid.
      *
-     * On success, either the sessionResumptionRequested outParam will be set to true
-     * and the resumptionID and initiatorResumeMICSpan outparams will be set to
-     * valid values, or the sessionResumptionRequested outParam will be set to false.
+     * On success, either the sessionResumptionRequested field will be set to true
+     * and the resumptionID and initiatorResumeMICSpan fields will be set to
+     * valid values, or the sessionResumptionRequested field will be set to false.
      */
-    CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma1 & outParam);
+    CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma1 & parsedMessage);
 
     /**
-     * @brief  Encodes a Sigma2 message into TLV format and allocates a buffer for it within the provided PacketBufferHandle.
+     * @brief  Encodes a Sigma2 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
+     *outparam.
      *
      * @param outMsg     PacketBufferHandle passed by reference. The handle must be empty prior to calling this method,
      *              as a new buffer will be allocated and assigned to it within the method.
@@ -286,10 +288,11 @@ protected:
      * @note the passed PacketBufferHandle `outMsg` must be in a null state.
      **/
 
-    CHIP_ERROR EncodeSigma2(System::PacketBufferHandle & outMsg, EncodeSigma2Inputs & inParam);
+    static CHIP_ERROR EncodeSigma2(System::PacketBufferHandle & outMsg, EncodeSigma2Inputs & inParam);
 
     /**
-     * @brief  Encodes a Sigma2_Resume message into TLV format and allocates a buffer for it within the provided PacketBufferHandle.
+     * @brief  Encodes a Sigma2_Resume message into TLV format and allocates a buffer for it, which is owned by the
+     *PacketBufferHandle outparam.
      *
      * @param outMsg     PacketBufferHandle passed by reference. The handle must be empty prior to calling this method,
      *              as a new buffer will be allocated and assigned to it within the method.
@@ -298,7 +301,7 @@ protected:
      *
      * @note the passed PacketBufferHandle `outMsg` must be in a null state.
      **/
-    CHIP_ERROR EncodeSigma2Resume(System::PacketBufferHandle & outMsg, EncodeSigma2ResInputs & inParam);
+    static CHIP_ERROR EncodeSigma2Resume(System::PacketBufferHandle & outMsg, EncodeSigma2ResumeInputs & inParam);
 
 private:
     friend class TestCASESession;
@@ -325,12 +328,12 @@ private:
 
     CHIP_ERROR SendSigma1();
     CHIP_ERROR HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg);
-    CHIP_ERROR HandleSigma1(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleSigma1(System::PacketBufferHandle && ms, Step & nextStep);
     CHIP_ERROR TryResumeSession(SessionResumptionStorage::ConstResumptionIdView resumptionId, ByteSpan resume1MIC,
                                 ByteSpan initiatorRandom);
 
     CHIP_ERROR PrepareSigma2(EncodeSigma2Inputs & output);
-    CHIP_ERROR PrepareSigma2Resume(EncodeSigma2ResInputs & output);
+    CHIP_ERROR PrepareSigma2Resume(EncodeSigma2ResumeInputs & output);
     CHIP_ERROR SendSigma2(System::PacketBufferHandle && msg_R2);
     CHIP_ERROR SendSigma2Resume(System::PacketBufferHandle && msg_R2_resume);
 
