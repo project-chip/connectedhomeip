@@ -6,18 +6,33 @@ import re
 import subprocess
 from datetime import datetime
 
+
 # Constants for default values
 DEFAULT_TARGETS = [
-    "linux-x64-ota-provider-no-ble-clang-boringssl",
-    "linux-x64-network-manager-ipv6only-no-ble-clang-boringssl",
-    "linux-x64-rvc-no-ble-clang-boringssl",
-    "linux-x64-bridge-no-ble-clang-boringssl",
-    "linux-x64-lock-no-ble-clang-boringssl",
-    "linux-x64-tv-app-no-ble-clang-boringssl",
+    "linux-x64-air-purifier-no-ble",
+    "linux-x64-air-quality-sensor-no-ble",
+    "linux-x64-all-clusters-minimal-no-ble",
     "linux-x64-all-clusters-no-ble-clang-boringssl",
+    "linux-x64-bridge-no-ble-clang-boringssl",
+    "linux-x64-contact-sensor-no-ble",
+    "linux-x64-dishwasher-no-ble",
     "linux-x64-energy-management-no-ble-clang-boringssl",
-    "linux-x64-microwave-oven-no-ble-clang-boringssl",
+    "linux-x64-light-data-model-no-unique-id-no-ble",
     "linux-x64-light-no-ble",
+    "linux-x64-lit-icd-no-ble",
+    "linux-x64-lock-no-ble-clang-boringssl",
+    "linux-x64-microwave-oven-no-ble-clang-boringssl",
+    "linux-x64-network-manager-ipv6only-no-ble-clang-boringssl",
+    "linux-x64-ota-provider-no-ble",
+    "linux-x64-ota-provider-no-ble-clang-boringssl",
+    "linux-x64-ota-requestor-no-ble",
+    "linux-x64-refrigerator-no-ble",
+    "linux-x64-rvc-no-ble",
+    "linux-x64-rvc-no-ble-clang-boringssl",
+    "linux-x64-thermostat-no-ble",
+    "linux-x64-tv-app-no-ble-clang-boringssl",
+    "linux-x64-tv-casting-app-no-ble",
+    "linux-x64-water-leak-detector-no-ble"
 ]
 DEFAULT_TESTS = ["TC_DeviceBasicComposition", "TC_DeviceConformance"]
 TMP_RESULTS_DIR = "/tmp/comformance_report"
