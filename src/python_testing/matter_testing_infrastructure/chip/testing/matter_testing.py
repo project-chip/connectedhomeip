@@ -2057,9 +2057,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")
 
-    commission_group.add_argument('--tc-version', type=int, help="Terms and conditions version")
+    commission_group.add_argument('--tc-version-to-simulate', type=int, help="Terms and conditions version")
 
-    commission_group.add_argument('--tc-user-response', type=int, help="Terms and conditions acknowledgements")
+    commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
 
     code_group = parser.add_mutually_exclusive_group(required=False)
 
