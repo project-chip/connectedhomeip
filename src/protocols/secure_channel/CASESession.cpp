@@ -946,12 +946,12 @@ CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle &
     MATTER_TRACE_SCOPE("HandleSigma1_and_SendSigma2", "CASESession");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Step nextStep  = Step::kNone;
 
     // Parse and Validate Received Sigma1, and decide next step
-    SuccessOrExit(err = HandleSigma1(std::move(msg), nextStep));
+    NextStep nextStep = HandleSigma1(std::move(msg));
+    VerifyOrExit(nextStep.Is<Step>(), err = nextStep.Get<CHIP_ERROR>());
 
-    switch (nextStep)
+    switch (nextStep.Get<Step>())
     {
     case Step::kSendSigma2: {
 
@@ -982,15 +982,11 @@ CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle &
         mDelegate->OnSessionEstablishmentStarted();
         break;
     }
-        // TODO should I keep this?
-    case Step::kSendStatusReport:
     default:
-        ExitNow();
         break;
     }
 
 exit:
-
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeNoSharedRoot);
@@ -1082,15 +1078,15 @@ CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumpti
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg, Step & nextStep)
+CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma1", "CASESession");
     ChipLogProgress(SecureChannel, "Received Sigma1 msg");
     MATTER_TRACE_COUNTER("Sigma1");
 
-    VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mFabricsTable != nullptr, NextStep::Create<CHIP_ERROR>(CHIP_ERROR_INCORRECT_STATE));
 
-    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg->Start(), msg->DataLength() }));
+    ReturnErrorVariantOnFailure(NextStep, mCommissioningHash.AddData(ByteSpan{ msg->Start(), msg->DataLength() }));
 
     System::PacketBufferTLVReader tlvReader;
     tlvReader.Init(std::move(msg));
@@ -1098,7 +1094,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg, Step & n
     // Struct that will serve as output in ParseSigma1
     ParsedSigma1 parsedSigma1;
 
-    ReturnErrorOnFailure(ParseSigma1(tlvReader, parsedSigma1));
+    ReturnErrorVariantOnFailure(NextStep, ParseSigma1(tlvReader, parsedSigma1));
 
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", parsedSigma1.initiatorSessionId);
     SetPeerSessionId(parsedSigma1.initiatorSessionId);
@@ -1119,12 +1115,9 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg, Step & n
         std::copy(parsedSigma1.initiatorRandom.begin(), parsedSigma1.initiatorRandom.end(), mInitiatorRandom);
         std::copy(parsedSigma1.resumptionId.begin(), parsedSigma1.resumptionId.end(), mResumeResumptionId.begin());
 
-        // Next Step is to send Sigma2Resume message to the initiator
-        nextStep = Step::kSendSigma2Resume;
-
         //  Early returning here, since the next Step is known to be Sigma2Resume, and no further processing is needed for the
         //  Sigma1 message
-        return CHIP_NO_ERROR;
+        return NextStep::Create<Step>(Step::kSendSigma2Resume);
     }
 
     //  ParseSigma1 ensures that:
@@ -1143,21 +1136,21 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg, Step & n
         // Side-effect of FindLocalNodeFromDestinationId success was that mFabricIndex/mLocalNodeId are now
         // set to the local fabric and associated NodeId that was targeted by the initiator.
 
-        nextStep = Step::kSendSigma2;
+        return NextStep::Create<Step>(Step::kSendSigma2);
     }
     else
     {
         ChipLogError(SecureChannel, "CASE failed to match destination ID with local fabrics");
         ChipLogByteSpan(SecureChannel, parsedSigma1.destinationId);
 
-        // FindLocalNodeFromDestinationId returns CHIP_ERROR_KEY_NOT_FOUND if validation of DestinationID fails, which will trigger
-        // status Report with ProtocolCode = NoSharedTrustRoots.
-        nextStep = Step::kSendStatusReport;
+        // FindLocalNodeFromDestinationId returns CHIP_ERROR_KEY_NOT_FOUND if Sigma1's DestinationId does not match any
+        // candidateDestinationId, this will trigger a status Report with ProtocolCode = NoSharedTrustRoots.
 
-        return err;
+        // Returning a CHIP_ERROR variant that will trigger a corresponding Status Report.
+        return NextStep::Create<CHIP_ERROR>(err);
     }
 
-    return CHIP_NO_ERROR;
+    return NextStep::Create<CHIP_ERROR>(CHIP_NO_ERROR);
 }
 
 CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResumeInputs & outSigma2ResData)

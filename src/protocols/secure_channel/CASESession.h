@@ -197,8 +197,11 @@ protected:
         kNone,
         kSendSigma2,
         kSendSigma2Resume,
-        kSendStatusReport
     };
+    // Making NextStep a Variant allows HandleSigma() to return either a Step value (indicating
+    // the next Sigma step to send) or a CHIP_ERROR (indicating a failure that will trigger
+    // a Status Report).
+    using NextStep = Variant<Step, CHIP_ERROR>;
     // This struct  only serves as a base struct for EncodedSigma1Inputs and ParsedSigma1
     struct Sigma1Param
     {
@@ -328,7 +331,7 @@ private:
 
     CHIP_ERROR SendSigma1();
     CHIP_ERROR HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg);
-    CHIP_ERROR HandleSigma1(System::PacketBufferHandle && ms, Step & nextStep);
+    NextStep HandleSigma1(System::PacketBufferHandle && msg);
     CHIP_ERROR TryResumeSession(SessionResumptionStorage::ConstResumptionIdView resumptionId, ByteSpan resume1MIC,
                                 ByteSpan initiatorRandom);
 
