@@ -976,9 +976,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         conf = self.matter_test_config
 
         for commission_idx, node_id in enumerate(conf.dut_node_ids):
-            logging.info("Starting commissioning for root index %d, fabric ID 0x%016X, node ID 0x%016X" %
-                         (conf.root_of_trust_index, conf.fabric_id, node_id))
-            logging.info("Commissioning method: %s" % conf.commissioning_method)
+            logging.info(f"Starting commissioning for root index {conf.root_of_trust_index}, fabric ID 0x{conf.fabric_id:016X}, node ID 0x{node_id:016X}")
+            logging.info(f"Commissioning method: {conf.commissioning_method}")
 
             await CommissionDeviceTest.commission_device(self, commission_idx)
 
