@@ -191,11 +191,7 @@ void BDXDiagnosticLogsProvider::OnAckReceived()
     // If the buffer has empty space, end the log collection session.
     if (isEndOfLog)
     {
-        err = mDelegate->EndLogCollection(mLogSessionHandle, err);
-        if (err == CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-            ChipLogError(DeviceLayer, "EndLogCollection not implemented in the delegate. Falling back to default behavior.");
-        }
+        mDelegate->EndLogCollection(mLogSessionHandle);
         mLogSessionHandle = kInvalidLogSessionHandle;
     }
 
@@ -283,11 +279,7 @@ void BDXDiagnosticLogsProvider::Reset(CHIP_ERROR error)
 
     if (mDelegate != nullptr)
     {
-        CHIP_ERROR err = mDelegate->EndLogCollection(mLogSessionHandle, error);
-        if (err == CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-            ChipLogError(DeviceLayer, "EndLogCollection not implemented in the delegate. Falling back to default behavior.");
-        }
+        mDelegate->EndLogCollection(mLogSessionHandle, error);
         mDelegate = nullptr;
     }
 
