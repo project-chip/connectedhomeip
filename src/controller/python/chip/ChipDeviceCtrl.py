@@ -2005,6 +2005,15 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_CreateManualCode.restype = PyChipError
             self._dmLib.pychip_CreateManualCode.argtypes = [c_uint16, c_uint32, c_char_p, c_size_t, POINTER(c_size_t)]
 
+            self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.argtypes = [c_bool]
+
+            self._dmLib.pychip_DeviceController_SetRequireTermsAndConditionsAcknowledgement.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetRequireTermsAndConditionsAcknowledgement.argtypes = [c_bool]
+
+            self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.argtypes = [c_uint16, c_uint16]
+
 
 class ChipDeviceController(ChipDeviceControllerBase):
     ''' The ChipDeviceCommissioner binding, named as ChipDeviceController
@@ -2131,6 +2140,27 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDSTOffset(offset, validStarting, validUntil)
+        ).raise_on_error()
+
+    def SetTCRequired(self, tcRequired: bool):
+        ''' Set whether TC Acknowledgements should be set during commissioning'''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetRequireTermsAndConditionsAcknowledgement(tcRequired)
+        ).raise_on_error()
+
+    def SetTCAcknowledgements(self, tcAcceptedVersion: int, tcUserResponse: int):
+        ''' Set the TC acknowledgements to set during commissioning'''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetTermsAcknowledgements(tcAcceptedVersion, tcUserResponse)
+        ).raise_on_error()
+
+    def SetSkipCommissioningComplete(self, skipCommissioningComplete: bool):
+        ''' Set whether to skip the commissioning complete callback'''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete(skipCommissioningComplete)
         ).raise_on_error()
 
     def SetDefaultNTP(self, defaultNTP: str):
