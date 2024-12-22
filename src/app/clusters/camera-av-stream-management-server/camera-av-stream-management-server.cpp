@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -196,7 +196,7 @@ CameraAVStreamMgmtServer::ReadAndEncodeRankedVideoStreamPrioritiesList(const Att
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    for (uint8_t i = 0; i < kNumOfStreamTypes; i++)
+    for (uint8_t i = 0; i < kNumOfStreamUsageTypes; i++)
     {
         err = encoder.Encode(mRankedVideoStreamPriorities[i]);
         SuccessOrExit(err);
@@ -219,9 +219,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveFromFabricsUsingCamera(chip::FabricIn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::SetRankedVideoStreamPriorities(const StreamTypeEnum newPriorities[kNumOfStreamTypes])
+CHIP_ERROR CameraAVStreamMgmtServer::SetRankedVideoStreamPriorities(const StreamUsageEnum newPriorities[kNumOfStreamUsageTypes])
 {
-    std::copy(newPriorities, newPriorities + kNumOfStreamTypes, mRankedVideoStreamPriorities);
+    std::copy(newPriorities, newPriorities + kNumOfStreamUsageTypes, mRankedVideoStreamPriorities);
 
     ReturnErrorOnFailure(StoreRankedVideoStreamPriorities());
 
@@ -1381,7 +1381,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::StoreRankedVideoStreamPriorities()
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
 
-    for (uint8_t i = 0; i < kNumOfStreamTypes; i++)
+    for (uint8_t i = 0; i < kNumOfStreamUsageTypes; i++)
     {
         ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), mRankedVideoStreamPriorities[i]));
     }
@@ -1407,7 +1407,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadRankedVideoStreamPriorities()
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(reader.EnterContainer(arrayType));
 
-    for (uint8_t i = 0; i < kNumOfStreamTypes; i++)
+    for (uint8_t i = 0; i < kNumOfStreamUsageTypes; i++)
     {
         if (reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag()) != CHIP_NO_ERROR)
         {
@@ -1562,7 +1562,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     Status status = Status::Success;
 
     Commands::VideoStreamAllocateResponse::Type response;
-    auto & streamType       = commandData.streamType;
+    auto & streamUsage      = commandData.streamUsage;
     auto & videoCodec       = commandData.videoCodec;
     auto & minFrameRate     = commandData.minFrameRate;
     auto & maxFrameRate     = commandData.maxFrameRate;
@@ -1597,7 +1597,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 
     // Call the delegate
     status =
-        mDelegate.VideoStreamAllocate(streamType, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution, minBitRate,
+        mDelegate.VideoStreamAllocate(streamUsage, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution, minBitRate,
                                       maxBitRate, minFragmentLen, maxFragmentLen, isWaterMarkEnabled, isOSDEnabled);
 
     if (status == Status::Success)
@@ -1617,7 +1617,6 @@ void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
     bool isWaterMarkEnabled = false;
     bool isOSDEnabled       = false;
     auto & videoStreamID    = commandData.videoStreamID;
-    auto & videoRes         = commandData.resolution;
 
     if (HasFeature(Feature::kWatermark))
     {
@@ -1640,7 +1639,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
     }
 
     // Call the delegate
-    status = mDelegate.VideoStreamModify(videoStreamID, videoRes, isWaterMarkEnabled, isOSDEnabled);
+    status = mDelegate.VideoStreamModify(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
 
 exit:
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -1669,7 +1668,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
 {
 
     Commands::AudioStreamAllocateResponse::Type response;
-    auto & streamType   = commandData.streamType;
+    auto & streamUsage  = commandData.streamUsage;
     auto & audioCodec   = commandData.audioCodec;
     auto & channelCount = commandData.channelCount;
     auto & sampleRate   = commandData.sampleRate;
@@ -1677,7 +1676,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
     auto & bitDepth     = commandData.bitDepth;
 
     // Call the delegate
-    Status status = mDelegate.AudioStreamAllocate(streamType, audioCodec, channelCount, sampleRate, bitRate, bitDepth);
+    Status status = mDelegate.AudioStreamAllocate(streamUsage, audioCodec, channelCount, sampleRate, bitRate, bitDepth);
 
     if (status != Status::Success)
     {

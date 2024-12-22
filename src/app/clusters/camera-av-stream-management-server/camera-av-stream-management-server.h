@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,20 +45,22 @@ constexpr uint16_t kMaxImageRotationDegrees = 359;
 
 constexpr size_t kViewportStructMaxSerializedSize = TLV::EstimateStructOverhead(sizeof(uint16_t) * 4);
 
-constexpr size_t kNumOfStreamTypes = 4;
+// The number of different use case types for the streams(Recording, Liveview, etc).
+constexpr size_t kNumOfStreamUsageTypes = 4;
 
-// StreamTypeEnum + Anonymous tag(1 byte)
-constexpr size_t kStreamTypeTlvSize = sizeof(StreamTypeEnum) + 1;
+// StreamUsageEnum + Anonymous tag(1 byte)
+constexpr size_t kStreamUsageTlvSize = sizeof(StreamUsageEnum) + 1;
 
 // 1 control byte + end-of-array marker
 constexpr size_t kArrayTlvOverhead = 2;
 
-constexpr size_t kRankedVideoStreamPrioritiesTlvSize = kArrayTlvOverhead + kStreamTypeTlvSize * kNumOfStreamTypes;
+constexpr size_t kRankedVideoStreamPrioritiesTlvSize = kArrayTlvOverhead + kStreamUsageTlvSize * kNumOfStreamUsageTypes;
 
 class CameraAVStreamMgmtServer;
 
 /** @brief
- *  Defines methods for implementing application-specific logic for the CameraAvStreamManagement Cluster.
+ *  Defines interfaces for implementing application-specific logic for various aspects of the CameraAvStreamManagement Cluster.
+ *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
  */
 class CameraAVStreamMgmtDelegate
 {
@@ -68,40 +70,120 @@ public:
     virtual ~CameraAVStreamMgmtDelegate() = default;
 
     /**
-     *   @brief Handle Command Delegate for Video stream allocation.
+     *   @brief Handle Command Delegate for Video stream allocation with the provided parameter list.
+     *
+     *   @param streamUsage        Indicates the type of usage of stream(Recording, Liveview, etc) that this allocation is for.
+     *
+     *   @param videoCodec         Indicates the type of video codec the stream should support.
+     *
+     *   @param minFrameRate       Indicates the minimum frame rate(frames/second) of the video stream.
+     *
+     *   @param maxFrameRate       Indicates the maximum frame rate(frames/second) of the video stream.
+     *
+     *   @param minResolution      Indicates the minimum resolution of the video stream.
+     *
+     *   @param maxResolution      Indicates the maximum resolution of the video stream.
+     *
+     *   @param minBitRate         Indicates the minimum bit rate(bits/second) of the video stream.
+     *
+     *   @param maxBitRate         Indicates the maximum bit rate(bits/second) of the video stream.
+     *
+     *   @param minFragmentLen     Indicates the minimum length(msecs) of a clip fragment for the video stream.
+     *
+     *   @param maxFragmentLen     Indicates the maximum length(msecs) of a clip fragment for the video stream.
+     *
+     *   @param waterMarkEnabled   Indicates  whether a watermark can be applied on the video stream.
+     *
+     *   @param osdEnabled         Indicates  whether the on-screen display can be applied on the video stream.
+     *
+     *   @return Success if the allocation is successful and a VideoStreamID was
+     *   produced; otherwise, the command SHALL be rejected with an appropriate
+     *   error.
      */
     virtual Protocols::InteractionModel::Status
-    VideoStreamAllocate(StreamTypeEnum streamType, CameraAvStreamManagement::VideoCodecEnum videoCodec, const uint16_t minFrameRate,
-                        const uint16_t maxFrameRate, VideoResolutionStruct minResolution, VideoResolutionStruct maxResolution,
-                        const uint32_t minBitRate, const uint32_t maxBitRate, const uint16_t minFragmentLen,
-                        const uint16_t maxFragmentLen, bool waterMarkEnabled, bool osdEnabled) = 0;
+    VideoStreamAllocate(StreamUsageEnum streamUsage, CameraAvStreamManagement::VideoCodecEnum videoCodec,
+                        const uint16_t minFrameRate, const uint16_t maxFrameRate, VideoResolutionStruct minResolution,
+                        VideoResolutionStruct maxResolution, const uint32_t minBitRate, const uint32_t maxBitRate,
+                        const uint16_t minFragmentLen, const uint16_t maxFragmentLen, bool waterMarkEnabled, bool osdEnabled) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream modification.
+     *
+     *   @param streamID           Indicates the streamID of the video stream to modify.
+     *
+     *   @param waterMarkEnabled   Indicates  whether a watermark can be applied on the video stream.
+     *
+     *   @param osdEnabled         Indicates  whether the on-screen display can be applied on the video stream.
+     *
+     *   @return Success if the stream modification is successful; otherwise, the command SHALL be rejected with an appropriate
+     *   error.
      */
-    virtual Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID,
-                                                                  Optional<VideoResolutionStruct> videoResolution,
-                                                                  bool waterMarkEnabled, bool osdEnabled) = 0;
+    virtual Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID, bool waterMarkEnabled,
+                                                                  bool osdEnabled) = 0;
 
     /**
-     *   @brief Handle Command Delegate for Video stream deallocation.
+     *   @brief Handle Command Delegate for Video stream deallocation for the
+     *   provided streamID.
+     *
+     *   @param streamID       Indicates the streamID to deallocate.
+     *
+     *   @return Success if the stream deallocation is successful; otherwise, the command SHALL be rejected with an appropriate
+     *   error.
+     *
      */
     virtual Protocols::InteractionModel::Status VideoStreamDeallocate(const uint16_t streamID) = 0;
 
     /**
      *   @brief Handle Command Delegate for Audio stream allocation.
+     *
+     *   @param streamUsage        Indicates the type of usage of stream(Recording, Liveview, etc) that this allocation is for.
+     *
+     *   @param audioCodec         Indicates the type of audio codec the stream should support.
+     *
+     *   @param channelCount       Indicates the the number of channels used by the stream, e.g., Mono(1), Stereo(2), etc.
+     *
+     *   @param sampleRate         Indicates the sampling rate of the audio stream in Hz.
+     *
+     *   @param bitRate            Indicates the bitrate(bits/sec) of the specified audio codec.
+     *
+     *   @param bitDepth           Indicates the number of information bits(8, 16, 24 or 32) used to represent each sample.
+     *
+     *   @return Success if the allocation is successful and an AudioStreamID was
+     *   produced; otherwise, the command SHALL be rejected with an appropriate
+     *   error.
      */
-    virtual Protocols::InteractionModel::Status AudioStreamAllocate(StreamTypeEnum streamType, AudioCodecEnum audioCodec,
+    virtual Protocols::InteractionModel::Status AudioStreamAllocate(StreamUsageEnum streamUsage, AudioCodecEnum audioCodec,
                                                                     const uint8_t channelCount, const uint32_t sampleRate,
                                                                     const uint32_t bitRate, const uint32_t bitDepth) = 0;
 
     /**
      *   @brief Handle Command Delegate for Audio stream deallocation.
+     *
+     *   @param streamID       Indicates the streamID to deallocate.
+     *
+     *   @return Success if the stream deallocation is successful; otherwise, the command SHALL be rejected with an appropriate
+     *   error.
      */
     virtual Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID) = 0;
 
     /**
      *   @brief Handle Command Delegate for Snapshot stream allocation.
+     *
+     *   @param imageCodec         Indicates the type of image codec to be used by the stream.
+     *
+     *   @param frameRate          Indicates the frame rate(frames/second) of the stream.
+     *
+     *   @param bitRate            Indicates the bitrate(bits/sec) of the stream.
+     *
+     *   @param minResolution      Indicates the minimum resolution of the stream.
+     *
+     *   @param maxResolution      Indicates the maximum resolution of the stream.
+     *
+     *   @param quality            Indicates a codec quality metric(integer between 1 and 100) for the stream.
+     *
+     *   @return Success if the allocation is successful and a SnapshotStreamID was
+     *   produced; otherwise, the command SHALL be rejected with an appropriate
+     *   error.
      */
     virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(ImageCodecEnum imageCodec, const uint16_t frameRate,
                                                                        const uint32_t bitRate, VideoResolutionStruct minResolution,
@@ -110,19 +192,36 @@ public:
 
     /**
      *   @brief Handle Command Delegate for Snapshot stream deallocation.
+     *
+     *   @param streamID       Indicates the streamID to deallocate.
+     *
+     *   @return Success if the stream deallocation is successful; otherwise, the command SHALL be rejected with an appropriate
+     *   error.
      */
     virtual Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) = 0;
 
     /**
-     *   @brief Handle Command Delegate for CaptureSnapshot.
-     */
-    virtual Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID, VideoResolutionStruct videoResolution) = 0;
-
-    /**
      *   @brief Handle Command Delegate for SetStreamPriorities.
+     *
+     *   @param streamPriorities    Indicates the list of stream priorities to set, in decreasing order of priorities.
+     *
+     *   @return Success if the setting of stream priorities is successful; otherwise, the command SHALL be rejected with an
+     * appropriate error.
      */
     virtual Protocols::InteractionModel::Status
-    SetStreamPriorities(const DataModel::DecodableList<StreamTypeEnum> streamPriorities) = 0;
+    SetStreamPriorities(const DataModel::DecodableList<StreamUsageEnum> streamPriorities) = 0;
+
+    /**
+     *   @brief Handle Command Delegate for CaptureSnapshot.
+     *
+     *   @param streamID          Indicates the streamID representing the shapshot stream.
+     *
+     *   @param videoResolution   Indicates the preferred resolution of the snapshot image.
+     *
+     *   @return Success if the processing of the Command is successful; otherwise, the command SHALL be rejected with an
+     * appropriate error.
+     */
+    virtual Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID, VideoResolutionStruct videoResolution) = 0;
 
     /**
      *  Delegate functions to load the allocated video, audio, and snapshot streams.
@@ -155,8 +254,9 @@ protected:
     CameraAVStreamMgmtServer * mCameraAVStreamMgmtServer = nullptr;
 
     /**
-     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a
+     * This method is used by the SDK to set the CameraAVStreamMgmtServer pointer. This is done during the instantiation of a
      * CameraAVStreamMgmtServer object.
+     *
      * @param aCameraAVStreamMgmtServer A pointer to the CameraAVStreamMgmtServer object related to this delegate object.
      */
     void SetCameraAVStreamMgmtServer(CameraAVStreamMgmtServer * aCameraAVStreamMgmtServer)
@@ -187,11 +287,37 @@ public:
     /**
      * @brief Creates a Camera AV Stream Management cluster instance. The Init() function needs to be called for this instance
      * to be registered and called by the interaction model at the appropriate times.
-     * @param aDelegate A pointer to the delegate to be used by this server.
-     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId The ID of the Camera AV Stream Management cluster to be instantiated.
-     * @param aFeature The bitmask value that identifies which features are supported by this instance.
+     *
+     * @param aDelegate                         A pointer to the delegate to be used by this server.
+     *                                          Note: the caller must ensure that the delegate lives throughout the instance's
+     *                                          lifetime.
+     *
+     * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aClusterId                        The ID of the Camera AV Stream Management cluster to be instantiated.
+     * @param aFeature                          The bitmask value that identifies which features are supported by this instance.
+     * @param aOptionalAttrs                    The bitmask value that identifies the optional attributes supported by this
+     *                                          instance.
+     * @param aPersistentStorage                The storage delegate to use to persist attributes.
+     * @param aMaxConcurrentVideoEncoders       The maximum number of video encoders supported by camera.
+     * @param aMaxEncodedPixelRate              The maximum data rate(encoded pixels/dec)supported by camera.
+     * @param aVideoSensorParams                The set of video sensor parameters for the camera.
+     * @param aNightVisionCapable               Indicates whether the camera supports night vision.
+     * @param aMinViewPort                      Indicates minimum resolution(width/height) in pixels allowed for camera viewport.
+     * @param aRateDistortionTradeOffPoints     Indicates the list of rate distortion trade-off points for supported hardware
+     *                                          encoders.
+     * @param aMaxContentBufferSize             The maximum size of the content buffer containing data for all streams, including
+     *                                          pre-roll.
+     * @param aMicrophoneCapabilities           Indicates the audio capabilities of the speaker in terms of the codec used,
+     *                                          supported sample rates and the number of channels.
+     * @param aSpkrCapabilities                 Indicates the audio capabilities of the speaker in terms of the codec used,
+     *                                          supported sample rates and the number of channels.
+     * @param aTwoWayTalkSupport                Indicates the type of two-way talk support the device has, e.g., half-duplex,
+     *                                          full-duplex, etc.
+     * @param aSupportedSnapshotParams          Indicates the set of supported snapshot parameters by the device, e.g., the image
+     *                                          codec, the resolution and the maximum frame rate.
+     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in mbps) that the device would consume for
+     *                                          the transmission of its media streams.
+     *
      */
     CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
                              BitMask<Feature> aFeature, OptionalAttributes aOptionalAttrs,
@@ -313,7 +439,7 @@ public:
 
     const std::vector<SnapshotStreamStruct> & GetAllocatedSnapshotStreams() const { return mAllocatedSnapshotStreams; }
 
-    const StreamTypeEnum * GetRankedVideoStreamPriorities() const { return mRankedVideoStreamPriorities; }
+    const StreamUsageEnum * GetRankedVideoStreamPriorities() const { return mRankedVideoStreamPriorities; }
 
     bool GetSoftRecordingPrivacyModeEnabled() const { return mSoftRecordingPrivacyModeEnabled; }
 
@@ -366,7 +492,7 @@ public:
 
     CHIP_ERROR RemoveFromFabricsUsingCamera(chip::FabricIndex aFabricIndex);
 
-    CHIP_ERROR SetRankedVideoStreamPriorities(const StreamTypeEnum newPriorities[kNumOfStreamTypes]);
+    CHIP_ERROR SetRankedVideoStreamPriorities(const StreamUsageEnum newPriorities[kNumOfStreamUsageTypes]);
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
@@ -431,7 +557,7 @@ private:
     // Managed lists
     std::unordered_set<chip::FabricIndex> mFabricsUsingCamera;
 
-    StreamTypeEnum mRankedVideoStreamPriorities[kNumOfStreamTypes];
+    StreamUsageEnum mRankedVideoStreamPriorities[kNumOfStreamUsageTypes];
 
     std::vector<VideoStreamStruct> mAllocatedVideoStreams;
     std::vector<AudioStreamStruct> mAllocatedAudioStreams;
