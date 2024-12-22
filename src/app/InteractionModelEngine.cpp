@@ -149,7 +149,8 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
                                         reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr,
-                                        SubscriptionResumptionStorage * subscriptionResumptionStorage)
+                                        SubscriptionResumptionStorage * subscriptionResumptionStorage,
+                                        EventManagement * eventManagement)
 {
     VerifyOrReturnError(apFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -165,7 +166,7 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
-    mReportingEngine.Init();
+    mReportingEngine.Init((eventManagement != nullptr) ? eventManagement : &EventManagement::GetInstance());
 
     StatusIB::RegisterErrorFormatter();
 

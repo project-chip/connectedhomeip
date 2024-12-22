@@ -50,7 +50,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:93
+            image: ghcr.io/project-chip/chip-build:94
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -457,7 +457,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:93
+            image: ghcr.io/project-chip/chip-build:94
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -520,24 +520,26 @@ jobs:
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
 
+            - name: Verify Testing Support
+              run: |
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_IDM_10_4.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_SC_7_1.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestChoiceConformanceSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestConformanceSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestConformanceTest.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestIdChecks.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestMatterTestingSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingDeviceType.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSupport.py'
+
             - name: Run Tests
               run: |
                   mkdir -p out/trace_data
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/test/test_scripts/mobile-device-test.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing'
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestIdChecks.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestSpecParsingDeviceType.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestConformanceSupport.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestConformanceTest.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestChoiceConformanceSupport.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestMatterTestingSupport.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestSpecParsingSupport.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/test_TC_ICDM_2_1.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/test_IDM_10_4.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/test_TC_SC_7_1.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/TestDecorators.py'
-
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/test/test_scripts/mobile-device-test.py'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing'
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app'
 
             - name: Uploading core files
               uses: actions/upload-artifact@v4

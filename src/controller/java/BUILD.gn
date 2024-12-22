@@ -19,8 +19,8 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tests.gni")
-import("${chip_root}/src/app/codegen-data-model-provider/model.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/platform/device.gni")
 
 buildconfig_header("controller_buildconfig") {

@@ -25,7 +25,7 @@
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app/ConcreteAttributePath.h"
-#include "app/codegen-data-model-provider/Instance.h"
+#include "data-model-providers/codegen/Instance.h"
 #include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AppConfig.h>

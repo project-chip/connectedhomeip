@@ -26,8 +26,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/TextOnlyLogging.h>
 #include <optional>
@@ -39,6 +39,9 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::Protocols;
+
+// Mock function for linking
+void InitDataModelHandler() {}
 
 namespace chip {
 namespace app {

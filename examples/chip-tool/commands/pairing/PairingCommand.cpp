@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2024 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -127,6 +127,20 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
     if (mCountryCode.HasValue())
     {
         params.SetCountryCode(CharSpan::fromCharString(mCountryCode.Value()));
+    }
+
+    // Default requiring TCs to false, to preserve release 1.3 chip-tool behavior
+    params.SetRequireTermsAndConditionsAcknowledgement(mRequireTCAcknowledgements.ValueOr(false));
+
+    // mTCAcknowledgements and mTCAcknowledgementVersion are optional, but related. When one is missing, default the value to 0, to
+    // increase the test tools ability to test the applications.
+    if (mTCAcknowledgements.HasValue() || mTCAcknowledgementVersion.HasValue())
+    {
+        TermsAndConditionsAcknowledgement termsAndConditionsAcknowledgement = {
+            .acceptedTermsAndConditions        = mTCAcknowledgements.ValueOr(0),
+            .acceptedTermsAndConditionsVersion = mTCAcknowledgementVersion.ValueOr(0),
+        };
+        params.SetTermsAndConditionsAcknowledgement(termsAndConditionsAcknowledgement);
     }
 
     // mTimeZoneList is an optional argument managed by TypedComplexArgument mComplex_TimeZones.
