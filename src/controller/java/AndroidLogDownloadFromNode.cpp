@@ -213,7 +213,7 @@ void AndroidLogDownloadFromNode::FinishLogDownloadFromNode(void * context, CHIP_
     jint jFabricIndex   = self->mController->GetFabricIndex();
     jlong jremoteNodeId = self->mRemoteNodeId;
 
-    VerifyOrExit(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != nullptr, ChipLogError(Test, "Could not get JNIEnv for current thread"));
 
     if (err == CHIP_NO_ERROR)
     {
