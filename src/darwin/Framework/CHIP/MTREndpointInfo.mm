@@ -118,7 +118,7 @@ MTR_DIRECT_MEMBERS
     }
 
     // Now iterate over the endpoints in reverse topological order, i.e. bottom up. This means
-    // that we will visit children before parents, so the first time we see and endpoint in a
+    // that we will visit children before parents, so the first time we see an endpoint in a
     // PartsList we can assign it as a child of the endpoint we're processing, and we can be sure
     // that this is the closest parent, not some higher ancestor using the Full-Family Pattern.
     NSMutableArray<MTREndpointInfo *> * children = [[NSMutableArray alloc] init];

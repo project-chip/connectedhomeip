@@ -150,7 +150,7 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
 {
     MTRDeviceController * strongController = mController;
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    VerifyOrReturn(strongDelegate && mQueue);
+    VerifyOrReturn(strongDelegate && mQueue && strongController);
 
     // TODO: These checks are pointless since currently mController == mDelegate
     BOOL wantCommissioneeInfo = [strongDelegate respondsToSelector:@selector(controller:readCommissioneeInfo:)];
