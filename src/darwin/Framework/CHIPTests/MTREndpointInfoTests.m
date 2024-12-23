@@ -33,6 +33,13 @@ static NSArray<NSNumber *> * ChildEndpointIDs(MTREndpointInfo * endpoint)
     return [[endpoint.children valueForKey:@"endpointID"] sortedArrayUsingSelector:@selector(compare:)];
 }
 
+static NSArray<NSNumber *> * Exclude(NSArray<NSNumber *> * numbers, NSNumber * numberToExclude)
+{
+    NSMutableArray * result = [numbers mutableCopy];
+    [result removeObject:numberToExclude];
+    return result;
+}
+
 - (NSDictionary<NSNumber *, MTREndpointInfo *> *)indexEndpoints:(NSArray<MTREndpointInfo *> *)endpoints
 {
     NSMutableDictionary * indexed = [[NSMutableDictionary alloc] init];
@@ -64,6 +71,28 @@ static NSArray<NSNumber *> * ChildEndpointIDs(MTREndpointInfo * endpoint)
     XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@6]), (@[]));
 }
 
+- (void)testPopulateChildren2
+{
+    // Same as testPopulateChildren, but with reversed PartsLists
+    NSDictionary<NSNumber *, MTREndpointInfo *> * endpoints = [self indexEndpoints:@[
+        MakeEndpoint(@0, @[ @6, @5, @4, @3, @2, @1 ]), // full-family pattern
+        MakeEndpoint(@1, @[ @3, @2 ]),
+        MakeEndpoint(@2, @[]),
+        MakeEndpoint(@3, @[]),
+        MakeEndpoint(@4, @[ @6, @5 ]), // full-family pattern
+        MakeEndpoint(@5, @[ @6 ]),
+        MakeEndpoint(@6, @[]),
+    ]];
+    XCTAssertTrue([MTREndpointInfo populateChildrenForEndpoints:endpoints]);
+    XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@0]), (@[ @1, @4 ]));
+    XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@1]), (@[ @2, @3 ]));
+    XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@2]), (@[]));
+    XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@3]), (@[]));
+    XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@4]), (@[ @5 ]));
+    XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@5]), (@[ @6 ]));
+    XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@6]), (@[]));
+}
+
 - (void)testPopulateChildrenRootOnly
 {
     NSDictionary<NSNumber *, MTREndpointInfo *> * endpoints = [self indexEndpoints:@[
@@ -73,7 +102,7 @@ static NSArray<NSNumber *> * ChildEndpointIDs(MTREndpointInfo * endpoint)
     XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@0]), (@[]));
 }
 
-- (void)testPopulateChildrenWithCompositionCycle
+- (void)testPopulateChildrenInvalidCompositionCycle
 {
     NSDictionary<NSNumber *, MTREndpointInfo *> * endpoints = [self indexEndpoints:@[
         MakeEndpoint(@0, @[ @1, @2, @3, @4, @5, @6 ]), // full-family pattern
@@ -82,7 +111,7 @@ static NSArray<NSNumber *> * ChildEndpointIDs(MTREndpointInfo * endpoint)
         MakeEndpoint(@3, @[]),
         MakeEndpoint(@4, @[ @5, @6 ]), // full-family pattern
         MakeEndpoint(@5, @[ @6 ]),
-        MakeEndpoint(@6, @[ @4 ]), // cycle 4 -> 5 -> 6 -> 4
+        MakeEndpoint(@6, @[ @4 ]), // not valid per spec: cycle 4 -> 5 -> 6 -> 4
     ]];
     XCTAssertFalse([MTREndpointInfo populateChildrenForEndpoints:endpoints]);
     XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@0]), (@[ @1, @4 ]));
@@ -90,6 +119,28 @@ static NSArray<NSNumber *> * ChildEndpointIDs(MTREndpointInfo * endpoint)
     XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@2]), (@[]));
     XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@3]), (@[]));
     // We make no promises about child lists for endpoints involved in a cycle
+}
+
+- (void)testPopulateChildrenInvalidNonTree
+{
+    NSDictionary<NSNumber *, MTREndpointInfo *> * endpoints = [self indexEndpoints:@[
+        MakeEndpoint(@0, @[ @1, @2, @3, @4, @5, @6 ]), // full-family pattern
+        MakeEndpoint(@1, @[ @2, @3, @6 ]),
+        MakeEndpoint(@2, @[]),
+        MakeEndpoint(@3, @[]),
+        MakeEndpoint(@4, @[ @5, @6 ]), // full-family pattern
+        MakeEndpoint(@5, @[ @6 ]),
+        MakeEndpoint(@6, @[]), // not valid per spec: 6 is a child of both 1 and 5
+    ]];
+    // Note: Not asserting a false return value here, this scenario is currently not detected.
+    [MTREndpointInfo populateChildrenForEndpoints:endpoints];
+    XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@0]), (@[ @1, @4 ]));
+    XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@2]), (@[]));
+    XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@3]), (@[]));
+    XCTAssertEqualObjects(ChildEndpointIDs(endpoints[@4]), (@[ @5 ]));
+    // Endpoint 6 has multiple parents, so we make no guarantees where (or if) it shows up
+    XCTAssertEqualObjects(Exclude(ChildEndpointIDs(endpoints[@1]), @6), (@[ @2, @3 ]));
+    XCTAssertEqualObjects(Exclude(ChildEndpointIDs(endpoints[@5]), @6), (@[]));
 }
 
 @end

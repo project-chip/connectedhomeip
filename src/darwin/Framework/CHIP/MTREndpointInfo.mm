@@ -52,6 +52,7 @@ MTR_DIRECT_MEMBERS
     _deviceTypes = [deviceTypes copy];
     _partsList = [partsList copy];
     _children = @[];
+    _mark = EndpointMark::NotVisited;
     return self;
 }
 
@@ -78,7 +79,7 @@ MTR_DIRECT_MEMBERS
     }
 
     // Perform a depth-first search with an explicit stack and create a list of endpoint
-    // IDs in reverse topological order. The _parentID field is used mark traversal states.
+    // IDs in reverse topological order. Note that endpoints start with _mark == NotVisited.
     BOOL valid = YES;
     std::deque<EndpointId> deque; // stack followed by sorted list
     deque.emplace_front(root->_endpointID);
@@ -109,6 +110,11 @@ MTR_DIRECT_MEMBERS
                 break; // visited the root, DFS traversal done
             }
         } else /* endpoint->_mark == EndpointMark::Visited */ {
+            // Nodes can be visited multiple times due to Full-Family
+            // ancestors like the root node, or in scenarios where a
+            // nodes is erroneously in the PartsList of two separate
+            // branches of the tree. There is no easy way to distinguish
+            // these cases here, so we are not setting valid = NO.
             deque.pop_front(); // nothing else to do
         }
     }
@@ -157,8 +163,7 @@ MTR_DIRECT_MEMBERS
         CHIP_ERROR err = CHIP_NO_ERROR;
         NSArray<MTRDescriptorClusterDeviceTypeStruct *> * deviceTypeList = MTRDecodeAttributeValue(path, *cache, &err);
         if (!deviceTypeList) {
-            MTR_LOG_ERROR("Ignoring endpoint %u, failed to parse DeviceTypeList: %" CHIP_ERROR_FORMAT, path.mEndpointId, err.Format());
-            return CHIP_NO_ERROR;
+            MTR_LOG_ERROR("Ignoring invalid DeviceTypeList for endpoint %u: %" CHIP_ERROR_FORMAT, path.mEndpointId, err.Format());
         }
 
         NSMutableArray * deviceTypes = [[NSMutableArray alloc] initWithCapacity:deviceTypeList.count];
@@ -172,15 +177,11 @@ MTR_DIRECT_MEMBERS
             }
             [deviceTypes addObject:type];
         }
-        if (!deviceTypes) {
-            MTR_LOG_ERROR("Ignoring endpoint %u, no device types", path.mEndpointId);
-            return CHIP_NO_ERROR;
-        }
 
         ConcreteAttributePath partsListPath(path.mEndpointId, path.mClusterId, PartsList::Id);
         NSArray<NSNumber *> * partsList = MTRDecodeAttributeValue(partsListPath, *cache, &err);
         if (!partsList) {
-            MTR_LOG_ERROR("Ignoring PartsList for endpoint %u: %" CHIP_ERROR_FORMAT, path.mEndpointId, err.Format());
+            MTR_LOG_ERROR("Ignoring invalid PartsList for endpoint %u: %" CHIP_ERROR_FORMAT, path.mEndpointId, err.Format());
             partsList = @[];
         }
 
