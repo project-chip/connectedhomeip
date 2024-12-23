@@ -27,15 +27,30 @@
 using namespace chip;
 
 MTR_DIRECT_MEMBERS
-@implementation MTRDeviceType
+@implementation MTRDeviceType {
+    const MTRDeviceTypeData * _meta;
+}
 
-- (instancetype)initWithDeviceTypeID:(NSNumber *)id name:(NSString *)name isUtility:(BOOL)isUtility
+- (instancetype)initWithDeviceTypeData:(const MTRDeviceTypeData *)metaData
 {
     self = [super init];
-    _id = id;
-    _name = name;
-    _isUtility = isUtility;
+    _meta = metaData;
     return self;
+}
+
+- (NSNumber *)id
+{
+    return @(_meta->id);
+}
+
+- (NSString *)name
+{
+    return const_cast<NSString *>(_meta->name);
+}
+
+- (BOOL)isUtility
+{
+    return _meta->deviceClass != MTRDeviceTypeClass::Simple;
 }
 
 + (nullable MTRDeviceType *)deviceTypeForID:(NSNumber *)deviceTypeID
@@ -50,14 +65,7 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    auto * name = [[NSString alloc] initWithBytesNoCopy:(void *) deviceTypeData->name
-                                                 length:strlen(deviceTypeData->name)
-                                               encoding:NSUTF8StringEncoding
-                                           freeWhenDone:NO];
-
-    return [[MTRDeviceType alloc] initWithDeviceTypeID:deviceTypeID
-                                                  name:name
-                                             isUtility:(deviceTypeData->deviceClass != MTRDeviceTypeClass::Simple)];
+    return [[MTRDeviceType alloc] initWithDeviceTypeData:deviceTypeData];
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -67,20 +75,20 @@ MTR_DIRECT_MEMBERS
 
 - (NSUInteger)hash
 {
-    return _id.hash;
+    return _meta->id;
 }
 
 - (BOOL)isEqual:(id)object
 {
     VerifyOrReturnValue([object class] == [self class], NO);
     MTRDeviceType * other = object;
-    return [_id isEqual:other->_id];
+    return _meta->id == other->_meta->id;
 }
 
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ 0x%" PRIx32 " (%@)>",
-                     self.class, _id.unsignedIntValue, _name];
+                     self.class, _meta->id, _meta->name];
 }
 
 @end
