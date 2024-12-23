@@ -44,10 +44,17 @@ public:
 private:
     CHIP_ERROR PrepareDownloadImpl();
     CHIP_ERROR ProcessHeader(ByteSpan & aBlock);
+    CHIP_ERROR InitFlashStream(size_t offset);
+    CHIP_ERROR RestoreBytes(ByteSpan & aBlock);
 
     OTADownloader * mDownloader = nullptr;
     OTAImageHeaderParser mHeaderParser;
     uint8_t mBuffer[kBufferSize];
+
+    // Define non-volatile storage keys for DownloadedBytes and ImageDigest.
+    static constexpr char kDownloadedBytes[] = "DownloadedBytes";
+    static constexpr char kImageDigest[]     = "ImageDigest";
+    uint64_t downloadedBytesRestored = 0;
 };
 
 } // namespace DeviceLayer
