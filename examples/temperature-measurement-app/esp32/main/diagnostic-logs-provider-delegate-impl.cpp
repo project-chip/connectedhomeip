@@ -281,7 +281,7 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ER
     if (error != CHIP_NO_ERROR)
     {
         // Handle the error
-        ChipLogError(DeviceLayer, "End log collection reason: %s", ErrorStr(error));
+        ChipLogProgress(DeviceLayer, "End log collection reason: %s", ErrorStr(error));
     }
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mSessionContextMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);

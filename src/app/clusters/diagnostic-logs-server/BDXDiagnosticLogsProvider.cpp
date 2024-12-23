@@ -191,7 +191,7 @@ void BDXDiagnosticLogsProvider::OnAckReceived()
     // If the buffer has empty space, end the log collection session.
     if (isEndOfLog)
     {
-        mDelegate->EndLogCollection(mLogSessionHandle);
+        mDelegate->EndLogCollection(mLogSessionHandle, CHIP_ERROR_INTERNAL);
         mLogSessionHandle = kInvalidLogSessionHandle;
     }
 
