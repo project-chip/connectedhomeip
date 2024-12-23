@@ -161,8 +161,7 @@
  *
  *  @brief
  *    This is for use when the calling function returns a Variant type. It returns a CHIP_ERROR variant with the corresponding error
- *    code if the expression returns an error. For a CHIP_ERROR expression, this means any value other
- *    than CHIP_NO_ERROR. For an integer expression, this means non-zero.
+ *    code if the expression returns an error.
  *
  *  Example usage:
  *

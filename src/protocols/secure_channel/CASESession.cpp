@@ -1162,7 +1162,7 @@ CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResumeInputs & outSigma2
     outSigma2ResData.resumptionId = mNewResumptionId;
 
     ReturnErrorOnFailure(GenerateSigmaResumeMIC(ByteSpan(mInitiatorRandom), mNewResumptionId, ByteSpan(kKDFS2RKeyInfo),
-                                                ByteSpan(kResume2MIC_Nonce), outSigma2ResData.resumeMICSpan));
+                                                ByteSpan(kResume2MIC_Nonce), outSigma2ResData.resumeMIC));
 
     outSigma2ResData.responderMrpConfig = &mLocalMRPConfig.Value();
 
@@ -1191,7 +1191,7 @@ CHIP_ERROR CASESession::EncodeSigma2Resume(System::PacketBufferHandle & msgR2Res
 
     ReturnErrorOnFailure(tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kResumptionID), input.resumptionId));
-    ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kSigma2ResumeMIC), input.resumeMICSpan));
+    ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kSigma2ResumeMIC), input.resumeMIC));
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kResponderSessionID), input.responderSessionId));
 
     ReturnErrorOnFailure(

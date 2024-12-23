@@ -888,10 +888,10 @@ TEST_F(TestCASESession, EncodeSigma1Test)
 
     uint8_t random[32];
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(&random[0], sizeof(random)), CHIP_NO_ERROR);
-    encodeParams.initiatorRandom    = ByteSpan(random, sizeof(random));
+    encodeParams.initiatorRandom    = ByteSpan(random);
     encodeParams.initiatorSessionId = 7315;
     uint8_t destinationId[32]       = { 0xDE, 0xAD };
-    encodeParams.destinationId      = ByteSpan(destinationId, sizeof(destinationId));
+    encodeParams.destinationId      = ByteSpan(destinationId);
 
     ReliableMessageProtocolConfig mrpConfig = GetDefaultMRPConfig();
     encodeParams.initiatorMrpConfig         = &mrpConfig;
@@ -937,15 +937,15 @@ TEST_F(TestCASESession, EncodeSigma1Test)
         tlvReader.Init(std::move(msg1));
 
         CASESessionAccess session;
-        CASESessionAccess::ParsedSigma1 parseParams;
+        CASESessionAccess::ParsedSigma1 parsedMessage;
 
-        EXPECT_EQ(CHIP_NO_ERROR, session.ParseSigma1(tlvReader, parseParams));
+        EXPECT_EQ(CHIP_NO_ERROR, session.ParseSigma1(tlvReader, parsedMessage));
 
         // compare parsed values with original values
-        EXPECT_TRUE(parseParams.initiatorRandom.data_equal(encodeParams.initiatorRandom));
-        EXPECT_EQ(parseParams.initiatorSessionId, encodeParams.initiatorSessionId);
-        EXPECT_TRUE(parseParams.destinationId.data_equal(encodeParams.destinationId));
-        EXPECT_TRUE(parseParams.initiatorEphPubKey.data_equal(
+        EXPECT_TRUE(parsedMessage.initiatorRandom.data_equal(encodeParams.initiatorRandom));
+        EXPECT_EQ(parsedMessage.initiatorSessionId, encodeParams.initiatorSessionId);
+        EXPECT_TRUE(parsedMessage.destinationId.data_equal(encodeParams.destinationId));
+        EXPECT_TRUE(parsedMessage.initiatorEphPubKey.data_equal(
             ByteSpan(encodeParams.initiatorEphPubKey->ConstBytes(), encodeParams.initiatorEphPubKey->Length())));
     }
 
@@ -971,20 +971,20 @@ TEST_F(TestCASESession, EncodeSigma1Test)
         tlvReader.Init(std::move(msg2));
 
         CASESessionAccess session;
-        CASESessionAccess::ParsedSigma1 parseParams;
+        CASESessionAccess::ParsedSigma1 parsedMessage;
 
-        EXPECT_EQ(CHIP_NO_ERROR, session.ParseSigma1(tlvReader, parseParams));
+        EXPECT_EQ(CHIP_NO_ERROR, session.ParseSigma1(tlvReader, parsedMessage));
 
         // RoundTrip
-        EXPECT_TRUE(parseParams.initiatorRandom.data_equal(encodeParams.initiatorRandom));
-        EXPECT_EQ(parseParams.initiatorSessionId, encodeParams.initiatorSessionId);
-        EXPECT_TRUE(parseParams.destinationId.data_equal(encodeParams.destinationId));
-        EXPECT_TRUE(parseParams.initiatorEphPubKey.data_equal(
+        EXPECT_TRUE(parsedMessage.initiatorRandom.data_equal(encodeParams.initiatorRandom));
+        EXPECT_EQ(parsedMessage.initiatorSessionId, encodeParams.initiatorSessionId);
+        EXPECT_TRUE(parsedMessage.destinationId.data_equal(encodeParams.destinationId));
+        EXPECT_TRUE(parsedMessage.initiatorEphPubKey.data_equal(
             ByteSpan(encodeParams.initiatorEphPubKey->ConstBytes(), encodeParams.initiatorEphPubKey->Length())));
 
-        EXPECT_TRUE(parseParams.resumptionId.data_equal(encodeParams.resumptionId));
-        EXPECT_TRUE(parseParams.initiatorResumeMIC.data_equal(encodeParams.initiatorResumeMIC));
-        EXPECT_TRUE(parseParams.initiatorMrpParamsPresent);
+        EXPECT_TRUE(parsedMessage.resumptionId.data_equal(encodeParams.resumptionId));
+        EXPECT_TRUE(parsedMessage.initiatorResumeMIC.data_equal(encodeParams.initiatorResumeMIC));
+        EXPECT_TRUE(parsedMessage.initiatorMrpParamsPresent);
     }
     // Release EphemeralKeyPair
     gDeviceOperationalKeystore.ReleaseEphemeralKeypair(ephemeralKey);

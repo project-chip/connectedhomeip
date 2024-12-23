@@ -194,7 +194,6 @@ protected:
     // Helper Enum for use in HandleSigma1_and_SendSigma2
     enum class Step : uint8_t
     {
-        kNone,
         kSendSigma2,
         kSendSigma2Resume,
     };
@@ -202,7 +201,7 @@ protected:
     // the next Sigma step to send) or a CHIP_ERROR (indicating a failure that will trigger
     // a Status Report).
     using NextStep = Variant<Step, CHIP_ERROR>;
-    // This struct  only serves as a base struct for EncodedSigma1Inputs and ParsedSigma1
+    // This struct only serves as a base struct for EncodeSigma1Inputs and ParsedSigma1
     struct Sigma1Param
     {
         ByteSpan initiatorRandom;
@@ -242,17 +241,17 @@ protected:
     {
         ByteSpan resumptionId;
         uint8_t sigma2ResumeMICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
-        MutableByteSpan resumeMICSpan{ sigma2ResumeMICBuffer };
+        MutableByteSpan resumeMIC{ sigma2ResumeMICBuffer };
         uint16_t responderSessionId;
         const ReliableMessageProtocolConfig * responderMrpConfig;
     };
 
     /**
      * @brief  Encodes a Sigma1 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
-     *outparam.
+     *         outparam.
      *
      * @param outMsg     PacketBufferHandle passed by reference. A new buffer will be allocated and assigned to it within the
-     *method.
+     *                   method.
      *
      * @param inParam a struct containing all the values that will be encoded into TLV format
      *
@@ -260,13 +259,13 @@ protected:
     static CHIP_ERROR EncodeSigma1(System::PacketBufferHandle & outMsg, EncodeSigma1Inputs & inParam);
 
     /**
-     * Parse a sigma1 message.  This function will return success only if the
+     * Parse a Sigma1 message.  This function will return success only if the
      * message passes schema checks.  Specifically:
      *   * The tags come in order.
      *   * The required tags are present.
      *   * The values for the tags that are present satisfy schema requirements
      *     (e.g. constraints on octet string lengths)
-     *   * Either resumptionID and initiatorResume1MICBuffer are both present or both
+     *   * Either resumptionID and initiatorResume1MICBuffer are both present or both are
      *     absent.
      *
      * On success, the members of outParam will be set to the values corresponding to the message.
@@ -280,10 +279,10 @@ protected:
 
     /**
      * @brief  Encodes a Sigma2 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
-     *outparam.
+     *         outparam.
      *
      * @param outMsg     PacketBufferHandle passed by reference. A new buffer will be allocated and assigned to it within the
-     *method.
+     *                   method.
      *
      * @param inParam a struct containing all the values that will be encoded into TLV format
      *
@@ -293,10 +292,10 @@ protected:
 
     /**
      * @brief  Encodes a Sigma2_Resume message into TLV format and allocates a buffer for it, which is owned by the
-     *PacketBufferHandle outparam.
+     *         PacketBufferHandle outparam.
      *
      * @param outMsg     PacketBufferHandle passed by reference. A new buffer will be allocated and assigned to it within the
-     *method.
+     *                   method.
      *
      * @param inParam a struct containing all the values that will be encoded into TLV format
      *
