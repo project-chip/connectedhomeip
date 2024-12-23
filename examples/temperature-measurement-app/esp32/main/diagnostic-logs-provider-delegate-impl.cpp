@@ -29,6 +29,10 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 LogProvider LogProvider::sInstance;
 LogProvider::CrashLogContext LogProvider::sCrashLogContext;
 
+#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+static uint32_t read_entries = 0;
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
 namespace {
 bool IsValidIntent(IntentEnum intent)
 {
@@ -115,14 +119,17 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
     case IntentEnum::kEndUserSupport: {
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
         CircularDiagnosticBuffer & diagnosticStorage = CircularDiagnosticBuffer::GetInstance();
-        MutableByteSpan endUserSupportSpan(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
+        MutableByteSpan endUserSupportSpan(endUserBuffer, 2048);
 
         VerifyOrReturnError(!diagnosticStorage.IsEmptyBuffer(), CHIP_ERROR_NOT_FOUND,
                             ChipLogError(DeviceLayer, "Empty Diagnostic buffer"));
         // Retrieve data from the diagnostic storage
-        CHIP_ERROR err = diagnosticStorage.Retrieve(endUserSupportSpan);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err,
-                            ChipLogError(DeviceLayer, "Failed to retrieve data: %s", chip::ErrorStr(err)));
+        CHIP_ERROR err = diagnosticStorage.Retrieve(endUserSupportSpan, read_entries);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to retrieve data: %s", chip::ErrorStr(err));
+            return err;
+        }
         context->EndUserSupport.span = endUserSupportSpan;
 #else
         context->EndUserSupport.span =
@@ -296,11 +303,18 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
 
 CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error)
 {
-    if (error != CHIP_NO_ERROR)
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    if (error == CHIP_NO_ERROR)
     {
-        // Handle the error
-        ChipLogProgress(DeviceLayer, "End log collection reason: %s", ErrorStr(error));
+        CHIP_ERROR err = CircularDiagnosticBuffer::GetInstance().ClearReadMemory(read_entries);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to clear diagnostic read entries");
+        }
+        ChipLogProgress(DeviceLayer, "Clear all read diagnostics successfully");
     }
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mSessionContextMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
