@@ -34,6 +34,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
+#include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #if ENABLE_TRACING
@@ -126,6 +127,7 @@ enum
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     kDeviceOption_WiFi_PAF,
 #endif
+    kDeviceOption_DacProvider,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -140,7 +142,7 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     { "wifipaf", kArgumentRequired, kDeviceOption_WiFi_PAF },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
     { "thread", kNoArgument, kDeviceOption_Thread },
 #endif // CHIP_ENABLE_OPENTHREAD
@@ -201,6 +203,7 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_WITH_NLFAULTINJECTION
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
 #endif
+    { "dac_provider", kArgumentRequired, kDeviceOption_DacProvider },
     {}
 };
 
@@ -363,6 +366,8 @@ const char * sDeviceOptionHelp =
     "  --faults <fault-string,...>\n"
     "       Inject specified fault(s) at runtime.\n"
 #endif
+    "   --dac_provider <filepath>\n"
+    "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
     "\n";
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -734,6 +739,14 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 #endif
+    case kDeviceOption_DacProvider: {
+        LinuxDeviceOptions::GetInstance().dacProviderFile.SetValue(aValue);
+        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
+        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
+
+        LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
+        break;
+    }
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -777,5 +790,6 @@ LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
     {
         gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
     }
+
     return gDeviceOptions;
 }
