@@ -31,7 +31,8 @@ CURRENT_IN_PROGRESS_DEFINES = get_in_progress_defines()
 
 # Replace hardcoded paths with dynamic paths using paths.py functions
 DEFAULT_CHIP_ROOT = get_chip_root()
-DEFAULT_OUTPUT_DIR_1_3 = get_data_model_path(Branch.V1_3)
+DEFAULT_OUTPUT_DIR_1_4 = get_data_model_path(Branch.V1_4)
+DEFAULT_OUTPUT_DIR_IN_PROGRESS = get_data_model_path(Branch.IN_PROGRESS)
 DEFAULT_OUTPUT_DIR_TOT = get_data_model_path(Branch.MASTER)
 DEFAULT_DOCUMENTATION_FILE = get_documentation_file_path()
 
@@ -76,9 +77,12 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     default=False,
     is_flag=True,
     help='Flag for dry run')
+@click.option(
+    '--include-in-progress',
+    type=click.Choice(['All', 'None', 'Current']), default='All')
 def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
     if not output_dir:
-        output_dir_map = {'All': DEFAULT_OUTPUT_DIR_TOT, 'None': DEFAULT_OUTPUT_DIR_1_3}
+        output_dir_map = {'All': DEFAULT_OUTPUT_DIR_TOT, 'None': DEFAULT_OUTPUT_DIR_1_4, 'Current': DEFAULT_OUTPUT_DIR_IN_PROGRESS}
         output_dir = output_dir_map[include_in_progress]
     scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress)
     scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress)
