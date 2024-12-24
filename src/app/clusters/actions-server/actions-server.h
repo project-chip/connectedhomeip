@@ -21,31 +21,32 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Actions {
 
-static constexpr size_t kActionNameMaxSize       = 128u;
-static constexpr size_t kEndpointListNameMaxSize = 128u;
-static constexpr size_t kEndpointListMaxSize     = 256u;
+// Last byte is reserved of '\0' terminator.
+static constexpr size_t kActionNameMaxSize       = 127u;
+static constexpr size_t kEndpointListNameMaxSize = 127u;
+
+static constexpr size_t kEndpointListMaxSize = 256u;
 
 class Delegate;
 
 struct ActionStructStorage : public Structs::ActionStruct::Type
 {
-    ActionStructStorage() : mActionName(mBuffer){};
+    ActionStructStorage() : mActionName(mBuffer, sizeof(mBuffer)){};
 
     ActionStructStorage(uint16_t action, const CharSpan & actionName, ActionTypeEnum actionType, uint16_t epListID,
                         BitMask<CommandBits> commands, ActionStateEnum actionState) :
-        mActionName(mBuffer)
+        mActionName(mBuffer, sizeof(mBuffer))
     {
         Set(action, actionName, actionType, epListID, commands, actionState);
     }
 
-    ActionStructStorage(const ActionStructStorage & action) : mActionName(mBuffer) { *this = action; }
+    ActionStructStorage(const ActionStructStorage & action) : mActionName(mBuffer, sizeof(mBuffer)) { *this = action; }
 
     ActionStructStorage & operator=(const ActionStructStorage & action)
     {
@@ -72,16 +73,16 @@ private:
 
 struct EndpointListStorage : public Structs::EndpointListStruct::Type
 {
-    EndpointListStorage() : mEpListName(mBuffer){};
+    EndpointListStorage() : mEpListName(mBuffer, sizeof(mBuffer)){};
 
     EndpointListStorage(uint16_t epListId, const CharSpan & epListName, EndpointListTypeEnum epListType,
                         const DataModel::List<const EndpointId> & endpointList) :
-        mEpListName(mBuffer)
+        mEpListName(mBuffer, sizeof(mBuffer))
     {
         Set(epListId, epListName, epListType, endpointList);
     }
 
-    EndpointListStorage(const EndpointListStorage & epList) : mEpListName(mBuffer) { *this = epList; }
+    EndpointListStorage(const EndpointListStorage & epList) : mEpListName(mBuffer, sizeof(mBuffer)) { *this = epList; }
 
     EndpointListStorage & operator=(const EndpointListStorage & epList)
     {
@@ -92,15 +93,15 @@ struct EndpointListStorage : public Structs::EndpointListStruct::Type
     void Set(uint16_t epListId, const CharSpan & epListName, EndpointListTypeEnum epListType,
              const DataModel::List<const EndpointId> & endpointList)
     {
-        endpointListID = epListId;
-        type           = epListType;
+        endpointListID    = epListId;
+        type              = epListType;
+        size_t epListSize = std::min(endpointList.size(), kEndpointListMaxSize);
 
-        for (uint8_t index = 0; index < std::min(endpointList.size(), kEndpointListMaxSize); index++)
+        for (uint8_t index = 0; index < epListSize; index++)
         {
-            mEpList.push_back(endpointList[index]);
+            mEpList[index] = endpointList[index];
         }
-        mEpListSpan = Span(mEpList.data(), mEpList.size());
-        endpoints   = DataModel::List<const EndpointId>(mEpListSpan);
+        endpoints = DataModel::List<const EndpointId>(Span(mEpList, epListSize));
         CopyCharSpanToMutableCharSpanWithTruncation(epListName, mEpListName);
         name = mEpListName;
     }
@@ -108,8 +109,7 @@ struct EndpointListStorage : public Structs::EndpointListStruct::Type
 private:
     char mBuffer[kEndpointListNameMaxSize];
     MutableCharSpan mEpListName;
-    std::vector<EndpointId> mEpList;
-    Span<const EndpointId> mEpListSpan;
+    EndpointId mEpList[kEndpointListMaxSize];
 };
 
 class ActionsServer : public AttributeAccessInterface, public CommandHandlerInterface
@@ -150,7 +150,8 @@ private:
                                          const AttributeValueEncoder::ListEncodeHelper & encoder);
     bool FindActionIdInActionList(EndpointId endpointId, uint16_t actionId);
 
-    // CommandHandlerInterface
+    // Cannot use CommandHandlerInterface::HandleCommand directly because we need to do the FindActionIdInActionList() check before
+    // sending a command.
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
