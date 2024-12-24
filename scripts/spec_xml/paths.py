@@ -22,8 +22,9 @@ from enum import Enum
 
 class Branch(Enum):
     MASTER = "master"
-    V1_3 = "1.4"
+    V1_3 = "1.3"
     V1_4 = "1.4"
+    IN_PROGRESS = "in_progress"
 
 
 def get_chip_root():
