@@ -15,6 +15,7 @@
 | build-example-linux-arm                 |         100 |
 | minimal-build-linux-configure           |         100 |
 | build-example-qpg                       |         100 |
+| dependabot-updates                      |         100 |
 | build-example-nuttx                     |         100 |
 | documentation-build                     |         100 |
 | tests                                   |         100 |
