@@ -26,25 +26,17 @@ namespace Diagnostics {
 class CircularDiagnosticBuffer : public chip::TLV::TLVCircularBuffer, public DiagnosticStorageInterface
 {
 public:
-    // Singleton instance getter
-    static CircularDiagnosticBuffer & GetInstance()
-    {
-        static CircularDiagnosticBuffer instance;
-        return instance;
-    }
+    CircularDiagnosticBuffer(uint8_t * buffer, size_t bufferLength) : chip::TLV::TLVCircularBuffer(buffer, bufferLength) {}
 
     // Delete copy constructor and assignment operator to ensure singleton
     CircularDiagnosticBuffer(const CircularDiagnosticBuffer &)             = delete;
     CircularDiagnosticBuffer & operator=(const CircularDiagnosticBuffer &) = delete;
 
-    void Init(uint8_t * buffer, size_t bufferLength) { chip::TLV::TLVCircularBuffer::Init(buffer, bufferLength); }
-
-    CHIP_ERROR Store(DiagnosticEntry & entry) override
+    CHIP_ERROR Store(const DiagnosticEntry & entry) override
     {
-        chip::TLV::CircularTLVWriter writer;
-        writer.Init(*this);
+        mWriter.Init(*this);
 
-        CHIP_ERROR err = entry.Encode(writer);
+        CHIP_ERROR err = entry.Encode(mWriter);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Failed to write entry: %s", chip::ErrorStr(err));
@@ -54,9 +46,7 @@ public:
 
     CHIP_ERROR Retrieve(MutableByteSpan & span, uint32_t & read_entries) override
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        chip::TLV::TLVReader reader;
-        reader.Init(*this);
+        mReader.Init(*this);
 
         chip::TLV::TLVWriter writer;
         writer.Init(span.data(), span.size());
@@ -65,14 +55,11 @@ public:
         bool close_success                = true; // To check if the last TLV is copied successfully.
         uint32_t successful_written_bytes = 0;    // Store temporary writer length in case last TLV is not copied successfully.
 
-        chip::TLV::TLVType outWriterContainer = chip::TLV::kTLVType_NotSpecified;
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_List, outWriterContainer));
-
-        while (CHIP_NO_ERROR == reader.Next())
+        while (CHIP_NO_ERROR == mReader.Next())
         {
-            if (reader.GetType() == chip::TLV::kTLVType_Structure && reader.GetTag() == chip::TLV::AnonymousTag())
+            if (mReader.GetType() == chip::TLV::kTLVType_Structure && mReader.GetTag() == chip::TLV::AnonymousTag())
             {
-                err = writer.CopyElement(reader);
+                CHIP_ERROR err = writer.CopyElement(mReader);
                 if (err == CHIP_NO_ERROR)
                 {
                     successful_written_bytes = writer.GetLengthWritten();
@@ -90,8 +77,6 @@ public:
                 ChipLogError(DeviceLayer, "Skipping unexpected TLV element");
             }
         }
-
-        ReturnErrorOnFailure(writer.EndContainer(outWriterContainer));
         ReturnErrorOnFailure(writer.Finalize());
         if (close_success)
         {
@@ -121,8 +106,8 @@ public:
     }
 
 private:
-    CircularDiagnosticBuffer() : chip::TLV::TLVCircularBuffer(nullptr, 0) {}
-    ~CircularDiagnosticBuffer() override = default;
+    chip::TLV::CircularTLVReader mReader;
+    chip::TLV::CircularTLVWriter mWriter;
 };
 
 } // namespace Diagnostics

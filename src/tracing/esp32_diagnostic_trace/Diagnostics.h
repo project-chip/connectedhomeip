@@ -25,6 +25,14 @@ namespace Tracing {
 
 namespace Diagnostics {
 
+// Diagnostic TAGs
+enum D_TAG
+{
+    TIMESTAMP = 0,
+    LABEL,
+    VALUE
+};
+
 /**
  * @class DiagnosticEntry
  * @brief Abstract base class for encoding diagnostic entries into TLV format.
@@ -46,7 +54,7 @@ public:
      * @return CHIP_ERROR Returns an error code indicating the success or
      *                    failure of the encoding operation.
      */
-    virtual CHIP_ERROR Encode(chip::TLV::CircularTLVWriter & writer) = 0;
+    virtual CHIP_ERROR Encode(chip::TLV::CircularTLVWriter & writer) const = 0;
 };
 
 template <typename T>
@@ -55,20 +63,20 @@ class Diagnostic : public DiagnosticEntry
 public:
     Diagnostic(const char * label, T value, uint32_t timestamp) : label_(label), value_(value), timestamp_(timestamp) {}
 
-    CHIP_ERROR Encode(chip::TLV::CircularTLVWriter & writer) override
+    CHIP_ERROR Encode(chip::TLV::CircularTLVWriter & writer) const override
     {
         chip::TLV::TLVType DiagnosticOuterContainer = chip::TLV::kTLVType_NotSpecified;
         ReturnErrorOnFailure(
             writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, DiagnosticOuterContainer));
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(0), timestamp_));
-        ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(1), label_));
+        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(D_TAG::TIMESTAMP), timestamp_));
+        ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(D_TAG::LABEL), label_));
         if constexpr (std::is_same_v<T, const char *>)
         {
-            ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(2), value_));
+            ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(D_TAG::VALUE), value_));
         }
         else
         {
-            ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(2), value_));
+            ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(D_TAG::VALUE), value_));
         }
         ReturnErrorOnFailure(writer.EndContainer(DiagnosticOuterContainer));
         ReturnErrorOnFailure(writer.Finalize());
@@ -99,7 +107,7 @@ public:
      *                    diagnostic data to store.
      * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an appropriate error code on failure.
      */
-    virtual CHIP_ERROR Store(DiagnosticEntry & diagnostic) = 0;
+    virtual CHIP_ERROR Store(const DiagnosticEntry & diagnostic) = 0;
 
     /**
      * @brief Retrieves diagnostic data as a payload.
