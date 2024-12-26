@@ -27,9 +27,7 @@ namespace chip {
 namespace Tracing {
 namespace Diagnostics {
 
-constexpr size_t kPermitListMaxSize = CONFIG_MAX_PERMIT_LIST_SIZE;
-using HashValue                     = uint32_t;
-
+namespace Utils {
 // Implements a murmurhash with 0 seed.
 uint32_t MurmurHash(const void * key)
 {
@@ -59,6 +57,11 @@ uint32_t MurmurHash(const void * key)
 
     return hash;
 }
+} // namespace Utils
+
+constexpr size_t kPermitListMaxSize = CONFIG_MAX_PERMIT_LIST_SIZE;
+using HashValue                     = uint32_t;
+using namespace Utils;
 
 HashValue gPermitList[kPermitListMaxSize] = { MurmurHash("PASESession"),
                                               MurmurHash("CASESession"),
