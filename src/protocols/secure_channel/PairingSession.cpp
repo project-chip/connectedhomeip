@@ -241,7 +241,104 @@ exit:
     }
     return err;
 }
+CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader,
+                                                        SessionParameters & sessionParameters)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // The MRP parameters are optional.
+    if (tlvReader.GetTag() != expectedTag)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    TLV::TLVType containerType = TLV::kTLVType_Structure;
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+
+    ReturnErrorOnFailure(tlvReader.Next());
+
+    ChipLogDetail(SecureChannel, "Found MRP parameters in the message");
+
+    // All TLV elements in the structure are optional. If the first element is present, process it and move
+    // the TLV reader to the next element.
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSessionIdleInterval)
+    {
+        uint32_t idleRetransTimeout;
+        ReturnErrorOnFailure(tlvReader.Get(idleRetransTimeout));
+        sessionParameters.SetMRPIdleRetransTimeout(System::Clock::Milliseconds32(idleRetransTimeout));
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSessionActiveInterval)
+    {
+        uint32_t activeRetransTimeout;
+        ReturnErrorOnFailure(tlvReader.Get(activeRetransTimeout));
+        sessionParameters.SetMRPActiveRetransTimeout(System::Clock::Milliseconds32(activeRetransTimeout));
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSessionActiveThreshold)
+    {
+        uint16_t activeThresholdTime;
+        ReturnErrorOnFailure(tlvReader.Get(activeThresholdTime));
+        sessionParameters.SetMRPActiveThresholdTime(System::Clock::Milliseconds16(activeThresholdTime));
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kDataModelRevision)
+    {
+        uint16_t dataModelRevision;
+        ReturnErrorOnFailure(tlvReader.Get(dataModelRevision));
+        sessionParameters.SetDataModelRevision(dataModelRevision);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kInteractionModelRevision)
+    {
+        uint16_t interactionModelRevision;
+        ReturnErrorOnFailure(tlvReader.Get(interactionModelRevision));
+        sessionParameters.SetInteractionModelRevision(interactionModelRevision);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSpecificationVersion)
+    {
+        uint32_t specificationVersion;
+        ReturnErrorOnFailure(tlvReader.Get(specificationVersion));
+        sessionParameters.SetSpecificationVersion(specificationVersion);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kMaxPathsPerInvoke)
+    {
+        uint16_t maxPathsPerInvoke;
+        ReturnErrorOnFailure(tlvReader.Get(maxPathsPerInvoke));
+        sessionParameters.SetMaxPathsPerInvoke(maxPathsPerInvoke);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    // Future proofing - Don't error out if there are other tags
+exit:
+    if (err == CHIP_END_OF_TLV)
+    {
+        return tlvReader.ExitContainer(containerType);
+    }
+    return err;
+}
 bool PairingSession::IsSessionEstablishmentInProgress()
 {
     if (!mSecureSessionHolder)

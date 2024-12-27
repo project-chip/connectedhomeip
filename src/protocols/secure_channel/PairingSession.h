@@ -100,6 +100,7 @@ public:
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteSessionParams.GetMRPConfig(); }
     const SessionParameters & GetRemoteSessionParameters() const { return mRemoteSessionParams; }
+    void SetRemoteSessionParameters(const SessionParameters & sessionParams) { mRemoteSessionParams = sessionParams; }
     void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteSessionParams.SetMRPConfig(config); }
 
     /**
@@ -208,7 +209,7 @@ protected:
 
     /**
      * Try to decode the current element (pointed by the TLV reader) as MRP parameters.
-     * If the MRP parameters are found, mRemoteSessionParams is updated with the devoded values.
+     * If the MRP parameters are found, mRemoteSessionParams is updated with the decoded values.
      *
      * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,
      * the function is a noop.
@@ -217,6 +218,19 @@ protected:
      * return the corresponding error.
      */
     CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader);
+
+    /**
+     * Try to decode the current element (pointed by the TLV reader) as MRP parameters.
+     * If the MRP parameters are found, outparam sessionParameters is updated with the decoded values.
+     *
+     * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,
+     * the function is a noop.
+     *
+     * If the parameters are present, but TLV reader fails to correctly parse it, the function will
+     * return the corresponding error.
+     */
+    static CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader,
+                                                   SessionParameters & sessionParameters);
 
     bool IsSessionEstablishmentInProgress();
 
