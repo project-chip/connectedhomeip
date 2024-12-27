@@ -247,6 +247,20 @@ protected:
         const ReliableMessageProtocolConfig * responderMrpConfig;
     };
 
+    struct ParsedSigma2
+    {
+        // TODO responderRandom is ByteSpan in ParsedSigma2 but is an array in EncodeSigma2Inputs
+        ByteSpan responderRandom;
+        uint16_t responderSessionId;
+        // TODO, If I will inherit, remember that this different from EncodeSigma2Inputs
+        ByteSpan responderEphPubKey;
+
+        Platform::ScopedMemoryBufferWithSize<uint8_t> msgR2Encrypted;
+        size_t encrypted2Length = 0;
+        const ReliableMessageProtocolConfig * responderMrpConfig;
+        bool responderMrpParamsPresent = false;
+        SessionParameters responderSessionParams;
+    };
     /**
      * @brief  Encodes a Sigma1 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
      *         outparam.
@@ -277,6 +291,8 @@ protected:
      * valid values, or the sessionResumptionRequested field will be set to false.
      */
     static CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma1 & parsedMessage);
+
+    static CHIP_ERROR ParseSigma2(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma2 & parsedMessage);
 
     /**
      * @brief  Encodes a Sigma2 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
