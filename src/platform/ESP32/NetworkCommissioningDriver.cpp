@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -458,6 +459,9 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
 
 void ESPWiFiDriver::OnNetworkStatusChange()
 {
+    // This function reports the status to the data model provider, so skip it if the provider is not ready.
+    VerifyOrReturn(app::InteractionModelEngine::GetInstance() &&
+                   app::InteractionModelEngine::GetInstance()->GetDataModelProvider());
     Network configuredNetwork;
     bool staEnabled = false, staConnected = false;
     VerifyOrReturn(ESP32Utils::IsStationEnabled(staEnabled) == CHIP_NO_ERROR);
