@@ -261,6 +261,15 @@ protected:
         bool responderMrpParamsPresent = false;
         SessionParameters responderSessionParams;
     };
+
+    struct ParsedSigma2TBEData
+    {
+        ByteSpan responderNOC;
+        ByteSpan responderICAC;
+        Crypto::P256ECDSASignature tbsData2Signature;
+        ByteSpan resumptionId;
+    };
+
     /**
      * @brief  Encodes a Sigma1 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
      *         outparam.
@@ -294,6 +303,7 @@ protected:
 
     static CHIP_ERROR ParseSigma2(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma2 & parsedMessage);
 
+    static CHIP_ERROR ParseSigma2TBEData(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma2TBEData & parsedMessage);
     /**
      * @brief  Encodes a Sigma2 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
      *         outparam.
