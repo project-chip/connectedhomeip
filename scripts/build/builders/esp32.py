@@ -111,6 +111,20 @@ class Esp32App(Enum):
             return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
 
 
+def TargetName(board: Esp32Board):
+    if board == Esp32Board.C3DevKit:
+        return 'esp32c3'
+    else:
+        return 'esp32'
+
+
+def TargetFileName(board: Esp32Board):
+    if board == Esp32Board.C3DevKit:
+        return 'sdkconfig.defaults.esp32c3'
+    else:
+        return ''
+
+
 def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
     rpc_enabled_apps = {Esp32App.ALL_CLUSTERS,
                         Esp32App.ALL_CLUSTERS_MINIMAL,
@@ -124,7 +138,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         return 'sdkconfig.defaults'
 
     rpc = "_rpc" if enable_rpcs else ""
-    if board == Esp32Board.DevKitC:
+    if board == Esp32Board.DevKitC or board == Esp32Board.C3DevKit:
         return 'sdkconfig{}.defaults'.format(rpc)
     elif board == Esp32Board.M5Stack:
         # a subset of apps have m5stack specific configurations. However others
@@ -139,8 +153,6 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
             return 'sdkconfig_m5stack{}.defaults'.format(rpc)
         else:
             return 'sdkconfig{}.defaults'.format(rpc)
-    elif board == Esp32Board.C3DevKit:
-        return 'sdkconfig{}.defaults.esp32c3'.format(rpc)
     else:
         raise Exception('Unknown board type')
 
@@ -195,6 +207,11 @@ class Esp32Builder(Builder):
         self._Execute(
             ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
 
+        if TargetFileName(self.board) != '':
+            target_defaults = os.path.join(self.ExamplePath, TargetFileName(self.board))
+            if os.path.exists(target_defaults):
+                self._Execute(['cp', target_defaults, os.path.join(self.output_dir, TargetFileName(self.board))])
+
         if not self.enable_ipv4:
             self._Execute(
                 ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
@@ -221,8 +238,9 @@ class Esp32Builder(Builder):
 
         cmake_args = " ".join(cmake_args)
         defaults = shlex.quote(defaults_out)
+        target = shlex.quote(TargetName(self.board))
 
-        cmd = f"\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py {cmake_args} reconfigure"
+        cmd = f"\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py {cmake_args} -DIDF_TARGET={target} reconfigure"
 
         # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
         self._IdfEnvExecute(cmd)
