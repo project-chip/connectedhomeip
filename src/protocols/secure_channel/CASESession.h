@@ -223,6 +223,7 @@ protected:
     {
         ByteSpan initiatorEphPubKey;
         bool initiatorMrpParamsPresent = false;
+        SessionParameters initiatorSessionParams;
     };
 
     struct EncodeSigma2Inputs
@@ -275,7 +276,7 @@ protected:
      * and the resumptionID and initiatorResumeMIC fields will be set to
      * valid values, or the sessionResumptionRequested field will be set to false.
      */
-    CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma1 & parsedMessage);
+    static CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma1 & parsedMessage);
 
     /**
      * @brief  Encodes a Sigma2 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle

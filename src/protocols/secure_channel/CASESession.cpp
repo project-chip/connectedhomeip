@@ -1100,6 +1100,7 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
     // Set the MRP parameters provided in the Sigma1 message
     if (parsedSigma1.initiatorMrpParamsPresent)
     {
+        SetRemoteSessionParameters(parsedSigma1.initiatorSessionParams);
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
     }
@@ -2324,7 +2325,8 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     CHIP_ERROR err = tlvReader.Next();
     if (err == CHIP_NO_ERROR && tlvReader.GetTag() == AsTlvContextTag(Sigma1Tags::kInitiatorSessionParams))
     {
-        ReturnErrorOnFailure(DecodeMRPParametersIfPresent(AsTlvContextTag(Sigma1Tags::kInitiatorSessionParams), tlvReader));
+        ReturnErrorOnFailure(DecodeMRPParametersIfPresent(AsTlvContextTag(Sigma1Tags::kInitiatorSessionParams), tlvReader,
+                                                          outParsedSigma1.initiatorSessionParams));
         outParsedSigma1.initiatorMrpParamsPresent = true;
 
         err = tlvReader.Next();
