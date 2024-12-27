@@ -28,8 +28,7 @@
 
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorageManager.h>
-static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE];
-using namespace chip::Tracing::Diagnostics;
+extern chip::Tracing::Diagnostics::CircularDiagnosticBuffer diagnosticStorage;
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 namespace chip {

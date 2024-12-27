@@ -54,6 +54,9 @@
 
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 #include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
+static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE]; // Global static buffer used to store diagnostics
+using namespace chip::Tracing::Diagnostics;
+CircularDiagnosticBuffer diagnosticStorage(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 namespace {
@@ -80,7 +83,6 @@ static void InitServer(intptr_t context)
 {
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    CircularDiagnosticBuffer & diagnosticStorage = CircularDiagnosticBuffer::GetInstance();
     diagnosticStorage.Init(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
     static ESP32Diagnostics diagnosticBackend(diagnosticStorage);
     Tracing::Register(diagnosticBackend);
