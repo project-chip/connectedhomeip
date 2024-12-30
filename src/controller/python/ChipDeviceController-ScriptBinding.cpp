@@ -42,7 +42,6 @@
 
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/icd/client/CheckInHandler.h>
 #include <app/icd/client/DefaultCheckInDelegate.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
@@ -55,6 +54,7 @@
 #include <controller/CurrentFabricRemover.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <controller/SetUpCodePairer.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
 #include <controller/python/ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h>
@@ -183,6 +183,12 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len);
 
+PyChipError pychip_DeviceController_SetRequireTermsAndConditionsAcknowledgement(bool tcRequired);
+
+PyChipError pychip_DeviceController_SetTermsAcknowledgements(uint16_t tcVersion, uint16_t tcUserResponse);
+
+PyChipError pychip_DeviceController_SetSkipCommissioningComplete(bool skipCommissioningComplete);
+
 // Pairing Delegate
 PyChipError
 pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
@@ -272,7 +278,7 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
 
     factoryParams.fabricIndependentStorage = storageAdapter;
     factoryParams.sessionKeystore          = &sSessionKeystore;
-    factoryParams.dataModelProvider        = app::CodegenDataModelProviderInstance();
+    factoryParams.dataModelProvider        = app::CodegenDataModelProviderInstance(storageAdapter);
 
     sICDClientStorage.Init(storageAdapter, &sSessionKeystore);
 
@@ -569,6 +575,25 @@ PyChipError pychip_DeviceController_SetDefaultNtp(const char * defaultNTP)
     VerifyOrReturnError(sDefaultNTPBuf.Alloc(len), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     memcpy(sDefaultNTPBuf.Get(), defaultNTP, len);
     sCommissioningParameters.SetDefaultNTP(chip::app::DataModel::MakeNullable(CharSpan(sDefaultNTPBuf.Get(), len)));
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetRequireTermsAndConditionsAcknowledgement(bool tcRequired)
+{
+    sCommissioningParameters.SetRequireTermsAndConditionsAcknowledgement(tcRequired);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetTermsAcknowledgements(uint16_t tcVersion, uint16_t tcUserResponse)
+{
+    sCommissioningParameters.SetTermsAndConditionsAcknowledgement(
+        { .acceptedTermsAndConditions = tcUserResponse, .acceptedTermsAndConditionsVersion = tcVersion });
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetSkipCommissioningComplete(bool skipCommissioningComplete)
+{
+    sCommissioningParameters.SetSkipCommissioningComplete(skipCommissioningComplete);
     return ToPyChipError(CHIP_NO_ERROR);
 }
 

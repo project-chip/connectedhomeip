@@ -71,7 +71,7 @@ class NxpBoard(Enum):
                 if self == NxpBoard.RW61X_ETH:
                     return 'rd_rw612_bga/rw612/ethernet'
                 else:
-                    return 'rd_rw612_bga'
+                    return 'frdm_rw612'
             else:
                 return 'rw61x'
         elif self == NxpBoard.MCXW71:

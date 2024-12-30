@@ -21,7 +21,7 @@ import chip.clusters as Clusters
 import jinja2
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
-from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster,
+from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
                                        add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
                                        combine_derived_clusters_with_base, get_data_model_directory)
 from mobly import asserts
@@ -275,9 +275,6 @@ class TestSpecParsingSupport(MatterBaseTest):
         string_override_check, problems = build_xml_clusters(str_path)
 
         asserts.assert_count_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
-
-        with asserts.assert_raises(SpecParsingException):
-            build_xml_clusters("baddir")
 
     def test_spec_parsing_access(self):
         strs = [None, 'view', 'operate', 'manage', 'admin']

@@ -582,3 +582,10 @@ config CHIP_BLE_ADVERTISING_DURATION
 	  else the maximum duration time can be extended to 2880 minutes (48h).
 
 endif
+
+if BT
+config CHIP_CUSTOM_BLE_ADV_DATA
+	bool "Use custom BLE advertising data"
+	help
+	  Customization of BLE advertising data at the application layer
+endif

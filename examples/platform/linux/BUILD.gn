@@ -94,7 +94,7 @@ source_set("app-main") {
     ":energy-reporting-test-event-trigger",
     ":smco-test-event-trigger",
     ":water-heater-management-test-event-trigger",
-    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
   ]
@@ -102,6 +102,7 @@ source_set("app-main") {
     ":ota-test-event-trigger",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
   ]
 
   if (current_os != "nuttx") {
@@ -164,8 +165,8 @@ source_set("commissioner-main") {
     "${chip_root}/src/lib",
   ]
   deps = [
-    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
   ]
 
   if (chip_enable_transport_trace) {

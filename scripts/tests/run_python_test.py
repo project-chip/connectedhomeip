@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import datetime
 import glob
 import io
@@ -22,9 +23,12 @@ import os
 import os.path
 import pathlib
 import re
+import select
 import shlex
 import sys
+import threading
 import time
+import typing
 
 import click
 import coloredlogs
@@ -68,6 +72,23 @@ def process_test_script_output(line, is_stderr):
     return process_chip_output(line, is_stderr, TAG_PROCESS_TEST)
 
 
+def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event):
+    """Forward the content of a named pipe to a file-like object."""
+    if not os.path.exists(path):
+        with contextlib.suppress(OSError):
+            os.mkfifo(path)
+    with open(os.open(path, os.O_RDONLY | os.O_NONBLOCK), 'rb') as f_in:
+        while not stop_event.is_set():
+            if select.select([f_in], [], [], 0.5)[0]:
+                line = f_in.readline()
+                if not line:
+                    break
+                f_out.write(line)
+                f_out.flush()
+    with contextlib.suppress(OSError):
+        os.unlink(path)
+
+
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
               help='Path to local application to use, omit to use external apps.')
@@ -79,6 +100,8 @@ def process_test_script_output(line, is_stderr):
               help='The extra arguments passed to the device. Can use placeholders like {SCRIPT_BASE_NAME}')
 @click.option("--app-ready-pattern", type=str, default=None,
               help='Delay test script start until given regular expression pattern is found in the application output.')
+@click.option("--app-stdin-pipe", type=str, default=None,
+              help='Path for a standard input redirection named pipe to be used by the test script.')
 @click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT,
                                                                              'src',
                                                                              'controller',
@@ -93,8 +116,10 @@ def process_test_script_output(line, is_stderr):
 @click.option("--quiet/--no-quiet", default=None,
               help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
+@click.option("--run", type=str, multiple=True, help="Run only the specified test run(s).")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
-         app_ready_pattern: str, script: str, script_args: str, script_gdb: bool, quiet: bool, load_from_env):
+         app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
+         script_gdb: bool, quiet: bool, load_from_env, run):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -106,6 +131,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
                 app=app,
                 app_args=app_args,
                 app_ready_pattern=app_ready_pattern,
+                app_stdin_pipe=app_stdin_pipe,
                 script_args=script_args,
                 script_gdb=script_gdb,
             )
@@ -116,7 +142,11 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             "No valid runs were found. Make sure you add runs to your file, see "
             "https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
 
-    # Override runs Metadata with the command line arguments
+    if run:
+        # Filter runs based on the command line arguments
+        runs = [r for r in runs if r.run in run]
+
+    # Override runs Metadata with the command line options
     for run in runs:
         if factory_reset is not None:
             run.factory_reset = factory_reset
@@ -128,11 +158,13 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
     for run in runs:
         logging.info("Executing %s %s", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "",
-                  run.app_ready_pattern, run.py_script_path, run.script_args or "", run.script_gdb, run.quiet)
+                  run.app_ready_pattern, run.app_stdin_pipe, run.py_script_path,
+                  run.script_args or "", run.script_gdb, run.quiet)
 
 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
-              app_ready_pattern: str, script: str, script_args: str, script_gdb: bool, quiet: bool):
+              app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
+              script_gdb: bool, quiet: bool):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -154,6 +186,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             pathlib.Path(match.group("path")).unlink(missing_ok=True)
 
     app_process = None
+    app_stdin_forwarding_thread = None
+    app_stdin_forwarding_stop_event = threading.Event()
     app_exit_code = 0
     app_pid = 0
 
@@ -172,11 +206,22 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                                  f_stdout=stream_output,
                                  f_stderr=stream_output)
         app_process.start(expected_output=app_ready_pattern, timeout=30)
-        app_process.p.stdin.close()
+        if app_stdin_pipe:
+            logging.info("Forwarding stdin from '%s' to app", app_stdin_pipe)
+            app_stdin_forwarding_thread = threading.Thread(
+                target=forward_fifo, args=(app_stdin_pipe, app_process.p.stdin, app_stdin_forwarding_stop_event))
+            app_stdin_forwarding_thread.start()
+        else:
+            app_process.p.stdin.close()
         app_pid = app_process.p.pid
 
-    script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-                      '--log-format', '%(message)s', "--app-pid", str(app_pid)] + shlex.split(script_args)
+    script_command = [
+        script,
+        "--fail-on-skipped",
+        "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+        "--log-format", '%(message)s',
+        "--app-pid", str(app_pid),
+    ] + shlex.split(script_args)
 
     if script_gdb:
         #
@@ -204,6 +249,9 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     if app_process:
         logging.info("Stopping app with SIGTERM")
+        if app_stdin_forwarding_thread:
+            app_stdin_forwarding_stop_event.set()
+            app_stdin_forwarding_thread.join()
         app_process.terminate()
         app_exit_code = app_process.returncode
 

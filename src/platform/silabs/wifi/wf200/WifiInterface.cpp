@@ -45,7 +45,7 @@ using namespace ::chip::DeviceLayer;
 
 // TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
 //       As such we can't depend on the platform here as well
-extern void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData);
+extern void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData);
 
 /* wfxRsi Task will use as its stack */
 StackType_t wfxEventTaskStack[1024] = { 0 };
@@ -58,7 +58,7 @@ StaticEventGroup_t wfxEventGroup;
 
 EventGroupHandle_t sl_wfx_event_group;
 TaskHandle_t wfx_events_task_handle;
-static sl_wfx_mac_address_t ap_mac;
+static MacAddress ap_mac;
 static uint32_t sta_ip;
 static wfx_wifi_scan_result_t ap_info;
 
@@ -92,9 +92,6 @@ static wfx_wifi_scan_result_t ap_info;
 #define STA_IP_FAIL (0)
 #define WLAN_TASK_PRIORITY (1)
 
-/*****************************************************************************
- * macros
- ******************************************************************************/
 #define WE_ST_STARTED 1
 #define WE_ST_STA_CONN 2
 #define WE_ST_HW_STARTED 4
@@ -118,19 +115,17 @@ bool hasNotifiedWifiConnectivity = false;
 static uint8_t retryJoin         = 0;
 bool retryInProgress             = false;
 
-#ifdef SL_WFX_CONFIG_SCAN
 static struct scan_result_holder
 {
     struct scan_result_holder * next;
     wfx_wifi_scan_result scan;
 } * scan_save;
 static uint8_t scan_count = 0;
-static void (*scan_cb)(wfx_wifi_scan_result_t *); /* user-callback - when scan is done */
-static char * scan_ssid;                          /* Which one are we scanning for */
-size_t scan_ssid_length = 0;
+static ScanCallback scan_cb;              /* user-callback - when scan is done */
+static uint8_t * scan_ssid     = nullptr; /* Which one are we scanning for */
+static size_t scan_ssid_length = 0;
 static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_result);
 static void sl_wfx_scan_complete_callback(uint32_t status);
-#endif /* SL_WFX_CONFIG_SCAN */
 
 static void wfx_events_task(void * p_arg);
 
@@ -295,6 +290,53 @@ error_handler:
 
 } // namespace
 
+CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, MutableByteSpan & address)
+{
+    VerifyOrReturnError(address.size() >= kWifiMacAddressLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+#ifdef SL_WFX_CONFIG_SOFTAP
+    chip::ByteSpan byteSpan((interface == SL_WFX_SOFTAP_INTERFACE) ? wifiContext.mac_addr_1.octet : wifiContext.mac_addr_0.octet);
+#else
+    chip::ByteSpan byteSpan(wifiContext.mac_addr_0.octet);
+#endif
+
+    return CopySpanToMutableSpan(byteSpan, address);
+}
+
+CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
+{
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // SSID Max Length that is supported by the Wi-Fi SDK is 32
+    VerifyOrReturnError(ssid.size() <= WFX_MAX_SSID_LENGTH, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    // Make sure memory is cleared before starting a new scan
+    if (scan_ssid)
+    {
+        chip::Platform::MemoryFree(scan_ssid);
+        scan_ssid = nullptr;
+    }
+
+    if (ssid.empty())
+    {
+        scan_ssid_length = 0;
+        scan_ssid        = nullptr;
+    }
+    else
+    {
+        scan_ssid_length = ssid.size();
+        scan_ssid        = reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(scan_ssid_length));
+        VerifyOrReturnError(scan_ssid != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        chip::MutableByteSpan scannedSsidSpan(scan_ssid, WFX_MAX_SSID_LENGTH);
+        chip::CopySpanToMutableSpan(ssid, scannedSsidSpan);
+    }
+    scan_cb = callback;
+
+    xEventGroupSetBits(sl_wfx_event_group, SL_WFX_SCAN_START);
+    return CHIP_NO_ERROR;
+}
+
 /***************************************************************************
  * @brief
  * Creates WFX events processing task.
@@ -326,7 +368,7 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
     /******** INDICATION ********/
     case SL_WFX_STARTUP_IND_ID: {
         ChipLogProgress(DeviceLayer, "startup completed.");
-        HandleWFXSystemEvent(WIFI_EVENT, event_payload);
+        HandleWFXSystemEvent(event_payload);
         break;
     }
     case SL_WFX_CONNECT_IND_ID: {
@@ -347,7 +389,6 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
         }
         break;
     }
-#ifdef SL_WFX_CONFIG_SCAN
     case SL_WFX_SCAN_RESULT_IND_ID: {
         sl_wfx_scan_result_ind_t * scan_result = (sl_wfx_scan_result_ind_t *) event_payload;
         sl_wfx_scan_result_callback(&scan_result->body);
@@ -358,7 +399,6 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
         sl_wfx_scan_complete_callback(scan_complete->body.status);
         break;
     }
-#endif /* SL_WFX_CONFIG_SCAN */
 #ifdef SL_WFX_CONFIG_SOFTAP
     case SL_WFX_START_AP_IND_ID: {
         sl_wfx_start_ap_ind_t * start_ap_indication = (sl_wfx_start_ap_ind_t *) event_payload;
@@ -425,7 +465,6 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
     return SL_STATUS_OK;
 }
 
-#ifdef SL_WFX_CONFIG_SCAN
 /****************************************************************************
  * @brief
  * Callback for individual scan result
@@ -433,56 +472,60 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
  *****************************************************************************/
 static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_result)
 {
-    struct scan_result_holder * ap;
 
     ChipLogDetail(DeviceLayer, "# %2d %2d  %03d %02X:%02X:%02X:%02X:%02X:%02X  %s", scan_count, scan_result->channel,
                   ((int16_t) (scan_result->rcpi - 220) / 2), scan_result->mac[0], scan_result->mac[1], scan_result->mac[2],
                   scan_result->mac[3], scan_result->mac[4], scan_result->mac[5], scan_result->ssid_def.ssid);
-    /* Report one AP information */
-    /* don't save if filter only wants specific ssid */
-    if (scan_ssid != nullptr)
+
+    chip::ByteSpan requestedSsid(scan_ssid, scan_ssid_length);
+    chip::ByteSpan scannedSsid(scan_result->ssid_def.ssid, scan_result->ssid_def.ssid_length);
+
+    // Verify that there was no requested SSID or that the SSID matches the requested SSID
+    VerifyOrReturn(requestedSsid.empty() || requestedSsid.data_equal(scannedSsid));
+
+    struct scan_result_holder * ap = reinterpret_cast<struct scan_result_holder *>(chip::Platform::MemoryAlloc(sizeof(*ap)));
+    VerifyOrReturn(ap != nullptr, ChipLogError(DeviceLayer, "Scan Callback: No Memory for scanned network."));
+
+    // Add Scan to the linked list
+    ap->next  = scan_save;
+    scan_save = ap;
+
+    // Copy scanned SSID to the output buffer
+    chip::MutableByteSpan outputSsid(ap->scan.ssid, WFX_MAX_SSID_LENGTH);
+    chip::CopySpanToMutableSpan(scannedSsid, outputSsid);
+    ap->scan.ssid_length = outputSsid.size();
+
+    // Set Network Security - We start by WPA3 to set the most secure type
+    ap->scan.security = WFX_SEC_UNSPECIFIED;
+    if (scan_result->security_mode.wpa3)
     {
-        if (strcmp(scan_ssid, (char *) &scan_result->ssid_def.ssid[0]) != 0)
-            return;
+        ap->scan.security = WFX_SEC_WPA3;
     }
-    if ((ap = (struct scan_result_holder *) (chip::Platform::MemoryAlloc(sizeof(*ap)))) == (struct scan_result_holder *) 0)
+    else if (scan_result->security_mode.wpa2)
     {
-        ChipLogError(DeviceLayer, "Scan: No Mem");
+        ap->scan.security = WFX_SEC_WPA2;
+    }
+    else if (scan_result->security_mode.wpa)
+    {
+        ap->scan.security = WFX_SEC_WPA;
+    }
+    else if (scan_result->security_mode.wep)
+    {
+        ap->scan.security = WFX_SEC_WEP;
     }
     else
     {
-        ap->next  = scan_save;
-        scan_save = ap;
-        /* Not checking if scan_result->ssid_length is < 33 */
-        chip::Platform::CopyString(ap->scan.ssid, sizeof(ap->scan.ssid), (char *) &scan_result->ssid_def.ssid[0]);
-        /* We do it in this order WPA3 first */
-        /* No EAP supported - Is this required */
-        ap->scan.security = WFX_SEC_UNSPECIFIED;
-        if (scan_result->security_mode.wpa3)
-        {
-            ap->scan.security = WFX_SEC_WPA3;
-        }
-        else if (scan_result->security_mode.wpa2)
-        {
-            ap->scan.security = WFX_SEC_WPA2;
-        }
-        else if (scan_result->security_mode.wpa)
-        {
-            ap->scan.security = WFX_SEC_WPA;
-        }
-        else if (scan_result->security_mode.wep)
-        {
-            ap->scan.security = WFX_SEC_WEP;
-        }
-        else
-        {
-            ap->scan.security = WFX_SEC_NONE;
-        }
-        ap->scan.chan = scan_result->channel;
-        ap->scan.rssi = scan_result->rcpi;
-        memcpy(&ap->scan.bssid[0], &scan_result->mac[0], BSSID_LEN);
-        scan_count++;
+        ap->scan.security = WFX_SEC_NONE;
     }
+
+    ap->scan.chan = scan_result->channel;
+    ap->scan.rssi = (scan_result->rcpi - 220) / 2;
+
+    chip::ByteSpan scannedBssid(scan_result->mac, kWifiMacAddressLength);
+    chip::MutableByteSpan outputBssid(ap->scan.bssid, kWifiMacAddressLength);
+    chip::CopySpanToMutableSpan(scannedBssid, outputBssid);
+
+    scan_count++;
 }
 
 /****************************************************************************
@@ -497,7 +540,6 @@ static void sl_wfx_scan_complete_callback(uint32_t status)
     /* Use scan_count value and reset it */
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_SCAN_COMPLETE);
 }
-#endif /* SL_WFX_CONFIG_SCAN */
 
 /****************************************************************************
  * @brief
@@ -515,7 +557,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
     {
     case WFM_STATUS_SUCCESS: {
         ChipLogProgress(DeviceLayer, "STA-Connected");
-        memcpy(&ap_mac.octet[0], mac, MAC_ADDRESS_FIRST_OCTET);
+        memcpy(ap_mac.data(), mac, kWifiMacAddressLength);
         sl_wfx_context->state =
             static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) | static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
         xEventGroupSetBits(sl_wfx_event_group, SL_WFX_CONNECT);
@@ -667,10 +709,7 @@ static void wfx_events_task(void * p_arg)
 #ifdef SL_WFX_CONFIG_SOFTAP
                                         | SL_WFX_START_AP | SL_WFX_STOP_AP
 #endif /* SL_WFX_CONFIG_SOFTAP */
-#ifdef SL_WFX_CONFIG_SCAN
-                                        | SL_WFX_SCAN_START | SL_WFX_SCAN_COMPLETE
-#endif /* SL_WFX_CONFIG_SCAN */
-                                        | BITS_TO_WAIT,
+                                        | SL_WFX_SCAN_START | SL_WFX_SCAN_COMPLETE | BITS_TO_WAIT,
                                     pdTRUE, pdFALSE, pdMS_TO_TICKS(250)); /* 250 msec delay converted to ticks */
         if (flags & SL_WFX_RETRY_CONNECT)
         {
@@ -692,23 +731,23 @@ static void wfx_events_task(void * p_arg)
                     if (!hasNotifiedWifiConnectivity)
                     {
                         ChipLogProgress(DeviceLayer, "will notify WiFi connectivity");
-                        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &ap_mac);
+                        NotifyConnection(ap_mac);
                         hasNotifiedWifiConnectivity = true;
                     }
                 }
                 else if (dhcp_state == DHCP_OFF)
                 {
-                    wfx_ip_changed_notify(IP_STATUS_FAIL);
+                    NotifyIPv4Change(false);
                     hasNotifiedIPV4 = false;
                 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
                 if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
                 {
-                    wfx_ipv6_notify(1);
+                    NotifyIPv6Change(true);
                     hasNotifiedIPV6 = true;
                     if (!hasNotifiedWifiConnectivity)
                     {
-                        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &ap_mac);
+                        NotifyConnection(ap_mac);
                         hasNotifiedWifiConnectivity = true;
                     }
                 }
@@ -719,10 +758,10 @@ static void wfx_events_task(void * p_arg)
         if (flags & SL_WFX_CONNECT)
         {
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-            wfx_ip_changed_notify(IP_STATUS_FAIL);
+            NotifyIPv4Change(false);
             hasNotifiedIPV4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
-            wfx_ipv6_notify(GET_IPV6_FAIL);
+            NotifyIPv6Change(false);
             hasNotifiedIPV6             = false;
             hasNotifiedWifiConnectivity = false;
             ChipLogProgress(DeviceLayer, "connected to AP");
@@ -744,37 +783,40 @@ static void wfx_events_task(void * p_arg)
         {
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-            wfx_ip_changed_notify(IP_STATUS_FAIL);
+            NotifyIPv4Change(false);
             hasNotifiedIPV4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
-            wfx_ipv6_notify(GET_IPV6_FAIL);
+            NotifyIPv6Change(false);
             hasNotifiedIPV6             = false;
             hasNotifiedWifiConnectivity = false;
             wifi_extra &= ~WE_ST_STA_CONN;
             wfx_lwip_set_sta_link_down();
         }
 
-#ifdef SL_WFX_CONFIG_SCAN
         if (flags & SL_WFX_SCAN_START)
         {
-            /*
-             * Start the Scan
-             */
-            sl_wfx_ssid_def_t ssid, *sp;
-            uint16_t num_ssid, slen;
+
+            // Start the Scan
+            sl_wfx_ssid_def_t ssid       = { 0 };
+            sl_wfx_ssid_def_t * ssidPtr  = nullptr;
+            uint16_t nbreScannedNetworks = 0;
+
             if (scan_ssid)
             {
-                memset(&ssid, 0, sizeof(ssid));
-                slen = strlen(scan_ssid);
-                memcpy(&ssid.ssid[0], scan_ssid, slen);
-                ssid.ssid_length = slen;
-                num_ssid         = 1;
-                sp               = &ssid;
+
+                chip::ByteSpan requestedSsid(scan_ssid, scan_ssid_length);
+                chip::MutableByteSpan outputSsid(ssid.ssid, WFX_MAX_SSID_LENGTH);
+
+                chip::CopySpanToMutableSpan(requestedSsid, outputSsid);
+                ssid.ssid_length = outputSsid.size();
+
+                nbreScannedNetworks = 1;
+                ssidPtr             = &ssid;
             }
             else
             {
-                num_ssid = 0;
-                sp       = (sl_wfx_ssid_def_t *) 0;
+                nbreScannedNetworks = 0;
+                ssidPtr             = nullptr;
             }
 
             ChipLogDetail(DeviceLayer,
@@ -782,9 +824,9 @@ static void wfx_events_task(void * p_arg)
                           "Channel Time: %d, Number of prob: %d",
                           ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
             (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
-            (void) sl_wfx_send_scan_command(WFM_SCAN_MODE_ACTIVE, CHANNEL_LIST, /* Channel list */
-                                            CHANNEL_COUNT,                      /* Scan all chans */
-                                            sp, num_ssid, IE_DATA,              /* IE we're looking for */
+            (void) sl_wfx_send_scan_command(WFM_SCAN_MODE_ACTIVE, CHANNEL_LIST,    /* Channel list */
+                                            CHANNEL_COUNT,                         /* Scan all chans */
+                                            ssidPtr, nbreScannedNetworks, IE_DATA, /* IE we're looking for */
                                             IE_DATA_LENGTH, BSSID_SCAN);
         }
         if (flags & SL_WFX_SCAN_COMPLETE)
@@ -795,21 +837,22 @@ static void wfx_events_task(void * p_arg)
             for (hp = scan_save; hp; hp = next)
             {
                 next = hp->next;
-                (*scan_cb)(&hp->scan);
+                scan_cb(&hp->scan);
                 chip::Platform::MemoryFree(hp);
             }
-            (*scan_cb)((wfx_wifi_scan_result *) 0);
-            scan_save  = (struct scan_result_holder *) 0;
+            scan_cb(nullptr);
+
+            // Clean up
+            scan_save  = nullptr;
             scan_count = 0;
+
             if (scan_ssid)
             {
                 chip::Platform::MemoryFree(scan_ssid);
                 scan_ssid = NULL;
             }
-            /* Terminate scan */
-            scan_cb = 0;
+            scan_cb = nullptr;
         }
-#endif /* SL_WFX_CONFIG_SCAN */
     }
 }
 
@@ -896,23 +939,31 @@ static void wfx_wifi_hw_start(void)
  **************************************************************************/
 int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
-    int32_t signal_strength;
+    uint32_t signal_strength = 0;
 
-    ap->ssid_length = strnlen(ap_info.ssid, std::min<size_t>(sizeof(ap_info.ssid), WFX_MAX_SSID_LENGTH));
-    chip::Platform::CopyString(ap->ssid, ap->ssid_length, ap_info.ssid);
-    memcpy(ap->bssid, ap_info.bssid, sizeof(ap_info.bssid));
+    chip::ByteSpan apSsidSpan(ap_info.ssid, ap_info.ssid_length);
+    chip::MutableByteSpan apSsidMutableSpan(ap->ssid, WFX_MAX_SSID_LENGTH);
+    chip::CopySpanToMutableSpan(apSsidSpan, apSsidMutableSpan);
+    ap->ssid_length = apSsidMutableSpan.size();
+
+    chip::ByteSpan apBssidSpan(ap_info.bssid, kWifiMacAddressLength);
+    chip::MutableByteSpan apBssidMutableSpan(ap->bssid, kWifiMacAddressLength);
+    chip::CopySpanToMutableSpan(apBssidSpan, apBssidMutableSpan);
+
     ap->security = ap_info.security;
     ap->chan     = ap_info.chan;
-    ChipLogDetail(DeviceLayer, "WIFI:SSID     :: %s", &ap_info.ssid[0]);
-    ChipLogDetail(DeviceLayer, "WIFI:BSSID    :: %02x:%02x:%02x:%02x:%02x:%02x", ap_info.bssid[0], ap_info.bssid[1],
-                  ap_info.bssid[2], ap_info.bssid[3], ap_info.bssid[4], ap_info.bssid[5]);
-    ChipLogDetail(DeviceLayer, "WIFI:security :: %d", ap->security);
-    ChipLogDetail(DeviceLayer, "WIFI:channel  ::  %d", ap->chan);
 
-    sl_status_t status = sl_wfx_get_signal_strength((uint32_t *) &signal_strength);
+    sl_status_t status = sl_wfx_get_signal_strength(&signal_strength);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
-    ChipLogDetail(DeviceLayer, "signal_strength: %ld", signal_strength);
     ap->rssi = (signal_strength - 220) / 2;
+
+    ChipLogDetail(DeviceLayer, "WIFI:SSID     : %s", ap_info.ssid);
+    ChipLogDetail(DeviceLayer, "WIFI:BSSID    : %02x:%02x:%02x:%02x:%02x:%02x", ap_info.bssid[0], ap_info.bssid[1],
+                  ap_info.bssid[2], ap_info.bssid[3], ap_info.bssid[4], ap_info.bssid[5]);
+    ChipLogDetail(DeviceLayer, "WIFI:security : %d", ap->security);
+    ChipLogDetail(DeviceLayer, "WIFI:channel  :  %d", ap->chan);
+    ChipLogDetail(DeviceLayer, "signal_strength: %ld", signal_strength);
+
     return status;
 }
 
@@ -1080,27 +1131,6 @@ sl_status_t wfx_connect_to_ap(void)
 
 /****************************************************************************
  * @brief
- * get the wifi mac addresss
- * @param[in] interface:
- * @param[in] addr : address
- *****************************************************************************/
-void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
-{
-    sl_wfx_mac_address_t * mac;
-
-#ifdef SL_WFX_CONFIG_SOFTAP
-    mac = (interface == SL_WFX_SOFTAP_INTERFACE) ? &wifiContext.mac_addr_1 : &wifiContext.mac_addr_0;
-#else
-    mac = &wifiContext.mac_addr_0;
-#endif
-    *addr = *mac;
-    ChipLogDetail(DeviceLayer, "WLAN:Get WiFi Mac addr %02x:%02x:%02x:%02x:%02x:%02x", mac->octet[0], mac->octet[1], mac->octet[2],
-                  mac->octet[3], mac->octet[4], mac->octet[5]);
-    memcpy(&ap_info.bssid[0], &mac->octet[0], 6);
-}
-
-/****************************************************************************
- * @brief
  *     function called when driver have ipv4 address
  * @param[in]  which_if:
  * @return returns false if sucessful,
@@ -1217,7 +1247,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", ip4_addr[0], ip4_addr[1], ip4_addr[2], ip4_addr[3]);
     sta_ip = ip;
 
-    wfx_ip_changed_notify(IP_STATUS_SUCCESS);
+    NotifyIPv4Change(true);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
@@ -1229,29 +1259,6 @@ void wfx_enable_sta_mode(void)
 {
     /* Nothing to do - default is that it is
        place holder */
-}
-
-/****************************************************************************
- * @brief
- * driver scan start
- * @param[in]  callback: Callback from the wifi scan  results
- * @return returns true if sucessful,
- *         false otherwise
- *****************************************************************************/
-#ifdef SL_WFX_CONFIG_SCAN
-bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
-{
-    VerifyOrReturnError(scan_cb != nullptr, false);
-    if (ssid)
-    {
-        scan_ssid_length = strnlen(ssid, WFX_MAX_SSID_LENGTH);
-        scan_ssid        = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(scan_ssid_length));
-        VerifyOrReturnError(scan_ssid != nullptr, false);
-        Platform::CopyString(scan_ssid, scan_ssid_length, ssid);
-    }
-    scan_cb = callback;
-    xEventGroupSetBits(sl_wfx_event_group, SL_WFX_SCAN_START);
-    return true;
 }
 
 /****************************************************************************
@@ -1278,4 +1285,3 @@ void wfx_cancel_scan(void)
     }
     scan_cb = nullptr;
 }
-#endif /* SL_WFX_CONFIG_SCAN */

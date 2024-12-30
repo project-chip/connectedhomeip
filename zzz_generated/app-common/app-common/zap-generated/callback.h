@@ -5823,30 +5823,6 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData);
 /**
- * @brief General Commissioning Cluster ArmFailSafe Command callback (from client)
- */
-bool emberAfGeneralCommissioningClusterArmFailSafeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData);
-/**
- * @brief General Commissioning Cluster SetRegulatoryConfig Command callback (from client)
- */
-bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::DecodableType & commandData);
-/**
- * @brief General Commissioning Cluster CommissioningComplete Command callback (from client)
- */
-bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::DecodableType & commandData);
-/**
- * @brief General Commissioning Cluster SetTCAcknowledgements Command callback (from client)
- */
-bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData);
-/**
  * @brief Diagnostic Logs Cluster RetrieveLogsRequest Command callback (from client)
  */
 bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
@@ -5870,12 +5846,6 @@ bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(
 bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData);
-/**
- * @brief Software Diagnostics Cluster ResetWatermarks Command callback (from client)
- */
-bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::DecodableType & commandData);
 /**
  * @brief Thread Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
@@ -6906,18 +6876,6 @@ bool emberAfWebRTCTransportRequestorClusterICECandidateCallback(
 bool emberAfWebRTCTransportRequestorClusterEndCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportRequestor::Commands::End::DecodableType & commandData);
-/**
- * @brief Commissioner Control Cluster RequestCommissioningApproval Command callback (from client)
- */
-bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissionerControl::Commands::RequestCommissioningApproval::DecodableType & commandData);
-/**
- * @brief Commissioner Control Cluster CommissionNode Command callback (from client)
- */
-bool emberAfCommissionerControlClusterCommissionNodeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissionerControl::Commands::CommissionNode::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */

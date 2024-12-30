@@ -1,6 +1,4 @@
-runtime: python27
-api_version: 1
-threadsafe: true
+runtime: python39
 handlers:
     - url: /
       static_files: html/index.html

@@ -204,10 +204,7 @@ static_library("core") {
   ]
 }
 
-static_library("vectortlv") {
-  output_name = "libVectorTlv"
-  output_dir = "${root_out_dir}/lib"
-
+source_set("vectortlv") {
   sources = [
     "TLVVectorWriter.cpp",
     "TLVVectorWriter.h",
