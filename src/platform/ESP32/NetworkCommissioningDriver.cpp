@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/InteractionModelEngine.h>
+#include <app/InteractionModelEngine.h> // nogncheck
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
