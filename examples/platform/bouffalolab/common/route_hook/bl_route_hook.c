@@ -194,7 +194,8 @@ int8_t bl_route_hook_init(void)
 
     hook->netif = lwip_netif;
     hook->pcb   = raw_new_ip_type(IPADDR_TYPE_V6, IP6_NEXTH_ICMP6);
-    if (NULL == hook->pcb) {
+    if (NULL == hook->pcb)
+    {
         ret = -1;
         goto exit;
     }
