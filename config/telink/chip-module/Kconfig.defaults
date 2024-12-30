@@ -431,8 +431,7 @@ config MBEDTLS_USER_CONFIG_ENABLE
 config MBEDTLS_USER_CONFIG_FILE
     default "telink-mbedtls-config.h"
 
-config MBEDTLS_ZEPHYR_ENTROPY
-    bool
+config MBEDTLS_ENTROPY_POLL_ZEPHYR
     default y
 
 config MBEDTLS_CIPHER_AES_ENABLED
