@@ -270,6 +270,17 @@ protected:
         ByteSpan resumptionId;
     };
 
+    struct ParsedSigma2Resume
+    {
+        ByteSpan resumptionId;
+        ByteSpan sigma2ResumeMIC;
+        uint16_t responderSessionId;
+        const ReliableMessageProtocolConfig * responderMrpConfig;
+        SessionParameters responderSessionParams;
+        // TODO consider removing this?
+        bool responderMrpParamsPresent = false;
+    };
+
     /**
      * @brief  Encodes a Sigma1 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
      *         outparam.
@@ -304,6 +315,9 @@ protected:
     static CHIP_ERROR ParseSigma2(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma2 & parsedMessage);
 
     static CHIP_ERROR ParseSigma2TBEData(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma2TBEData & parsedMessage);
+
+    static CHIP_ERROR ParseSigma2Resume(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma2Resume & outParsedSigma2Resume);
+
     /**
      * @brief  Encodes a Sigma2 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
      *         outparam.

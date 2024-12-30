@@ -1401,53 +1401,38 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     MATTER_TRACE_SCOPE("HandleSigma2Resume", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
-    TLV::TLVType containerType = TLV::kTLVType_Structure;
-
-    uint16_t responderSessionId;
-
-    uint32_t decodeTagIdSeq = 0;
 
     ChipLogDetail(SecureChannel, "Received Sigma2Resume msg");
     MATTER_TRACE_COUNTER("Sigma2Resume");
     MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
 
-    uint8_t sigma2ResumeMIC[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
+    // uint8_t sigma2ResumeMIC[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
+
+    ParsedSigma2Resume parsedSigma2Resume;
 
     tlvReader.Init(std::move(msg));
-    SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
-    SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    SessionResumptionStorage::ResumptionIdStorage resumptionId;
-    VerifyOrExit(tlvReader.GetLength() == resumptionId.size(), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
-    SuccessOrExit(err = tlvReader.GetBytes(resumptionId.data(), resumptionId.size()));
+    SuccessOrExit(err = ParseSigma2Resume(tlvReader, parsedSigma2Resume));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    VerifyOrExit(tlvReader.GetLength() == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
-    SuccessOrExit(err = tlvReader.GetBytes(sigma2ResumeMIC, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
-
-    SuccessOrExit(err = ValidateSigmaResumeMIC(ByteSpan(sigma2ResumeMIC), ByteSpan(mInitiatorRandom), resumptionId,
-                                               ByteSpan(kKDFS2RKeyInfo), ByteSpan(kResume2MIC_Nonce)));
-
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    SuccessOrExit(err = tlvReader.Get(responderSessionId));
-
-    if (tlvReader.Next() != CHIP_END_OF_TLV)
+    if (parsedSigma2Resume.responderMrpParamsPresent)
     {
-        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(4), tlvReader));
+        SetRemoteSessionParameters(parsedSigma2Resume.responderSessionParams);
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
     }
 
-    ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", responderSessionId);
-    SetPeerSessionId(responderSessionId);
+    SuccessOrExit(err = ValidateSigmaResumeMIC(parsedSigma2Resume.sigma2ResumeMIC, ByteSpan(mInitiatorRandom),
+                                               parsedSigma2Resume.resumptionId, ByteSpan(kKDFS2RKeyInfo),
+                                               ByteSpan(kResume2MIC_Nonce)));
+
+    ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", parsedSigma2Resume.responderSessionId);
+    SetPeerSessionId(parsedSigma2Resume.responderSessionId);
 
     if (mSessionResumptionStorage != nullptr)
     {
-        CHIP_ERROR err2 = mSessionResumptionStorage->Save(GetPeer(), resumptionId, mSharedSecret, mPeerCATs);
+        CHIP_ERROR err2 = mSessionResumptionStorage->Save(
+            GetPeer(), SessionResumptionStorage::ConstResumptionIdView(parsedSigma2Resume.resumptionId.data()), mSharedSecret,
+            mPeerCATs);
         if (err2 != CHIP_NO_ERROR)
             ChipLogError(SecureChannel, "Unable to save session resumption state: %" CHIP_ERROR_FORMAT, err2.Format());
     }
@@ -1464,6 +1449,40 @@ exit:
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
     }
     return err;
+}
+
+CHIP_ERROR CASESession::ParseSigma2Resume(ContiguousBufferTLVReader & tlvReader, ParsedSigma2Resume & outParsedSigma2Resume)
+{
+
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    TLVType containerType = kTLVType_Structure;
+
+    ReturnErrorOnFailure(err = tlvReader.Next(containerType, AnonymousTag()));
+    ReturnErrorOnFailure(err = tlvReader.EnterContainer(containerType));
+
+    ReturnErrorOnFailure(err = tlvReader.Next());
+    VerifyOrReturnError(tlvReader.GetTag() == AsTlvContextTag(Sigma2ResumeTags::kResumptionID), CHIP_ERROR_INVALID_TLV_TAG);
+    ReturnErrorOnFailure(err = tlvReader.GetByteView(outParsedSigma2Resume.resumptionId));
+    VerifyOrReturnError(outParsedSigma2Resume.resumptionId.size() == SessionResumptionStorage::kResumptionIdSize,
+                        CHIP_ERROR_INVALID_CASE_PARAMETER);
+
+    ReturnErrorOnFailure(err = tlvReader.Next());
+    VerifyOrReturnError(tlvReader.GetTag() == AsTlvContextTag(Sigma2ResumeTags::kSigma2ResumeMIC), CHIP_ERROR_INVALID_TLV_TAG);
+    ReturnErrorOnFailure(err = tlvReader.GetByteView(outParsedSigma2Resume.sigma2ResumeMIC));
+    VerifyOrReturnError(outParsedSigma2Resume.sigma2ResumeMIC.size() == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
+                        CHIP_ERROR_INVALID_CASE_PARAMETER);
+
+    ReturnErrorOnFailure(err = tlvReader.Next());
+    VerifyOrReturnError(tlvReader.GetTag() == AsTlvContextTag(Sigma2ResumeTags::kResponderSessionID), CHIP_ERROR_INVALID_TLV_TAG);
+    ReturnErrorOnFailure(err = tlvReader.Get(outParsedSigma2Resume.responderSessionId));
+
+    if (tlvReader.Next() != CHIP_END_OF_TLV)
+    {
+        ReturnErrorOnFailure(err = DecodeMRPParametersIfPresent(AsTlvContextTag(Sigma2ResumeTags::kResponderSessionID), tlvReader,
+                                                                outParsedSigma2Resume.responderSessionParams));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
@@ -2587,7 +2606,8 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     case State::kSentSigma2Resume:
         if (msgType == Protocols::SecureChannel::MsgType::StatusReport)
         {
-            // Need to capture before invoking status report since 'this' might be deallocated on successful completion of sigma3
+            // Need to capture before invoking status report since 'this' might be deallocated on successful completion of
+            // sigma3
             MetricKey key = (mState == State::kSentSigma3) ? kMetricDeviceCASESessionSigma3 : kMetricDeviceCASESessionSigma2Resume;
             err           = HandleStatusReport(std::move(msg), /* successExpected*/ true);
             MATTER_LOG_METRIC_END(key, err);
