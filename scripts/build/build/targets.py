@@ -772,6 +772,7 @@ def BuildTelinkTarget():
         TargetPart('tlsr9258a', board=TelinkBoard.TLSR9258A),
         TargetPart('tlsr9258a_retention', board=TelinkBoard.TLSR9258A_RETENTION),
         TargetPart('tl3218', board=TelinkBoard.TL3218),
+        TargetPart('tl7218', board=TelinkBoard.TL7218),
     ])
 
     target.AppendFixedTargets([

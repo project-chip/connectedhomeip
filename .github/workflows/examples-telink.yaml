@@ -191,6 +191,18 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
+            - name: Build example Telink (TL7218) Lighting App with OTA, Shell, Factory Data
+              # Run test for master and all PRs
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl7218-light-ota-shell-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl7218 light-app-ota-shell-factory-data \
+                    out/telink-tl7218-light-ota-shell-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
             - name: Build example Telink (B92) Light Switch App with OTA (LZMA), Shell, Factory Data, 4Mb flash
               # Run test for master and all PRs
               run: |
