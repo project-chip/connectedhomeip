@@ -168,12 +168,12 @@ int8_t bl_route_hook_init(void)
         goto exit;
     }
 
-    for (bl_route_hook_t * iter = s_hooks; iter != NULL; iter++)
+    for (bl_route_hook_t * iter = s_hooks; iter != NULL; iter = iter->next)
     {
         if (iter->netif == lwip_netif)
         {
             ret = 0;
-            break;
+            goto exit;
         }
     }
 
@@ -194,6 +194,11 @@ int8_t bl_route_hook_init(void)
 
     hook->netif = lwip_netif;
     hook->pcb   = raw_new_ip_type(IPADDR_TYPE_V6, IP6_NEXTH_ICMP6);
+    if (NULL == hook->pcb) {
+        ret = -1;
+        goto exit;
+    }
+
     hook->pcb->flags |= RAW_FLAGS_MULTICAST_LOOP;
     hook->pcb->chksum_reqd = 1;
     // The ICMPv6 header checksum offset
