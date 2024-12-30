@@ -425,12 +425,6 @@ config CHIP_ENABLE_PAIRING_AUTOSTART
 config MBEDTLS
 	default y
 
-config MBEDTLS_USER_CONFIG_ENABLE
-    default y
-
-config MBEDTLS_USER_CONFIG_FILE
-    default "telink-mbedtls-config.h"
-
 config MBEDTLS_ENTROPY_POLL_ZEPHYR
     default y
 
@@ -454,6 +448,18 @@ config MBEDTLS_ECDH_C
 
 config MBEDTLS_ECDSA_C
 	default y
+
+config MBEDTLS_HKDF_C
+    default y
+
+config MBEDTLS_PKCS5_C
+    default y
+
+config MBEDTLS_X509_CSR_WRITE_C
+    default y
+
+config MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED
+    default y
 
 # Disable not used shell modules
 
