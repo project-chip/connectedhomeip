@@ -36,6 +36,8 @@ group("default") {
       deps += [ "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4:logging" ]
     } else if (chip_device_platform == "ameba") {
       deps += [ "${chip_root}/src/platform/Ameba:logging" ]
+    } else if (chip_device_platform == "realtek_bee") {
+      deps += [ "${chip_root}/src/platform/Realtek_bee:logging" ]
     } else if (chip_device_platform == "asr") {
       deps += [ "${chip_root}/src/platform/ASR:logging" ]
     } else if (chip_device_platform == "webos") {
