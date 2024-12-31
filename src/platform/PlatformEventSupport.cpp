@@ -44,5 +44,15 @@ CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, System::Clock::T
     return PlatformMgr().StartChipTimer(delay);
 }
 
+void PlatformEventing::LockMatterStack(System::Layer & aLayer)
+{
+    PlatformMgr().LockChipStack();
+}
+
+void PlatformEventing::UnlockMatterStack(System::Layer & aLayer)
+{
+    PlatformMgr().UnlockChipStack();
+}
+
 } // namespace System
 } // namespace chip

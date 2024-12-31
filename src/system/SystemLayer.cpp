@@ -31,5 +31,14 @@ CHIP_ERROR Layer::ScheduleLambdaBridge(LambdaBridge && bridge)
     return lReturn;
 }
 
+CHIP_ERROR Layer::RunOnMatterContext(std::function<CHIP_ERROR()> func)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PlatformEventing::LockMatterStack(*this);
+    err = func();
+    PlatformEventing::UnlockMatterStack(*this);
+    return err;
+}
+
 } // namespace System
 } // namespace chip

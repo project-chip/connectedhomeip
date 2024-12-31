@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <functional>
 #include <type_traits>
 #include <utility>
 
@@ -218,6 +219,8 @@ public:
         bridge.Initialize(lambda);
         return ScheduleLambdaBridge(std::move(bridge));
     }
+
+    CHIP_ERROR RunOnMatterContext(std::function<CHIP_ERROR()>);
 
 private:
     CHIP_ERROR ScheduleLambdaBridge(LambdaBridge && bridge);
