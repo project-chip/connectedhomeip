@@ -156,7 +156,6 @@ config BT_BUF_ACL_RX_COUNT
     default 4
 
 config BT_GATT_CACHING
-    bool
     default n
 
 config BT_RX_STACK_SIZE
@@ -168,35 +167,26 @@ config BT_HCI_TX_STACK_SIZE
     default 2048 if BT_W91
 
 config BT_DEVICE_NAME_GATT_WRITABLE
-    bool
     default n
 
 if SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 config TL_BLE_CTRL_THREAD_STACK_SIZE
-    int
     default 648
 
 config TL_BLE_CTRL_MASTER_MAX_NUM
-    int
     default 0
 
 config TL_BLE_CTRL_SLAVE_MAX_NUM
-    int
     default 1
 
 config TL_BLE_CTRL_RF_POWER
-    int
     default 3 if PM 
     default 8 if BT_TLX
     default 9
 
 choice TL_BLE_CTRL_MAC_TYPE
-    prompt "MAC address type"
     default TL_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
-
-config TL_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
-    bool "Random Static MAC Address"
 
 endchoice
 
@@ -219,7 +209,7 @@ endif
 
 # Board non-retention config
 if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
-    BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D || BOARD_TL3218
+    BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D || BOARD_TL3218 || BOARD_TL7218
 config PWM
     default y
 endif
@@ -325,7 +315,6 @@ config NET_RX_STACK_SIZE
 
 # Disable certain parts of Zephyr IPv6 stack
 config NET_IPV6_NBR_CACHE
-    bool
     default n
 
 config NET_MAX_CONN
@@ -348,7 +337,7 @@ config CHIP_WIFI
 	select NET_IPV6_NBR_CACHE
 	select NET_STATISTICS_USER_API
 	imply MBEDTLS_ENTROPY_C
-    imply MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
+	imply MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
 
 if CHIP_WIFI
 
@@ -403,11 +392,9 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  within range [-JITTER; +JITTER].
 
 config NET_MGMT_EVENT_STACK_SIZE
-    int
 	default 1250
 
 config IPC_SERVICE_BACKEND_ICMSG_WQ_STACK_SIZE
-    int
 	default 2304 if TELINK_W91_IPC_DISPATCHER
 
 endif # CHIP_WIFI
