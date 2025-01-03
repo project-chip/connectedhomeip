@@ -200,7 +200,8 @@ source_set("system_config_header") {
         public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk" ]
       }
       if (chip_device_platform == "bl616") {
-        public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl616:bouffalo_sdk" ]
+        public_deps +=
+            [ "${bouffalolab_iot_sdk_build_root}/bl616:bouffalo_sdk" ]
       }
 
       # Add platform here as needed.
