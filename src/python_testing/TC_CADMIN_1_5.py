@@ -34,10 +34,10 @@
 import asyncio.exceptions as ae
 from time import sleep
 
-import chip.clusters as Clusters
-import chip.interaction_model
 from chip import ChipDeviceCtrl
+import chip.clusters as Clusters
 from chip.exceptions import ChipStackError
+from chip.interaction_model import InteractionModelError as IME
 from chip.native import PyChipError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery import mdns_discovery
@@ -53,19 +53,26 @@ class TC_CADMIN_1_5(MatterBaseTest):
         )
         return comm_service
 
-    async def CommissionOnNetwork(self, setup_code: int, discriminator: int):
-        ctx = asserts.assert_raises(ChipStackError)
-        try:
-            with ctx:
+    async def SnakeCase(self, setup_code: int, discriminator: int, expected_error: int=0):
+        # This is expected to error as steps 4 and 7 expects timeout issue or pase connection error to occur due to commissioning window being closed already
+        if expected_error == 50:
+            try:
                 await self.th2.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=setup_code,
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-            errcode = PyChipError.from_code(ctx.exception.err)
 
-        # Timeout error occurs during step 7 for TH2 due to commissioning window being closed already
-        except ae.CancelledError as e:
-            errcode = e.__cause__
-        return errcode
+            except ChipStackError as e:
+                asserts.assert_true(int(e.code) == expected_error,
+                    'Unexpected error code returned from Commissioning Attempt')
+
+        else:
+            try:
+                await self.th2.CommissionOnNetwork(
+                    nodeId=self.dut_node_id, setupPinCode=setup_code,
+                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+
+            except ae.CancelledError as e:
+                errcode = e.__cause__
 
     def steps_TC_CADMIN_1_5(self) -> list[TestStep]:
         return [
@@ -97,6 +104,8 @@ class TC_CADMIN_1_5(MatterBaseTest):
             TestStep(15, "TH_CR2 starts a commissioning process with DUT_CE", "Commissioning is successful"),
             TestStep(16, "TH_CR1 tries to revoke the commissioning window on DUT_CE using RevokeCommissioning command",
                      "Verify DUT_CE fails to revoke giving status code 4 (WindowNotOpen) as there was no window open"),
+            TestStep(17, "TH_CR1 sends the RemoveFabric command to the DUT to remove TH_CR2 fabric",
+                     "TH_CR1 removes TH_CR2 fabric"),
         ]
 
     def pics_TC_CADMIN_1_5(self) -> list[str]:
@@ -109,7 +118,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
         self.th1 = self.default_controller
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
-        self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+        self.th2 = th2_fabric_admin.NewController(nodeId=2)
 
         self.step(2)
         params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=180, node_id=self.dut_node_id)
@@ -118,10 +127,10 @@ class TC_CADMIN_1_5(MatterBaseTest):
         services = await self.get_txt_record()
         if services.txt_record['CM'] != "2":
             asserts.fail(f"Expected cm record value not found, instead value found was {str(services.txt_record['CM'])}")
+        sleep(190)
 
         self.step(4)
-        sleep(190)
-        await self.CommissionOnNetwork(setup_code=params.commissioningParameters.setupPinCode, discriminator=params.randomDiscriminator)
+        await self.SnakeCase(setup_code=params.commissioningParameters.setupPinCode, discriminator=params.randomDiscriminator)
 
         self.step(5)
         params2 = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=180, node_id=self.dut_node_id)
@@ -132,13 +141,13 @@ class TC_CADMIN_1_5(MatterBaseTest):
         sleep(1)
 
         self.step(7)
-        await self.CommissionOnNetwork(setup_code=params2.commissioningParameters.setupPinCode, discriminator=params2.randomDiscriminator)
+        await self.SnakeCase(setup_code=params2.commissioningParameters.setupPinCode, discriminator=params2.randomDiscriminator, expected_error=0x00000032)
 
         self.step(8)
         try:
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
-        except chip.interaction_model.InteractionModelError as e:
+        except IME as e:
             asserts.assert_true(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen,
                                 "Cluster status must be 4 to pass this step as window should be reported as not open")
 
@@ -148,7 +157,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
                 iterations=999, discriminator=3045, PAKEPasscodeVerifier=EcmPakeVerifier, commissioningTimeout=180, salt=b"SPAKE2P_Key_Salt")
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
-        except chip.interaction_model.InteractionModelError as e:
+        except IME as e:
             asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
@@ -157,7 +166,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
                 iterations=100001, discriminator=3045, PAKEPasscodeVerifier=EcmPakeVerifier, commissioningTimeout=180, salt=b"SPAKE2P_Key_Salt")
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
-        except chip.interaction_model.InteractionModelError as e:
+        except IME as e:
             asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
@@ -166,7 +175,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
                 iterations=10000, discriminator=3045, PAKEPasscodeVerifier=EcmPakeVerifier, commissioningTimeout=180, salt=b"too_short")
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
-        except chip.interaction_model.InteractionModelError as e:
+        except IME as e:
             asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
@@ -175,7 +184,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
                 iterations=10000, discriminator=3045, PAKEPasscodeVerifier=EcmPakeVerifier, commissioningTimeout=180, salt=b"'this pake salt very very very long'")
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
-        except chip.interaction_model.InteractionModelError as e:
+        except IME as e:
             asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
@@ -188,7 +197,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
         self.step(14)
         try:
             await self.open_commissioning_window(dev_ctrl=self.th1, timeout=duration.maxCumulativeFailsafeSeconds, node_id=self.dut_node_id)
-        except chip.exceptions.ChipStackError as e:
+        except ChipStackError as e:
             # Converting error code to useable format to do assert with
             code = int(((e.msg.split(":"))[2]), 16)
             asserts.assert_equal(code, Clusters.AdministratorCommissioning.Enums.StatusCode.kBusy,
@@ -203,9 +212,14 @@ class TC_CADMIN_1_5(MatterBaseTest):
         try:
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
-        except chip.interaction_model.InteractionModelError as e:
+        except IME as e:
             asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen,
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
+
+        self.step(17)
+        TH2_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+        removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(TH2_fabric_index)
+        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
 
 if __name__ == "__main__":
