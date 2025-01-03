@@ -70,7 +70,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
                     nodeId=self.dut_node_id, setupPinCode=setup_code,
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
 
-            except ae.CancelledError as e:
+            except ae.CancelledError:
                 # This is expected to fail due to timeout, however there is no code to validate here, so just passing since the correct exception was raised to get to this point
                 pass
 
