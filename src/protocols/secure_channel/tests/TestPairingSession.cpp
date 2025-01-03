@@ -58,10 +58,7 @@ public:
 
     CHIP_ERROR DeriveSecureSession(CryptoContext & session) override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, System::PacketBufferTLVReader & tlvReader)
-    {
-        return PairingSession::DecodeMRPParametersIfPresent(expectedTag, tlvReader);
-    }
+    using PairingSession::DecodeSessionParametersIfPresent;
 };
 
 TEST_F(TestPairingSession, PairingSessionEncodeDecodeMRPParams)
@@ -88,7 +85,7 @@ TEST_F(TestPairingSession, PairingSessionEncodeDecodeMRPParams)
     EXPECT_EQ(reader.EnterContainer(containerType), CHIP_NO_ERROR);
 
     EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
-    EXPECT_EQ(DecodeMRPParametersIfPresent(TLV::ContextTag(1), reader), CHIP_NO_ERROR);
+    EXPECT_EQ(DecodeSessionParametersIfPresent(TLV::ContextTag(1), reader, mRemoteSessionParams), CHIP_NO_ERROR);
 
     EXPECT_EQ(GetRemoteMRPConfig(), config);
 }
@@ -112,7 +109,7 @@ TEST_F(TestPairingSession, PairingSessionTryDecodeMissingMRPParams)
     EXPECT_EQ(reader.Next(containerType, TLV::AnonymousTag()), CHIP_NO_ERROR);
     EXPECT_EQ(reader.EnterContainer(containerType), CHIP_NO_ERROR);
     EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
-    EXPECT_EQ(DecodeMRPParametersIfPresent(TLV::ContextTag(2), reader), CHIP_NO_ERROR);
+    EXPECT_EQ(DecodeSessionParametersIfPresent(TLV::ContextTag(2), reader, mRemoteSessionParams), CHIP_NO_ERROR);
 
     EXPECT_EQ(GetRemoteMRPConfig(), GetDefaultMRPConfig());
 }
