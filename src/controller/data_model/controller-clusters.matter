@@ -9953,7 +9953,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
 }
 
 /** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider. */
-cluster WebRTCTransportRequestor = 1364 {
+provisional cluster WebRTCTransportRequestor = 1364 {
   revision 1;
 
   enum StreamUsageEnum : enum8 {
