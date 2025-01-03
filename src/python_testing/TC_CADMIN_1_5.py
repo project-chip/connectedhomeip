@@ -38,7 +38,6 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError as IME
-from chip.native import PyChipError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery import mdns_discovery
 from mobly import asserts
@@ -72,7 +71,8 @@ class TC_CADMIN_1_5(MatterBaseTest):
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
 
             except ae.CancelledError as e:
-                errcode = e.__cause__
+                # This is expected to fail due to timeout, however there is no code to validate here, so just passing since the correct exception was raised to get to this point
+                pass
 
     def steps_TC_CADMIN_1_5(self) -> list[TestStep]:
         return [
