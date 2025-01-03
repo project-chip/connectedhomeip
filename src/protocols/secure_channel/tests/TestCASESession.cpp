@@ -1,3 +1,4 @@
+
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
@@ -637,12 +638,13 @@ struct Sigma1Params
 {
     // Purposefully not using constants like kSigmaParamRandomNumberSize that
     // the code uses, so we have a cross-check.
-    static constexpr size_t kInitiatorRandomLen    = 32;
-    static constexpr uint16_t kInitiatorSessionId  = 0;
-    static constexpr size_t kDestinationIdLen      = 32;
-    static constexpr size_t kInitiatorEphPubKeyLen = 65;
-    static constexpr size_t kResumptionIdLen       = 0; // Nonzero means include it.
-    static constexpr size_t kInitiatorResumeMICLen = 0; // Nonzero means include it.
+    static constexpr size_t kInitiatorRandomLen      = 32;
+    static constexpr uint16_t kInitiatorSessionId    = 0;
+    static constexpr size_t kDestinationIdLen        = 32;
+    static constexpr size_t kInitiatorEphPubKeyLen   = 65;
+    static constexpr size_t kResumptionIdLen         = 0; // Nonzero means include it.
+    static constexpr size_t kInitiatorResumeMICLen   = 0; // Nonzero means include it.
+    static constexpr uint16_t kFutureProofTlvElement = 77;
 
     static constexpr uint8_t kInitiatorRandomTag    = 1;
     static constexpr uint8_t kInitiatorSessionIdTag = 2;
@@ -650,7 +652,11 @@ struct Sigma1Params
     static constexpr uint8_t kInitiatorEphPubKeyTag = 4;
     static constexpr uint8_t kResumptionIdTag       = 6;
     static constexpr uint8_t kInitiatorResumeMICTag = 7;
+    // Choosing a tag that is higher than the current highest tag value in the Specification
+    static constexpr uint8_t kFutureProofTlvElementTag = 11;
     static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
+
+    static constexpr bool kIncludeFutureProofTlvElement = false;
 
     static constexpr bool kIncludeStructEnd = true;
 
@@ -746,6 +752,12 @@ static CHIP_ERROR EncodeSigma1Helper(MutableByteSpan & buf)
         (&memset)(initiatorResumeMIC, 5, Params::kInitiatorResumeMICLen);
         ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kInitiatorResumeMICTag),
                                         ByteSpan(initiatorResumeMIC, Params::kInitiatorResumeMICLen)));
+    }
+
+    // Future-proofing: Ensure that TLV elements being added to the specification in the future are properly handled.
+    if constexpr (Params::kIncludeFutureProofTlvElement)
+    {
+        ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kFutureProofTlvElementTag), Params::kFutureProofTlvElement));
     }
 
     if constexpr (Params::kIncludeStructEnd)
@@ -862,6 +874,17 @@ struct Sigma1SessionIdTooBig : public BadSigma1ParamsBase
     static constexpr uint32_t kInitiatorSessionId = UINT16_MAX + 1;
 };
 
+struct Sigma1FutureProofTlvElement : public Sigma1Params
+{
+    static constexpr bool kIncludeFutureProofTlvElement = true;
+};
+
+struct Sigma1FutureProofTlvElementNoStructEnd : public BadSigma1ParamsBase
+{
+    static constexpr bool kIncludeFutureProofTlvElement = true;
+    static constexpr bool kIncludeStructEnd             = false;
+};
+
 TEST_F(TestCASESession, Sigma1ParsingTest)
 {
     // 1280 bytes must be enough by definition.
@@ -885,6 +908,8 @@ TEST_F(TestCASESession, Sigma1ParsingTest)
     TestSigma1Parsing(mem, bufferSize, Sigma1TooShortResumeMIC);
     TestSigma1Parsing(mem, bufferSize, Sigma1SessionIdMax);
     TestSigma1Parsing(mem, bufferSize, Sigma1SessionIdTooBig);
+    TestSigma1Parsing(mem, bufferSize, Sigma1FutureProofTlvElement);
+    TestSigma1Parsing(mem, bufferSize, Sigma1FutureProofTlvElementNoStructEnd);
 }
 
 TEST_F(TestCASESession, EncodeSigma1Test)
@@ -1003,13 +1028,18 @@ struct Sigma2Params
     static constexpr size_t kEncrypted2Len =
         CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + 1;              // Needs to be at least CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES
     static constexpr size_t kResponderSessionParamsLen = 0; // Nonzero means include it.
+    static constexpr uint16_t kFutureProofTlvElement   = 77;
 
     static constexpr uint8_t kResponderRandomTag        = 1;
     static constexpr uint8_t kResponderSessionIdTag     = 2;
     static constexpr uint8_t kResponderEphPubKeyTag     = 3;
     static constexpr uint8_t kEncrypted2Tag             = 4;
     static constexpr uint8_t kResponderSessionParamsTag = 5; // TODO SessionParams are not tested in non of ParseSigmaTests
+    static constexpr uint8_t kFutureProofTlvElementTag  = 11;
+
     static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
+
+    static constexpr bool kIncludeFutureProofTlvElement = false;
 
     static constexpr bool kIncludeStructEnd = true;
 
@@ -1036,6 +1066,12 @@ static CHIP_ERROR EncodeSigma2Helper(MutableByteSpan & buf)
 
     uint8_t encrypted2[Params::kEncrypted2Len] = { 3 };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kEncrypted2Tag), ByteSpan(encrypted2)));
+
+    // Future-proofing: Ensure that TLV elements being added to the specification in the future are properly handled.
+    if constexpr (Params::kIncludeFutureProofTlvElement)
+    {
+        ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kFutureProofTlvElementTag), Params::kFutureProofTlvElement));
+    }
 
     if constexpr (Params::kIncludeStructEnd)
     {
@@ -1108,6 +1144,18 @@ struct Sigma2SessionIdTooBig : public BadSigma2ParamsBase
 {
     static constexpr uint32_t kResponderSessionId = UINT16_MAX + 1;
 };
+
+struct Sigma2FutureProofTlvElement : public Sigma2Params
+{
+    static constexpr bool kIncludeFutureProofTlvElement = true;
+};
+
+struct Sigma2FutureProofTlvElementNoStructEnd : public BadSigma2ParamsBase
+{
+    static constexpr bool kIncludeFutureProofTlvElement = true;
+    static constexpr bool kIncludeStructEnd             = false;
+};
+
 // TODO: Consider making this test (and similar ones) to Value-Parameterized tests once pw_unit_test:light starts supporting them
 TEST_F(TestCASESession, Sigma2ParsingTest)
 {
@@ -1125,6 +1173,8 @@ TEST_F(TestCASESession, Sigma2ParsingTest)
     TestSigma2Parsing(mem, bufferSize, Sigma2TooShortPubkey);
     TestSigma2Parsing(mem, bufferSize, Sigma2SessionIdMax);
     TestSigma2Parsing(mem, bufferSize, Sigma2SessionIdTooBig);
+    TestSigma2Parsing(mem, bufferSize, Sigma2FutureProofTlvElement);
+    TestSigma2Parsing(mem, bufferSize, Sigma2FutureProofTlvElementNoStructEnd);
 }
 
 TEST_F(TestCASESession, EncodeSigma2Test)
@@ -1249,12 +1299,17 @@ struct Sigma2ResumeParams
     static constexpr size_t kSigma2ResumeMICLen        = 16;
     static constexpr uint16_t kResponderSessionId      = 0;
     static constexpr size_t kResponderSessionParamsLen = 0; // Nonzero means include it. TODO should I remove this
+    static constexpr uint16_t kFutureProofTlvElement   = 77;
 
     static constexpr uint8_t kResumptionIdTag           = 1;
     static constexpr uint8_t kSigma2ResumeMICTag        = 2;
     static constexpr uint8_t kResponderSessionIdTag     = 3;
     static constexpr uint8_t kResponderSessionParamsTag = 4; // TODO SessionParams are not tested in non of ParseSigmaTests
+    static constexpr uint8_t kFutureProofTlvElementTag  = 11;
+
     static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
+
+    static constexpr bool kIncludeFutureProofTlvElement = false;
 
     static constexpr bool kIncludeStructEnd = true;
 
@@ -1279,6 +1334,12 @@ static CHIP_ERROR EncodeSigma2ResumeHelper(MutableByteSpan & buf)
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kSigma2ResumeMICTag), ByteSpan(sigma2ResumeMIC)));
 
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderSessionIdTag), Params::kResponderSessionId));
+
+    // Future-proofing: Ensure that TLV elements being added to the specification in the future are properly handled.
+    if constexpr (Params::kIncludeFutureProofTlvElement)
+    {
+        ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kFutureProofTlvElementTag), Params::kFutureProofTlvElement));
+    }
 
     if constexpr (Params::kIncludeStructEnd)
     {
@@ -1352,6 +1413,17 @@ struct Sigma2ResumeSessionIdTooBig : public BadSigma2ResumeParamsBase
     static constexpr uint32_t kResponderSessionId = UINT16_MAX + 1;
 };
 
+struct Sigma2ResumeFutureProofTlvElement : public Sigma2ResumeParams
+{
+    static constexpr bool kIncludeFutureProofTlvElement = true;
+};
+
+struct Sigma2ResumeFutureProofTlvElementNoStructEnd : public BadSigma2ResumeParamsBase
+{
+    static constexpr bool kIncludeFutureProofTlvElement = true;
+    static constexpr bool kIncludeStructEnd             = false;
+};
+
 TEST_F(TestCASESession, ParseSigma2Resume)
 {
     // 1280 bytes must be enough by definition.
@@ -1368,6 +1440,8 @@ TEST_F(TestCASESession, ParseSigma2Resume)
     TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeTooShortResumeMIC);
     TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeSessionIdMax);
     TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeSessionIdTooBig);
+    TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeFutureProofTlvElement);
+    TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeFutureProofTlvElementNoStructEnd);
 }
 
 TEST_F(TestCASESession, EncodeSigma2ResumeTest)
@@ -1435,8 +1509,8 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
 {
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode, ScopedNodeId peerNodeId, ResumptionIdStorage * resumptionId,
                                  Crypto::P256ECDHDerivedSecret * sharedSecret) :
-        mFindMethodReturnCode(findMethodReturnCode), mPeerNodeId(peerNodeId), mResumptionId(resumptionId),
-        mSharedSecret(sharedSecret)
+        mFindMethodReturnCode(findMethodReturnCode),
+        mPeerNodeId(peerNodeId), mResumptionId(resumptionId), mSharedSecret(sharedSecret)
     {}
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode) : mFindMethodReturnCode(findMethodReturnCode) {}
     CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
@@ -1717,16 +1791,21 @@ struct Sigma2TBEDataParams
 {
     // Purposefully not using constants like kSigmaParamRandomNumberSize that
     // the code uses, so we have a cross-check.
-    static constexpr size_t kResponderNOCLen  = 400;
-    static constexpr size_t kResponderICACLen = 400;
-    static constexpr size_t kSignatureLen     = 64;
-    static constexpr size_t kResumptionIdLen  = 16;
+    static constexpr size_t kResponderNOCLen         = 400;
+    static constexpr size_t kResponderICACLen        = 400;
+    static constexpr size_t kSignatureLen            = 64;
+    static constexpr size_t kResumptionIdLen         = 16;
+    static constexpr uint16_t kFutureProofTlvElement = 77;
 
-    static constexpr uint8_t kResponderNOCTag  = 1;
-    static constexpr uint8_t kResponderICACTag = 2;
-    static constexpr uint8_t kSignatureTag     = 3;
-    static constexpr uint8_t kResumptionIdTag  = 4;
+    static constexpr uint8_t kResponderNOCTag          = 1;
+    static constexpr uint8_t kResponderICACTag         = 2;
+    static constexpr uint8_t kSignatureTag             = 3;
+    static constexpr uint8_t kResumptionIdTag          = 4;
+    static constexpr uint8_t kFutureProofTlvElementTag = 11;
+
     static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
+
+    static constexpr bool kIncludeFutureProofTlvElement = false;
 
     static constexpr bool kIncludeStructEnd = true;
 
@@ -1755,8 +1834,11 @@ static CHIP_ERROR EncodeSigma2TBEDataHelper(MutableByteSpan & buf)
     uint8_t resumptionId[Params::kResumptionIdLen] = { 22 };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResumptionIdTag), ByteSpan(resumptionId)));
 
-    uint8_t resumptionIssd[20] = { 22 };
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(5), ByteSpan(resumptionIssd)));
+    // Future-proofing: Ensure that TLV elements being added to the specification in the future are properly handled.
+    if constexpr (Params::kIncludeFutureProofTlvElement)
+    {
+        ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kFutureProofTlvElementTag), Params::kFutureProofTlvElement));
+    }
 
     if constexpr (Params::kIncludeStructEnd)
     {
@@ -1829,6 +1911,17 @@ struct Sigma2TBETooShortResumptionID : public BadSigma2TBEParamsBase
     static constexpr size_t kResumptionIdLen = 15;
 };
 
+struct Sigma2TBEFutureProofTlvElement : public Sigma2TBEDataParams
+{
+    static constexpr bool kIncludeFutureProofTlvElement = true;
+};
+
+struct Sigma2TBEFutureProofTlvElementNoStructEnd : public BadSigma2TBEParamsBase
+{
+    static constexpr bool kIncludeFutureProofTlvElement = true;
+    static constexpr bool kIncludeStructEnd             = false;
+};
+
 TEST_F(TestCASESession, ParseSigma2TBEData)
 {
     // 1280 bytes must be enough by definition.
@@ -1845,6 +1938,8 @@ TEST_F(TestCASESession, ParseSigma2TBEData)
     TestSigma2TBEParsing(mem, bufferSize, Sigma2TBETooShortSignature);
     TestSigma2TBEParsing(mem, bufferSize, Sigma2TBETooLongResumptionID);
     TestSigma2TBEParsing(mem, bufferSize, Sigma2TBETooShortResumptionID);
+    TestSigma2TBEParsing(mem, bufferSize, Sigma2TBEFutureProofTlvElement);
+    TestSigma2TBEParsing(mem, bufferSize, Sigma2TBEFutureProofTlvElementNoStructEnd);
 }
 
 } // namespace chip

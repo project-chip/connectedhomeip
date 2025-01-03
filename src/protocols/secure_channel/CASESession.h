@@ -222,7 +222,7 @@ protected:
     struct ParsedSigma1 : Sigma1Param
     {
         ByteSpan initiatorEphPubKey;
-        bool initiatorMrpParamsPresent = false;
+        bool initiatorSessionParamsPresent = false;
         SessionParameters initiatorSessionParams;
     };
 
@@ -242,7 +242,7 @@ protected:
     {
         ByteSpan resumptionId;
         uint8_t sigma2ResumeMICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
-        MutableByteSpan resumeMIC{ sigma2ResumeMICBuffer };
+        MutableByteSpan sigma2ResumeMIC{ sigma2ResumeMICBuffer };
         uint16_t responderSessionId;
         const ReliableMessageProtocolConfig * responderMrpConfig;
     };
@@ -256,9 +256,8 @@ protected:
         ByteSpan responderEphPubKey;
 
         Platform::ScopedMemoryBufferWithSize<uint8_t> msgR2Encrypted;
-        size_t encrypted2Length = 0;
-        const ReliableMessageProtocolConfig * responderMrpConfig;
-        bool responderMrpParamsPresent = false;
+        size_t encrypted2Length                 = 0;
+        bool responderSessionParamStructPresent = false;
         SessionParameters responderSessionParams;
     };
 
@@ -275,10 +274,9 @@ protected:
         ByteSpan resumptionId;
         ByteSpan sigma2ResumeMIC;
         uint16_t responderSessionId;
-        const ReliableMessageProtocolConfig * responderMrpConfig;
         SessionParameters responderSessionParams;
         // TODO consider removing this?
-        bool responderMrpParamsPresent = false;
+        bool responderSessionParamStructPresent = false;
     };
 
     /**
@@ -327,6 +325,7 @@ protected:
      *
      * @param inParam a struct containing all the values that will be encoded into TLV format
      *
+     * @note The inParam member msgR2Encrypted will be freed after encoding it.
      **/
 
     static CHIP_ERROR EncodeSigma2(System::PacketBufferHandle & outMsg, EncodeSigma2Inputs & inParam);
