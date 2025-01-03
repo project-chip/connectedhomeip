@@ -34,8 +34,8 @@
 import asyncio.exceptions as ae
 from time import sleep
 
-from chip import ChipDeviceCtrl
 import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError as IME
 from chip.native import PyChipError
