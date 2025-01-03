@@ -128,7 +128,7 @@ jobs:
       - name: Prepare some bloat report from the previous builds
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-              bl702l bl702l+mfd+littlefs contact-sensor \
+              bl702l bl702l+mfd+littlefs contact-sensor-app \
               out/artifacts/bouffalolab-bl704ldk-contact-sensor-thread-mtd-littlefs-mfd/chip-bl702l-contact-sensor-example.out \
               /tmp/bloat_reports/
       - name: Clean out build output
