@@ -97,6 +97,10 @@ public:
     void SetICDManager(ICDManager * manager) { mICDManager = manager; };
 #endif
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void SetTCPServerEnabled(const bool serverEnabled) { mTCPServerEnabled = serverEnabled; };
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
 
@@ -178,6 +182,10 @@ private:
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ICDManager * mICDManager = nullptr;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    bool mTCPServerEnabled = true;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     uint16_t mSecuredPort          = CHIP_PORT;
     uint16_t mUnsecuredPort        = CHIP_UDC_PORT;
