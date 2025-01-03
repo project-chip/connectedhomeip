@@ -66,29 +66,24 @@ RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
 
 void DefaultCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error)
 {
-    ICDClientInfo icdClientInfo;
-    if (refreshKeySender != nullptr)
-    {
-        icdClientInfo = refreshKeySender->getICDClientInfo();
-        Platform::Delete(refreshKeySender);
-        refreshKeySender = nullptr;
-    }
-    else
+    if (refreshKeySender == nullptr)
     {
         ChipLogError(ICD, "RefreshKeySender is null");
         return;
     }
+    auto icdClientInfo = refreshKeySender->GetICDClientInfo();
+    Platform::Delete(refreshKeySender);
+    refreshKeySender = nullptr;
     if (error == CHIP_NO_ERROR)
     {
-        ChipLogProgress(ICD, "Re-registration with new key completed successfully for peer node :" ChipLogFormatScopedNodeId,
+        ChipLogProgress(ICD, "Re-registration with new key completed successfully for peer node " ChipLogFormatScopedNodeId,
                         ChipLogValueScopedNodeId(icdClientInfo.peer_node));
     }
     else
     {
-        ChipLogError(ICD,
-                     "Re-registration with new key failed with error : %" CHIP_ERROR_FORMAT
-                     " for peer node :" ChipLogFormatScopedNodeId,
-                     error.Format(), ChipLogValueScopedNodeId(icdClientInfo.peer_node));
+        ChipLogError(
+            ICD, "Re-registration with new key failed with error %" CHIP_ERROR_FORMAT " for peer node " ChipLogFormatScopedNodeId,
+            error.Format(), ChipLogValueScopedNodeId(icdClientInfo.peer_node));
         // The callee can take corrective action  based on the error received.
     }
 }

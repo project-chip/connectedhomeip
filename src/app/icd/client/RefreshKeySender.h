@@ -58,7 +58,8 @@ public:
      * @return ICDClientInfo - ICDClientInfo object representing the state associated with the
                                node that requested a key refresh.
      */
-    const ICDClientInfo & getICDClientInfo();
+    const ICDClientInfo & GetICDClientInfo();
+
 
 private:
     // CASE session callbacks
