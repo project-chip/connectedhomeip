@@ -69,11 +69,17 @@ public:
     using CASESession::EncodeSigma2Inputs;
     using CASESession::EncodeSigma2ResumeInputs;
     using CASESession::ParsedSigma1;
+    using CASESession::ParsedSigma2;
+    using CASESession::ParsedSigma2Resume;
+    using CASESession::ParsedSigma2TBEData;
 
     using CASESession::EncodeSigma1;
     using CASESession::EncodeSigma2;
     using CASESession::EncodeSigma2Resume;
     using CASESession::ParseSigma1;
+    using CASESession::ParseSigma2;
+    using CASESession::ParseSigma2Resume;
+    using CASESession::ParseSigma2TBEData;
 };
 
 class TestCASESession : public Test::LoopbackMessagingContext
@@ -981,10 +987,144 @@ TEST_F(TestCASESession, EncodeSigma1Test)
 
         EXPECT_TRUE(parsedMessage.resumptionId.data_equal(encodeParams.resumptionId));
         EXPECT_TRUE(parsedMessage.initiatorResumeMIC.data_equal(encodeParams.initiatorResumeMIC));
-        EXPECT_TRUE(parsedMessage.initiatorMrpParamsPresent);
+        EXPECT_TRUE(parsedMessage.sessionResumptionRequested);
     }
     // Release EphemeralKeyPair
     gDeviceOperationalKeystore.ReleaseEphemeralKeypair(ephemeralKey);
+}
+
+struct Sigma2Params
+{
+    // Purposefully not using constants like kSigmaParamRandomNumberSize that
+    // the code uses, so we have a cross-check.
+    static constexpr size_t kResponderRandomLen    = 32;
+    static constexpr uint16_t kResponderSessionId  = 0;
+    static constexpr size_t kResponderEphPubKeyLen = 65;
+    static constexpr size_t kEncrypted2Len =
+        CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + 1;              // Needs to be at least CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES
+    static constexpr size_t kResponderSessionParamsLen = 0; // Nonzero means include it.
+
+    static constexpr uint8_t kResponderRandomTag        = 1;
+    static constexpr uint8_t kResponderSessionIdTag     = 2;
+    static constexpr uint8_t kResponderEphPubKeyTag     = 3;
+    static constexpr uint8_t kEncrypted2Tag             = 4;
+    static constexpr uint8_t kResponderSessionParamsTag = 5; // TODO SessionParams are not tested in non of ParseSigmaTests
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
+
+    static constexpr bool kIncludeStructEnd = true;
+
+    static constexpr bool kExpectSuccess = true;
+};
+
+template <typename Params>
+static CHIP_ERROR EncodeSigma2Helper(MutableByteSpan & buf)
+{
+    using namespace TLV;
+
+    TLVWriter writer;
+    writer.Init(buf);
+
+    TLVType containerType;
+    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
+    uint8_t responderRandom[Params::kResponderRandomLen] = { 1 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderRandomTag), ByteSpan(responderRandom)));
+
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderSessionIdTag), Params::kResponderSessionId));
+
+    uint8_t responderEphPubKey[Params::kResponderEphPubKeyLen] = { 2 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderEphPubKeyTag), ByteSpan(responderEphPubKey)));
+
+    uint8_t encrypted2[Params::kEncrypted2Len] = { 3 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kEncrypted2Tag), ByteSpan(encrypted2)));
+
+    if constexpr (Params::kIncludeStructEnd)
+    {
+        ReturnErrorOnFailure(writer.EndContainer(containerType));
+    }
+
+    buf.reduce_size(writer.GetLengthWritten());
+    return CHIP_NO_ERROR;
+}
+
+// A macro, so we can tell which test failed based on line number.
+#define TestSigma2Parsing(mem, bufferSize, params)                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
+        EXPECT_EQ(EncodeSigma2Helper<params>(buf), CHIP_NO_ERROR);                                                                 \
+                                                                                                                                   \
+        TLV::ContiguousBufferTLVReader reader;                                                                                     \
+        reader.Init(buf);                                                                                                          \
+        CASESessionAccess::ParsedSigma2 parsedSigma2;                                                                              \
+                                                                                                                                   \
+        EXPECT_EQ(CASESessionAccess::ParseSigma2(reader, parsedSigma2) == CHIP_NO_ERROR, params::kExpectSuccess);                  \
+        if (params::kExpectSuccess)                                                                                                \
+        {                                                                                                                          \
+            /* Add other verification tests here as desired */                                                                     \
+        }                                                                                                                          \
+    } while (0)
+
+struct BadSigma2ParamsBase : public Sigma2Params
+{
+    static constexpr bool kExpectSuccess = false;
+};
+
+struct Sigma2NoStructEnd : public BadSigma2ParamsBase
+{
+    static constexpr bool kIncludeStructEnd = false;
+};
+
+struct Sigma2WrongTags : public BadSigma2ParamsBase
+{
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ProfileTag(0, num); }
+};
+
+struct Sigma2TooLongRandom : public BadSigma2ParamsBase
+{
+    static constexpr size_t kResponderRandomLen = 33;
+};
+
+struct Sigma2TooShortRandom : public BadSigma2ParamsBase
+{
+    static constexpr size_t kResponderRandomLen = 31;
+};
+
+struct Sigma2TooLongPubkey : public BadSigma2ParamsBase
+{
+    static constexpr size_t kResponderEphPubKeyLen = 66;
+};
+
+struct Sigma2TooShortPubkey : public BadSigma2ParamsBase
+{
+    static constexpr size_t kResponderEphPubKeyLen = 64;
+};
+
+struct Sigma2SessionIdMax : public Sigma2Params
+{
+    static constexpr uint32_t kResponderSessionId = UINT16_MAX;
+};
+
+struct Sigma2SessionIdTooBig : public BadSigma2ParamsBase
+{
+    static constexpr uint32_t kResponderSessionId = UINT16_MAX + 1;
+};
+// TODO: Consider making this test (and similar ones) to Value-Parameterized tests once pw_unit_test:light starts supporting them
+TEST_F(TestCASESession, Sigma2ParsingTest)
+{
+    // 1280 bytes must be enough by definition.
+    constexpr size_t bufferSize = 1280;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> mem;
+    EXPECT_TRUE(mem.Calloc(bufferSize));
+
+    TestSigma2Parsing(mem, bufferSize, Sigma2Params);
+    TestSigma2Parsing(mem, bufferSize, Sigma2NoStructEnd);
+    TestSigma2Parsing(mem, bufferSize, Sigma2WrongTags);
+    TestSigma2Parsing(mem, bufferSize, Sigma2TooLongRandom);
+    TestSigma2Parsing(mem, bufferSize, Sigma2TooShortRandom);
+    TestSigma2Parsing(mem, bufferSize, Sigma2TooLongPubkey);
+    TestSigma2Parsing(mem, bufferSize, Sigma2TooShortPubkey);
+    TestSigma2Parsing(mem, bufferSize, Sigma2SessionIdMax);
+    TestSigma2Parsing(mem, bufferSize, Sigma2SessionIdTooBig);
 }
 
 TEST_F(TestCASESession, EncodeSigma2Test)
@@ -1006,8 +1146,10 @@ TEST_F(TestCASESession, EncodeSigma2Test)
     encodeParams.msgR2Encrypted.Alloc(encodeParams.encrypted2Length);
 
     // responder Session Parameters
-    ReliableMessageProtocolConfig mrpConfig = GetDefaultMRPConfig();
-    encodeParams.responderMrpConfig         = &mrpConfig;
+    ReliableMessageProtocolConfig mrpConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
+                                            System::Clock::Milliseconds16(4000));
+
+    encodeParams.responderMrpConfig = &mrpConfig;
 
     {
         System::PacketBufferHandle msg;
@@ -1069,20 +1211,185 @@ TEST_F(TestCASESession, EncodeSigma2Test)
         // Succeed when MRP Config is provided
         encodeParams.responderMrpConfig = &mrpConfig;
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2(msg, encodeParams));
+        // EncodeSigma2 frees msgR2Encrypted after encoding it
+        encodeParams.msgR2Encrypted.Alloc(encodeParams.encrypted2Length);
     }
+
+    // Round Trip Test: Encode then Parse Sigma2
+    {
+        System::PacketBufferHandle msg;
+        // Succeed when MRP Config is provided
+        encodeParams.responderMrpConfig = &mrpConfig;
+        EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2(msg, encodeParams));
+
+        System::PacketBufferTLVReader tlvReader;
+        tlvReader.Init(std::move(msg));
+        CASESessionAccess::ParsedSigma2 parsedMessage;
+
+        EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::ParseSigma2(tlvReader, parsedMessage));
+
+        // compare parsed values with original values
+        EXPECT_TRUE(parsedMessage.responderRandom.data_equal(ByteSpan(encodeParams.responderRandom)));
+        EXPECT_EQ(parsedMessage.responderSessionId, encodeParams.responderSessionId);
+        EXPECT_TRUE(parsedMessage.responderEphPubKey.data_equal(
+            ByteSpan(encodeParams.responderEphPubKey->ConstBytes(), encodeParams.responderEphPubKey->Length())));
+
+        EXPECT_EQ(parsedMessage.responderSessionParams.GetMRPConfig(), *encodeParams.responderMrpConfig);
+    }
+
     // Release EphemeralKeyPair
     gDeviceOperationalKeystore.ReleaseEphemeralKeypair(ephemeralKey);
+}
+
+struct Sigma2ResumeParams
+{
+    // Purposefully not using constants like kSigmaParamRandomNumberSize that
+    // the code uses, so we have a cross-check.
+    static constexpr size_t kResumptionIdLen           = 16;
+    static constexpr size_t kSigma2ResumeMICLen        = 16;
+    static constexpr uint16_t kResponderSessionId      = 0;
+    static constexpr size_t kResponderSessionParamsLen = 0; // Nonzero means include it. TODO should I remove this
+
+    static constexpr uint8_t kResumptionIdTag           = 1;
+    static constexpr uint8_t kSigma2ResumeMICTag        = 2;
+    static constexpr uint8_t kResponderSessionIdTag     = 3;
+    static constexpr uint8_t kResponderSessionParamsTag = 4; // TODO SessionParams are not tested in non of ParseSigmaTests
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
+
+    static constexpr bool kIncludeStructEnd = true;
+
+    static constexpr bool kExpectSuccess = true;
+};
+
+template <typename Params>
+static CHIP_ERROR EncodeSigma2ResumeHelper(MutableByteSpan & buf)
+{
+    using namespace TLV;
+
+    TLVWriter writer;
+    writer.Init(buf);
+
+    TLVType containerType;
+    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
+
+    uint8_t resumptionID[Params::kResumptionIdLen] = { 1 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResumptionIdTag), ByteSpan(resumptionID)));
+
+    uint8_t sigma2ResumeMIC[Params::kSigma2ResumeMICLen] = { 2 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kSigma2ResumeMICTag), ByteSpan(sigma2ResumeMIC)));
+
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderSessionIdTag), Params::kResponderSessionId));
+
+    if constexpr (Params::kIncludeStructEnd)
+    {
+        ReturnErrorOnFailure(writer.EndContainer(containerType));
+    }
+
+    buf.reduce_size(writer.GetLengthWritten());
+    return CHIP_NO_ERROR;
+}
+
+// A macro, so we can tell which test failed based on line number.
+#define TestSigma2ResumeParsing(mem, bufferSize, params)                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
+        EXPECT_EQ(EncodeSigma2ResumeHelper<params>(buf), CHIP_NO_ERROR);                                                           \
+                                                                                                                                   \
+        TLV::ContiguousBufferTLVReader reader;                                                                                     \
+        reader.Init(buf);                                                                                                          \
+        CASESessionAccess::ParsedSigma2Resume parsedSigma2Resume;                                                                  \
+                                                                                                                                   \
+        EXPECT_EQ(CASESessionAccess::ParseSigma2Resume(reader, parsedSigma2Resume) == CHIP_NO_ERROR, params::kExpectSuccess);      \
+        if (params::kExpectSuccess)                                                                                                \
+        {                                                                                                                          \
+            /* Add other verification tests here as desired */                                                                     \
+        }                                                                                                                          \
+    } while (0)
+
+struct BadSigma2ResumeParamsBase : public Sigma2ResumeParams
+{
+    static constexpr bool kExpectSuccess = false;
+};
+
+struct Sigma2ResumeNoStructEnd : public BadSigma2ResumeParamsBase
+{
+    static constexpr bool kIncludeStructEnd = false;
+};
+
+struct Sigma2ResumeWrongTags : public BadSigma2ResumeParamsBase
+{
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ProfileTag(0, num); }
+};
+
+struct Sigma2ResumeTooLongResumptionID : public BadSigma2ResumeParamsBase
+{
+    static constexpr size_t kResumptionIdLen = 17;
+};
+
+struct Sigma2ResumeTooShortResumptionID : public BadSigma2ResumeParamsBase
+{
+    static constexpr size_t kResumptionIdLen = 15;
+};
+
+struct Sigma2ResumeTooLongResumeMIC : public BadSigma2ResumeParamsBase
+{
+    static constexpr size_t kSigma2ResumeMICLen = 17;
+};
+
+struct Sigma2ResumeTooShortResumeMIC : public BadSigma2ResumeParamsBase
+{
+    static constexpr size_t kSigma2ResumeMICLen = 15;
+};
+
+struct Sigma2ResumeSessionIdMax : public Sigma2ResumeParams
+{
+    static constexpr uint32_t kResponderSessionId = UINT16_MAX;
+};
+
+struct Sigma2ResumeSessionIdTooBig : public BadSigma2ResumeParamsBase
+{
+    static constexpr uint32_t kResponderSessionId = UINT16_MAX + 1;
+};
+
+TEST_F(TestCASESession, ParseSigma2Resume)
+{
+    // 1280 bytes must be enough by definition.
+    constexpr size_t bufferSize = 1280;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> mem;
+    EXPECT_TRUE(mem.Calloc(bufferSize));
+
+    TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeParams);
+    TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeNoStructEnd);
+    TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeWrongTags);
+    TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeTooLongResumptionID);
+    TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeTooShortResumptionID);
+    TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeTooLongResumeMIC);
+    TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeTooShortResumeMIC);
+    TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeSessionIdMax);
+    TestSigma2ResumeParsing(mem, bufferSize, Sigma2ResumeSessionIdTooBig);
 }
 
 TEST_F(TestCASESession, EncodeSigma2ResumeTest)
 {
     CASESessionAccess::EncodeSigma2ResumeInputs encodeParams;
 
+    // Set ResumptionID
+    SessionResumptionStorage::ResumptionIdStorage resumptionId;
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
+    encodeParams.resumptionId = ByteSpan(resumptionId.data(), resumptionId.size());
+
+    // Set Sigma2ResumeMIC
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(&encodeParams.sigma2ResumeMICBuffer[0], sizeof(encodeParams.sigma2ResumeMICBuffer)),
+              CHIP_NO_ERROR);
+
+    // Set Responder Session ID
     encodeParams.responderSessionId = 7315;
 
-    // responder Session Parameters
-    ReliableMessageProtocolConfig mrpConfig = GetDefaultMRPConfig();
-    encodeParams.responderMrpConfig         = &mrpConfig;
+    // Set responder MRP Parameters
+    ReliableMessageProtocolConfig mrpConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
+                                            System::Clock::Milliseconds16(4000));
+    encodeParams.responderMrpConfig = &mrpConfig;
 
     {
         System::PacketBufferHandle msg;
@@ -1102,14 +1409,34 @@ TEST_F(TestCASESession, EncodeSigma2ResumeTest)
         encodeParams.responderMrpConfig = &mrpConfig;
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2Resume(msg, encodeParams));
     }
+
+    // Round Trip Test: Encode Parse Sigma2Resume
+    {
+        System::PacketBufferHandle msg;
+        // Succeed when MRP Config is provided
+        encodeParams.responderMrpConfig = &mrpConfig;
+        EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2Resume(msg, encodeParams));
+
+        System::PacketBufferTLVReader tlvReader;
+        tlvReader.Init(std::move(msg));
+        CASESessionAccess::ParsedSigma2Resume parsedMessage;
+
+        EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::ParseSigma2Resume(tlvReader, parsedMessage));
+
+        // compare parsed values with original values
+        EXPECT_TRUE(parsedMessage.resumptionId.data_equal(encodeParams.resumptionId));
+        EXPECT_TRUE(parsedMessage.sigma2ResumeMIC.data_equal(encodeParams.sigma2ResumeMIC));
+        EXPECT_EQ(parsedMessage.responderSessionId, encodeParams.responderSessionId);
+        EXPECT_EQ(parsedMessage.responderSessionParams.GetMRPConfig(), *encodeParams.responderMrpConfig);
+    }
 }
 
 struct SessionResumptionTestStorage : SessionResumptionStorage
 {
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode, ScopedNodeId peerNodeId, ResumptionIdStorage * resumptionId,
                                  Crypto::P256ECDHDerivedSecret * sharedSecret) :
-        mFindMethodReturnCode(findMethodReturnCode),
-        mPeerNodeId(peerNodeId), mResumptionId(resumptionId), mSharedSecret(sharedSecret)
+        mFindMethodReturnCode(findMethodReturnCode), mPeerNodeId(peerNodeId), mResumptionId(resumptionId),
+        mSharedSecret(sharedSecret)
     {}
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode) : mFindMethodReturnCode(findMethodReturnCode) {}
     CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
@@ -1384,6 +1711,140 @@ TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
 
     GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1);
     caseSession.Clear();
+}
+
+struct Sigma2TBEDataParams
+{
+    // Purposefully not using constants like kSigmaParamRandomNumberSize that
+    // the code uses, so we have a cross-check.
+    static constexpr size_t kResponderNOCLen  = 400;
+    static constexpr size_t kResponderICACLen = 400;
+    static constexpr size_t kSignatureLen     = 64;
+    static constexpr size_t kResumptionIdLen  = 16;
+
+    static constexpr uint8_t kResponderNOCTag  = 1;
+    static constexpr uint8_t kResponderICACTag = 2;
+    static constexpr uint8_t kSignatureTag     = 3;
+    static constexpr uint8_t kResumptionIdTag  = 4;
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
+
+    static constexpr bool kIncludeStructEnd = true;
+
+    static constexpr bool kExpectSuccess = true;
+};
+
+template <typename Params>
+static CHIP_ERROR EncodeSigma2TBEDataHelper(MutableByteSpan & buf)
+{
+    using namespace TLV;
+
+    TLVWriter writer;
+    writer.Init(buf);
+
+    TLVType containerType;
+    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
+    uint8_t responderNOC[Params::kResponderNOCLen] = { 1 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderNOCTag), ByteSpan(responderNOC)));
+
+    uint8_t responderICAC[Params::kResponderICACLen] = { 13 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderICACTag), ByteSpan(responderICAC)));
+
+    uint8_t signature[Params::kSignatureLen] = { 17 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kSignatureTag), ByteSpan(signature)));
+
+    uint8_t resumptionId[Params::kResumptionIdLen] = { 22 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResumptionIdTag), ByteSpan(resumptionId)));
+
+    uint8_t resumptionIssd[20] = { 22 };
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(5), ByteSpan(resumptionIssd)));
+
+    if constexpr (Params::kIncludeStructEnd)
+    {
+        ReturnErrorOnFailure(writer.EndContainer(containerType));
+    }
+
+    buf.reduce_size(writer.GetLengthWritten());
+    return CHIP_NO_ERROR;
+}
+
+// A macro, so we can tell which test failed based on line number.
+#define TestSigma2TBEParsing(mem, bufferSize, params)                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
+        EXPECT_EQ(EncodeSigma2TBEDataHelper<params>(buf), CHIP_NO_ERROR);                                                          \
+                                                                                                                                   \
+        TLV::ContiguousBufferTLVReader reader;                                                                                     \
+        reader.Init(buf);                                                                                                          \
+        CASESessionAccess::ParsedSigma2TBEData parsedSigma2TBEData;                                                                \
+                                                                                                                                   \
+        EXPECT_EQ(CASESessionAccess::ParseSigma2TBEData(reader, parsedSigma2TBEData) == CHIP_NO_ERROR, params::kExpectSuccess);    \
+        if (params::kExpectSuccess)                                                                                                \
+        {                                                                                                                          \
+            /* Add other verification tests here as desired */                                                                     \
+        }                                                                                                                          \
+    } while (0)
+
+struct BadSigma2TBEParamsBase : public Sigma2TBEDataParams
+{
+    static constexpr bool kExpectSuccess = false;
+};
+
+struct Sigma2TBENoStructEnd : public BadSigma2TBEParamsBase
+{
+    static constexpr bool kIncludeStructEnd = false;
+};
+
+struct Sigma2TBEWrongTags : public BadSigma2TBEParamsBase
+{
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ProfileTag(0, num); }
+};
+
+struct Sigma2TBETooLongNOC : public BadSigma2TBEParamsBase
+{
+    static constexpr size_t kResponderNOCLen = 401;
+};
+
+struct Sigma2TBETooLongICAC : public BadSigma2TBEParamsBase
+{
+    static constexpr size_t kResponderICACLen = 401;
+};
+
+struct Sigma2TBETooLongSignature : public BadSigma2TBEParamsBase
+{
+    static constexpr size_t kSignatureLen = 65;
+};
+struct Sigma2TBETooShortSignature : public BadSigma2TBEParamsBase
+{
+    static constexpr size_t kSignatureLen = 63;
+};
+
+struct Sigma2TBETooLongResumptionID : public BadSigma2TBEParamsBase
+{
+    static constexpr size_t kResumptionIdLen = 17;
+};
+
+struct Sigma2TBETooShortResumptionID : public BadSigma2TBEParamsBase
+{
+    static constexpr size_t kResumptionIdLen = 15;
+};
+
+TEST_F(TestCASESession, ParseSigma2TBEData)
+{
+    // 1280 bytes must be enough by definition.
+    constexpr size_t bufferSize = 1280;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> mem;
+    EXPECT_TRUE(mem.Calloc(bufferSize));
+
+    TestSigma2TBEParsing(mem, bufferSize, Sigma2TBEDataParams);
+    TestSigma2TBEParsing(mem, bufferSize, Sigma2TBENoStructEnd);
+    TestSigma2TBEParsing(mem, bufferSize, Sigma2TBEWrongTags);
+    TestSigma2TBEParsing(mem, bufferSize, Sigma2TBETooLongNOC);
+    TestSigma2TBEParsing(mem, bufferSize, Sigma2TBETooLongICAC);
+    TestSigma2TBEParsing(mem, bufferSize, Sigma2TBETooLongSignature);
+    TestSigma2TBEParsing(mem, bufferSize, Sigma2TBETooShortSignature);
+    TestSigma2TBEParsing(mem, bufferSize, Sigma2TBETooLongResumptionID);
+    TestSigma2TBEParsing(mem, bufferSize, Sigma2TBETooShortResumptionID);
 }
 
 } // namespace chip
