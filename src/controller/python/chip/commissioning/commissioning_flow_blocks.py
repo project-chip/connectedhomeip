@@ -240,6 +240,15 @@ class CommissioningFlowBlocks:
         if response.errorCode != 0:
             raise commissioning.CommissionFailure(repr(response))
 
+    async def send_terms_and_conditions_acknowledgements(self, parameter: commissioning.Parameters, node_id: int):
+        self._logger.info("Settings Terms and Conditions")
+        if parameter.tc_acknowledgements:
+            response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
+                TCVersion=parameter.tc_acknowledgements.version, TCUserResponse=parameter.tc_acknowledgements.user_response
+            ))
+        if response.errorCode != 0:
+            raise commissioning.CommissionFailure(repr(response))
+
     async def complete_commission(self, node_id: int):
         response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
         if response.errorCode != 0:
