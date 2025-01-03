@@ -63,12 +63,10 @@ CHIP_ERROR LogProvider::GetLogForIntent(IntentEnum intent, MutableByteSpan & out
 
     bool unusedOutIsEndOfLog;
     err = CollectLog(sessionHandle, outBuffer, unusedOutIsEndOfLog);
-    VerifyOrReturnError(CHIP_NO_ERROR == err, err, outBuffer.reduce_size(0));
+    VerifyOrDo(err == CHIP_NO_ERROR, outBuffer.reduce_size(0));
 
-    err = EndLogCollection(sessionHandle, err);
-    VerifyOrReturnError(CHIP_NO_ERROR == err, err, outBuffer.reduce_size(0));
-
-    return CHIP_NO_ERROR;
+    EndLogCollection(sessionHandle, err);
+    return err;
 }
 
 size_t LogProvider::GetSizeForIntent(IntentEnum intent)
