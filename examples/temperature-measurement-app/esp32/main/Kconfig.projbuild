@@ -93,4 +93,11 @@ menu "Platform Diagnostics"
         help
             Defines the buffer size (in bytes) for storing diagnostic data related to end user activity.
             This buffer will hold logs and traces relevant to user interactions with the Matter protocol.
+
+    config RETRIEVAL_BUFFER_SIZE
+        int "Set buffer size for retrieval of diagnostics from diagnostic storage"
+        depends on ENABLE_ESP_DIAGNOSTICS_TRACE
+        default 4096
+        help
+            Defines the buffer size (in bytes) for retrieval of diagnostic data.
 endmenu
