@@ -30,11 +30,8 @@ LogProvider LogProvider::sInstance;
 LogProvider::CrashLogContext LogProvider::sCrashLogContext;
 
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-static uint32_t read_entries = 0;
-#define BUFFER_SIZE 2048
-
-// Buffer is used to retrieve diagnostics from diagnostics storage
-static uint8_t retrievalBuffer[BUFFER_SIZE];
+static uint32_t sReadEntries = 0;
+static uint8_t retrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE];
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 namespace {
@@ -84,7 +81,9 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
     {
     case IntentEnum::kEndUserSupport: {
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-        return diagnosticStorage.GetDataSize();
+        VerifyOrReturnError(mStorageInstance != nullptr, 0,
+                            ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
+        return mStorageInstance->GetDataSize();
 #else
         return static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart);
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
@@ -122,11 +121,13 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
     {
     case IntentEnum::kEndUserSupport: {
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-        MutableByteSpan endUserSupportSpan(retrievalBuffer, BUFFER_SIZE);
-        VerifyOrReturnError(!diagnosticStorage.IsEmptyBuffer(), CHIP_ERROR_NOT_FOUND,
+        VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INTERNAL,
+                            ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
+        MutableByteSpan endUserSupportSpan(retrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
+        VerifyOrReturnError(!mStorageInstance->IsEmptyBuffer(), CHIP_ERROR_NOT_FOUND,
                             ChipLogError(DeviceLayer, "Empty Diagnostic buffer"));
         // Retrieve data from the diagnostic storage
-        CHIP_ERROR err = diagnosticStorage.Retrieve(endUserSupportSpan, read_entries);
+        CHIP_ERROR err = mStorageInstance->Retrieve(endUserSupportSpan, sReadEntries);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Failed to retrieve data: %s", chip::ErrorStr(err));
@@ -306,16 +307,18 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
 CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error)
 {
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
     if (error == CHIP_NO_ERROR)
     {
-        CHIP_ERROR err = diagnosticStorage.ClearReadMemory(read_entries);
+        CHIP_ERROR err = mStorageInstance->ClearReadMemory(sReadEntries);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Failed to clear diagnostic read entries");
         }
         else
         {
-            ChipLogProgress(DeviceLayer, "Clear all read diagnostics successfully");
+            ChipLogProgress(DeviceLayer, "Cleared all read diagnostics successfully");
         }
     }
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
