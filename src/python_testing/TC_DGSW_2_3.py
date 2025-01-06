@@ -53,6 +53,10 @@ class TC_DGSW_2_3(MatterBaseTest):
     def is_valid_uint32_value(value):
         return isinstance(value, int) and 0 <= value <= 0xFFFFFFFF
 
+    @staticmethod
+    def is_valid_str_value(value):
+        return isinstance(value, str) and len(value) > 0
+
     async def read_dgsw_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.SoftwareDiagnostics
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -106,19 +110,25 @@ class TC_DGSW_2_3(MatterBaseTest):
         self.step(3)
         if self.pics_guard(attributes.ThreadMetrics.attribute_id in attribute_list):
             thread_metrics_original = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.ThreadMetrics)
-            # the Id field is mandatory
-            asserts.assert_true(self.is_valid_uint64_value(thread_metrics_original[0].id), "Id field should be a uint64 type")
-            if thread_metrics_original[0].name is not None:
-                asserts.assert_true(thread_metrics_original[0].name, str, "Name field should be a string type")
-            if thread_metrics_original[0].stackFreeCurrent is not None:
-                asserts.assert_true(self.is_valid_uint32_value(
-                    thread_metrics_original[0].stackFreeCurrent), "StackFreeCurrent field should be a uint32 type")
-            if thread_metrics_original[0].stackFreeMinimum is not None:
-                asserts.assert_true(self.is_valid_uint32_value(
-                    thread_metrics_original[0].stackFreeMinimum), "StackFreeMinimum field should be a uint32 type")
-            if thread_metrics_original[0].stackSize is not None:
-                asserts.assert_true(self.is_valid_uint32_value(
-                    thread_metrics_original[0].stackSize), "StackSize field should be a uint32s type")
+
+            # Iterate over all items in the list and validate each one
+            for metric in thread_metrics_original:
+                # The Id field is mandatory
+                asserts.assert_true(self.is_valid_uint64_value(metric.id), "Id field should be a uint64 type")
+
+                if metric.name is not None:
+                    asserts.assert_true(self.is_valid_uint64_value(metric.name), "Name field should be a string type")
+
+                if metric.stackFreeCurrent is not None:
+                    asserts.assert_true(self.is_valid_uint32_value(metric.stackFreeCurrent),
+                                        "StackFreeCurrent field should be a uint32 type")
+
+                if metric.stackFreeMinimum is not None:
+                    asserts.assert_true(self.is_valid_uint32_value(metric.stackFreeMinimum),
+                                        "StackFreeMinimum field should be a uint32 type")
+
+                if metric.stackSize is not None:
+                    asserts.assert_true(self.is_valid_uint32_value(metric.stackSize), "StackSize field should be a uint32 type")
 
         # STEP 4: TH reads from the DUT the CurrentHeapHighWatermark attribute
         self.step(4)
@@ -163,19 +173,25 @@ class TC_DGSW_2_3(MatterBaseTest):
         self.step(8)
         if self.pics_guard(attributes.ThreadMetrics.attribute_id in attribute_list):
             thread_metrics_reset = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.ThreadMetrics)
-            # the Id field is mandatory
-            asserts.assert_true(self.is_valid_uint64_value(thread_metrics_reset[0].id), "Id field should be a uint64 type")
-            if thread_metrics_reset[0].name is not None:
-                asserts.assert_true(thread_metrics_reset[0].name, str, "Name field should be a string type")
-            if thread_metrics_reset[0].stackFreeCurrent is not None:
-                asserts.assert_true(self.is_valid_uint32_value(
-                    thread_metrics_reset[0].stackFreeCurrent), "StackFreeCurrent field should be a uint32 type")
-            if thread_metrics_reset[0].stackFreeMinimum is not None:
-                asserts.assert_true(self.is_valid_uint32_value(
-                    thread_metrics_reset[0].stackFreeMinimum), "StackFreeMinimum field should be a uint32 type")
-            if thread_metrics_reset[0].stackSize is not None:
-                asserts.assert_true(self.is_valid_uint32_value(
-                    thread_metrics_reset[0].stackSize), "StackSize field should be a uint32s type")
+
+            # Validate all elements in the list
+            for metric in thread_metrics_reset:
+                # The Id field is mandatory
+                asserts.assert_true(self.is_valid_uint64_value(metric.id), "Id field should be a uint64 type")
+
+                if metric.name is not None:
+                    asserts.assert_true(self.is_valid_uint64_value(metric.name), "Name field should be a string type")
+
+                if metric.stackFreeCurrent is not None:
+                    asserts.assert_true(self.is_valid_uint32_value(metric.stackFreeCurrent),
+                                        "StackFreeCurrent field should be a uint32 type")
+
+                if metric.stackFreeMinimum is not None:
+                    asserts.assert_true(self.is_valid_uint32_value(metric.stackFreeMinimum),
+                                        "StackFreeMinimum field should be a uint32 type")
+
+                if metric.stackSize is not None:
+                    asserts.assert_true(self.is_valid_uint32_value(metric.stackSize), "StackSize field should be a uint32 type")
 
             # Ensure the list length matches thread_metrics_original to simplify matching
             asserts.assert_equal(len(thread_metrics_reset), len(thread_metrics_original),
