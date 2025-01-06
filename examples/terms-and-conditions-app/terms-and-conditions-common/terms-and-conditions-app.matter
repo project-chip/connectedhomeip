@@ -1330,6 +1330,84 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
 
+/** The Group Key Management Cluster is the mechanism by which group keys are managed. */
+cluster GroupKeyManagement = 63 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum GroupKeySecurityPolicyEnum : enum8 {
+    kTrustFirst = 0;
+    kCacheAndSync = 1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kCacheAndSync = 0x1;
+  }
+
+  fabric_scoped struct GroupInfoMapStruct {
+    group_id groupId = 1;
+    endpoint_no endpoints[] = 2;
+    optional char_string<16> groupName = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_scoped struct GroupKeyMapStruct {
+    group_id groupId = 1;
+    int16u groupKeySetID = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct GroupKeySetStruct {
+    int16u groupKeySetID = 0;
+    GroupKeySecurityPolicyEnum groupKeySecurityPolicy = 1;
+    nullable octet_string<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable octet_string<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable octet_string<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
+  }
+
+  attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
+  readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct KeySetWriteRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct KeySetReadRequest {
+    int16u groupKeySetID = 0;
+  }
+
+  response struct KeySetReadResponse = 2 {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    int16u groupKeySetID = 0;
+  }
+
+  response struct KeySetReadAllIndicesResponse = 5 {
+    int16u groupKeySetIDs[] = 0;
+  }
+
+  /** Write a new set of keys for the given key set id. */
+  fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  /** Read the keys for a given key set id. */
+  fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  /** Revoke a Root Key from a Group */
+  fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  /** Return the list of Group Key Sets associated with the accessing fabric */
+  fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
@@ -1476,6 +1554,25 @@ endpoint 0 {
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
+  }
+
+  server cluster GroupKeyManagement {
+    callback attribute groupKeyMap;
+    callback attribute groupTable;
+    callback attribute maxGroupsPerFabric;
+    callback attribute maxGroupKeysPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command KeySetWrite;
+    handle command KeySetRead;
+    handle command KeySetReadResponse;
+    handle command KeySetRemove;
+    handle command KeySetReadAllIndices;
+    handle command KeySetReadAllIndicesResponse;
   }
 }
 endpoint 1 {
