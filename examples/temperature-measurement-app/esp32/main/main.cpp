@@ -84,7 +84,7 @@ static void InitServer(intptr_t context)
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     diagnosticStorage.Init(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
-    static ESP32Diagnostics diagnosticBackend(diagnosticStorage);
+    static ESP32Diagnostics diagnosticBackend(&diagnosticStorage);
     Tracing::Register(diagnosticBackend);
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 }
