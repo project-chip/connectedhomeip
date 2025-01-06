@@ -634,12 +634,15 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
 
     lPacket->payload = lPacket->ReserveStart() + aReservedSize;
-    lPacket->len = lPacket->tot_len = 0;
-    lPacket->next                   = nullptr;
-    lPacket->ref                    = 1;
 #if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
     lPacket->alloc_size = lAllocSize;
 #endif
+    // Set current packet and chained buffers' length and total length to 0
+    for (PacketBuffer *pktBuf = lPacket; pktBuf != nullptr; pktBuf = pktBuf->ChainedBuffer())
+    {
+        pktBuf->len = pktBuf->tot_len = 0;
+        pktBuf->ref = 1;
+    }
 
     return PacketBufferHandle(lPacket);
 }
@@ -652,14 +655,28 @@ PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aD
     PacketBufferHandle buffer = New(aDataSize + aAdditionalSize, aReservedSize);
     if (buffer.mBuffer != nullptr)
     {
-        memcpy(buffer.mBuffer->payload, aData, aDataSize);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         // Checks in the New() call catch buffer allocations greater
         // than UINT16_MAX for LwIP based platforms.
-        buffer.mBuffer->len = buffer.mBuffer->tot_len = static_cast<uint16_t>(aDataSize);
+        buffer.mBuffer->tot_len = static_cast<uint16_t>(aDataSize);
 #else
-        buffer.mBuffer->len = buffer.mBuffer->tot_len = aDataSize;
+        buffer.mBuffer->tot_len = aDataSize;
 #endif
+        PacketBuffer *currentBuffer = buffer.mBuffer;
+        const uint8_t *dataPtr = static_cast<const uint8_t *>(aData);
+        while (aDataSize > 0)
+        {
+            size_t copyLen = currentBuffer->MaxDataLength() > aDataSize ? aDataSize : currentBuffer->MaxDataLength();
+            memcpy(currentBuffer->payload, aData, copyLen);
+            aDataSize -= copyLen;
+            dataPtr += copyLen;
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+            currentBuffer->len = static_cast<uint16_t>(copyLen);
+#else
+            currentBuffer->len = copyLen;
+#endif
+            currentBuffer = currentBuffer->ChainedBuffer();
+        }
     }
     return buffer;
 }
