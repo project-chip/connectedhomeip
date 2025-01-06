@@ -353,12 +353,6 @@ public:
         return *this;
     }
 
-    CommissioningParameters & SetRequireTermsAndConditionsAcknowledgement(bool requireTermsAndConditionsAcknowledgement)
-    {
-        mRequireTermsAndConditionsAcknowledgement = requireTermsAndConditionsAcknowledgement;
-        return *this;
-    }
-
     CommissioningParameters &
     SetTermsAndConditionsAcknowledgement(TermsAndConditionsAcknowledgement termsAndConditionsAcknowledgement)
     {
