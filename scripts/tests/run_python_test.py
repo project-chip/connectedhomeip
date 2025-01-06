@@ -116,9 +116,10 @@ def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event)
 @click.option("--quiet/--no-quiet", default=None,
               help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
+@click.option("--run", type=str, multiple=True, help="Run only the specified test run(s).")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-         script_gdb: bool, quiet: bool, load_from_env):
+         script_gdb: bool, quiet: bool, load_from_env, run):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -141,7 +142,11 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             "No valid runs were found. Make sure you add runs to your file, see "
             "https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
 
-    # Override runs Metadata with the command line arguments
+    if run:
+        # Filter runs based on the command line arguments
+        runs = [r for r in runs if r.run in run]
+
+    # Override runs Metadata with the command line options
     for run in runs:
         if factory_reset is not None:
             run.factory_reset = factory_reset
@@ -210,8 +215,13 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             app_process.p.stdin.close()
         app_pid = app_process.p.pid
 
-    script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-                      '--log-format', '%(message)s', "--app-pid", str(app_pid)] + shlex.split(script_args)
+    script_command = [
+        script,
+        "--fail-on-skipped",
+        "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+        "--log-format", '%(message)s',
+        "--app-pid", str(app_pid),
+    ] + shlex.split(script_args)
 
     if script_gdb:
         #

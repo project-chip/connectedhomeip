@@ -18,6 +18,10 @@
 
 #import "MTRLogging_Internal.h"
 
+#ifndef GIT_COMMIT_SHA
+#define GIT_COMMIT_SHA "unknown-sha"
+#endif
+
 void MTRFrameworkInitDiagnosticLog()
 {
     MTR_LOG("Matter Framework Init (git: %s)", GIT_COMMIT_SHA);

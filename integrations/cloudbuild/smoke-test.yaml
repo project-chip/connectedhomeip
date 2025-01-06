@@ -34,7 +34,6 @@ steps:
               ./scripts/build/build_examples.py --enable-flashbundle --target
               esp32-devkitc-light-rpc --target
               esp32-m5stack-all-clusters-ipv6only --target
-              esp32-m5stack-all-clusters-rpc-ipv6only --target
               esp32-m5stack-light --target
               esp32-m5stack-light-ipv6only --target
               esp32-m5stack-ota-requestor build --create-archives

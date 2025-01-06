@@ -83,7 +83,6 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
                         --target esp32-m5stack-all-clusters-minimal \
-                        --target esp32-m5stack-all-clusters-rpc-ipv6only \
                         --pregen-dir ./zzz_pregenerated \
                         build \
                         --copy-artifacts-to out/artifacts \
@@ -95,6 +94,15 @@ jobs:
                   mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py
             - name: Build example All Clusters App(Target:ESP32C3)
               run: scripts/examples/esp_example.sh all-clusters-app sdkconfig.defaults.esp32c3 esp32c3
+            - name: Build example All Clusters App(Target:ESP32)
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --enable-flashbundle \
+                        --target esp32-devkitc-all-clusters-rpc-ipv6only \
+                        build \
+                        --copy-artifacts-to out/artifacts \
+                     "
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/esp32-build
