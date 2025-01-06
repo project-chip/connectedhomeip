@@ -32,7 +32,7 @@ namespace Diagnostics {
 class ESP32Diagnostics : public ::chip::Tracing::Backend
 {
 public:
-    ESP32Diagnostics(DiagnosticStorageInterface & storageInstance) : mStorageInstance(storageInstance) {}
+    ESP32Diagnostics(DiagnosticStorageInterface * storageInstance) : mStorageInstance(storageInstance) {}
 
     // Deleted copy constructor and assignment operator to prevent copying
     ESP32Diagnostics(const ESP32Diagnostics &)             = delete;
@@ -54,11 +54,11 @@ public:
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
     void LogMetricEvent(const MetricEvent &) override;
-    void StoreDiagnostics(const char * label, const char * group);
 
 private:
     using ValueType = MetricEvent::Value::Type;
-    DiagnosticStorageInterface & mStorageInstance;
+    DiagnosticStorageInterface * mStorageInstance;
+    CHIP_ERROR StoreDiagnostics(const char * label, const char * group);
 };
 
 } // namespace Diagnostics

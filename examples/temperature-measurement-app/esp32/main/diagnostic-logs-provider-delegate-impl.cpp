@@ -124,7 +124,7 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
         VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INTERNAL,
                             ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
         MutableByteSpan endUserSupportSpan(retrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
-        VerifyOrReturnError(!mStorageInstance->IsEmptyBuffer(), CHIP_ERROR_NOT_FOUND,
+        VerifyOrReturnError(!mStorageInstance->IsBufferEmpty(), CHIP_ERROR_NOT_FOUND,
                             ChipLogError(DeviceLayer, "Empty Diagnostic buffer"));
         // Retrieve data from the diagnostic storage
         CHIP_ERROR err = mStorageInstance->Retrieve(endUserSupportSpan, sReadEntries);
