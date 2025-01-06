@@ -102,6 +102,7 @@ source_set("app-main") {
     ":ota-test-event-trigger",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
   ]
 
   if (current_os != "nuttx") {

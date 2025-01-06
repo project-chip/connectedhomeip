@@ -113,6 +113,7 @@ ENV SILABS_BOARD=BRD4186C
 # Keep GSDK_ROOT name until rename transition to SISDK is completed
 ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV SISDK_ROOT=/opt/silabs/simplicity_sdk/
+ENV PATH $PATH:/opt/silabs/slc_cli/
 ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/

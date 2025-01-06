@@ -157,6 +157,33 @@
     } while (false)
 
 /**
+ *  @def ReturnErrorVariantOnFailure(expr)
+ *
+ *  @brief
+ *    This is for use when the calling function returns a Variant type. It returns a CHIP_ERROR variant with the corresponding error
+ *    code if the expression returns an error.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnErrorVariantOnFailure(NextStep, ParseSigma1(tlvReader, parsedSigma1));
+ *  @endcode
+ *
+ *  @param[in]  variantType   The Variant type that the calling function returns.
+ *  @param[in]  expr          An expression to be tested.
+
+ */
+#define ReturnErrorVariantOnFailure(variantType, expr)                                                                             \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            return variantType::Create<CHIP_ERROR>(__err);                                                                         \
+        }                                                                                                                          \
+    } while (false)
+
+/**
  *  @def ReturnLogErrorOnFailure(expr)
  *
  *  @brief
