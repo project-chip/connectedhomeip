@@ -695,23 +695,6 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute access(write: manage) char_string<35> activeLocale = 0;
-  readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
   revision 1; // NOTE: Default/not specifically set
@@ -1115,6 +1098,62 @@ cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
+/** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
+Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
+Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
+cluster Switch = 59 {
+  revision 2;
+
+  bitmap Feature : bitmap32 {
+    kLatchingSwitch = 0x1;
+    kMomentarySwitch = 0x2;
+    kMomentarySwitchRelease = 0x4;
+    kMomentarySwitchLongPress = 0x8;
+    kMomentarySwitchMultiPress = 0x10;
+    kActionSwitch = 0x20;
+  }
+
+  info event SwitchLatched = 0 {
+    int8u newPosition = 0;
+  }
+
+  info event InitialPress = 1 {
+    int8u newPosition = 0;
+  }
+
+  info event LongPress = 2 {
+    int8u newPosition = 0;
+  }
+
+  info event ShortRelease = 3 {
+    int8u previousPosition = 0;
+  }
+
+  info event LongRelease = 4 {
+    int8u previousPosition = 0;
+  }
+
+  info event MultiPressOngoing = 5 {
+    int8u newPosition = 0;
+    int8u currentNumberOfPressesCounted = 1;
+  }
+
+  info event MultiPressComplete = 6 {
+    int8u previousPosition = 0;
+    int8u totalNumberOfPressesCounted = 1;
+  }
+
+  readonly attribute int8u numberOfPositions = 0;
+  readonly attribute int8u currentPosition = 1;
+  readonly attribute optional int8u multiPressMax = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1; // NOTE: Default/not specifically set
@@ -1291,240 +1330,6 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
 
-/** The Group Key Management Cluster is the mechanism by which group keys are managed. */
-cluster GroupKeyManagement = 63 {
-  revision 1; // NOTE: Default/not specifically set
-
-  enum GroupKeySecurityPolicyEnum : enum8 {
-    kTrustFirst = 0;
-    kCacheAndSync = 1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kCacheAndSync = 0x1;
-  }
-
-  fabric_scoped struct GroupInfoMapStruct {
-    group_id groupId = 1;
-    endpoint_no endpoints[] = 2;
-    optional char_string<16> groupName = 3;
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_scoped struct GroupKeyMapStruct {
-    group_id groupId = 1;
-    int16u groupKeySetID = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
-  struct GroupKeySetStruct {
-    int16u groupKeySetID = 0;
-    GroupKeySecurityPolicyEnum groupKeySecurityPolicy = 1;
-    nullable octet_string<16> epochKey0 = 2;
-    nullable epoch_us epochStartTime0 = 3;
-    nullable octet_string<16> epochKey1 = 4;
-    nullable epoch_us epochStartTime1 = 5;
-    nullable octet_string<16> epochKey2 = 6;
-    nullable epoch_us epochStartTime2 = 7;
-  }
-
-  attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
-  readonly attribute GroupInfoMapStruct groupTable[] = 1;
-  readonly attribute int16u maxGroupsPerFabric = 2;
-  readonly attribute int16u maxGroupKeysPerFabric = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct KeySetWriteRequest {
-    GroupKeySetStruct groupKeySet = 0;
-  }
-
-  request struct KeySetReadRequest {
-    int16u groupKeySetID = 0;
-  }
-
-  response struct KeySetReadResponse = 2 {
-    GroupKeySetStruct groupKeySet = 0;
-  }
-
-  request struct KeySetRemoveRequest {
-    int16u groupKeySetID = 0;
-  }
-
-  response struct KeySetReadAllIndicesResponse = 5 {
-    int16u groupKeySetIDs[] = 0;
-  }
-
-  /** Write a new set of keys for the given key set id. */
-  fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
-  /** Read the keys for a given key set id. */
-  fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
-  /** Revoke a Root Key from a Group */
-  fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
-  /** Return the list of Group Key Sets associated with the accessing fabric */
-  fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
-}
-
-/** Attributes and commands for scene configuration and manipulation. */
-provisional cluster ScenesManagement = 98 {
-  revision 1;
-
-  bitmap CopyModeBitmap : bitmap8 {
-    kCopyAllScenes = 0x1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kSceneNames = 0x1;
-  }
-
-  struct AttributeValuePairStruct {
-    attrib_id attributeID = 0;
-    optional int8u valueUnsigned8 = 1;
-    optional int8s valueSigned8 = 2;
-    optional int16u valueUnsigned16 = 3;
-    optional int16s valueSigned16 = 4;
-    optional int32u valueUnsigned32 = 5;
-    optional int32s valueSigned32 = 6;
-    optional int64u valueUnsigned64 = 7;
-    optional int64s valueSigned64 = 8;
-  }
-
-  struct ExtensionFieldSet {
-    cluster_id clusterID = 0;
-    AttributeValuePairStruct attributeValueList[] = 1;
-  }
-
-  fabric_scoped struct SceneInfoStruct {
-    int8u sceneCount = 0;
-    fabric_sensitive int8u currentScene = 1;
-    fabric_sensitive group_id currentGroup = 2;
-    fabric_sensitive boolean sceneValid = 3;
-    int8u remainingCapacity = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  readonly attribute optional nullable node_id lastConfiguredBy = 0;
-  readonly attribute int16u sceneTableSize = 1;
-  readonly attribute SceneInfoStruct fabricSceneInfo[] = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    int32u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  response struct AddSceneResponse = 0 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct ViewSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct ViewSceneResponse = 1 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-    optional int32u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  request struct RemoveSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct RemoveSceneResponse = 2 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RemoveAllScenesRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveAllScenesResponse = 3 {
-    status status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct StoreSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct StoreSceneResponse = 4 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RecallSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    optional nullable int32u transitionTime = 2;
-  }
-
-  request struct GetSceneMembershipRequest {
-    group_id groupID = 0;
-  }
-
-  response struct GetSceneMembershipResponse = 6 {
-    status status = 0;
-    nullable int8u capacity = 1;
-    group_id groupID = 2;
-    optional int8u sceneList[] = 3;
-  }
-
-  request struct CopySceneRequest {
-    CopyModeBitmap mode = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-    group_id groupIdentifierTo = 3;
-    int8u sceneIdentifierTo = 4;
-  }
-
-  response struct CopySceneResponse = 64 {
-    status status = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-  }
-
-  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}' */
-  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  /** Retrieves the requested scene entry from its Scene table. */
-  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
-  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
-  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
-  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
-  fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
-}
-
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
@@ -1570,16 +1375,6 @@ endpoint 0 {
     callback attribute maxPathsPerInvoke;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
-  }
-
-  server cluster LocalizationConfiguration {
-    ram      attribute activeLocale;
-    callback attribute supportedLocales;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralCommissioning {
@@ -1682,22 +1477,6 @@ endpoint 0 {
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
   }
-
-  server cluster GroupKeyManagement {
-    callback attribute groupKeyMap;
-    callback attribute groupTable;
-    callback attribute maxGroupsPerFabric;
-    callback attribute maxGroupKeysPerFabric;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-
-    handle command KeySetWrite;
-    handle command KeySetRead;
-    handle command KeySetReadResponse;
-    handle command KeySetRemove;
-    handle command KeySetReadAllIndices;
-    handle command KeySetReadAllIndicesResponse;
-  }
 }
 endpoint 1 {
   device type ma_onoffpluginunit = 266, version 3;
@@ -1768,28 +1547,14 @@ endpoint 1 {
     callback attribute clusterRevision;
   }
 
-  server cluster ScenesManagement {
-    ram      attribute sceneTableSize default = 16;
-    callback attribute fabricSceneInfo;
+  server cluster Switch {
+    ram      attribute numberOfPositions default = 2;
+    ram      attribute currentPosition;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command AddScene;
-    handle command AddSceneResponse;
-    handle command ViewScene;
-    handle command ViewSceneResponse;
-    handle command RemoveScene;
-    handle command RemoveSceneResponse;
-    handle command RemoveAllScenes;
-    handle command RemoveAllScenesResponse;
-    handle command StoreSceneResponse;
-    handle command StoreScene;
-    handle command RecallScene;
-    handle command GetSceneMembershipResponse;
-    handle command GetSceneMembership;
+    ram      attribute clusterRevision default = 2;
   }
 }
 

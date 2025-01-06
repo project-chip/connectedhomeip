@@ -64,12 +64,8 @@ static OptionSet sTermsAndConditionsCmdLineOptions = {
 void ApplicationInit()
 {
     const app::TermsAndConditions termsAndConditions = app::TermsAndConditions(sTcRequiredAcknowledgements, sTcMinRequiredVersion);
-
-    const Optional<app::TermsAndConditions> requiredTermsAndConditions = Optional<app::TermsAndConditions>(termsAndConditions);
-
     PersistentStorageDelegate & persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
-
-    chip::app::TermsAndConditionsManager::GetInstance()->Init(&persistentStorageDelegate, requiredTermsAndConditions);
+    app::TermsAndConditionsManager::GetInstance()->Init(&persistentStorageDelegate, MakeOptional(termsAndConditions));
 }
 
 void ApplicationShutdown() {}
