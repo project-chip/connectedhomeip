@@ -104,7 +104,7 @@ class TC_DGSW_2_3(MatterBaseTest):
 
         # STEP 3: TH reads from the DUT the ThreadMetrics attribute
         self.step(3)
-        if self.pics_guard(Clusters.SoftwareDiagnostics.Attributes.ThreadMetrics.attribute_id in attribute_list):
+        if self.pics_guard(attributes.ThreadMetrics.attribute_id in attribute_list):
             thread_metrics_original = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.ThreadMetrics)
             # the Id field is mandatory
             asserts.assert_true(self.is_valid_uint64_value(thread_metrics_original[0].id), "Id field should be a uint64 type")
