@@ -541,16 +541,16 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     """
     Get the directory of the data model for a specific version and level from the installed package.
 
-
     `data_model_directory` given as a path MUST be of type Traversable (often `pathlib.Path(somepathstring)`).
     If `data_model_directory` is given as a Traversable, it is returned directly WITHOUT using the data_model_level at all.
     """
-    # If it's a prebuilt directory, build the path based on the version and data model level
-    if isinstance(data_model_directory, PrebuiltDataModelDirectory):
-        return pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
-            'data_model').joinpath(data_model_directory.dirname).joinpath(data_model_level.dirname)
-    else:
+    # Early return if data_model_directory is already a Traversable type
+    if not isinstance(data_model_directory, PrebuiltDataModelDirectory):
         return data_model_directory
+
+    # If it's a prebuilt directory, build the path based on the version and data model level
+    return pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+        'data_model').joinpath(data_model_directory.dirname).joinpath(data_model_level.dirname)
 
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> typing.Tuple[dict[int, dict], list]:
@@ -559,7 +559,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     This function supports both pre-built locations and full paths.
 
     `data_model_directory`` given as a path MUST be of type Traversable (often `pathlib.Path(somepathstring)`).
-    If data_model_directory is a Travesable, it is assumed to already contain `clusters` (i.e. be a directory
+    If data_model_directory is a Traversable, it is assumed to already contain `clusters` (i.e. be a directory
     with all XML files in it)
     """
 
@@ -606,6 +606,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     mask = clusters[descriptor_id].feature_map[code]
     clusters[descriptor_id].features[mask].conformance = optional()
     remove_problem(FeaturePathLocation(endpoint_id=0, cluster_id=descriptor_id, feature_code=code))
+
     action_id = Clusters.Actions.id
     for c in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[action_id]:
         clusters[action_id].accepted_commands[c].conformance = optional()
