@@ -26,7 +26,7 @@ namespace Tracing {
 namespace Diagnostics {
 
 // Diagnostic TAGs
-enum D_TAG
+enum class DiagTag : uint8_t
 {
     TIMESTAMP = 0,
     LABEL,
@@ -68,15 +68,15 @@ public:
         chip::TLV::TLVType DiagnosticOuterContainer = chip::TLV::kTLVType_NotSpecified;
         ReturnErrorOnFailure(
             writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, DiagnosticOuterContainer));
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(D_TAG::TIMESTAMP), timestamp_));
-        ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(D_TAG::LABEL), label_));
+        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(DiagTag::TIMESTAMP), timestamp_));
+        ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::LABEL), label_));
         if constexpr (std::is_same_v<T, const char *>)
         {
-            ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(D_TAG::VALUE), value_));
+            ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::VALUE), value_));
         }
         else
         {
-            ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(D_TAG::VALUE), value_));
+            ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(DiagTag::VALUE), value_));
         }
         ReturnErrorOnFailure(writer.EndContainer(DiagnosticOuterContainer));
         ReturnErrorOnFailure(writer.Finalize());
@@ -121,7 +121,7 @@ public:
      * @brief Checks if the storage buffer is empty.
      * @return bool true if the buffer contains no stored diagnostic data, otherwise false.
      */
-    virtual bool IsEmptyBuffer() = 0;
+    virtual bool IsBufferEmpty() = 0;
 
     /**
      * @brief Retrieves the size of the data currently stored in the buffer.

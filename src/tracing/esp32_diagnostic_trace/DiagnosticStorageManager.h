@@ -28,19 +28,11 @@ class CircularDiagnosticBuffer : public chip::TLV::TLVCircularBuffer, public Dia
 public:
     CircularDiagnosticBuffer(uint8_t * buffer, size_t bufferLength) : chip::TLV::TLVCircularBuffer(buffer, bufferLength) {}
 
-    // Delete copy constructor and assignment operator to ensure singleton
-    CircularDiagnosticBuffer(const CircularDiagnosticBuffer &)             = delete;
-    CircularDiagnosticBuffer & operator=(const CircularDiagnosticBuffer &) = delete;
-
     CHIP_ERROR Store(const DiagnosticEntry & entry) override
     {
+        CHIP_ERROR err = CHIP_NO_ERROR;
         mWriter.Init(*this);
-
-        CHIP_ERROR err = entry.Encode(mWriter);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Failed to write entry: %s", chip::ErrorStr(err));
-        }
+        ReturnLogErrorOnFailure(entry.Encode(mWriter));
         return err;
     }
 
@@ -87,7 +79,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    bool IsEmptyBuffer() override { return DataLength() == 0; }
+    bool IsBufferEmpty() override { return DataLength() == 0; }
 
     uint32_t GetDataSize() override { return DataLength(); }
 

@@ -102,32 +102,33 @@ void ESP32Diagnostics::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
 void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturn(mStorageInstance != nullptr, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
     switch (event.ValueType())
     {
     case ValueType::kInt32: {
-        ESP_LOGI("mtr", "The value of %s is %ld ", event.key(), event.ValueInt32());
+        ChipLogProgress(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueInt32());
         Diagnostic<int32_t> metric(event.key(), event.ValueInt32(), esp_log_timestamp());
-        err = mStorageInstance.Store(metric);
+        err = mStorageInstance->Store(metric);
     }
     break;
 
     case ValueType::kUInt32: {
-        ESP_LOGI("mtr", "The value of %s is %lu ", event.key(), event.ValueUInt32());
+        ChipLogProgress(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueUInt32());
         Diagnostic<uint32_t> metric(event.key(), event.ValueUInt32(), esp_log_timestamp());
-        err = mStorageInstance.Store(metric);
+        err = mStorageInstance->Store(metric);
     }
     break;
 
     case ValueType::kChipErrorCode:
-        ESP_LOGI("mtr", "The value of %s is error with code %lu ", event.key(), event.ValueErrorCode());
+        ChipLogProgress(DeviceLayer, "The value of %s is error with code %lu ", event.key(), event.ValueErrorCode());
         break;
 
     case ValueType::kUndefined:
-        ESP_LOGI("mtr", "The value of %s is undefined", event.key());
+        ChipLogProgress(DeviceLayer, "The value of %s is undefined", event.key());
         break;
 
     default:
-        ESP_LOGI("mtr", "The value of %s is of an UNKNOWN TYPE", event.key());
+        ChipLogProgress(DeviceLayer, "The value of %s is of an UNKNOWN TYPE", event.key());
         break;
     }
 
@@ -136,14 +137,16 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 
 void ESP32Diagnostics::TraceCounter(const char * label)
 {
-    ESPDiagnosticCounter::GetInstance(label).ReportMetrics(label, mStorageInstance);
+    CHIP_ERROR err = ESPDiagnosticCounter::GetInstance(label).ReportMetrics(label, mStorageInstance);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to store Counter Diagnostic data"));
 }
 
 void ESP32Diagnostics::TraceBegin(const char * label, const char * group)
 {
     if (IsPermitted(group))
     {
-        StoreDiagnostics(label, group);
+        CHIP_ERROR err = StoreDiagnostics(label, group);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to store Trace Diagnostic data"));
     }
 }
 
@@ -153,15 +156,18 @@ void ESP32Diagnostics::TraceInstant(const char * label, const char * value)
 {
     if (!IsPermitted(value))
     {
-        StoreDiagnostics(label, value);
+        CHIP_ERROR err = StoreDiagnostics(label, value);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to store Trace Diagnostic data"));
     }
 }
 
-void ESP32Diagnostics::StoreDiagnostics(const char * label, const char * group)
+CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * group)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(mStorageInstance != nullptr, err, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
     Diagnostic<const char *> trace(label, group, esp_log_timestamp());
-    VerifyOrReturn(mStorageInstance.Store(trace) == CHIP_NO_ERROR,
-                   ChipLogError(DeviceLayer, "Failed to store Trace Diagnostic data"));
+    err = mStorageInstance->Store(trace);
+    return err;
 }
 
 } // namespace Diagnostics

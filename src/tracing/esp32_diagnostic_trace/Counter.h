@@ -45,7 +45,7 @@ public:
 
     uint32_t GetInstanceCount(const char * label) const;
 
-    void ReportMetrics(const char * label, DiagnosticStorageInterface & mStorageInstance);
+    CHIP_ERROR ReportMetrics(const char * label, DiagnosticStorageInterface * mStorageInstance);
 
 private:
     ESPDiagnosticCounter() {}
