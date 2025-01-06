@@ -203,43 +203,14 @@ public:
     //  - Lookups should be performed using `Get...` and `SeekTo`.
     //
     /////////////////////////////////////////////////////////////////////////
-    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId)           = 0;
-    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId)              = 0;
-    virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId)              = 0;
-    virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints()                        = 0;
-    virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath) = 0;
-
-    // TODO: below items MUST transition to pure virtual and have implementations everywhere
-
-    virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId)
-    {
-        return std::make_unique<NullMetadataIterator<ClusterId, ClusterInfo>>();
-    }
-
-    virtual std::unique_ptr<MetaDataIterator<AttributeId, AttributeInfo>> GetAttributes(ConcreteClusterPath clusterPath)
-    {
-        return std::make_unique<NullMetadataIterator<AttributeId, AttributeInfo>>();
-    }
-    virtual std::unique_ptr<MetaDataIterator<CommandId, CommandInfo>> GetAcceptedCommands(ConcreteClusterPath clusterPath)
-    {
-        return std::make_unique<NullMetadataIterator<CommandId, CommandInfo>>();
-    }
-
-    // This iteration will list all server clusters on a given endpoint
-    virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
-    virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
-    virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
-
-    // Attribute iteration and accessors provide cluster-level access over
-    // attributes
-    virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)                = 0;
-    virtual AttributeEntry NextAttribute(const ConcreteAttributePath & before)                = 0;
-    virtual std::optional<AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) = 0;
-
-    // Command iteration and accessors provide cluster-level access over commands
-    virtual CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster)              = 0;
-    virtual CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before)                = 0;
-    virtual std::optional<CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) = 0;
+    virtual std::unique_ptr<ElementIterator<DeviceTypeEntry>> GetDeviceTypes(EndpointId endpointId)                        = 0;
+    virtual std::unique_ptr<ElementIterator<SemanticTag>> GetSemanticTags(EndpointId endpointId)                           = 0;
+    virtual std::unique_ptr<ElementIterator<ClusterId>> GetClientClusters(EndpointId endpointId)                           = 0;
+    virtual std::unique_ptr<MetaDataIterator<EndpointId, EndpointInfo>> GetEndpoints()                                     = 0;
+    virtual std::unique_ptr<ElementIterator<CommandId>> GetGeneratedCommands(ConcreteClusterPath clusterPath)              = 0;
+    virtual std::unique_ptr<MetaDataIterator<CommandId, CommandInfo>> GetAcceptedCommands(ConcreteClusterPath clusterPath) = 0;
+    virtual std::unique_ptr<MetaDataIterator<ClusterId, ClusterInfo>> GetServerClusters(EndpointId endpointId)             = 0;
+    virtual std::unique_ptr<MetaDataIterator<AttributeId, AttributeInfo>> GetAttributes(ConcreteClusterPath clusterPath)   = 0;
 
     /// Workaround function to report attribute change.
     ///

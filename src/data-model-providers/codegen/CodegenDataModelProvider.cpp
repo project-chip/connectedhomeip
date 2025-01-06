@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/support/ScopedBuffer.h"
+#include "app/util/attribute-metadata.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -38,79 +38,16 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/SpanSearchValue.h>
 
 #include <cstdint>
 #include <limits>
-#include <memory>
 #include <optional>
 #include <variant>
 
 namespace chip {
 namespace app {
-namespace detail {
-
-Loop EnumeratorCommandFinder::HandlerCallback(CommandId id)
-{
-    switch (mOperation)
-    {
-    case Operation::kFindFirst:
-        mFound = id;
-        return Loop::Break;
-    case Operation::kFindExact:
-        if (mTarget == id)
-        {
-            mFound = id; // found it
-            return Loop::Break;
-        }
-        break;
-    case Operation::kFindNext:
-        if (mTarget == id)
-        {
-            // Once we found the ID, get the first
-            mOperation = Operation::kFindFirst;
-        }
-        break;
-    }
-    return Loop::Continue; // keep searching
-}
-
-std::optional<CommandId> EnumeratorCommandFinder::FindCommandId(Operation operation, const ConcreteCommandPath & path)
-{
-    mOperation = operation;
-    mTarget    = path.mCommandId;
-
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-
-    if (interface == nullptr)
-    {
-        return std::nullopt; // no data: no interface
-    }
-
-    CHIP_ERROR err = (interface->*mCallback)(path, HandlerCallbackFn, this);
-    if (err == CHIP_ERROR_NOT_IMPLEMENTED)
-    {
-        return std::nullopt; // no data provided by the interface
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        // Report the error here since we lose actual error. This generally should NOT be possible as CommandHandlerInterface
-        // usually returns unimplemented or should just work for our use case (our callback never fails)
-        ChipLogError(DataManagement, "Enumerate error: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-        return kInvalidCommandId;
-    }
-
-    return mFound.value_or(kInvalidCommandId);
-}
-
-} // namespace detail
-
-using detail::EnumeratorCommandFinder;
-
 namespace {
 
 /// Search by device type within a span of EmberAfDeviceType (finds the device type that matches the given
@@ -125,142 +62,6 @@ struct ByDeviceType
         return (instance.deviceId == id.deviceTypeId) && (instance.deviceVersion == id.deviceTypeRevision);
     }
 };
-
-const CommandId * AcceptedCommands(const EmberAfCluster & cluster)
-{
-    return cluster.acceptedCommandList;
-}
-
-/// Load the cluster information into the specified destination
-std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster)
-{
-    DataVersion * versionPtr = emberAfDataVersionStorage(path);
-    if (versionPtr == nullptr)
-    {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI, static_cast<int>(path.mEndpointId),
-                     ChipLogValueMEI(cluster.clusterId));
-#endif
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
-    DataModel::ClusterInfo info(*versionPtr);
-    // TODO: set entry flags:
-    //   info->flags.Set(ClusterQualityFlags::kDiagnosticsData)
-    return info;
-}
-
-/// Converts a EmberAfCluster into a ClusterEntry
-std::variant<CHIP_ERROR, DataModel::ClusterEntry> ClusterEntryFrom(EndpointId endpointId, const EmberAfCluster & cluster)
-{
-    ConcreteClusterPath clusterPath(endpointId, cluster.clusterId);
-    auto info = LoadClusterInfo(clusterPath, cluster);
-
-    if (CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&info))
-    {
-        return *err;
-    }
-
-    if (DataModel::ClusterInfo * infoValue = std::get_if<DataModel::ClusterInfo>(&info))
-    {
-        return DataModel::ClusterEntry{
-            .path = clusterPath,
-            .info = *infoValue,
-        };
-    }
-    return CHIP_ERROR_INCORRECT_STATE;
-}
-
-/// Finds the first server cluster entry for the given endpoint data starting at [start_index]
-///
-/// Returns an invalid entry if no more server clusters are found
-DataModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const EmberAfEndpointType * endpoint, unsigned start_index,
-                                                unsigned & found_index)
-{
-    for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
-    {
-        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (!cluster.IsServer())
-        {
-            continue;
-        }
-
-        found_index = cluster_idx;
-        auto entry  = ClusterEntryFrom(endpointId, cluster);
-
-        if (DataModel::ClusterEntry * entryValue = std::get_if<DataModel::ClusterEntry>(&entry))
-        {
-            return *entryValue;
-        }
-
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        if (CHIP_ERROR * errValue = std::get_if<CHIP_ERROR>(&entry))
-        {
-            ChipLogError(AppServer, "Failed to load cluster entry: %" CHIP_ERROR_FORMAT, errValue->Format());
-        }
-        else
-        {
-            // Should NOT be possible: entryFrom has only 2 variants
-            ChipLogError(AppServer, "Failed to load cluster entry, UNKNOWN entry return type");
-        }
-#endif
-    }
-
-    return DataModel::ClusterEntry::kInvalid;
-}
-
-/// Load the attribute information into the specified destination
-///
-/// `info` is assumed to be default-constructed/clear (i.e. this sets flags, but does not reset them).
-void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttributeMetadata & attribute,
-                       DataModel::AttributeInfo * info)
-{
-    info->readPrivilege = RequiredPrivilege::ForReadAttribute(path);
-    if (!attribute.IsReadOnly())
-    {
-        info->writePrivilege = RequiredPrivilege::ForWriteAttribute(path);
-    }
-
-    info->flags.Set(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
-    info->flags.Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
-
-    // NOTE: we do NOT provide additional info for:
-    //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
-    //    - IsSingleton spec defines it for CLUSTERS where as we have it for ATTRIBUTES
-    //    - Several specification flags are not available (reportable, quieter reporting,
-    //      fixed, source attribution)
-
-    // TODO: Set additional flags:
-    // info->flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
-    // info->flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
-    // info->flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
-}
-
-DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
-{
-    DataModel::AttributeEntry entry;
-
-    entry.path = ConcreteAttributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
-    LoadAttributeInfo(entry.path, attribute, &entry.info);
-
-    return entry;
-}
-
-DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath, CommandId clusterCommandId)
-{
-    DataModel::CommandEntry entry;
-    entry.path                 = ConcreteCommandPath(clusterPath.mEndpointId, clusterPath.mClusterId, clusterCommandId);
-    entry.info.invokePrivilege = RequiredPrivilege::ForInvokeCommand(entry.path);
-
-    entry.info.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(clusterPath.mClusterId, clusterCommandId));
-
-    entry.info.flags.Set(DataModel::CommandQualityFlags::kFabricScoped,
-                         CommandIsFabricScoped(clusterPath.mClusterId, clusterCommandId));
-
-    entry.info.flags.Set(DataModel::CommandQualityFlags::kLargeMessage,
-                         CommandHasLargePayload(clusterPath.mClusterId, clusterCommandId));
-    return entry;
-}
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
@@ -435,29 +236,268 @@ private:
     const CommandId * mCommands;
 };
 
-class AllocatedGeneratedCommandsIterator : public DataModel::ElementIterator<CommandId>
+class AcceptedCommandsIterator : public DataModel::MetaDataIterator<CommandId, DataModel::CommandInfo>
 {
 public:
-    AllocatedGeneratedCommandsIterator(CommandId * commands, size_t size) : mCommands(commands), mSize(size) {}
+    AcceptedCommandsIterator(ConcreteClusterPath clusterPath, const CommandId * commands) :
+        mClusterPath(clusterPath), mCommands(commands)
+    {}
+
+    std::optional<CommandId> Next() override
+    {
+        VerifyOrReturnValue(mCommands != nullptr, std::nullopt);
+        VerifyOrReturnValue(*mCommands != kInvalidCommandId, std::nullopt);
+
+        auto id = *mCommands;
+        ++mCommands;
+        return id;
+    }
+
+    bool SeekTo(const CommandId & id) override
+    {
+        VerifyOrReturnValue(mCommands != nullptr, false);
+
+        // we do NOT have a fast seek capability here... we just iterate
+        while ((*mCommands != id) && (*mCommands != kInvalidCommandId))
+        {
+            mCommands++;
+        }
+
+        return (*mCommands == id);
+    }
+
+    std::optional<DataModel::CommandInfo> GetMetadata() override
+    {
+        VerifyOrReturnValue(mCommands != nullptr, std::nullopt);
+        VerifyOrReturnValue(*mCommands != kInvalidCommandId, std::nullopt);
+        DataModel::CommandInfo info;
+
+        info.invokePrivilege =
+            RequiredPrivilege::ForInvokeCommand(ConcreteCommandPath(mClusterPath.mEndpointId, mClusterPath.mClusterId, *mCommands));
+        info.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(mClusterPath.mClusterId, *mCommands));
+        info.flags.Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(mClusterPath.mClusterId, *mCommands));
+        info.flags.Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(mClusterPath.mClusterId, *mCommands));
+
+        return info;
+    }
+
+private:
+    const ConcreteClusterPath mClusterPath;
+    const CommandId * mCommands;
+};
+
+class AllocatedGeneratedCommandsIterator : public GeneratedCommandsIterator
+{
+public:
+    AllocatedGeneratedCommandsIterator(CommandId * commands) : GeneratedCommandsIterator(commands), mCommands(commands) {}
     ~AllocatedGeneratedCommandsIterator() override { Platform::Impl::PlatformMemoryManagement::MemoryFree(mCommands); }
 
     AllocatedGeneratedCommandsIterator(const AllocatedGeneratedCommandsIterator &)             = delete;
     AllocatedGeneratedCommandsIterator & operator=(const AllocatedGeneratedCommandsIterator &) = delete;
 
-    std::optional<CommandId> Next() override
-    {
-        VerifyOrReturnValue(mCommands != nullptr, std::nullopt);
-        VerifyOrReturnValue(mIndex < mSize, std::nullopt);
+private:
+    CommandId * mCommands;
+};
 
-        auto id = mCommands[mIndex];
-        ++mIndex;
-        return id;
-    }
+class AllocatedAcceptedCommandsIterator : public AcceptedCommandsIterator
+{
+public:
+    AllocatedAcceptedCommandsIterator(ConcreteClusterPath clusterPath, CommandId * commands) :
+        AcceptedCommandsIterator(clusterPath, commands), mCommands(commands)
+    {}
+    ~AllocatedAcceptedCommandsIterator() override { Platform::Impl::PlatformMemoryManagement::MemoryFree(mCommands); }
+
+    AllocatedAcceptedCommandsIterator(const AllocatedGeneratedCommandsIterator &)             = delete;
+    AllocatedAcceptedCommandsIterator & operator=(const AllocatedGeneratedCommandsIterator &) = delete;
 
 private:
     CommandId * mCommands;
-    const size_t mSize;
-    size_t mIndex = 0;
+};
+
+class ServerClusterIterator : public DataModel::MetaDataIterator<ClusterId, DataModel::ClusterInfo>
+{
+public:
+    static std::unique_ptr<ServerClusterIterator> NullIterator(unsigned & hint)
+    {
+        return std::make_unique<ServerClusterIterator>(kInvalidEndpointId, Span<const EmberAfCluster>(), hint);
+    }
+
+    ServerClusterIterator(EndpointId endpointId, Span<const EmberAfCluster> clusters, unsigned & hint) :
+        mEndpointId(endpointId), mClusters(clusters), mIterationHint(hint)
+    {}
+
+    std::optional<ClusterId> Next() override
+    {
+        while (true)
+        {
+            if (mClusters.empty())
+            {
+                mCurrentMetadata = nullptr;
+                return std::nullopt;
+            }
+
+            if (mClusters.front().IsServer())
+            {
+                mCurrentMetadata = mClusters.data();
+                mIterationHint   = mIndex++;
+                mClusters        = mClusters.SubSpan(1);
+
+                return mCurrentMetadata->clusterId;
+            }
+            mIndex++;
+            mClusters = mClusters.SubSpan(1);
+        }
+    }
+
+    bool SeekTo(const ClusterId & id) override
+    {
+        // the only speedup if is hint matches somehow
+        if (mIterationHint < mClusters.size())
+        {
+            // maybe valid ... check
+            if (mClusters[mIterationHint].clusterId == id)
+            {
+                mCurrentMetadata = &mClusters[mIterationHint];
+                mIndex           = mIterationHint + 1;
+                mClusters        = mClusters.SubSpan(mIterationHint + 1);
+                return true;
+            }
+        }
+
+        // not found. Just seek until found
+        mIndex = 0;
+        for (auto search_id = Next(); search_id.has_value(); search_id = Next())
+        {
+            if (*search_id == id)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    std::optional<DataModel::ClusterInfo> GetMetadata() override
+    {
+        VerifyOrReturnValue(mCurrentMetadata != nullptr, std::nullopt);
+
+        ConcreteClusterPath clusterPath(mEndpointId, mCurrentMetadata->clusterId);
+
+        DataVersion * versionPtr = emberAfDataVersionStorage(clusterPath);
+        if (versionPtr == nullptr)
+        {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+            ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI,
+                         static_cast<int>(clusterPath.mEndpointId), ChipLogValueMEI(clusterPath.mClusterId));
+#endif
+            return std::nullopt;
+        }
+
+        DataModel::ClusterInfo info(*versionPtr);
+        // TODO: set entry flags:
+        //   info->flags.Set(ClusterQualityFlags::kDiagnosticsData)
+        return info;
+    }
+
+private:
+    EndpointId mEndpointId;
+    Span<const EmberAfCluster> mClusters;
+    const EmberAfCluster * mCurrentMetadata = nullptr; // metadata after we called Next()
+    unsigned & mIterationHint;
+    unsigned mIndex = 0;
+};
+
+class AttributeIterator : public DataModel::MetaDataIterator<AttributeId, DataModel::AttributeInfo>
+{
+public:
+    static std::unique_ptr<AttributeIterator> NullIterator(unsigned & hint)
+    {
+        return std::make_unique<AttributeIterator>(ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId),
+                                                   Span<const EmberAfAttributeMetadata>(), hint);
+    }
+
+    AttributeIterator(const ConcreteClusterPath & clusterPath, Span<const EmberAfAttributeMetadata> clusters, unsigned & hint) :
+        mClusterPath(clusterPath), mAttributes(clusters), mIterationHint(hint)
+    {}
+
+    std::optional<AttributeId> Next() override
+    {
+        if (mAttributes.empty())
+        {
+            mCurrentMetadata = nullptr;
+            return std::nullopt;
+        }
+
+        mCurrentMetadata = mAttributes.data();
+        mIterationHint   = mIndex++;
+        mAttributes      = mAttributes.SubSpan(1);
+
+        return mCurrentMetadata->attributeId;
+    }
+
+    bool SeekTo(const AttributeId & id) override
+    {
+        // the only speedup if is hint matches somehow
+        if (mIterationHint < mAttributes.size())
+        {
+            // maybe valid ... check
+            if (mAttributes[mIterationHint].attributeId == id)
+            {
+                mCurrentMetadata = &mAttributes[mIterationHint];
+                mIndex           = mIterationHint + 1;
+                mAttributes      = mAttributes.SubSpan(mIterationHint + 1);
+                return true;
+            }
+        }
+
+        // not found. Just seek until found
+        mIndex = 0;
+        for (auto search_id = Next(); search_id.has_value(); search_id = Next())
+        {
+            if (*search_id == id)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    std::optional<DataModel::AttributeInfo> GetMetadata() override
+    {
+        VerifyOrReturnValue(mCurrentMetadata != nullptr, std::nullopt);
+
+        ConcreteAttributePath attributePath(mClusterPath.mEndpointId, mClusterPath.mClusterId, mCurrentMetadata->attributeId);
+        DataModel::AttributeInfo info;
+
+        info.readPrivilege = RequiredPrivilege::ForReadAttribute(attributePath);
+        if (!mCurrentMetadata->IsReadOnly())
+        {
+            info.writePrivilege = RequiredPrivilege::ForWriteAttribute(attributePath);
+        }
+
+        info.flags.Set(DataModel::AttributeQualityFlags::kListAttribute,
+                       (mCurrentMetadata->attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
+        info.flags.Set(DataModel::AttributeQualityFlags::kTimed, mCurrentMetadata->MustUseTimedWrite());
+
+        // NOTE: we do NOT provide additional info for:
+        //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
+        //    - IsSingleton spec defines it for CLUSTERS where as we have it for ATTRIBUTES
+        //    - Several specification flags are not available (reportable, quieter reporting,
+        //      fixed, source attribution)
+
+        // TODO: Set additional flags:
+        // info->flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
+        // info->flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
+        // info->flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
+
+        return info;
+    }
+
+private:
+    ConcreteClusterPath mClusterPath;
+    Span<const EmberAfAttributeMetadata> mAttributes;
+    const EmberAfAttributeMetadata * mCurrentMetadata = nullptr; // metadata after we called Next()
+    unsigned & mIterationHint;
+    unsigned mIndex = 0;
 };
 
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
@@ -590,88 +630,17 @@ std::unique_ptr<DataModel::MetaDataIterator<EndpointId, DataModel::EndpointInfo>
     return std::make_unique<EndpointIterator>(mEndpointIterationHint);
 }
 
-DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId endpointId)
+std::unique_ptr<DataModel::MetaDataIterator<ClusterId, DataModel::ClusterInfo>>
+CodegenDataModelProvider::GetServerClusters(EndpointId endpointId)
 {
+
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
-    VerifyOrReturnValue(endpoint != nullptr, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint != nullptr, ServerClusterIterator::NullIterator(mServerClusterIterationHint));
+    VerifyOrReturnValue(endpoint->clusterCount > 0, ServerClusterIterator::NullIterator(mServerClusterIterationHint));
+    VerifyOrReturnValue(endpoint->cluster != nullptr, ServerClusterIterator::NullIterator(mServerClusterIterationHint));
 
-    return FirstServerClusterEntry(endpointId, endpoint, 0, mServerClusterIterationHint);
-}
-
-std::optional<unsigned> CodegenDataModelProvider::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint,
-                                                                            ClusterId id) const
-{
-    const unsigned clusterCount = endpoint->clusterCount;
-    unsigned hint               = mServerClusterIterationHint;
-
-    if (mServerClusterIterationHint < clusterCount)
-    {
-        const EmberAfCluster & cluster = endpoint->cluster[hint];
-        if (cluster.IsServer() && (cluster.clusterId == id))
-        {
-            return std::make_optional(hint);
-        }
-    }
-
-    // linear search, this may be slow
-    // does NOT use emberAfClusterIndex to not iterate over endpoints as we have
-    // already found the correct endpoint
-    for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
-    {
-        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (!cluster.IsServer())
-        {
-            continue;
-        }
-        if (cluster.clusterId == id)
-        {
-            return std::make_optional(cluster_idx);
-        }
-    }
-
-    return std::nullopt;
-}
-
-DataModel::ClusterEntry CodegenDataModelProvider::NextServerCluster(const ConcreteClusterPath & before)
-{
-    // TODO: This search still seems slow (ember will loop). Should use index hints as long
-    //       as ember API supports it
-    const EmberAfEndpointType * endpoint = emberAfFindEndpointType(before.mEndpointId);
-
-    VerifyOrReturnValue(endpoint != nullptr, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
-
-    std::optional<unsigned> cluster_idx = TryFindServerClusterIndex(endpoint, before.mClusterId);
-    if (!cluster_idx.has_value())
-    {
-        return DataModel::ClusterEntry::kInvalid;
-    }
-
-    return FirstServerClusterEntry(before.mEndpointId, endpoint, *cluster_idx + 1, mServerClusterIterationHint);
-}
-
-std::optional<DataModel::ClusterInfo> CodegenDataModelProvider::GetServerClusterInfo(const ConcreteClusterPath & path)
-{
-    const EmberAfCluster * cluster = FindServerCluster(path);
-
-    VerifyOrReturnValue(cluster != nullptr, std::nullopt);
-
-    auto info = LoadClusterInfo(path, *cluster);
-
-    if (CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&info))
-    {
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to load cluster info: %" CHIP_ERROR_FORMAT, err->Format());
-#else
-        (void) err->Format();
-#endif
-        return std::nullopt;
-    }
-
-    return std::make_optional(std::get<DataModel::ClusterInfo>(info));
+    return std::make_unique<ServerClusterIterator>(
+        endpointId, Span<const EmberAfCluster>(endpoint->cluster, endpoint->clusterCount), mServerClusterIterationHint);
 }
 
 std::unique_ptr<DataModel::ElementIterator<ClusterId>> CodegenDataModelProvider::GetClientClusters(EndpointId endpointId)
@@ -685,39 +654,17 @@ std::unique_ptr<DataModel::ElementIterator<ClusterId>> CodegenDataModelProvider:
     return std::make_unique<ClientClusterIdIterator>(Span(endpoint->cluster, endpoint->clusterCount));
 }
 
-DataModel::AttributeEntry CodegenDataModelProvider::FirstAttribute(const ConcreteClusterPath & path)
+std::unique_ptr<DataModel::MetaDataIterator<AttributeId, DataModel::AttributeInfo>>
+CodegenDataModelProvider::GetAttributes(ConcreteClusterPath clusterPath)
 {
-    const EmberAfCluster * cluster = FindServerCluster(path);
+    const EmberAfCluster * cluster = FindServerCluster(clusterPath);
 
-    VerifyOrReturnValue(cluster != nullptr, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributeCount > 0, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributes != nullptr, DataModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster != nullptr, AttributeIterator::NullIterator(mAttributeIterationHint));
+    VerifyOrReturnValue(cluster->attributeCount > 0, AttributeIterator::NullIterator(mAttributeIterationHint));
+    VerifyOrReturnValue(cluster->attributes != nullptr, AttributeIterator::NullIterator(mAttributeIterationHint));
 
-    mAttributeIterationHint = 0;
-    return AttributeEntryFrom(path, cluster->attributes[0]);
-}
-
-std::optional<unsigned> CodegenDataModelProvider::TryFindAttributeIndex(const EmberAfCluster * cluster, AttributeId id) const
-{
-    const unsigned attributeCount = cluster->attributeCount;
-
-    // attempt to find this based on the embedded hint
-    if ((mAttributeIterationHint < attributeCount) && (cluster->attributes[mAttributeIterationHint].attributeId == id))
-    {
-        return std::make_optional(mAttributeIterationHint);
-    }
-
-    // linear search is required. This may be slow
-    for (unsigned attribute_idx = 0; attribute_idx < attributeCount; attribute_idx++)
-    {
-
-        if (cluster->attributes[attribute_idx].attributeId == id)
-        {
-            return std::make_optional(attribute_idx);
-        }
-    }
-
-    return std::nullopt;
+    return std::make_unique<AttributeIterator>(
+        clusterPath, Span<const EmberAfAttributeMetadata>(cluster->attributes, cluster->attributeCount), mAttributeIterationHint);
 }
 
 const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const ConcreteClusterPath & path)
@@ -736,114 +683,6 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
         mEmberMetadataStructureGeneration = emberAfMetadataStructureGeneration();
     }
     return cluster;
-}
-
-CommandId CodegenDataModelProvider::FindCommand(const ConcreteCommandPath & path, detail::EnumeratorCommandFinder & handlerFinder,
-                                                detail::EnumeratorCommandFinder::Operation operation,
-                                                CodegenDataModelProvider::EmberCommandListIterator & emberIterator,
-                                                CommandListGetter commandListGetter)
-{
-
-    std::optional<CommandId> handlerCommandId = handlerFinder.FindCommandId(operation, path);
-    if (handlerCommandId.has_value())
-    {
-        return *handlerCommandId;
-    }
-
-    const EmberAfCluster * cluster = FindServerCluster(path);
-    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandId);
-
-    const CommandId * commandList = commandListGetter(*cluster);
-
-    switch (operation)
-    {
-    case EnumeratorCommandFinder::Operation::kFindFirst:
-        return emberIterator.First(commandList).value_or(kInvalidCommandId);
-    case EnumeratorCommandFinder::Operation::kFindNext:
-        return emberIterator.Next(commandList, path.mCommandId).value_or(kInvalidCommandId);
-    case EnumeratorCommandFinder::Operation::kFindExact:
-    default:
-        return emberIterator.Exists(commandList, path.mCommandId) ? path.mCommandId : kInvalidCommandId;
-    }
-}
-
-DataModel::AttributeEntry CodegenDataModelProvider::NextAttribute(const ConcreteAttributePath & before)
-{
-    const EmberAfCluster * cluster = FindServerCluster(before);
-    VerifyOrReturnValue(cluster != nullptr, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributeCount > 0, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributes != nullptr, DataModel::AttributeEntry::kInvalid);
-
-    // find the given attribute in the list and then return the next one
-    std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, before.mAttributeId);
-    if (!attribute_idx.has_value())
-    {
-        return DataModel::AttributeEntry::kInvalid;
-    }
-
-    unsigned next_idx = *attribute_idx + 1;
-    if (next_idx < cluster->attributeCount)
-    {
-        mAttributeIterationHint = next_idx;
-        return AttributeEntryFrom(before, cluster->attributes[next_idx]);
-    }
-
-    // iteration complete
-    return DataModel::AttributeEntry::kInvalid;
-}
-
-std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeInfo(const ConcreteAttributePath & path)
-{
-    const EmberAfCluster * cluster = FindServerCluster(path);
-
-    VerifyOrReturnValue(cluster != nullptr, std::nullopt);
-    VerifyOrReturnValue(cluster->attributeCount > 0, std::nullopt);
-    VerifyOrReturnValue(cluster->attributes != nullptr, std::nullopt);
-
-    std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, path.mAttributeId);
-
-    if (!attribute_idx.has_value())
-    {
-        return std::nullopt;
-    }
-
-    DataModel::AttributeInfo info;
-    LoadAttributeInfo(path, cluster->attributes[*attribute_idx], &info);
-    return std::make_optional(info);
-}
-
-DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const ConcreteClusterPath & path)
-{
-    EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateAcceptedCommands);
-
-    CommandId commandId =
-        FindCommand(ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId), handlerFinder,
-                    detail::EnumeratorCommandFinder::Operation::kFindFirst, mAcceptedCommandsIterator, AcceptedCommands);
-
-    VerifyOrReturnValue(commandId != kInvalidCommandId, DataModel::CommandEntry::kInvalid);
-    return CommandEntryFrom(path, commandId);
-}
-
-DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const ConcreteCommandPath & before)
-{
-
-    EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateAcceptedCommands);
-    CommandId commandId = FindCommand(before, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindNext,
-                                      mAcceptedCommandsIterator, AcceptedCommands);
-
-    VerifyOrReturnValue(commandId != kInvalidCommandId, DataModel::CommandEntry::kInvalid);
-    return CommandEntryFrom(before, commandId);
-}
-
-std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
-{
-
-    EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateAcceptedCommands);
-    CommandId commandId = FindCommand(path, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindExact,
-                                      mAcceptedCommandsIterator, AcceptedCommands);
-
-    VerifyOrReturnValue(commandId != kInvalidCommandId, std::nullopt);
-    return CommandEntryFrom(path, commandId).info;
 }
 
 std::unique_ptr<DataModel::ElementIterator<CommandId>>
@@ -879,7 +718,7 @@ CodegenDataModelProvider::GetGeneratedCommands(ConcreteClusterPath clusterPath)
             data.index   = 0;
             data.maxSize = commandCount;
 
-            if (!data.commands.Alloc(commandCount))
+            if (!data.commands.Alloc(commandCount + 1)) // +1 for the final terminator
             {
                 ChipLogError(DataManagement, "Out of memory reading generated commands");
                 return std::make_unique<GeneratedCommandsIterator>(nullptr);
@@ -910,7 +749,8 @@ CodegenDataModelProvider::GetGeneratedCommands(ConcreteClusterPath clusterPath)
                 return std::make_unique<GeneratedCommandsIterator>(nullptr);
             }
 
-            return std::make_unique<AllocatedGeneratedCommandsIterator>(data.commands.Release(), data.maxSize);
+            data.commands[data.index] = kInvalidCommandId;
+            return std::make_unique<AllocatedGeneratedCommandsIterator>(data.commands.Release());
         }
 
         if (err != CHIP_ERROR_NOT_IMPLEMENTED)
@@ -924,6 +764,87 @@ CodegenDataModelProvider::GetGeneratedCommands(ConcreteClusterPath clusterPath)
     VerifyOrReturnValue(cluster != nullptr, std::make_unique<GeneratedCommandsIterator>(nullptr));
 
     return std::make_unique<GeneratedCommandsIterator>(cluster->generatedCommandList);
+}
+
+std::unique_ptr<DataModel::MetaDataIterator<CommandId, DataModel::CommandInfo>>
+CodegenDataModelProvider::GetAcceptedCommands(ConcreteClusterPath clusterPath)
+{
+    // we should FIND the handler and allocate things (if needed)
+    // OR return metadata items
+    CommandHandlerInterface * interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(clusterPath.mEndpointId, clusterPath.mClusterId);
+
+    if (interface != nullptr)
+    {
+        // maybe we have actual generated commands here ...
+        size_t commandCount = 0;
+        CHIP_ERROR err      = interface->EnumerateAcceptedCommands(
+            clusterPath,
+            [](CommandId commandId, void * context) -> Loop {
+                (*reinterpret_cast<size_t *>(context))++;
+                return Loop::Continue;
+            },
+            reinterpret_cast<void *>(&commandCount));
+
+        if (err == CHIP_NO_ERROR)
+        {
+            typedef struct
+            {
+                Platform::ScopedMemoryBuffer<CommandId> commands;
+                size_t index;
+                size_t maxSize;
+            } FetchData;
+
+            FetchData data;
+            data.index   = 0;
+            data.maxSize = commandCount;
+
+            if (!data.commands.Alloc(commandCount + 1)) // +1 for the terminator
+            {
+                ChipLogError(DataManagement, "Out of memory reading generated commands");
+                return std::make_unique<AcceptedCommandsIterator>(clusterPath, nullptr);
+            }
+
+            err = interface->EnumerateAcceptedCommands(
+                clusterPath,
+                [](CommandId commandId, void * context) -> Loop {
+                    auto fetchData = reinterpret_cast<FetchData *>(context);
+                    if (fetchData->index < fetchData->maxSize)
+                    {
+                        fetchData->commands[fetchData->index] = commandId;
+                    }
+                    fetchData->index++;
+                    return Loop::Continue;
+                },
+                reinterpret_cast<void *>(&data));
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "Error fetching commands from CHI");
+                return std::make_unique<AcceptedCommandsIterator>(clusterPath, nullptr);
+            }
+
+            if (data.index != data.maxSize)
+            {
+                ChipLogError(DataManagement, "Command size mismatch: command list is not deterministic");
+                return std::make_unique<AcceptedCommandsIterator>(clusterPath, nullptr);
+            }
+
+            data.commands[data.index] = kInvalidCommandId;
+            return std::make_unique<AllocatedAcceptedCommandsIterator>(clusterPath, data.commands.Release());
+        }
+
+        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            // hard failure, we cannot return anything
+            return std::make_unique<AcceptedCommandsIterator>(clusterPath, nullptr);
+        }
+    }
+
+    const EmberAfCluster * cluster = FindServerCluster(clusterPath);
+    VerifyOrReturnValue(cluster != nullptr, std::make_unique<AcceptedCommandsIterator>(clusterPath, nullptr));
+
+    return std::make_unique<AcceptedCommandsIterator>(clusterPath, cluster->acceptedCommandList);
 }
 
 void CodegenDataModelProvider::InitDataModelForTesting()

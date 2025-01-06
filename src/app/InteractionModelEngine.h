@@ -26,6 +26,7 @@
 #pragma once
 
 // TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
+#include "app/data-model-provider/MetadataTypes.h"
 #include <lib/core/CHIPCore.h>
 
 #include <access/AccessControl.h>
@@ -615,8 +616,9 @@ private:
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
     Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath);
-    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest);
-    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest);
+    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest,
+                              const std::optional<DataModel::CommandInfo> & aCommandMetadata);
+    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest, const DataModel::CommandInfo & aCommandMetadata);
 
     /**
      * Check if the given attribute path is a valid path in the data model provider.

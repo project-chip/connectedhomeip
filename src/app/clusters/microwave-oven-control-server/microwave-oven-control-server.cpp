@@ -16,6 +16,7 @@
  *
  */
 
+#include "app/ConcreteClusterPath.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -247,10 +248,11 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
     if (startAfterSetting.HasValue())
     {
-        ConcreteCommandPath commandPath(mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id);
+        ConcreteClusterPath clusterPath(mEndpointId, OperationalState::Id);
 
-        bool commandExists =
-            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetAcceptedCommandInfo(commandPath).has_value();
+        auto acceptedCommands = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetAcceptedCommands(clusterPath);
+        bool commandExists    = acceptedCommands->SeekTo(OperationalState::Commands::Start::Id);
+
         VerifyOrExit(
             commandExists, status = Status::InvalidCommand; ChipLogError(
                 Zcl,

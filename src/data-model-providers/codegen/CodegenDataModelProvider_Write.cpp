@@ -190,7 +190,14 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     if (request.path.mDataVersion.HasValue())
     {
-        std::optional<DataModel::ClusterInfo> clusterInfo = GetServerClusterInfo(request.path);
+        std::optional<DataModel::ClusterInfo> clusterInfo;
+
+        auto clusters = GetServerClusters(request.path.mEndpointId);
+        if (clusters->SeekTo(request.path.mClusterId))
+        {
+            clusterInfo = clusters->GetMetadata();
+        }
+
         if (!clusterInfo.has_value())
         {
             ChipLogError(DataManagement, "Unable to get cluster info for Endpoint 0x%x, Cluster " ChipLogFormatMEI,

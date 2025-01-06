@@ -17,7 +17,9 @@
 #include <app/AttributePathExpandIterator.h>
 
 #include <app/GlobalAttributes.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <optional>
 
 using namespace chip::app::DataModel;
 
@@ -45,31 +47,26 @@ bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
         break;
     }
 
-    const ConcreteAttributePath attributePath(mOutputPath.mEndpointId, mOutputPath.mClusterId, attributeId);
-    return mDataModelProvider->GetAttributeInfo(attributePath).has_value();
+    return mDataModelProvider->GetAttributes(mOutputPath)->SeekTo(attributeId);
 }
 
-std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
+std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId(SearchSession & session)
 {
     if (mOutputPath.mAttributeId == kInvalidAttributeId)
     {
-        if (mpAttributePath->mValue.HasWildcardAttributeId())
+        if (!mpAttributePath->mValue.HasWildcardAttributeId())
         {
-            AttributeEntry entry = mDataModelProvider->FirstAttribute(mOutputPath);
-            return entry.IsValid()                                         //
-                ? entry.path.mAttributeId                                  //
-                : Clusters::Globals::Attributes::GeneratedCommandList::Id; //
-        }
-
-        // We allow fixed attribute IDs if and only if they are valid:
-        //    - they may be GLOBAL attributes OR
-        //    - they are valid attributes for this cluster
-        if (IsValidAttributeId(mpAttributePath->mValue.mAttributeId))
-        {
+            // We allow fixed attribute IDs if and only if they are valid:
+            //    - they may be GLOBAL attributes OR
+            //    - they are valid attributes for this cluster
+            if (!IsValidAttributeId(mpAttributePath->mValue.mAttributeId))
+            {
+                return std::nullopt;
+            }
             return mpAttributePath->mValue.mAttributeId;
         }
 
-        return std::nullopt;
+        session.attributes = mDataModelProvider->GetAttributes(mOutputPath);
     }
 
     // advance the existing attribute id if it can be advanced
@@ -93,10 +90,10 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
         return std::nullopt;
     }
 
-    AttributeEntry entry = mDataModelProvider->NextAttribute(mOutputPath);
-    if (entry.IsValid())
+    auto id = session.attributes->Next();
+    if (id.has_value())
     {
-        return entry.path.mAttributeId;
+        return id;
     }
 
     // Finished the data model, start with global attributes
@@ -104,31 +101,22 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
     return GlobalAttributesNotInMetadata[0];
 }
 
-std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
+std::optional<ClusterId> AttributePathExpandIterator::NextClusterId(SearchSession & session)
 {
-
     if (mOutputPath.mClusterId == kInvalidClusterId)
     {
-        if (mpAttributePath->mValue.HasWildcardClusterId())
+        if (!mpAttributePath->mValue.HasWildcardClusterId())
         {
-            ClusterEntry entry = mDataModelProvider->FirstServerCluster(mOutputPath.mEndpointId);
-            return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
+            return mpAttributePath->mValue.mClusterId;
         }
 
-        // only return a cluster if it is valid
-        const ConcreteClusterPath clusterPath(mOutputPath.mEndpointId, mpAttributePath->mValue.mClusterId);
-        if (!mDataModelProvider->GetServerClusterInfo(clusterPath).has_value())
-        {
-            return std::nullopt;
-        }
-
-        return mpAttributePath->mValue.mClusterId;
+        // restart iteration over the clusters of the current endpoint
+        session.clusters = mDataModelProvider->GetServerClusters(mOutputPath.mEndpointId);
     }
 
     VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardClusterId(), std::nullopt);
 
-    ClusterEntry entry = mDataModelProvider->NextServerCluster(mOutputPath);
-    return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
+    return session.clusters->Next();
 }
 
 AttributePathExpandIterator::SearchSession AttributePathExpandIterator::PrepareSearch()
@@ -143,7 +131,40 @@ AttributePathExpandIterator::SearchSession AttributePathExpandIterator::PrepareS
         // we are already positioned on a specific endpoint, so start from there
         if (!session.endpoints->SeekTo(mOutputPath.mEndpointId))
         {
-            ChipLogError(InteractionModel, "Endpoint id %d is not valid anymore", mOutputPath.mEndpointId);
+            ChipLogError(InteractionModel, "Endpoint id " ChipLogFormatMEI " is not valid anymore",
+                         ChipLogValueMEI(mOutputPath.mEndpointId));
+        }
+    }
+
+    if (mOutputPath.mEndpointId != kInvalidEndpointId)
+    {
+        session.clusters = mDataModelProvider->GetServerClusters(mOutputPath.mEndpointId);
+        if (mOutputPath.mClusterId != kInvalidClusterId)
+        {
+            // we are already positioned on a specific cluster, so start from there
+            if (!session.clusters->SeekTo(mOutputPath.mClusterId))
+            {
+                ChipLogError(InteractionModel,
+                             "Cluster id " ChipLogFormatMEI " is not valid anymore (in endpoint " ChipLogFormatMEI ")",
+                             ChipLogValueMEI(mOutputPath.mClusterId), ChipLogValueMEI(mOutputPath.mEndpointId));
+            }
+        }
+    }
+
+    if ((mOutputPath.mEndpointId != kInvalidEndpointId) && (mOutputPath.mClusterId != kInvalidClusterId))
+    {
+        session.attributes = mDataModelProvider->GetAttributes(mOutputPath);
+        if (mOutputPath.mAttributeId != kInvalidAttributeId)
+        {
+            // we are already positioned on a specific cluster, so start from there
+            if (!session.attributes->SeekTo(mOutputPath.mAttributeId))
+            {
+                ChipLogError(InteractionModel,
+                             "Attribute id " ChipLogFormatMEI " is not valid anymore (in " ChipLogFormatMEI "/" ChipLogFormatMEI
+                             ")",
+                             ChipLogValueMEI(mOutputPath.mAttributeId), ChipLogValueMEI(mOutputPath.mEndpointId),
+                             ChipLogValueMEI(mOutputPath.mClusterId));
+            }
         }
     }
 
@@ -203,7 +224,7 @@ bool AttributePathExpandIterator::AdvanceOutputPath(SearchSession & session)
         if (mOutputPath.mClusterId != kInvalidClusterId)
         {
 
-            std::optional<AttributeId> nextAttribute = NextAttributeId();
+            std::optional<AttributeId> nextAttribute = NextAttributeId(session);
             if (nextAttribute.has_value())
             {
                 mOutputPath.mAttributeId = *nextAttribute;
@@ -214,7 +235,7 @@ bool AttributePathExpandIterator::AdvanceOutputPath(SearchSession & session)
         // no valid attribute, try to advance the cluster, see if a suitable one exists
         if (mOutputPath.mEndpointId != kInvalidEndpointId)
         {
-            std::optional<ClusterId> nextCluster = NextClusterId();
+            std::optional<ClusterId> nextCluster = NextClusterId(session);
             if (nextCluster.has_value())
             {
                 mOutputPath.mClusterId   = *nextCluster;
