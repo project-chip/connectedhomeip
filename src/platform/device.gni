@@ -158,7 +158,9 @@ if (chip_device_platform == "cc13x4_26x4") {
 } else if (chip_device_platform == "qpg") {
   _chip_device_layer = "qpg"
 } else if (chip_device_platform == "realtek_bee") {
-  _chip_device_layer = "Realtek_bee"
+  _chip_device_layer = "realtek_bee"
+} else if (chip_device_platform == "realtek_bee_zephyr") {
+  _chip_device_layer = "realtek_bee/zephyr"
 } else if (chip_device_platform == "nxp") {
   import("//build_overrides/nxp_sdk.gni")
   import("${nxp_sdk_build_root}/nxp_sdk.gni")
@@ -260,6 +262,7 @@ assert(
         chip_device_platform == "efr32" || chip_device_platform == "esp32" ||
         chip_device_platform == "external" || chip_device_platform == "linux" ||
         chip_device_platform == "tizen" || chip_device_platform == "realtek_bee" ||
+        chip_device_platform == "realtek_bee_zephyr" ||
         chip_device_platform == "nrfconnect" || chip_device_platform == "nxp" ||
         chip_device_platform == "nxp_zephyr" || chip_device_platform == "qpg" ||
         chip_device_platform == "telink" || chip_device_platform == "mbed" ||

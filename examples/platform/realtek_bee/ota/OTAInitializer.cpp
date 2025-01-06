@@ -20,7 +20,7 @@
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
-#include <platform/Realtek_bee/OTAImageProcessorImpl.h>
+#include <ota/OTAImageProcessorImpl.h>
 
 using namespace chip;
 using namespace chip::DeviceLayer;

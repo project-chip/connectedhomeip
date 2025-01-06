@@ -23,7 +23,7 @@
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/Span.h>
-#include <platform/Realtek_bee/CHIPDevicePlatformConfig.h>
+#include <platform/realtek_bee/CHIPDevicePlatformConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>

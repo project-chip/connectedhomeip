@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <platform/Realtek_bee/BeeConfig.h>
+#include <platform/realtek_bee/BeeConfig.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 

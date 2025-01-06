@@ -280,7 +280,13 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       device_layer_target_define = "REALTEK_BEE"
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_REALTEK_BEE=1",
-        "CHIP_DEVICE_LAYER_TARGET=Realtek_bee",
+        "CHIP_DEVICE_LAYER_TARGET=realtek_bee",
+      ]
+    } else if (chip_device_platform == "realtek_bee_zephyr") {
+      device_layer_target_define = "REALTEK_BEE"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_REALTEK_BEE=1",
+        "CHIP_DEVICE_LAYER_TARGET=realtek_bee/zephyr",
       ]
     } else if (chip_device_platform == "cyw30739") {
       device_layer_target_define = "CYW30739"
@@ -580,7 +586,9 @@ if (chip_device_platform != "none") {
     } else if (chip_device_platform == "ameba") {
       _platform_target = "Ameba"
     } else if (chip_device_platform == "realtek_bee") {
-      _platform_target = "Realtek_bee"
+      _platform_target = "realtek_bee"
+    } else if (chip_device_platform == "realtek_bee_zephyr") {
+      _platform_target = "realtek_bee/zephyr:realtek_bee_zephyr"
     } else if (chip_device_platform == "webos") {
       _platform_target = "webos"
     } else if (chip_device_platform == "bl602") {

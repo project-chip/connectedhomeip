@@ -1,0 +1,122 @@
+/ {
+	chosen {
+		zephyr,ieee802154 = &ieee802154;
+		zephyr,code-partition = &app_partition_0;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		led0: led_0 {
+			gpios = <&gpioa 1 GPIO_ACTIVE_HIGH>;
+			label = "Green LED 0";
+		};
+		led1: led_1 {
+			gpios = <&gpioa 2 GPIO_ACTIVE_HIGH>;
+			label = "Green LED 1";
+		};
+	};
+
+    buttons {
+		compatible = "gpio-keys";
+		button0: button_0 {
+			gpios = <&gpiob 5 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "Push button switch 0";
+		};
+		button1: button_1 {
+			gpios = <&gpiob 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "Push button switch 1";
+		};
+		button2: button_2 {
+			gpios = <&gpioa 25 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "Push button switch 2";
+		};
+		button3: button_3 {
+			gpios = <&gpioa 24 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "Push button switch 3";
+		};
+        button4: button_4 {
+			gpios = <&gpiob 2 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "Push button switch 3";
+		};
+    };
+
+	/* These aliases are provided for compatibility with samples */
+	aliases {
+		led0 = &led0;
+		led1 = &led1;
+        sw0 = &button0;
+		sw1 = &button1;
+		sw2 = &button2;
+		sw3 = &button3;
+        sw4 = &button4;
+	};
+
+	tcm {
+		/delete-node/ memory@100c00;
+		/delete-node/ memory@119c00;
+		/delete-node/ memory@133c00;
+
+		ram_data: memory@100c00 {
+			device_type = "ram data region";
+			reg = <0x100c00 0x2DC00>;
+		};
+		ram_code: memory@12E800 {
+			device_type = "ram code region";
+			compatible = "zephyr,memory-region", "arm,itcm";
+			reg = <0x12E800 0x9800>;
+			zephyr,memory-region = "ITCM";
+		};
+		heap: memory@138000 {
+			device_type = "heap region";
+			reg = <0x138000 0x4C00>;
+		};
+	};
+};
+
+&gpioa {
+	status = "okay";
+};
+
+&gpiob {
+	status = "okay";
+};
+
+&flash {
+    reg = <0x4000000 DT_SIZE_M(4)>;
+	partitions {
+		/delete-node/ partition@2d000;
+		/delete-node/ partition@94000;
+		/delete-node/ partition@fc000;
+
+		app_partition_0: partition@2d000 {
+			label = "app-image";
+			reg = <0x2D000 DT_SIZE_K(1024)>;
+		};
+		/* Bank 1 */
+        ota_header_1: partition@12d000 {
+			label = "ota-header-1-image";
+			reg = <0x12D000 DT_SIZE_K(4)>;
+		};
+		system_patch_1: partition@12e000 {
+			label = "system-patch-1-image";
+			reg = <0x12E000 DT_SIZE_K(32)>;
+		};
+		stack_patch_1: partition@1360000 {
+			label = "stack-patch-1-image";
+			reg = <0x1360000 DT_SIZE_K(72)>;
+		};
+		app_partition_1: partition@148000 {
+			label = "app-image-1";
+			reg = <0x148000 DT_SIZE_K(1024)>;
+		};
+		/* storage */
+		storage_partition: partition@248000 {
+			label = "storage";
+			reg = <0x248000 DT_SIZE_K(32)>;
+		};
+	};
+};
+
+&ieee802154 {
+	status = "okay";
+};

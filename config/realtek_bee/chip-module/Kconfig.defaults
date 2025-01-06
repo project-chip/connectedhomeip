@@ -1,0 +1,299 @@
+#
+#   Copyright (c) 2023 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# The purpose of this file is to define new default values of settings used when building Matter samples.
+# This file only changes defaults and thus all symbols here must be promptless
+# and safeguarded so that they only are applied when building Matter.
+
+if CHIP
+
+config LOG
+    default y
+
+if LOG
+
+choice LOG_MODE
+    default LOG_MODE_MINIMAL
+endchoice
+
+choice MATTER_LOG_LEVEL_CHOICE
+    default MATTER_LOG_LEVEL_DBG
+endchoice
+
+config CHIP_APP_LOG_LEVEL
+    default 4 # info
+
+config LOG_DEFAULT_LEVEL
+    default 1 # error
+
+config CHIP_LOG_SIZE_OPTIMIZATION
+    default y
+
+endif
+
+config PRINTK_SYNC
+	default y
+
+config ASSERT
+    default n
+
+config ASSERT_NO_COND_INFO
+    default n
+
+config ASSERT_NO_MSG_INFO
+    default n
+
+config HW_STACK_PROTECTION
+    default y
+
+config SHELL
+    default y if CHIP_LIB_SHELL
+
+config PTHREAD_IPC
+    bool
+    default n
+
+config POSIX_MAX_FDS
+    int
+    default 16
+
+choice LIBC_IMPLEMENTATION
+	default NEWLIB_LIBC
+endchoice
+
+# Application stack size
+config MAIN_STACK_SIZE
+    default 8192
+
+config INIT_STACKS
+    default y
+
+config SYSTEM_WORKQUEUE_STACK_SIZE
+    default 2048
+
+config HEAP_MEM_POOL_SIZE
+    default 1024
+
+config CHIP_MALLOC_SYS_HEAP_SIZE
+    default 8192 if NET_L2_OPENTHREAD
+
+config COMMON_LIBC_MALLOC_ARENA_SIZE
+    default 8192
+
+config NET_IPV6_MLD
+    default y
+
+# Network buffers
+config NET_PKT_RX_COUNT
+    default 8
+
+config NET_PKT_TX_COUNT
+    default 8
+
+config NET_BUF_RX_COUNT
+    default 32
+
+config NET_BUF_TX_COUNT
+    default 32
+
+config GPIO
+    default y
+
+# Bluetooth Low Energy configs
+
+config BT
+    default y
+
+config BT_PERIPHERAL
+    default y
+
+config BT_GATT_DYNAMIC_DB
+    default y
+
+config BT_DEVICE_NAME_DYNAMIC
+    default y
+
+config BT_DEVICE_NAME_MAX
+    default 15
+
+config BT_MAX_CONN
+    default 1
+
+config BT_L2CAP_TX_MTU
+    default 247
+
+config BT_BUF_ACL_RX_SIZE
+    default 251
+
+config BT_BUF_ACL_TX_SIZE
+    default 251
+
+config BT_RX_STACK_SIZE
+    default 2200
+
+config BT_HCI_TX_STACK_SIZE
+    default 1024
+
+config BT_DEVICE_NAME_GATT_WRITABLE
+    bool
+    default n
+
+# Config dynamic interrupts to have posibility to switch between BLE/Thread radio drivers
+config DYNAMIC_INTERRUPTS
+    default y
+
+config CHIP_OTA_REQUESTOR
+    default y
+
+# In current config/zephyr/Kconfig
+# next deprecated values are selected
+# warning: Deprecated symbol CPLUSPLUS is enabled.
+# warning: Deprecated symbol LIB_CPLUSPLUS is enabled.
+# new one are:
+# CONFIG_CPP
+# CONFIG_LIBCPP_IMPLEMENTATION
+# See https://docs.zephyrproject.org/latest/releases/release-notes-3.3.html
+# Since not only Telink is using Zephyr just suppress warnings
+config WARN_DEPRECATED
+    default n
+
+config NVS_LOOKUP_CACHE
+    default y
+
+config NVS_LOOKUP_CACHE_SIZE
+    default 512
+
+# Set multiplicator of Name Value Storage (NVS) as 1 to reach NVS sector size 4KB
+# nvs_sector_size = flash_page_size * mult = 4KB * 1 = 4KB
+config SETTINGS_NVS_SECTOR_SIZE_MULT
+    default 1
+
+# Set sector counter of NVS
+config SETTINGS_NVS_SECTOR_COUNT
+    default 8
+
+# Enable OpenThread
+
+config NET_L2_OPENTHREAD
+    default y
+
+choice CHIP_THREAD_DEVICE_ROLE
+    prompt "Thread network device role"
+    default CHIP_THREAD_DEVICE_ROLE_ROUTER
+config CHIP_THREAD_DEVICE_ROLE_ROUTER
+	depends on !PM
+	bool "thread device router"
+config CHIP_THREAD_DEVICE_ROLE_END_DEVICE
+	depends on !PM
+	bool "thread end device"
+config CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
+	bool "thread sleepy end device"
+endchoice
+
+choice OPENTHREAD_DEVICE_TYPE
+	default OPENTHREAD_FTD if CHIP_THREAD_DEVICE_ROLE_ROUTER
+	default OPENTHREAD_MTD if CHIP_THREAD_DEVICE_ROLE_END_DEVICE || CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
+endchoice
+
+config CHIP_ENABLE_ICD_SUPPORT
+	default y if CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
+
+config OPENTHREAD_SLAAC
+    default y
+
+config OPENTHREAD_MANUAL_START
+    default y
+
+# Disable certain parts of Zephyr IPv6 stack
+config NET_IPV6_NBR_CACHE
+    bool
+    default n
+
+config NET_MAX_CONN
+    default 1
+
+config NET_MAX_CONTEXTS
+    default 1
+
+config NET_CONFIG_INIT_TIMEOUT
+    default 0
+
+# Configure MBEDTLS lib
+config MBEDTLS_USER_CONFIG_ENABLE
+    default y
+
+config MBEDTLS_USER_CONFIG_FILE
+    default "bee4-mbedtls-config.h"
+
+config MBEDTLS_ZEPHYR_ENTROPY
+	default y
+
+config MBEDTLS_ENABLE_HEAP
+	default y
+
+config MBEDTLS_HEAP_SIZE
+	default 8192
+
+config MBEDTLS_ECP_C
+    default y
+
+
+# getopt version
+config GETOPT_LONG
+    default y
+
+# Disable not used shell modules
+
+config SHELL_WILDCARD
+    default n
+
+config SHELL_VT100_COLORS
+    default n
+
+config SHELL_STATS
+    default n
+
+config KERNEL_SHELL
+    default n
+
+config SENSOR_SHELL
+    default n
+
+config DEVICE_SHELL
+    default n
+
+config DATE_SHELL
+    default n
+
+config DEVMEM_SHELL
+    default n
+
+config MCUBOOT_SHELL
+    default n
+
+config FLASH_SHELL
+    default n
+
+config HWINFO_SHELL
+    default n
+
+config PWM_SHELL
+    default n
+
+config OPENTHREAD_SHELL
+    default n
+
+endif

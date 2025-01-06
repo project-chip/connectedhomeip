@@ -29,7 +29,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <core/ErrorStr.h>
-#include <platform/Realtek_bee/FactoryDataProvider.h>
+#include <platform/realtek_bee/FactoryDataProvider.h>
 
 #include "Globals.h"
 
