@@ -77,9 +77,9 @@ extern "C" {
 #include "sl_si91x_power_manager.h"
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 
-// Temmporary work-around for wifi-init failure in ACX modules with WiseConnect v3.3.3. This can be removed after integrating with
-// WiseConnect v3.4.0
-#if (SL_SI91X_ACX_MODULE == 1)
+// TODO : Temporary work-around for wifi-init failure in 917NCP and 917SOC ACX module boards.
+// Can be removed after Wiseconnect fixes region code for all ACX module boards.
+#if (SL_SI91X_ACX_MODULE == 1) || defined(EXP_BOARD)
 #define REGION_CODE IGNORE_REGION
 #else
 #define REGION_CODE US
