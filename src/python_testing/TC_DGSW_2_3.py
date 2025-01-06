@@ -122,7 +122,7 @@ class TC_DGSW_2_3(MatterBaseTest):
 
         # STEP 4: TH reads from the DUT the CurrentHeapHighWatermark attribute
         self.step(4)
-        if self.pics_guard(Clusters.SoftwareDiagnostics.Attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
+        if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
             high_watermark_original = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
             asserts.assert_true(self.is_valid_uint64_value(high_watermark_original),
                                 "CurrentHeapHighWatermark field should be a uint64 type")
