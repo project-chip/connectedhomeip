@@ -236,7 +236,7 @@ CHIP_ERROR PairingSession::DecodeSessionParametersIfPresent(TLV::Tag expectedTag
 
     // Future proofing - Don't error out if there are other tags
 exit:
-    if (err == CHIP_END_OF_TLV)
+    if (err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR)
     {
         return tlvReader.ExitContainer(containerType);
     }
