@@ -169,7 +169,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal({0}, read_request.keys(), "Endpoint 0 not in output")
         asserts.assert_equal({Clusters.Descriptor}, read_request[0].keys(), "Descriptor cluster not in output")
         # asserts.assert_equal(sorted(attribute_ids), sorted(returned_attributes), "Expected attribute list doesn't match")
-        
+
         # Step 2
         # TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint
         # AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID]]
@@ -274,7 +274,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             standard_clusters = [x for x in endpoint_clusters if global_attribute_ids.cluster_id_type(x)
                                  == global_attribute_ids.ClusterIdType.kStandard]
             returned_clusters.extend(standard_clusters)
-            asserts.assert_in(Clusters.Objects.Descriptor, read_request.attributes[endpoint].keys(), "Descriptor cluster not in output")
+            asserts.assert_in(Clusters.Objects.Descriptor,
+                              read_request.attributes[endpoint].keys(), "Descriptor cluster not in output")
             asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList,
                               read_request.attributes[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
         for endpoint in read_request.tlvAttributes:
@@ -285,7 +286,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 asserts.assert_true(
                     set([int(x) for x in global_attribute_ids.GlobalAttributeIds]).issubset(
                         set(read_request.tlvAttributes[endpoint][cluster][global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID])),
-                        "Missing global attributes in output")
+                    "Missing global attributes in output")
 
         # Step 7
         # TH sends the Read Request Message to the DUT to read all attributes from a cluster at all Endpoints
