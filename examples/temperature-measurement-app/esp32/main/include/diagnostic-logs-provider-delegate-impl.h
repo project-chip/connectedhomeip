@@ -28,7 +28,7 @@
 
 #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorageManager.h>
-extern chip::Tracing::Diagnostics::CircularDiagnosticBuffer diagnosticStorage;
+using namespace chip::Tracing::Diagnostics;
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 namespace chip {
@@ -45,7 +45,16 @@ namespace DiagnosticLogs {
 class LogProvider : public DiagnosticLogsProviderDelegate
 {
 public:
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    static inline LogProvider & GetInstance(CircularDiagnosticBuffer * bufferInstance)
+    {
+        VerifyOrReturnValue(bufferInstance != nullptr, sInstance);
+        sInstance.mStorageInstance = bufferInstance;
+        return sInstance;
+    }
+#else
     static inline LogProvider & GetInstance() { return sInstance; }
+#endif
 
     /////////// DiagnosticLogsProviderDelegate Interface /////////
     CHIP_ERROR StartLogCollection(IntentEnum intent, LogSessionHandle & outHandle, Optional<uint64_t> & outTimeStamp,
@@ -63,6 +72,10 @@ private:
 
     LogProvider(const LogProvider &)             = delete;
     LogProvider & operator=(const LogProvider &) = delete;
+
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    CircularDiagnosticBuffer * mStorageInstance = nullptr;
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
     struct CrashLogContext
     {

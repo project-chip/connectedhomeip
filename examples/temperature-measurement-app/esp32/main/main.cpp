@@ -144,6 +144,10 @@ extern "C" void app_main()
 using namespace chip::app::Clusters::DiagnosticLogs;
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    auto & logProvider = LogProvider::GetInstance(&diagnosticStorage);
+#else
     auto & logProvider = LogProvider::GetInstance();
+#endif
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
