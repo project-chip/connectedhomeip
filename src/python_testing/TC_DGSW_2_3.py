@@ -129,7 +129,7 @@ class TC_DGSW_2_3(MatterBaseTest):
 
         # STEP 5: TH reads from the DUT the CurrentHeapUsed attribute
         self.step(5)
-        if self.pics_guard(Clusters.SoftwareDiagnostics.Attributes.CurrentHeapUsed.attribute_id in attribute_list):
+        if self.pics_guard(attributes.CurrentHeapUsed.attribute_id in attribute_list):
             current_heap_used_original = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
             asserts.assert_true(self.is_valid_uint64_value(current_heap_used_original),
                                 "CurrentHeapUsed field should be a uint64 type")
