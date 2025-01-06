@@ -638,10 +638,10 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     lPacket->alloc_size = lAllocSize;
 #endif
     // Set current packet and chained buffers' length and total length to 0
-    for (PacketBuffer *pktBuf = lPacket; pktBuf != nullptr; pktBuf = pktBuf->ChainedBuffer())
+    for (PacketBuffer * pktBuf = lPacket; pktBuf != nullptr; pktBuf = pktBuf->ChainedBuffer())
     {
         pktBuf->len = pktBuf->tot_len = 0;
-        pktBuf->ref = 1;
+        pktBuf->ref                   = 1;
     }
 
     return PacketBufferHandle(lPacket);
@@ -662,8 +662,8 @@ PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aD
 #else
         buffer.mBuffer->tot_len = aDataSize;
 #endif
-        PacketBuffer *currentBuffer = buffer.mBuffer;
-        const uint8_t *dataPtr = static_cast<const uint8_t *>(aData);
+        PacketBuffer * currentBuffer = buffer.mBuffer;
+        const uint8_t * dataPtr      = static_cast<const uint8_t *>(aData);
         while (aDataSize > 0)
         {
             size_t copyLen = currentBuffer->MaxDataLength() > aDataSize ? aDataSize : currentBuffer->MaxDataLength();
