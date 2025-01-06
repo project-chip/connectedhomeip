@@ -60,7 +60,6 @@ public:
      */
     const ICDClientInfo & GetICDClientInfo();
 
-
 private:
     // CASE session callbacks
     /**
