@@ -667,7 +667,7 @@ PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aD
         while (aDataSize > 0)
         {
             size_t copyLen = currentBuffer->MaxDataLength() > aDataSize ? aDataSize : currentBuffer->MaxDataLength();
-            memcpy(currentBuffer->payload, aData, copyLen);
+            memcpy(currentBuffer->payload, dataPtr, copyLen);
             aDataSize -= copyLen;
             dataPtr += copyLen;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
