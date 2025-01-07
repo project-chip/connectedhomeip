@@ -4,9 +4,8 @@ tests that can be flashed onto a device and run. The device is controlled using
 the included RPCs through the python test runner.
 
 -   [Prerequisites](#prerequisites)
--   [Building the Unit Tests](#building-the-unit-tests)
--   [Building and Installing the Runner](#building-and-installing-the-runner)
--   [Running the Unit Tests](#running-the-unit-tests)
+-   [Building and Running the Unit Tests](#building-and-running-the-unit-tests)
+-   [Building and Running the Unit Tests with the build_examples Script](#building-and-running-the-unit-tests-with-the-build_examples-script)
 
 ## Prerequisites
 
@@ -37,9 +36,11 @@ the included RPCs through the python test runner.
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
-## Building the Unit Tests
+## Building and Running the Unit Tests
 
-The unit tests can be built using gn and ninja:
+### Building the Unit Tests
+
+The unit tests can be built using gn and ninja. Set the appropriate board name.
 
     source scripts/activate.sh
     cd src/test_driver/efr32
@@ -47,15 +48,36 @@ The unit tests can be built using gn and ninja:
     gn gen out/debug
     ninja -C out/debug
 
-## Building and Installing the Runner
+### Building and Installing the Runner
 
 The python wheels for the runner can be built and installed like this:
 
     ninja -C out/debug runner
     pip3 install out/debug/chip_pw_test_runner_wheels/*.whl --force-reinstall
 
-## Running the Unit Tests
+### Running the Unit Tests
 
 The unit tests can be run using the test runner python script:
 
     python -m py.pw_test_runner.pw_test_runner -d /dev/ttyACM1 -f out/debug/tests -o out.log
+
+## Building and Running the Unit Tests with the build_examples Script
+
+### Building the Unit Tests
+
+The unit tests can be built using the build_examples script. Set the appropriate board name.
+
+    scripts/build/build_examples.py --target efr32-brd2703a-unit-test build
+
+### Building and Installing the Runner
+
+The python wheels for the runner can be built and installed like this:
+
+    scripts/build/build_examples.py --target linux-x64-efr32-test-runner build
+    pip3 install out/linux-x64-efr32-test-runner/chip_pw_test_runner_wheels/*.whl --force-reinstall
+
+### Running the Unit Tests
+
+The unit tests can be run using the test runner python script:
+
+    python -m src.test_driver.efr32.py.pw_test_runner.pw_test_runner -d /dev/ttyACM1 -f out/efr32-brd2703a-unit-test/tests -o out.log
