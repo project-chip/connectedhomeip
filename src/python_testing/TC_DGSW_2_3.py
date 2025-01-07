@@ -64,14 +64,7 @@ class TC_DGSW_2_3(MatterBaseTest):
     async def send_reset_watermarks_command(self):
         endpoint = 0
         diags_cluster = Clusters.Objects.SoftwareDiagnostics
-
-        try:
-            response = await self.send_single_cmd(cmd=diags_cluster.Commands.ResetWatermarks(), endpoint=endpoint)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
-
-        return response
+        return await self.send_single_cmd(cmd=diags_cluster.Commands.ResetWatermarks(), endpoint=endpoint)
 
     def desc_TC_DGSW_2_3(self) -> str:
         """Returns a description of this test"""
