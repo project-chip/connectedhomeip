@@ -163,6 +163,15 @@ source_set("valve-configuration-and-control-test-srcs") {
     "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-matter-context.cpp",
     "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-matter-context.h",
   ]
+  public_deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
+}
+
 source_set("ecosystem-information-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.cpp",
@@ -172,7 +181,6 @@ source_set("ecosystem-information-test-srcs") {
     "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/platform",
   ]
 }
 
