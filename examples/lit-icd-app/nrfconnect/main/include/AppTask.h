@@ -56,6 +56,9 @@ private:
     static void FunctionTimerEventHandler(const AppEvent & event);
     static void FunctionHandler(const AppEvent & event);
     static void StartBLEAdvertisementHandler(const AppEvent & event);
+#ifdef CONFIG_CHIP_ICD_DSLS_SUPPORT
+    static void IcdDslsEventHandler(const AppEvent & event);
+#endif
     static void IcdUatEventHandler(const AppEvent & event);
     static void UpdateLedStateEventHandler(const AppEvent & event);
 

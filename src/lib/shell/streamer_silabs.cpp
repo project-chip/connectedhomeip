@@ -47,7 +47,13 @@ ssize_t streamer_efr_read(streamer_t * streamer, char * buffer, size_t length)
 ssize_t streamer_efr_write(streamer_t * streamer, const char * buffer, size_t length)
 {
     (void) streamer;
-    return uartConsoleWrite(buffer, (uint16_t) length);
+    int16_t bytesWritten = uartConsoleWrite(buffer, (uint16_t) length);
+    if (bytesWritten < 0) // The Write failed
+    {
+        bytesWritten = 0;
+    }
+
+    return bytesWritten;
 }
 
 static streamer_t streamer_efr = {

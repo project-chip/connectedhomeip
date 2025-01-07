@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+import("${chip_root}/config/recommended.gni")
+
 declare_args() {
   # Temporary flag for interaction model and echo protocols, set it to true to enable
   chip_app_use_echo = false
@@ -22,13 +25,14 @@ declare_args() {
   # communicated to OperationalSessionSetup API consumers.
   chip_enable_busy_handling_for_operational_session_setup = true
 
-  # Data model interface usage:
-  #   - disabled: does not use data model interface at all
-  #   - check:    runs BOTH datamodel and non-data-model (if possible) functionality and compares results
-  #   - enabled:  runs only the data model interface (does not use the legacy code)
-  if (current_os == "linux") {
-    chip_use_data_model_interface = "check"
-  } else {
-    chip_use_data_model_interface = "disabled"
-  }
+  # Controls whether the device commissioning process requires the user to
+  # acknowledge terms and conditions during commissioning.
+  chip_terms_and_conditions_required = false
+
+  # This controls if more logging is supposed to be enabled into the data models.
+  # This is an optimization for small-flash size devices as extra logging requires
+  # additional flash for messages & code for formatting.
+  chip_data_model_extra_logging =
+      current_os == "linux" || current_os == "ios" || current_os == "mac" ||
+      current_os == "android"
 }

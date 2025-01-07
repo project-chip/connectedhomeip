@@ -7,7 +7,7 @@ for Raspberry Pi Desktop 20.10 (aarch64)**
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
-[README document](../../../docs/guides/nxp/nxp_imx8m_linux_examples.md) for
+[README document](../../../docs/platforms/nxp/nxp_imx8m_linux_examples.md) for
 details.
 
 <hr>
@@ -127,11 +127,6 @@ details.
 
 -   To use the chip-rpc console after it has been installed run:
     `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
-
--   Then you can Get and Set the light using the RPCs:
-    `rpcs.chip.rpc.Lighting.Get()`
-
-    `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
 
 ## Device Tracing
 

@@ -18,23 +18,57 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# TODO: Skip CI for now, we don't have any way to run this. Needs setup. See test_TC_CCTRL.py
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: examples/fabric-admin/scripts/fabric-sync-app.py
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
 import logging
 import os
 import random
-import signal
-import subprocess
+import tempfile
 import time
-import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                    per_endpoint_test)
+from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
+                                         run_if_endpoint_matches)
 from mobly import asserts
 
 
@@ -43,22 +77,34 @@ class TC_CCTRL_2_3(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        self.app_process = None
-        app = self.user_params.get("th_server_app_path", None)
-        if not app:
-            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
 
-        self.kvs = f'kvs_{str(uuid.uuid4())}'
-        self.port = 5543
-        discriminator = random.randint(0, 4095)
-        passcode = 20202021
-        app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs}'
-        cmd = f'{app} {app_args}'
-        # TODO: Determine if we want these logs cooked or pushed to somewhere else
-        logging.info("Starting TH_SERVER")
-        self.app_process = subprocess.Popen(cmd, bufsize=0, shell=True)
-        logging.info("TH_SERVER started")
-        time.sleep(3)
+        self.th_server = None
+        self.storage = None
+
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        if not th_server_app:
+            asserts.fail("This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>")
+        if not os.path.exists(th_server_app):
+            asserts.fail(f"The path {th_server_app} does not exist")
+
+        # Create a temporary storage directory for keeping KVS files.
+        self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
+        logging.info("Temporary storage directory: %s", self.storage.name)
+
+        self.th_server_port = 5543
+        self.th_server_discriminator = random.randint(0, 4095)
+        self.th_server_passcode = 20202021
+
+        # Start the TH_SERVER app.
+        self.th_server = AppServerSubprocess(
+            th_server_app,
+            storage_dir=self.storage.name,
+            port=self.th_server_port,
+            discriminator=self.th_server_discriminator,
+            passcode=self.th_server_passcode)
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
         logging.info("Commissioning from separate fabric")
 
@@ -68,20 +114,18 @@ class TC_CCTRL_2_3(MatterBaseTest):
         paa_path = str(self.matter_test_config.paa_trust_store_path)
         self.TH_server_controller = new_fabric_admin.NewController(nodeId=112233, paaTrustStorePath=paa_path)
         self.server_nodeid = 1111
-        await self.TH_server_controller.CommissionOnNetwork(nodeId=self.server_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+        await self.TH_server_controller.CommissionOnNetwork(
+            nodeId=self.server_nodeid,
+            setupPinCode=self.th_server_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.th_server_discriminator)
         logging.info("Commissioning TH_SERVER complete")
 
     def teardown_class(self):
-        # In case the th_server_app_path does not exist, then we failed the test
-        # and there is nothing to remove
-        if self.app_process is not None:
-            logging.warning("Stopping app with SIGTERM")
-            self.app_process.send_signal(signal.SIGTERM.value)
-            self.app_process.wait()
-
-            if os.path.exists(self.kvs):
-                os.remove(self.kvs)
-
+        if self.th_server is not None:
+            self.th_server.terminate()
+        if self.storage is not None:
+            self.storage.cleanup()
         super().teardown_class()
 
     def steps_TC_CCTRL_2_3(self) -> list[TestStep]:
@@ -95,14 +139,18 @@ class TC_CCTRL_2_3(MatterBaseTest):
                  TestStep(8, "Send CommissionNode command to DUT with CASE session, with valid parameters"),
                  TestStep(9, "Send another CommissionNode command to DUT with CASE session, with with same RequestId as the previous one"),
                  TestStep(10, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster sent to TH_SERVER"),
-                 TestStep(11, "Wait for DUT to successfully commission TH_SERVER, 30 seconds"),
-                 TestStep(12, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER")]
+                 TestStep(11, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER (up to 30 seconds)")]
 
         return steps
 
-    @per_endpoint_test(has_cluster(Clusters.CommissionerControl))
+    # This test has some manual steps and one sleep for up to 30 seconds. Test typically
+    # runs under 1 mins, so 3 minutes is more than enough.
+    @property
+    def default_timeout(self) -> int:
+        return 3*60
+
+    @run_if_endpoint_matches(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_3(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         self.step(1)
         th_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
@@ -116,11 +164,11 @@ class TC_CCTRL_2_3(MatterBaseTest):
         self.step(4)
         good_request_id = 0x1234567812345678
         cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
-            requestId=good_request_id, vendorId=th_server_vid, productId=th_server_pid, label="Test Ecosystem")
+            requestID=good_request_id, vendorID=th_server_vid, productID=th_server_pid, label="Test Ecosystem")
         await self.send_single_cmd(cmd=cmd)
 
         self.step(5)
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Approve Commissioning approval request using manufacturer specified mechanism")
 
         self.step(6)
@@ -128,13 +176,13 @@ class TC_CCTRL_2_3(MatterBaseTest):
         events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
         asserts.assert_equal(len(events), 1, "Unexpected event list len")
         asserts.assert_equal(events[0].Data.statusCode, 0, "Unexpected status code")
-        asserts.assert_equal(events[0].Data.clientNodeId,
+        asserts.assert_equal(events[0].Data.clientNodeID,
                              self.matter_test_config.controller_node_id, "Unexpected client node id")
-        asserts.assert_equal(events[0].Data.requestId, good_request_id, "Unexpected request ID")
+        asserts.assert_equal(events[0].Data.requestID, good_request_id, "Unexpected request ID")
 
         self.step(7)
         cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
-            requestId=good_request_id, vendorId=th_server_vid, productId=th_server_pid)
+            requestID=good_request_id, vendorID=th_server_vid, productID=th_server_pid)
         try:
             await self.send_single_cmd(cmd=cmd)
             asserts.fail("Unexpected success on CommissionNode")
@@ -142,13 +190,13 @@ class TC_CCTRL_2_3(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Failure, "Incorrect error returned")
 
         self.step(8)
-        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
+        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestID=good_request_id, responseTimeoutSeconds=30)
         resp = await self.send_single_cmd(cmd)
         asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow,
                              "Incorrect response type")
 
         self.step(9)
-        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
+        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestID=good_request_id, responseTimeoutSeconds=30)
         try:
             await self.send_single_cmd(cmd=cmd)
             asserts.fail("Unexpected success on CommissionNode")
@@ -164,11 +212,23 @@ class TC_CCTRL_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
 
         self.step(11)
-        time.sleep(30)
+        max_wait_time_sec = 30
+        start_time = time.time()
+        elapsed = 0
+        time_remaining = max_wait_time_sec
+        previous_number_th_server_fabrics = len(th_server_fabrics)
 
-        self.step(12)
-        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
-        asserts.assert_equal(len(th_server_fabrics) + 1, len(th_server_fabrics_new),
+        th_server_fabrics_new = None
+        while time_remaining > 0:
+            time.sleep(2)
+            th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
+            if previous_number_th_server_fabrics != len(th_server_fabrics_new):
+                break
+            elapsed = time.time() - start_time
+            time_remaining = max_wait_time_sec - elapsed
+
+        asserts.assert_not_equal(th_server_fabrics_new, None, "Failed to read Fabrics attribute")
+        asserts.assert_equal(previous_number_th_server_fabrics + 1, len(th_server_fabrics_new),
                              "Unexpected number of fabrics on TH_SERVER")
 
 

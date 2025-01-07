@@ -31,13 +31,8 @@ chip_test_suite("tests") {
     "TestOptional.cpp",
     "TestReferenceCounted.cpp",
     "TestTLV.cpp",
+    "TestTLVVectorWriter.cpp",
   ]
-
-  # requires large amount of heap for multiple unfragmented 10k buffers
-  # skip for efr32 to allow flash space for other tests
-  if (chip_device_platform != "efr32") {
-    test_sources += [ "TestTLVVectorWriter.cpp" ]
-  }
 
   cflags = [ "-Wconversion" ]
 
@@ -53,6 +48,16 @@ chip_test_suite("tests") {
 if (enable_fuzz_test_targets) {
   chip_fuzz_target("fuzz-tlv-reader") {
     sources = [ "FuzzTlvReader.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+}
+
+if (pw_enable_fuzz_test_targets) {
+  chip_pw_fuzz_target("fuzz-tlv-reader-pw") {
+    test_source = [ "FuzzTlvReaderPW.cpp" ]
     public_deps = [
       "${chip_root}/src/lib/core",
       "${chip_root}/src/platform/logging:default",

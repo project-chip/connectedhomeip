@@ -34,9 +34,6 @@ const char * StageToString(CommissioningStage stage)
     case kReadCommissioningInfo:
         return "ReadCommissioningInfo";
 
-    case kReadCommissioningInfo2:
-        return "ReadCommissioningInfo2";
-
     case kArmFailsafe:
         return "ArmFailSafe";
 
@@ -45,6 +42,9 @@ const char * StageToString(CommissioningStage stage)
 
     case kConfigRegulatory:
         return "ConfigRegulatory";
+
+    case kConfigureTCAcknowledgments:
+        return "ConfigureTCAcknowledgments";
 
     case kConfigureUTCTime:
         return "ConfigureUTCTime";
@@ -139,8 +139,11 @@ const char * StageToString(CommissioningStage stage)
     case kPrimaryOperationalNetworkFailed:
         return "PrimaryOperationalNetworkFailed";
 
-    case kDisablePrimaryNetworkInterface:
-        return "DisablePrimaryNetworkInterface";
+    case kRemoveWiFiNetworkConfig:
+        return "RemoveWiFiNetworkConfig";
+
+    case kRemoveThreadNetworkConfig:
+        return "RemoveThreadNetworkConfig";
 
     default:
         return "???";
@@ -160,9 +163,6 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
 
     case kReadCommissioningInfo:
         return "core_commissioning_stage_read_commissioning_info";
-
-    case kReadCommissioningInfo2:
-        return "core_commissioning_stage_read_commissioning_info2";
 
     case kArmFailsafe:
         return "core_commissioning_stage_arm_failsafe";

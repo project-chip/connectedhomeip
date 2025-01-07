@@ -108,9 +108,29 @@ public:
     virtual BitMask<WaterHeaterHeatSourceBitmap> GetHeaterTypes() = 0;
     virtual BitMask<WaterHeaterHeatSourceBitmap> GetHeatDemand()  = 0;
     virtual uint16_t GetTankVolume()                              = 0;
-    virtual int64_t GetEstimatedHeatRequired()                    = 0;
+    virtual Energy_mWh GetEstimatedHeatRequired()                 = 0;
     virtual Percent GetTankPercentage()                           = 0;
     virtual BoostStateEnum GetBoostState()                        = 0;
+
+    // ------------------------------------------------------------------
+    // Event generation
+
+    /**
+     * @brief Generates a BoostStarted event.
+     *        The parameters are same as those passed to HandleBoost().
+     *
+     * @return CHIP_NO_ERROR if the event was successfully generated, otherwise an error.
+     */
+    CHIP_ERROR GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot, Optional<bool> emergencyBoost,
+                                         Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
+                                         Optional<Percent> targetReheat);
+
+    /**
+     * @brief Generates a BoostEnded event.
+     *
+     * @return CHIP_NO_ERROR if the event was successfully generated, otherwise an error.
+     */
+    CHIP_ERROR GenerateBoostEndedEvent();
 
 protected:
     EndpointId mEndpointId = 0;

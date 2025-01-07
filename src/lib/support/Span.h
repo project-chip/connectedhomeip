@@ -374,7 +374,8 @@ inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan &
 {
     VerifyOrReturnError(out_buf.size() >= span_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(out_buf.data(), span_to_copy.data(), span_to_copy.size());
+    // There is no guarantee that span_to_copy and out_buf don't overlap, so use memmove()
+    memmove(out_buf.data(), span_to_copy.data(), span_to_copy.size());
     out_buf.reduce_size(span_to_copy.size());
 
     return CHIP_NO_ERROR;
@@ -384,10 +385,26 @@ inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableC
 {
     VerifyOrReturnError(out_buf.size() >= cspan_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());
+    // There is no guarantee that cspan_to_copy and out_buf don't overlap, so use memmove()
+    memmove(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());
     out_buf.reduce_size(cspan_to_copy.size());
 
     return CHIP_NO_ERROR;
+}
+
+/**
+ * Copies a CharSpan into a MutableCharSpan.
+ * If the span_to_copy does not fit in out_span, span_to_copy is truncated to fit in out_span.
+ * @param span_to_copy The CharSpan to copy.
+ * @param out_span The MutableCharSpan in which span_to_copy is to be copied.
+ */
+inline void CopyCharSpanToMutableCharSpanWithTruncation(CharSpan span_to_copy, MutableCharSpan & out_span)
+{
+    size_t size_to_copy = std::min(span_to_copy.size(), out_span.size());
+
+    // There is no guarantee that span_to_copy and out_buf don't overlap, so use memmove()
+    memmove(out_span.data(), span_to_copy.data(), size_to_copy);
+    out_span.reduce_size(size_to_copy);
 }
 
 } // namespace chip

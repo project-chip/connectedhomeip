@@ -56,33 +56,47 @@ enum EVSEStateMachineEvent
 class EvseSession
 {
 public:
-    EvseSession(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
+    EvseSession() {}
     /**
      * @brief This function records the start time and provided energy meter values as part of the new session.
      *
+     * @param endpointId            - The endpoint to report the update on
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StartSession(int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StartSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+
+    /**
+     * @brief This function updates the session information at the unplugged event
+     *
+     * @param endpointId            - The endpoint to report the update on
+     * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
+     * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
+     */
+    void StopSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
      * @brief This function updates the session Duration to allow read attributes to return latest values
+     *
+     * @param endpointId            - The endpoint to report the update on
      */
-    void RecalculateSessionDuration();
+    void RecalculateSessionDuration(EndpointId endpointId);
 
     /**
      * @brief This function updates the EnergyCharged meter value
      *
+     * @param endpointId            - The endpoint to report the update on
      * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
      */
-    void UpdateEnergyCharged(int64_t chargingMeterValue);
+    void UpdateEnergyCharged(EndpointId endpointId, int64_t chargingMeterValue);
 
     /**
      * @brief This function updates the EnergyDischarged meter value
      *
+     * @param endpointId            - The endpoint to report the update on
      * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
      */
-    void UpdateEnergyDischarged(int64_t dischargingMeterValue);
+    void UpdateEnergyDischarged(EndpointId endpointId, int64_t dischargingMeterValue);
 
     /* Public members - represent attributes in the cluster */
     DataModel::Nullable<uint32_t> mSessionID;
@@ -91,8 +105,6 @@ public:
     DataModel::Nullable<int64_t> mSessionEnergyDischarged;
 
 private:
-    EndpointId mEndpointId = 0;
-
     uint32_t mStartTime                     = 0; // Epoch_s - 0 means it hasn't started yet
     int64_t mSessionEnergyChargedAtStart    = 0; // in mWh - 0 means it hasn't been set yet
     int64_t mSessionEnergyDischargedAtStart = 0; // in mWh - 0 means it hasn't been set yet
@@ -358,7 +370,7 @@ private:
     DataModel::Nullable<CharSpan> mVehicleID;
 
     /* Session Object */
-    EvseSession mSession = EvseSession(mEndpointId);
+    EvseSession mSession = EvseSession();
 
     /* Helper variable to hold meter val since last EnergyTransferStarted event */
     int64_t mMeterValueAtEnergyTransferStart;

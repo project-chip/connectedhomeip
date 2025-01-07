@@ -106,6 +106,13 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (void)controller:(MTRDeviceController *)controller
     readCommissioningInfo:(MTRProductIdentity *)info MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+
+/**
+ * Notify the delegate when the suspended state changed of the controller, after this happens
+ * the controller will be in the specified state.
+ */
+- (void)controller:(MTRDeviceController *)controller
+    suspendedChangedTo:(BOOL)suspended MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 @end
 
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {

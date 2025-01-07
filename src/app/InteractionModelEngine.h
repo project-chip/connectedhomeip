@@ -49,6 +49,7 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
@@ -86,6 +87,7 @@ namespace app {
  */
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
+                               private DataModel::ActionContext,
                                public CommandResponseSender::Callback,
                                public CommandHandlerImpl::Callback,
                                public ReadHandler::ManagementCallback,
@@ -124,11 +126,13 @@ public:
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apFabricTable    A pointer to the FabricTable object.
      *  @param[in]    apCASESessionMgr An optional pointer to a CASESessionManager (used for re-subscriptions).
+     *  @parma[in]    eventManagement  An optional pointer to a EventManagement. If null, the global instance will be used.
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
                     reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr = nullptr,
-                    SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
+                    SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr,
+                    EventManagement * eventManagement                             = nullptr);
 
     void Shutdown();
 
@@ -313,6 +317,8 @@ public:
 
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
+    bool FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex) override;
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
      * @brief Function decrements the number of subscriptions to resume counter - mNumOfSubscriptionsToResume.
@@ -412,6 +418,9 @@ public:
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
 private:
+    /* DataModel::ActionContext implementation */
+    Messaging::ExchangeContext * CurrentExchange() override { return mCurrentExchange; }
+
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
@@ -463,9 +472,8 @@ private:
      *
      * aRequestedEventPathCount will be updated to reflect the number of event paths in the request.
      */
-    static CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                      EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
-                                      size_t & aRequestedEventPathCount);
+    CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor, EventPathIBs::Parser & aEventPathListParser,
+                               bool & aHasValidEventPath, size_t & aRequestedEventPathCount);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
@@ -501,7 +509,8 @@ private:
 
     void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
-    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
+
+    Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override;
 
     bool HasActiveRead();
 
@@ -605,6 +614,15 @@ private:
     void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
+    Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath);
+    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest);
+    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest);
+
+    /**
+     * Check if the given attribute path is a valid path in the data model provider.
+     */
+    bool IsExistentAttributePath(const ConcreteAttributePath & path);
+
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     template <typename T, size_t N>
@@ -698,7 +716,31 @@ private:
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
-    DataModel::Provider * mDataModelProvider = nullptr;
+    DataModel::Provider * mDataModelProvider      = nullptr;
+    Messaging::ExchangeContext * mCurrentExchange = nullptr;
+
+    enum class State : uint8_t
+    {
+        kUninitialized, // The object has not been initialized.
+        kInitializing,  // Initial setup is in progress (e.g. setting up mpExchangeMgr).
+        kInitialized    // The object has been fully initialized and is ready for use.
+    };
+    State mState = State::kUninitialized;
+
+    // Changes the current exchange context of a InteractionModelEngine to a given context
+    class CurrentExchangeValueScope
+    {
+    public:
+        CurrentExchangeValueScope(InteractionModelEngine & engine, Messaging::ExchangeContext * context) : mEngine(engine)
+        {
+            mEngine.mCurrentExchange = context;
+        }
+
+        ~CurrentExchangeValueScope() { mEngine.mCurrentExchange = nullptr; }
+
+    private:
+        InteractionModelEngine & mEngine;
+    };
 };
 
 } // namespace app

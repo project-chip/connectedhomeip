@@ -20,6 +20,7 @@
 #include <app/util/attribute-storage-null-handling.h>
 #include <lib/support/TypeTraits.h>
 
+#include <cstdint>
 #include <limits>
 
 namespace chip {
@@ -90,6 +91,59 @@ struct IntegerByteIndexing<ByteSize, false>
     static constexpr int pastHighIndex = ByteSize;
 };
 } // namespace detail
+
+namespace NumericLimits {
+
+// Generic size information for unsigned values.
+//
+// Assumes non-nullable types. Nullable types reserve one of the values as NULL (the max)
+inline constexpr uint64_t MaxUnsignedValue(unsigned ByteSize)
+{
+    if (ByteSize == 8)
+    {
+        return std::numeric_limits<uint64_t>::max();
+    }
+    return (1ULL << (8 * ByteSize)) - 1;
+}
+
+/// Readability-method to express that the maximum unsigned value is a null value
+///
+/// Our encoding states that max int value is the NULL value
+inline constexpr uint64_t UnsignedMaxValueToNullValue(uint64_t value)
+{
+    return value;
+}
+
+// Generic size information for signed values.
+//
+// Assumes non-nullable types. Nullable types reserve one of the values as NULL (the min)
+inline constexpr int64_t MaxSignedValue(unsigned ByteSize)
+{
+    if (ByteSize == 8)
+    {
+        return std::numeric_limits<int64_t>::max();
+    }
+    return (static_cast<int64_t>(1) << (8 * ByteSize - 1)) - 1;
+}
+
+inline constexpr int64_t MinSignedValue(unsigned ByteSize)
+{
+    if (ByteSize == 8)
+    {
+        return std::numeric_limits<int64_t>::min();
+    }
+    return -(static_cast<int64_t>(1) << (8 * ByteSize - 1));
+}
+
+/// Readability-method to express that the maximum signed value is a null value
+///
+/// Our encoding states that min int value is the NULL value
+inline constexpr int64_t SignedMinValueToNullValue(int64_t value)
+{
+    return value;
+}
+
+} // namespace NumericLimits
 
 template <int ByteSize, bool IsSigned, bool IsBigEndian>
 struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>, IsBigEndian> : detail::IntegerByteIndexing<ByteSize, IsBigEndian>
@@ -200,27 +254,7 @@ struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>, IsBigEndian> 
 
     static constexpr bool CanRepresentValue(bool isNullable, WorkingType value)
     {
-        // Since WorkingType has at least one extra byte, none of our bitshifts
-        // overflow.
-        if (IsSigned)
-        {
-            WorkingType max = (static_cast<WorkingType>(1) << (8 * ByteSize - 1)) - 1;
-            WorkingType min = -max;
-            if (!isNullable)
-            {
-                // We have one more value.
-                min -= 1;
-            }
-            return value >= min && value <= max;
-        }
-
-        WorkingType max = (static_cast<WorkingType>(1) << (8 * ByteSize)) - 1;
-        if (isNullable)
-        {
-            // we have one less value
-            max -= 1;
-        }
-        return value <= max;
+        return MinValue(isNullable) <= value && value <= MaxValue(isNullable);
     }
 
     static CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, StorageType value)
@@ -229,6 +263,43 @@ struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>, IsBigEndian> 
     }
 
     static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return value; }
+
+    static WorkingType MinValue(bool isNullable)
+    {
+        if constexpr (!IsSigned)
+        {
+            return 0;
+        }
+
+        // Since WorkingType has at least one extra byte, the bitshift cannot overflow.
+        constexpr WorkingType signedMin = -(static_cast<WorkingType>(1) << (8 * ByteSize - 1));
+        if (isNullable)
+        {
+            // Smallest negative value is excluded for nullable signed types.
+            return signedMin + 1;
+        }
+
+        return signedMin;
+    }
+
+    static WorkingType MaxValue(bool isNullable)
+    {
+        // Since WorkingType has at least one extra byte, none of our bitshifts
+        // overflow.
+        if constexpr (IsSigned)
+        {
+            return (static_cast<WorkingType>(1) << (8 * ByteSize - 1)) - 1;
+        }
+
+        constexpr WorkingType unsignedMax = (static_cast<WorkingType>(1) << (8 * ByteSize)) - 1;
+        if (isNullable)
+        {
+            // Largest value is excluded for nullable unsigned types.
+            return unsignedMax - 1;
+        }
+
+        return unsignedMax;
+    }
 };
 
 } // namespace app

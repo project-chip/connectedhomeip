@@ -95,7 +95,7 @@ limitations under the License.
         <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                              optional="false">UniqueID</attribute>
         <attribute side="server" code="20" define="PRODUCT_APPEARANCE"        type="ProductAppearanceStruct"                                            optional="true">ProductAppearance</attribute>
 
-        <command source="client" code="0x80" name="KeepActive" optional="true" apiMaturity="provisional">
+        <command source="client" code="0x80" name="KeepActive" optional="true">
           <description> The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active.</description>
           <arg id="0" name="StayActiveDuration" type="int32u"/>
           <arg id="1" name="TimeoutMs" type="int32u" min="30000" max="3600000"/>
@@ -111,7 +111,7 @@ limitations under the License.
         <event side="server" code="0x02" name="Leave" priority="info" optional="true">
             <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
         </event>
-        <event side="server" code="0x03" name="ReachableChanged" priority="info" optional="false">
+        <event side="server" code="0x03" name="ReachableChanged" priority="info">
             <description>This event SHALL be generated when there is a change in the Reachable attribute.</description>
             <field id="0" name="ReachableNewValue" type="boolean"/>
         </event>

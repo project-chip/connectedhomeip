@@ -67,6 +67,14 @@ Davis, CA 95616, USA
     <clusterId id="0x0054" name="RVC Run Mode"/>
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="RVCRUNM" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+      <disallowConform/>
+    </feature>
+    <feature bit="16" code="DIRECTMODECH" name="DirectModeChange" summary="Cluster supports changing run modes from non-Idle states">
+      <optionalConform/>
+    </feature>
+  </features>
   <dataTypes>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label">
@@ -81,11 +89,6 @@ Davis, CA 95616, USA
       </field>
     </struct>
   </dataTypes>
-  <features>
-    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster is disallowed for this cluster">
-      <disallowConform/>
-    </feature>
-  </features>
   <attributes>
     <attribute id="0x0000" name="SupportedModes">
       <mandatoryConform/>
@@ -97,7 +100,7 @@ Davis, CA 95616, USA
       <disallowConform/>
     </attribute>
     <attribute id="0x0003" name="OnMode">
-      <deprecateConform/>
+      <disallowConform/>
     </attribute>
   </attributes>
 </cluster>

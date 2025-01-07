@@ -152,6 +152,7 @@ ReadHandler::~ReadHandler()
     auto * appCallback = mManagementCallback.GetAppCallback();
     if (mFlags.Has(ReadHandlerFlags::ActiveSubscription) && appCallback)
     {
+        mFlags.Clear(ReadHandlerFlags::ActiveSubscription);
         appCallback->OnSubscriptionTerminated(*this);
     }
 
@@ -741,7 +742,9 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(err);
 
     ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
-    ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxInterval));
+    ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mSubscriberRequestedMaxInterval));
+    mMaxInterval = mSubscriberRequestedMaxInterval;
+
     VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER

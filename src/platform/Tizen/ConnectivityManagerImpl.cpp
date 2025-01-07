@@ -115,7 +115,7 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     wifi_manager_device_state_e deviceState = WIFI_MANAGER_DEVICE_STATE_DEACTIVATED;
 
-    ReturnErrorCodeIf(mWiFiStationMode == kWiFiStationMode_ApplicationControlled, mWiFiStationMode);
+    VerifyOrReturnError(mWiFiStationMode != kWiFiStationMode_ApplicationControlled, mWiFiStationMode);
 
     err = Internal::WiFiMgr().GetDeviceState(&deviceState);
     VerifyOrReturnError(err == CHIP_NO_ERROR, mWiFiStationMode);
@@ -130,7 +130,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiF
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     wifi_manager_device_state_e deviceState = WIFI_MANAGER_DEVICE_STATE_DEACTIVATED;
 
-    ReturnErrorCodeIf(val == kWiFiStationMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(val != kWiFiStationMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
 
     if (val != kWiFiStationMode_ApplicationControlled)
     {
@@ -254,17 +254,7 @@ bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
 {
-    constexpr size_t bssIdSize = 6;
-    VerifyOrReturnError(value.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    uint8_t * bssId = nullptr;
-    CHIP_ERROR err  = Internal::WiFiMgr().GetBssId(bssId);
-    ReturnErrorOnFailure(err);
-
-    memcpy(value.data(), bssId, bssIdSize);
-    value.reduce_size(bssIdSize);
-
-    return CHIP_NO_ERROR;
+    return Internal::WiFiMgr().GetBssId(value);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & securityType)

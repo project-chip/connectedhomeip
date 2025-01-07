@@ -20,4 +20,11 @@ package chip.platform;
 public class AndroidChipLogging {
   // logging level is in android.util.Log class
   public static native void setLogFilter(int level);
+
+  // This must be called after System.loadLibrary
+  public static native void setLogCallback(LogCallback callback);
+
+  public interface LogCallback {
+    void onLogMessage(String module, int priority, String message);
+  }
 }

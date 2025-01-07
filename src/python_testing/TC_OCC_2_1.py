@@ -23,18 +23,27 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --endpoint 1
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -74,7 +83,7 @@ class TC_OCC_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OCC_2_1(self):
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint()
         cluster = Clusters.Objects.OccupancySensing
         attributes = cluster.Attributes
 
@@ -121,25 +130,31 @@ class TC_OCC_2_1(MatterBaseTest):
             hold_time_limits_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTimeLimits)
             asserts.assert_less_equal(hold_time_limits_dut.holdTimeMin, hold_time_limits_dut.holdTimeMax,
                                       "HoldTimeMin is not in valid range")
-            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMin, 0, "HoldTimeMin is not in valid range")
-            asserts.assert_less_equal(hold_time_limits_dut.holdTimeMax, 0xFFFE, "HoldTimeMin is not in valid range")
-            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMax,
-                                         hold_time_limits_dut.holdTimeMin, "HoldTimeMin is not in valid range")
+            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMin, 1, "HoldTimeMin is less than 1.")
+            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMax, 10, "HoldTimeMax is less than 10.")
+            asserts.assert_less_equal(hold_time_limits_dut.holdTimeMin, 0xFFFE, "HoldTimeMin is not in valid range.")
+            asserts.assert_less_equal(hold_time_limits_dut.holdTimeMax, 0xFFFE, "HoldTimeMax is not in valid range.")
+            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMax, hold_time_limits_dut.holdTimeMin,
+                                         "HoldTimeMax is less than HoldTimeMin.")
             asserts.assert_less_equal(hold_time_limits_dut.holdTimeDefault,
-                                      hold_time_limits_dut.holdTimeMax, "HoldTimeMin is not in valid range")
+                                      hold_time_limits_dut.holdTimeMax, "HoldTimeDefault is greater than HoldTimeMax.")
             asserts.assert_greater_equal(hold_time_limits_dut.holdTimeDefault,
-                                         hold_time_limits_dut.holdTimeMin, "HoldTimeMin is not in valid range")
+                                         hold_time_limits_dut.holdTimeMin, "HoldTimeDefault is less than HoldTimeMin.")
         else:
             logging.info("HoldTimeLimits not supported. Test step skipped")
             self.mark_current_step_skipped()
 
         self.step(6)
         if attributes.HoldTime.attribute_id in attribute_list:
+            asserts.assert_in(attributes.HoldTimeLimits.attribute_id, attribute_list,
+                              "HoldTimeLimits attribute conformance failed.")
             hold_time_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTime)
             hold_time_limits_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTimeLimits)
 
-            asserts.assert_less_equal(hold_time_dut, hold_time_limits_dut.holdTimeMax, "HoldTime attribute is out of range")
-            asserts.assert_greater_equal(hold_time_dut, hold_time_limits_dut.holdTimeMin, "HoldTime attribute is out of range")
+            asserts.assert_less_equal(hold_time_dut, hold_time_limits_dut.holdTimeMax,
+                                      "HoldTime attribute is greater than HoldTimeMax.")
+            asserts.assert_greater_equal(hold_time_dut, hold_time_limits_dut.holdTimeMin,
+                                         "HoldTime attribute is less than HoldTimeMin.")
         else:
             logging.info("HoldTime not supported. The rest of legacy attribute test can be skipped")
             self.skip_all_remaining_steps(7)

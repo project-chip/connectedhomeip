@@ -56,12 +56,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
     }
-    else if (clusterId == OnOffSwitchConfiguration::Id)
-    {
-        GetAppTask().PostEvent(AppTask::APP_EVENT_LIGHTING_ONOFF);
-        ChipLogProgress(Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
-    }
     else if (clusterId == Identify::Id)
     {
         GetAppTask().PostEvent(AppTask::APP_EVENT_IDENTIFY_IDENTIFY);

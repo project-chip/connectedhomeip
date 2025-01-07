@@ -115,9 +115,6 @@ class TracingContext:
         else:
             raise ValueError("Invalid trace-to destination: %r", destination)
 
-    def __init__(self):
-        pass
-
     def __enter__(self):
         return self
 

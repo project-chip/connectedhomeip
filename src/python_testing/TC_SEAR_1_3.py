@@ -20,19 +20,28 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_RVC_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --json-arg PIXIT.SEAR.VALID_AREAS:'[7, 1234567]'
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -74,20 +83,12 @@ class TC_SEAR_1_3(MatterBaseTest):
                              expected_response,
                              f"Command response ({ret.status}) doesn't match the expected one")
 
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Allow some time for the command to take effect.
-        # This removes the test flakiness which is very annoying for everyone in CI.
-        sleep(0.001)
-
     def TC_SEAR_1_3(self) -> list[str]:
         return ["SEAR.S"]
 
     @async_test_body
     async def test_TC_SEAR_1_3(self):
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         if self.is_ci:
@@ -100,7 +101,7 @@ class TC_SEAR_1_3(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe({"Name": "Reset"})
 
         supported_area_ids = await self.read_supported_areas(step=2)
         asserts.assert_true(len(self.supported_areas) > 0, "SupportedAreas is empty")
@@ -119,47 +120,53 @@ class TC_SEAR_1_3(MatterBaseTest):
         selected_areas = await self.read_selected_areas(step=6)
         asserts.assert_true(len(selected_areas) == 0, "SelectedAreas should be empty")
 
-        await self.send_cmd_select_areas_expect_response(step=8, new_areas=[invalid_area_id], expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kUnsupportedArea)
+        await self.send_cmd_select_areas_expect_response(step=7, new_areas=[invalid_area_id], expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kUnsupportedArea)
+
+        if "PIXIT.SEAR.VALID_AREAS" not in self.matter_test_config.global_test_params:
+            # All the remaining tests require the PIXIT.SEAR.VALID_AREAS
+            return
+
+        valid_areas = self.matter_test_config.global_test_params['PIXIT.SEAR.VALID_AREAS']
 
         if self.check_pics("SEAR.S.M.INVALID_STATE_FOR_SELECT_AREAS") and self.check_pics("SEAR.S.M.HAS_MANUAL_SELAREA_STATE_CONTROL"):
             test_step = "Manually intervene to put the device in a state that prevents it from executing the SelectAreas command"
-            self.print_step("7", test_step)
+            self.print_step("8", test_step)
             if self.is_ci:
                 await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=1), endpoint=self.endpoint)
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            await self.send_cmd_select_areas_expect_response(step=10, new_areas=[valid_area_id], expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kInvalidInMode)
+            await self.send_cmd_select_areas_expect_response(step=9, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kInvalidInMode)
 
         if self.check_pics("SEAR.S.M.VALID_STATE_FOR_SELECT_AREAS") and self.check_pics("SEAR.S.M.HAS_MANUAL_SELAREA_STATE_CONTROL"):
-            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({supported_area_ids}) command"
-            self.print_step("9", test_step)
+            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({valid_areas}) command"
+            self.print_step("10", test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "Reset"}')
+                self.write_to_app_pipe({"Name": "Reset"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            await self.send_cmd_select_areas_expect_response(step=11, new_areas=supported_area_ids, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kSuccess)
+            await self.send_cmd_select_areas_expect_response(step=11, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kSuccess)
 
             selected_areas = await self.read_selected_areas(step=12)
-            asserts.assert_true(len(selected_areas) == len(supported_area_ids),
-                                f"SelectedAreas({selected_areas}) should match SupportedAreas({supported_area_ids})")
+            asserts.assert_true(selected_areas == valid_areas,
+                                f"SelectedAreas({selected_areas}) should match SupportedAreas({valid_areas})")
 
-            await self.send_cmd_select_areas_expect_response(step=13, new_areas=supported_area_ids, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kSuccess)
+            await self.send_cmd_select_areas_expect_response(step=13, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kSuccess)
 
         if self.check_pics("SEAR.S.M.VALID_STATE_FOR_SELECT_AREAS") and self.check_pics("SEAR.S.M.HAS_MANUAL_SELAREA_STATE_CONTROL") and self.check_pics("SEAR.S.M.SELECT_AREAS_WHILE_NON_IDLE"):
-            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({valid_area_id}) command, and put the device in a non-idle state"
+            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({valid_areas}) command, and put the device in a non-idle state"
             self.print_step("14", test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "Reset"}')
+                self.write_to_app_pipe({"Name": "Reset"})
                 await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=1), endpoint=self.endpoint)
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             if self.check_pics("SEAR.S.F00"):
-                await self.send_cmd_select_areas_expect_response(step=15, new_areas=[valid_area_id], expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kSuccess)
+                await self.send_cmd_select_areas_expect_response(step=15, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kSuccess)
             else:
-                await self.send_cmd_select_areas_expect_response(step=15, new_areas=[valid_area_id], expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kInvalidInMode)
+                await self.send_cmd_select_areas_expect_response(step=15, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kInvalidInMode)
 
 
 if __name__ == "__main__":

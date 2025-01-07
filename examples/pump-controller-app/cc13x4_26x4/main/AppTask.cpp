@@ -38,6 +38,7 @@
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -50,6 +51,10 @@
 
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+#include "app/icd/server/ICDNotifier.h"
+#endif
 
 /* syscfg */
 #include <ti_drivers_config.h>
@@ -297,6 +302,7 @@ int AppTask::Init()
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     chip::Server::GetInstance().Init(initParams);
 
     ret = PlatformMgr().StartEventLoopTask();
@@ -457,8 +463,13 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
                 PumpMgr().InitiateAction(0, PumpManager::START_ACTION);
             }
         }
+        else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
+        {
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+            PlatformMgr().ScheduleWork([](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+#endif
+        }
         break;
-
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {

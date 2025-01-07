@@ -115,8 +115,7 @@ public:
      *
      * When EncodeList returns an error, the consumers must abort the encoding, and return the exact error to the caller.
      *
-     * TODO: Can we hold a error state in the AttributeValueEncoder itself so functions in ember-compatibility-functions don't have
-     * to rely on the above assumption?
+     * TODO: Can we hold a error state in the AttributeValueEncoder itself?
      *
      * Consumers are allowed to make either one call to EncodeList or one call to Encode to handle a read.
      *

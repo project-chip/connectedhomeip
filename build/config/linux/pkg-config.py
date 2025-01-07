@@ -142,6 +142,8 @@ def main():
                       dest='dridriverdir')
     parser.add_option('--version-as-components', action='store_true',
                       dest='version_as_components')
+    parser.add_option('--static', action='store_true',
+                      dest='static')
     (options, args) = parser.parse_args()
 
     # Make a list of regular expressions to strip out.
@@ -203,7 +205,13 @@ def main():
         sys.stdout.write(dridriverdir.strip())
         return
 
-    cmd = [options.pkg_config, "--cflags", "--libs"] + args
+    cmd = [options.pkg_config, "--cflags", "--libs"]
+
+    if options.static:
+        cmd.append("--static")
+
+    cmd.extend(args)
+
     if options.debug:
         sys.stderr.write('Running: %s\n' % ' '.join(cmd))
 

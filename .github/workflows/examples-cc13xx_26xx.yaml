@@ -15,15 +15,12 @@
 name: Build example - TI CC13XX_26XX
 
 on:
-    workflow_dispatch:
-    # Temporarely disabled:
-    #    - TI CI runs out of disk space
-    #    - Image should be updated to an Ubuntu 24.04 or higher based one (move from :54 version)
-    # push:
-    #     branches-ignore:
-    #         - 'dependabot/**'
-    # pull_request:
-    # merge_group:
+    push:
+        branches:
+            - master
+            - 'v*-branch'
+    pull_request:
+    merge_group:
 
 concurrency:
     group:
@@ -45,7 +42,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-ti:74
+            image: ghcr.io/project-chip/chip-build-ti:94
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -67,13 +64,9 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target ti-cc13x4_26x4-lighting-ftd \
-                      --target ti-cc13x4_26x4-lighting-mtd \
                       --target ti-cc13x4_26x4-lock-ftd \
-                      --target ti-cc13x4_26x4-lock-mtd \
                       --target ti-cc13x4_26x4-pump-mtd \
-                      --target ti-cc13x4_26x4-pump-ftd \
                       --target ti-cc13x4_26x4-pump-controller-mtd \
-                      --target ti-cc13x4_26x4-pump-controller-ftd \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -82,12 +75,6 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 lock-ftd \
                     out/artifacts/ti-cc13x4_26x4-lock-ftd/chip-LP_EM_CC1354P10_6-lock-example.out \
-                    /tmp/bloat_reports/
-            - name: Get lock MTD size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cc13x4_26x4 LP_EM_CC1354P10_6 lock-mtd \
-                    out/artifacts/ti-cc13x4_26x4-lock-mtd/chip-LP_EM_CC1354P10_6-lock-example.out \
                     /tmp/bloat_reports/
             - name: Get Pump App size stats
               run: |

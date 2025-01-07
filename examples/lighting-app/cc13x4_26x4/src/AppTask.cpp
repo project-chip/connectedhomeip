@@ -47,6 +47,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
@@ -54,6 +55,10 @@
 
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+#include "app/icd/server/ICDNotifier.h"
+#endif
 
 /* syscfg */
 #include <ti_drivers_config.h>
@@ -311,6 +316,7 @@ int AppTask::Init()
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     // Initialize info provider
     sExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
@@ -475,8 +481,12 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+            PlatformMgr().ScheduleWork([](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+#else
             actor = AppEvent::kEventType_ButtonLeft;
             LightMgr().InitiateAction(actor, LightingManager::ON_ACTION);
+#endif
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
@@ -488,7 +498,12 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
             actor = AppEvent::kEventType_ButtonRight;
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+            LightMgr().IsLightOn() ? LightMgr().InitiateAction(actor, LightingManager::OFF_ACTION)
+                                   : LightMgr().InitiateAction(actor, LightingManager::ON_ACTION);
+#else
             LightMgr().InitiateAction(actor, LightingManager::OFF_ACTION);
+#endif
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {

@@ -17,7 +17,12 @@
  */
 
 #include "DeviceSynchronization.h"
+
+#include "DeviceSubscriptionManager.h"
+
+#if defined(PW_RPC_ENABLED)
 #include "rpc/RpcClient.h"
+#endif
 
 #include <app/InteractionModelEngine.h>
 #include <app/server/Server.h>
@@ -29,6 +34,8 @@
 using namespace ::chip;
 using namespace ::chip::app;
 using chip::app::ReadClient;
+
+namespace admin {
 
 namespace {
 
@@ -42,6 +49,7 @@ void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerI
     reinterpret_cast<DeviceSynchronizer *>(context)->OnDeviceConnectionFailure(peerId, error);
 }
 
+#if defined(PW_RPC_ENABLED)
 bool SuccessOrLog(CHIP_ERROR err, const char * name)
 {
     if (err == CHIP_NO_ERROR)
@@ -53,6 +61,7 @@ bool SuccessOrLog(CHIP_ERROR err, const char * name)
 
     return false;
 }
+#endif
 
 } // namespace
 
@@ -72,8 +81,15 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     VerifyOrDie(path.mEndpointId == kRootEndpointId);
     VerifyOrDie(path.mClusterId == Clusters::BasicInformation::Id);
 
+    if (!status.IsSuccess())
+    {
+        ChipLogError(NotSpecified, "Response Failure: %" CHIP_ERROR_FORMAT, status.ToChipError().Format());
+        return;
+    }
+
     switch (path.mAttributeId)
     {
+#if defined(PW_RPC_ENABLED)
     case Clusters::BasicInformation::Attributes::UniqueID::Id:
         mCurrentDeviceData.has_unique_id =
             SuccessOrLog(data->GetString(mCurrentDeviceData.unique_id, sizeof(mCurrentDeviceData.unique_id)), "UniqueId");
@@ -112,6 +128,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
             data->GetString(mCurrentDeviceData.software_version_string, sizeof(mCurrentDeviceData.software_version_string)),
             "SoftwareVersionString");
         break;
+#endif // #if defined(PW_RPC_ENABLED)
     default:
         break;
     }
@@ -120,29 +137,38 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
 void DeviceSynchronizer::OnReportEnd()
 {
     // Report end is at the end of all attributes (success)
+    MoveToState(State::ReceivedResponse);
+}
+
+void DeviceSynchronizer::OnDone(app::ReadClient * apReadClient)
+{
+    ChipLogProgress(NotSpecified, "Synchronization complete for NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+
 #if defined(PW_RPC_ENABLED)
-    if (!DeviceMgr().IsCurrentBridgeDevice(mCurrentDeviceData.node_id))
+    if (mState == State::ReceivedResponse && !DeviceManager::Instance().IsCurrentBridgeDevice(mNodeId))
     {
-        AddSynchronizedDevice(mCurrentDeviceData);
+        GetUniqueId();
+        if (mState == State::GettingUid)
+        {
+            ChipLogProgress(NotSpecified,
+                            "GetUniqueId was successful and we rely on callback to call SynchronizationCompleteAddDevice.");
+            return;
+        }
+        SynchronizationCompleteAddDevice();
     }
 #else
     ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
 #endif
-}
-
-void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
-{
-    // Nothing to do: error reported on OnError or report ended called.
-    mDeviceSyncInProcess = false;
+    MoveToState(State::Idle);
 }
 
 void DeviceSynchronizer::OnError(CHIP_ERROR error)
 {
+    MoveToState(State::ReceivedError);
     ChipLogProgress(NotSpecified, "Error fetching device data: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
-void DeviceSynchronizer::OnDeviceConnected(chip::Messaging::ExchangeManager & exchangeMgr,
-                                           const chip::SessionHandle & sessionHandle)
+void DeviceSynchronizer::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
                                            *this /* callback */, ReadClient::InteractionType::Read);
@@ -161,31 +187,150 @@ void DeviceSynchronizer::OnDeviceConnected(chip::Messaging::ExchangeManager & ex
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to issue read for BasicInformation data");
-        mDeviceSyncInProcess = false;
+        MoveToState(State::Idle);
     }
+    MoveToState(State::AwaitingResponse);
 }
 
-void DeviceSynchronizer::OnDeviceConnectionFailure(const chip::ScopedNodeId & peerId, CHIP_ERROR error)
+void DeviceSynchronizer::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    mDeviceSyncInProcess = false;
+    MoveToState(State::Idle);
 }
 
-void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController & controller, chip::NodeId nodeId,
-                                                    bool deviceIsIcd)
+void DeviceSynchronizer::StartDeviceSynchronization(Controller::DeviceController * controller, NodeId nodeId, bool deviceIsIcd)
 {
-    if (mDeviceSyncInProcess)
+    VerifyOrDie(controller);
+    if (mState != State::Idle)
     {
         ChipLogError(NotSpecified, "Device Sync NOT POSSIBLE: another sync is in progress");
         return;
     }
 
-    mCurrentDeviceData            = chip_rpc_SynchronizedDevice_init_default;
-    mCurrentDeviceData.node_id    = nodeId;
-    mCurrentDeviceData.has_is_icd = true;
-    mCurrentDeviceData.is_icd     = deviceIsIcd;
+    mNodeId = nodeId;
 
-    mDeviceSyncInProcess = true;
+    ChipLogProgress(NotSpecified, "Start device synchronization for NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
-    controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+#if defined(PW_RPC_ENABLED)
+    mCurrentDeviceData                 = chip_rpc_SynchronizedDevice_init_default;
+    mCurrentDeviceData.has_id          = true;
+    mCurrentDeviceData.id.node_id      = nodeId;
+    mCurrentDeviceData.id.fabric_index = controller->GetFabricIndex();
+    mCurrentDeviceData.has_is_icd      = true;
+    mCurrentDeviceData.is_icd          = deviceIsIcd;
+#endif
+
+    ReturnOnFailure(controller->GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback));
+    mController = controller;
+    MoveToState(State::Connecting);
 }
+
+void DeviceSynchronizer::GetUniqueId()
+{
+    VerifyOrDie(mState == State::ReceivedResponse);
+    VerifyOrDie(mController);
+
+#if defined(PW_RPC_ENABLED)
+    // If we have a UniqueId we can return leaving state in ReceivedResponse.
+    VerifyOrReturn(!mCurrentDeviceData.has_unique_id, ChipLogDetail(NotSpecified, "We already have UniqueId"));
+#endif
+
+    auto * device = DeviceManager::Instance().FindDeviceByNode(mNodeId);
+    // If there is no associated remote Fabric Sync Aggregator there is no other place for us to try
+    // getting the UniqueId from and can return leaving the state in ReceivedResponse.
+    VerifyOrReturn(device, ChipLogDetail(NotSpecified, "No remote Fabric Sync Aggregator to get UniqueId from"));
+
+    // Because device is not-null we expect IsFabricSyncReady to be true. IsFabricSyncReady indicates we have a
+    // connection to the remote Fabric Sync Aggregator.
+    VerifyOrDie(DeviceManager::Instance().IsFabricSyncReady());
+    auto remoteBridgeNodeId               = DeviceManager::Instance().GetRemoteBridgeNodeId();
+    EndpointId remoteEndpointIdOfInterest = device->GetEndpointId();
+
+    ChipLogDetail(NotSpecified, "Attempting to get UniqueId from remote Fabric Sync Aggregator");
+    CHIP_ERROR err = mUniqueIdGetter.GetUniqueId(
+        [this](std::optional<CharSpan> aUniqueId) {
+            if (aUniqueId.has_value())
+            {
+#if defined(PW_RPC_ENABLED)
+                this->mCurrentDeviceData.has_unique_id = true;
+                memcpy(this->mCurrentDeviceData.unique_id, aUniqueId.value().data(), aUniqueId.value().size());
+#endif
+            }
+            else
+            {
+                ChipLogError(NotSpecified, "We expected to get UniqueId from remote Fabric Sync Aggregator, but failed");
+            }
+            this->SynchronizationCompleteAddDevice();
+        },
+        *mController, remoteBridgeNodeId, remoteEndpointIdOfInterest);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        MoveToState(State::GettingUid);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Failed to get UniqueId from remote Fabric Sync Aggregator")
+    }
+}
+
+void DeviceSynchronizer::SynchronizationCompleteAddDevice()
+{
+    VerifyOrDie(mState == State::ReceivedResponse || mState == State::GettingUid);
+    ChipLogProgress(NotSpecified, "Synchronization complete and add device");
+
+#if defined(PW_RPC_ENABLED)
+    AddSynchronizedDevice(mCurrentDeviceData);
+    // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
+    if (!mCurrentDeviceData.is_icd)
+    {
+        VerifyOrDie(mController);
+        ScopedNodeId scopedNodeId(mNodeId, mController->GetFabricIndex());
+        CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, scopedNodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+            chip_rpc_ReachabilityChanged reachabilityChanged;
+            reachabilityChanged.has_id       = true;
+            reachabilityChanged.id           = mCurrentDeviceData.id;
+            reachabilityChanged.reachability = false;
+            DeviceReachableChanged(reachabilityChanged);
+        }
+    }
+#endif
+
+    MoveToState(State::Idle);
+}
+
+void DeviceSynchronizer::MoveToState(const State targetState)
+{
+    mState = targetState;
+    ChipLogDetail(NotSpecified, "DeviceSynchronizer moving to [%10.10s]", GetStateStr());
+}
+
+const char * DeviceSynchronizer::GetStateStr() const
+{
+    switch (mState)
+    {
+    case State::Idle:
+        return "Idle";
+
+    case State::Connecting:
+        return "Connecting";
+
+    case State::AwaitingResponse:
+        return "AwaitingResponse";
+
+    case State::ReceivedResponse:
+        return "ReceivedResponse";
+
+    case State::ReceivedError:
+        return "ReceivedError";
+
+    case State::GettingUid:
+        return "GettingUid";
+    }
+    return "N/A";
+}
+
+} // namespace admin

@@ -14,11 +14,13 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/platform/device.gni")
 
 buildconfig_header("controller_buildconfig") {
@@ -130,11 +132,17 @@ shared_library("jni") {
     "AndroidCurrentFabricRemover.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
+    "AndroidLogDownloadFromNode.cpp",
+    "AndroidLogDownloadFromNode.h",
     "AndroidOperationalCredentialsIssuer.cpp",
     "AndroidOperationalCredentialsIssuer.h",
     "AttestationTrustStoreBridge.cpp",
     "AttestationTrustStoreBridge.h",
+    "BdxDiagnosticLogsReceiver.cpp",
+    "BdxDiagnosticLogsReceiver.h",
     "CHIPDeviceController-JNI.cpp",
+    "CHIPP256KeypairBridge.cpp",
+    "CHIPP256KeypairBridge.h",
     "DeviceAttestation-JNI.cpp",
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",
@@ -168,6 +176,15 @@ shared_library("jni") {
     defines += [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
 
     deps += [ "${chip_root}/src/controller:nodatamodel" ]
+
+    # Temporary dependency: InteractionModelEngine NEEDS a codegen data model instance
+    # defined and application is supposed to provide it. This adds the sources
+    # in the same way "data_model" implementations do
+    #
+    # DynamicDispatcher in src/app:interaction-model implements the actual required
+    # ember callbacks in this case...
+    sources += codegen_data_model_SOURCES
+    public_deps = codegen_data_model_PUBLIC_DEPS
   } else {
     deps += [ "${chip_root}/src/controller/data_model" ]
   }
@@ -223,6 +240,7 @@ if (chip_link_tests) {
       ":android_chip_im_jni",
       ":jni",
       "${chip_root}/src/messaging/tests:helpers",
+      dir_pw_unit_test,
     ]
 
     if (matter_enable_java_compilation) {
@@ -623,7 +641,9 @@ android_library("java") {
     "src/chip/devicecontroller/ControllerParams.java",
     "src/chip/devicecontroller/DeviceAttestation.java",
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
+    "src/chip/devicecontroller/DiagnosticLogType.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",
+    "src/chip/devicecontroller/DownloadLogCallback.java",
     "src/chip/devicecontroller/GroupKeySecurityPolicy.java",
     "src/chip/devicecontroller/ICDCheckInDelegate.java",
     "src/chip/devicecontroller/ICDCheckInDelegateWrapper.java",

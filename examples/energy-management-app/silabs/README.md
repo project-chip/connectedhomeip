@@ -33,8 +33,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 ## Introduction
 
 The EFR32 Energy Management example provides a baseline demonstration of a EVSE
-device, built using Matter and the Silicon Labs gecko SDK. It can be controlled
-by a Chip controller over an Openthread or Wifi network..
+or Water Heater device, built using Matter and the Silicon Labs gecko SDK. It
+can be controlled by a Chip controller over an Openthread or Wifi network.
 
 The EFR32 device can be commissioned over Bluetooth Low Energy where the device
 and the Chip controller will exchange security information with the Rendez-vous
@@ -45,9 +45,9 @@ If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
 needed commissioning information for the BLE connection and starting the
 Rendez-vous procedure.
 
-The EVSE example is intended to serve both as a means to explore the workings of
-Matter as well as a template for creating real products based on the Silicon
-Labs platform.
+The EVSE and Water Heater examples are intended to serve both as a means to
+explore the workings of Matter Energy Management as well as a template for
+creating real products based on the Silicon Labs platform.
 
 ## Building
 
@@ -99,7 +99,23 @@ Labs platform.
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export SILABS_BOARD=BRD4187C
+
+    To build the EVSE example
+
           $ gn gen out/debug
+          $ ninja -C out/debug
+
+    To build the Water Heater example you can change the args to gn gen (see
+    BUILD.gn for arg options)
+
+          $ gn gen out/debug --args='sl_enable_example_evse_device=false sl_enable_example_water_heater_device=true'
+          $ ninja -C out/debug
+
+    To change Device Energy Management feature support (e.g. Power forecast or
+    State forecast reporting), you can change the args to gn gen (see BUILD.gn
+    for arg options)
+
+          $ gn gen out/debug --args='sl_dem_support_state_forecast_reporting=true sl_dem_support_power_forecast_reporting=false'
           $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
@@ -110,10 +126,6 @@ Labs platform.
 *   Build the example as Intermittently Connected Device (ICD)
 
           $ ./scripts/examples/gn_silabs_example.sh ./examples/energy-management-app/silabs/ ./out/energy-management-app_ICD BRD4187C --icd
-
-    or use gn as previously mentioned but adding the following arguments:
-
-          $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
 
 *   Build the example with pigweed RPC
 
@@ -241,6 +253,7 @@ combination with JLinkRTTClient as follows:
         -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
             for 30 seconds. The device will then switch to a slower interval advertisement.
             After 15 minutes, the advertisement stops.
+            Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
 
         -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
@@ -319,7 +332,7 @@ tracking code inside the `trackAlloc` and `trackFree` function
 
 For the description of Software Update process with EFR32 example applications
 see
-[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+[EFR32 OTA Software Update](../../../docs/platforms/silabs/silabs_efr32_software_update.md)
 
 ## Group Communication (Multicast)
 

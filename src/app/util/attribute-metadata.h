@@ -18,7 +18,6 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-
 #include <cstdint>
 
 /**
@@ -157,6 +156,21 @@ struct EmberAfAttributeMetadata
      * functionality.
      */
     EmberAfAttributeMask mask;
+
+    /**
+     * Check wether this attribute is a boolean based on its type according to the spec.
+     */
+    bool IsBoolean() const;
+
+    /**
+     * Check wether this attribute is signed based on its type according to the spec.
+     */
+    bool IsSignedIntegerAttribute() const;
+
+    /**
+     * Check whether this attribute has a define min and max.
+     */
+    bool HasMinMax() const { return mask & ATTRIBUTE_MASK_MIN_MAX; }
 
     /**
      * Check whether this attribute is nullable.

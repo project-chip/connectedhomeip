@@ -26,6 +26,7 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <examples/platform/cc13x4_26x4/CC13X4_26X4DeviceAttestationCreds.h>
 
 #include <DeviceInfoProviderImpl.h>
@@ -59,6 +60,10 @@
 
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+#include "app/icd/server/ICDNotifier.h"
+#endif
 
 /* syscfg */
 #include <ti_drivers_config.h>
@@ -145,6 +150,10 @@ TimerHandle_t sOTAInitTimer = 0;
 // has been started once, it does not need to be started again so the flag will
 // be set to false.
 bool isAppStarting = true;
+
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+bool switchIsTurnedOn = false;
+#endif
 
 ::Identify stIdentify = { SWITCH_APPLICATION_IDENTIFY_ENDPOINT, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
                           Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, AppTask::TriggerIdentifyEffectHandler };
@@ -316,6 +325,7 @@ int AppTask::Init()
     static DefaultTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     // Initialize info provider
     sExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
@@ -479,8 +489,12 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+            PlatformMgr().ScheduleWork([](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+#else
             actor = AppEvent::kEventType_ButtonLeft;
             LightSwitchMgr().InitiateAction(actor, LightSwitchManager::SWITCH_OFF_ACTION);
+#endif
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
@@ -492,7 +506,20 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
             actor = AppEvent::kEventType_ButtonRight;
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+            if (switchIsTurnedOn)
+            {
+                LightSwitchMgr().InitiateAction(actor, LightSwitchManager::SWITCH_OFF_ACTION);
+                switchIsTurnedOn = false;
+            }
+            else
+            {
+                LightSwitchMgr().InitiateAction(actor, LightSwitchManager::SWITCH_ON_ACTION);
+                switchIsTurnedOn = true;
+            }
+#else
             LightSwitchMgr().InitiateAction(actor, LightSwitchManager::SWITCH_ON_ACTION);
+#endif
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {

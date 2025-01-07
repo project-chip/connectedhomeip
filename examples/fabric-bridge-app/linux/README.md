@@ -92,7 +92,7 @@ defined:
 
     ```
     source scripts/activate.sh
-    ./scripts/build/build_examples.py --target linux-x64-fabric-bridge-rpc build
+    ./scripts/build/build_examples.py --target linux-x64-fabric-bridge-rpc-no-ble build
     ```
 
     ### For Raspberry Pi 4 example:
@@ -100,13 +100,13 @@ defined:
     Pull Docker Images
 
     ```
-    docker pull connectedhomeip/chip-build-vscode:latest
+    docker pull ghcr.io/project-chip/chip-build-crosscompile:94
     ```
 
     Run docker
 
     ```
-    docker run -it -v ~/connectedhomeip:/var/connectedhomeip connectedhomeip/chip-build-vscode:latest /bin/bash
+    docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:94 /bin/bash
     ```
 
     Build
@@ -115,8 +115,6 @@ defined:
     cd /var/connectedhomeip
 
     git config --global --add safe.directory /var/connectedhomeip
-    git config --global --add safe.directory /var/connectedhomeip/third_party/pigweed/repo
-    git config --global --add safe.directory /var/connectedhomeip/examples/common/QRCode/repo
 
     ./scripts/run_in_build_env.sh \
      "./scripts/build/build_examples.py \
@@ -128,13 +126,6 @@ defined:
 
     ```
     scp ./fabric-bridge-app ubuntu@xxx.xxx.xxx.xxx:/home/ubuntu
-    ```
-
--   To delete generated executable, libraries and object files use:
-
-    ```sh
-    cd ~/connectedhomeip/examples/fabric-bridge-app/linux
-    rm -rf out/
     ```
 
 ## Running the Complete Example on Ubuntu

@@ -22,7 +22,7 @@ menuconfig CHIP
 	imply REQUIRES_FULL_LIBC
 	imply NEWLIB_LIBC_NANO
 	imply CBPRINTF_LIBC_SUBSTS
-	imply POSIX_API if !ARCH_POSIX && !CHIP_NRF_PLATFORM && !CHIP_NXP_PLATFORM
+	imply POSIX_API if !ARCH_POSIX && !CHIP_NRF_PLATFORM
 	imply EVENTFD if !ARCH_POSIX
 	imply REBOOT
 	imply ENTROPY_GENERATOR
@@ -30,7 +30,7 @@ menuconfig CHIP
 	imply NET_IPV6
 	imply NET_CONFIG_NEED_IPV6
 	imply NET_SOCKETS
-	imply NET_SOCKETS_POSIX_NAMES if !ARCH_POSIX && (CHIP_NRF_PLATFORM || CHIP_NXP_PLATFORM)
+	imply NET_SOCKETS_POSIX_NAMES if !ARCH_POSIX && CHIP_NRF_PLATFORM
 	imply NETWORKING
 	imply HWINFO
 	imply FLASH
@@ -354,6 +354,15 @@ config CHIP_ICD_SLOW_POLL_INTERVAL
 	  device is in the idle mode. It determines the fastest frequency at which the device will be able
 	  to receive the messages in the idle mode.
 
+config CHIP_ICD_SIT_SLOW_POLL_LIMIT
+	int "Intermittently Connected Device slow polling interval limit for device in SIT mode (ms)"
+	default 15000
+	range 0 15000
+	help
+	  Provides the limit for Intermittently Connected Device slow polling interval in milliseconds while the
+	  device is in the SIT mode. By spec, this value cannot exceed 15 s (spec 9.16.1.5). This value can be
+	  used for the LIT device, to limit the slow poll interval used while temporarily working in the SIT mode.
+
 config CHIP_ICD_FAST_POLLING_INTERVAL
 	int "Intermittently Connected Device fast polling interval (ms)"
 	default 200
@@ -389,7 +398,7 @@ config CHIP_ICD_ACTIVE_MODE_THRESHOLD
 	  For LIT devices it cannot be set to a value smaller than 5000 ms.
 
 config CHIP_ICD_LIT_SUPPORT
-	bool "Intermittenly Connected Device Long Idle Time support"
+	bool "Intermittently Connected Device Long Idle Time support"
 	imply CHIP_ICD_CHECK_IN_SUPPORT
 	imply CHIP_ICD_UAT_SUPPORT
 	help
@@ -397,16 +406,23 @@ config CHIP_ICD_LIT_SUPPORT
 	  It also implies the ICD Check-In and UAT features support that are mandatory for LIT device.
 
 config CHIP_ICD_CHECK_IN_SUPPORT
-	bool "Intermittenly Connected Device Check-In protocol support"
+	bool "Intermittently Connected Device Check-In protocol support"
 	help
 	  Enables the Check-In protocol support in Matter. It allows an ICD device to notify the registered
 	  ICD clients that it is available for communication.
 
 config CHIP_ICD_UAT_SUPPORT
-	bool "Intermittenly Connected Device User Active Mode Trigger support"
+	bool "Intermittently Connected Device User Active Mode Trigger support"
 	help
 	  Enables the User Active Mode Trigger (UAT) support in Matter. It allows the User to use application specific
 	  means (e.g. button press) to trigger an ICD device to enter the active mode and become responsive.
+
+config CHIP_ICD_DSLS_SUPPORT
+	bool "Intermittenttly Connected Device Dynamic SIT LIT support"
+	depends on CHIP_ICD_LIT_SUPPORT
+	help
+	  Enables the Dynamic SIT LIT support in Matter. It allows the application to dynamically switch between
+	  SIT and LIT modes, as long as the requirements for these modes are met (e.g. device has at least one active ICD client).
 
 config CHIP_ICD_CLIENTS_PER_FABRIC
 	int "Intermittently Connected Device number of clients per fabric"
@@ -565,4 +581,11 @@ config CHIP_BLE_ADVERTISING_DURATION
 	  If CHIP_BLE_EXT_ADVERTISING is set to false, the maximum duration time is 15 minutes, 
 	  else the maximum duration time can be extended to 2880 minutes (48h).
 
+endif
+
+if BT
+config CHIP_CUSTOM_BLE_ADV_DATA
+	bool "Use custom BLE advertising data"
+	help
+	  Customization of BLE advertising data at the application layer
 endif

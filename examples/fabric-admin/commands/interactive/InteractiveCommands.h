@@ -24,6 +24,9 @@
 
 #include <string>
 
+constexpr uint16_t kFabricBridgeServerPort = 33002;
+constexpr uint16_t kFabricLocalServerPort  = 33001;
+
 class Commands;
 
 class InteractiveCommand : public CHIPCommand
@@ -55,7 +58,13 @@ public:
     InteractiveStartCommand(Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
         InteractiveCommand("start", commandsHandler, "Start an interactive shell that can then run other commands.",
                            credsIssuerConfig)
-    {}
+    {
+#if defined(PW_RPC_ENABLED)
+        AddArgument("fabric-bridge-server-port", 0, UINT16_MAX, &mFabricBridgeServerPort,
+                    "The fabric-bridge RPC port number to connect to.");
+        AddArgument("local-server-port", 0, UINT16_MAX, &mLocalServerPort, "The port number for local RPC server.");
+#endif
+    }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
@@ -63,6 +72,11 @@ public:
 private:
     char * GetCommand(char * command);
     std::string GetHistoryFilePath() const;
+
+#if defined(PW_RPC_ENABLED)
+    chip::Optional<uint16_t> mFabricBridgeServerPort{ kFabricBridgeServerPort };
+    chip::Optional<uint16_t> mLocalServerPort{ kFabricLocalServerPort };
+#endif
 };
 
 void PushCommand(const std::string & command);

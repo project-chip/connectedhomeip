@@ -19,12 +19,27 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --featureSet 0x7e --application evse
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ENERGY_MANAGEMENT_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --enable-key 000102030405060708090a0b0c0d0e0f
+#       --featureSet 0x7c
+#       --application evse
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 """Define Matter test case TC_DEM_2_9."""
@@ -33,7 +48,7 @@
 import logging
 
 import chip.clusters as Clusters
-from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
@@ -58,18 +73,20 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
     def steps_TC_DEM_2_9(self) -> list[TestStep]:
         """Execute the test steps."""
         steps = [
-            TestStep("1", "Commissioning, already done",
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
-                     "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
-            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Test Event",
-                     "Verify DUT responds with status SUCCESS(0x00)"),
-            TestStep("3a", "TH reads Forecast attribute.",
+            TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
+                     "Verify that the DUT response contains the _FeatureMap_ attribute. Verify one of PowerForecastReporting or StateForecastReporting is supported but not both."),
+            TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
+                     "Value has to be 1 (True)"),
+            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("4a", "TH reads from the DUT the Forecast",
                      "Value has to include a valid slots[0].ManufacturerESAState"),
-            TestStep("3b", "TH reads Forecast attribute.",
+            TestStep("4b", "TH reads from the DUT the Forecast",
                      "Value has to include valid slots[0].NominalPower, slots[0].MinPower, slots[0].MaxPower, slots[0].NominalEnergy"),
-            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Test Event Clear",
-                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("5", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Test Event Clear",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
         return steps
@@ -81,27 +98,24 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
         self.step("1")
         # Commission DUT - already done
 
-        # Subscribe to Events and when they are sent push them to a queue for checking later
-        events_callback = EventChangeCallback(Clusters.DeviceEnergyManagement)
-        await events_callback.start(self.default_controller,
-                                    self.dut_node_id,
-                                    self.matter_test_config.endpoint)
-
         self.step("2")
-        await self.check_test_event_triggers_enabled()
+        await self.validate_pfr_or_sfr_in_feature_map()
 
         self.step("3")
+        await self.check_test_event_triggers_enabled()
+
+        self.step("4")
         await self.send_test_event_trigger_forecast()
 
-        self.step("3a")
+        self.step("4a")
         feature_map = await self.read_dem_attribute_expect_success(attribute="FeatureMap")
         if feature_map & Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStateForecastReporting:
             forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
             asserts.assert_is_not_none(forecast.slots[0].manufacturerESAState)
         else:
-            logging.info('Device does not support StateForecastReporting. Skipping step 3a')
+            logging.info('Device does not support StateForecastReporting. Skipping step 4a')
 
-        self.step("3b")
+        self.step("4b")
         if feature_map & Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerForecastReporting:
             forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
 
@@ -110,9 +124,9 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
             asserts.assert_is_not_none(forecast.slots[0].maxPower)
             asserts.assert_is_not_none(forecast.slots[0].nominalEnergy)
         else:
-            logging.info('Device does not support StateForecastReporting. Skipping step 3b')
+            logging.info('Device does not support PowerForecastReporting. Skipping step 4b')
 
-        self.step("4")
+        self.step("5")
         await self.send_test_event_trigger_forecast_clear()
 
 

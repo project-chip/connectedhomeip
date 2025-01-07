@@ -266,4 +266,7 @@ protected:
      * Protected Attributes declaration
      *********************************************************/
     bool mSyncClusterToButtonAction;
+
+private:
+    static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
 };

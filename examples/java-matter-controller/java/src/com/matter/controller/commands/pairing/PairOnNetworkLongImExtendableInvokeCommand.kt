@@ -75,6 +75,7 @@ class PairOnNetworkLongImExtendableInvokeCommand(
         ) {
           setFailure("invoke failure with incorrect status")
         }
+        responseCount++
       }
 
       if (clusterId == CLUSTER_ID_TEST && commandId == TEST_ADD_ARGUMENT_RSP_COMMAND) {
@@ -89,8 +90,8 @@ class PairOnNetworkLongImExtendableInvokeCommand(
         if (status != null) {
           setFailure("invoke failure with incorrect status")
         }
+        responseCount++
       }
-      responseCount++
     }
 
     override fun onNoResponse(noInvokeResponseData: NoInvokeResponseData) {
@@ -126,7 +127,7 @@ class PairOnNetworkLongImExtendableInvokeCommand(
 
     val element1: InvokeElement =
       InvokeElement.newInstance(
-        /* endpointId= */ 0,
+        /* endpointId= */ 1,
         CLUSTER_ID_IDENTIFY,
         IDENTIFY_COMMAND,
         tlvWriter1.getEncoded(),

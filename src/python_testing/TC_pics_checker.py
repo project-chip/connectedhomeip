@@ -17,13 +17,13 @@
 import math
 
 import chip.clusters as Clusters
-from basic_composition_support import BasicCompositionTests
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
-                                    MatterBaseTest, ProblemLocation, TestStep, async_test_body, default_matter_test_main)
+from chip.testing.basic_composition import BasicCompositionTests
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
+                                         MatterBaseTest, ProblemLocation, TestStep, async_test_body, default_matter_test_main)
+from chip.testing.pics import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
+from chip.testing.spec_parsing import build_xml_clusters
 from mobly import asserts
-from pics_support import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
-from spec_parsing_support import build_xml_clusters
 
 
 class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
@@ -177,7 +177,7 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                 self._check_and_record_errors(location, required, pics)
 
         self.step(7)
-        if self.check_pics('PICS_SDK_CI_ONLY'):
+        if self.is_pics_sdk_ci_only:
             self.record_error("PICS check", location=ProblemLocation(),
                               problem="PICS PICS_SDK_CI_ONLY found in PICS list. This PICS is disallowed for certification.")
             self.success = False

@@ -18,6 +18,8 @@
 
 #include "BdxTransferDiagnosticLog.h"
 
+#include <protocols/bdx/BdxTransferDiagnosticLogPool.h>
+
 namespace chip {
 namespace bdx {
 
@@ -199,6 +201,24 @@ void BdxTransferDiagnosticLog::OnExchangeClosing(Messaging::ExchangeContext * ec
     VerifyOrReturn(!mIsExchangeClosing);
     mExchangeCtx = nullptr;
     LogErrorOnFailure(OnTransferSessionEnd(CHIP_ERROR_INTERNAL));
+}
+
+bool BdxTransferDiagnosticLog::IsForFabric(FabricIndex fabricIndex) const
+{
+    if (mExchangeCtx == nullptr || !mExchangeCtx->HasSessionHandle())
+    {
+        return false;
+    }
+
+    auto session = mExchangeCtx->GetSessionHandle();
+    return session->GetFabricIndex() == fabricIndex;
+}
+
+void BdxTransferDiagnosticLog::AbortTransfer()
+{
+    // No need to mTransfer.AbortTransfer() here, since that just tries to async
+    // send a StatusReport to the other side, but we are going away here.
+    Reset();
 }
 
 } // namespace bdx

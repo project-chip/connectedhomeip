@@ -52,6 +52,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   if (enable_fuzz_test_targets) {
     group("fuzz_tests") {
       deps = [
+        "${chip_root}/examples/all-clusters-app/linux:fuzz-chip-all-clusters-app",
         "${chip_root}/src/credentials/tests:fuzz-chip-cert",
         "${chip_root}/src/lib/core/tests:fuzz-tlv-reader",
         "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing",
@@ -62,13 +63,26 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
+  if (pw_enable_fuzz_test_targets) {
+    group("pw_fuzz_tests") {
+      deps = [
+        "${chip_root}/src/credentials/tests:fuzz-chip-cert-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/core/tests:fuzz-tlv-reader-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/format/tests:fuzz-payload-decoder-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/protocols/secure_channel/tests:fuzz-PASE-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+      ]
+    }
+  }
+
   # Matter's in-tree pw_python_package or pw_python_distribution targets.
   _matter_python_packages = [
     "//examples/chef",
     "//examples/common/pigweed/rpc_console/py:chip_rpc",
     "//integrations/mobly:chip_mobly",
     "//scripts/py_matter_yamltests:matter_yamltests",
-    "//src/python_testing/matter_testing_infrastructure:metadata_parser",
+    "//src/python_testing/matter_testing_infrastructure:chip-testing",
   ]
 
   pw_python_venv("matter_build_venv") {
@@ -109,7 +123,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps = [
         "${chip_root}/scripts:matter_yamltests_distribution.wheel",
         "${chip_root}/src/controller/python:chip-repl",
-        "${chip_root}/src/python_testing/matter_testing_infrastructure:metadata_parser.wheel",
+        "${chip_root}/src/python_testing/matter_testing_infrastructure:chip-testing.wheel",
       ]
     }
   }
@@ -138,6 +152,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     if (enable_fuzz_test_targets) {
       deps += [ "//:fuzz_tests" ]
+    }
+
+    if (pw_enable_fuzz_test_targets) {
+      deps += [ "//:pw_fuzz_tests" ]
     }
 
     if (chip_device_platform != "none") {
@@ -232,7 +250,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//scripts/py_matter_idl:matter_idl.tests",
         "//scripts/py_matter_yamltests:matter_yamltests.tests",
         "//src:tests_run",
-        "//src/python_testing/matter_testing_infrastructure:metadata_parser.tests",
+        "//src/python_testing/matter_testing_infrastructure:chip-testing.tests",
       ]
 
       if (current_os == "linux" || current_os == "mac") {

@@ -672,8 +672,8 @@ Status EnergyEvseDelegate::HandleEVPluggedInEvent()
     if (mState == StateEnum::kNotPluggedIn)
     {
         /* EV was not plugged in - start a new session */
-        // TODO get energy meter readings
-        mSession.StartSession(0, 0);
+        // TODO get energy meter readings - #35370
+        mSession.StartSession(mEndpointId, 0, 0);
         SendEVConnectedEvent();
 
         /* Set the state to either PluggedInNoDemand or PluggedInDemand as indicated by mHwState */
@@ -694,6 +694,8 @@ Status EnergyEvseDelegate::HandleEVNotDetectedEvent()
         SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kOther);
     }
 
+    // TODO get energy meter readings - #35370
+    mSession.StopSession(mEndpointId, 0, 0);
     SendEVNotDetectedEvent();
     SetState(StateEnum::kNotPluggedIn);
     return Status::Success;
@@ -706,7 +708,7 @@ Status EnergyEvseDelegate::HandleEVNoDemandEvent()
         /*
          * EV was transferring current - EV decided to stop
          */
-        mSession.RecalculateSessionDuration();
+        mSession.RecalculateSessionDuration(mEndpointId);
         SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVStopped);
     }
     /* We must still be plugged in to get here - so no need to check if we are plugged in! */
@@ -932,10 +934,10 @@ Status EnergyEvseDelegate::ComputeMaxChargeCurrentLimit()
 
     oldValue                    = mActualChargingCurrentLimit;
     mActualChargingCurrentLimit = mMaxHardwareCurrentLimit;
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mCircuitCapacity);
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mCableAssemblyCurrentLimit);
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mMaximumChargingCurrentLimitFromCommand);
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mUserMaximumChargeCurrent);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mCircuitCapacity);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mCableAssemblyCurrentLimit);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mMaximumChargingCurrentLimitFromCommand);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mUserMaximumChargeCurrent);
 
     /* Set the actual max charging current attribute */
     mMaximumChargeCurrent = mActualChargingCurrentLimit;
@@ -1601,7 +1603,6 @@ DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetSessionID()
 }
 DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetSessionDuration()
 {
-    mSession.RecalculateSessionDuration();
     return mSession.mSessionDuration;
 }
 DataModel::Nullable<int64_t> EnergyEvseDelegate::GetSessionEnergyCharged()
@@ -1626,10 +1627,11 @@ bool EnergyEvseDelegate::IsEvsePluggedIn()
 /**
  * @brief This function samples the start-time, and energy meter to hold the session info
  *
+ * @param endpointId            - The endpoint to report the update on
  * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
  * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
  */
-void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMeterValue)
+void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue)
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
@@ -1661,13 +1663,13 @@ void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMe
     mSessionEnergyCharged    = MakeNullable(static_cast<int64_t>(0));
     mSessionEnergyDischarged = MakeNullable(static_cast<int64_t>(0));
 
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionID::Id);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionDuration::Id);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionID::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionDuration::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
 
     // Write values to persistent storage.
-    ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, SessionID::Id);
+    ConcreteAttributePath path = ConcreteAttributePath(endpointId, EnergyEvse::Id, SessionID::Id);
     GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSessionID);
 
     // TODO persist mStartTime
@@ -1675,12 +1677,28 @@ void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMe
     // TODO persist mSessionEnergyDischargedAtStart
 }
 
+/**
+ * @brief This function updates the session information at the unplugged event
+ *
+ * @param endpointId            - The endpoint to report the update on
+ * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
+ * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
+ */
+void EvseSession::StopSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue)
+{
+    RecalculateSessionDuration(endpointId);
+    UpdateEnergyCharged(endpointId, chargingMeterValue);
+    UpdateEnergyDischarged(endpointId, dischargingMeterValue);
+}
+
 /*---------------------- EvseSession functions --------------------------*/
 
 /**
  * @brief This function updates the session attrs to allow read attributes to return latest values
+ *
+ * @param endpointId            - The endpoint to report the update on
  */
-void EvseSession::RecalculateSessionDuration()
+void EvseSession::RecalculateSessionDuration(EndpointId endpointId)
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
@@ -1696,27 +1714,29 @@ void EvseSession::RecalculateSessionDuration()
 
     uint32_t duration = chipEpoch - mStartTime;
     mSessionDuration  = MakeNullable(duration);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionDuration::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionDuration::Id);
 }
 
 /**
  * @brief This function updates the EnergyCharged meter value
  *
+ * @param endpointId            - The endpoint to report the update on
  * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
  */
-void EvseSession::UpdateEnergyCharged(int64_t chargingMeterValue)
+void EvseSession::UpdateEnergyCharged(EndpointId endpointId, int64_t chargingMeterValue)
 {
     mSessionEnergyCharged = MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
 }
 
 /**
  * @brief This function updates the EnergyDischarged meter value
  *
+ * @param endpointId            - The endpoint to report the update on
  * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
  */
-void EvseSession::UpdateEnergyDischarged(int64_t dischargingMeterValue)
+void EvseSession::UpdateEnergyDischarged(EndpointId endpointId, int64_t dischargingMeterValue)
 {
     mSessionEnergyDischarged = MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
 }

@@ -28,5 +28,5 @@ default_args = {
   import("//args.gni")
 
   # Import default platform configs
-  import("${chip_root}/src/platform/nxp/k32w1/args.gni")
+  import("${chip_root}/src/platform/nxp/mcxw71_k32w1/args.gni")
 }

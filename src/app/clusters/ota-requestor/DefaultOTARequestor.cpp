@@ -593,7 +593,7 @@ CHIP_ERROR DefaultOTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIn
     CHIP_ERROR error = mDefaultOtaProviderList.Delete(fabricIndex);
 
     // Ignore the error if no entry for the associated fabric index has been found.
-    ReturnErrorCodeIf(error == CHIP_ERROR_NOT_FOUND, CHIP_NO_ERROR);
+    VerifyOrReturnError(error != CHIP_ERROR_NOT_FOUND, CHIP_NO_ERROR);
     ReturnErrorOnFailure(error);
 
     return mStorage->StoreDefaultProviders(mDefaultOtaProviderList);

@@ -28,6 +28,7 @@
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDiagnosticLogsDownloader.h"
 #import "MTRError_Internal.h"
@@ -57,6 +58,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
@@ -69,13 +71,6 @@ using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Tracing::DarwinFramework;
 
-static bool sExitHandlerRegistered = false;
-static void ShutdownOnExit()
-{
-    MTR_LOG("ShutdownOnExit invoked on exit");
-    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
-}
-
 @interface MTRDeviceControllerFactoryParams ()
 
 // Flag to keep track of whether our .storage is real consumer-provided storage
@@ -83,6 +78,18 @@ static void ShutdownOnExit()
 @property (nonatomic, assign) BOOL hasStorage;
 
 @end
+
+class MTRApplicationCallback : public app::ReadHandler::ApplicationCallback {
+    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & readHandler, Transport::SecureSession & secureSession) override
+    {
+        uint16_t requestedMinInterval = 0;
+        uint16_t requestedMaxInterval = 0;
+        readHandler.GetReportingIntervals(requestedMinInterval, requestedMaxInterval);
+
+        uint16_t maximumMaxInterval = std::max(kSubscriptionMaxIntervalPublisherLimit, requestedMaxInterval);
+        return readHandler.SetMaxReportingInterval(maximumMaxInterval);
+    }
+};
 
 MTR_DIRECT_MEMBERS
 @interface MTRDeviceControllerFactory ()
@@ -96,6 +103,7 @@ MTR_DIRECT_MEMBERS
 
     Credentials::IgnoreCertificateValidityPeriodPolicy _certificateValidityPolicy;
     Crypto::RawKeySessionKeystore _sessionKeystore;
+    MTRApplicationCallback _applicationCallback;
     // We use TestPersistentStorageDelegate just to get an in-memory store to back
     // our group data provider impl.  We initialize this store correctly on every
     // controller startup, so don't need to actually persist it.
@@ -110,7 +118,7 @@ MTR_DIRECT_MEMBERS
     MTRSessionResumptionStorageBridge * _sessionResumptionStorage;
     PersistentStorageOperationalKeystore * _keystore;
     Credentials::PersistentStorageOpCertStore * _opCertStore;
-    MTROperationalBrowser * _operationalBrowser;
+    std::unique_ptr<MTROperationalBrowser> _operationalBrowser;
 
     // productAttestationAuthorityCertificates and certificationDeclarationCertificates are just copied
     // from MTRDeviceControllerFactoryParams.
@@ -149,9 +157,9 @@ MTR_DIRECT_MEMBERS
     //    must lock.
     // D. Locking around reads not from the Matter queue is OK but not required.
     os_unfair_lock _controllersLock;
-    NSMutableArray<MTRDeviceController *> * _controllers;
-    MTRDeviceController * _controllerBeingStarted;
-    MTRDeviceController * _controllerBeingShutDown;
+    NSMutableArray<MTRDeviceController_Concrete *> * _controllers;
+    MTRDeviceController_Concrete * _controllerBeingStarted;
+    MTRDeviceController_Concrete * _controllerBeingShutDown;
 
     // Next available fabric index.  Only valid when _controllerBeingStarted is
     // non-nil, and then it corresponds to the controller being started.  This
@@ -222,6 +230,8 @@ MTR_DIRECT_MEMBERS
     _serverEndpointsLock = OS_UNFAIR_LOCK_INIT;
     _serverEndpoints = [[NSMutableArray alloc] init];
 
+    _operationalBrowser = std::make_unique<MTROperationalBrowser>(self, self->_chipWorkQueue);
+
     return self;
 }
 
@@ -243,6 +253,8 @@ MTR_DIRECT_MEMBERS
 
     // Make sure the deinit order here is the reverse of the init order in
     // startControllerFactory:
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+
     _certificationDeclarationCertificates = nil;
     _productAttestationAuthorityCertificates = nil;
 
@@ -331,6 +343,7 @@ MTR_DIRECT_MEMBERS
                           error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+    [self _maybeLogBacktrace:@"Controller Factory Start"];
 
     __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     dispatch_sync(_chipWorkQueue, ^{
@@ -370,6 +383,8 @@ MTR_DIRECT_MEMBERS
         _productAttestationAuthorityCertificates = [startupParams.productAttestationAuthorityCertificates copy];
         _certificationDeclarationCertificates = [startupParams.certificationDeclarationCertificates copy];
 
+        app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&_applicationCallback);
+
         {
             chip::Controller::FactoryInitParams params;
             if (startupParams.port != nil) {
@@ -384,20 +399,10 @@ MTR_DIRECT_MEMBERS
             params.opCertStore = _opCertStore;
             params.certificateValidityPolicy = &_certificateValidityPolicy;
             params.sessionResumptionStorage = _sessionResumptionStorage;
+            params.dataModelProvider = app::CodegenDataModelProviderInstance(_persistentStorageDelegate);
             SuccessOrExit(err = _controllerFactory->Init(params));
         }
 
-        // This needs to happen after DeviceControllerFactory::Init,
-        // because that creates (lazily, by calling functions with
-        // static variables in them) some static-lifetime objects.
-        if (!sExitHandlerRegistered) {
-            if (atexit(ShutdownOnExit) != 0) {
-                char error[128];
-                strerror_r(errno, error, sizeof(error));
-                MTR_LOG_ERROR("Warning: Failed to register atexit handler: %s", error);
-            }
-            sExitHandlerRegistered = true;
-        }
         HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
 
         // Make sure we don't leave a system state running while we have no
@@ -433,9 +438,10 @@ MTR_DIRECT_MEMBERS
 - (void)stopControllerFactory
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+    [self _maybeLogBacktrace:@"Controller Factory Stop"];
 
-    while ([_controllers count] != 0) {
-        [_controllers[0] shutdown];
+    for (MTRDeviceController * controller in [_controllers copy]) {
+        [controller shutdown];
     }
 
     dispatch_sync(_chipWorkQueue, ^{
@@ -458,12 +464,12 @@ MTR_DIRECT_MEMBERS
  * The provided controller is expected to have just been allocated and to not be
  * initialized yet.
  */
-- (MTRDeviceController * _Nullable)_startDeviceController:(MTRDeviceController *)controller
-                                            startupParams:(id)startupParams
-                                            fabricChecker:(MTRDeviceControllerStartupParamsInternal * (^)(FabricTable * fabricTable,
-                                                              MTRDeviceController * controller,
-                                                              CHIP_ERROR & fabricError))fabricChecker
-                                                    error:(NSError * __autoreleasing *)error
+- (MTRDeviceController_Concrete * _Nullable)_startDeviceController:(MTRDeviceController_Concrete *)controller
+                                                     startupParams:(id)startupParams
+                                                     fabricChecker:(MTRDeviceControllerStartupParamsInternal * (^)(FabricTable * fabricTable,
+                                                                       MTRDeviceController_Concrete * controller,
+                                                                       CHIP_ERROR & fabricError))fabricChecker
+                                                             error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
@@ -474,6 +480,7 @@ MTR_DIRECT_MEMBERS
     dispatch_queue_t _Nullable otaProviderDelegateQueue;
     NSUInteger concurrentSubscriptionPoolSize = 0;
     MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = nil;
+    BOOL startSuspended = NO;
     if ([startupParams isKindOfClass:[MTRDeviceControllerParameters class]]) {
         MTRDeviceControllerParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
@@ -483,6 +490,7 @@ MTR_DIRECT_MEMBERS
         otaProviderDelegateQueue = params.otaProviderDelegateQueue;
         concurrentSubscriptionPoolSize = params.concurrentSubscriptionEstablishmentsAllowedOnThread;
         storageBehaviorConfiguration = params.storageBehaviorConfiguration;
+        startSuspended = params.startSuspended;
     } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
@@ -545,18 +553,13 @@ MTR_DIRECT_MEMBERS
                     otaProviderDelegateQueue:otaProviderDelegateQueue
                             uniqueIdentifier:uniqueIdentifier
               concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize
-                storageBehaviorConfiguration:storageBehaviorConfiguration];
+                storageBehaviorConfiguration:storageBehaviorConfiguration
+                              startSuspended:startSuspended];
     if (controller == nil) {
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
-    }
-
-    if ([_controllers count] == 0) {
-        dispatch_sync(_chipWorkQueue, ^{
-            self->_operationalBrowser = new MTROperationalBrowser(self, self->_chipWorkQueue);
-        });
     }
 
     // Add the controller to _controllers now, so if we fail partway through its
@@ -590,7 +593,7 @@ MTR_DIRECT_MEMBERS
         // Check that we are not trying to start a controller with a uniqueIdentifier that
         // matches a running controller.
         auto * controllersCopy = [self getRunningControllers];
-        for (MTRDeviceController * existing in controllersCopy) {
+        for (MTRDeviceController_Concrete * existing in controllersCopy) {
             if (existing != controller && [existing.uniqueIdentifier isEqual:params.uniqueIdentifier]) {
                 MTR_LOG_ERROR("Already have running controller with uniqueIdentifier %@", existing.uniqueIdentifier);
                 fabricError = CHIP_ERROR_INVALID_ARGUMENT;
@@ -661,15 +664,15 @@ MTR_DIRECT_MEMBERS
     }
 
     // If there is a controller already running with matching parameters that is conceptually shut down from the API consumer's viewpoint, re-use it.
-    MTRDeviceController * existingController = [self _findPendingShutdownControllerWithOperationalCertificate:startupParams.operationalCertificate andRootCertificate:startupParams.rootCertificate];
+    auto * existingController = [self _findPendingShutdownControllerWithOperationalCertificate:startupParams.operationalCertificate andRootCertificate:startupParams.rootCertificate];
     if (existingController) {
         return existingController;
     }
 
-    return [self _startDeviceController:[MTRDeviceController alloc]
+    return [self _startDeviceController:[MTRDeviceController_Concrete alloc]
                           startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
-                              FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
+                              FabricTable * fabricTable, MTRDeviceController_Concrete * controller, CHIP_ERROR & fabricError) {
                               const FabricInfo * fabric = nullptr;
                               BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
                               if (!ok) {
@@ -686,7 +689,7 @@ MTR_DIRECT_MEMBERS
 
                               auto * controllersCopy = [self getRunningControllers];
 
-                              for (MTRDeviceController * existing in controllersCopy) {
+                              for (MTRDeviceController_Concrete * existing in controllersCopy) {
                                   BOOL isRunning = YES; // assume the worst
                                   if ([existing isRunningOnFabric:fabricTable
                                                       fabricIndex:fabric->GetFabricIndex()
@@ -738,10 +741,10 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    return [self _startDeviceController:[MTRDeviceController alloc]
+    return [self _startDeviceController:[MTRDeviceController_Concrete alloc]
                           startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
-                              FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
+                              FabricTable * fabricTable, MTRDeviceController_Concrete * controller, CHIP_ERROR & fabricError) {
                               const FabricInfo * fabric = nullptr;
                               BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
                               if (!ok) {
@@ -818,7 +821,7 @@ MTR_DIRECT_MEMBERS
     } else {
         // No root certificate means the nocSigner is using the root keys, because
         // consumers must provide a root certificate whenever an ICA is used.
-        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(params.nocSigner.publicKey, &pubKey);
+        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromMTRKeypair(params.nocSigner, &pubKey);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Can't extract public key from MTRKeypair: %s", ErrorStr(err));
             return NO;
@@ -834,7 +837,7 @@ MTR_DIRECT_MEMBERS
 // Returns nil on failure, the input controller on success.
 // If the provider has been initialized already, it is not considered as a failure.
 //
-- (MTRDeviceController * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController * _Nonnull)controller
+- (MTRDeviceController_Concrete * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController_Concrete * _Nonnull)controller
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
@@ -906,7 +909,7 @@ MTR_DIRECT_MEMBERS
     app::DnssdServer::Instance().StartServer();
 }
 
-- (void)controllerShuttingDown:(MTRDeviceController *)controller
+- (void)controllerShuttingDown:(MTRDeviceController_Concrete *)controller
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
@@ -939,9 +942,6 @@ MTR_DIRECT_MEMBERS
         // OtaProviderDelegateBridge uses some services provided by the system
         // state without retaining it.
         if (_controllers.count == 0) {
-            delete self->_operationalBrowser;
-            self->_operationalBrowser = nullptr;
-
             if (_otaProviderDelegateBridge) {
                 _otaProviderDelegateBridge->Shutdown();
                 _otaProviderDelegateBridge.reset();
@@ -957,6 +957,10 @@ MTR_DIRECT_MEMBERS
             _otaProviderDelegateBridge->ControllerShuttingDown(controller);
         }
 
+        if (_diagnosticLogsDownloader != nil) {
+            [_diagnosticLogsDownloader abortDownloadsForController:controller];
+        }
+
         [controller shutDownCppController];
 
         self->_controllerBeingShutDown = nil;
@@ -968,26 +972,26 @@ MTR_DIRECT_MEMBERS
     [controller deinitFromFactory];
 }
 
-- (NSArray<MTRDeviceController *> *)getRunningControllers
+- (NSArray<MTRDeviceController_Concrete *> *)getRunningControllers
 {
     std::lock_guard lock(_controllersLock);
     return [_controllers copy];
 }
 
-- (nullable MTRDeviceController *)runningControllerForFabricIndex:(FabricIndex)fabricIndex
-                                      includeControllerStartingUp:(BOOL)includeControllerStartingUp
-                                    includeControllerShuttingDown:(BOOL)includeControllerShuttingDown
+- (nullable MTRDeviceController_Concrete *)runningControllerForFabricIndex:(FabricIndex)fabricIndex
+                                               includeControllerStartingUp:(BOOL)includeControllerStartingUp
+                                             includeControllerShuttingDown:(BOOL)includeControllerShuttingDown
 {
     assertChipStackLockedByCurrentThread();
 
     auto * controllersCopy = [self getRunningControllers];
 
     os_unfair_lock_lock(&_controllersLock);
-    MTRDeviceController * controllerBeingStarted = _controllerBeingStarted;
-    MTRDeviceController * controllerBeingShutDown = _controllerBeingShutDown;
+    auto * controllerBeingStarted = _controllerBeingStarted;
+    auto * controllerBeingShutDown = _controllerBeingShutDown;
     os_unfair_lock_unlock(&_controllersLock);
 
-    for (MTRDeviceController * existing in controllersCopy) {
+    for (MTRDeviceController_Concrete * existing in controllersCopy) {
         if (existing.fabricIndex == fabricIndex) {
             return existing;
         }
@@ -1005,7 +1009,7 @@ MTR_DIRECT_MEMBERS
     return nil;
 }
 
-- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
+- (nullable MTRDeviceController_Concrete *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
 {
     return [self runningControllerForFabricIndex:fabricIndex includeControllerStartingUp:YES includeControllerShuttingDown:YES];
 }
@@ -1087,7 +1091,7 @@ MTR_DIRECT_MEMBERS
         }
     }
 
-    for (MTRDeviceController * controller in [self getRunningControllers]) {
+    for (MTRDeviceController_Concrete * controller in [self getRunningControllers]) {
         NSNumber * _Nullable neededPrivilege = [controller neededReadPrivilegeForClusterID:clusterID attributeID:attributeID];
         if (neededPrivilege != nil) {
             return neededPrivilege;
@@ -1098,7 +1102,7 @@ MTR_DIRECT_MEMBERS
 }
 
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
-                       controller:(MTRDeviceController *)controller
+                       controller:(MTRDeviceController_Concrete *)controller
                              type:(MTRDiagnosticLogType)type
                           timeout:(NSTimeInterval)timeout
                             queue:(dispatch_queue_t)queue
@@ -1126,12 +1130,12 @@ MTR_DIRECT_MEMBERS
 
     auto * controllersCopy = [self getRunningControllers];
 
-    for (MTRDeviceController * controller in controllersCopy) {
+    for (MTRDeviceController_Concrete * controller in controllersCopy) {
         auto * compressedFabricId = controller.compressedFabricID;
         if (compressedFabricId != nil && compressedFabricId.unsignedLongLongValue == operationalID.GetCompressedFabricId()) {
             ChipLogProgress(Controller, "Notifying controller at fabric index %u about new operational node 0x" ChipLogFormatX64,
                 controller.fabricIndex, ChipLogValueX64(operationalID.GetNodeId()));
-            [controller operationalInstanceAdded:operationalID.GetNodeId()];
+            [controller operationalInstanceAdded:@(operationalID.GetNodeId())];
         }
 
         // Keep going: more than one controller might match a given compressed
@@ -1139,10 +1143,13 @@ MTR_DIRECT_MEMBERS
     }
 }
 
-- (nullable MTRDeviceController *)_findPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
+- (nullable MTRDeviceController_Concrete *)_findPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
 {
     std::lock_guard lock(_controllersLock);
-    for (MTRDeviceController * controller in _controllers) {
+    for (MTRDeviceController_Concrete * controller in _controllers) {
+        // TODO: Once we know our controllers are MTRDeviceController_Concrete, move
+        // matchesPendingShutdownControllerWithOperationalCertificate and clearPendingShutdown to that
+        // interface and remove them from base MTRDeviceController_Internal.
         if ([controller matchesPendingShutdownControllerWithOperationalCertificate:operationalCertificate andRootCertificate:rootCertificate]) {
             MTR_LOG("%@ Found existing controller %@ that is pending shutdown and matching parameters, re-using it", self, controller);
             [controller clearPendingShutdown];
@@ -1152,14 +1159,14 @@ MTR_DIRECT_MEMBERS
     return nil;
 }
 
-- (nullable MTRDeviceController *)initializeController:(MTRDeviceController *)controller
-                                        withParameters:(MTRDeviceControllerParameters *)parameters
-                                                 error:(NSError * __autoreleasing *)error
+- (nullable MTRDeviceController_Concrete *)initializeController:(MTRDeviceController_Concrete *)controller
+                                                 withParameters:(MTRDeviceControllerParameters *)parameters
+                                                          error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
     // If there is a controller already running with matching parameters that is conceptually shut down from the API consumer's viewpoint, re-use it.
-    MTRDeviceController * existingController = [self _findPendingShutdownControllerWithOperationalCertificate:parameters.operationalCertificate andRootCertificate:parameters.rootCertificate];
+    MTRDeviceController_Concrete * existingController = [self _findPendingShutdownControllerWithOperationalCertificate:parameters.operationalCertificate andRootCertificate:parameters.rootCertificate];
     if (existingController) {
         return existingController;
     }
@@ -1167,7 +1174,7 @@ MTR_DIRECT_MEMBERS
     return [self _startDeviceController:controller
                           startupParams:parameters
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
-                              FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
+                              FabricTable * fabricTable, MTRDeviceController_Concrete * controller, CHIP_ERROR & fabricError) {
                               auto advertiseOperational = self->_advertiseOperational && parameters.shouldAdvertiseOperational;
                               auto * params =
                                   [[MTRDeviceControllerStartupParamsInternal alloc] initForNewController:controller
@@ -1236,6 +1243,34 @@ MTR_DIRECT_MEMBERS
 - (Credentials::GroupDataProvider *)groupDataProvider
 {
     return &_groupDataProvider;
+}
+
+- (MTROperationalBrowser *)operationalBrowser
+{
+    return _operationalBrowser.get();
+}
+
+- (FabricTable * _Nullable)fabricTable
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (_controllerFactory == nullptr) {
+        return nullptr;
+    }
+
+    auto systemState = _controllerFactory->GetSystemState();
+    if (systemState == nullptr) {
+        return nullptr;
+    }
+
+    return systemState->Fabrics();
+}
+
+- (void)_maybeLogBacktrace:(NSString *)message
+{
+    @autoreleasepool {
+        MTR_LOG("[%@]: %@", message, [NSThread callStackSymbols]);
+    }
 }
 
 @end

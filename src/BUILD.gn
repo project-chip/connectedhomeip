@@ -50,21 +50,25 @@ if (chip_build_tests) {
   chip_test_group("tests") {
     deps = []
     tests = [
+      "${chip_root}/src/access/tests",
       "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
-      "${chip_root}/src/access/tests",
+      "${chip_root}/src/app/icd/server/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
       "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/lib/asn1/tests",
       "${chip_root}/src/lib/core/tests",
+      "${chip_root}/src/lib/format/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
       "${chip_root}/src/protocols/interaction_model/tests",
+      "${chip_root}/src/protocols/secure_channel/tests",
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
+      "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/retransmit/tests",
-      "${chip_root}/src/app/icd/server/tests",
+      "${chip_root}/src/transport/tests",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
@@ -81,46 +85,41 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
     }
 
-    if (current_os != "zephyr" && current_os != "mbed" &&
-        chip_device_platform != "efr32") {
+    if (current_os != "zephyr" && current_os != "mbed") {
       # Avoid these items from "one single binary" test executions. Once tests
-      # are split, we can re-visit this (and likely many others)
+      # are split, we can re-visit this (and likely many others).
       #
-      # In particular:
-      #   "app/codegen-data-model-provider/tests" contains symbols for ember mocks which
-      #                                  are used by other tests
+      # In particular: "data-model-providers/codegen/tests" contains
+      # symbols for ember mocks which are used by other tests.
 
       tests += [
-        "${chip_root}/src/app/codegen-data-model-provider/tests",
+        "${chip_root}/src/data-model-providers/codegen/tests",
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
       ]
     }
 
-    # Skip on efr32 due to flash and/or ram limitations.
     if (chip_device_platform != "efr32") {
       tests += [
         "${chip_root}/src/app/tests",
-        "${chip_root}/src/credentials/tests",
-        "${chip_root}/src/lib/format/tests",
-        "${chip_root}/src/lib/support/tests",
-        "${chip_root}/src/protocols/secure_channel/tests",
-        "${chip_root}/src/system/tests",
-        "${chip_root}/src/transport/tests",
-      ]
 
-      if (matter_enable_tracing_support &&
-          matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
-        tests += [ "${chip_root}/src/tracing/tests" ]
-      }
+        # Disabled for EFR32 because _open is not implemented.
+        # https://github.com/project-chip/connectedhomeip/issues/35624
+        "${chip_root}/src/credentials/tests",
+        "${chip_root}/src/lib/support/tests",
+      ]
+    }
+
+    if (matter_enable_tracing_support &&
+        matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
+      tests += [ "${chip_root}/src/tracing/tests" ]
     }
 
     if (chip_device_platform != "none") {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
     }
 
-    if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
-        chip_device_platform != "ameba") {
+    if (chip_device_platform != "esp32" && chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/platform/tests" ]
     }
 
@@ -130,9 +129,7 @@ if (chip_build_tests) {
 
     # On nrfconnect, the controller tests run into
     # https://github.com/project-chip/connectedhomeip/issues/9630
-    if (chip_device_platform != "nrfconnect" &&
-        chip_device_platform != "efr32") {
-      # Doesn't compile on ef32. Multiple definitions issues with attribute storage and overflows flash memory.
+    if (chip_device_platform != "nrfconnect") {
       tests += [ "${chip_root}/src/controller/tests/data_model" ]
 
       # Skip controller test for Open IoT SDK

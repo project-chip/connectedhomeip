@@ -212,6 +212,13 @@ enum TestGlobalEnum : enum8 {
   kFinalValue = 2;
 }
 
+enum ThreeLevelAutoEnum : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+  kAutomatic = 3;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -409,14 +416,10 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
-    nullable long_char_string instruction = 1;
-    nullable long_char_string redirectURL = 2;
+    optional long_char_string instruction = 1;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -443,7 +446,7 @@ cluster AccessControl = 31 {
   }
 
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -695,23 +698,6 @@ cluster OtaSoftwareUpdateRequestor = 42 {
 
   /** Announce the presence of an OTA Provider */
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute access(write: manage) char_string<35> activeLocale = 0;
-  readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -1038,6 +1024,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1445,7 +1432,7 @@ cluster GeneralDiagnostics = 51 {
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** Request a variable length payload response. */
-  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+  command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -2115,10 +2102,10 @@ cluster IcdManagement = 70 {
   readonly attribute access(read: administer) optional MonitoringRegistrationStruct registeredClients[] = 3;
   readonly attribute access(read: administer) optional int32u ICDCounter = 4;
   readonly attribute optional int16u clientsSupportedPerFabric = 5;
-  provisional readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
-  provisional readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
-  provisional readonly attribute optional OperatingModeEnum operatingMode = 8;
-  provisional readonly attribute optional int32u maximumCheckInBackOff = 9;
+  readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
+  readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  readonly attribute optional OperatingModeEnum operatingMode = 8;
+  readonly attribute optional int32u maximumCheckInBackOff = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2749,6 +2736,7 @@ cluster DoorLock = 257 {
     nullable fabric_idx creatorFabricIndex = 2;
     nullable fabric_idx lastModifiedFabricIndex = 3;
     nullable int16u nextCredentialIndex = 4;
+    optional nullable octet_string credentialData = 5;
   }
 
   request struct ClearCredentialRequest {
@@ -2811,7 +2799,7 @@ cluster DoorLock = 257 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
   device type ma_powersource = 17, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -2823,7 +2811,6 @@ endpoint 0 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2839,7 +2826,6 @@ endpoint 0 {
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
@@ -2872,7 +2858,6 @@ endpoint 0 {
     callback attribute maxPathsPerInvoke;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
@@ -2892,21 +2877,9 @@ endpoint 0 {
     handle command AnnounceOTAProvider;
   }
 
-  server cluster LocalizationConfiguration {
-    persist  attribute activeLocale default = "en-US";
-    callback attribute supportedLocales;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster UnitLocalization {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2922,7 +2895,6 @@ endpoint 0 {
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 2;
@@ -2936,7 +2908,6 @@ endpoint 0 {
     callback attribute supportsConcurrentConnection;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2960,7 +2931,6 @@ endpoint 0 {
     ram      attribute lastConnectErrorValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
@@ -3000,7 +2970,6 @@ endpoint 0 {
     callback attribute testEventTriggersEnabled default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -3136,7 +3105,6 @@ endpoint 0 {
     callback attribute adminVendorId;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -3154,7 +3122,6 @@ endpoint 0 {
     callback attribute currentFabricIndex;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -3180,7 +3147,6 @@ endpoint 0 {
     callback attribute maxGroupKeysPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -3215,7 +3181,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_doorlock = 10, version 1;
+  device type ma_doorlock = 10, version 3;
 
 
   server cluster Identify {
@@ -3223,7 +3189,6 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -3239,7 +3204,6 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -3257,7 +3221,6 @@ endpoint 1 {
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0A;
     ram      attribute clusterRevision default = 2;
@@ -3306,7 +3269,6 @@ endpoint 1 {
     callback attribute numberOfAliroEndpointKeysSupported;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x7DB3;
     ram      attribute clusterRevision default = 7;

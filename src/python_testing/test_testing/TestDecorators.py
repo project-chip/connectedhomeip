@@ -25,22 +25,13 @@
 #
 # You will get step_* calls as appropriate in between the test_start and test_stop calls if the test is not skipped.
 
-import os
 import sys
+from typing import Optional
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-
-try:
-    from matter_testing_support import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test, has_attribute,
-                                        has_cluster, has_feature, per_endpoint_test, per_node_test)
-except ImportError:
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    from matter_testing_support import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test, has_attribute,
-                                        has_cluster, has_feature, per_endpoint_test, per_node_test)
-
-from typing import Optional
-
+from chip.testing.matter_testing import (MatterBaseTest, MatterTestConfig, async_test_body, has_attribute, has_cluster, has_feature,
+                                         run_if_endpoint_matches, run_on_singleton_matching_endpoint, should_run_test_on_endpoint)
 from mobly import asserts
 from MockTestRunner import MockTestRunner
 
@@ -136,106 +127,90 @@ class TestDecorators(MatterBaseTest):
         all_endpoints = await self.default_controller.Read(self.dut_node_id, [()])
         all_endpoints = list(all_endpoints.attributes.keys())
 
-        msg = "Unexpected endpoint list returned"
+        msg = "Unexpected evaluation of should_run_test_on_endpoint"
+        for e in all_endpoints:
+            self.matter_test_config.endpoint = e
+            should_run = await should_run_test_on_endpoint(self, has_onoff)
+            asserts.assert_true(should_run, msg)
 
-        endpoints = await get_accepted_endpoints_for_test(self, has_onoff)
-        asserts.assert_equal(endpoints, all_endpoints, msg)
+            should_run = await should_run_test_on_endpoint(self, has_onoff_onoff)
+            asserts.assert_true(should_run, msg)
 
-        endpoints = await get_accepted_endpoints_for_test(self, has_onoff_onoff)
-        asserts.assert_equal(endpoints, all_endpoints, msg)
+            should_run = await should_run_test_on_endpoint(self, has_onoff_ontime)
+            asserts.assert_false(should_run, msg)
 
-        endpoints = await get_accepted_endpoints_for_test(self, has_onoff_ontime)
-        asserts.assert_equal(endpoints, [], msg)
+            should_run = await should_run_test_on_endpoint(self, has_timesync)
+            asserts.assert_false(should_run, msg)
 
-        endpoints = await get_accepted_endpoints_for_test(self, has_timesync)
-        asserts.assert_equal(endpoints, [], msg)
-
-        endpoints = await get_accepted_endpoints_for_test(self, has_timesync_utc)
-        asserts.assert_equal(endpoints, [], msg)
-
-    # This test should cause an assertion because it has pics_ method
-    @per_node_test
-    async def test_whole_node_with_pics(self):
-        pass
-
-    # This method returns the top level pics for test_whole_node_with_pics
-    # It is used to test that test_whole_node_with_pics will fail since you can't have a whole node test gated on a PICS.
-    def pics_whole_node_with_pics(self):
-        return ['EXAMPLE.S']
-
-    # This test should cause an assertion because it has a pics_ method
-    @per_endpoint_test(has_cluster(Clusters.OnOff))
-    async def test_per_endpoint_with_pics(self):
-        pass
-
-    # This method returns the top level pics for test_per_endpoint_with_pics
-    # It is used to test that test_per_endpoint_with_pics will fail since you can't have a per endpoint test gated on a PICS.
-    def pics_per_endpoint_with_pics(self):
-        return ['EXAMPLE.S']
-
-    # This test should be run once
-    @per_node_test
-    async def test_whole_node_ok(self):
-        pass
+            should_run = await should_run_test_on_endpoint(self, has_timesync_utc)
+            asserts.assert_false(should_run, msg)
 
     # This test should be run once per endpoint
-    @per_endpoint_test(has_cluster(Clusters.OnOff))
+    @run_if_endpoint_matches(has_cluster(Clusters.OnOff))
     async def test_endpoint_cluster_yes(self):
         pass
 
     # This test should be skipped since this cluster isn't on any endpoint
-    @per_endpoint_test(has_cluster(Clusters.TimeSynchronization))
+    @run_if_endpoint_matches(has_cluster(Clusters.TimeSynchronization))
     async def test_endpoint_cluster_no(self):
         pass
 
     # This test should be run once per endpoint
-    @per_endpoint_test(has_attribute(Clusters.OnOff.Attributes.OnOff))
+    @run_if_endpoint_matches(has_attribute(Clusters.OnOff.Attributes.OnOff))
     async def test_endpoint_attribute_yes(self):
         pass
 
     # This test should be skipped since this attribute isn't on the supported cluster
-    @per_endpoint_test(has_attribute(Clusters.OnOff.Attributes.OffWaitTime))
+    @run_if_endpoint_matches(has_attribute(Clusters.OnOff.Attributes.OffWaitTime))
     async def test_endpoint_attribute_supported_cluster_no(self):
         pass
 
     # This test should be skipped since this attribute is part of an unsupported cluster
-    @per_endpoint_test(has_attribute(Clusters.TimeSynchronization.Attributes.Granularity))
+    @run_if_endpoint_matches(has_attribute(Clusters.TimeSynchronization.Attributes.Granularity))
     async def test_endpoint_attribute_unsupported_cluster_no(self):
         pass
 
     # This test should be run once per endpoint
-    @per_endpoint_test(has_feature(Clusters.OnOff, Clusters.OnOff.Bitmaps.Feature.kLighting))
+    @run_if_endpoint_matches(has_feature(Clusters.OnOff, Clusters.OnOff.Bitmaps.Feature.kLighting))
     async def test_endpoint_feature_yes(self):
         pass
 
     # This test should be skipped since this attribute is part of an unsupported cluster
-    @per_endpoint_test(has_feature(Clusters.TimeSynchronization, Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient))
+    @run_if_endpoint_matches(has_feature(Clusters.TimeSynchronization, Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient))
     async def test_endpoint_feature_unsupported_cluster_no(self):
         pass
 
     # This test should be run since both are present
-    @per_endpoint_test(has_attribute(Clusters.OnOff.Attributes.OnOff) and has_cluster(Clusters.OnOff))
+    @run_if_endpoint_matches(has_attribute(Clusters.OnOff.Attributes.OnOff) and has_cluster(Clusters.OnOff))
     async def test_endpoint_boolean_yes(self):
         pass
 
     # This test should be skipped since we have an OnOff cluster, but no Time sync
-    @per_endpoint_test(has_cluster(Clusters.OnOff) and has_cluster(Clusters.TimeSynchronization))
+    @run_if_endpoint_matches(has_cluster(Clusters.OnOff) and has_cluster(Clusters.TimeSynchronization))
     async def test_endpoint_boolean_no(self):
         pass
 
-    @per_endpoint_test(has_cluster(Clusters.OnOff))
+    @run_if_endpoint_matches(has_cluster(Clusters.OnOff))
     async def test_fail_on_ep0(self):
         if self.matter_test_config.endpoint == 0:
             asserts.fail("Expected failure")
 
-    @per_endpoint_test(has_cluster(Clusters.OnOff))
+    @run_if_endpoint_matches(has_cluster(Clusters.OnOff))
     async def test_fail_on_ep1(self):
         if self.matter_test_config.endpoint == 1:
             asserts.fail("Expected failure")
 
-    @per_node_test
-    async def test_fail_on_whole_node(self):
+    @run_on_singleton_matching_endpoint(has_cluster(Clusters.OnOff))
+    async def test_run_on_singleton_matching_endpoint(self):
+        pass
+
+    @run_on_singleton_matching_endpoint(has_cluster(Clusters.OnOff))
+    async def test_run_on_singleton_matching_endpoint_failure(self):
         asserts.fail("Expected failure")
+
+    @run_on_singleton_matching_endpoint(has_attribute(Clusters.OnOff.Attributes.OffWaitTime))
+    async def test_no_run_on_singleton_matching_endpoint(self):
+        pass
 
 
 def main():
@@ -258,81 +233,122 @@ def main():
     if not ok:
         failures.append("Test case failure: test_endpoints")
 
-    test_name = 'test_whole_node_with_pics'
-    test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
-    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
-    if ok:
-        failures.append(f"Did not get expected test assertion on {test_name}")
-
-    test_name = 'test_per_endpoint_with_pics'
-    test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
-    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
-    if ok:
-        failures.append(f"Did not get expected test assertion on {test_name}")
-
     # Test should run once for the whole node, regardless of the number of endpoints
-    def run_check(test_name: str, read_response: Attribute.AsyncReadTransaction.ReadResponse, expected_runs: int, expect_skip: bool) -> None:
+    def run_check(test_name: str, read_response: Attribute.AsyncReadTransaction.ReadResponse, expect_skip: bool) -> None:
         nonlocal failures
         test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
         hooks = DecoratorTestRunnerHooks()
-        ok = test_runner.run_test_with_mock_read(read_response, hooks)
-        started_ok = len(hooks.started) == expected_runs
-        skipped_ok = (hooks.skipped != []) == expect_skip
-        stopped_ok = hooks.stopped == expected_runs
+        num_endpoints = 2
+        for e in [0, 1]:
+            test_runner.set_test_config(MatterTestConfig(endpoint=e))
+            ok = test_runner.run_test_with_mock_read(read_response, hooks)
+        started_ok = len(hooks.started) == num_endpoints
+        expected_num_skips = 2 if expect_skip else 0
+        skipped_ok = len(hooks.skipped) == expected_num_skips
+        stopped_ok = hooks.stopped == num_endpoints
         if not ok or not started_ok or not skipped_ok or not stopped_ok:
             failures.append(
-                f'Expected {expected_runs} run of {test_name}, skips expected: {expect_skip}. Runs: {hooks.started}, skips: {hooks.skipped} stops: {hooks.stopped}')
-
-    def check_once_per_node(test_name: str):
-        run_check(test_name, get_clusters([0]), 1, False)
-        run_check(test_name, get_clusters([0, 1]), 1, False)
+                f'Expected {num_endpoints} run of {test_name}, skips expected: {expect_skip}. Runs: {hooks.started}, skips: {hooks.skipped} stops: {hooks.stopped}')
 
     def check_once_per_endpoint(test_name: str):
-        run_check(test_name, get_clusters([0]), 1, False)
-        run_check(test_name, get_clusters([0, 1]), 2, False)
+        run_check(test_name, get_clusters([0, 1]), False)
 
-    def check_skipped(test_name: str):
-        run_check(test_name, get_clusters([0]), 1, True)
-        run_check(test_name, get_clusters([0, 1]), 1, True)
+    def check_all_skipped(test_name: str):
+        run_check(test_name, get_clusters([0, 1]), True)
 
-    check_once_per_node('test_whole_node_ok')
     check_once_per_endpoint('test_endpoint_cluster_yes')
-    check_skipped('test_endpoint_cluster_no')
+    check_all_skipped('test_endpoint_cluster_no')
     check_once_per_endpoint('test_endpoint_attribute_yes')
-    check_skipped('test_endpoint_attribute_supported_cluster_no')
-    check_skipped('test_endpoint_attribute_unsupported_cluster_no')
+    check_all_skipped('test_endpoint_attribute_supported_cluster_no')
+    check_all_skipped('test_endpoint_attribute_unsupported_cluster_no')
     check_once_per_endpoint('test_endpoint_feature_yes')
-    check_skipped('test_endpoint_feature_unsupported_cluster_no')
+    check_all_skipped('test_endpoint_feature_unsupported_cluster_no')
     check_once_per_endpoint('test_endpoint_boolean_yes')
-    check_skipped('test_endpoint_boolean_no')
+    check_all_skipped('test_endpoint_boolean_no')
 
     test_name = 'test_fail_on_ep0'
     test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
     read_resp = get_clusters([0, 1])
+    # fail on EP0, pass on EP1
+    test_runner.set_test_config(MatterTestConfig(endpoint=0))
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if ok:
         failures.append(f"Did not get expected test assertion on {test_name}")
-
-    test_name = 'test_fail_on_ep1'
-    test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
-    read_resp = get_clusters([0, 1])
-    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
-    if ok:
-        failures.append(f"Did not get expected test assertion on {test_name}")
-
-    test_name = 'test_fail_on_ep1'
-    test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
-    read_resp = get_clusters([0])
+    test_runner.set_test_config(MatterTestConfig(endpoint=1))
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if not ok:
         failures.append(f"Unexpected failure on {test_name}")
 
-    test_name = 'test_fail_on_whole_node'
+    test_name = 'test_fail_on_ep1'
     test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
     read_resp = get_clusters([0, 1])
+    # pass on EP0, fail on EP1
+    test_runner.set_test_config(MatterTestConfig(endpoint=0))
+    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+    if not ok:
+        failures.append(f"Unexpected failure on {test_name}")
+    test_runner.set_test_config(MatterTestConfig(endpoint=1))
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if ok:
         failures.append(f"Did not get expected test assertion on {test_name}")
+
+    def run_singleton_dynamic(test_name: str, cluster_list: list[int]) -> tuple[bool, DecoratorTestRunnerHooks]:
+        nonlocal failures
+        read_resp = get_clusters(cluster_list)
+        test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
+        test_runner.set_test_config(MatterTestConfig(endpoint=2))
+        hooks = DecoratorTestRunnerHooks()
+        ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+        # for all tests, we need to ensure the endpoint was set back to the prior values
+        if test_runner.config.endpoint != 2:
+            failures.append(f"Dynamic tests {test_name} with clusters {cluster_list} did not set endpoint back to prior")
+        # All tests should have a start and a stop
+        started_ok = len(hooks.started) == 1
+        stopped_ok = hooks.stopped == 1
+        if not started_ok or not stopped_ok:
+            failures.append(
+                f'Hooks failure on {test_name}, Runs: {hooks.started}, skips: {hooks.skipped} stops: {hooks.stopped}')
+        return ok, hooks
+
+    def expect_success_dynamic(test_name: str, cluster_list: list[int]):
+        ok, hooks = run_singleton_dynamic(test_name, cluster_list)
+        if not ok:
+            failures.append(f"Unexpected failure on {test_name} with cluster list {cluster_list}")
+        if hooks.skipped:
+            failures.append(f'Unexpected skip call on {test_name} with cluster list {cluster_list}')
+
+    def expect_failure_dynamic(test_name: str, cluster_list: list[int]):
+        ok, hooks = run_singleton_dynamic(test_name, cluster_list)
+        if ok:
+            failures.append(f"Unexpected success on {test_name} with cluster list {cluster_list}")
+        if hooks.skipped:
+            # We don't expect a skip call because the test actually failed.
+            failures.append(f'Skip called for {test_name} with cluster list {cluster_list}')
+
+    def expect_skip_dynamic(test_name: str, cluster_list: list[int]):
+        ok, hooks = run_singleton_dynamic(test_name, cluster_list)
+        if not ok:
+            failures.append(f"Unexpected failure on {test_name} with cluster list {cluster_list}")
+        if not hooks.skipped:
+            # We don't expect a skip call because the test actually failed.
+            failures.append(f'Skip not called for {test_name} with cluster list {cluster_list}')
+
+    test_name = 'test_run_on_singleton_matching_endpoint'
+    expect_success_dynamic(test_name, [0])
+    expect_success_dynamic(test_name, [1])
+    # expect failure because there is more than 1 endpoint
+    expect_failure_dynamic(test_name, [0, 1])
+
+    test_name = 'test_run_on_singleton_matching_endpoint_failure'
+    expect_failure_dynamic(test_name, [0])
+    expect_failure_dynamic(test_name, [1])
+    expect_failure_dynamic(test_name, [0, 1])
+
+    test_name = 'test_no_run_on_singleton_matching_endpoint'
+    # no failure, no matches, expect skips on all endpoints
+    expect_skip_dynamic(test_name, [0])
+    expect_skip_dynamic(test_name, [1])
+    expect_skip_dynamic(test_name, [0, 1])
 
     test_runner.Shutdown()
     print(

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2024 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -202,6 +202,19 @@ public:
             AddArgument("dst-offset", &mComplex_DSTOffsets,
                         "DSTOffset list to use when setting Time Synchronization cluster's DSTOffset attribute",
                         Argument::kOptional);
+
+            AddArgument("require-tc-acknowledgements", 0, 1, &mRequireTCAcknowledgements,
+                        "Indicates whether Terms and Conditions acknowledgements are required during commissioning. If set to "
+                        "true, the tc-acknowledgements and tc-acknowledgements-version arguments must be provided for the "
+                        "commissioning to succeed. If false, the T&C acknowledgement step will be skipped.");
+
+            AddArgument("tc-acknowledgements", 0, UINT16_MAX, &mTCAcknowledgements,
+                        "Bit-field value indicating which Terms and Conditions have been accepted by the user. This value is sent "
+                        "to the device during commissioning via the General Commissioning cluster");
+
+            AddArgument("tc-acknowledgements-version", 0, UINT16_MAX, &mTCAcknowledgementVersion,
+                        "Version number of the Terms and Conditions that were accepted by the user. This value is sent to the "
+                        "device during commissioning to indicate which T&C version was acknowledged");
         }
 
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
@@ -244,7 +257,7 @@ private:
     const PairingNetworkType mNetworkType;
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
-    NodeId mNodeId;
+    NodeId mNodeId = chip::kUndefinedNodeId;
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<bool> mDiscoverOnce;
     chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
@@ -259,6 +272,9 @@ private:
     chip::Optional<uint64_t> mICDMonitoredSubject;
     chip::Optional<chip::app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
     chip::Optional<uint32_t> mICDStayActiveDurationMsec;
+    chip::Optional<bool> mRequireTCAcknowledgements;
+    chip::Optional<uint16_t> mTCAcknowledgements;
+    chip::Optional<uint16_t> mTCAcknowledgementVersion;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
         mComplex_TimeZones;
@@ -266,7 +282,7 @@ private:
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
         mComplex_DSTOffsets;
 
-    uint16_t mRemotePort;
+    uint16_t mRemotePort = 0;
     // mDiscriminator is only used for some situations, but in those situations
     // it's mandatory.  Track whether we're actually using it; the cases that do
     // will emplace this optional.
@@ -275,15 +291,15 @@ private:
     // it's mandatory.  Track whether we're actually using it; the cases that do
     // will emplace this optional.
     std::optional<uint32_t> mSetupPINCode;
-    uint16_t mIndex;
+    uint16_t mIndex = 0;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
-    char * mOnboardingPayload;
-    uint64_t mDiscoveryFilterCode;
-    char * mDiscoveryFilterInstanceName;
+    char * mOnboardingPayload           = nullptr;
+    uint64_t mDiscoveryFilterCode       = 0;
+    char * mDiscoveryFilterInstanceName = nullptr;
 
-    bool mDeviceIsICD;
+    bool mDeviceIsICD = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     // For unpair

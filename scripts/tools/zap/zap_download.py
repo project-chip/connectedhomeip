@@ -106,15 +106,21 @@ def _SetupReleaseZap(install_directory: str, zap_version: str):
 
     if sys.platform == 'linux':
         zap_platform = 'linux'
+        arch = os.uname().machine
     elif sys.platform == 'darwin':
         zap_platform = 'mac'
+        arch = os.uname().machine
+    elif sys.platform == 'win32':
+        zap_platform = 'win'
+        # os.uname is not implemented on Windows, so use an alternative instead.
+        import platform
+        arch = platform.uname().machine
     else:
         raise Exception('Unknown platform - do not know what zip file to download.')
 
-    arch = os.uname().machine
     if arch == 'arm64':
         zap_arch = 'arm64'
-    elif arch == 'x86_64':
+    elif arch == 'x86_64' or arch == 'AMD64':
         zap_arch = 'x64'
     else:
         raise Exception(f'Unknown architecture "${arch}" - do not know what zip file to download.')
@@ -228,17 +234,21 @@ def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional
 
     install_directory = os.path.join(extract_root, f"zap-{zap_version}")
 
+    export_cmd = "export"
+    if sys.platform == 'win32':
+        export_cmd = "set"
+
     if zap == DownloadType.SOURCE:
         install_directory = install_directory + "-src"
         _SetupSourceZap(install_directory, zap_version)
 
         # Make sure the results can be used in scripts
-        print(f"export ZAP_DEVELOPMENT_PATH={shlex.quote(install_directory)}")
+        print(f"{export_cmd} ZAP_DEVELOPMENT_PATH={shlex.quote(install_directory)}")
     else:
         _SetupReleaseZap(install_directory, zap_version)
 
         # Make sure the results can be used in scripts
-        print(f"export ZAP_INSTALL_PATH={shlex.quote(install_directory)}")
+        print(f"{export_cmd} ZAP_INSTALL_PATH={shlex.quote(install_directory)}")
 
 
 if __name__ == '__main__':

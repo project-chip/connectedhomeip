@@ -106,7 +106,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount = 0;
-    bool failSafeArmed;
 
 #if CONFIG_BOOT_REASON_SDK_SUPPORT
     uint8_t rebootCause = POWER_GetResetCause();
@@ -178,8 +177,8 @@ CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
 
     ReturnErrorOnFailure(err);
 
-    ReturnErrorCodeIf(uniqueIdLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(buf[uniqueIdLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrReturnError(uniqueIdLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(buf[uniqueIdLen] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
 
     return err;
 }

@@ -210,6 +210,7 @@ const AesCtrTestEntry theAesCtrTestVector[] = {
     }
 };
 
+#if !(CHIP_CRYPTO_KEYSTORE_APP)
 struct TestAesKey
 {
 public:
@@ -245,6 +246,7 @@ public:
     DefaultSessionKeystore keystore;
     Hmac128KeyHandle key;
 };
+#endif
 
 static void TestAES_CTR_128_Encrypt(const AesCtrTestEntry * vector)
 {
@@ -964,6 +966,7 @@ TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_RawKey)
     EXPECT_EQ(numOfTestsExecuted, numOfTestCases);
 }
 
+#if !(CHIP_CRYPTO_KEYSTORE_APP)
 TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_KeyHandle)
 {
     HeapChecker heapChecker;
@@ -994,6 +997,7 @@ TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_KeyHandle)
     }
     EXPECT_EQ(numOfTestsExecuted, numOfTestCases);
 }
+#endif
 
 TEST_F(TestChipCryptoPAL, TestHKDF_SHA256)
 {
@@ -1870,7 +1874,6 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_RFC)
     size_t Pverifier_len = sizeof(Pverifier);
     uint8_t Vverifier[kMAX_Hash_Length];
     size_t Vverifier_len = sizeof(Vverifier);
-    DefaultSessionKeystore keystore;
 
     int numOfTestVectors = ArraySize(rfc_tvs);
     int numOfTestsRan    = 0;
@@ -1967,7 +1970,9 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_RFC)
         error = Verifier.KeyConfirm(Pverifier, Pverifier_len);
         EXPECT_EQ(error, CHIP_NO_ERROR);
 
+#if !(CHIP_CRYPTO_KEYSTORE_APP)
         // Import HKDF key from the test vector to the keystore
+        DefaultSessionKeystore keystore;
         HkdfKeyHandle vectorKe;
         error = keystore.CreateKey(ByteSpan(vector->Ke, vector->Ke_len), vectorKe);
         EXPECT_EQ(error, CHIP_NO_ERROR);
@@ -1988,7 +1993,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_RFC)
         keystore.DestroyKey(vectorKe);
         keystore.DestroyKey(PKe);
         keystore.DestroyKey(VKe);
-
+#endif
         numOfTestsRan += 1;
     }
     EXPECT_GT(numOfTestsRan, 0);

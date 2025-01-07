@@ -18,12 +18,26 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --application evse
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ENERGY_MANAGEMENT_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --enable-key 000102030405060708090a0b0c0d0e0f
+#       --application evse
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -32,7 +46,7 @@ from datetime import datetime, timedelta, timezone
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
@@ -52,91 +66,90 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_3(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commissioning, already done",
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
-                     "Verify value is 1 (True)"),
-            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event.",
-                     "Verify Command response is Success"),
-            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE TimeOfUse Mode Test Event.",
-                     "Verify Command response is Success"),
-            TestStep("5", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event.",
-                     "Verify Command response is Success and event EEVSE.S.E00(EVConnected) sent"),
-            TestStep("6", "TH sends ClearTargets.",
-                     "Verify Command response is Success"),
-            TestStep("6a", "TH reads NextChargeStartTime attribute.",
-                     "Verify value is null."),
-            TestStep("6b", "TH reads NextChargeTargetTime attribute.",
-                     "Verify value is null."),
-            TestStep("6c", "TH reads NextChargeRequiredEnergy attribute.",
-                     "Verify value is null."),
-            TestStep("6d", "TH reads NextChargeTargetSoC attribute.",
-                     "Verify value is null."),
-            TestStep("7", "TH sends GetTargets.",
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
+                     "Value has to be 1 (True)"),
+            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EVSE TimeOfUse Mode Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("5", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E00(EVConnected) sent"),
+            TestStep("6", "TH sends command ClearTargets",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("6a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be null."),
+            TestStep("6b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be null."),
+            TestStep("6c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be null."),
+            TestStep("6d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be null."),
+            TestStep("7", "TH sends command GetTargets",
                      "Response EEVSE.S.C00.Tx(GetTargetsResponse) sent with no targets defined."),
-            TestStep("8", "TH sends SetTargets with DayOfTheWeekforSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1439, TargetSoC=null, AddedEnergy=25000000}.",
-                     "Verify Command response is Success"),
-            TestStep("8a", "TH reads NextChargeStartTime attribute.",
-                     "Verify value is null."),
-            TestStep("8b", "TH reads NextChargeTargetTime attribute.",
-                     "Verify value is null."),
-            TestStep("8c", "TH reads NextChargeRequiredEnergy attribute.",
-                     "Verify value is null."),
-            TestStep("8d", "TH reads NextChargeTargetSoC attribute.",
-                     "Verify value is null."),
-            TestStep("9", "TH sends EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000.",
-                     "Verify Command response is Success"),
-            TestStep("9a", "TH reads NextChargeStartTime attribute.",
-                     "Verify value is before the next TargetTime above."),
-            TestStep("9b", "TH reads NextChargeTargetTime attribute.",
-                     "Verify value is TargetTime above."),
-            TestStep("9c", "TH reads NextChargeRequiredEnergy attribute.",
-                     "Verify value is AddedEnergy above."),
-            TestStep("9d", "TH reads NextChargeTargetSoC attribute.",
-                     "Verify value is null."),
-            TestStep("10", "TH sends GetTargets.",
+            TestStep("8", "TH sends command SetTargets with DayOfTheWeekforSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1439, TargetSoC=null, AddedEnergy=25000000}",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("8a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be null."),
+            TestStep("8b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be null."),
+            TestStep("8c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be null."),
+            TestStep("8d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be null."),
+            TestStep("9", "TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("9a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be before the next TargetTime above."),
+            TestStep("9b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be TargetTime above."),
+            TestStep("9c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be AddedEnergy above."),
+            TestStep("9d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be null."),
+            TestStep("10", "TH sends command GetTargets",
                      "Response EEVSE.S.C00.Tx(GetTargetsResponse) sent with targets equivalent to the above (Note 1)."),
-            TestStep("11", "TH sends SetTargets with DayOfTheWeekforSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1, TargetSoC=100, AddedEnergy=null}.",
-                     "Verify Command response is Success"),
-            TestStep("11a", "TH reads NextChargeStartTime attribute.",
-                     "Verify value is before the next TargetTime above."),
-            TestStep("11b", "TH reads NextChargeTargetTime attribute.",
-                     "Verify value is TargetTime above."),
-            TestStep("11c", "TH reads NextChargeRequiredEnergy attribute.",
-                     "Verify value is null."),
-            TestStep("11d", "TH reads NextChargeTargetSoC attribute.",
-                     "Verify value is 100."),
-            TestStep("12", "TH sends GetTargets.",
+            TestStep("11", "TH sends command SetTargets with DayOfTheWeekforSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1, TargetSoC=100, AddedEnergy=null}",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("11a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be before the next TargetTime above."),
+            TestStep("11b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be TargetTime above."),
+            TestStep("11c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be null."),
+            TestStep("11d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be 100."),
+            TestStep("12", "TH sends command GetTargets",
                      "Response EEVSE.S.C00.Tx(GetTargetsResponse) sent with targets equivalent to the above (Note 1)."),
-            TestStep("13", "TH sends SetTargets with DayOfTheWeekforSequence=0x40 (i.e. having Saturday set) and 10 ChargingTargets with TargetTimes=60,180,300,420,540,660,780,900,1020,1140 and all with TargetSoC=null, AddedEnergy=2500000.",
-                     "Verify Command response is Success"),
-            TestStep("14", "TH sends SetTargets with DayOfTheWeekforSequence=0x01 (i.e. having Sunday set) and no ChargingTargets.",
-                     "Verify Command response is Success"),
-            TestStep("15", "TH sends GetTargets.",
+            TestStep("13", "TH sends command SetTargets with DayOfTheWeekforSequence=0x40 (i.e. having Saturday set) and 10 ChargingTargets with TargetTimes=60,180,300,420,540,660,780,900,1020,1140 and all with TargetSoC=null, AddedEnergy=2500000",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("14", "TH sends command SetTargets with DayOfTheWeekforSequence=0x01 (i.e. having Sunday set) and no ChargingTargets",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("15", "TH sends command GetTargets",
                      "Response EEVSE.S.C00.Tx(GetTargetsResponse) sent with 1 target for each day Monday to Friday equivalent to step 9 (Note 1), 10 targets for Saturday as step 11, and no targets for Sunday."),
-            TestStep("16", "TH sends ClearTargets.",
-                     "Verify Command response is Success"),
-            TestStep("16a", "TH reads NextChargeStartTime attribute.",
-                     "Verify value is null."),
-            TestStep("16b", "TH reads NextChargeTargetTime attribute.",
-                     "Verify value is null."),
-            TestStep("16c", "TH reads NextChargeRequiredEnergy attribute.",
-                     "Verify value is null."),
-            TestStep("16d", "TH reads NextChargeTargetSoC attribute.",
-                     "Verify value is null."),
-            TestStep("17", "TH sends GetTargets.",
+            TestStep("16", "TH sends command ClearTargets",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("16a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be null."),
+            TestStep("16b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be null."),
+            TestStep("16c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be null."),
+            TestStep("16d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be null."),
+            TestStep("17", "TH sends command GetTargets",
                      "Response EEVSE.S.C00.Tx(GetTargetsResponse) sent with no targets defined."),
-            TestStep("18", "TH sends SetTargets with two identical ChargingTargetSchedules={DayOfTheWeekforSequence=0x01,ChargingTarget[0]={TargetTime=60,TargetSoC=null,AddedEnergy=2500000}}.",
-                     "Verify Command response is ConstraintError"),
-            TestStep("19", "TH sends SetTargets with DayOfTheWeekforSequence=0x40 and 11 ChargingTargets with TargetTimes=60,180,300,420,540,660,780,900,1020,1140,1260 and all with TargetSoC=null, AddedEnergy=2500000.",
-                     "Verify Command response is ResourceExhausted"),
-            TestStep("20", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event Clear.",
-                     "Verify Command response is Success and event EEVSE.S.E01(EVNotDetected) sent"),
-            TestStep("21", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear.",
-                     "Verify Command response is Success"),
-            TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for for EVSE TimeOfUse Mode Test Event Clear.",
-                     "Verify Command response is Success"),
-
+            TestStep("18", "TH sends command SetTargets with two identical ChargingTargetSchedules={DayOfTheWeekforSequence=0x01,ChargingTarget[0]={TargetTime=60,TargetSoC=null,AddedEnergy=2500000}}",
+                     "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+            TestStep("19", "TH sends command SetTargets with DayOfTheWeekforSequence=0x40 and 11 ChargingTargets with TargetTimes=60,180,300,420,540,660,780,900,1020,1140,1260 and all with TargetSoC=null, AddedEnergy=2500000",
+                     "Verify DUT responds w/ status RESOURCE_EXHAUSTED(0x89)"),
+            TestStep("20", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event Clear",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E01(EVNotDetected) sent"),
+            TestStep("21", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event Clear",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EVSE TimeOfUse Mode Test Event Clear",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
         return steps
@@ -181,8 +194,10 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
             f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight%60)}"
             f" Expected target_time = {target_time}")
 
-        target_time_delta = target_time - \
-            datetime(2000, 1, 1, 0, 0, 0, 0).astimezone(timezone.utc)
+        matter_base_time = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
+
+        target_time_delta = target_time - matter_base_time
+
         expected_target_time_epoch_s = int(target_time_delta.total_seconds())
         return expected_target_time_epoch_s
 
@@ -196,7 +211,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         events_callback = EventChangeCallback(Clusters.EnergyEvse)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
-                                    self.matter_test_config.endpoint)
+                                    self.get_endpoint())
 
         self.step("2")
         await self.check_test_event_triggers_enabled()

@@ -19,6 +19,7 @@ import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/build/chip/fuzz_test.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 if (chip_enable_pw_rpc) {
@@ -91,7 +92,7 @@ source_set("chip-all-clusters-common") {
   deps = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/platform/linux:app-main",
-    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
   ]
@@ -200,4 +201,14 @@ group("linux") {
 
 group("default") {
   deps = [ ":linux" ]
+}
+
+if (enable_fuzz_test_targets) {
+  chip_fuzz_target("fuzz-chip-all-clusters-app") {
+    sources = [ "fuzzing-main.cpp" ]
+    public_deps = [
+      ":chip-all-clusters-common",
+      "${chip_root}/examples/platform/linux:app-main",
+    ]
+  }
 }

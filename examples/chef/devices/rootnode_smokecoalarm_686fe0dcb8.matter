@@ -212,6 +212,13 @@ enum TestGlobalEnum : enum8 {
   kFinalValue = 2;
 }
 
+enum ThreeLevelAutoEnum : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+  kAutomatic = 3;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -486,14 +493,10 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
-    nullable long_char_string instruction = 1;
-    nullable long_char_string redirectURL = 2;
+    optional long_char_string instruction = 1;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -520,7 +523,7 @@ cluster AccessControl = 31 {
   }
 
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -918,6 +921,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1325,7 +1329,7 @@ cluster GeneralDiagnostics = 51 {
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** Request a variable length payload response. */
-  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+  command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -1877,7 +1881,6 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
@@ -1913,7 +1916,6 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -1922,7 +1924,7 @@ endpoint 1 {
   server cluster PowerSource {
     emits event BatFaultChange;
     ram      attribute status default = 0;
-    ram      attribute order default = 2;
+    persist  attribute order default = 2;
     ram      attribute description default = "B2";
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
@@ -1930,7 +1932,6 @@ endpoint 1 {
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 2;
@@ -1963,7 +1964,6 @@ endpoint 1 {
     ram      attribute expiryDate default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;

@@ -34,9 +34,6 @@ constexpr size_t kUniqueLocationIdMaxSize       = 64;
 constexpr size_t kUniqueLocationIdsListMaxSize  = 64;
 constexpr size_t kLocationDescriptorNameMaxSize = 128;
 
-constexpr size_t kDeviceDirectoryMaxSize   = 256;
-constexpr size_t kLocationDirectoryMaxSize = 64;
-
 class AttrAccess : public AttributeAccessInterface
 {
 public:
@@ -218,9 +215,11 @@ EcosystemLocationStruct::Builder::SetLocationDescriptorLastEdit(uint64_t aLocati
 std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build()
 {
     VerifyOrReturnValue(!mIsAlreadyBuilt, nullptr, ChipLogError(Zcl, "Build() already called"));
-    VerifyOrReturnValue(!mLocationDescriptor.mLocationName.empty(), nullptr, ChipLogError(Zcl, "Must Provided Location Name"));
-    VerifyOrReturnValue(mLocationDescriptor.mLocationName.size() <= kLocationDescriptorNameMaxSize, nullptr,
-                        ChipLogError(Zcl, "Must Location Name must be less than 64 bytes"));
+    VerifyOrReturnValue(!mLocationDescriptor.mLocationName.empty(), nullptr, ChipLogError(Zcl, "Must Provide Location Name"));
+    static_assert(kLocationDescriptorNameMaxSize <= std::numeric_limits<uint16_t>::max());
+    VerifyOrReturnValue(
+        mLocationDescriptor.mLocationName.size() <= kLocationDescriptorNameMaxSize, nullptr,
+        ChipLogError(Zcl, "Location Name must be less than %u bytes", static_cast<uint16_t>(kLocationDescriptorNameMaxSize)));
 
     // std::make_unique does not have access to private constructor we workaround with using new
     std::unique_ptr<EcosystemLocationStruct> ret{ new EcosystemLocationStruct(std::move(mLocationDescriptor),
@@ -264,8 +263,8 @@ CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::
     VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto & deviceInfo = mDevicesMap[aEndpoint];
-    VerifyOrReturnError((deviceInfo.mDeviceDirectory.size() < kDeviceDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
     deviceInfo.mDeviceDirectory.push_back(std::move(aDevice));
+    mMatterContext.MarkDirty(aEndpoint, Attributes::DeviceDirectory::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -275,6 +274,7 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
     VerifyOrReturnError(aLocation, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!aLocationId.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aLocationId.size() <= kUniqueLocationIdMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aFabricIndex >= kMinValidFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aFabricIndex <= kMaxValidFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -282,8 +282,8 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
     EcosystemLocationKey key = { .mUniqueLocationId = aLocationId, .mFabricIndex = aFabricIndex };
     VerifyOrReturnError((deviceInfo.mLocationDirectory.find(key) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError((deviceInfo.mLocationDirectory.size() < kLocationDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
     deviceInfo.mLocationDirectory[key] = std::move(aLocation);
+    mMatterContext.MarkDirty(aEndpoint, Attributes::LocationDirectory::Id);
     return CHIP_NO_ERROR;
 }
 

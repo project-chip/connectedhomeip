@@ -70,7 +70,7 @@ Davis, CA 95616, USA
     <cluster id="0x0004" name="Groups" side="server">
       <disallowConform/>
     </cluster>
-    <cluster id="0x0005" name="Scenes Management" side="server">
+    <cluster id="0x0062" name="Scenes Management" side="server">
       <disallowConform/>
     </cluster>
     <cluster id="0x0101" name="Door Lock" side="server">
@@ -95,49 +95,14 @@ Davis, CA 95616, USA
             <optionalConform/>
           </otherwiseConform>
         </feature>
-        <feature code="" name="Logging">
-          <disallowConform/>
-        </feature>
-        <feature code="" name="Notification">
-          <disallowConform/>
-        </feature>
       </features>
       <attributes>
-        <attribute code="" name="KeypadOperationEventMask">
-          <disallowConform/>
-        </attribute>
-        <attribute code="" name="RemoteOperationEventMask">
-          <disallowConform/>
-        </attribute>
-        <attribute code="" name="ManualOperationEventMask">
-          <disallowConform/>
-        </attribute>
-        <attribute code="" name="RFIDOperationEventMask">
-          <disallowConform/>
-        </attribute>
-        <attribute code="" name="KeypadProgrammingEventMask">
-          <disallowConform/>
-        </attribute>
-        <attribute code="" name="RemoteProgrammingEventMask">
-          <disallowConform/>
-        </attribute>
-        <attribute code="" name="RFIDProgrammingEventMask">
-          <disallowConform/>
-        </attribute>
         <attribute code="" name="AlarmMask">
           <optionalConform>
             <attribute name="Alarms"/>
           </optionalConform>
         </attribute>
       </attributes>
-      <commands>
-        <command id="" name="OperatingEventNotification">
-          <disallowConform/>
-        </command>
-        <command id="" name="ProgrammingEventNotification">
-          <disallowConform/>
-        </command>
-      </commands>
     </cluster>
   </clusters>
 </deviceType>

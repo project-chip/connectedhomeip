@@ -99,6 +99,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val creatorFabricIndex: UByte?,
     val lastModifiedFabricIndex: UByte?,
     val nextCredentialIndex: UShort?,
+    val credentialData: ByteArray?,
   )
 
   class LockStateAttribute(val value: UByte?)
@@ -1320,6 +1321,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val TAG_NEXT_CREDENTIAL_INDEX: Int = 4
     var nextCredentialIndex_decoded: UShort? = null
 
+    val TAG_CREDENTIAL_DATA: Int = 5
+    var credentialData_decoded: ByteArray? = null
+
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
@@ -1385,6 +1389,25 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
+      }
+
+      if (tag == ContextSpecificTag(TAG_CREDENTIAL_DATA)) {
+        credentialData_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(tag)) {
+                tlvReader.getByteArray(tag)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
       } else {
         tlvReader.skipElement()
       }
@@ -1402,6 +1425,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       creatorFabricIndex_decoded,
       lastModifiedFabricIndex_decoded,
       nextCredentialIndex_decoded,
+      credentialData_decoded,
     )
   }
 

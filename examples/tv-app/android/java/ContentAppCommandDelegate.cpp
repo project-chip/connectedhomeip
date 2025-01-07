@@ -219,7 +219,12 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
 void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response)
 {
     handlerContext.SetCommandHandled();
+    Json::Reader reader;
     Json::Value value;
+    if (!reader.parse(response, value))
+    {
+        return;
+    }
 
     // handle errors from platform-app
     if (!value[FAILURE_KEY].empty())

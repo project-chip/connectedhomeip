@@ -16,8 +16,9 @@ name: Lint Code Base
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -35,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:74
+            image: ghcr.io/project-chip/chip-build:94
 
         steps:
             - name: Checkout
@@ -104,10 +105,8 @@ jobs:
                      --known-failure app/reporting/reporting.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.h \
-                     --known-failure app/util/attribute-storage.cpp \
                      --known-failure app/util/attribute-storage-detail.h \
                      --known-failure app/util/attribute-storage.h \
-                     --known-failure app/util/attribute-table.cpp \
                      --known-failure app/util/attribute-table-detail.h \
                      --known-failure app/util/attribute-table.h \
                      --known-failure app/util/binding-table.cpp \
@@ -115,11 +114,7 @@ jobs:
                      --known-failure app/util/config.h \
                      --known-failure app/util/DataModelHandler.cpp \
                      --known-failure app/util/DataModelHandler.h \
-                     --known-failure app/util/ember-compatibility-functions.cpp \
-                     --known-failure app/util/ember-compatibility-functions.h \
-                     --known-failure app/util/ember-global-attribute-access-interface.cpp \
                      --known-failure app/util/ember-global-attribute-access-interface.h \
-                     --known-failure app/util/ember-io-storage.cpp \
                      --known-failure app/util/ember-io-storage.h \
                      --known-failure app/util/endpoint-config-api.h \
                      --known-failure app/util/generic-callbacks.h \
@@ -134,7 +129,12 @@ jobs:
                      --known-failure platform/GLibTypeDeleter.h \
                      --known-failure platform/SingletonConfigurationManager.cpp \
                   "
-
+                  # These ARE actually orphaned but due to dynamic-server we have code paths
+                  # for them. Keeping them as a list as they still need review ...
+                  #   --known-failure app/util/attribute-table.cpp \
+                  #   --known-failure app/util/ember-io-storage.cpp \
+                  #   --known-failure app/util/ember-global-attribute-access-interface.cpp \
+                  #   --known-failure app/util/attribute-storage.cpp \
             - name: Check for matter lint errors
               if: always()
               run: |
@@ -149,6 +149,8 @@ jobs:
                       if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/thermostat/thermostat-common/thermostat.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/window-app/common/window-app.matter' ]; then continue; fi
+                      # Example is intentionally not spe compliant for use in cert testing
+                      if [ "$idl_file" = './examples/lighting-app-data-mode-no-unique-id/lighting-common/lighting-app.matter' ]; then continue; fi
 
                       # Test files are intentionally small and not spec-compilant, just parse-compliant
                       if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi
@@ -290,13 +292,14 @@ jobs:
                   git grep -I -n 'emberAfWriteAttribute' -- './*'                                            \
                       ':(exclude).github/workflows/lint.yml'                                                 \
                       ':(exclude)examples/common/pigweed/rpc_services/Attributes.h'                          \
-                      ':(exclude)src/app/codegen-data-model-provider/CodegenDataModelProvider_Write.cpp'     \
-                      ':(exclude)src/app/codegen-data-model-provider/tests/EmberReadWriteOverride.cpp'       \
+                      ':(exclude)src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp'     \
+                      ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.cpp'       \
+                      ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp'                               \
                       ':(exclude)src/app/util/attribute-table.cpp'                                           \
                       ':(exclude)src/app/util/attribute-table.h'                                             \
-                      ':(exclude)src/app/util/ember-compatibility-functions.cpp'                             \
                       ':(exclude)src/app/util/mock/CodegenEmberMocks.cpp'                                    \
                       ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt'          \
+                      ':(exclude)src/darwin/Framework/CHIP/ServerEndpoint/MTRIMDispatch.mm'                  \
                       ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' \
                       && exit 1 || exit 0
 

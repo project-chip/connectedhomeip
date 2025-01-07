@@ -57,14 +57,20 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009D" name="Energy EVSE Mode Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009D" name="Energy EVSE Mode Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Disallowed OnMode and StartUpMode attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x009D" name="Energy EVSE Mode"/>
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="EEVSEM" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+      <disallowConform/>
+    </feature>
+  </features>
   <dataTypes>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label">
@@ -79,11 +85,6 @@ Davis, CA 95616, USA
       </field>
     </struct>
   </dataTypes>
-  <features>
-    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
-      <provisionalConform/>
-    </feature>
-  </features>
   <attributes>
     <attribute id="0x0000" name="SupportedModes">
       <mandatoryConform/>
@@ -92,10 +93,10 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="StartUpMode">
-      <provisionalConform/>
+      <disallowConform/>
     </attribute>
     <attribute id="0x0003" name="OnMode">
-      <provisionalConform/>
+      <disallowConform/>
     </attribute>
   </attributes>
 </cluster>

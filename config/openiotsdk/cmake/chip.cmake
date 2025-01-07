@@ -74,7 +74,6 @@ function(chip_add_data_model target scope model_name)
     include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
     chip_configure_data_model(${target}
         SCOPE ${scope}
-        INCLUDE_SERVER
         ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../${model_name}-common/${model_name}-app.zap
     )
 endfunction()

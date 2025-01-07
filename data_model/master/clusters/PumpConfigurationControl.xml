@@ -55,13 +55,12 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0200" name="Pump Configuration and Control Cluster" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0200" name="Pump Configuration and Control Cluster" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="All Hubs changes"/>
     <revision revision="3" summary="New data model format and notation, added additional events"/>
     <revision revision="4" summary="Added feature map"/>
-    <revision revision="5" summary="Added Q quality for Capacity, Speed and Power"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0200" name="Pump Configuration and Control"/>
@@ -97,37 +96,44 @@ Davis, CA 95616, USA
           <feature name="SPD"/>
         </mandatoryConform>
       </item>
-      <item value="1" name="ConstantPressure" summary="The pump will regulate its speed to maintain a constant differential pressure over its flanges.">
+      <item value="1" name="ConstantPressure" summary="The pump will regulate its speed to maintain a
+                                 constant differential pressure over its flanges.">
         <mandatoryConform>
           <feature name="PRSCONST"/>
         </mandatoryConform>
       </item>
-      <item value="2" name="ProportionalPressure" summary="The pump will regulate its speed to maintain a constant differential pressure over its flanges.">
+      <item value="2" name="ProportionalPressure" summary="The pump will regulate its speed to maintain a
+                                 constant differential pressure over its flanges.">
         <mandatoryConform>
           <feature name="PRSCOMP"/>
         </mandatoryConform>
       </item>
-      <item value="3" name="ConstantFlow" summary="The pump will regulate its speed to maintain a constant flow through the pump.">
+      <item value="3" name="ConstantFlow" summary="The pump will regulate its speed to maintain a
+                                 constant flow through the pump.">
         <mandatoryConform>
           <feature name="FLW"/>
         </mandatoryConform>
       </item>
-      <item value="5" name="ConstantTemperature" summary="The pump will regulate its speed to maintain a constant temperature.">
+      <item value="5" name="ConstantTemperature" summary="The pump will regulate its speed to maintain a
+                                 constant temperature.">
         <mandatoryConform>
           <feature name="TEMP"/>
         </mandatoryConform>
       </item>
-      <item value="7" name="Automatic" summary="The operation of the pump is automatically optimized to provide the most suitable performance with respect to comfort and energy savings.">
+      <item value="7" name="Automatic" summary="The operation of the pump is automatically optimized to provide
+                                 the most suitable performance with respect to comfort and energy savings.">
         <mandatoryConform>
           <feature name="AUTO"/>
         </mandatoryConform>
       </item>
     </enum>
     <enum name="OperationModeEnum">
-      <item value="0" name="Normal" summary="The pump is controlled by a setpoint, as defined by a connected remote sensor or by the ControlMode attribute.">
+      <item value="0" name="Normal" summary="The pump is controlled by a setpoint,
+                    as defined by a connected remote sensor or by the ControlMode attribute.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Minimum" summary="This value sets the pump to run at the minimum possible speed it can without being stopped.">
+      <item value="1" name="Minimum" summary="This value sets the pump to run at the minimum possible speed
+                    it can without being stopped.">
         <mandatoryConform>
           <feature name="SPD"/>
         </mandatoryConform>
@@ -137,7 +143,8 @@ Davis, CA 95616, USA
           <feature name="SPD"/>
         </mandatoryConform>
       </item>
-      <item value="3" name="Local" summary="This value sets the pump to run with the local settings of the pump, regardless of what these are.">
+      <item value="3" name="Local" summary="This value sets the pump to run with the local settings of the pump,
+                    regardless of what these are.">
         <mandatoryConform>
           <feature name="LOCAL"/>
         </mandatoryConform>
@@ -331,12 +338,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0013" name="Capacity" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0014" name="Speed" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0015" name="LifetimeRunningHours" type="uint24" default="0">
@@ -346,7 +353,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0016" name="Power" type="uint24" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0017" name="LifetimeEnergyConsumed" type="uint32" default="0">

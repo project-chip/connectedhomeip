@@ -41,7 +41,7 @@ openthread_external_platform =
 chip_openthread_target =
     "${chip_root}/third_party/openthread/platforms/ti:ot-ti-cert"
 
-# Disable CHIP Logging
+# Enable CHIP Logging
 chip_progress_logging = true
 chip_detail_logging = true
 chip_automation_logging = true
@@ -65,6 +65,7 @@ custom_factory_data = false
 chip_enable_icd_server = false
 chip_persist_subscriptions = false
 chip_subscription_timeout_resumption = false
+chip_enable_icd_lit = false
 
 freertos_root = "//third_party/connectedhomeip/third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx/source/third_party/freertos"
 

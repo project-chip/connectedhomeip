@@ -59,6 +59,18 @@
         {
             "name": "renamed_struct_field_impl",
             "path": "partials/renamed_struct_field_impl.zapt"
+        },
+        {
+            "name": "cluster_id_shims",
+            "path": "partials/cluster_id_shims.zapt"
+        },
+        {
+            "name": "attribute_id_shims",
+            "path": "partials/attribute_id_shims.zapt"
+        },
+        {
+            "name": "command_id_shims",
+            "path": "partials/command_id_shims.zapt"
         }
     ],
     "templates": [

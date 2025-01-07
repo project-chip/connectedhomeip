@@ -54,6 +54,22 @@ tests:
               - name: "IdentifyTime"
                 value: 60
 
+    - label:
+          "Verify that the device enters its identification state using the
+          IdentifyType from Step 1b, in order to indicate to an observer which
+          of several nodes and/or endpoints it is."
+      verification: |
+          Verify that the device enters its identification state using the IdentifyType from step1b, Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state. This IdentifyType can vary to device ref: 1.2.5.1 in spec for the IdentifyTypeEnum of the particular DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "Step 2b: TH reads immediately IdentifyTime attribute from DUT"
       PICS: I.S.A0000
       command: "readAttribute"
@@ -82,24 +98,8 @@ tests:
               minValue: 42
               maxValue: 58
 
-    # - label:
-    #       "Step 3: TH sends IdentifyQuery command to DUT and Verify
-    #       IdentifyQueryResponse command to TH,with the Timeout field set to a
-    #       value in the range 0x0000 to 0x0032"
-    #   verification: |
-    #       IdentifyQuery is not supported by Matter
-    #   cluster: "LogCommands"
-    #   command: "UserPrompt"
-    #   PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
-    #   arguments:
-    #       values:
-    #           - name: "message"
-    #             value: "Please enter 'y' for success"
-    #           - name: "expectedValue"
-    #             value: "y"
-
     - label:
-          "Step 4a: Before 60 seconds expire, TH sends Identify command to DUT,
+          "Step 3a: Before 60 seconds expire, TH sends Identify command to DUT,
           with the identify time field set to 0x0000 (stop identifying)."
       PICS: I.S.C00.Rsp
       command: "Identify"
@@ -108,35 +108,28 @@ tests:
               - name: "IdentifyTime"
                 value: 0
 
-    - label: "Step 4b: TH reads immediately IdentifyTime attribute from DUT"
+    - label: "Step 3b: TH reads immediately IdentifyTime attribute from DUT"
       PICS: I.S.A0000
       command: "readAttribute"
       attribute: "IdentifyTime"
       response:
           value: 0
 
-    # disabled due to IdentifyQuery not supported for matter V1.0
-    #- label: "Step 5: TH sends IdentifyQuery command to DUT "
-    #  verification: |
-    #      IdentifyQuery is not supported by Matter
-    #  cluster: "LogCommands"
-    #  command: "UserPrompt"
-    #  PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
-    #  arguments:
-    #      values:
-    #          - name: "message"
-    #            value: "Please enter 'y' for success"
-    #          - name: "expectedValue"
-    #            value: "y"
+    - label:
+          "Step 4a: TH writes a value of 0x000f (15s) to IdentifyTime attribute
+          of DUT"
+      PICS: I.S.A0000
+      command: "writeAttribute"
+      attribute: "IdentifyTime"
+      arguments:
+          value: 15
 
     - label:
-          "Step 6a: Verify that the device enters its identification state using
-          the IdentifyType from Step 1b, in order to indicate to an observer
-          which of several nodes and/or endpoints it is."
+          "Verify that the device enters its identification state using the
+          IdentifyType from Step 1b, in order to indicate to an observer which
+          of several nodes and/or endpoints it is."
       verification: |
-          Verify that the device enters its identification state using the IdentifyType from step1b,
-          Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state.
-          This IdentifyType can vary to device ref: 1.2.5.1 in spec for the IdentifyTypeEnum of the particular DUT
+          Verify that the device enters its identification state using the IdentifyType from step1b, Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state. This IdentifyType can vary to device ref: 1.2.5.1 in spec for the IdentifyTypeEnum of the particular DUT
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && I.S.A0001
@@ -146,15 +139,6 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    - label:
-          "Step 6a: TH writes a value of 0x000f (15s) to IdentifyTime attribute
-          of DUT"
-      PICS: I.S.A0000
-      command: "writeAttribute"
-      attribute: "IdentifyTime"
-      arguments:
-          value: 15
 
     - label: "Wait 15000ms"
       cluster: "DelayCommands"
@@ -165,7 +149,7 @@ tests:
                 value: 15000
 
     - label:
-          "Step 6b: After 15 seconds, the TH reads IdentifyTime attribute from
+          "Step 4b: After 15 seconds, the TH reads IdentifyTime attribute from
           DUT"
       PICS: I.S.A0000
       command: "readAttribute"
@@ -174,19 +158,3 @@ tests:
           constraints:
               minValue: 0
               maxValue: 5
-
-    - label:
-          "Step 6b: Verify that the device terminates its identification state"
-      verification: |
-          Verify that the identification state is terminated in the DUT.
-          Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state.
-          This IdentifyType can vary to device ref: 1.2.5.1 in spec for the IdentifyTypeEnum of the particular DUT
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && I.S.A0001
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"

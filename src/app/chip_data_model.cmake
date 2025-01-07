@@ -17,7 +17,7 @@
 set(CHIP_APP_BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 include("${CHIP_ROOT}/build/chip/chip_codegen.cmake")
-include("${CHIP_ROOT}/src/app/codegen-data-model-provider/model.cmake")
+include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 
 # Configure ${APP_TARGET} with source files associated with ${CLUSTER} cluster
 #
@@ -60,7 +60,6 @@ endfunction()
 # Available options are:
 # SCOPE             CMake scope keyword that defines the scope of included sources.
 # The default is PRIVATE scope.
-# INCLUDE_SERVER    Include source files from src/app/server directory.
 # ZAP_FILE          Path to the ZAP file, used to determine the list of clusters
 # supported by the application.
 # IDL               .matter IDL file to use for codegen. Inferred from ZAP_FILE
@@ -71,27 +70,29 @@ endfunction()
 #
 function(chip_configure_data_model APP_TARGET)
     set(SCOPE PRIVATE)
-    cmake_parse_arguments(ARG "INCLUDE_SERVER" "SCOPE;ZAP_FILE;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
+    cmake_parse_arguments(ARG "" "SCOPE;ZAP_FILE;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
 
     if(ARG_SCOPE)
         set(SCOPE ${ARG_SCOPE})
     endif()
 
-    if(ARG_INCLUDE_SERVER)
-        target_sources(${APP_TARGET} ${SCOPE}
-            ${CHIP_APP_BASE_DIR}/server/AclStorage.cpp
-            ${CHIP_APP_BASE_DIR}/server/DefaultAclStorage.cpp
-            ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
-            ${CHIP_APP_BASE_DIR}/server/Dnssd.cpp
-            ${CHIP_APP_BASE_DIR}/server/EchoHandler.cpp
-            ${CHIP_APP_BASE_DIR}/server/OnboardingCodesUtil.cpp
-            ${CHIP_APP_BASE_DIR}/server/Server.cpp
-        )
+    # CMAKE data model auto-includes the server side implementation
+    target_sources(${APP_TARGET} ${SCOPE}
+        ${CHIP_APP_BASE_DIR}/SafeAttributePersistenceProvider.cpp
+        ${CHIP_APP_BASE_DIR}/StorageDelegateWrapper.cpp
+        ${CHIP_APP_BASE_DIR}/server/AclStorage.cpp
+        ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
+        ${CHIP_APP_BASE_DIR}/server/DefaultAclStorage.cpp
+        ${CHIP_APP_BASE_DIR}/server/DefaultTermsAndConditionsProvider.cpp
+        ${CHIP_APP_BASE_DIR}/server/Dnssd.cpp
+        ${CHIP_APP_BASE_DIR}/server/EchoHandler.cpp
+        ${CHIP_APP_BASE_DIR}/server/OnboardingCodesUtil.cpp
+        ${CHIP_APP_BASE_DIR}/server/Server.cpp
+    )
 
-        target_compile_options(${APP_TARGET} ${SCOPE}
-            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
-        )
-    endif()
+    target_compile_options(${APP_TARGET} ${SCOPE}
+        "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
+    )
 
     if(ARG_ZAP_FILE)
         chip_configure_zap_file(${APP_TARGET} ${ARG_ZAP_FILE} "${ARG_EXTERNAL_CLUSTERS}")
@@ -119,6 +120,27 @@ function(chip_configure_data_model APP_TARGET)
         set(APP_GEN_FILES)
     endif()
 
+    # These are:
+    #   //src/app/icd/server:notfier
+    #   //src/app/icd/server:monitoring-table
+    #   //src/app/icd/server:configuration-data
+    #
+    # TODO: ideally we would avoid duplication and would link gn-built items. In this case
+    #       it may be slightly harder because these are source_sets rather than libraries.
+    target_sources(${APP_TARGET} ${SCOPE}
+        ${CHIP_APP_BASE_DIR}/icd/server/ICDMonitoringTable.cpp
+        ${CHIP_APP_BASE_DIR}/icd/server/ICDNotifier.cpp
+        ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp
+    )
+
+    # This is:
+    #    //src/app/common:cluster-objects
+    #
+    # TODO: ideally we would avoid duplication and would link gn-built items
+    target_sources(${APP_TARGET} ${SCOPE}
+        ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
+    )
+
     chip_zapgen(${APP_TARGET}-zapgen
         INPUT "${ARG_ZAP_FILE}"
         GENERATOR "app-templates"
@@ -133,25 +155,20 @@ function(chip_configure_data_model APP_TARGET)
     target_include_directories(${APP_TARGET} ${SCOPE} "${APP_TEMPLATES_GEN_DIR}")
     add_dependencies(${APP_TARGET} ${APP_TARGET}-zapgen)
 
-    # TODO: source for codedgen_data_model ???
-
     target_sources(${APP_TARGET} ${SCOPE}
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
-        ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
         ${CHIP_APP_BASE_DIR}/reporting/reporting.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
         ${CHIP_APP_BASE_DIR}/util/binding-table.cpp
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDMonitoringTable.cpp
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDNotifier.cpp
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp
         ${CHIP_APP_BASE_DIR}/util/DataModelHandler.cpp
-        ${CHIP_APP_BASE_DIR}/util/ember-compatibility-functions.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-global-attribute-access-interface.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-io-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/generic-callback-stubs.cpp
         ${CHIP_APP_BASE_DIR}/util/privilege-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/util.cpp
+        ${CHIP_APP_BASE_DIR}/util/persistence/AttributePersistenceProvider.cpp
+        ${CHIP_APP_BASE_DIR}/util/persistence/DefaultAttributePersistenceProvider.cpp
         ${CODEGEN_DATA_MODEL_SOURCES}
         ${APP_GEN_FILES}
         ${APP_TEMPLATES_GEN_FILES}

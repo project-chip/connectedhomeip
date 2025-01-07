@@ -147,6 +147,7 @@ if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_lit"                       CONFIG_CHIP_ICD_LIT_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_checkin"                   CONFIG_CHIP_ICD_CHECK_IN_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_user_active_mode_trigger"  CONFIG_CHIP_ICD_UAT_SUPPORT)
+    matter_add_gn_arg_bool  ("chip_enable_icd_dsls"                      CONFIG_CHIP_ICD_DSLS_SUPPORT)
 endif()
 
 if (CONFIG_CHIP_FACTORY_DATA OR CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)

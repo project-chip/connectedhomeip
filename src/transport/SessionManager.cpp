@@ -220,6 +220,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     FabricIndex fabricIndex;
 #endif // CHIP_PROGRESS_LOGGING
 
+    NodeId sourceNodeId = kUndefinedNodeId;
     PeerAddress destination_address;
 
     switch (sessionHandle->GetSessionType())
@@ -236,7 +237,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         packetHeader.SetMessageCounter(mGroupClientCounter.GetCounter(isControlMsg));
         mGroupClientCounter.IncrementCounter(isControlMsg);
         packetHeader.SetSessionType(Header::SessionType::kGroupSession);
-        NodeId sourceNodeId = fabric->GetNodeId();
+        sourceNodeId = fabric->GetNodeId();
         packetHeader.SetSourceNodeId(sourceNodeId);
 
         if (!packetHeader.IsValidGroupMsg())
@@ -292,7 +293,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         CryptoContext::NonceStorage nonce;
-        NodeId sourceNodeId = session->GetLocalScopedNodeId().GetNodeId();
+        sourceNodeId = session->GetLocalScopedNodeId().GetNodeId();
         CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), messageCounter, sourceNodeId);
 
         ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session->GetCryptoContext(), nonce, payloadHeader, packetHeader, message));
@@ -332,6 +333,14 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 #if CHIP_PROGRESS_LOGGING
         destination = kUndefinedNodeId;
         fabricIndex = kUndefinedFabricIndex;
+        if (session->GetSessionRole() == Transport::UnauthenticatedSession::SessionRole::kResponder)
+        {
+            destination = session->GetEphemeralInitiatorNodeID();
+        }
+        else if (session->GetSessionRole() == Transport::UnauthenticatedSession::SessionRole::kInitiator)
+        {
+            sourceNodeId = session->GetEphemeralInitiatorNodeID();
+        }
 #endif // CHIP_PROGRESS_LOGGING
     }
     break;
@@ -382,16 +391,22 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     char exchangeStr[5 + 1 + 1];
     snprintf(exchangeStr, sizeof(exchangeStr), ChipLogFormatExchangeId, ChipLogValueExchangeIdFromSentHeader(payloadHeader));
 
+    // More work around pigweed not allowing more than 14 format args in a log
+    // message when using tokenized logs.
+    // text(5) + source(16) + text(4) + fabricIndex(uint16_t, at most 5 chars) + text(1) + destination(16) + text(2) + compressed
+    // fabric id(4) + text(1) + null-terminator
+    char sourceDestinationStr[5 + 16 + 4 + 5 + 1 + 16 + 2 + 4 + 1 + 1];
+    snprintf(sourceDestinationStr, sizeof(sourceDestinationStr), "from " ChipLogFormatX64 " to %u:" ChipLogFormatX64 " [%04X]",
+             ChipLogValueX64(sourceNodeId), fabricIndex, ChipLogValueX64(destination), static_cast<uint16_t>(compressedFabricId));
+
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
     //
     ChipLogProgress(ExchangeManager,
-                    "<<< [E:%s S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX to %u:" ChipLogFormatX64
-                    " [%04X] [%s] --- Type %s (%s:%s) (B:%u)",
+                    "<<< [E:%s S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX %s [%s] --- Type %s (%s:%s) (B:%u)",
                     exchangeStr, sessionHandle->SessionIdForLogging(), packetHeader.GetMessageCounter(), ackBuf,
-                    Transport::GetSessionTypeString(sessionHandle), fabricIndex, ChipLogValueX64(destination),
-                    static_cast<uint16_t>(compressedFabricId), addressStr, typeStr, protocolName, msgTypeName,
-                    static_cast<unsigned>(message->TotalLength()));
+                    Transport::GetSessionTypeString(sessionHandle), sourceDestinationStr, addressStr, typeStr, protocolName,
+                    msgTypeName, static_cast<unsigned>(message->TotalLength()));
 #endif
 
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
@@ -1282,7 +1297,7 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
             {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                 // Set up a TCP transport based session as standby
-                if ((tcpSession == nullptr || tcpSession->GetLastActivityTime() < session->GetLastActivityTime()) &&
+                if ((tcpSession == nullptr || tcpSession->GetLastPeerActivityTime() < session->GetLastPeerActivityTime()) &&
                     session->GetTCPConnection() != nullptr)
                 {
                     tcpSession = session;
@@ -1290,7 +1305,7 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
             }
 
-            if ((mrpSession == nullptr) || (mrpSession->GetLastActivityTime() < session->GetLastActivityTime()))
+            if ((mrpSession == nullptr) || (mrpSession->GetLastPeerActivityTime() < session->GetLastPeerActivityTime()))
             {
                 mrpSession = session;
             }

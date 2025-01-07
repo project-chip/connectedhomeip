@@ -922,6 +922,9 @@ MCORE.BDX.Sender=0
 MCORE.BDX.SynchronousReceiver=0
 MCORE.BDX.SynchronousSender=0
 
+# Fabric Synchronization
+MCORE.FS=1
+
 # General Diagnostics Cluster
 
 DGGEN.S=1
@@ -1989,6 +1992,7 @@ TSTAT.S.A004a=1
 TSTAT.S.A004e=1
 TSTAT.S.A0050=1
 TSTAT.S.A0051=0
+TSTAT.S.A0052=0
 
 TSTAT.S.M.MinSetpointDeadBandWritable=1
 TSTAT.S.M.HVACSystemTypeConfigurationWritable=0
@@ -1999,6 +2003,7 @@ TSTAT.S.C01.Rsp=0
 TSTAT.S.C02.Rsp=0
 TSTAT.S.C03.Rsp=0
 TSTAT.S.C04.Rsp=0
+TSTAT.S.C05.Rsp=0
 TSTAT.S.C06.Rsp=1
 TSTAT.S.Cfe.Rsp=1
 TSTAT.S.Cfd.Tx=1
@@ -2016,6 +2021,7 @@ TSTAT.C.C02.Tx=0
 TSTAT.C.C03.Tx=0
 TSTAT.S.C00.Tx=0
 TSTAT.S.C01.Tx=0
+TSTAT.C.C05.Tx=0
 TSTAT.C.C06.Tx=1
 TSTAT.C.Cfe.Tx=1
 

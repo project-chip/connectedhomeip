@@ -28,14 +28,21 @@ else
     CHIP_ROOT="$MATTER_ROOT"
 fi
 
+if [[ -z "${PW_ENVIRONMENT_ROOT}" ]]; then
+    echo "Using the bootstrapped pigweed ENV in Matter root"
+    PW_PATH="$CHIP_ROOT/.environment/cipd/packages/pigweed"
+else
+    echo "Using provided $PW_ENVIRONMENT_ROOT as Pigweed ENV root"
+    PW_PATH="$PW_ENVIRONMENT_ROOT/cipd/packages/pigweed"
+fi
+
 set -x
 env
 USE_WIFI=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
 USE_SLC=false
-GN_PATH=gn
-GN_PATH_PROVIDED=false
+GN_PATH="$PW_PATH/gn"
 USE_BOOTLOADER=false
 DOTFILE=".gn"
 
@@ -192,7 +199,7 @@ else
                     exit 1
                 fi
                 USE_WIFI=true
-                optArgs+="chip_device_platform =\"efr32\" "
+                optArgs+="chip_device_platform =\"efr32\" chip_crypto_keystore=\"psa\""
                 shift
                 shift
                 ;;
@@ -260,7 +267,6 @@ else
                 ;;
             --slc_reuse_files)
                 optArgs+="slc_reuse_files=true "
-                USE_SLC=true
                 shift
                 ;;
             --gn_path)
@@ -270,7 +276,6 @@ else
                 else
                     GN_PATH="$2"
                 fi
-                GN_PATH_PROVIDED=true
                 shift
                 shift
                 ;;
@@ -297,10 +302,9 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4338A" ]; then
+    if [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD2605A" ] || [ "$SILABS_BOARD" == "BRD4343A" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
-        optArgs+="chip_device_platform =\"SiWx917\" is_debug=false "
     fi
 
     if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
@@ -311,11 +315,7 @@ else
         } &>/dev/null
     fi
 
-    if [ "$USE_SLC" == true ]; then
-        if [ "$GN_PATH_PROVIDED" == false ]; then
-            GN_PATH=./.environment/cipd/packages/pigweed/gn
-        fi
-    elif [ "$USE_SLC" == false ]; then
+    if [ "$USE_SLC" == false ]; then
         # Activation needs to be after SLC generation which is done in gn gen.
         # Zap generation requires activation and is done in the build phase
         source "$CHIP_ROOT/scripts/activate.sh"
@@ -340,7 +340,7 @@ else
         optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
     fi
 
-    "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
+    "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
 
     if [ "$USE_SLC" == true ]; then
         # Activation needs to be after SLC generation which is done in gn gen.

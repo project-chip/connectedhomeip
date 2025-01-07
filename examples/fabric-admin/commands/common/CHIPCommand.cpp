@@ -19,8 +19,11 @@
 #include "CHIPCommand.h"
 
 #include "IcdManager.h"
+
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <device_manager/PairingManager.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
@@ -120,6 +123,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.opCertStore              = &mOpCertStore;
     factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
     factoryInitParams.sessionKeystore          = &sSessionKeystore;
+    factoryInitParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance(&mDefaultStorage);
 
     // Init group data provider that will be used for all group keys and IPKs for the
     // fabric-admin-configured fabrics. This is OK to do once since the fabric tables
@@ -180,6 +184,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     bool allowTestCdSigningKey = !mOnlyAllowTrustedCdKeys.ValueOr(false);
     mCredIssuerCmds->SetCredentialIssuerOption(CredentialIssuerCommands::CredentialIssuerOptions::kAllowTestCdSigningKey,
                                                allowTestCdSigningKey);
+
+    ReturnLogErrorOnFailure(admin::PairingManager::Instance().Init(&CurrentCommissioner(), mCredIssuerCmds));
 
     return CHIP_NO_ERROR;
 }

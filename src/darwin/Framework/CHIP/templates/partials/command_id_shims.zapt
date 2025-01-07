@@ -1,0 +1,31 @@
+    // Cluster BarrierControl deprecated command id names
+    MTRClusterBarrierControlCommandBarrierControlGoToPercentID
+        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterBarrierControlCommandBarrierControlGoToPercentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000000,
+    MTRClusterBarrierControlCommandBarrierControlStopID
+        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterBarrierControlCommandBarrierControlStopID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000001,
+
+    // Cluster BarrierControl commands
+    MTRCommandIDTypeClusterBarrierControlCommandBarrierControlGoToPercentID MTR_DEPRECATED("The BarrierControlGoToPercent command will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000000,
+    MTRCommandIDTypeClusterBarrierControlCommandBarrierControlStopID MTR_DEPRECATED("The BarrierControlStop command will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000001,
+
+    // Cluster ElectricalMeasurement deprecated command id names
+    MTRClusterElectricalMeasurementCommandGetProfileInfoResponseCommandID
+        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoResponseCommandID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000000,
+    MTRClusterElectricalMeasurementCommandGetProfileInfoCommandID
+        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000000,
+    MTRClusterElectricalMeasurementCommandGetMeasurementProfileResponseCommandID
+        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileResponseCommandID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000001,
+    MTRClusterElectricalMeasurementCommandGetMeasurementProfileCommandID
+        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000001,
+
+    // Cluster ElectricalMeasurement commands
+    MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoResponseCommandID MTR_DEPRECATED("The GetProfileInfoResponseCommand command will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000000,
+    MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID MTR_DEPRECATED("The GetProfileInfoCommand command will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000000,
+    MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileResponseCommandID MTR_DEPRECATED("The GetMeasurementProfileResponseCommand command will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000001,
+    MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID MTR_DEPRECATED("The GetMeasurementProfileCommand command will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000001,

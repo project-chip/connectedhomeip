@@ -23,10 +23,10 @@ import subprocess
 import sys
 
 from crc import Calculator, Crc16
-from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVersion, HardwareVersionStr, IterationCount,
-                    ManufacturingDate, PaiCert, PartNumber, ProductFinish, ProductId, ProductLabel, ProductName,
-                    ProductPrimaryColor, ProductURL, Salt, SerialNum, SetupPasscode, StrArgument, UniqueId, VendorId, VendorName,
-                    Verifier)
+from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, El2GoDacCertID, El2GoDacKeyID, El2GoObject, HardwareVersion,
+                    HardwareVersionStr, IterationCount, ManufacturingDate, PaiCert, PartNumber, ProductFinish, ProductId,
+                    ProductLabel, ProductName, ProductPrimaryColor, ProductURL, Salt, SerialNum, SetupPasscode, StrArgument,
+                    UniqueId, VendorId, VendorName, Verifier)
 from default import InputArgument
 
 # Global variable for hash ID
@@ -75,13 +75,24 @@ class KlvGenerator:
         self.spake2p = Spake2p()
         if self.args.spake2p_verifier is None:
             self.spake2p.generate(self.args)
-        self.args.dac_key.generate_private_key(self.args.dac_key_password, self.args.dac_key_use_sss_blob)
+        if self.args.dac_key:
+            self.args.dac_key.generate_private_key(self.args.dac_key_password, self.args.dac_key_use_sss_blob)
 
     def _validate_args(self):
-        if self.args.dac_key_password is None:
+        if self.args.dac_key_password is None and self.args.EL2GO_bin is None:
             logging.warning(
                 "DAC Key password not provided. It means DAC Key is not protected."
             )
+        if self.args.dac_key and self.args.EL2GO_bin:
+            logging.error("Could not provide two DAC Key provisionning method at the same time")
+
+        if (not self.args.dac_key or not self.args.dac_cert) and not self.args.EL2GO_bin:
+            logging.error("Need to provide a DAC provisionner")
+            raise Exception("Could not generate factory data")
+
+        if self.args.EL2GO_bin and (not self.args.EL2GO_DAC_CERT_ID or not self.args.EL2GO_DAC_KEY_ID):
+            logging.error("Need to provide EdgeLock 2Go DAC IDs")
+            raise Exception("Could not generate factory data")
 
         str_args = [obj for key, obj in vars(self.args).items() if isinstance(obj, StrArgument)]
         for str_arg in str_args:
@@ -106,7 +117,7 @@ class KlvGenerator:
 
         return data
 
-    def to_bin(self, klv, out, aes128_key):
+    def to_bin(self, klv, out, aes_key):
         fullContent = bytearray()
         with open(out, "wb") as file:
             for entry in klv:
@@ -115,7 +126,7 @@ class KlvGenerator:
                 fullContent += entry[2]
             size = len(fullContent)
 
-            if (aes128_key is None):
+            if (aes_key is None):
                 # Calculate 4 bytes of hashing
                 hashing = hashlib.sha256(fullContent).hexdigest()
                 hashing = hashing[0:8]
@@ -146,7 +157,7 @@ class KlvGenerator:
                 logging.info("Size of final generated binary is: {} bytes".format(size))
                 file.write(fullContent)
             else:
-                # In case a aes128_key is given the data will be encrypted
+                # In case a aes_key is given the data will be encrypted
                 # Always add a padding to be 16 bytes aligned
                 padding_len = size % 16
                 padding_len = 16 - padding_len
@@ -156,7 +167,7 @@ class KlvGenerator:
                 size = len(fullContent)
                 logging.info("(After padding) Size of generated binary is: {} bytes".format(size))
                 from Crypto.Cipher import AES
-                cipher = AES.new(bytes.fromhex(aes128_key), AES.MODE_ECB)
+                cipher = AES.new(bytes.fromhex(aes_key), AES.MODE_ECB)
                 fullContentCipher = cipher.encrypt(fullContent)
 
                 # Add 4 bytes of hashing to generated binary to check for integrity
@@ -210,10 +221,6 @@ def main():
                           help="[str] Hardware version as string")
     required.add_argument("--cert_declaration", required=True, type=CertDeclaration,
                           help="[path] Path to Certification Declaration in DER format")
-    required.add_argument("--dac_cert", required=True, type=DacCert,
-                          help="[path] Path to DAC certificate in DER format")
-    required.add_argument("--dac_key", required=True, type=DacPKey,
-                          help="[path] Path to DAC key in DER format")
     required.add_argument("--pai_cert", required=True, type=PaiCert,
                           help="[path] Path to PAI certificate in DER format")
     required.add_argument("--spake2p_path", required=True, type=str,
@@ -221,6 +228,16 @@ def main():
     required.add_argument("--out", required=True, type=str,
                           help="[path] Path to output binary")
 
+    optional.add_argument("--dac_cert", type=DacCert,
+                          help="[path] Path to DAC certificate in DER format")
+    optional.add_argument("--dac_key", type=DacPKey,
+                          help="[path] Path to DAC key in DER format")
+    optional.add_argument("--EL2GO_bin", type=El2GoObject,
+                          help="[path] Path to EL2GO secure objects binary")
+    optional.add_argument("--EL2GO_DAC_KEY_ID", type=El2GoDacKeyID,
+                          help="[hex] EL2GO DAC key ID")
+    optional.add_argument("--EL2GO_DAC_CERT_ID", type=El2GoDacCertID,
+                          help="[hex] EL2GO DAC certificate ID")
     optional.add_argument("--dac_key_password", type=str,
                           help="[path] Password to decode DAC Key if available")
     optional.add_argument("--dac_key_use_sss_blob", action='store_true',
@@ -229,6 +246,8 @@ def main():
                           help="[base64 str] Already generated spake2p verifier")
     optional.add_argument("--aes128_key",
                           help="[hex] AES 128 bits key used to encrypt the whole dataset")
+    optional.add_argument("--aes256_key",
+                          help="[hex] AES 256 bits key used to encrypt the whole dataset")
     optional.add_argument("--date", type=ManufacturingDate,
                           help="[str] Manufacturing Date (YYYY-MM-DD)")
     optional.add_argument("--part_number", type=PartNumber,
@@ -252,7 +271,12 @@ def main():
 
     klv = KlvGenerator(args)
     data = klv.generate()
-    klv.to_bin(data, args.out, args.aes128_key)
+    aes_key = None
+    if args.aes256_key:
+        aes_key = args.aes256_key
+    elif args.aes128_key:
+        aes_key = args.aes128_key
+    klv.to_bin(data, args.out, aes_key)
 
 
 if __name__ == "__main__":

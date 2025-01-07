@@ -18,7 +18,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_NEWLY_AVAILABLE
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDsKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerContextKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+
+MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID getStateWithReply:(void (^)(MTRDeviceState state))reply;
@@ -27,54 +35,51 @@ MTR_NEWLY_AVAILABLE
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID getEstimatedSubscriptionLatencyWithReply:(void (^)(NSNumber * _Nullable estimatedSubscriptionLatency))reply;
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID readAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID params:(MTRReadParams * _Nullable)params withReply:(void (^)(NSDictionary<NSString *, id> * _Nullable))reply;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID writeAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(id _Nullable)value expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval timedWriteTimeout:(NSNumber * _Nullable)timeout;
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID writeAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(id)value expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval timedWriteTimeout:(NSNumber * _Nullable)timeout;
+
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths withReply:(void (^)(NSArray<NSDictionary<NSString *, id> *> *))reply;
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID invokeCommandWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID commandFields:(id)commandFields expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval timedInvokeTimeout:(NSNumber * _Nullable)timeout serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
                      completion:(MTRDeviceResponseHandler)completion;
 
-// Not Supported via XPC
-//- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator duration:(NSNumber *)duration completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator duration:(NSNumber *)duration completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID getClientDataKeysWithReply:(void (^)(NSArray * _Nullable))reply;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID clientDataForKey:(NSString *)key withReply:(void (^)(id<NSSecureCoding> _Nullable))reply;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID removeClientDataForKey:(NSString *)key;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID clientDataKeysForEndpointID:(NSNumber *)endpointID withReply:(void (^)(NSArray * _Nullable))reply;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID withReply:(void (^)(id<NSSecureCoding> _Nullable))reply;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding> _Nullable)value;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID;
+- (oneway void)downloadLogOfType:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
-// Not Supported via XPC
-// - (oneway void)downloadLogOfType:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
+@optional
+/* Note: The consumer of the completion block should move the file that the url points to or open it for reading before the
+ * completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
+ */
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID downloadLogOfType:(MTRDiagnosticLogType)type timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
+
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol_MTRDeviceController <NSObject>
 
-- (oneway void)deviceController:(NSUUID *)controller getIsRunningWithReply:(void (^)(BOOL response))reply;
-- (oneway void)deviceController:(NSUUID *)controller getUniqueIdentifierWithReply:(void (^)(NSUUID *))reply;
-- (oneway void)deviceController:(NSUUID *)controller controllerNodeIDWithReply:(void (^)(NSNumber * nodeID))reply;
-
-// Not Supported via XPC
-// - (oneway void)deviceController:(NSUUID *)controller setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload newNodeID:(NSNumber *)newNodeID withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
-// - (oneway void)deviceController:(NSUUID *)controller setupCommissioningSessionWithDiscoveredDevice:(MTRCommissionableBrowserResult *)discoveredDevice payload:(MTRSetupPayload *)payload newNodeID:(NSNumber *)newNodeID withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
-// - (oneway void)deviceController:(NSUUID *)controller commissionNodeWithID:(NSNumber *)nodeID commissioningParams:(MTRCommissioningParameters *)commissioningParams withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
-// - (oneway void)deviceController:(NSUUID *)controller continueCommissioningDevice:(void *)opaqueDeviceHandle ignoreAttestationFailure:(BOOL)ignoreAttestationFailure withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
-// - (oneway void)deviceController:(NSUUID *)controller cancelCommissioningForNodeID:(NSNumber *)nodeID withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
+@optional
+// - (oneway void)deviceController:(NSUUID *)controller setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload newNodeID:(NSNumber *)newNodeID withReply:(void (^)(BOOL success, NSError * _Nullable error))reply;
+// - (oneway void)deviceController:(NSUUID *)controller setupCommissioningSessionWithDiscoveredDevice:(MTRCommissionableBrowserResult *)discoveredDevice payload:(MTRSetupPayload *)payload newNodeID:(NSNumber *)newNodeID withReply:(void (^)(BOOL success, NSError * _Nullable error))reply;
+// - (oneway void)deviceController:(NSUUID *)controller commissionNodeWithID:(NSNumber *)nodeID commissioningParams:(MTRCommissioningParameters *)commissioningParams withReply:(void (^)(BOOL success, NSError * _Nullable error))reply;
+// - (oneway void)deviceController:(NSUUID *)controller continueCommissioningDevice:(void *)opaqueDeviceHandle ignoreAttestationFailure:(BOOL)ignoreAttestationFailure withReply:(void (^)(BOOL success, NSError * _Nullable error))reply;
+// - (oneway void)deviceController:(NSUUID *)controller cancelCommissioningForNodeID:(NSNumber *)nodeID withReply:(void (^)(BOOL success, NSError * _Nullable error))reply;
 // - (nullable MTRBaseDevice *)deviceController:(NSUUID *)controller deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error;
-// - (oneway void)deviceController:(NSUUID *)controller startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate withReply:(void(^)(BOOL success))reply;
-// - (oneway void)deviceController:(NSUUID *)controller stopBrowseForCommissionablesWithReply:(void(^)(BOOL success))reply;
-// - (oneway void)deviceController:(NSUUID *)controller attestationChallengeForDeviceID:(NSNumber *)deviceID withReply:(void(^)(NSData * _Nullable))reply;
+// - (oneway void)deviceController:(NSUUID *)controller startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate withReply:(void (^)(BOOL success))reply;
+// - (oneway void)deviceController:(NSUUID *)controller stopBrowseForCommissionablesWithReply:(void (^)(BOOL success))reply;
+// - (oneway void)deviceController:(NSUUID *)controller attestationChallengeForDeviceID:(NSNumber *)deviceID withReply:(void (^)(NSData * _Nullable))reply;
 
-//- (oneway void)deviceController:(NSUUID *)controller addServerEndpoint:(MTRServerEndpoint *)endpoint withReply:(void(^)(BOOL success))reply;
-//- (oneway void)deviceController:(NSUUID *)controller removeServerEndpoint:(MTRServerEndpoint *)endpoint;
+// - (oneway void)deviceController:(NSUUID *)controller addServerEndpoint:(MTRServerEndpoint *)endpoint withReply:(void (^)(BOOL success))reply;
+// - (oneway void)deviceController:(NSUUID *)controller removeServerEndpoint:(MTRServerEndpoint *)endpoint;
 
-- (oneway void)deviceController:(NSUUID *)controller shutdownDeviceController:(NSUUID *)controller;
+- (oneway void)deviceController:(NSUUID *)controller registerNodeID:(NSNumber *)nodeID;
+- (oneway void)deviceController:(NSUUID *)controller unregisterNodeID:(NSNumber *)nodeID;
+- (oneway void)deviceController:(NSUUID *)controller updateControllerConfiguration:(NSDictionary *)controllerState;
 
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol <NSObject, MTRXPCServerProtocol_MTRDevice, MTRXPCServerProtocol_MTRDeviceController>
+@optional
 - (oneway void)deviceController:(NSUUID *)controller checkInWithContext:(NSDictionary *)context;
 @end
 

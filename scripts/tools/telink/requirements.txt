@@ -1,5 +1,6 @@
-cryptography==41.0.4
-cffi==1.15.0
+cryptography==43.0.1
+cffi==1.15.0; python_version < "3.13"
+cffi==1.17.1; python_version >= "3.13"
 future==0.18.3
 pycparser==2.21
 pypng==0.0.21

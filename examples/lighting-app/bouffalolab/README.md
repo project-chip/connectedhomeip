@@ -1,4 +1,4 @@
-# `Bouffalo Lab`
+# Matter `Bouffalo Lab` Lighting Example
 
 This example functions as a light bulb device type, with on/off and level
 capabilities and uses a test Vendor ID (VID) and a Product ID (PID)
@@ -17,8 +17,6 @@ Legacy supported boards:
 -   `BL602-NIGHT-LIGHT`
 -   `XT-ZB6-DevKit`
 -   `BL706-NIGHT-LIGHT`
--   `BL706DK`
--   `BL704LDK`
 
 > Warning: Changing the VID/PID may cause compilation problems, we recommend
 > leaving it as the default while using this example.
@@ -99,6 +97,7 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
 
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602dk-light build
+    ./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-wifi build
     ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light build
     ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light build
     ```
@@ -113,25 +112,28 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
 
 ### Build options with build_examples.py
 
--   `-wifi`, to specify that connectivity Wi-Fi is enabled for Matter
-    application.
+-   `-wifi`, specifies to use Wi-Fi for Matter application.
 
-    -   BL602 uses `-wifi` by default
-    -   BL702 needs specify to use BL706 + BL602 for Wi-Fi connectivity.
+    -   BL602 uses Wi-Fi by default. `-wifi` could be elided.
+    -   BL702 needs it to specify to use BL706 + BL602 for Wi-Fi.
 
--   `-thread`, to specify that connectivity Thread is enabled for Matter
-    application.
+-   `-thread`, specifies to use Thread for Matter application.
 
-    -   BL70X uses `-thread` by default.
+    -   BL70X uses Thread by default. `-thread` could be elided.
 
--   `-ethernet`, to specify that connectivity Ethernet is enabled for Matte
-    application.
+-   `-ethernet`, specifies to use Ethernet for Matter application.
 
-    -   BL706 needs specify to use Ethernet connectivity.
+    -   BL706 needs it to specify to use Ethernet.
 
--   `-easyflash`, to specify that `easyflash` is used for flash storage access.
+-   `-littlefs`, specifies to use `littlefs` for flash access.
+-   `-easyflash`, specifies to use `easyflash` for flash access.
+    -   for platform BL602/BL70X, it is necessary to specify one of `-easyflash`
+        and `-littlefs`.
 -   `-mfd`, enable Matter factory data feature, which load factory data from
     `MFD` partition
+    -   Please refer to
+        [Bouffalo Lab Matter factory data guide](../../../docs/platforms/bouffalolab/matter_factory_data.md)
+        or contact to `Bouffalo Lab` for support.
 -   `-shell`, enable command line
 -   `-rpc`, enable Pigweed RPC feature
 -   `-115200`, set UART baudrate to 115200 for log and command line
@@ -173,11 +175,11 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
 
         -   `BL602DK`, `BL704LDK` and `BL706DK`.
 
-
             ```shell
-            ./out/bouffalolab-bl602dk-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
-            ./out/bouffalolab-bl704ldk-light/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0
-            ./out/bouffalolab-bl706dk-light/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl602dk-light-littlefs/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl616dk-light-wifi/chip-bl616dk-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl704ldk-light-littlefs/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl706dk-light-littlefs/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
             ```
 
         -   To wipe out flash and download image, please append `--erase`
@@ -209,15 +211,16 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
 
 ## Test Commission and Control with chip-tool
 
-Please follow [chip_tool_guide](../../../docs/guides/chip_tool_guide.md) and
-[guide](../../chip-tool/README.md) to build and use chip-tool for test.
+Please follow
+[chip_tool_guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md)
+and [guide](../../chip-tool/README.md) to build and use chip-tool for test.
 
 ### Prerequisite for Thread Protocol
 
 Thread wireless protocol runs on BL706, which needs a Thread border router to
 connect Thread network to Wi-Fi/Ethernet network. Please follow this
-[guide](../../../docs/guides/openthread_border_router_pi.md) to setup a
-raspberry Pi border router.
+[guide](../../../docs/platforms/openthread/openthread_border_router_pi.md) to
+setup a raspberry Pi border router.
 
 After Thread border router setup, please type following command on Thread border
 router to get Thread network credential.
@@ -300,11 +303,11 @@ ota-provider-app build and usage.
     -   Add boot parameters, signature/encryption if specified
     -   And specify whether image has be compressed.
 -   Add Matter recognition header by
-    [ota_image_tool.py](../../../docs/guides/openthread_border_router_pi.md).
+    [ota_image_tool.py](../../../docs/platforms/openthread/openthread_border_router_pi.md).
 
 Script `*.flash.py` builds `Bouffalo Lab` bootable image and call
-[ota_image_tool.py](../../../docs/guides/openthread_border_router_pi.md) to add
-Matter recognition header. Take `BL602DK` as example.
+[ota_image_tool.py](../../../docs/platforms/openthread/openthread_border_router_pi.md)
+to add Matter recognition header. Take `BL602DK` as example.
 
 ```shell
 ./out/bouffalolab-bl602dk-light/chip-bl602-lighting-example.flash.py --build-ota --vendor-id <vendor id> --product-id <product id> --version <version> --version-str <version string> --digest-algorithm <digest algorithm>

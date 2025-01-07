@@ -43,7 +43,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 {
     DiscoveryContext * discoveryContext = static_cast<DiscoveryContext *>(context);
 
-    if (error != CHIP_NO_ERROR)
+    if (error != CHIP_NO_ERROR && error != CHIP_ERROR_IN_PROGRESS)
     {
         discoveryContext->Release();
         return;
@@ -55,7 +55,13 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 
     nodeData.Get<CommissionNodeData>().LogDetail();
     discoveryContext->OnNodeDiscovered(nodeData);
-    discoveryContext->Release();
+
+    // CHIP_ERROR_IN_PROGRESS indicates that more results are coming, so don't release
+    // the context yet.
+    if (error == CHIP_NO_ERROR)
+    {
+        discoveryContext->Release();
+    }
 }
 
 static void HandleNodeOperationalBrowse(void * context, DnssdService * result, CHIP_ERROR error)
@@ -409,7 +415,6 @@ void DnssdService::ToDiscoveredCommissionNodeData(const Span<Inet::IPAddress> & 
         ByteSpan key(reinterpret_cast<const uint8_t *>(mTextEntries[i].mKey), strlen(mTextEntries[i].mKey));
         ByteSpan val(mTextEntries[i].mData, mTextEntries[i].mDataSize);
         FillNodeDataFromTxt(key, val, discoveredData);
-        FillNodeDataFromTxt(key, val, discoveredData);
     }
 }
 
@@ -447,8 +452,7 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
         publisher->mState = State::kInitialized;
 
         // Post an event that will start advertising
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type = DeviceLayer::DeviceEventType::kDnssdInitialized;
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kDnssdInitialized };
 
         CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
         if (error != CHIP_NO_ERROR)
@@ -472,9 +476,8 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
         // Restore dnssd state before restart, also needs to call ChipDnssdShutdown()
         publisher->Shutdown();
 
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded;
-        error      = DeviceLayer::PlatformMgr().PostEvent(&event);
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded };
+        error = DeviceLayer::PlatformMgr().PostEvent(&event);
 
         if (error != CHIP_NO_ERROR)
         {

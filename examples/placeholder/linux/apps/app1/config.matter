@@ -212,6 +212,13 @@ enum TestGlobalEnum : enum8 {
   kFinalValue = 2;
 }
 
+enum ThreeLevelAutoEnum : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+  kAutomatic = 3;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -930,14 +937,10 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
-    nullable long_char_string instruction = 1;
-    nullable long_char_string redirectURL = 2;
+    optional long_char_string instruction = 1;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -964,7 +967,7 @@ cluster AccessControl = 31 {
   }
 
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
 /** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
@@ -1669,6 +1672,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1760,6 +1764,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2120,7 +2125,7 @@ cluster GeneralDiagnostics = 51 {
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** Request a variable length payload response. */
-  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+  command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -2715,7 +2720,7 @@ cluster BridgedDeviceBasicInformation = 57 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 cluster Switch = 59 {
-  revision 1;
+  revision 2;
 
   bitmap Feature : bitmap32 {
     kLatchingSwitch = 0x1;
@@ -2771,7 +2776,7 @@ cluster Switch = 59 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 cluster Switch = 59 {
-  revision 1;
+  revision 2;
 
   bitmap Feature : bitmap32 {
     kLatchingSwitch = 0x1;
@@ -3509,7 +3514,7 @@ provisional cluster ScenesManagement = 98 {
   /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
   /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
-  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 64;
+  fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
 }
 
 /** An interface to a generic way to secure a door */
@@ -4102,6 +4107,7 @@ cluster DoorLock = 257 {
     nullable fabric_idx creatorFabricIndex = 2;
     nullable fabric_idx lastModifiedFabricIndex = 3;
     nullable int16u nextCredentialIndex = 4;
+    optional nullable octet_string credentialData = 5;
   }
 
   request struct ClearCredentialRequest {
@@ -4753,6 +4759,7 @@ cluster DoorLock = 257 {
     nullable fabric_idx creatorFabricIndex = 2;
     nullable fabric_idx lastModifiedFabricIndex = 3;
     nullable int16u nextCredentialIndex = 4;
+    optional nullable octet_string credentialData = 5;
   }
 
   request struct ClearCredentialRequest {
@@ -6716,6 +6723,50 @@ cluster OccupancySensing = 1030 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Manage the Thread network of Thread Border Router */
+provisional cluster ThreadBorderRouterManagement = 1106 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kPANChange = 0x1;
+  }
+
+  provisional readonly attribute char_string<63> borderRouterName = 0;
+  provisional readonly attribute octet_string<254> borderAgentID = 1;
+  provisional readonly attribute int16u threadVersion = 2;
+  provisional readonly attribute boolean interfaceEnabled = 3;
+  provisional readonly attribute nullable int64u activeDatasetTimestamp = 4;
+  provisional readonly attribute nullable int64u pendingDatasetTimestamp = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct DatasetResponse = 2 {
+    octet_string<254> dataset = 0;
+  }
+
+  request struct SetActiveDatasetRequestRequest {
+    octet_string<254> activeDataset = 0;
+    optional int64u breadcrumb = 1;
+  }
+
+  request struct SetPendingDatasetRequestRequest {
+    octet_string<254> pendingDataset = 0;
+  }
+
+  /** Command to request the active operational dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  command access(invoke: manage) GetActiveDatasetRequest(): DatasetResponse = 0;
+  /** Command to request the pending dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  command access(invoke: manage) GetPendingDatasetRequest(): DatasetResponse = 1;
+  /** Command to set or update the active Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 3;
+  /** Command set or update the pending Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 4;
+}
+
 /** This cluster provides an interface for controlling the current Channel on a device. */
 cluster Channel = 1284 {
   revision 2;
@@ -7910,9 +7961,9 @@ cluster ContentLauncher = 1290 {
   bitmap Feature : bitmap32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
-    kAdvancedSeek = 0x3;
-    kTextTracks = 0x4;
-    kAudioTracks = 0x5;
+    kAdvancedSeek = 0x4;
+    kTextTracks = 0x8;
+    kAudioTracks = 0x10;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
@@ -8063,9 +8114,9 @@ cluster ContentLauncher = 1290 {
   bitmap Feature : bitmap32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
-    kAdvancedSeek = 0x3;
-    kTextTracks = 0x4;
-    kAudioTracks = 0x5;
+    kAdvancedSeek = 0x4;
+    kTextTracks = 0x8;
+    kAudioTracks = 0x10;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
@@ -8552,7 +8603,6 @@ endpoint 0 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -8567,7 +8617,6 @@ endpoint 0 {
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
@@ -8606,7 +8655,6 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
@@ -8617,7 +8665,6 @@ endpoint 0 {
     callback attribute supportedLocales;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -8629,7 +8676,6 @@ endpoint 0 {
     callback attribute supportedCalendarTypes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -8638,7 +8684,6 @@ endpoint 0 {
   server cluster UnitLocalization {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -8679,7 +8724,6 @@ endpoint 0 {
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
@@ -8693,7 +8737,6 @@ endpoint 0 {
     callback attribute supportsConcurrentConnection;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -8717,7 +8760,6 @@ endpoint 0 {
     ram      attribute lastConnectErrorValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
@@ -8746,7 +8788,6 @@ endpoint 0 {
     callback attribute testEventTriggersEnabled default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -8916,7 +8957,6 @@ endpoint 0 {
     callback attribute adminVendorId;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -8935,7 +8975,6 @@ endpoint 0 {
     callback attribute currentFabricIndex;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -8961,7 +9000,6 @@ endpoint 0 {
     callback attribute maxGroupKeysPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -9607,17 +9645,37 @@ endpoint 1 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
-    ram      attribute PIROccupiedToUnoccupiedDelay default = 0x00;
+    callback attribute PIROccupiedToUnoccupiedDelay;
     ram      attribute PIRUnoccupiedToOccupiedDelay default = 0x00;
     ram      attribute PIRUnoccupiedToOccupiedThreshold default = 1;
-    ram      attribute ultrasonicOccupiedToUnoccupiedDelay default = 0x00;
+    callback attribute ultrasonicOccupiedToUnoccupiedDelay;
     ram      attribute ultrasonicUnoccupiedToOccupiedDelay default = 0x00;
     ram      attribute ultrasonicUnoccupiedToOccupiedThreshold default = 1;
-    ram      attribute physicalContactOccupiedToUnoccupiedDelay default = 0x00;
+    callback attribute physicalContactOccupiedToUnoccupiedDelay;
     ram      attribute physicalContactUnoccupiedToOccupiedDelay default = 0x00;
     ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 1;
     callback attribute featureMap;
     callback attribute clusterRevision default = 5;
+  }
+
+  server cluster ThreadBorderRouterManagement {
+    callback attribute borderRouterName;
+    callback attribute borderAgentID;
+    callback attribute threadVersion;
+    callback attribute interfaceEnabled;
+    callback attribute activeDatasetTimestamp;
+    callback attribute pendingDatasetTimestamp;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+
+    handle command GetActiveDatasetRequest;
+    handle command GetPendingDatasetRequest;
+    handle command DatasetResponse;
+    handle command SetActiveDatasetRequest;
+    handle command SetPendingDatasetRequest;
   }
 }
 

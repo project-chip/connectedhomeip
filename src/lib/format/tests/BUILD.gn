@@ -57,3 +57,18 @@ if (enable_fuzz_test_targets) {
     ]
   }
 }
+
+if (pw_enable_fuzz_test_targets) {
+  chip_pw_fuzz_target("fuzz-payload-decoder-pw") {
+    test_source = [ "FuzzPayloadDecoderPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/controller/data_model:cluster-tlv-metadata",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/format:flat-tree",
+      "${chip_root}/src/lib/format:protocol-decoder",
+      "${chip_root}/src/lib/format:protocol-tlv-metadata",
+      "${chip_root}/src/lib/support",
+      "${chip_root}/src/platform/logging:stdio",
+    ]
+  }
+}

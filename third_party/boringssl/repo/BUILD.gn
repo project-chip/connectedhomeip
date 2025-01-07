@@ -29,6 +29,7 @@ config("boringssl_config_disable_warnings") {
   cflags = [
     "-Wno-unused-variable",
     "-Wno-conversion",
+    "-Wno-cast-function-type-mismatch",
   ]
 
   if (is_clang) {

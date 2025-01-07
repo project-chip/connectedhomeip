@@ -56,3 +56,13 @@ if (enable_fuzz_test_targets) {
     ]
   }
 }
+
+if (pw_enable_fuzz_test_targets) {
+  chip_pw_fuzz_target("fuzz-setup-payload-base38-pw") {
+    test_source = [ "FuzzBase38PW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/platform/logging:stdio",
+      "${chip_root}/src/setup_payload",
+    ]
+  }
+}

@@ -15,16 +15,16 @@
 #    limitations under the License.
 #
 
-import os
 import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import MatterBaseTest, ProblemNotice, default_matter_test_main
+import jinja2
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
+from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
+                                       add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
+                                       combine_derived_clusters_with_base, get_data_model_directory)
 from mobly import asserts
-from spec_parsing_support import (ClusterParser, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster,
-                                  add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
-                                  combine_derived_clusters_with_base)
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958
@@ -225,6 +225,28 @@ ALIASED_CLUSTERS = (
     '</cluster>'
 )
 
+PROVISIONAL_CLUSTER_TEMPLATE = """
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="{{ id }}" name="Test Provisional" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="{{ id }}" name="Test Provisional">
+    {% if provisional %}
+      <provisionalConform/>
+    {% endif %}
+    </clusterId>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="PROVISIONAL" scope="Node"/>
+  <commands>
+    <command id="0x00" name="My command" direction="commandToServer">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+  </commands>
+</cluster>
+"""
+
 
 class TestSpecParsingSupport(MatterBaseTest):
     def setup_class(self):
@@ -236,18 +258,23 @@ class TestSpecParsingSupport(MatterBaseTest):
         # checks that the 1.3 spec (default) does not contain in-progress clusters and the TOT does
         tot_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
         one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
+        one_four_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
         asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_three_clusters.keys())),
-                               0, "In progress dir does not contain any clusters not in 1.3")
+                               0, "Master dir does not contain any clusters not in 1.3")
+        asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_four_clusters.keys())),
+                               0, "Master dir does not contain any clusters not in 1.4")
+        asserts.assert_greater(len(set(one_four_clusters.keys()) - set(one_three_clusters.keys())),
+                               0, "1.4 dir does not contain any clusters not in 1.3")
         # only the pulse width modulation cluster was removed post 1.3
         asserts.assert_equal(set(one_three_clusters.keys()) - set(tot_xml_clusters.keys()),
                              set([Clusters.PulseWidthModulation.id]), "There are some 1.3 clusters that are not included in the TOT spec")
+        asserts.assert_equal(set(one_four_clusters.keys())-set(tot_xml_clusters.keys()),
+                             set(), "There are some 1.4 clusters that are not included in the TOT spec")
 
-        str_path = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'master', 'clusters'))
+        str_path = get_data_model_directory(PrebuiltDataModelDirectory.k1_4, DataModelLevel.kCluster)
         string_override_check, problems = build_xml_clusters(str_path)
-        asserts.assert_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
 
-        with asserts.assert_raises(SpecParsingException):
-            build_xml_clusters("baddir")
+        asserts.assert_count_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
 
     def test_spec_parsing_access(self):
         strs = [None, 'view', 'operate', 'manage', 'admin']
@@ -405,6 +432,58 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(len(missing_clusters), 0, f"Missing aliased clusters from DM XML - {missing_clusters}")
         for d in known_derived_clusters:
             asserts.assert_true(self.spec_xml_clusters is not None, "Derived cluster with no base cluster marker")
+
+    def test_provisional_clusters(self):
+        clusters: dict[int, XmlCluster] = {}
+        pure_base_clusters: dict[str, XmlCluster] = {}
+        ids_by_name: dict[str, int] = {}
+        problems: list[ProblemNotice] = []
+        id = 0x0001
+
+        environment = jinja2.Environment()
+        template = environment.from_string(PROVISIONAL_CLUSTER_TEMPLATE)
+
+        provisional = template.render(provisional=True, id=id)
+        cluster_xml = ElementTree.fromstring(provisional)
+        add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
+
+        asserts.assert_equal(len(problems), 0, "Unexpected problems parsing provisional cluster")
+        asserts.assert_in(id, clusters.keys(), "Provisional cluster not parsed")
+        asserts.assert_true(clusters[id].is_provisional, "Provisional cluster not marked as provisional")
+
+        non_provisional = template.render(provisional=False, id=id)
+        cluster_xml = ElementTree.fromstring(non_provisional)
+        add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
+
+        asserts.assert_equal(len(problems), 0, "Unexpected problems parsing non-provisional cluster")
+        asserts.assert_in(id, clusters.keys(), "Non-provisional cluster not parsed")
+        asserts.assert_false(clusters[id].is_provisional, "Non-provisional cluster marked as provisional")
+
+    def test_atomic_thermostat(self):
+        tot_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
+        one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
+        one_four_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+
+        asserts.assert_in("Atomic Request", tot_xml_clusters[Clusters.Thermostat.id].command_map,
+                          "Atomic request not found on thermostat command map")
+        request_id = tot_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Request"]
+        asserts.assert_in(request_id, tot_xml_clusters[Clusters.Thermostat.id].accepted_commands.keys(),
+                          "Atomic request not found in thermostat accepted command list")
+
+        asserts.assert_in("Atomic Response", one_four_clusters[Clusters.Thermostat.id].command_map,
+                          "Atomic response not found in the thermostat command map")
+        response_id = tot_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Response"]
+        asserts.assert_in(response_id, one_four_clusters[Clusters.Thermostat.id].generated_commands.keys(),
+                          "Atomic response not found in thermostat generated command list")
+
+        asserts.assert_not_in(
+            "Atomic Request", one_three_clusters[Clusters.Thermostat.id].command_map, "Atomic request found on thermostat command map for 1.3")
+        asserts.assert_not_in(request_id, one_three_clusters[Clusters.Thermostat.id].accepted_commands.keys(),
+                              "Atomic request found in thermostat accepted command list for 1.3")
+        asserts.assert_not_in(
+            "Atomic Response", one_three_clusters[Clusters.Thermostat.id].command_map, "Atomic response found on thermostat command map for 1.3")
+        asserts.assert_not_in(response_id, one_three_clusters[Clusters.Thermostat.id].generated_commands.keys(),
+                              "Atomic request found in thermostat generated command list for 1.3")
 
 
 if __name__ == "__main__":

@@ -26,7 +26,6 @@
 
 namespace {
 
-using namespace std;
 using namespace chip;
 using namespace mdns::Minimal;
 
@@ -205,11 +204,11 @@ TEST(TestRecordData, PtrRecordComplexParsing)
 class TxtRecordAccumulator : public TxtRecordDelegate
 {
 public:
-    using DataType = vector<pair<string, string>>;
+    using DataType = std::vector<std::pair<std::string, std::string>>;
 
     void OnRecord(const BytesRange & name, const BytesRange & value) override
     {
-        mData.push_back(make_pair(AsString(name), AsString(value)));
+        mData.push_back(std::make_pair(AsString(name), AsString(value)));
     }
 
     DataType & Data() { return mData; }
@@ -218,9 +217,9 @@ public:
 private:
     DataType mData;
 
-    static string AsString(const BytesRange & range)
+    static std::string AsString(const BytesRange & range)
     {
-        return string(reinterpret_cast<const char *>(range.Start()), reinterpret_cast<const char *>(range.End()));
+        return std::string(reinterpret_cast<const char *>(range.Start()), reinterpret_cast<const char *>(range.End()));
     }
 };
 
@@ -237,9 +236,9 @@ TEST(TestRecordData, TxtRecord)
 
     EXPECT_TRUE(ParseTxtRecord(BytesRange(record, record + sizeof(record)), &accumulator));
     EXPECT_EQ(accumulator.Data().size(), 4u);
-    EXPECT_EQ(accumulator.Data()[0], (make_pair<std::string, std::string>("some", "")));
-    EXPECT_EQ(accumulator.Data()[1], (make_pair<std::string, std::string>("foo", "bar")));
-    EXPECT_EQ(accumulator.Data()[2], (make_pair<std::string, std::string>("x", "y=z")));
-    EXPECT_EQ(accumulator.Data()[3], (make_pair<std::string, std::string>("a", "")));
+    EXPECT_EQ(accumulator.Data()[0], (std::make_pair<std::string, std::string>("some", "")));
+    EXPECT_EQ(accumulator.Data()[1], (std::make_pair<std::string, std::string>("foo", "bar")));
+    EXPECT_EQ(accumulator.Data()[2], (std::make_pair<std::string, std::string>("x", "y=z")));
+    EXPECT_EQ(accumulator.Data()[3], (std::make_pair<std::string, std::string>("a", "")));
 }
 } // namespace

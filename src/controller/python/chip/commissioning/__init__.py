@@ -73,6 +73,12 @@ class WiFiCredentials:
 
 
 @dataclasses.dataclass
+class TermsAndConditionsParameters:
+    version: int
+    user_response: int
+
+
+@dataclasses.dataclass
 class Parameters:
     pase_param: Union[PaseOverBLEParameters, PaseOverIPParameters]
     regulatory_config: RegulatoryConfig
@@ -80,6 +86,7 @@ class Parameters:
     commissionee_info: CommissioneeInfo
     wifi_credentials: WiFiCredentials
     thread_credentials: bytes
+    tc_acknowledgements: Optional[TermsAndConditionsParameters] = None
     failsafe_expiry_length_seconds: int = 600
 
 

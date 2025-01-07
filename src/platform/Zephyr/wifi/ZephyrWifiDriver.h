@@ -25,9 +25,9 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-constexpr uint8_t kMaxWiFiNetworks                  = 1;
-constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 35;
+inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
+inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 35;
 
 class ZephyrWifiScanResponseIterator : public Iterator<WiFiScanResponse>
 {
@@ -48,8 +48,8 @@ class ZephyrWifiDriver final : public WiFiDriver
 public:
     // Define non-volatile storage keys for SSID and password.
     // The naming convention is aligned with DefaultStorageKeyAllocator class.
-    static constexpr const char * kSsidKey = "g/wi/s";
-    static constexpr const char * kPassKey = "g/wi/p";
+    static constexpr char kSsidKey[] = "g/wi/s";
+    static constexpr char kPassKey[] = "g/wi/p";
 
     class WiFiNetworkIterator final : public NetworkIterator
     {
@@ -86,6 +86,7 @@ public:
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
+    uint32_t GetSupportedWiFiBandsMask() const override;
 
     static ZephyrWifiDriver & Instance()
     {
@@ -93,9 +94,9 @@ public:
         return sInstance;
     }
 
-    void OnNetworkStatusChanged(Status status);
+    void OnNetworkConnStatusChanged(const wifi_conn_status & connStatus);
     void OnScanWiFiNetworkResult(const WiFiScanResponse & result);
-    void OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus status);
+    void OnScanWiFiNetworkDone(const WiFiManager::ScanDoneStatus & status);
 
 private:
     void LoadFromStorage();

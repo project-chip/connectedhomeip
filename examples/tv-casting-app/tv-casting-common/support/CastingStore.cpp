@@ -78,8 +78,9 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
     size_t castingStoreDataSize = 0;
     err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kCastingStoreDataKey, castingStoreData,
                                                                       kCastingStoreDataMaxBytes, &castingStoreDataSize);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
-                        ChipLogError(AppServer, "KeyValueStoreMgr.Get failed %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturnValue(
+        err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
+        ChipLogError(AppServer, "CastingStore::ReadAll() KeyValueStoreMgr.Get failed %" CHIP_ERROR_FORMAT, err.Format()));
     ChipLogProgress(AppServer, "CastingStore::ReadAll() Read TLV(CastingStoreData) from KVS store with size: %lu bytes",
                     static_cast<unsigned long>(castingStoreDataSize));
 
@@ -252,6 +253,9 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                         if (endpointContainerTagNum == kCastingPlayerEndpointIdTag)
                         {
                             err = reader.Get(endpointAttributes.mId);
+                            // Log which endpoints we cached.
+                            ChipLogProgress(AppServer, "CastingStore::ReadAll() Endpoints container endpointAttributes.mId: %d",
+                                            endpointAttributes.mId);
                             VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                                                 ChipLogError(AppServer, "TLVReader.Get failed %" CHIP_ERROR_FORMAT, err.Format()));
                             continue;
@@ -427,9 +431,14 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
             for (auto & endpointAttributes : endpointAttributesList)
             {
                 std::shared_ptr<core::Endpoint> endpoint(new core::Endpoint(castingPlayer, endpointAttributes));
+                ChipLogProgress(AppServer, "CastingStore::ReadAll() endpointServerListMap[endpointAttributes.mId].size(): %d",
+                                static_cast<int>(endpointServerListMap[endpointAttributes.mId].size()));
                 endpoint->RegisterClusters(endpointServerListMap[endpointAttributes.mId]);
                 castingPlayer->RegisterEndpoint(endpoint);
+                ChipLogProgress(AppServer, "CastingStore::ReadAll() Registered endpointID: %d", endpoint->GetId());
             }
+            ChipLogProgress(AppServer, "CastingStore::ReadAll() Created CastingPlayer with deviceName: %s",
+                            castingPlayer->GetDeviceName());
             castingPlayers.push_back(*castingPlayer);
             continue;
         }
@@ -453,7 +462,7 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
 
 CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayers)
 {
-    ChipLogProgress(AppServer, "CastingStore::WriteAll called");
+    ChipLogProgress(AppServer, "CastingStore::WriteAll() called");
 
     chip::TLV::TLVWriter tlvWriter;
     uint8_t castingStoreData[kCastingStoreDataMaxBytes];
@@ -470,6 +479,7 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
 
     for (auto & castingPlayer : castingPlayers)
     {
+        ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer:");
         chip::TLV::TLVType castingPlayerContainerType;
         // CastingPlayer container starts
         ReturnErrorOnFailure(
@@ -502,6 +512,8 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
         std::vector<memory::Strong<core::Endpoint>> endpoints = core::CastingPlayer::GetTargetCastingPlayer()->GetEndpoints();
         for (auto & endpoint : endpoints)
         {
+            ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer Endpoint with endpointId: %d",
+                            endpoint->GetId());
             chip::TLV::TLVType endpointContainerType;
             // Endpoint container starts
             ReturnErrorOnFailure(
@@ -539,8 +551,11 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
             ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointServerListContainerTag),
                                                           chip::TLV::kTLVType_Structure, serverListContainerType));
             std::vector<chip::ClusterId> serverList = endpoint->GetServerList();
+            ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer Endpoint ID: %d ServerList.size(): %d",
+                            endpoint->GetId(), static_cast<int>(serverList.size()));
             for (chip::ClusterId clusterId : serverList)
             {
+                ChipLogProgress(AppServer, "CastingStore::WriteAll() clusterId: %d", clusterId);
                 ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointServerClusterIdTag), clusterId));
             }
             // ServerList container ends
@@ -562,7 +577,7 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
 
     ReturnErrorOnFailure(tlvWriter.Finalize());
     ChipLogProgress(AppServer,
-                    "CastingStore::WriteAll TLV(CastingStoreData).LengthWritten: %d bytes, CastingPlayers size: %lu "
+                    "CastingStore::WriteAll() TLV(CastingStoreData).LengthWritten: %d bytes, CastingPlayers size: %lu "
                     "and version: %d",
                     tlvWriter.GetLengthWritten(), static_cast<unsigned long>(castingPlayers.size()),
                     kCurrentCastingStoreDataVersion);
@@ -576,7 +591,7 @@ CHIP_ERROR CastingStore::DeleteAll()
     CHIP_ERROR err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kCastingStoreDataKey);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) // no error, if the key-value pair was not stored
     {
-        ChipLogProgress(AppServer, "CastingStore::DeleteAll ignoring error %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogProgress(AppServer, "CastingStore::DeleteAll() ignoring error %" CHIP_ERROR_FORMAT, err.Format());
         return CHIP_NO_ERROR;
     }
     return err;
@@ -584,7 +599,7 @@ CHIP_ERROR CastingStore::DeleteAll()
 
 CHIP_ERROR CastingStore::Delete(core::CastingPlayer castingPlayer)
 {
-    ChipLogProgress(AppServer, "CastingStore::Delete");
+    ChipLogProgress(AppServer, "CastingStore::Delete()");
 
     // Read cache of CastingPlayers
     std::vector<core::CastingPlayer> castingPlayers = ReadAll();
@@ -598,7 +613,7 @@ CHIP_ERROR CastingStore::Delete(core::CastingPlayer castingPlayer)
 
         if (it != castingPlayers.end())
         {
-            ChipLogProgress(AppServer, "CastingStore::Delete deleting CastingPlayer %s from CastingStore cache", it->GetId());
+            ChipLogProgress(AppServer, "CastingStore::Delete() deleting CastingPlayer %s from CastingStore cache", it->GetId());
             castingPlayers.erase(it);
             return WriteAll(castingPlayers);
         }
@@ -608,7 +623,7 @@ CHIP_ERROR CastingStore::Delete(core::CastingPlayer castingPlayer)
 
 void CastingStore::OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex)
 {
-    ChipLogProgress(AppServer, "CastingStore::OnFabricRemoved");
+    ChipLogProgress(AppServer, "CastingStore::OnFabricRemoved()");
 
     // Read cache of CastingPlayers
     std::vector<core::CastingPlayer> castingPlayers = ReadAll();
@@ -623,12 +638,15 @@ void CastingStore::OnFabricRemoved(const chip::FabricTable & fabricTable, chip::
 
         if (it != castingPlayers.end())
         {
-            ChipLogProgress(AppServer, "CastingStore::OnFabricRemoved deleting CastingPlayer %s from CastingStore cache",
+            ChipLogProgress(AppServer, "CastingStore::OnFabricRemoved() deleting CastingPlayer %s from CastingStore cache",
                             it->GetId());
             castingPlayers.erase(it);
             WriteAll(castingPlayers);
         }
     }
+    CHIP_ERROR err = chip::Server::GetInstance().GetSessionResumptionStorage()->DeleteAll(fabricIndex);
+    ChipLogProgress(AppServer, "CastingStore::OnFabricRemoved() SessionResumptionStorage.DeleteAll(%d) status %" CHIP_ERROR_FORMAT,
+                    fabricIndex, err.Format());
 }
 
 }; // namespace support

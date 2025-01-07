@@ -15,8 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include <memory>
 #include <utility>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -70,9 +68,12 @@ public:
         chip::MutableByteSpan span(buf);
         ASSERT_EQ(GetBobFabric()->GetCompressedFabricIdBytes(span), CHIP_NO_ERROR);
         ASSERT_EQ(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span), CHIP_NO_ERROR);
+
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
     }
     void TearDown() override
     {
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
         if (provider != nullptr)
         {
@@ -93,6 +94,9 @@ public:
     static void AddAttributeStatus(WriteHandler & aWriteHandler);
     static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
+
+private:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
@@ -296,7 +300,8 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
 
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
-            writeHandler.Init(chip::app::InteractionModelEngine::GetInstance());
+            writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
+                              chip::app::InteractionModelEngine::GetInstance());
 
             GenerateWriteRequest(messageIsTimed, buf);
 

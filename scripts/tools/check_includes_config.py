@@ -119,6 +119,7 @@ ALLOW: Dict[str, Set[str]] = {
     # Only uses <chrono> for zero-cost types.
     'src/system/SystemClock.h': {'chrono'},
     'src/platform/mbed/MbedEventTimeout.h': {'chrono'},
+    'src/lib/core/StringBuilderAdapters.h': {'chrono'},
 
     'src/app/app-platform/ContentApp.h': {'list', 'string'},
     'src/app/app-platform/ContentAppPlatform.cpp': {'string'},
@@ -180,6 +181,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
     'src/lib/support/jsontlv/TlvToJson.h': {'string'},
     'src/lib/support/jsontlv/TextFormat.h': {'string'},
+    'src/lib/support/TemporaryFileStream.h': {'ostream', 'streambuf', 'string'},
     'src/app/icd/client/DefaultICDClientStorage.cpp': {'vector'},
     'src/app/icd/client/DefaultICDClientStorage.h': {'vector'},
     'src/app/icd/client/DefaultICDStorageKey.h': {'vector'},

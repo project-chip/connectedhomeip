@@ -6,11 +6,9 @@ FROM ghcr.io/project-chip/chip-build-android:${VERSION} AS android
 FROM ghcr.io/project-chip/chip-build-esp32-qemu:${VERSION} as esp32
 FROM ghcr.io/project-chip/chip-build-telink:${VERSION} AS telink
 FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS psoc6
-FROM ghcr.io/project-chip/chip-build-tizen:${VERSION} AS tizen
+FROM ghcr.io/project-chip/chip-build-tizen-qemu:${VERSION} AS tizen
 FROM ghcr.io/project-chip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM ghcr.io/project-chip/chip-build-ameba:${VERSION} AS ameba
-FROM ghcr.io/project-chip/chip-build-k32w:${VERSION} AS k32w
-FROM ghcr.io/project-chip/chip-build-rw61x:${VERSION} AS rw61x
 FROM ghcr.io/project-chip/chip-build-nxp:${VERSION} AS nxp
 FROM ghcr.io/project-chip/chip-build-nxp-zephyr:${VERSION} AS nxpzephyr
 FROM ghcr.io/project-chip/chip-build-imx:${VERSION} AS imx
@@ -48,13 +46,9 @@ COPY --from=crosscompile /opt/ubuntu-22.04.1-aarch64-sysroot /opt/ubuntu-22.04.1
 
 COPY --from=ameba /opt/ameba /opt/ameba
 
-COPY --from=k32w /opt/sdk /opt/k32w
-
-COPY --from=rw61x /opt/sdk /opt/nxp-sdk
-
 COPY --from=nxp /opt/nxp /opt/nxp
 
-COPY --from=nxpzephyr /opt/nxp-zephyr/zephyr-sdk-0.16.5/ /opt/nxp-zephyr/zephyr-sdk-0.16.5/
+COPY --from=nxpzephyr /opt/nxp-zephyr/zephyr-sdk-0.17.0/ /opt/nxp-zephyr/zephyr-sdk-0.17.0/
 COPY --from=nxpzephyr /opt/nxp-zephyr/zephyrproject/ /opt/nxp-zephyr/zephyrproject/
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
@@ -119,6 +113,7 @@ ENV SILABS_BOARD=BRD4186C
 # Keep GSDK_ROOT name until rename transition to SISDK is completed
 ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV SISDK_ROOT=/opt/silabs/simplicity_sdk/
+ENV PATH $PATH:/opt/silabs/slc_cli/
 ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
@@ -126,11 +121,7 @@ ENV IDF_TOOLS_PATH=/opt/espressif/tools
 ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/6.1-langdale
 ENV JAVA_PATH=/usr/lib/jvm/java-8-openjdk-amd64
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
-ENV NXP_K32W0_SDK_ROOT=/opt/k32w/core
-ENV NXP_K32W1_SDK_ROOT=/opt/k32w/k32w1
-ENV NXP_SDK_ROOT=/opt/nxp-sdk/rw61x
 ENV OPENOCD_PATH=/opt/openocd/
-ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-22.04.1-aarch64-sysroot
@@ -141,13 +132,18 @@ ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.16.5
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 ENV ZEPHYR_NXP_BASE=/opt/nxp-zephyr/zephyrproject/zephyr
-ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.16.5
+ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.17.0
 ENV NXP_UPDATE_SDK_SCRIPT_DOCKER=/opt/nxp/nxp_matter_support/scripts/update_nxp_sdk.py
+ENV NXP_SDK_PATH=/opt/nxp
 
-ENV TIZEN_VERSION 7.0
+# Places bootstrap files there instead of the default one which is `.environment`.
+# NOTE: This directory is NOT persistent.
+ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
+
+ENV TIZEN_VERSION 8.0
 ENV TIZEN_SDK_ROOT /opt/tizen-sdk
 ENV TIZEN_SDK_TOOLCHAIN $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
-ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core
+ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core
 
 ENV FVP_CORSTONE_300_PATH=/opt/FVP_Corstone_SSE-300
 ENV BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk

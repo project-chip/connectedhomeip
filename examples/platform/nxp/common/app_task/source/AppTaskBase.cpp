@@ -28,8 +28,10 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
+
 #include <platform/CommissionableDataProvider.h>
 
 #include "lib/core/ErrorStr.h"
@@ -56,8 +58,8 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #endif
 
-#if CONFIG_CHIP_TCP_DOWNLOAD
-#include "TcpDownload.h"
+#if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
+#include "WifiConnect.h"
 #endif
 
 #if CONFIG_OPERATIONAL_KEYSTORE
@@ -74,6 +76,7 @@
 
 #if CONFIG_LOW_POWER
 #include "LowPower.h"
+#include "PWR_Interface.h"
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -97,6 +100,11 @@
 #include <app/TestEventTriggerDelegate.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+#include "platform/OpenThread/GenericThreadBorderRouterDelegate.h"
+#include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
+#endif
+
 #ifndef CONFIG_THREAD_DEVICE_TYPE
 #define CONFIG_THREAD_DEVICE_TYPE kThreadDeviceType_Router
 #endif
@@ -115,9 +123,23 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
 app::Clusters::NetworkCommissioning::Instance sNetworkCommissioningInstance(0,
                                                                             chip::NXP::App::GetAppTask().GetWifiDriverInstance());
+#elif CONFIG_CHIP_ETHERNET
+app::Clusters::NetworkCommissioning::Instance
+    sNetworkCommissioningInstance(0, chip::NXP::App::GetAppTask().GetEthernetDriverInstance());
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+static constexpr EndpointId kThreadBRMgmtEndpoint = 2;
+static CharSpan sBrName("NXP-BR", strlen("NXP-BR"));
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER || (CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+                                                                                          0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
+                                                                                          0xcc, 0xdd, 0xee, 0xff };
+#endif
+
+#ifdef SMOKE_CO_ALARM
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
@@ -164,6 +186,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_NET_L2_OPENTHREAD
     // Init ZCL Data Model and start server
@@ -193,6 +216,14 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
 #if CONFIG_CHIP_OTA_PROVIDER
     InitOTAServer();
+#endif
+
+#if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
+    VerifyOrDie(WifiConnectAtboot(chip::NXP::App::GetAppTask().GetWifiDriverInstance()) == CHIP_NO_ERROR);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+    GetAppTask().EnableTbrManagementCluster();
 #endif
 }
 
@@ -288,6 +319,8 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
 #ifdef ENABLE_CHIP_SHELL
     Shell::SetWiFiDriver(chip::NXP::App::GetAppTask().GetWifiDriverInstance());
 #endif
+#elif CONFIG_CHIP_ETHERNET
+    sNetworkCommissioningInstance.Init();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     if (err == CHIP_NO_ERROR)
@@ -319,10 +352,6 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     {
         ChipLogError(DeviceLayer, "Error during ThreadStackMgrImpl().StartThreadTask()");
     }
-#endif
-
-#if CONFIG_CHIP_TCP_DOWNLOAD
-    EnableTcpDownloadComponent();
 #endif
 
 exit:
@@ -405,6 +434,20 @@ void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
     chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
+void chip::NXP::App::AppTaskBase::AppMatter_DisallowDeviceToSleep(void)
+{
+#if CONFIG_LOW_POWER
+    PWR_DisallowDeviceToSleep();
+#endif
+}
+
+void chip::NXP::App::AppTaskBase::AppMatter_AllowDeviceToSleep(void)
+{
+#if CONFIG_LOW_POWER
+    PWR_AllowDeviceToSleep();
+#endif
+}
+
 void chip::NXP::App::AppTaskBase::PrintOnboardingInfo()
 {
 #if CONFIG_NETWORK_LAYER_BLE
@@ -438,3 +481,19 @@ void chip::NXP::App::AppTaskBase::PrintCurrentVersion()
 
     ChipLogProgress(DeviceLayer, "Current Software Version: %s, %d", currentSoftwareVer, static_cast<int>(currentVersion));
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
+{
+    auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
+
+    static ThreadBorderRouterManagement::GenericOpenThreadBorderRouterDelegate sThreadBRDelegate(persistentStorage);
+    static ThreadBorderRouterManagement::ServerInstance sThreadBRMgmtInstance(kThreadBRMgmtEndpoint, &sThreadBRDelegate,
+                                                                              Server::GetInstance().GetFailSafeContext());
+
+    // Initialize TBR name
+    sThreadBRDelegate.SetThreadBorderRouterName(sBrName);
+    // Initialize TBR cluster
+    sThreadBRMgmtInstance.Init();
+}
+#endif

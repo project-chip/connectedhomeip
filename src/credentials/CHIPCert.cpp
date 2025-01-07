@@ -989,7 +989,7 @@ CHIP_ERROR ChipDN::DecodeFromASN1(ASN1Reader & reader)
 
                 // Only one AttributeTypeAndValue allowed per RDN.
                 err = reader.Next();
-                ReturnErrorCodeIf(err == CHIP_NO_ERROR, ASN1_ERROR_UNSUPPORTED_ENCODING);
+                VerifyOrReturnError(err != CHIP_NO_ERROR, ASN1_ERROR_UNSUPPORTED_ENCODING);
                 VerifyOrReturnError(err == ASN1_END, err);
             }
             ASN1_EXIT_SET;
@@ -1245,7 +1245,7 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, N
 {
     // Since we assume the cert is pre-validated, we are going to assume that
     // its subject in fact has both a node id and a fabric id.
-    ReturnErrorCodeIf(outNodeId == nullptr || outFabricId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(outNodeId != nullptr && outFabricId != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     NodeId nodeId      = 0;
     FabricId fabricId  = kUndefinedFabricId;
     bool foundNodeId   = false;
@@ -1341,7 +1341,7 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
             // This error should never happen in practice because valid NOC cannot have more
             // than kMaxSubjectCATAttributeCount CATs in its subject. The check that it is
             // valid NOC was done above.
-            ReturnErrorCodeIf(catCount == cats.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(catCount != cats.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
             VerifyOrReturnError(CanCastTo<CASEAuthTag>(rdn.mChipVal), CHIP_ERROR_INVALID_ARGUMENT);
             cats.values[catCount++] = static_cast<CASEAuthTag>(rdn.mChipVal);
         }

@@ -17,15 +17,12 @@
  */
 
 #include <DEMManufacturerDelegate.h>
-#include <DeviceEnergyManagementDelegateImpl.h>
-#include <EVSEManufacturerImpl.h>
-#include <EnergyEvseManager.h>
+#include <EnergyManagementAppCommonMain.h>
 
 #include <EnergyTimeUtils.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
-#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #include <app/clusters/power-source-server/power-source-server.h>
 #include <app/server/Server.h>
 
@@ -38,7 +35,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
@@ -145,7 +141,7 @@ void FakeReadings::FakeReadingsUpdate()
     int64_t current = (static_cast<int64_t>(rand()) % (2 * mCurrentRandomness_mA)) - mCurrentRandomness_mA;
     current += mCurrent_mA; // add in the base current
 
-    GetEvseManufacturer()->SendPowerReading(mEndpointId, power, voltage, current);
+    GetDEMDelegate()->GetDEMManufacturerDelegate()->SendPowerReading(mEndpointId, power, voltage, current);
 
     // update the energy meter - we'll assume that the power has been constant during the previous interval
     if (mPower_mW > 0)
@@ -163,9 +159,11 @@ void FakeReadings::FakeReadingsUpdate()
         mTotalEnergyExported += mPeriodicEnergyExported;
     }
 
-    GetEvseManufacturer()->SendPeriodicEnergyReading(mEndpointId, mPeriodicEnergyImported, mPeriodicEnergyExported);
+    GetDEMDelegate()->GetDEMManufacturerDelegate()->SendPeriodicEnergyReading(mEndpointId, mPeriodicEnergyImported,
+                                                                              mPeriodicEnergyExported);
 
-    GetEvseManufacturer()->SendCumulativeEnergyReading(mEndpointId, mTotalEnergyImported, mTotalEnergyExported);
+    GetDEMDelegate()->GetDEMManufacturerDelegate()->SendCumulativeEnergyReading(mEndpointId, mTotalEnergyImported,
+                                                                                mTotalEnergyExported);
 
     // start/restart the timer
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(mInterval_s), FakeReadingsTimerExpiry, this);
@@ -179,4 +177,29 @@ void FakeReadings::FakeReadingsTimerExpiry(System::Layer * systemLayer, void * m
     FakeReadings * mn = reinterpret_cast<FakeReadings *>(manufacturer);
 
     mn->FakeReadingsUpdate();
+}
+
+void FakeReadings::SetPower(Power_mW aPower_mW)
+{
+    mPower_mW = aPower_mW;
+}
+Power_mW FakeReadings::GetPower()
+{
+    return mPower_mW;
+};
+void FakeReadings::SetVoltage(Voltage_mV aVoltage_mV)
+{
+    mVoltage_mV = aVoltage_mV;
+}
+Voltage_mV FakeReadings::GetVoltage()
+{
+    return mVoltage_mV;
+};
+void FakeReadings::SetCurrent(Amperage_mA aCurrent_mA)
+{
+    mCurrent_mA = aCurrent_mA;
+}
+Amperage_mA FakeReadings::GetCurrent()
+{
+    return mCurrent_mA;
 }

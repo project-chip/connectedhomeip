@@ -19,24 +19,34 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_RVC_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --int-arg PIXIT.RVCRUNM.MODE_A:1 PIXIT.RVCRUNM.MODE_B:2
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --int-arg PIXIT.RVCRUNM.MODE_A:1
+#       --int-arg PIXIT.RVCRUNM.MODE_B:2
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import enum
-from time import sleep
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # This test requires several additional command line arguments.
 # Run the test with
-# --int-arg PIXIT.RVCRUNM.MODE_A:<mode id> PIXIT.RVCRUNM.MODE_B:<mode id>
+# --int-arg PIXIT.RVCRUNM.MODE_A:<mode id> --int-arg PIXIT.RVCRUNM.MODE_B:<mode id>
 
 
 class RvcStatusEnum(enum.IntEnum):
@@ -110,14 +120,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
             Clusters.RvcOperationalState.Attributes.OperationalState)
         return ret
 
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        # TODO(#31239): centralize pipe write logic and remove the need of sleep
-        sleep(0.001)
-
     def pics_TC_RVCRUNM_2_2(self) -> list[str]:
         return ["RVCRUNM.S"]
 
@@ -131,10 +133,8 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                          "PIXIT.RVCRUNM.MODE_A:<mode id> \n"
                          "PIXIT.RVCRUNM.MODE_B:<mode id>")
 
-        # TODO Replace 0x8000 with python object of RVCRUN FEATURE bit when implemented
-        # 0x8000 corresponds to 16 bit DIRECTMODECH Feature map
-        self.directmodech_bit_mask = 0x8000
-        self.endpoint = self.matter_test_config.endpoint
+        self.directmodech_bit_mask = Clusters.RvcRunMode.Bitmaps.Feature.kDirectModeChange
+        self.endpoint = self.get_endpoint()
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.mode_a = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_A']
         self.mode_b = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_B']
@@ -158,7 +158,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe({"Name": "Reset"})
         test_step = ("Manually put the device in a RVC Run Mode cluster mode with "
                      "the Idle(0x4000) mode tag and in a device state that allows changing to either "
                      "of these modes: %i, %i" % (self.mode_a, self.mode_b))
@@ -237,7 +237,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         if op_state not in valid_op_states:
             self.print_step(9, "Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "ChargerFound"}')
+                self.write_to_app_pipe({"Name": "ChargerFound"})
             else:
                 self.wait_for_user_input(
                     prompt_msg="Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42), and press Enter when ready.\n")

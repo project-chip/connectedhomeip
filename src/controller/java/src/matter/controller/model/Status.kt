@@ -57,6 +57,7 @@ data class Status(val status: Int, val clusterStatus: Int?) {
     RESERVED99(0X99),
     RESERVED9A(0X9A),
     BUSY(0X9C),
+    ACCESS_RESTRICTED(0x9D),
     DEPRECATEDC0(0XC0),
     DEPRECATEDC1(0XC1),
     DEPRECATEDC2(0XC2),

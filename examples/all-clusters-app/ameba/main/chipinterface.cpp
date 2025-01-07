@@ -23,22 +23,20 @@
 #include "DeviceCallbacks.h"
 #include "Globals.h"
 #include "LEDWidget.h"
-#include "ManualOperationCommand.h"
 #include "chip_porting.h"
+#if CHIP_AMEBA_APP_TASK
+#include "ameba_main_task.h"
+#endif
 #include <DeviceInfoProviderImpl.h>
-#include <lwip_netconf.h>
 
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
-#include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
-#include <laundry-dryer-controls-delegate-impl.h>
-#include <laundry-washer-controls-delegate-impl.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
-#include <microwave-oven-device.h>
+
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #if CONFIG_ENABLE_AMEBA_CRYPTO
@@ -47,11 +45,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <static-supported-modes-manager.h>
-#include <static-supported-temperature-levels.h>
 #include <support/CHIPMem.h>
+
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
-#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #include <test_event_trigger/AmebaTestEventTriggerDelegate.h>
 #endif
 
@@ -76,9 +72,6 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
                                       &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
-
-app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
-Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 } // namespace
 
 void NetWorkCommissioningInstInit()
@@ -157,6 +150,7 @@ static void InitServer(intptr_t context)
     initParams.appDelegate = &sAmebaObserver;
 
     initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_ENABLE_AMEBA_CRYPTO
     ChipLogProgress(DeviceLayer, "platform crypto enabled!");
@@ -180,14 +174,9 @@ static void InitServer(intptr_t context)
 
 #if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
-    InitManualOperation();
 #endif
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
-    Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
-    MatterMicrowaveOvenServerInit();
-#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
-    static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler;
-    Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sSmokeCOTestEventTriggerHandler);
+#if CHIP_AMEBA_APP_TASK
+    AppTaskInit();
 #endif
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
@@ -230,16 +219,4 @@ extern "C" void ChipTestShutdown(void)
 bool lowPowerClusterSleep()
 {
     return true;
-}
-
-using namespace chip::app::Clusters::LaundryWasherControls;
-void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
-{
-    LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
-}
-
-using namespace chip::app::Clusters::LaundryDryerControls;
-void emberAfLaundryDryerControlsClusterInitCallback(EndpointId endpoint)
-{
-    LaundryDryerControlsServer::SetDefaultDelegate(endpoint, &LaundryDryerControlDelegate::getLaundryDryerControlDelegate());
 }

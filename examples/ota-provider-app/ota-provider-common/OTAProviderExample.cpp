@@ -61,7 +61,7 @@ constexpr uint32_t kBdxServerPollIntervalMillis    = 50;                        
 void GetUpdateTokenString(const chip::ByteSpan & token, char * buf, size_t bufSize)
 {
     const uint8_t * tokenData = static_cast<const uint8_t *>(token.data());
-    size_t minLength          = chip::min(token.size(), bufSize);
+    size_t minLength          = std::min(token.size(), bufSize);
     for (size_t i = 0; i < (minLength / 2) - 1; ++i)
     {
         snprintf(&buf[i * 2], bufSize, "%02X", tokenData[i]);

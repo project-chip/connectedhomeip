@@ -19,22 +19,24 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <commands/pairing/PairingCommand.h>
+#include <device_manager/BridgeSubscription.h>
+#include <device_manager/CommissionerControl.h>
+#include <device_manager/FabricSyncGetter.h>
+#include <device_manager/PairingManager.h>
 #include <platform/CHIPDeviceLayer.h>
-
 #include <set>
 
-constexpr uint16_t kResponseTimeoutSeconds = 30;
+namespace admin {
 
-class Device
+class SyncedDevice
 {
 public:
-    Device(chip::NodeId nodeId, chip::EndpointId endpointId) : mNodeId(nodeId), mEndpointId(endpointId) {}
+    SyncedDevice(chip::NodeId nodeId, chip::EndpointId endpointId) : mNodeId(nodeId), mEndpointId(endpointId) {}
 
     chip::NodeId GetNodeId() const { return mNodeId; }
     chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
-    bool operator<(const Device & other) const
+    bool operator<(const SyncedDevice & other) const
     {
         return mNodeId < other.mNodeId || (mNodeId == other.mNodeId && mEndpointId < other.mEndpointId);
     }
@@ -44,10 +46,16 @@ private:
     chip::EndpointId mEndpointId;
 };
 
-class DeviceManager : public PairingDelegate
+class DeviceManager
 {
 public:
     DeviceManager() = default;
+
+    static DeviceManager & Instance()
+    {
+        static DeviceManager instance;
+        return instance;
+    }
 
     void Init();
 
@@ -59,21 +67,22 @@ public:
 
     void UpdateLastUsedNodeId(chip::NodeId nodeId);
 
-    void SetRemoteBridgeNodeId(chip::NodeId nodeId) { mRemoteBridgeNodeId = nodeId; }
+    void SetRemoteBridgeNodeId(chip::NodeId nodeId);
 
     void SetLocalBridgeNodeId(chip::NodeId nodeId) { mLocalBridgeNodeId = nodeId; }
-
-    bool IsAutoSyncEnabled() const { return mAutoSyncEnabled; }
 
     bool IsFabricSyncReady() const { return mRemoteBridgeNodeId != chip::kUndefinedNodeId; }
 
     bool IsLocalBridgeReady() const { return mLocalBridgeNodeId != chip::kUndefinedNodeId; }
 
-    void EnableAutoSync(bool state) { mAutoSyncEnabled = state; }
+    void AddSyncedDevice(const SyncedDevice & device);
 
-    void AddSyncedDevice(const Device & device);
+    void RemoveSyncedDevice(chip::ScopedNodeId scopedNodeId);
 
-    void RemoveSyncedDevice(chip::NodeId nodeId);
+    /**
+     * @brief Initializes the CommissionerControl for fabric sync setup process.
+     */
+    void InitCommissionerControl();
 
     /**
      * @brief Determines whether a given nodeId corresponds to the "current bridge device," either local or remote.
@@ -89,19 +98,19 @@ public:
      *
      * This function initiates the process to open the commissioning window for a device identified by the given node ID.
      *
-     * @param nodeId               The ID of the node that should open the commissioning window.
-     * @param commissioningTimeout The time in seconds before the commissioning window closes. This value determines
-     *                             how long the commissioning window remains open for incoming connections.
+     * @param scopedNodeId         The scoped node ID of the device that should open the commissioning window.
      * @param iterations           The number of PBKDF (Password-Based Key Derivation Function) iterations to use
      *                             for deriving the PAKE (Password Authenticated Key Exchange) verifier.
+     * @param commissioningTimeoutSec The time in seconds before the commissioning window closes. This value determines
+     *                             how long the commissioning window remains open for incoming connections.
      * @param discriminator        The device-specific discriminator, determined during commissioning, which helps
      *                             to uniquely identify the device among others.
-     * @param saltHex              The hexadecimal-encoded salt used in the cryptographic operations for commissioning.
-     * @param verifierHex          The hexadecimal-encoded PAKE verifier used to authenticate the commissioning process.
+     * @param salt                 The salt used in the cryptographic operations for commissioning.
+     * @param verifier             The PAKE verifier used to authenticate the commissioning process.
      *
      */
-    void OpenDeviceCommissioningWindow(chip::NodeId nodeId, uint32_t commissioningTimeout, uint32_t iterations,
-                                       uint32_t discriminator, const char * saltHex, const char * verifierHex);
+    void OpenDeviceCommissioningWindow(chip::ScopedNodeId scopedNodeId, uint32_t iterations, uint16_t commissioningTimeoutSec,
+                                       uint16_t discriminator, const chip::ByteSpan & salt, const chip::ByteSpan & verifier);
 
     /**
      * @brief Open the commissioning window of a device from another fabric via its fabric bridge.
@@ -118,43 +127,6 @@ public:
      */
     void OpenRemoteDeviceCommissioningWindow(chip::EndpointId remoteEndpointId);
 
-    /**
-     * @brief Pair a remote fabric bridge with a given node ID.
-     *
-     * This function initiates the pairing process for a remote fabric bridge using the specified parameters.
-
-     * @param nodeId            The user-defined ID for the node being commissioned. It doesn’t need to be the same ID,
-     *                          as for the first fabric.
-     * @param deviceRemoteIp    The IP address of the remote device that is being paired as part of the fabric bridge.
-     */
-    void PairRemoteFabricBridge(chip::NodeId nodeId, const char * deviceRemoteIp);
-
-    /**
-     * @brief Pair a remote Matter device to the current fabric.
-     *
-     * This function initiates the pairing process for a remote device using the specified parameters.
-
-     * @param nodeId            The user-defined ID for the node being commissioned. It doesn’t need to be the same ID,
-     *                          as for the first fabric.
-     * @param payload           The the QR code payload or a manual pairing code generated by the first commissioner
-     *                          instance when opened commissioning window.
-     */
-    void PairRemoteDevice(chip::NodeId nodeId, const char * payload);
-
-    /**
-     * @brief Pair a local fabric bridge with a given node ID.
-     *
-     * This function initiates the pairing process for the local fabric bridge using the specified parameters.
-
-     * @param nodeId            The user-defined ID for the node being commissioned. It doesn’t need to be the same ID,
-     *                          as for the first fabric.
-     */
-    void PairLocalFabricBridge(chip::NodeId nodeId);
-
-    void UnpairRemoteFabricBridge();
-
-    void UnpairLocalFabricBridge();
-
     void SubscribeRemoteFabricBridge();
 
     void ReadSupportedDeviceCategories();
@@ -165,11 +137,10 @@ public:
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
+    SyncedDevice * FindDeviceByEndpoint(chip::EndpointId endpointId);
+    SyncedDevice * FindDeviceByNode(chip::NodeId nodeId);
+
 private:
-    friend DeviceManager & DeviceMgr();
-
-    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
-
     void RequestCommissioningApproval();
 
     void HandleReadSupportedDeviceCategories(chip::TLV::TLVReader & data);
@@ -182,8 +153,6 @@ private:
 
     void HandleReverseOpenCommissioningWindow(chip::TLV::TLVReader & data);
 
-    static DeviceManager sInstance;
-
     chip::NodeId mLastUsedNodeId = 0;
 
     // The Node ID of the remote bridge used for Fabric-Sync
@@ -194,26 +163,13 @@ private:
     // This represents the bridge within its own ecosystem.
     chip::NodeId mLocalBridgeNodeId = chip::kUndefinedNodeId;
 
-    std::set<Device> mSyncedDevices;
-    bool mAutoSyncEnabled = false;
-    bool mInitialized     = false;
-    uint64_t mRequestId   = 0;
+    std::set<SyncedDevice> mSyncedDevices;
+    bool mInitialized   = false;
+    uint64_t mRequestId = 0;
 
-    Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
-    Device * FindDeviceByNode(chip::NodeId nodeId);
+    BridgeSubscription mBridgeSubscriber;
+    CommissionerControl mCommissionerControl;
+    FabricSyncGetter mFabricSyncGetter;
 };
 
-/**
- * Returns the public interface of the DeviceManager singleton object.
- *
- * Applications should use this to access features of the DeviceManager
- * object.
- */
-inline DeviceManager & DeviceMgr()
-{
-    if (!DeviceManager::sInstance.mInitialized)
-    {
-        DeviceManager::sInstance.Init();
-    }
-    return DeviceManager::sInstance;
-}
+} // namespace admin

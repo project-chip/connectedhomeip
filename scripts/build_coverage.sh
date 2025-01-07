@@ -50,6 +50,7 @@ SUPPORTED_TESTS=(unit yaml all)
 CODE="core"
 TESTS="unit"
 skip_gn=false
+TEST_TARGET=check
 
 help() {
 
@@ -70,6 +71,7 @@ help() {
                             'unit': Run unit test to drive the coverage check. --default
                             'yaml': Run yaml test to drive the coverage check.
                             'all': Run unit & yaml test to drive the coverage check.
+  --target                  Specific test target to run (e.g. TestEmberAttributeBuffer.run)
   "
 }
 
@@ -88,6 +90,9 @@ for i in "$@"; do
         -t=* | --tests=*)
             TESTS="${i#*=}"
             shift
+            ;;
+        --target=*)
+            TEST_TARGET="${i#*=}"
             ;;
         -o=* | --output_root=*)
             OUTPUT_ROOT="${i#*=}"
@@ -121,20 +126,21 @@ if [ "$skip_gn" == false ]; then
     # Generates ninja files
     EXTRA_GN_ARGS=""
     if [[ "$TESTS" == "yaml" || "$TESTS" == "all" ]]; then
-      EXTRA_GN_ARGS="$EXTRA_GN_ARGS chip_build_all_clusters_app=true"
+        EXTRA_GN_ARGS="$EXTRA_GN_ARGS chip_build_all_clusters_app=true"
     else
         EXTRA_GN_ARGS="$EXTRA_GN_ARGS chip_build_tools=false"
     fi
     gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="use_coverage=true$EXTRA_GN_ARGS"
-    ninja -C "$OUTPUT_ROOT"
 
     # Run unit tests
     if [[ "$TESTS" == "unit" || "$TESTS" == "all" ]]; then
-        ninja -C "$OUTPUT_ROOT" check
+        ninja -C "$OUTPUT_ROOT" "$TEST_TARGET"
     fi
 
     # Run yaml tests
     if [[ "$TESTS" == "yaml" || "$TESTS" == "all" ]]; then
+        ninja -C "$OUTPUT_ROOT"
+
         scripts/run_in_build_env.sh \
             "./scripts/tests/run_test_suite.py \
              --chip-tool ""$OUTPUT_ROOT/chip-tool \
@@ -173,7 +179,7 @@ mkdir -p "$COVERAGE_ROOT"
 lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_base.info"
 lcov --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_test.info"
 lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" --add-tracefile "$COVERAGE_ROOT/lcov_test.info" --output-file "$COVERAGE_ROOT/lcov_final.info"
-genhtml "$COVERAGE_ROOT/lcov_final.info" --output-directory "$COVERAGE_ROOT/html"
+genhtml "$COVERAGE_ROOT/lcov_final.info" --output-directory "$COVERAGE_ROOT/html" --title "SHA:$(git rev-parse HEAD)" --header-title "Matter SDK Coverage Report"
 
 # Copy webapp's YAML file to the coverage output directory
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" "$COVERAGE_ROOT/webapp_config.yaml"

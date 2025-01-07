@@ -60,22 +60,27 @@ struct NumericAttributeTraits
     static constexpr WorkingType StorageToWorking(StorageType storageValue) { return storageValue; }
 
 private:
+    // Ensure that this generic NumericAttributeTraits implementation is being used for some type for which it
+    // actually works.
+    static_assert(std::is_floating_point_v<T> || std::is_integral_v<T> || std::is_enum_v<T>,
+                  "NumericAttributeTraits specialization needed for this type");
+
     // We need to make sure we never look like we are assigning NaN to an
     // integer, even in a not-reached branch.  Without "if constexpr", the best
     // we can do is these functions using enable_if.
-    template <typename U = T, typename std::enable_if_t<std::is_floating_point<U>::value, int> = 0>
+    template <typename U = T, typename std::enable_if_t<std::is_floating_point_v<U>, int> = 0>
     static constexpr StorageType GetNullValue()
     {
         return std::numeric_limits<T>::quiet_NaN();
     }
 
-    template <typename U = T, typename std::enable_if_t<std::is_integral<U>::value, int> = 0>
+    template <typename U = T, typename std::enable_if_t<std::is_integral_v<U>, int> = 0>
     static constexpr StorageType GetNullValue()
     {
         return std::is_signed<T>::value ? std::numeric_limits<T>::min() : std::numeric_limits<T>::max();
     }
 
-    template <typename U = T, typename std::enable_if_t<std::is_enum<U>::value, int> = 0>
+    template <typename U = T, typename std::enable_if_t<std::is_enum_v<U>, int> = 0>
     static constexpr StorageType GetNullValue()
     {
         static_assert(!std::is_signed<std::underlying_type_t<T>>::value, "Enums must be unsigned");
@@ -127,6 +132,39 @@ public:
     // Utility that lets consumers treat a StorageType instance as a uint8_t*
     // for writing to the attribute store.
     static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return reinterpret_cast<uint8_t *>(&value); }
+
+    // Min and max values for the type.
+    static WorkingType MinValue(bool isNullable)
+    {
+        if constexpr (!std::is_signed_v<WorkingType>)
+        {
+            return 0;
+        }
+
+        if (isNullable)
+        {
+            // Smallest negative value is excluded for nullable signed types.
+            return static_cast<WorkingType>(std::numeric_limits<WorkingType>::min() + 1);
+        }
+
+        return std::numeric_limits<WorkingType>::min();
+    }
+
+    static WorkingType MaxValue(bool isNullable)
+    {
+        if constexpr (std::is_signed_v<WorkingType>)
+        {
+            return std::numeric_limits<WorkingType>::max();
+        }
+
+        if (isNullable)
+        {
+            // Largest value is excluded for nullable unsigned types.
+            return static_cast<WorkingType>(std::numeric_limits<WorkingType>::max() - 1);
+        }
+
+        return std::numeric_limits<WorkingType>::max();
+    }
 };
 
 template <typename T>
@@ -209,7 +247,10 @@ struct NumericAttributeTraits<bool>
 
     static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return reinterpret_cast<uint8_t *>(&value); }
 
-private:
+    static uint8_t MinValue(bool isNullable) { return 0; }
+
+    static uint8_t MaxValue(bool isNullable) { return 1; }
+
     static constexpr StorageType kNullValue = 0xFF;
 };
 

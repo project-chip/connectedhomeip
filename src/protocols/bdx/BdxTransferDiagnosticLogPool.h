@@ -18,14 +18,14 @@
 
 #pragma once
 
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/Pool.h>
+#include <protocols/bdx/BdxTransferDiagnosticLog.h>
 #include <protocols/bdx/BdxTransferServerDelegate.h>
 #include <system/SystemLayer.h>
 
 namespace chip {
 namespace bdx {
-
-class BdxTransferDiagnosticLog;
 
 class BdxTransferDiagnosticLogPoolDelegate
 {
@@ -49,6 +49,17 @@ public:
     }
 
     void Release(BdxTransferDiagnosticLog * transfer) override { mTransferPool.ReleaseObject(transfer); }
+
+    void AbortTransfersForFabric(FabricIndex fabricIndex)
+    {
+        mTransferPool.ForEachActiveObject([fabricIndex](BdxTransferDiagnosticLog * transfer) {
+            if (transfer->IsForFabric(fabricIndex))
+            {
+                transfer->AbortTransfer();
+            }
+            return Loop::Continue;
+        });
+    }
 
 private:
     ObjectPool<BdxTransferDiagnosticLog, N> mTransferPool;

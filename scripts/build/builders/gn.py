@@ -55,7 +55,7 @@ class GnBuilder(Builder):
     def generate(self):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
-            '--export-compile-commands',
+            '--add-export-compile-commands=*',
             '--root=%s' % self.root
         ]
 
@@ -95,6 +95,8 @@ class GnBuilder(Builder):
         self.PreBuildCommand()
 
         cmd = ['ninja', '-C', self.output_dir]
+        if self.ninja_jobs is not None:
+            cmd.append('-j' + str(self.ninja_jobs))
         if self.build_command:
             cmd.append(self.build_command)
 

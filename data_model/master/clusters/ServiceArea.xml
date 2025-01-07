@@ -113,7 +113,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="2" name="AreaDesc" type="AreaInfoStruct" default="MS">
+      <field id="2" name="AreaInfo" type="AreaInfoStruct" default="MS">
         <mandatoryConform/>
       </field>
     </struct>
@@ -121,7 +121,7 @@ Davis, CA 95616, USA
       <field id="0" name="LandmarkTag" type="tag">
         <mandatoryConform/>
       </field>
-      <field id="1" name="PositionTag" type="tag">
+      <field id="1" name="RelativePositionTag" type="tag">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>

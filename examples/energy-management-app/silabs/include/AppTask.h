@@ -28,7 +28,7 @@
 
 #include "AppEvent.h"
 #include "BaseApplication.h"
-#include "EnergyEvseManager.h"
+
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/BLEEndPoint.h>
@@ -80,7 +80,7 @@ public:
 
 private:
     static AppTask sAppTask;
-    static void EvseActionEventHandler(AppEvent * aEvent);
+    static void EnergyManagementActionEventHandler(AppEvent * aEvent);
 
     static void UpdateClusterState(intptr_t context);
 

@@ -91,13 +91,13 @@ config POSIX_MAX_FDS
 
 # Application stack size
 config MAIN_STACK_SIZE
-	default 8192
+	default 3072
 
 config INIT_STACKS
 	default y
 
 config NET_MGMT_EVENT_STACK_SIZE
-	default 2048
+	default 1024
 
 config NET_MGMT_EVENT_QUEUE_SIZE
 	default 20
@@ -136,21 +136,27 @@ config NET_TC_TX_THREAD_BASE_PRIO
 config NET_TC_RX_THREAD_BASE_PRIO
 	default 3
 
+config NET_TC_SKIP_FOR_HIGH_PRIO
+	default y
+
+config NET_CONTEXT_PRIORITY
+	default y
+
 # Network buffers
 config NET_PKT_RX_COUNT
-	default 60
+	default 14
 
 config NET_PKT_TX_COUNT
-	default 40
+	default 14
 
 config NET_BUF_RX_COUNT
-	default 60
+	default 36
 
 config NET_BUF_TX_COUNT
-	default 80
+	default 36
 
 config NET_BUF_DATA_SIZE
-	default 1744
+	default 256
 
 # Bluetooth Low Energy configs
 
@@ -205,7 +211,10 @@ config BT_BUF_ACL_TX_SIZE
 
 config BT_RX_STACK_SIZE
 	default 2048 if NO_OPTIMIZATIONS && DEBUG
-	default 1600
+	default 1700
+
+config BT_LONG_WQ_STACK_SIZE
+	default 1024
 
 config BT_DEVICE_NAME_GATT_WRITABLE
 	bool
@@ -232,20 +241,42 @@ config NVS_LOOKUP_CACHE_SIZE
 
 if CHIP_WIFI
 
+choice NXP_WIFI_PART
+	default NXP_RW610 if SOC_SERIES_RW6XX
+endchoice
+
+config ZVFS_OPEN_MAX
+	default 30
+
 choice SCHED_ALGORITHM
 	default SCHED_MULTIQ
 endchoice
 
-choice LIBC_IMPLEMENTATION
-	default NEWLIB_LIBC
+config WIFI_NM_MAX_MANAGED_INTERFACES
+	default 2
+
+config WIFI_NM_WPA_SUPPLICANT_WQ_PRIO
+	default 3
+
+config WIFI_NM_WPA_SUPPLICANT_PRIO
+	default 3
+
+choice WIFI_NM_WPA_SUPPLICANT_LOG_LEVEL_CHOICE
+	default WIFI_NM_WPA_SUPPLICANT_LOG_LEVEL_INF
 endchoice
 
-choice WPA_SUPP_LOG_LEVEL_CHOICE
-	default WPA_SUPP_LOG_LEVEL_ERR
+choice WIFI_NM_WPA_SUPPLICANT_CRYPTO_BACKEND
+	default WIFI_NM_WPA_SUPPLICANT_CRYPTO_ALT
 endchoice
 
-config WPA_SUPP_THREAD_STACK_SIZE
-	default 12288
+config WIFI_NM_WPA_SUPPLICANT_THREAD_STACK_SIZE
+	default 6144
+
+config WIFI_NM_WPA_SUPPLICANT_WQ_STACK_SIZE
+	default 5120
+
+config WIFI_NM_WPA_SUPPLICANT_INF_MON
+	default n
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
 	default 2048
@@ -261,7 +292,7 @@ config NET_IF_MCAST_IPV6_ADDR_COUNT
 	default 8
 
 config NET_SOCKETS_POLL_MAX
-	default 8
+	default 14
 
 config NET_IPV4_FRAGMENT_MAX_COUNT
 	default 3
@@ -276,7 +307,7 @@ config NET_IPV6_FRAGMENT_MAX_COUNT
 	default 3
 
 config NET_IPV6_FRAGMENT_MAX_PKT
-	default 7
+	default 8
 
 config NET_IPV6_FRAGMENT_TIMEOUT
 	default 3
@@ -287,7 +318,7 @@ config NET_MAX_ROUTERS
 	default 1
 
 config NET_MAX_CONN
-	default 4
+	default 10
 
 config SHELL_STACK_SIZE
 	default 2616
@@ -297,6 +328,28 @@ config HEAP_MEM_POOL_SIZE
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
 	default 28672 # 28 kB
+
+config ETH_DRIVER
+	default n
+
+endif
+
+if CHIP_ETHERNET || CHIP_WIFI
+
+choice LIBC_IMPLEMENTATION
+	default NEWLIB_LIBC
+endchoice
+
+endif
+
+if CHIP_ETHERNET
+
+choice NXP_ENET_DRIVER
+	default ETH_NXP_ENET
+endchoice
+
+config NET_SOCKETS_POLL_MAX
+	default 7
 
 endif
 
@@ -313,11 +366,14 @@ config MBEDTLS_USER_CONFIG_ENABLE
 config MBEDTLS_USER_CONFIG_FILE
     default "nxp-zephyr-mbedtls-config.h"
 
-config MBEDTLS_ENTROPY_ENABLED
+config MBEDTLS_ENTROPY_C
 	default y
 
-config MBEDTLS_ZEPHYR_ENTROPY
+config MBEDTLS_ENTROPY_POLL_ZEPHYR
 	default y
+
+config MBEDTLS_SSL_MAX_CONTENT_LEN
+	default 8192
 
 config MBEDTLS_ENABLE_HEAP
 	default y
@@ -343,13 +399,16 @@ config MBEDTLS_ECP_C
 config MBEDTLS_ECP_DP_SECP256R1_ENABLED
 	default y
 
+config CHIP_CRYPTO_PSA
+	default y
+
 if CHIP_CRYPTO_PSA
 
 config MBEDTLS_PSA_CRYPTO_C
 	default y
 
-config WPA_SUPP_CRYPTO_MBEDTLS_PSA
-	default y if WPA_SUPP_CRYPTO
+config WIFI_NM_WPA_SUPPLICANT_CRYPTO_MBEDTLS_PSA
+	default y if WIFI_NM_WPA_SUPPLICANT
 
 endif
 
@@ -358,11 +417,11 @@ config MCUX_ELS_PKC
 
 if MCUX_ELS_PKC
 
-config KSDK_MBEDTLS
-	default n
-
 config MCUX_PSA_CRYPTO_DRIVER_ELS_PKC
-	default y if MBEDTLS_PSA_CRYPTO_C
+	default y if CHIP_CRYPTO_PSA
+
+config MCUX_PSA_CRYPTO_DRIVER_ELS_PKC_THREAD
+	default y if CHIP_CRYPTO_PSA
 
 config ENTROPY_GENERATOR
 	default y

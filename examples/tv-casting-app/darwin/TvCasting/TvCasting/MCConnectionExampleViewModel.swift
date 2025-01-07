@@ -22,6 +22,8 @@ import UIKit
 class MCConnectionExampleViewModel: ObservableObject {
     let Log = Logger(subsystem: "com.matter.casting",
                      category: "MCConnectionExampleViewModel")
+
+    var passcodeAlertController: UIAlertController?
     
     // VendorId of the MCEndpoint on the MCCastingPlayer that the MCCastingApp desires to interact with after connection
     let kDesiredEndpointVendorId: UInt16 = 65521;
@@ -37,6 +39,8 @@ class MCConnectionExampleViewModel: ObservableObject {
     @Published var connectionSuccess: Bool?;
 
     @Published var connectionStatus: String?;
+
+    @Published var errorCodeDescription: String?
 
     func connect(selectedCastingPlayer: MCCastingPlayer?, useCommissionerGeneratedPasscode: Bool) {
         self.Log.info("MCConnectionExampleViewModel.connect() useCommissionerGeneratedPasscode: \(String(describing: useCommissionerGeneratedPasscode))")
@@ -63,6 +67,22 @@ class MCConnectionExampleViewModel: ObservableObject {
         let commissionerDeclarationCallback: (MCCommissionerDeclaration) -> Void = { commissionerDeclarationMessage in
             DispatchQueue.main.async {
                 self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, recived a message form the MCCastingPlayer:\n\(commissionerDeclarationMessage)")
+
+                // Display CommissionerDeclaration error code if `errorCode` is not `kNoError`
+                if commissionerDeclarationMessage.errorCode != CdError.noError {
+                    self.errorCodeDescription = "CommissionerDeclaration error from CastingPlayer: \(commissionerDeclarationMessage.getErrorCodeString())"
+                    self.Log.error("MCConnectionExampleViewModel connect() Casting Player/Commissioner Error: \(self.errorCodeDescription ?? "Unknown Error")")
+                }
+
+                // Check if the passcode dialog should be cancelled
+                if commissionerDeclarationMessage.cancelPasscode {
+                    self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback. Cancel passcode received. Dismissing the PasscodeInputDialog.")
+                    self.passcodeAlertController?.dismiss(animated: true, completion: nil)
+                    self.connectionStatus = "Connection attempt cancelled by the CastingPlayer/Commissioner user. \n\nRoute back to exit."
+                    return
+                }
+
+                // Continue with passcode dialog if needed
                 if commissionerDeclarationMessage.commissionerPasscode {
                     self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, calling getTopMostViewController()")
                     if let topViewController = self.getTopMostViewController() {
@@ -151,7 +171,7 @@ class MCConnectionExampleViewModel: ObservableObject {
             targetAppInfo = MCTargetAppInfo(vendorId: kDesiredEndpointVendorId)
             connectionCallbacks = MCConnectionCallbacks(
                 callbacks: connectionCompleteCallback,
-                commissionerDeclarationCallback: nil
+                commissionerDeclarationCallback: commissionerDeclarationCallback
             )
         }
 
@@ -171,6 +191,7 @@ class MCConnectionExampleViewModel: ObservableObject {
 
         // Create the alert controller
         let alertController = UIAlertController(title: "Enter Passcode", message: nil, preferredStyle: .alert)
+        self.passcodeAlertController = alertController
 
         // Add the text field with the default passcode
         alertController.addTextField { textField in

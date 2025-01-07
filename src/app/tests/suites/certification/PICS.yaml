@@ -339,6 +339,13 @@ PICS:
           "Does commissionee provide a Firmware Information field in the
           AttestationResponse?"
       id: MCORE.DA.ATTESTELEMENT_FW_INFO
+
+    #
+    # Fabric Synchronization
+    #
+    - label: "Does the device implement Fabric Synchronization capabilities?"
+      id: MCORE.FS
+
     #
     #IDM
     #
@@ -6494,6 +6501,13 @@ PICS:
     - label: "Does the device implement the Schedules attribute?"
       id: TSTAT.S.A0051
 
+    - label: "Does the device implement the Schedules attribute?"
+      id: TSTAT.S.A0051
+
+    - label:
+          "Does the device implement the SetpointHoldExpiryTimestamp attribute?"
+      id: TSTAT.S.A0052
+
     #
     # server / commandsReceived
     #
@@ -6516,6 +6530,11 @@ PICS:
     - label:
           "Does the device implement receiving the GetRelayStatusLog command?"
       id: TSTAT.S.C04.Rsp
+
+    - label:
+          "Does the device implement receiving the SetActiveScheduleRequest
+          command?"
+      id: TSTAT.S.C05.Rsp
 
     - label:
           "Does the device implement receiving the SetActivePresetRequest
@@ -6613,6 +6632,11 @@ PICS:
 
     - label: "Does the device implement sending the GetRelayStatusLog command?"
       id: TSTAT.C.C04.Tx
+
+    - label:
+          "Does the device implement sending the SetActiveScheduleRequest
+          command?"
+      id: TSTAT.C.C05.Tx
 
     - label:
           "Does the device implement sending the SetActivePresetRequest command?"

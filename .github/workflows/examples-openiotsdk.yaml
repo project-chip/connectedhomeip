@@ -15,11 +15,7 @@
 name: Build example - Open IoT SDK
 
 on:
-    push:
-        branches-ignore:
-            - 'dependabot/**'
-    pull_request:
-    merge_group:
+    # Workflow disabled due to lack of maintainer
     workflow_dispatch:
 
 concurrency:
@@ -40,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-openiotsdk:74
+            image: ghcr.io/project-chip/chip-build-openiotsdk:94
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
             options: --privileged

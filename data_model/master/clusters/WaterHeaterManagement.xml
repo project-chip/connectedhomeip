@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0094" name="Water Heater Management Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0094" name="Water Heater Management Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added events and simplified data types"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0094" name="Water Heater Management"/>
@@ -69,7 +70,7 @@ Davis, CA 95616, USA
     <feature bit="0" code="EM" name="EnergyManagement" summary="Allows energy management control of the tank">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="TP" name="TankPercent" summary="Supports monitoring the percentage of the water in the tank which is hot">
+    <feature bit="1" code="TP" name="TankPercent" summary="Supports monitoring the percentage of hot water in the tank">
       <optionalConform/>
     </feature>
   </features>
@@ -82,48 +83,58 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <bitmap name="WaterHeaterDemandBitmap">
-      <bitfield name="ImmersionElement1" bit="0" summary="Immersion Heating Element1 State On">
+    <bitmap name="WaterHeaterHeatSourceBitmap">
+      <bitfield name="ImmersionElement1" bit="0" summary="Immersion Heating Element 1">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="ImmersionElement2" bit="1" summary="Immersion Heating Element2 State On">
+      <bitfield name="ImmersionElement2" bit="1" summary="Immersion Heating Element 2">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="HeatPump" bit="2" summary="Heat pump Heating State On">
+      <bitfield name="HeatPump" bit="2" summary="Heat pump Heating">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Boiler" bit="3" summary="Boiler Heating State On">
+      <bitfield name="Boiler" bit="3" summary="Boiler Heating (e.g. Gas or Oil)">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Other" bit="4" summary="Other Heating State On">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="WaterHeaterTypeBitmap">
-      <bitfield name="ImmersionElement1" bit="0" summary="Supports Immersion Heating Element1">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="ImmersionElement2" bit="1" summary="Supports Immersion Heating Element2">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HeatPump" bit="2" summary="Supports Heat pump Heating">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Boiler" bit="3" summary="Supports Boiler Heating (e.g. Gas or Oil)">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Other" bit="4" summary="Supports Other Heating">
+      <bitfield name="Other" bit="4" summary="Other Heating">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
+    <struct name="WaterHeaterBoostInfoStruct">
+      <field id="0" name="Duration" type="elapsed-s">
+        <mandatoryConform/>
+        <constraint type="min" value="1"/>
+      </field>
+      <field id="1" name="OneShot" type="bool" default="False"/>
+      <field id="2" name="EmergencyBoost" type="bool" default="False">
+        <optionalConform/>
+      </field>
+      <field id="3" name="TemporarySetpoint" type="temperature">
+        <optionalConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="4" name="TargetPercentage" type="percent">
+        <otherwiseConform>
+          <mandatoryConform>
+            <attribute name="TargetReheat"/>
+          </mandatoryConform>
+          <optionalConform>
+            <feature name="TP"/>
+          </optionalConform>
+        </otherwiseConform>
+      </field>
+      <field id="5" name="TargetReheat" type="percent">
+        <constraint type="max" value="TargetPercentage"/>
+      </field>
+    </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="HeaterTypes" type="WaterHeaterTypeBitmap" default="0">
+    <attribute id="0x0000" name="HeaterTypes" type="WaterHeaterHeatSourceBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="HeatDemand" type="WaterHeaterDemandBitmap" default="0">
+    <attribute id="0x0001" name="HeatDemand" type="WaterHeaterHeatSourceBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
@@ -138,6 +149,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="EM"/>
       </mandatoryConform>
+      <constraint type="min" value="0"/>
     </attribute>
     <attribute id="0x0004" name="TankPercentage" type="percent" default="0">
       <access read="true" readPrivilege="view"/>
@@ -154,27 +166,9 @@ Davis, CA 95616, USA
     <command id="0x00" name="Boost" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
-      <field id="0" name="Duration" type="elapsed-s">
+      <field id="0" name="BoostInfo" type="WaterHeaterBoostInfoStruct">
         <mandatoryConform/>
-      </field>
-      <field id="1" name="OneShot" type="bool" default="False">
-        <optionalConform/>
-      </field>
-      <field id="2" name="EmergencyBoost" type="bool" default="False">
-        <optionalConform/>
-      </field>
-      <field id="3" name="TemporarySetpoint" type="temperature">
-        <optionalConform/>
-      </field>
-      <field id="4" name="TargetPercentage" type="percent">
-        <optionalConform>
-          <feature name="TP"/>
-        </optionalConform>
-      </field>
-      <field id="5" name="TargetReheat" type="percent">
-        <optionalConform>
-          <feature name="TP"/>
-        </optionalConform>
+        <constraint type="desc"/>
       </field>
     </command>
     <command id="0x01" name="CancelBoost" direction="commandToServer" response="Y">
@@ -182,4 +176,18 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </command>
   </commands>
+  <events>
+    <event id="0x00" name="BoostStarted" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="BoostInfo" type="WaterHeaterBoostInfoStruct">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+    </event>
+    <event id="0x01" name="BoostEnded" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+    </event>
+  </events>
 </cluster>

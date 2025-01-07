@@ -20,6 +20,7 @@ package matter.onboardingpayload
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -224,7 +225,7 @@ class QRCodeTest {
 
     try {
       QRCodeOnboardingPayloadParser(invalidString).populatePayload()
-      assertThat(false)
+      assertTrue(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
     }
@@ -240,7 +241,7 @@ class QRCodeTest {
 
     try {
       QRCodeOnboardingPayloadParser(invalidString).populatePayload()
-      assertThat(false)
+      assertTrue(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
     }
@@ -396,21 +397,21 @@ class QRCodeTest {
     // verify we can grab just the serial number as well
     assertThat(parsedQrCode.getSerialNumber()).isEqualTo("123456789")
 
-    // Test 2nd optional field
-    optionalQRCodeInfo = OptionalQRCodeInfoExtension()
-    optionalQRCodeInfo.tag = 130
-    optionalQRCodeInfo.type = OptionalQRCodeInfoType.TYPE_STRING
-    optionalQRCodeInfo.data = "myData"
+    val optionalQRCodeInfo1 = OptionalQRCodeInfoExtension()
+    optionalQRCodeInfo1.tag = 130
+    optionalQRCodeInfo1.type = OptionalQRCodeInfoType.TYPE_STRING
+    optionalQRCodeInfo1.data = "myData"
 
-    assertThat(parsedQrCode.getAllOptionalVendorData()[0]).isEqualTo(optionalQRCodeInfo)
+    val optionalQRCodeInfo2 = OptionalQRCodeInfoExtension()
+    optionalQRCodeInfo2.tag = 131
+    optionalQRCodeInfo2.type = OptionalQRCodeInfoType.TYPE_INT32
+    optionalQRCodeInfo2.int32 = 12
 
-    // Test 3rd optional field
-    optionalQRCodeInfo = OptionalQRCodeInfoExtension()
-    optionalQRCodeInfo.tag = 131
-    optionalQRCodeInfo.type = OptionalQRCodeInfoType.TYPE_INT32
-    optionalQRCodeInfo.int32 = 12
+    val vendor1 = parsedQrCode.getAllOptionalVendorData()[0]
+    val vendor2 = parsedQrCode.getAllOptionalVendorData()[1]
 
-    assertThat(parsedQrCode.getAllOptionalVendorData()[1]).isEqualTo(optionalQRCodeInfo)
+    assertTrue(vendor1 == optionalQRCodeInfo1 || vendor1 == optionalQRCodeInfo2)
+    assertTrue(vendor2 == optionalQRCodeInfo1 || vendor2 == optionalQRCodeInfo2)
   }
 
   companion object {

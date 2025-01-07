@@ -18,11 +18,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceControllerXPCParameters : MTRDeviceControllerParameters
-@end
+@interface MTRDeviceControllerMachServiceXPCParameters : MTRDeviceControllerAbstractParameters
 
-@interface MTRDeviceControllerMachServiceXPCParameters : MTRDeviceControllerXPCParameters
+- (nullable instancetype)initWithUniqueIdentifier:(NSUUID *)uniqueIdentifier;
 
+@property (atomic, retain) NSUUID * uniqueIdentifier;
 @property (atomic, retain) NSString * machServiceName;
 @property (atomic, readwrite) NSXPCConnectionOptions connectionOptions;
 

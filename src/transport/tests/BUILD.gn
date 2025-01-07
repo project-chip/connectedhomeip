@@ -44,9 +44,8 @@ chip_test_suite("tests") {
     "TestSessionManagerDispatch.cpp",
   ]
 
-  if (chip_device_platform != "mbed" && chip_device_platform != "efr32" &&
-      chip_device_platform != "esp32" && chip_device_platform != "nrfconnect" &&
-      chip_device_platform != "nxp") {
+  if (chip_device_platform != "mbed" && chip_device_platform != "esp32" &&
+      chip_device_platform != "nrfconnect" && chip_device_platform != "nxp") {
     test_sources += [ "TestSecureSessionTable.cpp" ]
   }
 

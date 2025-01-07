@@ -94,7 +94,8 @@ satisfied with the following command:
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
+     default-jre
 ```
 
 #### UI builds
@@ -381,6 +382,30 @@ They pick up environment variables such as `$CFLAGS`, `$CXXFLAGS` and
 `$LIB_FUZZING_ENGINE`.
 
 You likely want `libfuzzer` + `asan` builds instead for local testing.
+
+### `pw_fuzzer` `FuzzTests`
+
+An Alternative way for writing and running Fuzz Tests is Google's `FuzzTest`
+framework, integrated through `pw_fuzzer`. The Tests will have to be built and
+executed manually.
+
+```
+./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
+```
+
+NOTE: `asan` is enabled by default in FuzzTest, so please do not add it in
+build_examples.py invocation.
+
+Tests will be located in:
+`out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where
+`chip_pw_fuzztest` is the name of the toolchain used.
+
+-   Details on How To Run Fuzz Tests in
+    [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#running-fuzztests)
+
+FAQ: In the event of a build failure related to missing files or dependencies
+for pw_fuzzer, check the
+[FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
 
 ## Build custom configuration
 

@@ -12,10 +12,6 @@ group("default") {
   if (chip_logging_backend == "platform") {
     deps = []
 
-    if (chip_use_pw_logging) {
-      deps += [ "$dir_pw_log" ]
-    }
-
     if (chip_device_platform == "cyw30739") {
       deps += [ "${chip_root}/src/platform/Infineon/CYW30739:logging" ]
     } else if (chip_device_platform == "psoc6") {

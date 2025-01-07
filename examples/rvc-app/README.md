@@ -181,11 +181,8 @@ Example command:
 
 ### TC 1.3
 
-todo once the
-[test plan issue](https://github.com/CHIP-Specifications/chip-test-plans/issues/4454)
-is resolved, add the required PIXIT and set the
-PICS`SEAR.S.M.VALID_STATE_FOR_SELECT_AREAS=1`. PIXIT: `` Example command:
-`./scripts/tests/run_python_test.py --script src/python_testing/TC_SEAR_1_3.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1`
+PIXIT: `PIXIT.SEAR.VALID_AREAS:'[7, 1234567]'` Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_SEAR_1_3.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --json-arg PIXIT.SEAR.VALID_AREAS:'[7, 1234567]'`
 
 ### TC 1.4
 
