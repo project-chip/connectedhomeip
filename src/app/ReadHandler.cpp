@@ -15,9 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/AttributePathExpandIterator.h"
-#include "lib/support/CodeUtils.h"
 #include <app/AppConfig.h>
+#include <app/AttributePathExpandIterator.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusResponseMessage.h>
@@ -26,6 +25,7 @@
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/CodeUtils.h>
 #include <messaging/ExchangeContext.h>
 
 #include <app/ReadHandler.h>
