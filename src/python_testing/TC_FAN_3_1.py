@@ -79,9 +79,12 @@ class TC_FAN_3_1(MatterBaseTest):
 
         self.print_step("2a", "Read from the DUT the FanMode attribute and store")
         existing_fan_mode = await self.read_fan_mode(endpoint=endpoint)
+        print(f"\n\n\n\n\t\t\t [FANS] existing_fan_mode: {existing_fan_mode.name}\n\n\n\n\n")
 
         self.print_step("2b", "Write High to FanMode")
         status = await self.write_fan_mode(endpoint=endpoint, fan_mode=Clusters.FanControl.Enums.FanModeEnum.kHigh)
+        print(f"\n\n\n\n\t\t\t [FANS] write fan mode status: {status.name}\n\n\n\n\n")
+
         status_ok = (status == Status.Success) or (status == Status.InvalidInState)
         asserts.assert_true(status_ok, "FanMode write did not return a value of Success or InvalidInState")
 
@@ -89,6 +92,7 @@ class TC_FAN_3_1(MatterBaseTest):
         time.sleep(3)
 
         new_fan_mode = await self.read_fan_mode(endpoint=endpoint)
+        print(f"\n\n\n\n\t\t\t [FANS] new_fan_mode: {new_fan_mode.name}\n\n\n\n\n")
 
         if status == Status.Success:
             asserts.assert_equal(new_fan_mode, Clusters.FanControl.Enums.FanModeEnum.kHigh, "FanMode is not High")
@@ -97,6 +101,11 @@ class TC_FAN_3_1(MatterBaseTest):
 
         self.print_step("3a", "Read from the DUT the PercentSetting attribute and store")
         existing_percent_setting = await self.read_percent_setting(endpoint=endpoint)
+        print(f"\n\n\n\n\t\t\t [FANS] existing_percent_setting: {existing_percent_setting.value}\n\n\n\n\n")
+
+        # If mode was set, verify that the percent value is non-zero
+        if status == Status.Success:
+            asserts.assert_greater(existing_percent_setting, 0, "Percentage value cannot be 0 when a mode other than off is set.")
 
         self.print_step("3b", "Write Off to Fan Mode")
         status = await self.write_fan_mode(endpoint=endpoint, fan_mode=Clusters.FanControl.Enums.FanModeEnum.kOff)
