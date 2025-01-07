@@ -31,7 +31,8 @@ CHIP_ERROR Layer::ScheduleLambdaBridge(LambdaBridge && bridge)
     return lReturn;
 }
 
-CHIP_ERROR Layer::RunOnMatterContext(std::function<CHIP_ERROR()> func)
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+CHIP_ERROR LayerFreeRTOS::RunOnMatterContext(std::function<CHIP_ERROR()> func)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PlatformEventing::LockMatterStack(*this);
@@ -39,6 +40,7 @@ CHIP_ERROR Layer::RunOnMatterContext(std::function<CHIP_ERROR()> func)
     PlatformEventing::UnlockMatterStack(*this);
     return err;
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 } // namespace System
 } // namespace chip

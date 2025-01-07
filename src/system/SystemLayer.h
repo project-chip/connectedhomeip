@@ -220,8 +220,6 @@ public:
         return ScheduleLambdaBridge(std::move(bridge));
     }
 
-    CHIP_ERROR RunOnMatterContext(std::function<CHIP_ERROR()>);
-
 private:
     CHIP_ERROR ScheduleLambdaBridge(LambdaBridge && bridge);
 
@@ -234,6 +232,7 @@ private:
 
 class LayerFreeRTOS : public Layer
 {
+    CHIP_ERROR RunOnMatterContext(std::function<CHIP_ERROR()>);
 };
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
