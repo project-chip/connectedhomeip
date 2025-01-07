@@ -35,6 +35,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 from typing import List
 
 import chip.clusters as Clusters
@@ -50,7 +51,8 @@ class TC_G_2_2(MatterBaseTest):
     def steps_TC_G_2_2(self):
         return [TestStep(1, "Comissioning, already done", is_commissioning=True),
                 TestStep(2, "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT on EP0 using a key that is pre-installed on the TH. GroupKeySet fields are as follows:"),
-                TestStep(3, "TH writes the GroupKeyMap attribute in the GroupKeyManagement cluster on EP0 with maxgroups entries binding GroupId(0x0001 to (maxgroups)) with GroupKeySetID 1")]
+                TestStep(3, "TH writes the GroupKeyMap attribute in the GroupKeyManagement cluster on EP0 with maxgroups entries binding GroupId(0x0001 to (maxgroups)) with GroupKeySetID 1"),
+                TestStep(4, "TH cleans up the groups by sending the RemoveAllGroups command to the DUT")]
 
     @async_test_body
     async def test_TC_G_2_2(self):
@@ -59,7 +61,7 @@ class TC_G_2_2(MatterBaseTest):
 
         self.step(2)
         th1 = self.default_controller
-        kGroupKeySetID = 0x01a1
+        kGroupKeySetID = 0x0001
         groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=kGroupKeySetID,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
@@ -83,6 +85,13 @@ class TC_G_2_2(MatterBaseTest):
             groupKeySetID=kGroupKeySetID))
         resp = await th1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(groupKeyMapStruct))])
         asserts.assert_equal(resp[0].Status, Status.Success, "GroupKeyMap attribute write failed")
+
+        self.step(4)
+        cmd = Clusters.Groups.Commands.RemoveAllGroups()
+        print("matter_test_config: ", self.matter_test_config.endpoint)
+        await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveAllGroups())
+        #await asyncio.sleep(20)
+        #print("RemoveAllGroups step: ", resp)
 
 if __name__ == "__main__":
     default_matter_test_main()
