@@ -104,7 +104,7 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
         return;
     }
     ReadHandler * readHandler =
-        imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler(), imEngine->GetDataModelProvider());
+        imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
     if (readHandler == nullptr)
     {
         // TODO - Should we keep the subscription here?
