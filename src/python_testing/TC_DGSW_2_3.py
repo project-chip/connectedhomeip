@@ -117,7 +117,7 @@ class TC_DGSW_2_3(MatterBaseTest):
                 asserts.assert_true(self.is_valid_uint64_value(metric.id), "Id field should be a uint64 type")
 
                 if metric.name is not None:
-                    asserts.assert_true(self.is_valid_uint64_value(metric.name), "Name field should be a string type")
+                    asserts.assert_true(self.is_valid_str_value(metric.name), "Name field should be a string type")
 
                 if metric.stackFreeCurrent is not None:
                     asserts.assert_true(self.is_valid_uint32_value(metric.stackFreeCurrent),
@@ -180,7 +180,7 @@ class TC_DGSW_2_3(MatterBaseTest):
                 asserts.assert_true(self.is_valid_uint64_value(metric.id), "Id field should be a uint64 type")
 
                 if metric.name is not None:
-                    asserts.assert_true(self.is_valid_uint64_value(metric.name), "Name field should be a string type")
+                    asserts.assert_true(self.is_valid_str_value(metric.name), "Name field should be a string type")
 
                 if metric.stackFreeCurrent is not None:
                     asserts.assert_true(self.is_valid_uint32_value(metric.stackFreeCurrent),
