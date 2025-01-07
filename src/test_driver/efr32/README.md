@@ -65,7 +65,8 @@ The unit tests can be run using the test runner python script:
 
 ### Building the Unit Tests
 
-The unit tests can be built using the build_examples script. Set the appropriate board name.
+The unit tests can be built using the build_examples script. Set the appropriate
+board name.
 
     scripts/build/build_examples.py --target efr32-brd2703a-unit-test build
 
