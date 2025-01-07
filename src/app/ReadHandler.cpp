@@ -863,7 +863,7 @@ void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const 
 
     {
         // Inside a separate block, to allow the read and rollback to happen as one unit.
-        // we want to look at what `next` would be but not actually change state as we need to reset the 
+        // we want to look at what `next` would be but not actually change state as we need to reset the
         // current cluster
         PeekAttributePathExpandIterator2 iterator(apDataModel, mAttributePathExpandState);
         bHasNext = iterator.Next(path);
@@ -878,8 +878,7 @@ void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const 
     // TODO (#16699): Currently we can only guarantee the reports generated from a single path in the request are consistent. The
     // data might be inconsistent if the user send a request with two paths from the same cluster. We need to clearify the behavior
     // or make it consistent.
-    if (bHasNext &&
-        (aAttributeChanged.HasWildcardEndpointId() || aAttributeChanged.mEndpointId == path.mEndpointId) &&
+    if (bHasNext && (aAttributeChanged.HasWildcardEndpointId() || aAttributeChanged.mEndpointId == path.mEndpointId) &&
         (aAttributeChanged.HasWildcardClusterId() || aAttributeChanged.mClusterId == path.mClusterId))
     {
         ChipLogDetail(DataManagement,
