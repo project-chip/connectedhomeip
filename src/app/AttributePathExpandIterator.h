@@ -184,10 +184,10 @@ private:
  * TODO: The AttributePathParams may support a group id, the iterator should be able to call group data provider to expand the group
  * id.
  */
-class AttributePathExpandIterator
+class AttributePathExpandIteratorLegacy
 {
 public:
-    AttributePathExpandIterator(DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath);
+    AttributePathExpandIteratorLegacy(DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath);
 
     /**
      * Proceed the iterator to the next attribute path in the given cluster info.
@@ -218,7 +218,7 @@ public:
     /** Start iterating over the given `paths` */
     inline void ResetTo(SingleLinkedListNode<AttributePathParams> * paths)
     {
-        *this = AttributePathExpandIterator(mDataModelProvider, paths);
+        *this = AttributePathExpandIteratorLegacy(mDataModelProvider, paths);
     }
 
 private:
