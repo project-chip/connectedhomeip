@@ -102,7 +102,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             all_types = list(set(all_types) & set(cluster_attributes))
             if all_types:
                 chosen_attributes = all_types
-                cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_attributes[0].cluster_id]
+                # cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_attributes[0].cluster_id]
                 break
         else:
             print(f"Attribute not found on device: {desired_attribute_type}")
