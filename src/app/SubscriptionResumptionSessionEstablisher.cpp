@@ -103,8 +103,7 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
         ChipLogProgress(InteractionModel, "no resource for subscription resumption");
         return;
     }
-    ReadHandler * readHandler =
-        imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
+    ReadHandler * readHandler = imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
     if (readHandler == nullptr)
     {
         // TODO - Should we keep the subscription here?

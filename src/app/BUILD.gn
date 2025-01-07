@@ -416,12 +416,11 @@ source_set("path-expansion") {
   public_deps = [
     ":global-attributes",
     ":paths",
-    "${chip_root}/src/lib/core:types",
     "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
   ]
 }
-
 
 source_set("attribute-persistence") {
   sources = [
