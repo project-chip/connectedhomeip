@@ -44,7 +44,6 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
     {
         if (mState.mLastOutputPath.mClusterId != kInvalidClusterId)
         {
-
             std::optional<AttributeId> nextAttribute = NextAttributeId();
             if (nextAttribute.has_value())
             {
