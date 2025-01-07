@@ -790,7 +790,7 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
     {
         TCPEndPointImplLwIP * listenEP       = static_cast<TCPEndPointImplLwIP *>(arg);
         TCPEndPointImplLwIP * conEP          = nullptr;
-        System::LayerFreeRTOS & lSystemLayer = static_cast<System::LayerFreeRTOS &>(istenEP->GetSystemLayer());
+        System::LayerFreeRTOS & lSystemLayer = static_cast<System::LayerFreeRTOS &>(listenEP->GetSystemLayer());
 
         // Tell LwIP we've accepted the connection so it can decrement the listen PCB's pending_accepts counter.
         tcp_accepted(listenEP->mTCP);
