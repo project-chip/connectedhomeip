@@ -69,6 +69,12 @@ CHIP_ERROR AppTask::StartAppTask()
     return (xReturned == pdPASS) ? CHIP_NO_ERROR : APP_ERROR_CREATE_TASK_FAILED;
 }
 
+void AppTask::DeleteAppTask()
+{
+    vTaskDelete(sAppTaskHandle);
+    vQueueDelete(sAppEventQueue);
+}
+
 void AppTask::TimerEventHandler(TimerHandle_t xTimer)
 {
     AppEvent event;

@@ -115,6 +115,15 @@ void Esp32AppServer::DeInitBLEIfCommissioned(void)
 #endif /* CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
 }
 
+void Esp32AppServer::Shutdown()
+{
+    chip::DeviceLayer::Internal::BLEMgr().Shutdown();
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    chip::app::DnssdServer::Instance().StopServer();
+#endif
+    chip::Server::GetInstance().Shutdown();
+}
+
 void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 {
     // Init ZCL Data Model and CHIP App Server

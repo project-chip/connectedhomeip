@@ -145,6 +145,33 @@ void emberAfLaundryDryerControlsClusterInitCallback(EndpointId endpoint)
     LaundryDryerControlsServer::SetDefaultDelegate(endpoint, &LaundryDryerControlDelegate::getLaundryDryerControlDelegate());
 }
 
+static void Shutdown(TimerHandle_t xTimer)
+{
+    DeviceLayer::StackLock lock;
+    ESP_LOGE(TAG, "Shutdown called");
+    Esp32AppServer::Shutdown();
+
+    ESP_LOGE(TAG, "Esp32AppServer Shutdown");
+    GetAppTask().DeleteAppTask();
+
+    ESP_LOGE(TAG, "DeleteAppTask");
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (DeviceLayer::Internal::ESP32Utils::DeInitWiFiStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to deinitialize the Wi-Fi stack");
+        return;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+    ESP_LOGE(TAG, "nvs_flash_deinit");
+    esp_err_t err = nvs_flash_deinit();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
+        return;
+    }
+}
+
 extern "C" void app_main()
 {
     // Initialize the ESP NVS layer.

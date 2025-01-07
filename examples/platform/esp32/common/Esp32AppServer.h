@@ -24,4 +24,5 @@
 namespace Esp32AppServer {
 void DeInitBLEIfCommissioned(void);
 void Init(AppDelegate * context = nullptr);
+void Shutdown();
 } // namespace Esp32AppServer
