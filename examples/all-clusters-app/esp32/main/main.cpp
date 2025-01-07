@@ -145,16 +145,16 @@ void emberAfLaundryDryerControlsClusterInitCallback(EndpointId endpoint)
     LaundryDryerControlsServer::SetDefaultDelegate(endpoint, &LaundryDryerControlDelegate::getLaundryDryerControlDelegate());
 }
 
+/** A sequence of API calls to shutdown matter server from the example.
+    usage: xTimerStart(xTimerCreate("Timer", 100, pdFALSE, nullptr, Shutdown), 0);
+*/
 static void Shutdown(TimerHandle_t xTimer)
 {
     DeviceLayer::StackLock lock;
-    ESP_LOGE(TAG, "Shutdown called");
+
     Esp32AppServer::Shutdown();
+    GetAppTask().StopAppTask();
 
-    ESP_LOGE(TAG, "Esp32AppServer Shutdown");
-    GetAppTask().DeleteAppTask();
-
-    ESP_LOGE(TAG, "DeleteAppTask");
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     if (DeviceLayer::Internal::ESP32Utils::DeInitWiFiStack() != CHIP_NO_ERROR)
     {
@@ -163,7 +163,6 @@ static void Shutdown(TimerHandle_t xTimer)
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-    ESP_LOGE(TAG, "nvs_flash_deinit");
     esp_err_t err = nvs_flash_deinit();
     if (err != ESP_OK)
     {
