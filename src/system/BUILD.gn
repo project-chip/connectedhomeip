@@ -43,6 +43,8 @@ declare_args() {
   #
   # see https://clang.llvm.org/docs/ThreadSafetyAnalysis.html
   chip_enable_thread_safety_checks = is_clang
+
+  chip_external_sdk_target = ""
 }
 
 if (chip_project_config_include_dirs == [] &&
@@ -196,6 +198,9 @@ source_set("system_config_header") {
       }
       if (chip_device_platform == "bl702l") {
         public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk" ]
+      }
+      if (chip_external_sdk_target != "") {
+        public_deps += [ "${chip_external_sdk_target}" ]
       }
 
       # Add platform here as needed.
