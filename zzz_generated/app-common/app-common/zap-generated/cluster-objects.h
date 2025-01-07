@@ -359,7 +359,7 @@ enum class Fields : uint8_t
     kId              = 1,
     kPeerNodeID      = 2,
     kPeerFabricIndex = 3,
-    kStreamType      = 4,
+    kStreamUsage     = 4,
     kVideoStreamID   = 5,
     kAudioStreamID   = 6,
     kMetadataOptions = 7,
@@ -371,7 +371,7 @@ public:
     uint16_t id                       = static_cast<uint16_t>(0);
     chip::NodeId peerNodeID           = static_cast<chip::NodeId>(0);
     chip::FabricIndex peerFabricIndex = static_cast<chip::FabricIndex>(0);
-    StreamTypeEnum streamType         = static_cast<StreamTypeEnum>(0);
+    StreamUsageEnum streamUsage       = static_cast<StreamUsageEnum>(0);
     DataModel::Nullable<uint16_t> videoStreamID;
     DataModel::Nullable<uint16_t> audioStreamID;
     chip::BitMask<WebRTCMetadataOptions> metadataOptions = static_cast<chip::BitMask<WebRTCMetadataOptions>>(0);
@@ -40955,7 +40955,7 @@ namespace VideoStreamStruct {
 enum class Fields : uint8_t
 {
     kVideoStreamID    = 0,
-    kStreamType       = 1,
+    kStreamUsage      = 1,
     kVideoCodec       = 2,
     kMinFrameRate     = 3,
     kMaxFrameRate     = 4,
@@ -40973,11 +40973,11 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint16_t videoStreamID    = static_cast<uint16_t>(0);
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    VideoCodecEnum videoCodec = static_cast<VideoCodecEnum>(0);
-    uint16_t minFrameRate     = static_cast<uint16_t>(0);
-    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
+    uint16_t videoStreamID      = static_cast<uint16_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    VideoCodecEnum videoCodec   = static_cast<VideoCodecEnum>(0);
+    uint16_t minFrameRate       = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate       = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
     uint32_t minBitRate     = static_cast<uint32_t>(0);
@@ -41123,7 +41123,7 @@ namespace AudioStreamStruct {
 enum class Fields : uint8_t
 {
     kAudioStreamID  = 0,
-    kStreamType     = 1,
+    kStreamUsage    = 1,
     kAudioCodec     = 2,
     kChannelCount   = 3,
     kSampleRate     = 4,
@@ -41135,14 +41135,14 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint16_t audioStreamID    = static_cast<uint16_t>(0);
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    AudioCodecEnum audioCodec = static_cast<AudioCodecEnum>(0);
-    uint8_t channelCount      = static_cast<uint8_t>(0);
-    uint32_t sampleRate       = static_cast<uint32_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
-    uint8_t bitDepth          = static_cast<uint8_t>(0);
-    uint8_t referenceCount    = static_cast<uint8_t>(0);
+    uint16_t audioStreamID      = static_cast<uint16_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    AudioCodecEnum audioCodec   = static_cast<AudioCodecEnum>(0);
+    uint8_t channelCount        = static_cast<uint8_t>(0);
+    uint32_t sampleRate         = static_cast<uint32_t>(0);
+    uint32_t bitRate            = static_cast<uint32_t>(0);
+    uint8_t bitDepth            = static_cast<uint8_t>(0);
+    uint8_t referenceCount      = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -41260,7 +41260,7 @@ namespace Commands {
 namespace AudioStreamAllocate {
 enum class Fields : uint8_t
 {
-    kStreamType   = 0,
+    kStreamUsage  = 0,
     kAudioCodec   = 1,
     kChannelCount = 2,
     kSampleRate   = 3,
@@ -41275,12 +41275,12 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AudioStreamAllocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    AudioCodecEnum audioCodec = static_cast<AudioCodecEnum>(0);
-    uint8_t channelCount      = static_cast<uint8_t>(0);
-    uint32_t sampleRate       = static_cast<uint32_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
-    uint8_t bitDepth          = static_cast<uint8_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    AudioCodecEnum audioCodec   = static_cast<AudioCodecEnum>(0);
+    uint8_t channelCount        = static_cast<uint8_t>(0);
+    uint32_t sampleRate         = static_cast<uint32_t>(0);
+    uint32_t bitRate            = static_cast<uint32_t>(0);
+    uint8_t bitDepth            = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -41295,12 +41295,12 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AudioStreamAllocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    AudioCodecEnum audioCodec = static_cast<AudioCodecEnum>(0);
-    uint8_t channelCount      = static_cast<uint8_t>(0);
-    uint32_t sampleRate       = static_cast<uint32_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
-    uint8_t bitDepth          = static_cast<uint8_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    AudioCodecEnum audioCodec   = static_cast<AudioCodecEnum>(0);
+    uint8_t channelCount        = static_cast<uint8_t>(0);
+    uint32_t sampleRate         = static_cast<uint32_t>(0);
+    uint32_t bitRate            = static_cast<uint32_t>(0);
+    uint8_t bitDepth            = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AudioStreamAllocate
@@ -41371,7 +41371,7 @@ public:
 namespace VideoStreamAllocate {
 enum class Fields : uint8_t
 {
-    kStreamType       = 0,
+    kStreamUsage      = 0,
     kVideoCodec       = 1,
     kMinFrameRate     = 2,
     kMaxFrameRate     = 3,
@@ -41392,10 +41392,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::VideoStreamAllocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    VideoCodecEnum videoCodec = static_cast<VideoCodecEnum>(0);
-    uint16_t minFrameRate     = static_cast<uint16_t>(0);
-    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    VideoCodecEnum videoCodec   = static_cast<VideoCodecEnum>(0);
+    uint16_t minFrameRate       = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate       = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
     uint32_t minBitRate     = static_cast<uint32_t>(0);
@@ -41418,10 +41418,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::VideoStreamAllocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    VideoCodecEnum videoCodec = static_cast<VideoCodecEnum>(0);
-    uint16_t minFrameRate     = static_cast<uint16_t>(0);
-    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    VideoCodecEnum videoCodec   = static_cast<VideoCodecEnum>(0);
+    uint16_t minFrameRate       = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate       = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::DecodableType minResolution;
     Structs::VideoResolutionStruct::DecodableType maxResolution;
     uint32_t minBitRate     = static_cast<uint32_t>(0);
@@ -41469,9 +41469,8 @@ namespace VideoStreamModify {
 enum class Fields : uint8_t
 {
     kVideoStreamID    = 0,
-    kResolution       = 1,
-    kWatermarkEnabled = 2,
-    kOSDEnabled       = 3,
+    kWatermarkEnabled = 1,
+    kOSDEnabled       = 2,
 };
 
 struct Type
@@ -41482,7 +41481,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<Structs::VideoResolutionStruct::Type> resolution;
     Optional<bool> watermarkEnabled;
     Optional<bool> OSDEnabled;
 
@@ -41500,7 +41498,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<Structs::VideoResolutionStruct::DecodableType> resolution;
     Optional<bool> watermarkEnabled;
     Optional<bool> OSDEnabled;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -41662,7 +41659,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetStreamPriorities::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    DataModel::List<const StreamTypeEnum> streamPriorities;
+    DataModel::List<const StreamUsageEnum> streamPriorities;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -41677,7 +41674,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetStreamPriorities::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    DataModel::DecodableList<StreamTypeEnum> streamPriorities;
+    DataModel::DecodableList<StreamUsageEnum> streamPriorities;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetStreamPriorities
@@ -41700,7 +41697,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::CameraAvStreamManagement::Commands::CaptureSnapshotResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -41990,10 +41987,10 @@ struct TypeInfo
 namespace RankedVideoStreamPrioritiesList {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamTypeEnum>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamTypeEnum>;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamTypeEnum> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RankedVideoStreamPrioritiesList::Id; }
@@ -42364,7 +42361,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 enum class Fields : uint8_t
 {
     kVideoStreamID  = 0,
-    kStreamType     = 1,
+    kStreamUsage    = 1,
     kVideoCodec     = 2,
     kMinFrameRate   = 3,
     kMaxFrameRate   = 4,
@@ -42385,7 +42382,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<StreamTypeEnum> streamType;
+    Optional<StreamUsageEnum> streamUsage;
     Optional<VideoCodecEnum> videoCodec;
     Optional<uint16_t> minFrameRate;
     Optional<uint16_t> maxFrameRate;
@@ -42407,7 +42404,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<StreamTypeEnum> streamType;
+    Optional<StreamUsageEnum> streamUsage;
     Optional<VideoCodecEnum> videoCodec;
     Optional<uint16_t> minFrameRate;
     Optional<uint16_t> maxFrameRate;
@@ -42427,7 +42424,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 enum class Fields : uint8_t
 {
     kAudioStreamID = 0,
-    kStreamType    = 1,
+    kStreamUsage   = 1,
     kAudioCodec    = 2,
     kChannelCount  = 3,
     kSampleRate    = 4,
@@ -42444,7 +42441,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t audioStreamID = static_cast<uint16_t>(0);
-    Optional<StreamTypeEnum> streamType;
+    Optional<StreamUsageEnum> streamUsage;
     Optional<AudioCodecEnum> audioCodec;
     Optional<uint8_t> channelCount;
     Optional<uint32_t> sampleRate;
@@ -42462,7 +42459,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     uint16_t audioStreamID = static_cast<uint16_t>(0);
-    Optional<StreamTypeEnum> streamType;
+    Optional<StreamUsageEnum> streamUsage;
     Optional<AudioCodecEnum> audioCodec;
     Optional<uint8_t> channelCount;
     Optional<uint32_t> sampleRate;
@@ -42575,7 +42572,7 @@ namespace Commands {
 namespace SolicitOffer {
 enum class Fields : uint8_t
 {
-    kStreamType         = 0,
+    kStreamUsage        = 0,
     kVideoStreamID      = 1,
     kAudioStreamID      = 2,
     kICEServers         = 3,
@@ -42590,7 +42587,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
@@ -42610,7 +42607,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
@@ -42665,7 +42662,7 @@ enum class Fields : uint8_t
 {
     kWebRTCSessionID    = 0,
     kSdp                = 1,
-    kStreamType         = 2,
+    kStreamUsage        = 2,
     kVideoStreamID      = 3,
     kAudioStreamID      = 4,
     kICEServers         = 5,
@@ -42682,7 +42679,7 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
@@ -42704,7 +42701,7 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;

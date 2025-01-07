@@ -1,7 +1,7 @@
 ameba-amebad-{all-clusters,all-clusters-minimal,light,light-switch,pigweed}
 asr-{asr582x,asr595x,asr550x}-{all-clusters,all-clusters-minimal,lighting,light-switch,lock,bridge,temperature-measurement,thermostat,ota-requestor,dishwasher,refrigerator}[-ota][-shell][-no_logging][-factory][-rotating_id][-rio]
 android-{arm,arm64,x86,x64,androidstudio-arm,androidstudio-arm64,androidstudio-x86,androidstudio-x64}-{chip-tool,chip-test,tv-server,tv-casting-app,java-matter-controller,kotlin-matter-controller,virtual-device-app}[-no-debug]
-bouffalolab-{bl602dk,bl704ldk,bl706dk,bl602-night-light,bl706-night-light,bl602-iot-matter-v1,xt-zb6-devkit}-light[-ethernet][-wifi][-thread][-easyflash][-littlefs][-shell][-mfd][-rotating_device_id][-rpc][-cdc][-mot][-resetcnt][-memmonitor][-115200][-fp]
+bouffalolab-{bl602dk,bl616dk,bl704ldk,bl706dk,bl602-night-light,bl706-night-light,bl602-iot-matter-v1,xt-zb6-devkit}-light-{ethernet,wifi,thread,thread-ftd,thread-mtd}-{easyflash,littlefs}[-shell][-mfd][-rotating_device_id][-rpc][-cdc][-mot][-memmonitor][-coredump]
 cc32xx-{lock,air-purifier}
 ti-cc13x4_26x4-{lighting,lock,pump,pump-controller}[-mtd][-ftd]
 cyw30739-{cyw30739b2_p5_evk_01,cyw30739b2_p5_evk_02,cyw30739b2_p5_evk_03,cyw930739m2evb_01,cyw930739m2evb_02}-{light,light-switch,lock,thermostat}

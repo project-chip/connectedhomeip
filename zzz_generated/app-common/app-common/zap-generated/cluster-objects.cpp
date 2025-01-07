@@ -613,7 +613,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kId), id);
     encoder.Encode(to_underlying(Fields::kPeerNodeID), peerNodeID);
     encoder.Encode(to_underlying(Fields::kPeerFabricIndex), peerFabricIndex);
-    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kMetadataOptions), metadataOptions);
@@ -646,9 +646,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, peerFabricIndex);
         }
-        else if (__context_tag == to_underlying(Fields::kStreamType))
+        else if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
-            err = DataModel::Decode(reader, streamType);
+            err = DataModel::Decode(reader, streamUsage);
         }
         else if (__context_tag == to_underlying(Fields::kVideoStreamID))
         {
@@ -28972,7 +28972,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
-    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoCodec), videoCodec);
     encoder.Encode(to_underlying(Fields::kMinFrameRate), minFrameRate);
     encoder.Encode(to_underlying(Fields::kMaxFrameRate), maxFrameRate);
@@ -29006,9 +29006,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, videoStreamID);
         }
-        else if (__context_tag == to_underlying(Fields::kStreamType))
+        else if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
-            err = DataModel::Decode(reader, streamType);
+            err = DataModel::Decode(reader, streamUsage);
         }
         else if (__context_tag == to_underlying(Fields::kVideoCodec))
         {
@@ -29287,7 +29287,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
-    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kAudioCodec), audioCodec);
     encoder.Encode(to_underlying(Fields::kChannelCount), channelCount);
     encoder.Encode(to_underlying(Fields::kSampleRate), sampleRate);
@@ -29315,9 +29315,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioStreamID);
         }
-        else if (__context_tag == to_underlying(Fields::kStreamType))
+        else if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
-            err = DataModel::Decode(reader, streamType);
+            err = DataModel::Decode(reader, streamUsage);
         }
         else if (__context_tag == to_underlying(Fields::kAudioCodec))
         {
@@ -29415,7 +29415,7 @@ namespace AudioStreamAllocate {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kAudioCodec), audioCodec);
     encoder.Encode(to_underlying(Fields::kChannelCount), channelCount);
     encoder.Encode(to_underlying(Fields::kSampleRate), sampleRate);
@@ -29438,9 +29438,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kStreamType))
+        if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
-            err = DataModel::Decode(reader, streamType);
+            err = DataModel::Decode(reader, streamUsage);
         }
         else if (__context_tag == to_underlying(Fields::kAudioCodec))
         {
@@ -29542,7 +29542,7 @@ namespace VideoStreamAllocate {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoCodec), videoCodec);
     encoder.Encode(to_underlying(Fields::kMinFrameRate), minFrameRate);
     encoder.Encode(to_underlying(Fields::kMaxFrameRate), maxFrameRate);
@@ -29571,9 +29571,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kStreamType))
+        if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
-            err = DataModel::Decode(reader, streamType);
+            err = DataModel::Decode(reader, streamUsage);
         }
         else if (__context_tag == to_underlying(Fields::kVideoCodec))
         {
@@ -29666,7 +29666,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
-    encoder.Encode(to_underlying(Fields::kResolution), resolution);
     encoder.Encode(to_underlying(Fields::kWatermarkEnabled), watermarkEnabled);
     encoder.Encode(to_underlying(Fields::kOSDEnabled), OSDEnabled);
     return encoder.Finalize();
@@ -29689,10 +29688,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kVideoStreamID))
         {
             err = DataModel::Decode(reader, videoStreamID);
-        }
-        else if (__context_tag == to_underlying(Fields::kResolution))
-        {
-            err = DataModel::Decode(reader, resolution);
         }
         else if (__context_tag == to_underlying(Fields::kWatermarkEnabled))
         {
@@ -30100,7 +30095,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kVideoStreamID), videoStreamID));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kStreamType), streamType));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kStreamUsage), streamUsage));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kVideoCodec), videoCodec));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMinFrameRate), minFrameRate));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMaxFrameRate), maxFrameRate));
@@ -30131,9 +30126,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, videoStreamID);
         }
-        else if (__context_tag == to_underlying(Fields::kStreamType))
+        else if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
-            err = DataModel::Decode(reader, streamType);
+            err = DataModel::Decode(reader, streamUsage);
         }
         else if (__context_tag == to_underlying(Fields::kVideoCodec))
         {
@@ -30185,7 +30180,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kAudioStreamID), audioStreamID));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kStreamType), streamType));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kStreamUsage), streamUsage));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kAudioCodec), audioCodec));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kChannelCount), channelCount));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kSampleRate), sampleRate));
@@ -30212,9 +30207,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioStreamID);
         }
-        else if (__context_tag == to_underlying(Fields::kStreamType))
+        else if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
-            err = DataModel::Decode(reader, streamType);
+            err = DataModel::Decode(reader, streamUsage);
         }
         else if (__context_tag == to_underlying(Fields::kAudioCodec))
         {
@@ -30320,7 +30315,7 @@ namespace SolicitOffer {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
@@ -30343,9 +30338,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kStreamType))
+        if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
-            err = DataModel::Decode(reader, streamType);
+            err = DataModel::Decode(reader, streamUsage);
         }
         else if (__context_tag == to_underlying(Fields::kVideoStreamID))
         {
@@ -30430,7 +30425,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
     encoder.Encode(to_underlying(Fields::kSdp), sdp);
-    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
@@ -30461,9 +30456,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sdp);
         }
-        else if (__context_tag == to_underlying(Fields::kStreamType))
+        else if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
-            err = DataModel::Decode(reader, streamType);
+            err = DataModel::Decode(reader, streamUsage);
         }
         else if (__context_tag == to_underlying(Fields::kVideoStreamID))
         {

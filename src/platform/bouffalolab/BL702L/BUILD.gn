@@ -39,6 +39,7 @@ static_library("BL702L") {
     "../common/DiagnosticDataProviderImpl.cpp",
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/PlatformManagerImpl.cpp",
+    "../common/SystemTimeSupport.cpp",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -55,8 +56,6 @@ static_library("BL702L") {
     ]
   }
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
-
   if (chip_enable_factory_data) {
     sources += [
       "../common/FactoryDataProvider.cpp",
@@ -69,6 +68,11 @@ static_library("BL702L") {
   } else {
     sources += [ "../common/BLConfig_littlefs.cpp" ]
   }
+
+  deps = [
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 
   if (chip_enable_openthread) {
     # needed for MTD/FTD
@@ -92,6 +96,5 @@ static_library("BL702L") {
     }
   }
 
-  deps += [ "${chip_root}/src/credentials:credentials_header" ]
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }
