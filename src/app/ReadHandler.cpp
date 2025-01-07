@@ -861,7 +861,6 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
 
     // check that regular and state-based iteration are IDENTICAL
     // to be enabled ONLY WHEN we use both iteration styles in parallel
-#if 0
     {
         ConcreteAttributePath pathA;
         ConcreteAttributePath pathB;
@@ -876,7 +875,6 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
             VerifyOrDie(pathA.mExpanded == pathB.mExpanded);
         }
     }
-#endif
 
     // We won't reset the path iterator for every AttributePathIsDirty call to reduce the number of full data reports.
     // The iterator will be reset after finishing each report session.

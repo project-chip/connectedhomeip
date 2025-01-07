@@ -314,10 +314,20 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         uint32_t attributesRead = 0;
 #endif
 
+        AttributePathExpandIterator2 iterator = apReadHandler->IterateAttributePaths(mpImEngine->GetDataModelProvider());
+
         // For each path included in the interested path of the read handler...
         for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
              apReadHandler->GetAttributePathExpandIterator()->Next())
         {
+            // Validate that iteration is IDENTICAL
+            {
+                ConcreteAttributePath readPath2;
+                VerifyOrDie(iterator.Next(readPath2));
+                VerifyOrDie(readPath == readPath2);
+                VerifyOrDie(readPath.mExpanded == readPath2.mExpanded);
+            }
+
             if (!apReadHandler->IsPriming())
             {
                 bool concretePathDirty = false;
@@ -428,6 +438,12 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             // Successfully encoded the attribute, clear the internal state.
             apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
         }
+
+        {
+            ConcreteAttributePath readPath2;
+            VerifyOrDie(!iterator.Next(readPath2));
+        }
+
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
         // chunks for this report.
         hasMoreChunks = false;
@@ -1208,6 +1224,6 @@ void Engine::MarkDirty(const AttributePathParams & path)
 
 // TODO: MatterReportingAttributeChangeCallback should just live in libCHIP, It does not depend on any
 // app-specific generated bits.
-void __attribute__((weak))
-MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+void __attribute__((weak)) MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                  chip::AttributeId attributeId)
 {}

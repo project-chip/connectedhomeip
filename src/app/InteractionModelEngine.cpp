@@ -582,6 +582,10 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
 
         if (paramsList.mValue.IsWildcardPath())
         {
+
+            AttributePathExpandIterator2::State state = AttributePathExpandIterator2::State::StartIterating(&paramsList);
+            AttributePathExpandIterator2 pathIterator2(GetDataModelProvider(), state);
+
             AttributePathExpandIteratorLegacy pathIterator(GetDataModelProvider(), &paramsList);
             ConcreteAttributePath readPath;
 
@@ -589,6 +593,14 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             // AttributePathExpandIterator. So we just need to check the ACL bits.
             for (; pathIterator.Get(readPath); pathIterator.Next())
             {
+                // test iterator 2 is IDENTICAL
+                {
+                    ConcreteAttributePath readPath2;
+                    VerifyOrDie(pathIterator2.Next(readPath2));
+                    VerifyOrDie(readPath == readPath2);
+                    VerifyOrDie(readPath.mExpanded == readPath2.mExpanded);
+                }
+
                 // leave requestPath.entityId optional value unset to indicate wildcard
                 Access::RequestPath requestPath{ .cluster     = readPath.mClusterId,
                                                  .endpoint    = readPath.mEndpointId,
@@ -600,6 +612,10 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
                     aHasValidAttributePath = true;
                     break;
                 }
+            }
+            {
+                ConcreteAttributePath readPath2;
+                VerifyOrDie(!pathIterator2.Next(readPath2));
             }
         }
         else
