@@ -856,27 +856,17 @@ void ReadHandler::ResetPathIterator()
 
 void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const AttributePathParams & aAttributeChanged)
 {
+    bool bHasNext = false;
     ConcreteAttributePath path;
 
     mDirtyGeneration = mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().GetDirtySetGeneration();
 
-    // check that regular and state-based iteration are IDENTICAL
-    // to be enabled ONLY WHEN we use both iteration styles in parallel
     {
+        // Inside a separate block, to allow the read and rollback to happen as one unit.
+        // we want to look at what `next` would be but not actually change state as we need to reset the 
+        // current cluster
         PeekAttributePathExpandIterator2 iterator(apDataModel, mAttributePathExpandState);
-
-        ConcreteAttributePath pathA;
-        ConcreteAttributePath pathB;
-        bool hasA = mLegacyAttributePathExpandIterator.Get(pathA);
-        bool hasB = iterator.Next(pathB);
-
-        VerifyOrDie(hasA == hasB);
-
-        if (hasA)
-        {
-            VerifyOrDie(pathA == pathB);
-            VerifyOrDie(pathA.mExpanded == pathB.mExpanded);
-        }
+        bHasNext = iterator.Next(path);
     }
 
     // We won't reset the path iterator for every AttributePathIsDirty call to reduce the number of full data reports.
@@ -888,7 +878,7 @@ void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const 
     // TODO (#16699): Currently we can only guarantee the reports generated from a single path in the request are consistent. The
     // data might be inconsistent if the user send a request with two paths from the same cluster. We need to clearify the behavior
     // or make it consistent.
-    if (mLegacyAttributePathExpandIterator.Get(path) &&
+    if (bHasNext &&
         (aAttributeChanged.HasWildcardEndpointId() || aAttributeChanged.mEndpointId == path.mEndpointId) &&
         (aAttributeChanged.HasWildcardClusterId() || aAttributeChanged.mClusterId == path.mClusterId))
     {
@@ -900,6 +890,7 @@ void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const 
         // the state of the cluster as present on the server
         mLegacyAttributePathExpandIterator.ResetCurrentCluster();
         mAttributePathExpandState.IterateFromTheStartOfTheCurrentCluster();
+
         mAttributeEncoderState.Reset();
     }
 
