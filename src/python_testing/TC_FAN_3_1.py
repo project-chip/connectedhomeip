@@ -101,7 +101,9 @@ class TC_FAN_3_1(MatterBaseTest):
 
         self.print_step("3a", "Read from the DUT the PercentSetting attribute and store")
         existing_percent_setting = await self.read_percent_setting(endpoint=endpoint)
-        print(f"\n\n\n\n\t\t\t [FANS] existing_percent_setting: {existing_percent_setting.value}\n\n\n\n\n")
+        existing_percent_current = await self.read_percent_current(endpoint=endpoint)
+        print(f"\n\n\n\n\t\t\t [FANS] existing_percent_setting: {existing_percent_setting}\n\n\n\n\n")
+        print(f"\n\n\n\n\t\t\t [FANS] existing_percent_current: {existing_percent_current}\n\n\n\n\n")
 
         # If mode was set, verify that the percent value is non-zero
         if status == Status.Success:
