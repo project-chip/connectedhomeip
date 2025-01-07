@@ -9003,7 +9003,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _videoStreamID = @(0);
 
-        _streamType = @(0);
+        _streamUsage = @(0);
 
         _videoCodec = @(0);
 
@@ -9037,7 +9037,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRCameraAVStreamManagementClusterVideoStreamStruct alloc] init];
 
     other.videoStreamID = self.videoStreamID;
-    other.streamType = self.streamType;
+    other.streamUsage = self.streamUsage;
     other.videoCodec = self.videoCodec;
     other.minFrameRate = self.minFrameRate;
     other.maxFrameRate = self.maxFrameRate;
@@ -9056,7 +9056,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; streamType:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minFragmentLen:%@; maxFragmentLen:%@; watermarkEnabled:%@; osdEnabled:%@; referenceCount:%@; >", NSStringFromClass([self class]), _videoStreamID, _streamType, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minFragmentLen, _maxFragmentLen, _watermarkEnabled, _osdEnabled, _referenceCount];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; streamUsage:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minFragmentLen:%@; maxFragmentLen:%@; watermarkEnabled:%@; osdEnabled:%@; referenceCount:%@; >", NSStringFromClass([self class]), _videoStreamID, _streamUsage, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minFragmentLen, _maxFragmentLen, _watermarkEnabled, _osdEnabled, _referenceCount];
     return descriptionString;
 }
 
@@ -9219,7 +9219,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _audioStreamID = @(0);
 
-        _streamType = @(0);
+        _streamUsage = @(0);
 
         _audioCodec = @(0);
 
@@ -9241,7 +9241,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRCameraAVStreamManagementClusterAudioStreamStruct alloc] init];
 
     other.audioStreamID = self.audioStreamID;
-    other.streamType = self.streamType;
+    other.streamUsage = self.streamUsage;
     other.audioCodec = self.audioCodec;
     other.channelCount = self.channelCount;
     other.sampleRate = self.sampleRate;
@@ -9254,7 +9254,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: audioStreamID:%@; streamType:%@; audioCodec:%@; channelCount:%@; sampleRate:%@; bitRate:%@; bitDepth:%@; referenceCount:%@; >", NSStringFromClass([self class]), _audioStreamID, _streamType, _audioCodec, _channelCount, _sampleRate, _bitRate, _bitDepth, _referenceCount];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: audioStreamID:%@; streamUsage:%@; audioCodec:%@; channelCount:%@; sampleRate:%@; bitRate:%@; bitDepth:%@; referenceCount:%@; >", NSStringFromClass([self class]), _audioStreamID, _streamUsage, _audioCodec, _channelCount, _sampleRate, _bitRate, _bitDepth, _referenceCount];
     return descriptionString;
 }
 
@@ -9342,7 +9342,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _videoStreamID = @(0);
 
-        _streamType = nil;
+        _streamUsage = nil;
 
         _videoCodec = nil;
 
@@ -9370,7 +9370,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRCameraAVStreamManagementClusterVideoStreamChangedEvent alloc] init];
 
     other.videoStreamID = self.videoStreamID;
-    other.streamType = self.streamType;
+    other.streamUsage = self.streamUsage;
     other.videoCodec = self.videoCodec;
     other.minFrameRate = self.minFrameRate;
     other.maxFrameRate = self.maxFrameRate;
@@ -9386,7 +9386,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; streamType:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minFragmentLen:%@; maxFragmentLen:%@; >", NSStringFromClass([self class]), _videoStreamID, _streamType, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minFragmentLen, _maxFragmentLen];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; streamUsage:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minFragmentLen:%@; maxFragmentLen:%@; >", NSStringFromClass([self class]), _videoStreamID, _streamUsage, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minFragmentLen, _maxFragmentLen];
     return descriptionString;
 }
 
@@ -9399,7 +9399,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _audioStreamID = @(0);
 
-        _streamType = nil;
+        _streamUsage = nil;
 
         _audioCodec = nil;
 
@@ -9419,7 +9419,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRCameraAVStreamManagementClusterAudioStreamChangedEvent alloc] init];
 
     other.audioStreamID = self.audioStreamID;
-    other.streamType = self.streamType;
+    other.streamUsage = self.streamUsage;
     other.audioCodec = self.audioCodec;
     other.channelCount = self.channelCount;
     other.sampleRate = self.sampleRate;
@@ -9431,7 +9431,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: audioStreamID:%@; streamType:%@; audioCodec:%@; channelCount:%@; sampleRate:%@; bitRate:%@; bitDepth:%@; >", NSStringFromClass([self class]), _audioStreamID, _streamType, _audioCodec, _channelCount, _sampleRate, _bitRate, _bitDepth];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: audioStreamID:%@; streamUsage:%@; audioCodec:%@; channelCount:%@; sampleRate:%@; bitRate:%@; bitDepth:%@; >", NSStringFromClass([self class]), _audioStreamID, _streamUsage, _audioCodec, _channelCount, _sampleRate, _bitRate, _bitDepth];
     return descriptionString;
 }
 
@@ -9529,7 +9529,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _peerFabricIndex = @(0);
 
-        _streamType = @(0);
+        _streamUsage = @(0);
 
         _videoStreamID = nil;
 
@@ -9547,7 +9547,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.id = self.id;
     other.peerNodeID = self.peerNodeID;
     other.peerFabricIndex = self.peerFabricIndex;
-    other.streamType = self.streamType;
+    other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.metadataOptions = self.metadataOptions;
@@ -9557,7 +9557,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerFabricIndex:%@; streamType:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerFabricIndex, _streamType, _videoStreamID, _audioStreamID, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerFabricIndex:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerFabricIndex, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions];
     return descriptionString;
 }
 
@@ -9610,7 +9610,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _peerFabricIndex = @(0);
 
-        _streamType = @(0);
+        _streamUsage = @(0);
 
         _videoStreamID = nil;
 
@@ -9628,7 +9628,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.id = self.id;
     other.peerNodeID = self.peerNodeID;
     other.peerFabricIndex = self.peerFabricIndex;
-    other.streamType = self.streamType;
+    other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.metadataOptions = self.metadataOptions;
@@ -9638,7 +9638,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerFabricIndex:%@; streamType:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerFabricIndex, _streamType, _videoStreamID, _audioStreamID, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerFabricIndex:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerFabricIndex, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions];
     return descriptionString;
 }
 

@@ -596,7 +596,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.peerFabricIndex", "peerFabricIndex",
                                                                   value.isMember("peerFabricIndex")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.streamType", "streamType", value.isMember("streamType")));
+        ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.streamUsage", "streamUsage", value.isMember("streamUsage")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.videoStreamID", "videoStreamID",
                                                                   value.isMember("videoStreamID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.audioStreamID", "audioStreamID",
@@ -617,9 +617,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.peerFabricIndex, value["peerFabricIndex"]));
     valueCopy.removeMember("peerFabricIndex");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "streamType");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.streamType, value["streamType"]));
-    valueCopy.removeMember("streamType");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "streamUsage");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.streamUsage, value["streamUsage"]));
+    valueCopy.removeMember("streamUsage");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "videoStreamID");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoStreamID, value["videoStreamID"]));
@@ -641,7 +641,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::WebRT
     ComplexArgumentParser::Finalize(request.id);
     ComplexArgumentParser::Finalize(request.peerNodeID);
     ComplexArgumentParser::Finalize(request.peerFabricIndex);
-    ComplexArgumentParser::Finalize(request.streamType);
+    ComplexArgumentParser::Finalize(request.streamUsage);
     ComplexArgumentParser::Finalize(request.videoStreamID);
     ComplexArgumentParser::Finalize(request.audioStreamID);
     ComplexArgumentParser::Finalize(request.metadataOptions);
@@ -6038,7 +6038,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.videoStreamID", "videoStreamID",
                                                                   value.isMember("videoStreamID")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.streamType", "streamType", value.isMember("streamType")));
+        ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.streamUsage", "streamUsage", value.isMember("streamUsage")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.videoCodec", "videoCodec", value.isMember("videoCodec")));
     ReturnErrorOnFailure(
@@ -6065,9 +6065,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoStreamID, value["videoStreamID"]));
     valueCopy.removeMember("videoStreamID");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "streamType");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.streamType, value["streamType"]));
-    valueCopy.removeMember("streamType");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "streamUsage");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.streamUsage, value["streamUsage"]));
+    valueCopy.removeMember("streamUsage");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "videoCodec");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoCodec, value["videoCodec"]));
@@ -6129,7 +6129,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.videoStreamID);
-    ComplexArgumentParser::Finalize(request.streamType);
+    ComplexArgumentParser::Finalize(request.streamUsage);
     ComplexArgumentParser::Finalize(request.videoCodec);
     ComplexArgumentParser::Finalize(request.minFrameRate);
     ComplexArgumentParser::Finalize(request.maxFrameRate);
@@ -6360,7 +6360,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.audioStreamID", "audioStreamID",
                                                                   value.isMember("audioStreamID")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.streamType", "streamType", value.isMember("streamType")));
+        ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.streamUsage", "streamUsage", value.isMember("streamUsage")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.audioCodec", "audioCodec", value.isMember("audioCodec")));
     ReturnErrorOnFailure(
@@ -6379,9 +6379,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioStreamID, value["audioStreamID"]));
     valueCopy.removeMember("audioStreamID");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "streamType");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.streamType, value["streamType"]));
-    valueCopy.removeMember("streamType");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "streamUsage");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.streamUsage, value["streamUsage"]));
+    valueCopy.removeMember("streamUsage");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "audioCodec");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioCodec, value["audioCodec"]));
@@ -6413,7 +6413,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.audioStreamID);
-    ComplexArgumentParser::Finalize(request.streamType);
+    ComplexArgumentParser::Finalize(request.streamUsage);
     ComplexArgumentParser::Finalize(request.audioCodec);
     ComplexArgumentParser::Finalize(request.channelCount);
     ComplexArgumentParser::Finalize(request.sampleRate);
