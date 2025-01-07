@@ -35,7 +35,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+from typing import List
+
 import chip.clusters as Clusters
+from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -46,7 +49,8 @@ class TC_G_2_2(MatterBaseTest):
 
     def steps_TC_G_2_2(self):
         return [TestStep(1, "Comissioning, already done", is_commissioning=True),
-                TestStep(2, "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT on EP0 using a key that is pre-installed on the TH. GroupKeySet fields are as follows:")]
+                TestStep(2, "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT on EP0 using a key that is pre-installed on the TH. GroupKeySet fields are as follows:"),
+                TestStep(3, "TH writes the GroupKeyMap attribute in the GroupKeyManagement cluster on EP0 with maxgroups entries binding GroupId(0x0001 to (maxgroups)) with GroupKeySetID 1")]
 
     @async_test_body
     async def test_TC_G_2_2(self):
@@ -68,7 +72,17 @@ class TC_G_2_2(MatterBaseTest):
 
         cmd = Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey)
         resp = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
+        #await th1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey))
 
+        self.step(3)
+        kGroup1 = 0x0001
+        groupKeyMapStruct: List[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
+
+        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
+            groupId=kGroup1,
+            groupKeySetID=kGroupKeySetID))
+        resp = await th1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(groupKeyMapStruct))])
+        asserts.assert_equal(resp[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
 if __name__ == "__main__":
     default_matter_test_main()
