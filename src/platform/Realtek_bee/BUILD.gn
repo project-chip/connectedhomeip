@@ -1,0 +1,91 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+assert(chip_device_platform == "realtek_bee")
+
+static_library("Realtek_bee") {
+  sources = [
+    "../FreeRTOS/SystemTimeSupport.cpp",
+    "../SingletonConfigurationManager.cpp",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
+    "BlePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPPlatformConfig.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "FactoryDataDecoder.cpp",
+    "FactoryDataDecoder.h",
+    "FactoryDataProvider.cpp",
+    "FactoryDataProvider.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "InetPlatformConfig.h",
+    "OTAImageProcessorImpl.cpp",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "SystemPlatformConfig.h",
+    "BeeConfig.cpp",
+    "BeeConfig.h",
+  ]
+
+ deps = [
+    "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  public_configs = []
+
+  if (chip_enable_openthread) {
+
+    sources += [
+      "../OpenThread/OpenThreadUtils.cpp",
+      "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
+      "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
+      "../OpenThread/OpenThreadDnssdImpl.h",
+      "../OpenThread/OpenThreadDnssdImpl.cpp",
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    if (chip_mdns == "platform") {
+      sources += [ "../OpenThread/DnssdImpl.cpp" ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+  }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [
+    "Logging.cpp",
+  ]
+}
