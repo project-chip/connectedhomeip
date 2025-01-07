@@ -253,6 +253,11 @@ tests:
                                     },
                                 ],
                         },
+                        {
+                            ClusterID: 0x0050,
+                            AttributeValueList:
+                                [{ AttributeID: 0x0003, ValueUnsigned8: 0x01 }],
+                        },
                     ]
       response:
           values:
@@ -348,6 +353,11 @@ tests:
                                         ValueUnsigned8: 0x64,
                                     },
                                 ],
+                        },
+                        {
+                            ClusterID: 0x0050,
+                            AttributeValueList:
+                                [{ AttributeID: 0x0003, ValueUnsigned8: 0x01 }],
                         },
                     ]
 

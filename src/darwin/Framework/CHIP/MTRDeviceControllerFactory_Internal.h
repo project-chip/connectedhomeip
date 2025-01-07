@@ -57,21 +57,21 @@ MTR_DIRECT_MEMBERS
  * Get the list of running controllers.  This will include controllers that are
  * in the middle of starting up or shutting down.
  */
-- (NSArray<MTRDeviceController *> *)getRunningControllers;
+- (NSArray<MTRDeviceController_Concrete *> *)getRunningControllers;
 
 /**
  * Find a running controller, if any, for the given fabric index.
  */
-- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex;
+- (nullable MTRDeviceController_Concrete *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex;
 
 /**
  * Find a running controller, if any, for the given fabric index.  Allows
  * controlling whether to include a controller that is in the middle of startup
  * or shutdown.
  */
-- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
-                                      includeControllerStartingUp:(BOOL)includeControllerStartingUp
-                                    includeControllerShuttingDown:(BOOL)includeControllerShuttingDown;
+- (nullable MTRDeviceController_Concrete *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
+                                               includeControllerStartingUp:(BOOL)includeControllerStartingUp
+                                             includeControllerShuttingDown:(BOOL)includeControllerShuttingDown;
 
 /**
  * Notify the controller factory that a new operational instance with the given
@@ -83,7 +83,7 @@ MTR_DIRECT_MEMBERS
  * Download log of the desired type from the device.
  */
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
-                       controller:(MTRDeviceController *)controller
+                       controller:(MTRDeviceController_Concrete *)controller
                              type:(MTRDiagnosticLogType)type
                           timeout:(NSTimeInterval)timeout
                             queue:(dispatch_queue_t)queue

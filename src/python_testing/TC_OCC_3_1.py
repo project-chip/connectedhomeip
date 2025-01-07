@@ -15,13 +15,23 @@
 #    limitations under the License.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --endpoint 1 --bool-arg simulate_occupancy:true
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#       --bool-arg simulate_occupancy:true
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
+#
 #  There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for
 #  the occupancy state ON/OFF change.
 #  [TC-OCC-3.1] test procedure step 3, 4
@@ -33,8 +43,8 @@ from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
-                                    async_test_body, await_sequence_of_reports, default_matter_test_main)
+from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
+                                         async_test_body, await_sequence_of_reports, default_matter_test_main)
 from mobly import asserts
 
 
@@ -45,13 +55,13 @@ class TC_OCC_3_1(MatterBaseTest):
 
     async def read_occ_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.OccupancySensing
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint()
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def write_hold_time(self, hold_time: Optional[Any]) -> Status:
         dev_ctrl = self.default_controller
         node_id = self.dut_node_id
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint()
 
         cluster = Clusters.OccupancySensing
         write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint, cluster.Attributes.HoldTime(hold_time))])
@@ -134,7 +144,7 @@ class TC_OCC_3_1(MatterBaseTest):
 
         self.step(4)
         # Setup Occupancy attribute subscription here
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
         attrib_listener = ClusterAttributeChangeAccumulator(cluster)

@@ -33,7 +33,7 @@ on:
               required: false
               type: boolean
               default: false
-  
+
 jobs:
     build_images_base:
         name: Build Docker CHIP Build images - base
@@ -101,7 +101,8 @@ jobs:
                     # ApplyLayer exit status 1 stdout:  stderr: write /opt/fsl-imx-xwayland/5.15-kirkstone/sysroots/armv8a-poky-linux/opt/ltp/testcases/bin/fanotify15: no space left on device
                     # - "-imx"
                     - "-java"
-                    - "-k32w"
+                    - "-nxp"
+                    - "-nxp-zephyr"
                     - "-nrf-platform"
                     - "-telink"
                     - "-ti"
@@ -120,7 +121,7 @@ jobs:
               run: |
                   cd integrations/docker/images/stage-2/chip-build${{ matrix.img }}
                   ./build.sh --latest
-                    
+
     build_images_stage_3:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2]
         name: Build Docker CHIP Build images - stage 3

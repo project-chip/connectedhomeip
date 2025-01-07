@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
@@ -73,8 +74,6 @@ source_set("app-main") {
     "AppMain.h",
     "CommissionableInit.cpp",
     "CommissionableInit.h",
-    "CommissionerMain.cpp",
-    "CommissionerMain.h",
     "LinuxCommissionableDataProvider.cpp",
     "LinuxCommissionableDataProvider.h",
     "NamedPipeCommands.cpp",
@@ -89,13 +88,13 @@ source_set("app-main") {
 
   public_deps = [
     ":boolean-state-configuration-test-event-trigger",
+    ":commissioner-main",
     ":device-energy-management-test-event-trigger",
     ":energy-evse-test-event-trigger",
     ":energy-reporting-test-event-trigger",
     ":smco-test-event-trigger",
     ":water-heater-management-test-event-trigger",
-    "${chip_root}/src/controller:controller",
-    "${chip_root}/src/controller:gen_check_chip_controller_headers",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
   ]
@@ -103,6 +102,7 @@ source_set("app-main") {
     ":ota-test-event-trigger",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
   ]
 
   if (current_os != "nuttx") {
@@ -133,6 +133,9 @@ source_set("app-main") {
       "${chip_root}/src/tracing",
     ]
   }
+  if (chip_enable_icd_server) {
+    deps += [ "${chip_root}/src/app/icd/server:manager" ]
+  }
 
   defines += [
     "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=${chip_enable_smoke_co_trigger}",
@@ -159,10 +162,12 @@ source_set("commissioner-main") {
 
   public_deps = [
     "${chip_root}/src/controller:controller",
-    "${chip_root}/src/controller:gen_check_chip_controller_headers",
     "${chip_root}/src/lib",
   ]
-  deps = [ "${chip_root}/src/app/server" ]
+  deps = [
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
+  ]
 
   if (chip_enable_transport_trace) {
     deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]

@@ -32,20 +32,27 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="MEDIA_INPUT_LIST"          type="array" entryType="InputInfoStruct" length="254"           writable="false" optional="false">InputList</attribute>
-    <attribute side="server" code="0x0001" define="MEDIA_INPUT_CURRENT_INPUT" type="int8u" default="0x00"              min="0x00" max="0xFF"  writable="false" optional="false">CurrentInput</attribute>
+    <attribute side="server" code="0x0000" name="InputList" define="MEDIA_INPUT_LIST" type="array" entryType="InputInfoStruct" length="254">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="CurrentInput" define="MEDIA_INPUT_CURRENT_INPUT" type="int8u">
+      <mandatoryConform/>
+    </attribute>
 
     <command source="client" code="0x00" name="SelectInput" optional="false">
       <description>Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List.</description>
       <arg name="Index" type="int8u"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x01" name="ShowInputStatus" optional="false">
       <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x02" name="HideInputStatus" optional="false">
       <description>Upon receipt, this SHALL hide the input list from the screen.</description>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x03" name="RenameInput" optional="true">
@@ -53,6 +60,9 @@ limitations under the License.
       <access op="invoke" privilege="manage"/>
       <arg name="Index" type="int8u"/>
       <arg name="Name" type="char_string"/>
+      <mandatoryConform>
+        <feature name="NU"/>
+      </mandatoryConform>
     </command>
 
   </cluster>

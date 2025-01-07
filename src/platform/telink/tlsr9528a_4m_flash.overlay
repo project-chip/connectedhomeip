@@ -1,13 +1,12 @@
 &flash {
 	reg = <0x20000000 0x400000>;
 
+	/delete-node/ partitions;
 	partitions {
-		/delete-node/ partition@0;
-		/delete-node/ partition@20000;
-		/delete-node/ partition@88000;
-		/delete-node/ partition@f0000;
-		/delete-node/ partition@f4000;
-		/delete-node/ partition@fe000;
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
 		boot_partition: partition@0 {
 			label = "mcuboot";
 			reg = <0x00000000 0x13000>;
@@ -26,23 +25,23 @@
 		};
 		dac_keypair_partition: partition@3f6000 {
 			label = "dac-keypair";
-			reg = <0x3f6000 0x1000>; //store dac and key pair.
+			reg = <0x3f6000 0x1000>; // store dac and key pair.
 		};
 		factory_partition: partition@3f7000 {
 			label = "factory-data";
-			reg = <0x3f7000 0x1000>; // factory data info 
+			reg = <0x3f7000 0x1000>; // factory data info.
 		};
 		secure_partition: partition@3f8000 {
  			label = "secure";
-			reg = <0x3f8000 0x4000>; //secure info ,reserved for secure boot .if not use , can be used by other way .
+			reg = <0x3f8000 0x4000>; // secure info, reserved for secure boot. if not use, can be used by other way.
  		};
 		vendor_rfu_partition: partition@3fc000 {
 			label = "vendor-rfu";
-			reg = <0x3fc000 0x2000>;// reserved for chip extend.
+			reg = <0x3fc000 0x2000>; // reserved for chip extend.
 		};
 		vendor_partition: partition@3fe000 {
 			label = "vendor-data";
-			reg = <0x3fe000 0x2000>;// mac and adc info.
+			reg = <0x3fe000 0x2000>; // mac and adc info.
 		};
 	};
 };

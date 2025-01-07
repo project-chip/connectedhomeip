@@ -121,6 +121,8 @@ class TelinkBoard(Enum):
     TLSR9528A_RETENTION = auto()
     TLSR9258A = auto()
     TLSR9258A_RETENTION = auto()
+    TL3218X = auto()
+    TL7218X = auto()
 
     def GnArgName(self):
         if self == TelinkBoard.TLRS9118BDK40D:
@@ -135,6 +137,10 @@ class TelinkBoard(Enum):
             return 'tlsr9258a'
         elif self == TelinkBoard.TLSR9258A_RETENTION:
             return 'tlsr9258a_retention'
+        elif self == TelinkBoard.TL3218X:
+            return 'tl3218x'
+        elif self == TelinkBoard.TL7218X:
+            return 'tl7218x'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -154,7 +160,8 @@ class TelinkBuilder(Builder):
                  enable_4mb_flash: bool = False,
                  mars_board_config: bool = False,
                  usb_board_config: bool = False,
-                 use_data_model_interface: Optional[str] = None,
+                 compress_lzma_config: bool = False,
+                 thread_analyzer_config: bool = False,
                  ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
@@ -167,7 +174,8 @@ class TelinkBuilder(Builder):
         self.enable_4mb_flash = enable_4mb_flash
         self.mars_board_config = mars_board_config
         self.usb_board_config = usb_board_config
-        self.use_data_model_interface = use_data_model_interface
+        self.compress_lzma_config = compress_lzma_config
+        self.thread_analyzer_config = thread_analyzer_config
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -212,12 +220,14 @@ class TelinkBuilder(Builder):
         if self.usb_board_config:
             flags.append("-DTLNK_USB_DONGLE=y")
 
+        if self.compress_lzma_config:
+            flags.append("-DCONFIG_COMPRESS_LZMA=y")
+
+        if self.thread_analyzer_config:
+            flags.append("-DCONFIG_THREAD_ANALYZER=y")
+
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
-
-        if self.use_data_model_interface is not None:
-            value = 'y' if self.use_data_model_interface else 'n'
-            flags.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={value}")
 
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
@@ -237,6 +247,9 @@ class TelinkBuilder(Builder):
         logging.info('Compiling Telink at %s', self.output_dir)
 
         cmd = self.get_cmd_prefixes() + ("ninja -C %s" % self.output_dir)
+
+        if self.ninja_jobs is not None:
+            cmd += " -j%s" % str(self.ninja_jobs)
 
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 

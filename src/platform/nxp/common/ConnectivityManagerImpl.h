@@ -138,6 +138,8 @@ private:
     bool mBorderRouterInit = false;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    bool mWifiManagerInit = false;
+
     enum WiFiEventGroup{
         kWiFiEventGroup_WiFiStationModeBit = (1 << 0),
     };

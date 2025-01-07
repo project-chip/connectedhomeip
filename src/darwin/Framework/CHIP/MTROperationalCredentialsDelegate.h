@@ -20,7 +20,7 @@
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
 
-#import "MTRDeviceController.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTROperationalCertificateIssuer.h"
@@ -38,7 +38,7 @@ class MTROperationalCredentialsDelegate : public chip::Controller::OperationalCr
 public:
     using ChipP256KeypairPtr = chip::Crypto::P256Keypair *;
 
-    MTROperationalCredentialsDelegate(MTRDeviceController * deviceController);
+    MTROperationalCredentialsDelegate(MTRDeviceController_Concrete * deviceController);
     ~MTROperationalCredentialsDelegate() {}
 
     CHIP_ERROR Init(ChipP256KeypairPtr nocSigner, NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert);
@@ -147,7 +147,7 @@ private:
     NSData * _Nullable mRootCert;
     NSData * _Nullable mIntermediateCert;
 
-    MTRDeviceController * __weak mWeakController;
+    MTRDeviceController_Concrete * __weak mWeakController;
     chip::Controller::DeviceCommissioner * _Nullable mCppCommissioner = nullptr;
     id<MTROperationalCertificateIssuer> _Nullable mOperationalCertificateIssuer;
     dispatch_queue_t _Nullable mOperationalCertificateIssuerQueue;

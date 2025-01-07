@@ -235,6 +235,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "TestReadNoneSubscribeNone.yaml",    # chip-repl does not support AnyCommands (07/27/2023)
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
         "Test_TC_BRBINFO_2_1.yaml",          # chip-repl does not support AnyCommands (24/07/2024)
+        "TestThermostat.yaml",               # chip-repl does not support AnyCommands (14/10/2024)
         "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in chip-repl
         "Test_TC_ICDM_3_4.yaml",           # chip-repl does not support ICD registration
         # chip-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110

@@ -27,8 +27,12 @@ limitations under the License.
 
     <!-- Current cluster version -->
     <globalAttribute side="either" code="0xFFFD" value="1"/>
-
-    <attribute side="server" code="0x0000" define="WAKE_ON_LAN_MAC_ADDRESS" type="char_string" length="12" writable="false" optional="true">MACAddress</attribute>
-    <attribute apiMaturity="provisional" side="server" code="0x0001" define="LINK_LOCAL_ADDRESS" type="octet_string" length="16" writable="false" optional="true">LinkLocalAddress</attribute>
+    
+    <attribute side="server" code="0x0000" name="MACAddress" define="WAKE_ON_LAN_MAC_ADDRESS" type="char_string" length="12" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute apiMaturity="provisional" side="server" code="0x0001" name="LinkLocalAddress" define="LINK_LOCAL_ADDRESS" type="octet_string" length="16" optional="true">
+      <optionalConform/>
+    </attribute>
   </cluster>
 </configurator>

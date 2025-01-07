@@ -53,6 +53,7 @@ CHIP_ERROR ICDMonitoringEntry::Serialize(TLV::TLVWriter & writer) const
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Fields::kClientType), clientType));
 
     ReturnErrorOnFailure(writer.EndContainer(outer));
+    ReturnErrorOnFailure(writer.Finalize());
     return CHIP_NO_ERROR;
 }
 

@@ -80,10 +80,19 @@ pw_proto_library("button_service") {
   prefix = "button_service"
 }
 
+pw_proto_library("fabric_sync_common") {
+  sources = [ "protos/fabric_sync_common.proto" ]
+  strip_prefix = "protos"
+  prefix = "fabric_sync_common"
+}
+
 pw_proto_library("fabric_admin_service") {
   sources = [ "protos/fabric_admin_service.proto" ]
   inputs = [ "protos/fabric_admin_service.options" ]
-  deps = [ "$dir_pw_protobuf:common_protos" ]
+  deps = [
+    ":fabric_sync_common",
+    "$dir_pw_protobuf:common_protos",
+  ]
   strip_prefix = "protos"
   prefix = "fabric_admin_service"
 }
@@ -91,7 +100,10 @@ pw_proto_library("fabric_admin_service") {
 pw_proto_library("fabric_bridge_service") {
   sources = [ "protos/fabric_bridge_service.proto" ]
   inputs = [ "protos/fabric_bridge_service.options" ]
-  deps = [ "$dir_pw_protobuf:common_protos" ]
+  deps = [
+    ":fabric_sync_common",
+    "$dir_pw_protobuf:common_protos",
+  ]
   strip_prefix = "protos"
   prefix = "fabric_bridge_service"
 }

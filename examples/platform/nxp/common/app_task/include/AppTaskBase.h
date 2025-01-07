@@ -102,7 +102,7 @@ public:
      * This function can be overridden in order to implement a specific disallow mechanism.
      *
      */
-    virtual void AppMatter_DisallowDeviceToSleep(void) {}
+    virtual void AppMatter_DisallowDeviceToSleep(void);
 
     /**
      * \brief Allow entering low power mode.
@@ -110,7 +110,7 @@ public:
      * This function can be overridden in order to implement a specific allow mechanism.
      *
      */
-    virtual void AppMatter_AllowDeviceToSleep(void) {}
+    virtual void AppMatter_AllowDeviceToSleep(void);
 
     /**
      * \brief Print onboarding information.
@@ -168,6 +168,17 @@ public:
      *
      */
     static void InitServer(intptr_t arg);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+    /**
+     * \brief Initialize the Thread Border Router management cluster.
+     *
+     * Called when the border router function is up and running. This cluster stays disabled
+     * when the application is used as a Matter over Thread device.
+     *
+     */
+    void EnableTbrManagementCluster();
+#endif
 
     /**
      * Commissioning handlers

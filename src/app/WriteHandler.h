@@ -189,15 +189,19 @@ private:
     CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
                                 TLV::TLVReader & aData);
 
+    /// Checks whether the given path corresponds to a list attribute
+    /// Return values:
+    ///    true/false: valid attribute path, known if list or not
+    ///    std::nulloptr - path not available/valid, unknown if attribute is a list or not
+    std::optional<bool> IsListAttributePath(const ConcreteAttributePath & path);
+
     Messaging::ExchangeHolder mExchangeCtx;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     Optional<ConcreteAttributePath> mProcessingAttributePath;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     DataModel::Provider * mDataModelProvider = nullptr;
     std::optional<ConcreteAttributePath> mLastSuccessfullyWrittenPath;
-#endif
 
     // This may be a "fake" pointer or a real delegate pointer, depending
     // on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.

@@ -26,6 +26,7 @@
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
+#include <access/ProviderDeviceTypeResolver.h>
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app/InteractionModelEngine.h>
@@ -35,7 +36,6 @@
 #include <lib/core/Global.h>
 #include <lib/core/NodeId.h>
 
-#include <app/util/ember-compatibility-functions.h>
 #include <app/util/privilege-storage.h>
 
 using namespace chip;
@@ -43,11 +43,12 @@ using namespace chip::Access;
 
 namespace {
 
-class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver {
+class DeviceTypeResolver : public chip::Access::DynamicProviderDeviceTypeResolver {
 public:
-    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override
+    DeviceTypeResolver()
+        : chip::Access::DynamicProviderDeviceTypeResolver(
+            [] { return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(); })
     {
-        return app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
     }
 };
 
@@ -92,7 +93,7 @@ class AccessControlDelegate : public AccessControl::Delegate {
                 }
                 break;
             default:
-                MTR_LOG_ERROR("Uknown granted privilege %u, ignoring", grant.grantedPrivilege);
+                MTR_LOG_ERROR("Unknown granted privilege %u, ignoring", grant.grantedPrivilege);
                 break;
             }
 

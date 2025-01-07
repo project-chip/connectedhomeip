@@ -86,7 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
                     completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
                           done:(void (^)(MTRDownload * finishedDownload))done;
 
-- (void)abortDownloadsForController:(MTRDeviceController *)controller;
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
 
 @end
 
@@ -195,10 +195,11 @@ private:
 
     VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusBusy)], [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_BUSY]]);
     VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusDenied)], [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_ACCESS_DENIED]]);
+    VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusNoLogs)], [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]]);
 
     // If the whole log content fits into the response LogContent field or if there is no log, forward it to the caller
     // and stop here.
-    if ([status isEqual:@(MTRDiagnosticLogsStatusExhausted)] || [status isEqual:@(MTRDiagnosticLogsStatusNoLogs)]) {
+    if ([status isEqual:@(MTRDiagnosticLogsStatusExhausted)]) {
         NSError * writeError = nil;
         [self writeToFile:response.logContent error:&writeError];
         VerifyOrReturn(nil == writeError, [self failure:writeError]);
@@ -354,7 +355,7 @@ private:
     return download;
 }
 
-- (void)abortDownloadsForController:(MTRDeviceController *)controller
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller
 {
     assertChipStackLockedByCurrentThread();
 
@@ -408,7 +409,7 @@ private:
 }
 
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
-                       controller:(MTRDeviceController *)controller
+                       controller:(MTRDeviceController_Concrete *)controller
                              type:(MTRDiagnosticLogType)type
                           timeout:(NSTimeInterval)timeout
                             queue:(dispatch_queue_t)queue
@@ -462,7 +463,7 @@ private:
     }
 }
 
-- (void)abortDownloadsForController:(MTRDeviceController *)controller;
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
 {
     assertChipStackLockedByCurrentThread();
 
@@ -476,7 +477,7 @@ private:
                                           abortHandler:(AbortHandler)abortHandler;
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG("BDX Transfer Session Begin: %@", fileDesignator);
+    MTR_LOG("BDX Transfer Session Begin for log download: %@", fileDesignator);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
     VerifyOrReturn(nil != download, completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]));
@@ -492,7 +493,7 @@ private:
                                            completion:(MTRStatusCompletion)completion
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG("BDX Transfer Session Data: %@: %@", fileDesignator, data);
+    MTR_LOG("BDX Transfer Session Data for log download: %@: %@", fileDesignator, data);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
     VerifyOrReturn(nil != download, completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]));
@@ -510,7 +511,7 @@ private:
                                                error:(NSError * _Nullable)error
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG("BDX Transfer Session End: %@: %@", fileDesignator, error);
+    MTR_LOG("BDX Transfer Session End for log download: %@: %@", fileDesignator, error);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
     VerifyOrReturn(nil != download);

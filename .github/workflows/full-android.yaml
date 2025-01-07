@@ -16,8 +16,9 @@ name: Full builds - Android
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     workflow_dispatch:
 
 concurrency:
@@ -38,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-android:77
+            image: ghcr.io/project-chip/chip-build-android:97
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 

@@ -18,15 +18,31 @@
 
 #pragma once
 
+#include <commands/common/CredentialIssuerCommands.h>
 #include <controller/CHIPDeviceController.h>
+#include <controller/CommissioningDelegate.h>
 #include <controller/CommissioningWindowOpener.h>
+#include <controller/CurrentFabricRemover.h>
 #include <crypto/CHIPCryptoPAL.h>
+
+namespace admin {
+
+// Constants
+constexpr uint16_t kMaxManualCodeLength = 22;
 
 class CommissioningWindowDelegate
 {
 public:
     virtual void OnCommissioningWindowOpened(chip::NodeId deviceId, CHIP_ERROR err, chip::SetupPayload payload) = 0;
     virtual ~CommissioningWindowDelegate()                                                                      = default;
+};
+
+class PairingDelegate
+{
+public:
+    virtual void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) {}
+    virtual void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) {}
+    virtual ~PairingDelegate() = default;
 };
 
 /**
@@ -49,7 +65,9 @@ public:
  * manager.OpenCommissioningWindow();
  * @endcode
  */
-class PairingManager
+class PairingManager : public chip::Controller::DevicePairingDelegate,
+                       public chip::Controller::DeviceDiscoveryDelegate,
+                       public chip::Credentials::DeviceAttestationDelegate
 {
 public:
     static PairingManager & Instance()
@@ -58,7 +76,13 @@ public:
         return instance;
     }
 
-    void Init(chip::Controller::DeviceCommissioner * commissioner);
+    CHIP_ERROR Init(chip::Controller::DeviceCommissioner * commissioner, CredentialIssuerCommands * credIssuerCmds);
+
+    void SetOpenCommissioningWindowDelegate(CommissioningWindowDelegate * delegate) { mCommissioningWindowDelegate = delegate; }
+    void SetPairingDelegate(PairingDelegate * delegate) { mPairingDelegate = delegate; }
+    PairingDelegate * GetPairingDelegate() { return mPairingDelegate; }
+
+    chip::Controller::DeviceCommissioner & CurrentCommissioner() { return *mCommissioner; };
 
     /**
      * Opens a commissioning window on the specified node and endpoint.
@@ -79,31 +103,103 @@ public:
                                        uint32_t iterations, uint16_t discriminator, const chip::ByteSpan & salt,
                                        const chip::ByteSpan & verifier);
 
-    void SetOpenCommissioningWindowDelegate(CommissioningWindowDelegate * delegate) { mCommissioningWindowDelegate = delegate; }
+    /**
+     * Pairs a device using a setup code payload.
+     *
+     * @param nodeId The target node ID for pairing.
+     * @param payload The setup code payload, which typically contains device-specific pairing information.
+     *
+     * @return CHIP_NO_ERROR on successful initiation of the pairing process, or an appropriate CHIP_ERROR if pairing fails.
+     */
+    CHIP_ERROR PairDeviceWithCode(chip::NodeId nodeId, const char * payload);
+
+    /**
+     * Pairs a device using its setup PIN code and remote IP address.
+     *
+     * @param nodeId The target node ID for pairing.
+     * @param setupPINCode The setup PIN code for the device, used for establishing a secure connection.
+     * @param deviceRemoteIp The IP address of the remote device.
+     * @param deviceRemotePort The port number on which the device is listening for pairing requests.
+     *
+     * @return CHIP_NO_ERROR if the pairing process is initiated successfully, or an appropriate CHIP_ERROR if pairing fails.
+     */
+    CHIP_ERROR PairDevice(chip::NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp, uint16_t deviceRemotePort);
+
+    /**
+     * Unpairs a device with the specified node ID.
+     *
+     * @param nodeId The node ID of the device to be unpaired.
+     *
+     * @return CHIP_NO_ERROR if the device is successfully unpaired, or an appropriate CHIP_ERROR if the process fails.
+     */
+    CHIP_ERROR UnpairDevice(chip::NodeId nodeId);
+
+    /**
+     * Resets the PairingManager's internal state to a baseline, making it ready to handle a new command.
+     * This method clears all internal states and resets all members to their initial values.
+     */
+    void ResetForNextCommand();
 
 private:
+    // Constructors
     PairingManager();
     PairingManager(const PairingManager &)             = delete;
     PairingManager & operator=(const PairingManager &) = delete;
 
-    chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
+    // Private member functions (static and non-static)
+    chip::Controller::CommissioningParameters GetCommissioningParameters();
+    void InitPairingCommand();
+    CHIP_ERROR Pair(chip::NodeId remoteId, chip::Transport::PeerAddress address);
 
-    /////////// Open Commissioning Window Command Interface /////////
-    struct CommissioningWindowParams
-    {
-        chip::NodeId nodeId;
-        chip::EndpointId endpointId;
-        uint16_t commissioningWindowTimeout;
-        uint32_t iteration;
-        uint16_t discriminator;
-        chip::Optional<uint32_t> setupPIN;
-        uint8_t verifierBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
-        chip::ByteSpan verifier;
-        uint8_t saltBuffer[chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length];
-        chip::ByteSpan salt;
-    };
+    /////////// DevicePairingDelegate Interface /////////
+    void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
+    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingDeleted(CHIP_ERROR error) override;
+    void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
+    void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
+    void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
+    void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
+
+    /////////// DeviceDiscoveryDelegate Interface /////////
+    void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
+
+    /////////// DeviceAttestationDelegate Interface /////////
+    chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override;
+    bool ShouldWaitAfterDeviceAttestation() override;
+    void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
+                                      const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
+                                      chip::Credentials::AttestationVerificationResult attestationResult) override;
+
+    static void OnOpenCommissioningWindowResponse(void * context, chip::NodeId deviceId, CHIP_ERROR status,
+                                                  chip::SetupPayload payload);
+    static void OnOpenCommissioningWindowVerifierResponse(void * context, chip::NodeId deviceId, CHIP_ERROR status);
+    static void OnCurrentFabricRemove(void * context, chip::NodeId remoteNodeId, CHIP_ERROR status);
+
+    // Private data members
+    chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
+    CredentialIssuerCommands * mCredIssuerCmds           = nullptr;
 
     CommissioningWindowDelegate * mCommissioningWindowDelegate = nullptr;
+    PairingDelegate * mPairingDelegate                         = nullptr;
+
+    chip::NodeId mNodeId = chip::kUndefinedNodeId;
+    chip::ByteSpan mVerifier;
+    chip::ByteSpan mSalt;
+    uint16_t mDiscriminator = 0;
+    uint32_t mSetupPINCode  = 0;
+    bool mDeviceIsICD       = false;
+    uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+    uint8_t mVerifierBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
+    uint8_t mSaltBuffer[chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length];
+    char mRemoteIpAddr[chip::Inet::IPAddress::kMaxStringLength];
+    char mOnboardingPayload[kMaxManualCodeLength + 1];
+
+    chip::Optional<bool> mICDRegistration;
+    chip::Optional<chip::NodeId> mICDCheckInNodeId;
+    chip::Optional<chip::app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
+    chip::Optional<chip::ByteSpan> mICDSymmetricKey;
+    chip::Optional<uint64_t> mICDMonitoredSubject;
+    chip::Optional<uint32_t> mICDStayActiveDurationMsec;
 
     /**
      * Holds the unique_ptr to the current CommissioningWindowOpener.
@@ -111,12 +207,12 @@ private:
      * The pointer is reset when the commissioning window is closed or when an error occurs.
      */
     chip::Platform::UniquePtr<chip::Controller::CommissioningWindowOpener> mWindowOpener;
-
-    static void OnOpenCommissioningWindow(intptr_t context);
-    static void OnOpenCommissioningWindowResponse(void * context, chip::NodeId deviceId, CHIP_ERROR status,
-                                                  chip::SetupPayload payload);
-    static void OnOpenCommissioningWindowVerifierResponse(void * context, chip::NodeId deviceId, CHIP_ERROR status);
-
     chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindow> mOnOpenCommissioningWindowCallback;
     chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindowWithVerifier> mOnOpenCommissioningWindowVerifierCallback;
+
+    // For Unpair
+    chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
+    chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
 };
+
+} // namespace admin

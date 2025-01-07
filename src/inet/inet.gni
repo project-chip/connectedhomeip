@@ -26,11 +26,18 @@ declare_args() {
   # Enable TCP endpoint.
   chip_inet_config_enable_tcp_endpoint = true
 
+  # TODO: Set to false when using Network.framework until a Network.framework TCP endpoint backend is implemented.
+  if (chip_system_config_use_network_framework) {
+    chip_inet_config_enable_tcp_endpoint = false
+  }
+
   # Inet implementation type.
   if (chip_system_config_use_open_thread_inet_endpoints) {
     chip_system_config_inet = "OpenThread"
   } else if (chip_system_config_use_lwip) {
     chip_system_config_inet = "LwIP"
+  } else if (chip_system_config_use_network_framework) {
+    chip_system_config_inet = "NetworkFramework"
   } else {
     chip_system_config_inet = "Sockets"
   }

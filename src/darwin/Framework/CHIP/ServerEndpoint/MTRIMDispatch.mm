@@ -50,6 +50,15 @@ Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAtt
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
+Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
+{
+    assertChipStackLockedByCurrentThread();
+
+    // All of our attributes are handled via AttributeAccessInterface, so this
+    // should be unreached.
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
 namespace chip {
 namespace app {
 

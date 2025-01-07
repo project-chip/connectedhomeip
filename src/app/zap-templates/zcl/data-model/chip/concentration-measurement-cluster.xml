@@ -58,17 +58,59 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="MIN_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="MAX_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="PeakMeasuredValue" define="PEAK_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="PeakMeasuredValueWindow" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="AverageMeasuredValue" define="AVG_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="AverageMeasuredValueWindow" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="Uncertainty" define="UNCERTAINTY" type="single" optional="true">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="MeasurementUnit" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="MeasurementMedium" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" optional="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x000a" name="LevelValue" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="LEV"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
   <cluster>
@@ -113,17 +155,59 @@ limitations under the License.
      </features>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="MIN_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="MAX_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="PeakMeasuredValue" define="PEAK_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="PeakMeasuredValueWindow" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="AverageMeasuredValue" define="AVG_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="AverageMeasuredValueWindow" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="Uncertainty" define="UNCERTAINTY" type="single" optional="true">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="MeasurementUnit" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="MeasurementMedium" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" optional="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x000a" name="LevelValue" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="LEV"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
   <cluster>
@@ -139,45 +223,87 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <features>
-       <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-       <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-     </features>
+      <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+      <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+    </features>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="MIN_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="MAX_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="PeakMeasuredValue" define="PEAK_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="PeakMeasuredValueWindow" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="AverageMeasuredValue" define="AVG_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="AverageMeasuredValueWindow" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="Uncertainty" define="UNCERTAINTY" type="single" optional="true">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="MeasurementUnit" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="MeasurementMedium" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" optional="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x000a" name="LevelValue" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="LEV"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
   <cluster>
@@ -193,45 +319,87 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <features>
-       <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-       <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-     </features>
+      <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+      <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+    </features>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="MIN_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="MAX_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="PeakMeasuredValue" define="PEAK_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="PeakMeasuredValueWindow" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="AverageMeasuredValue" define="AVG_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="AverageMeasuredValueWindow" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="Uncertainty" define="UNCERTAINTY" type="single" optional="true">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="MeasurementUnit" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="MeasurementMedium" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" optional="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x000a" name="LevelValue" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="LEV"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
   <cluster>
@@ -247,45 +415,87 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <features>
-       <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-       <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-     </features>
+      <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+      <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+    </features>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="MIN_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="MAX_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="PeakMeasuredValue" define="PEAK_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="PeakMeasuredValueWindow" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="AverageMeasuredValue" define="AVG_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="AverageMeasuredValueWindow" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="Uncertainty" define="UNCERTAINTY" type="single" optional="true">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="MeasurementUnit" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="MeasurementMedium" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" optional="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x000a" name="LevelValue" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="LEV"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
   <cluster>
@@ -301,45 +511,87 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <features>
-       <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-       <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-     </features>
+      <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+      <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+    </features>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="MIN_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="MAX_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="PeakMeasuredValue" define="PEAK_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="PeakMeasuredValueWindow" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="AverageMeasuredValue" define="AVG_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="AverageMeasuredValueWindow" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="Uncertainty" define="UNCERTAINTY" type="single" optional="true">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="MeasurementUnit" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="MeasurementMedium" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" optional="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x000a" name="LevelValue" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="LEV"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
   <cluster>
@@ -355,45 +607,87 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <features>
-       <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-       <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-     </features>
+      <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+      <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+    </features>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="MIN_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="MAX_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="PeakMeasuredValue" define="PEAK_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="PeakMeasuredValueWindow" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="AverageMeasuredValue" define="AVG_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="AverageMeasuredValueWindow" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="Uncertainty" define="UNCERTAINTY" type="single" optional="true">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="MeasurementUnit" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="MeasurementMedium" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" optional="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x000a" name="LevelValue" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="LEV"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
   <cluster>
@@ -409,45 +703,87 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <features>
-       <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-       <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-     </features>
-
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+      <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+      <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+    </features>
+    
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="MIN_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="MAX_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="PeakMeasuredValue" define="PEAK_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="PeakMeasuredValueWindow" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="AverageMeasuredValue" define="AVG_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="AverageMeasuredValueWindow" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="Uncertainty" define="UNCERTAINTY" type="single" optional="true">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="MeasurementUnit" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="MeasurementMedium" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" optional="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x000a" name="LevelValue" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="LEV"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
   <cluster>
@@ -463,45 +799,87 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <features>
-       <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-       <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-     </features>
+      <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+      <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+    </features>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="MIN_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="MAX_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="PeakMeasuredValue" define="PEAK_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="PeakMeasuredValueWindow" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="AverageMeasuredValue" define="AVG_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="AverageMeasuredValueWindow" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="Uncertainty" define="UNCERTAINTY" type="single" optional="true">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="MeasurementUnit" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="MeasurementMedium" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" optional="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x000a" name="LevelValue" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="LEV"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
   <cluster>
@@ -517,45 +895,87 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <features>
-       <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
-         <optionalConform choice="a" more="true"/>
-       </feature>
-       <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
-         <optionalConform>
-           <feature name="LEV"/>
-         </optionalConform>
-       </feature>
-       <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-       <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
-         <optionalConform>
-           <feature name="MEA"/>
-         </optionalConform>
-       </feature>
-     </features>
+      <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+      <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+    </features>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="MIN_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="MAX_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="PeakMeasuredValue" define="PEAK_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="PeakMeasuredValueWindow" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="AverageMeasuredValue" define="AVG_MEASURED_VALUE" type="single" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="AverageMeasuredValueWindow" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" max="604800" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="Uncertainty" define="UNCERTAINTY" type="single" optional="true">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="MeasurementUnit" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" optional="true">
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="MeasurementMedium" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" optional="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x000a" name="LevelValue" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="LEV"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
   <!-- Cluster Data Types -->

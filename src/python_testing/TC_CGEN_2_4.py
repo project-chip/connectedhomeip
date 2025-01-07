@@ -19,12 +19,19 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -39,18 +46,19 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # Commissioning stage numbers - we should find a better way to match these to the C++ code
-kArmFailsafe = 4
-kConfigRegulatory = 5
-kSendPAICertificateRequest = 10
-kSendDACCertificateRequest = 11
-kSendAttestationRequest = 12
-kSendOpCertSigningRequest = 15
-kSendTrustedRootCert = 18
-kSendNOC = 19
+# TODO: https://github.com/project-chip/connectedhomeip/issues/36629
+kArmFailsafe = 3
+kConfigRegulatory = 4
+kSendPAICertificateRequest = 9
+kSendDACCertificateRequest = 10
+kSendAttestationRequest = 11
+kSendOpCertSigningRequest = 14
+kSendTrustedRootCert = 17
+kSendNOC = 18
 
 
 class TC_CGEN_2_4(MatterBaseTest):

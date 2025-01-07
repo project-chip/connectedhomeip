@@ -37,7 +37,7 @@ constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
 {
     CHIP_ERROR status     = CHIP_NO_ERROR;
-    uint32_t bytes        = chip::min(mLength - mProcessedLength, static_cast<uint32_t>(block.size()));
+    uint32_t bytes        = std::min(mLength - mProcessedLength, static_cast<uint32_t>(block.size()));
     ByteSpan relevantData = block.SubSpan(0, bytes);
 
     status = ProcessInternal(relevantData);
@@ -92,7 +92,7 @@ void OTADataAccumulator::Clear()
 
 CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 {
-    uint32_t numBytes = chip::min(mThreshold - mBufferOffset, static_cast<uint32_t>(block.size()));
+    uint32_t numBytes = std::min(mThreshold - mBufferOffset, static_cast<uint32_t>(block.size()));
     memcpy(&mBuffer[mBufferOffset], block.data(), numBytes);
     mBufferOffset += numBytes;
     block = block.SubSpan(numBytes);

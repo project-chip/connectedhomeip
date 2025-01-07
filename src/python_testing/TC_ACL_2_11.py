@@ -19,25 +19,37 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${NETWORK_MANAGEMENT_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --commissioning-arl-entries "[{\"endpoint\": 1,\"cluster\": 1105,\"restrictions\": [{\"type\": 0,\"id\": 0}]}]" --arl-entries "[{\"endpoint\": 1,\"cluster\": 1105,\"restrictions\": [{\"type\": 0,\"id\": 0}]}]"
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${NETWORK_MANAGEMENT_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: >
+#       --discriminator 1234 --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --commissioning-arl-entries "[{\"endpoint\": 1,\"cluster\": 1105,\"restrictions\": [{\"type\": 0,\"id\": 0}]}]"
+#       --arl-entries "[{\"endpoint\": 1,\"cluster\": 1105,\"restrictions\": [{\"type\": 0,\"id\": 0}]}]"
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import logging
 import queue
 
 import chip.clusters as Clusters
-from basic_composition_support import arls_populated
+import matter_testing_infrastructure.chip.testing.global_attribute_ids as global_attribute_ids
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, ValueDecodeFailure
 from chip.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, ALL_CLUSTERS, ClusterEvent
 from chip.clusters.Objects import AccessControl
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.basic_composition import arls_populated
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -65,15 +77,6 @@ def WaitForEventReport(q: queue.Queue, expected_event: ClusterEvent):
 
 
 class TC_ACL_2_11(MatterBaseTest):
-
-    global_attributes = [
-        Clusters.Descriptor.Attributes.GeneratedCommandList.attribute_id,
-        Clusters.Descriptor.Attributes.AcceptedCommandList.attribute_id,
-        Clusters.Descriptor.Attributes.AttributeList.attribute_id,
-        Clusters.Descriptor.Attributes.FeatureMap.attribute_id,
-        Clusters.Descriptor.Attributes.ClusterRevision.attribute_id,
-        Clusters.Descriptor.Attributes.EventList.attribute_id
-    ]
 
     def pics_TC_ACL_2_11(self) -> list[str]:
         return ['ACL.S.F01']
@@ -143,7 +146,7 @@ class TC_ACL_2_11(MatterBaseTest):
                     # if ID1 is null, it means it is a wildcard.  We need to read all attributes on the cluster
                     if ID1 is NullValue:
                         for attr_id, attribute in ALL_ATTRIBUTES[C1].items():
-                            if attr_id not in self.global_attributes:
+                            if global_attribute_ids.attribute_id_type(attr_id) != global_attribute_ids.AttributeIdType.kStandardGlobal:
                                 await self.read_single_attribute_expect_error(cluster=cluster, attribute=attribute, error=Status.AccessRestricted, endpoint=E1)
                     else:
                         attribute = ALL_ATTRIBUTES[C1][ID1]
@@ -151,7 +154,7 @@ class TC_ACL_2_11(MatterBaseTest):
                 elif restriction_type == AccessControl.Enums.AccessRestrictionTypeEnum.kAttributeWriteForbidden:
                     if ID1 is NullValue:
                         for attr_id, attribute in ALL_ATTRIBUTES[C1].items():
-                            if attr_id not in self.global_attributes:
+                            if global_attribute_ids.attribute_id_type(attr_id) != global_attribute_ids.AttributeIdType.kStandardGlobal:
                                 status = await self.write_single_attribute(attribute_value=attribute(), endpoint_id=E1, expect_success=False)
                                 if status is not Status.UnsupportedWrite:
                                     asserts.assert_equal(status, Status.AccessRestricted,

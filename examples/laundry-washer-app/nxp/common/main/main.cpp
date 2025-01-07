@@ -32,7 +32,7 @@ uint8_t __attribute__((section(".heap"))) ucHeap[configTOTAL_HEAP_SIZE];
 
 using namespace ::chip::DeviceLayer;
 
-extern "C" int main(int argc, char * argv[])
+int main(int argc, char * argv[])
 {
     TaskHandle_t taskHandle;
 

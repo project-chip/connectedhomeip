@@ -30,7 +30,8 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfAttributeChanged(endpoint, clusterId, attributeId, emberAfGlobalInteractionModelAttributesChangedListener());
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->Temporary_ReportAttributeChanged(
+        AttributePathParams(endpoint, clusterId, attributeId));
 }
 
 void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
@@ -39,8 +40,8 @@ void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfAttributeChanged(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                            emberAfGlobalInteractionModelAttributesChangedListener());
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->Temporary_ReportAttributeChanged(
+        AttributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId));
 }
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint)
@@ -49,5 +50,5 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelAttributesChangedListener());
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->Temporary_ReportAttributeChanged(AttributePathParams(endpoint));
 }

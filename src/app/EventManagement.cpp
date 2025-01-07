@@ -83,7 +83,7 @@ struct CopyAndAdjustDeltaTimeContext
 void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                            CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
                            MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-                           System::Clock::Milliseconds64 aMonotonicStartupTime)
+                           System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter)
 {
     CircularEventBuffer * current = nullptr;
     CircularEventBuffer * prev    = nullptr;
@@ -124,6 +124,16 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
     mBytesWritten = 0;
 
     mMonotonicStartupTime = aMonotonicStartupTime;
+
+    // TODO(#36890): Should remove using the global instance and rely only on passed in variable.
+    if (apEventReporter == nullptr)
+    {
+        mpEventReporter = &InteractionModelEngine::GetInstance()->GetReportingEngine();
+    }
+    else
+    {
+        mpEventReporter = apEventReporter;
+    }
 }
 
 CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer)
@@ -490,7 +500,7 @@ exit:
                       opts.mTimestamp.mType == Timestamp::Type::kSystem ? "Sys" : "Epoch", ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
-        err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleEventDelivery(opts.mPath, mBytesWritten);
+        err = mpEventReporter->NewEventGenerated(opts.mPath, mBytesWritten);
     }
 
     return err;
@@ -563,9 +573,9 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
         Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
     if (accessControlError != CHIP_NO_ERROR)
     {
-        ReturnErrorCodeIf((accessControlError != CHIP_ERROR_ACCESS_DENIED) &&
-                              (accessControlError != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL),
-                          accessControlError);
+        VerifyOrReturnError((accessControlError == CHIP_ERROR_ACCESS_DENIED) ||
+                                (accessControlError == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL),
+                            accessControlError);
         ret = CHIP_ERROR_UNEXPECTED_EVENT;
     }
 

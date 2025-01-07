@@ -337,3 +337,30 @@ class ProductPrimaryColor(StrArgument):
 
     def max_length(self):
         return 64
+
+
+class El2GoObject(FileArgument):
+
+    def __init__(self, arg):
+        super().__init__(arg)
+
+    def key(self):
+        return 24
+
+
+class El2GoDacKeyID(IntArgument):
+
+    def __init__(self, arg):
+        super().__init__(arg)
+
+    def key(self):
+        return 25
+
+
+class El2GoDacCertID(IntArgument):
+
+    def __init__(self, arg):
+        super().__init__(arg)
+
+    def key(self):
+        return 26

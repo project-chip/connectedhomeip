@@ -16,7 +16,6 @@
  */
 
 #include "ICDConfigurationData.h"
-#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
@@ -25,15 +24,16 @@ ICDConfigurationData ICDConfigurationData::instance;
 
 System::Clock::Milliseconds32 ICDConfigurationData::GetSlowPollingInterval()
 {
-#if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
-    // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
+#if CHIP_CONFIG_ENABLE_ICD_LIT
+    // When in SIT mode, the slow poll interval SHALL NOT be greater than the SIT mode polling threshold, per spec.
     // This is important for ICD device configured for LIT operation but currently operating as a SIT
     // due to a lack of client registration
     if (mICDMode == ICDMode::SIT && mSlowPollingInterval > kSITPollingThreshold)
     {
         return kSITPollingThreshold;
     }
-#endif
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
+
     return mSlowPollingInterval;
 }
 

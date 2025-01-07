@@ -105,7 +105,6 @@ public:
      */
     std::vector<chip::ClusterId> GetServerList()
     {
-        ChipLogProgress(AppServer, "Endpoint::GetServerList() mClusters.size(): %d", static_cast<int>(mClusters.size()));
         std::vector<chip::ClusterId> serverList;
         for (auto const & cluster : mClusters)
         {
@@ -123,7 +122,6 @@ public:
     template <typename T>
     void RegisterCluster(const chip::ClusterId clusterId)
     {
-        ChipLogProgress(AppServer, "Endpoint::RegisterCluster() Registering clusterId %d for endpointId %d", clusterId, GetId());
         static_assert(std::is_base_of<BaseCluster, T>::value, "T must be derived from BaseCluster");
         auto cluster = std::make_shared<T>(shared_from_this());
         cluster->SetUp();
@@ -137,7 +135,6 @@ public:
     memory::Strong<T> GetCluster()
     {
         static_assert(std::is_base_of<BaseCluster, T>::value, "T must be derived from BaseCluster");
-        ChipLogProgress(AppServer, "Endpoint::GetCluster() mClusters.size(): %d", static_cast<int>(mClusters.size()));
         for (const auto & pair : mClusters)
         {
             auto cluster = std::dynamic_pointer_cast<T>(pair.second);
@@ -151,8 +148,8 @@ public:
 
     void LogDetail() const
     {
-        ChipLogProgress(AppServer, "Endpoint::LogDetail() Endpoint ID: %d, Vendor ID: %d, Product ID: %d", mAttributes.mId,
-                        mAttributes.mVendorId, mAttributes.mProductId);
+        ChipLogProgress(AppServer, "Endpoint::LogDetail() Endpoint ID: %d, Vendor ID: %d, Product ID: %d, Clusters: %d",
+                        mAttributes.mId, mAttributes.mVendorId, mAttributes.mProductId, static_cast<int>(mClusters.size()));
     }
 };
 

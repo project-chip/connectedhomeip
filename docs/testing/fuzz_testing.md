@@ -79,10 +79,10 @@ for an example of a simple fuzz test.
     -   Another example:
         [src/setup_payload/tests/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/b367512f519e5e109346e81a0d84fd85cd9192f7/src/setup_payload/tests/BUILD.gn#L43)
 
--   Add to `src/BUILD.gn`
+-   Add to `${chip_root}/BUILD.gn`
 
     -   Add the Fuzzing Target in this part of the code :
-        [src/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/b367512f519e5e109346e81a0d84fd85cd9192f7/BUILD.gn#L52)
+        [\${chip_root}/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/b367512f519e5e109346e81a0d84fd85cd9192f7/BUILD.gn#L52)
 
     -   Add Fuzzing Target like that
 
@@ -255,6 +255,25 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
 ./fuzz-chip-cert-pw --help
 
 ```
+
+### FAQ
+
+#### What revision should the FuzzTest and Abseil submodules be for running `pw_fuzzer` with FuzzTest?
+
+-   Google FuzzTest is integrated into Matter using `pw_fuzzer`, which has
+    several dependencies. These dependencies are listed here:
+    [Step 0: Set up FuzzTest for your project](https://pigweed.dev/pw_fuzzer/guides/fuzztest.html#step-0-set-up-fuzztest-for-your-project).
+-   Matter integrates these dependencies as submodules, including Google
+    FuzzTest and Abseil.
+-   Since FuzzTest and Abseil only support the `bazel` and `CMake` build systems
+    and do not support GN, Pigweed maintainers use a script to generate GN files
+    for these dependencies.
+-   the revision of FuzzTest and Abseil submodules in Matter should match or at
+    least be as new as the specific version (SHA1) used when generating these GN
+    files.
+-   You can find the version used for the generated GN files here:
+    [FuzzTest Version](https://pigweed.dev/third_party/fuzztest/#version) and
+    [Abseil Version](https://pigweed.dev/third_party/abseil-cpp/#version).
 
 #### TO ADD:
 

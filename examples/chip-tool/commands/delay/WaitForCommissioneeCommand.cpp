@@ -23,7 +23,7 @@ using namespace chip;
 CHIP_ERROR WaitForCommissioneeCommand::RunCommand()
 {
     chip::FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
-    ReturnErrorCodeIf(fabricIndex == chip::kUndefinedFabricIndex, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(fabricIndex != chip::kUndefinedFabricIndex, CHIP_ERROR_INCORRECT_STATE);
 
     if (mExpireExistingSession.ValueOr(true))
     {

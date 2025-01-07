@@ -56,12 +56,9 @@
 #include <openthread/ip6.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
-#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <net/if.h>
 #include <netinet/in.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <sys/socket.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 
@@ -110,7 +107,7 @@ enum class IPv6MulticastFlag : uint8_t
 };
 using IPv6MulticastFlags = BitFlags<IPv6MulticastFlag>;
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 /**
  * SockAddr should be used when calling any API that returns (by copying into
  * it) a sockaddr, because that will need enough storage that it can hold data
@@ -139,7 +136,7 @@ union SockAddrWithoutStorage
     sockaddr_in in;
     sockaddr_in6 in6;
 };
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 /**
  * @brief   Internet protocol address

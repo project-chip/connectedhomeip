@@ -275,14 +275,22 @@ darwin:
 silabs:
   - changed-files:
     - any-glob-to-any-file:
+      - examples/platform/silabs/*
+      - examples/platform/silabs/**/*
       - src/platform/silabs/*
       - src/platform/silabs/**/*
+      - src/test_driver/efr32/*
+      - src/test_driver/efr32/**/*
 
 esp32:
   - changed-files:
     - any-glob-to-any-file:
+      - examples/platform/esp32/*
+      - examples/platform/esp32/**/*
       - src/platform/ESP32/*
       - src/platform/ESP32/**/*
+      - src/test_driver/esp32/*
+      - src/test_driver/esp32/**/*
 
 freeRTOS:
   - changed-files:
@@ -290,23 +298,31 @@ freeRTOS:
       - src/platform/FreeRTOS/*
       - src/platform/FreeRTOS/**/*
 
-k32w:
+nxp:
   - changed-files:
     - any-glob-to-any-file:
-      - src/platform/K32W/*
-      - src/platform/K32W/**/*
+      - examples/platform/nxp/*
+      - examples/platform/nxp/**/*
+      - src/platform/nxp/*
+      - src/platform/nxp/**/*
 
 linux:
   - changed-files:
     - any-glob-to-any-file:
+      - examples/platform/linux/*
+      - examples/platform/linux/**/*
       - src/platform/Linux/*
       - src/platform/Linux/**/*
 
 nrf connect:
   - changed-files:
     - any-glob-to-any-file:
+      - examples/platform/nrfconnect/*
+      - examples/platform/nrfconnect/**/*
       - src/platform/nrfconnect/*
       - src/platform/nrfconnect/**/*
+      - src/test_driver/nrfconnect/*
+      - src/test_driver/nrfconnect/**/*
 
 openthread:
   - changed-files:
@@ -323,11 +339,17 @@ zephyr:
 telink:
   - changed-files:
     - any-glob-to-any-file:
+      - examples/platform/telink/*
+      - examples/platform/telink/**/*
       - src/platform/telink/*
       - src/platform/telink/**/*
 
 tizen:
   - changed-files:
     - any-glob-to-any-file:
+      - examples/platform/tizen/*
+      - examples/platform/tizen/**/*
       - src/platform/Tizen/*
       - src/platform/Tizen/**/*
+      - src/test_driver/tizen/*
+      - src/test_driver/tizen/**/*

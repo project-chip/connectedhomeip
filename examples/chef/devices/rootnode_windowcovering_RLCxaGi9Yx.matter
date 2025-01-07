@@ -212,6 +212,13 @@ enum TestGlobalEnum : enum8 {
   kFinalValue = 2;
 }
 
+enum ThreeLevelAutoEnum : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+  kAutomatic = 3;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -830,6 +837,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1237,7 +1245,7 @@ cluster GeneralDiagnostics = 51 {
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** Request a variable length payload response. */
-  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+  command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1961,24 +1969,24 @@ endpoint 1 {
     ram      attribute type default = 8;
     ram      attribute physicalClosedLimitLift default = 0x0000;
     ram      attribute physicalClosedLimitTilt default = 0x0000;
-    ram      attribute currentPositionLift default = 0;
-    ram      attribute currentPositionTilt default = 0;
-    ram      attribute numberOfActuationsLift default = 0x0000;
-    ram      attribute numberOfActuationsTilt default = 0x0000;
-    ram      attribute configStatus default = 0x19;
-    ram      attribute currentPositionLiftPercentage default = 0;
-    ram      attribute currentPositionTiltPercentage default = 0;
+    persist  attribute currentPositionLift default = 0;
+    persist  attribute currentPositionTilt default = 0;
+    persist  attribute numberOfActuationsLift default = 0x0000;
+    persist  attribute numberOfActuationsTilt default = 0x0000;
+    persist  attribute configStatus default = 0x19;
+    persist  attribute currentPositionLiftPercentage default = 0;
+    persist  attribute currentPositionTiltPercentage default = 0;
     ram      attribute operationalStatus default = 0x00;
     ram      attribute targetPositionLiftPercent100ths default = 0;
     ram      attribute targetPositionTiltPercent100ths default = 0;
     ram      attribute endProductType default = 8;
-    ram      attribute currentPositionLiftPercent100ths default = 0;
-    ram      attribute currentPositionTiltPercent100ths default = 0;
-    ram      attribute installedOpenLimitLift default = 0;
-    ram      attribute installedClosedLimitLift default = 65534;
-    ram      attribute installedOpenLimitTilt default = 0;
-    ram      attribute installedClosedLimitTilt default = 1800;
-    ram      attribute mode default = 0x00;
+    persist  attribute currentPositionLiftPercent100ths default = 0;
+    persist  attribute currentPositionTiltPercent100ths default = 0;
+    persist  attribute installedOpenLimitLift default = 0;
+    persist  attribute installedClosedLimitLift default = 65534;
+    persist  attribute installedOpenLimitTilt default = 0;
+    persist  attribute installedClosedLimitTilt default = 1800;
+    persist  attribute mode default = 0x00;
     ram      attribute safetyStatus default = 0x0000;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

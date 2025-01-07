@@ -33,10 +33,10 @@ namespace chip {
     do                                                                                                                             \
     {                                                                                                                              \
         constexpr size_t len = std::extent<decltype(keyPrefix)>::value;                                                            \
-        nlSTATIC_ASSERT_PRINT(len > 0, "keyPrefix length must be known at compile time");                                          \
+        static_assert(len > 0, "keyPrefix length must be known at compile time");                                                  \
         /* 2 * sizeof(chip::NodeId) to accommodate 2 character for each byte in Node Id */                                         \
         char key[len + 2 * sizeof(chip::NodeId) + 1];                                                                              \
-        nlSTATIC_ASSERT_PRINT(sizeof(node) <= sizeof(uint64_t), "Node ID size is greater than expected");                          \
+        static_assert(sizeof(node) <= sizeof(uint64_t), "Node ID size is greater than expected");                                  \
         /* Be careful about switching to ChipLogFormatX64: it would change the storage keys! */                                    \
         snprintf(key, sizeof(key), "%s%" PRIx64, keyPrefix, node);                                                                 \
         action;                                                                                                                    \

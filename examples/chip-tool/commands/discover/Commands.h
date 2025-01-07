@@ -84,6 +84,7 @@ void registerCommandsDiscover(Commands & commands, CredentialIssuerCommands * cr
         make_unique<DiscoverCommissionableByCommissioningModeCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionableByVendorIdCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionableByDeviceTypeCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByInstanceNameCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionersCommand>(credsIssuerConfig),
     };
 

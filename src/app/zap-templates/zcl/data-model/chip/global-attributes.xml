@@ -19,7 +19,6 @@ limitations under the License.
     <attribute side="server" code="0xFFFD" define="CLUSTER_REVISION_SERVER" type="int16u"   default="1">ClusterRevision</attribute>
     <attribute side="server" code="0xFFFC" define="FEATURE_MAP_SERVER"      type="bitmap32" default="0">FeatureMap</attribute>
     <attribute side="server" code="0xFFFB" define="ATTRIBUTE_LIST_SERVER"   type="array" entryType="attrib_id">AttributeList</attribute>
-    <attribute side="server" code="0xFFFA" define="EVENT_LIST"              type="array" entryType="event_id">EventList</attribute>
     <attribute side="server" code="0xFFF9" define="ACCEPTED_COMMAND_LIST"   type="array" entryType="command_id">AcceptedCommandList</attribute>
     <attribute side="server" code="0xFFF8" define="GENERATED_COMMAND_LIST"  type="array" entryType="command_id">GeneratedCommandList</attribute>
   </global>

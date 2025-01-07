@@ -34,6 +34,7 @@ choice LOG_MODE
 endchoice
 
 choice MATTER_LOG_LEVEL_CHOICE
+    default MATTER_LOG_LEVEL_WRN if SOC_RISCV_TELINK_TL321X
     default MATTER_LOG_LEVEL_DBG
 endchoice
 
@@ -61,17 +62,19 @@ config POSIX_MAX_FDS
 
 # Application stack size
 config MAIN_STACK_SIZE
-    default 3240 if PM
+    default 3240 if PM || SOC_RISCV_TELINK_TL321X
     default 4096
 
 config INIT_STACKS
     default y
 
 config IDLE_STACK_SIZE
-    default 512 if PM
+    default 512 if PM || SOC_RISCV_TELINK_TL321X
+
 
 config ISR_STACK_SIZE
-    default 502 if PM
+    default 576 if PM
+    default 528 if SOC_RISCV_TELINK_TL321X
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
     default 616 if PM
@@ -79,27 +82,34 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 config HEAP_MEM_POOL_SIZE
     default 256
 
-config COMMON_LIBC_MALLOC_ARENA_SIZE 
+config COMMON_LIBC_MALLOC_ARENA_SIZE
+    default 20716 if SOC_RISCV_TELINK_TL321X || SOC_SERIES_RISCV_TELINK_B9X_RETENTION
+    default 16384 if SOC_RISCV_TELINK_TL721X
     default 12288
 
 config NET_IPV6_MLD
-    default n
+    default n if PM
+    default y
+
+config NET_IF_MCAST_IPV6_ADDR_COUNT
+    default 8 if PM
+    default 15
 
 # Network buffers
 config NET_PKT_RX_COUNT
-    default 4 if PM
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 8
 
 config NET_PKT_TX_COUNT
-    default 4 if PM
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 8
 
 config NET_BUF_RX_COUNT
-    default 16 if PM
+    default 12 if PM || SOC_RISCV_TELINK_TL321X
     default 32
 
 config NET_BUF_TX_COUNT
-    default 16 if PM
+    default 12 if PM || SOC_RISCV_TELINK_TL321X
     default 32
 
 config GPIO
@@ -128,59 +138,89 @@ config BT_MAX_CONN
     default 1
 
 config BT_L2CAP_TX_MTU
+    default 103 if SOC_RISCV_TELINK_TL321X
     default 247
 
 config BT_BUF_ACL_RX_SIZE
+    default 107 if SOC_RISCV_TELINK_TL321X
     default 251
 
 config BT_BUF_ACL_TX_SIZE
+    default 107 if SOC_RISCV_TELINK_TL321X
     default 251
 
+
+#ifdef CONFIG_SOC_RISCV_TELINK_TL321X
+
+config BT_BUF_EVT_RX_COUNT
+    default 4
+
+config BT_BUF_ACL_RX_COUNT
+    default 4
+
+config BT_GATT_CACHING
+    bool
+    default n
+
+
+#endif
+
 config BT_RX_STACK_SIZE
-    default 810 if BT_B9X
+    default 1352 if BT_B9X || BT_TLX
     default 2048 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
-    default 640 if BT_B9X
+    default 640 if BT_B9X || BT_TLX
     default 2048 if BT_W91
 
 config BT_DEVICE_NAME_GATT_WRITABLE
     bool
     default n
 
-config B9X_BLE_CTRL_THREAD_STACK_SIZE
-    default 576
+if SOC_SERIES_RISCV_TELINK_B9X || SOC_SERIES_RISCV_TELINK_TLX
 
-config B9X_BLE_CTRL_MASTER_MAX_NUM
+config TL_BLE_CTRL_THREAD_STACK_SIZE
+    default 648
+
+config TL_BLE_CTRL_MASTER_MAX_NUM
     default 0
 
-config B9X_BLE_CTRL_SLAVE_MAX_NUM
+config TL_BLE_CTRL_SLAVE_MAX_NUM
     default 1
 
-config B9X_BLE_CTRL_RF_POWER
+config TL_BLE_CTRL_RF_POWER
     default 3 if PM 
+    default 8 if BT_TLX
     default 9
 
-choice B9X_BLE_CTRL_MAC_TYPE
-    default B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
+choice TL_BLE_CTRL_MAC_TYPE
+    default TL_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
 endchoice
 
-endif
+endif # SOC_SERIES_RISCV_TELINK_B9X || SOC_SERIES_RISCV_TELINK_TLX
+
+
+endif # BT
 
 # Board retention config
+# Cut down the ram cost by matter's change,it can keep ramcode (driver).
+# No need load the ramcode every time in thread mode (retention mode).
+# If the ram is not enough , can change it back , initial setting is n.
 if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
 config SOC_SERIES_RISCV_TELINK_B9X_NON_RETENTION_RAM_CODE
-    default y if PM
+    default n if PM
 
 config TELINK_B9X_MATTER_RETENTION_LAYOUT
     default y if PM
 
 config PWM
     default n
+
 endif
 
 # Board non-retention config
-if BOARD_TLSR9118BDK40D || BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
+if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
+    BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D || BOARD_TL3218X || BOARD_TL7218X
 config PWM
     default y
 endif
@@ -191,6 +231,10 @@ config DYNAMIC_INTERRUPTS
 
 config CHIP_OTA_REQUESTOR
     default y
+
+config MCUBOOT_SIGNATURE_KEY_FILE
+	default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D
+	depends on BOOTLOADER_MCUBOOT
 
 # In current config/zephyr/Kconfig
 # next deprecated values are selected
@@ -212,6 +256,7 @@ config NVS_LOOKUP_CACHE
     default y
 
 config NVS_LOOKUP_CACHE_SIZE
+    default 400  if SOC_RISCV_TELINK_TL321X
     default 2048 if !PM
 
 # Set multiplicator of Name Value Storage (NVS) as 1 to reach NVS sector size 4KB
@@ -251,10 +296,10 @@ config CHIP_ENABLE_ICD_SUPPORT
 	default y if CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
 
 config OPENTHREAD_THREAD_STACK_SIZE
-    default 2178 if PM
+    default 2400 if PM || SOC_RISCV_TELINK_TL321X
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
-    default 361 if PM
+    default 432 if PM
     default 608
 
 config OPENTHREAD_SLAAC
@@ -267,13 +312,17 @@ config OPENTHREAD_DEFAULT_TX_POWER
     default 3 if PM
     default 9
 
+config OPENTHREAD_IP6_MAX_EXT_MCAST_ADDRS
+    default 2 if PM
+    default 8
+
 endif # NET_L2_OPENTHREAD
 
 config NET_TX_STACK_SIZE
-    default 554 if PM
+    default 554 if PM || SOC_RISCV_TELINK_TL321X
 
 config NET_RX_STACK_SIZE
-    default 554 if PM
+    default 554 if PM || SOC_RISCV_TELINK_TL321X
 
 # Disable certain parts of Zephyr IPv6 stack
 config NET_IPV6_NBR_CACHE
@@ -292,7 +341,7 @@ config NET_CONFIG_INIT_TIMEOUT
 
 config CHIP_WIFI
 	bool "Enable Telink Wi-Fi support"
-	default y if BOARD_TLSR9118BDK40D
+	default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
 	select WIFI_W91
 	select WIFI
 	select NET_STATISTICS
@@ -351,6 +400,9 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
 	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 	  within range [-JITTER; +JITTER].
+
+config NET_MGMT_EVENT_STACK_SIZE
+	default 1128
 
 endif # CHIP_WIFI
 
@@ -434,7 +486,17 @@ config PWM_SHELL
 config OPENTHREAD_SHELL
     default n
 
-config CHIP_TASK_STACK_SIZE
-	default 4864 if PM
+# Thread analyzer
+config THREAD_ANALYZER
+    default n
+    select THREAD_ANALYZER_AUTO
+
+config THREAD_ANALYZER_AUTO_INTERVAL
+    default 5
+    depends on THREAD_ANALYZER_AUTO
+
+config THREAD_ANALYZER_LOG_LEVEL
+    default 3 # info
+    depends on THREAD_ANALYZER
 
 endif

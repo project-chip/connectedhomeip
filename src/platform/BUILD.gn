@@ -496,6 +496,8 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericDeviceInstanceInfoProvider.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl.h",
       "../include/platform/internal/GenericPlatformManagerImpl.ipp",
+      "../include/platform/internal/GenericPlatformManagerImpl_CMSISOS.h",
+      "../include/platform/internal/GenericPlatformManagerImpl_CMSISOS.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",

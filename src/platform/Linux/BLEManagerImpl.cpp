@@ -186,9 +186,8 @@ uint16_t BLEManagerImpl::_NumConnections()
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
 {
-    mAdapterId   = aAdapterId;
-    mIsCentral   = aIsCentral;
-    mpBLEAdvUUID = "0xFFF6";
+    mAdapterId = aAdapterId;
+    mIsCentral = aIsCentral;
     return CHIP_NO_ERROR;
 }
 
@@ -578,7 +577,7 @@ void BLEManagerImpl::DriveBLEState()
             // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                SuccessOrExit(err = mBLEAdvertisement.Init(mAdapter.get(), mpBLEAdvUUID, mDeviceName));
+                SuccessOrExit(err = mBLEAdvertisement.Init(mAdapter.get(), Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR, mDeviceName));
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
 

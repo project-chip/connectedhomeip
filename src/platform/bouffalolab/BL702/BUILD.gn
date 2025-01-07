@@ -68,6 +68,8 @@ static_library("BL702") {
 
   if (bouffalo_sdk_component_easyflash_enabled) {
     sources += [ "../common/BLConfig.cpp" ]
+  } else {
+    sources += [ "../common/BLConfig_littlefs.cpp" ]
   }
 
   if (chip_enable_wifi) {

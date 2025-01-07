@@ -17,7 +17,6 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
-#include <app/codegen-data-model-provider/Instance.h>
 
 namespace chip {
 namespace app {

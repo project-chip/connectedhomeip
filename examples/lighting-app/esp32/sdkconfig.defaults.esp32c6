@@ -53,7 +53,6 @@ CONFIG_FREERTOS_ENABLE_BACKWARD_COMPATIBILITY=y
 
 # Wi-Fi Settings
 CONFIG_ENABLE_WIFI_STATION=y
-CONFIG_ENABLE_WIFI_AP=n
 # Enable this to avoid implicit declaration of function 'esp_send_assoc_resp'
 CONFIG_ESP_WIFI_SOFTAP_SUPPORT=y
 
@@ -65,3 +64,7 @@ CONFIG_ENABLE_CHIP_SHELL=y
 
 # Enable HKDF in mbedtls
 CONFIG_MBEDTLS_HKDF_C=y
+
+# Serial Flasher config
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"

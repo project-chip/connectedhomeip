@@ -240,7 +240,8 @@ terminal.
 
 #### CHIP Tools
 
-Read the [MbedCommissioning](../../../docs/guides/mbedos_commissioning.md) to
+Read the
+[MbedCommissioning](../../../docs/platforms/mbedos/mbedos_commissioning.md) to
 see how to use different CHIP tools to commission and control the application
 within a WiFi network.
 
@@ -314,7 +315,7 @@ The example supports building and running on the following mbed-enabled devices:
 
 -   More details and guidelines about porting new hardware into the Matter
     project with Mbed OS can be found in
-    [MbedNewTarget](../../../docs/guides/mbedos_add_new_target.md)
+    [MbedNewTarget](../../../docs/platforms/mbedos/mbedos_add_new_target.md)
 -   Some useful information about HW platform specific settings can be found in
     `lighting-app/mbed/mbed_app.json`. Information about this file syntax and
     its meaning in mbed-os project can be found here:

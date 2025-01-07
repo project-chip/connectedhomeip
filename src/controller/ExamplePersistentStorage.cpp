@@ -19,6 +19,7 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/IniEscaping.h>
+#include <protocols/secure_channel/PASESession.h>
 
 #include <fstream>
 #include <map>
@@ -30,7 +31,6 @@ using Section  = std::map<String, String>;
 using Sections = std::map<String, Section>;
 
 using namespace ::chip;
-using namespace ::chip::Controller;
 using namespace ::chip::IniEscaping;
 using namespace ::chip::Logging;
 
@@ -102,20 +102,20 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 {
     std::string iniValue;
 
-    ReturnErrorCodeIf(((value == nullptr) && (size != 0)), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((value != nullptr) || (size == 0), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto section = mConfig.sections[kDefaultSectionName];
 
-    ReturnErrorCodeIf(!SyncDoesKeyExist(key), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(SyncDoesKeyExist(key), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     std::string escapedKey = EscapeKey(key);
-    ReturnErrorCodeIf(!inipp::extract(section[escapedKey], iniValue), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inipp::extract(section[escapedKey], iniValue), CHIP_ERROR_INVALID_ARGUMENT);
 
     iniValue = Base64ToString(iniValue);
 
     uint16_t dataSize = static_cast<uint16_t>(iniValue.size());
-    ReturnErrorCodeIf(size == 0 && dataSize == 0, CHIP_NO_ERROR);
-    ReturnErrorCodeIf(value == nullptr, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(size != 0 || dataSize != 0, CHIP_NO_ERROR);
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint16_t sizeToCopy = std::min(size, dataSize);
 
@@ -126,7 +126,7 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 
 CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    ReturnErrorCodeIf((value == nullptr) && (size != 0), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((value != nullptr) || (size == 0), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto section = mConfig.sections[kDefaultSectionName];
 
@@ -148,7 +148,7 @@ CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
 {
     auto section = mConfig.sections[kDefaultSectionName];
 
-    ReturnErrorCodeIf(!SyncDoesKeyExist(key), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(SyncDoesKeyExist(key), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     std::string escapedKey = EscapeKey(key);
     section.erase(escapedKey);

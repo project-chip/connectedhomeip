@@ -80,9 +80,6 @@ void ICDManager::Init()
         VerifyOrDieWithMsg(ICDConfigurationData::GetInstance().GetMinLitActiveModeThreshold() <=
                                ICDConfigurationData::GetInstance().GetActiveModeThreshold(),
                            AppServer, "The minimum ActiveModeThreshold value for a LIT ICD is 5 seconds.");
-        // Disabling check until LIT support is compelte
-        // VerifyOrDieWithMsg((GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
-        //                    "LIT support is required for slow polling intervals superior to 15 seconds");
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
@@ -120,13 +117,13 @@ void ICDManager::Shutdown()
 bool ICDManager::SupportsFeature(Feature feature)
 {
     // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
-#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
     uint32_t featureMap = 0;
     bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == Status::Success);
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 #else
     return ((mFeatureMap & to_underlying(feature)) != 0);
-#endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
 }
 
 uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
@@ -148,7 +145,7 @@ uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 void ICDManager::SendCheckInMsgs()
 {
-#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
     VerifyOrDie(mStorage != nullptr);
     VerifyOrDie(mFabricTable != nullptr);
 
@@ -216,7 +213,7 @@ void ICDManager::SendCheckInMsgs()
             }
         }
     }
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
 }
 
 bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsgsBeSentFunction> & shouldCheckInMsgsBeSentFunction)
@@ -399,7 +396,7 @@ void ICDManager::UpdateICDMode()
         ICDConfigurationData::GetInstance().SetICDMode(tempMode);
 
         // Can't use attribute accessors/Attributes::OperatingMode::Set in unit tests
-#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
         Attributes::OperatingMode::Set(kRootEndpointId, static_cast<OperatingModeEnum>(tempMode));
 #endif
 

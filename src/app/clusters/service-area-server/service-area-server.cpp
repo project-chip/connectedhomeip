@@ -378,12 +378,19 @@ void Instance::HandleSkipAreaCmd(HandlerContext & ctx, const Commands::SkipArea:
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     };
 
-    // The SkippedArea field SHALL match an entry in the SupportedAreas list.
-    // If the Status field is set to InvalidAreaList, the StatusText field SHALL be an empty string.
+    // If the SelectedAreas attribute is empty, the SkipAreaResponse command’s Status field SHALL indicate InvalidAreaList.
+    if (GetNumberOfSelectedAreas() == 0)
+    {
+        exitResponse(SkipAreaStatus::kInvalidAreaList, ""_span);
+        return;
+    }
+
+    // If the SkippedArea field does not match an entry in the SupportedAreas attribute, the SkipAreaResponse command’s Status field
+    // SHALL indicate InvalidSkippedArea.
     if (!mStorageDelegate->IsSupportedArea(req.skippedArea))
     {
         ChipLogError(Zcl, "SkippedArea (%" PRIu32 ") is not in the SupportedAreas attribute.", req.skippedArea);
-        exitResponse(SkipAreaStatus::kInvalidAreaList, ""_span);
+        exitResponse(SkipAreaStatus::kInvalidSkippedArea, ""_span);
         return;
     }
 

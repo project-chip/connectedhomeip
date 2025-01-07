@@ -18,10 +18,6 @@
 
 #include "AppTask.h"
 
-#if CONFIG_LOW_POWER
-#include "PWR_Interface.h"
-#endif
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -35,18 +31,6 @@ void ContactSensorApp::AppTask::PreInitMatterStack()
 {
     ChipLogProgress(DeviceLayer, "Welcome to NXP Contact Sensor Demo App");
 }
-
-#if CONFIG_LOW_POWER
-void ContactSensorApp::AppTask::AppMatter_DisallowDeviceToSleep()
-{
-    PWR_DisallowDeviceToSleep();
-}
-
-void ContactSensorApp::AppTask::AppMatter_AllowDeviceToSleep()
-{
-    PWR_AllowDeviceToSleep();
-}
-#endif
 
 ContactSensorApp::AppTask & ContactSensorApp::AppTask::GetDefaultInstance()
 {

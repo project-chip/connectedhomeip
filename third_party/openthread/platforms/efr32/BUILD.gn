@@ -18,8 +18,8 @@ import("//build_overrides/openthread.gni")
 
 import("//build_overrides/openthread.gni")
 
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
-import("${efr32_sdk_build_root}/silabs_board.gni")
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
+import("${silabs_sdk_build_root}/silabs_board.gni")
 
 config("openthread_efr32_config") {
   defines = [
@@ -48,7 +48,7 @@ source_set("openthread_core_config_efr32") {
     "${sl_ot_efr32_root}/openthread-core-efr32-config.h",
   ]
 
-  public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
+  public_deps = [ "${silabs_sdk_build_root}:silabs_sdk" ]
 
   public_configs = [ ":openthread_efr32_config" ]
 }
@@ -65,7 +65,6 @@ source_set("libopenthread-efr32") {
     "${sl_ot_efr32_root}/flash.c",
     "${sl_ot_efr32_root}/ieee802154-packet-utils.cpp",
     "${sl_ot_efr32_root}/misc.c",
-    "${sl_ot_efr32_root}/radio.c",
     "${sl_ot_efr32_root}/radio_coex.c",
     "${sl_ot_efr32_root}/radio_extension.c",
     "${sl_ot_efr32_root}/radio_power_manager.c",
@@ -73,6 +72,9 @@ source_set("libopenthread-efr32") {
     "${sl_ot_efr32_root}/sleep.c",
     "${sl_ot_efr32_root}/soft_source_match_table.c",
     "${sl_ot_efr32_root}/system.c",
+
+    # Temporary file until the files in the SI SDK is fixed
+    "${sdk_support_root}/protocol/openthread/platform-abstraction/efr32/radio.c",
   ]
 
   include_dirs = [ "${openthread_root}/examples/platforms/utils" ]

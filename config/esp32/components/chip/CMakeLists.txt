@@ -31,13 +31,7 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
-set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
-
-set(CHIP_DATA_MODEL_INTERFACE "disabled" CACHE STRING "Data model interface option to use: enabled or disabled")
-
-if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
-    list(APPEND CHIP_REQUIRE_COMPONENTS mdns)
-endif()
+set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash mdns)
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
@@ -65,12 +59,6 @@ macro(chip_gn_arg_bool arg boolean)
         string(APPEND chip_gn_args "${arg} = false\n")
     endif()
 endmacro()
-
-if ("${CHIP_DATA_MODEL_INTERFACE}" STREQUAL "enabled")
-    chip_gn_arg_append("chip_use_data_model_interface" "\"enabled\"")
-else()
-    chip_gn_arg_append("chip_use_data_model_interface" "\"disabled\"")
-endif()
 
 # ESP-IDF lets user set software version string by two ways:
 # 1. Project's CMakeLists.txt file and 2. Config option
@@ -143,9 +131,6 @@ endif()
 
 if(CONFIG_ENABLE_ICD_SERVER)
     chip_gn_arg_append("chip_enable_icd_server"               "true")
-    if(CONFIG_ICD_ENFORCE_SIT_SLOW_POLL_LIMIT)
-        chip_gn_arg_append("icd_enforce_sit_slow_poll_limit"               "true")
-    endif()
     if(CONFIG_ICD_REPORT_ON_ACTIVE_MODE)
         chip_gn_arg_append("chip_icd_report_on_active_mode"               "true")
     endif()
@@ -321,8 +306,12 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
 endif()
 
-if (CONFIG_ENABLE_MATTER_EVENT_LIST)
-    chip_gn_arg_append  ("enable_eventlist_attribute" "true")
+if (CONFIG_CHIP_DEVICE_ENABLE_DYNAMIC_SERVER)
+    chip_gn_arg_append("chip_build_controller_dynamic_server" "true")
+endif()
+
+if (CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS)
+    chip_gn_arg_append("icd_max_notification_subscribers" ${CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS})
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
@@ -400,7 +389,6 @@ externalproject_add(
     BUILD_COMMAND           ninja "esp32"
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${chip_libraries}
-    WORKING_DIRECTORY       ${CMAKE_CURRENT_LIST_DIR}
     DEPENDS                 args_gn
     BUILD_ALWAYS            1
 )
@@ -432,155 +420,24 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}/../../"
 )
 
-idf_component_get_property(mbedtls_lib mbedtls COMPONENT_LIB)
-
-idf_build_get_property(idf_target IDF_TARGET)
-set(target_name "${idf_target}")
-
-if(CONFIG_BT_ENABLED)
-    idf_component_get_property(bt_lib bt COMPONENT_LIB)
-    if((target_name STREQUAL "esp32h2") OR (target_name STREQUAL "esp32c2") OR (target_name STREQUAL "esp32c6"))
-        idf_component_get_property(bt_dir bt COMPONENT_DIR)
-        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a")
-    else()
-        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
-    endif()
-endif()
-
-if (CONFIG_ENABLE_CHIP_SHELL)
-    idf_component_get_property(console_lib console COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${console_lib}>)
-endif()
-
-if(CONFIG_OPENTHREAD_ENABLED)
-    idf_component_get_property(openthread_lib openthread COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${openthread_lib}>)
-    if (CONFIG_IEEE802154_ENABLED)
-        idf_component_get_property(ieee802154_lib ieee802154 COMPONENT_LIB)
-        list(APPEND chip_libraries $<TARGET_FILE:${ieee802154_lib}>)
-    endif()
-endif()
-
-if(NOT CONFIG_USE_MINIMAL_MDNS)
-    idf_build_get_property(build_components BUILD_COMPONENTS)
-    # For IDF v5.x, the mdns component was moved to idf_managed_components.
-    # We should use 'espressif__mdns' for 'idf_component_get_property'.
-    if("espressif__mdns" IN_LIST build_components)
-        idf_component_get_property(mdns_lib espressif__mdns COMPONENT_LIB)
-        list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
-    elseif("mdns" IN_LIST build_components)
-        idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
-        list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
-    endif()
-endif()
-
-if(CONFIG_OPENTHREAD_BORDER_ROUTER)
-    idf_component_get_property(rcp_update_lib espressif__esp_rcp_update COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${rcp_update_lib}>)
-    idf_component_get_property(serial_flasher_lib espressif__esp-serial-flasher COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${serial_flasher_lib}>)
-endif()
-
-if (CONFIG_ENABLE_ENCRYPTED_OTA)
-    idf_component_get_property(esp_encrypted_img_lib espressif__esp_encrypted_img COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${esp_encrypted_img_lib}>)
-endif()
-
-# Let user set EXECUTABLE_COMPONENT_NAME and defaults to main if not specified
-if (NOT EXECUTABLE_COMPONENT_NAME)
-  set(EXECUTABLE_COMPONENT_NAME "main")
-endif()
-
-if (CONFIG_ENABLE_DELTA_OTA)
-    idf_component_get_property(esp_delta_ota_lib espressif__esp_delta_ota COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${esp_delta_ota_lib}>)
-endif()
-
-idf_component_get_property(main_lib ${EXECUTABLE_COMPONENT_NAME} COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
-
-if (CONFIG_SEC_CERT_DAC_PROVIDER)
-    idf_component_get_property(esp32_secure_cert_mgr_lib espressif__esp_secure_cert_mgr COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${esp32_secure_cert_mgr_lib}>)
-endif()
-
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-    idf_build_get_property(build_components BUILD_COMPONENTS)
-    # esp_insights can be used as an independent component or through component manager so,
-    # We should check and add the right component.
-    if("espressif__esp_insights" IN_LIST build_components)
-        idf_component_get_property(esp_insights_lib espressif__esp_insights COMPONENT_LIB)
-    elseif("esp_insights" IN_LIST build_components)
-        idf_component_get_property(esp_insights_lib esp_insights COMPONENT_LIB)
-    endif()
-
-    list(APPEND chip_libraries $<TARGET_FILE:${esp_insights_lib}>)
-endif()
-
-idf_component_get_property(lwip_lib lwip COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${lwip_lib}>)
-
-
-if (CONFIG_ESP32_WIFI_ENABLED)
-    idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
-    idf_component_get_property(esp_wifi_dir esp_wifi COMPONENT_DIR)
-    list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)
-    if (CONFIG_IDF_TARGET_ESP32C2)
-        set(blobs core net80211 pp)
-    else()
-        set(blobs core mesh net80211 pp)
-    endif()
-
-    foreach(blob ${blobs})
-    list(APPEND chip_libraries "${esp_wifi_dir}/lib/${target_name}/lib${blob}.a")
-    endforeach()
-
-    idf_component_get_property(wpa_supplicant_lib wpa_supplicant COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${wpa_supplicant_lib}>)
-endif()
-
-if (CONFIG_ETH_ENABLED)
-    idf_component_get_property(esp_eth_lib esp_eth COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${esp_eth_lib}>)
-endif()
-
-idf_component_get_property(esp_netif_lib esp_netif COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${esp_netif_lib}>)
-
-idf_component_get_property(esp_hw_support_lib esp_hw_support COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${esp_hw_support_lib}>)
-
-idf_component_get_property(esp_phy_lib esp_phy COMPONENT_LIB)
-idf_component_get_property(esp_phy_dir esp_phy COMPONENT_DIR)
-list(APPEND chip_libraries $<TARGET_FILE:${esp_phy_lib}>)
-
-if (CONFIG_IDF_TARGET_ESP32)
-    set(phy_blobs phy rtc)
-elseif (CONFIG_IDF_TARGET_ESP32S2)
-    set(phy_blobs phy)
-else()
-    set(phy_blobs phy btbb)
-endif()
-foreach(phy_blob ${phy_blobs})
-    list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
-endforeach()
-
-set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos esp_timer)
+set(matter_requires lwip freertos console bt)
 idf_build_get_property(build_components BUILD_COMPONENTS)
-foreach(component ${components_to_link})
-    # Some of the components are not present in IDF v4.x
-    # So, Check if the component is in the list of build components
-    if("${component}" IN_LIST build_components)
-        idf_component_get_property(lib_name ${component} COMPONENT_LIB)
-        list(APPEND chip_libraries $<TARGET_FILE:${lib_name}>)
-    endif()
-endforeach()
+if("espressif__mdns" IN_LIST build_components)
+    list(APPEND matter_requires espressif__mdns)
+elseif("mdns" IN_LIST build_components)
+    list(APPEND matter_requires mdns)
+endif()
+
+if (CONFIG_OPENTHREAD_BORDER_ROUTER)
+    list(APPEND matter_requires espressif__esp_rcp_update)
+endif()
+
+add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
+                     REQUIRES ${matter_requires})
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
-                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:mbedx509>
-                                                $<TARGET_FILE:${mbedtls_lib}>
+                                                matterlib
                                                 -Wl,--end-group)
 
 # Make the component dependent on our CHIP build

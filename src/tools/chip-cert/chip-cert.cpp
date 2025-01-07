@@ -85,7 +85,7 @@ bool PrintVersion()
 
 } // namespace
 
-extern "C" int main(int argc, char * argv[])
+int main(int argc, char * argv[])
 {
     bool res = false;
 
