@@ -130,11 +130,14 @@ struct DecodeSessionParamsTestCase
     bool includeEndContainer                   = true;
 };
 
+constexpr uint8_t kSessionParamsStructTag = 1;
+
 void EncodeSessionParamsHelper(const DecodeSessionParamsTestCase & testCase, TLV::TLVWriter & writer)
 {
 
     TLVType sessionParamsContainer = kTLVType_NotSpecified;
-    EXPECT_EQ(writer.StartContainer(ContextTag(1), kTLVType_Structure, sessionParamsContainer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.StartContainer(ContextTag(kSessionParamsStructTag), kTLVType_Structure, sessionParamsContainer),
+              CHIP_NO_ERROR);
 
     writer.Put(ContextTag(SessionParameters::Tag::kSessionIdleInterval), testCase.mrpConfig.mIdleRetransTimeout.count());
     writer.Put(ContextTag(SessionParameters::Tag::kSessionActiveInterval), testCase.mrpConfig.mActiveRetransTimeout.count());
@@ -150,8 +153,11 @@ void EncodeSessionParamsHelper(const DecodeSessionParamsTestCase & testCase, TLV
 
     if (testCase.testFutureProofing)
     {
+        // Choosing a tag that is much higher than the current highest tag value in the Specification
+        constexpr uint8_t kFutureProofTlvElementTag = 17;
+
         uint32_t futureProofTlvElement = 0x777666;
-        writer.Put(ContextTag(8), futureProofTlvElement);
+        writer.Put(ContextTag(kFutureProofTlvElementTag), futureProofTlvElement);
     }
 
     if (testCase.includeEndContainer)
@@ -336,7 +342,7 @@ TEST_F(TestPairingSession, TestDecodeSessionParameters)
         bool testCaseFailed = false;
         CHIP_ERROR err      = CHIP_NO_ERROR;
 
-        err = DecodeSessionParametersIfPresent(ContextTag(1), reader, decodedParams);
+        err = DecodeSessionParametersIfPresent(ContextTag(kSessionParamsStructTag), reader, decodedParams);
         if (err != testCase.expectedErrorDecodeParams)
         {
             printf("\nDecodeSessionParametersIfPresent returned Unexpected error code: %" CHIP_ERROR_FORMAT, err.Format());

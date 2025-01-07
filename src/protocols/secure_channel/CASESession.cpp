@@ -1098,7 +1098,7 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
     SetPeerSessionId(parsedSigma1.initiatorSessionId);
 
     // Set the Session parameters provided in the Sigma1 message
-    if (parsedSigma1.initiatorSessionParamsPresent)
+    if (parsedSigma1.initiatorSessionParamStructPresent)
     {
         SetRemoteSessionParameters(parsedSigma1.initiatorSessionParams);
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
@@ -2328,7 +2328,7 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     {
         ReturnErrorOnFailure(DecodeSessionParametersIfPresent(AsTlvContextTag(Sigma1Tags::kInitiatorSessionParams), tlvReader,
                                                               outParsedSigma1.initiatorSessionParams));
-        outParsedSigma1.initiatorSessionParamsPresent = true;
+        outParsedSigma1.initiatorSessionParamStructPresent = true;
 
         err = tlvReader.Next();
     }

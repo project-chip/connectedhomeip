@@ -222,7 +222,7 @@ protected:
     struct ParsedSigma1 : Sigma1Param
     {
         ByteSpan initiatorEphPubKey;
-        bool initiatorSessionParamsPresent = false;
+        bool initiatorSessionParamStructPresent = false;
         SessionParameters initiatorSessionParams;
     };
 
@@ -275,6 +275,8 @@ protected:
      * On success, either the sessionResumptionRequested field will be set to true
      * and the resumptionID and initiatorResumeMIC fields will be set to
      * valid values, or the sessionResumptionRequested field will be set to false.
+     *
+     *  @note Calls to this function must always be made with a newly created and fresh ParsedSigma1 parameter.
      */
     static CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma1 & parsedMessage);
 
