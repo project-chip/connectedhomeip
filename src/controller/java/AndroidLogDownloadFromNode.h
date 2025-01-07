@@ -54,6 +54,8 @@ private:
     AndroidLogDownloadFromNode(DeviceController * controller, NodeId remoteNodeId, app::Clusters::DiagnosticLogs::IntentEnum intent,
                                uint16_t timeout, jobject javaCallback);
 
+    ~AndroidLogDownloadFromNode() {}
+
     DeviceController * mController = nullptr;
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
@@ -76,7 +78,7 @@ private:
     CHIP_ERROR SendRetrieveLogsRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void OnTransferCallback(FabricIndex fabricIndex, NodeId remoteNodeId, const chip::ByteSpan & data,
                             CHIP_ERROR * errInfoOnFailure);
-    void FinishLogDownloadFromNode(CHIP_ERROR err);
+    static void FinishLogDownloadFromNode(void * context, CHIP_ERROR err);
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
