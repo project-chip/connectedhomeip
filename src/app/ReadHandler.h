@@ -124,14 +124,14 @@ public:
         /*
          * Called after a subscription has been fully established.
          */
-        virtual void OnSubscriptionEstablished(ReadHandler & aReadHandler){};
+        virtual void OnSubscriptionEstablished(ReadHandler & aReadHandler) {};
 
         /*
          * Called right before a subscription is about to get terminated. This is only called on subscriptions that were terminated
          * after they had been fully established (and therefore had called OnSubscriptionEstablished).
          * OnSubscriptionEstablishment().
          */
-        virtual void OnSubscriptionTerminated(ReadHandler & aReadHandler){};
+        virtual void OnSubscriptionTerminated(ReadHandler & aReadHandler) {};
     };
 
     /*
@@ -407,7 +407,13 @@ private:
     bool IsFabricFiltered() const { return mFlags.Has(ReadHandlerFlags::FabricFiltered); }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
-    AttributePathExpandIteratorLegacy * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
+
+    AttributePathExpandIterator2 IterateAttributePaths(DataModel::Provider * provider)
+    {
+        return AttributePathExpandIterator2(provider, mAttributePathExpandState);
+    }
+
+    AttributePathExpandIteratorLegacy * GetAttributePathExpandIterator() { return &mLegacyAttributePathExpandIterator; }
 
     /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine
     /// run if the change to the attribute path makes the ReadHandler reportable.
@@ -519,7 +525,10 @@ private:
     /// @param aFlag Flag to clear
     void ClearStateFlag(ReadHandlerFlags aFlag);
 
-    AttributePathExpandIteratorLegacy mAttributePathExpandIterator;
+    AttributePathExpandIteratorLegacy mLegacyAttributePathExpandIterator;
+
+    /// State for any on-going path expansion for handling wildcard reads/subscriptions
+    AttributePathExpandIterator2::State mAttributePathExpandState;
 
     // The current generation of the reporting engine dirty set the last time we were notified that a path we're interested in was
     // marked dirty.
