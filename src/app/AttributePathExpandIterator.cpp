@@ -17,7 +17,9 @@
 #include <app/AttributePathExpandIterator.h>
 
 #include <app/GlobalAttributes.h>
+#include <cmath>
 #include <lib/support/CodeUtils.h>
+#include <optional>
 
 using namespace chip::app::DataModel;
 
@@ -26,20 +28,6 @@ namespace app {
 
 bool AttributePathExpandIterator::AdvanceOutputPath()
 {
-    if (!mState.mAttributePath->mValue.IsWildcardPath())
-    {
-        if (mState.mLastOutputPath.mEndpointId != kInvalidEndpointId)
-        {
-            return false; // cannot expand non-wildcard path
-        }
-
-        mState.mLastOutputPath.mEndpointId  = mState.mAttributePath->mValue.mEndpointId;
-        mState.mLastOutputPath.mClusterId   = mState.mAttributePath->mValue.mClusterId;
-        mState.mLastOutputPath.mAttributeId = mState.mAttributePath->mValue.mAttributeId;
-        mState.mLastOutputPath.mExpanded    = false;
-        return true;
-    }
-
     while (true)
     {
         if (mState.mLastOutputPath.mClusterId != kInvalidClusterId)
@@ -48,6 +36,7 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
             if (nextAttribute.has_value())
             {
                 mState.mLastOutputPath.mAttributeId = *nextAttribute;
+                mState.mLastOutputPath.mExpanded    = mState.mAttributePath->mValue.IsWildcardPath();
                 return true;
             }
         }
@@ -127,15 +116,19 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
                 : Clusters::Globals::Attributes::GeneratedCommandList::Id; //
         }
 
-        // We allow fixed attribute IDs if and only if they are valid:
-        //    - they may be GLOBAL attributes OR
-        //    - they are valid attributes for this cluster
-        if (IsValidAttributeId(mState.mAttributePath->mValue.mAttributeId))
+        if (mState.mAttributePath->mValue.IsWildcardPath())
         {
-            return mState.mAttributePath->mValue.mAttributeId;
+            // We allow fixed attribute IDs if and only if they are valid:
+            //    - they may be GLOBAL attributes OR
+            //    - they are valid attributes for this cluster
+            // This applies to something like expanding "*/*/attributeId=123"" where we would accept attribute 123.
+            // only if the given endpoint/cluster contains this attribute id
+            if (!IsValidAttributeId(mState.mAttributePath->mValue.mAttributeId))
+            {
+                return std::nullopt;
+            }
         }
-
-        return std::nullopt;
+        return mState.mAttributePath->mValue.mAttributeId;
     }
 
     // advance the existing attribute id if it can be advanced
@@ -181,11 +174,16 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
             return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
         }
 
-        // only return a cluster if it is valid
-        const ConcreteClusterPath clusterPath(mState.mLastOutputPath.mEndpointId, mState.mAttributePath->mValue.mClusterId);
-        if (!mDataModelProvider->GetServerClusterInfo(clusterPath).has_value())
+        if (mState.mAttributePath->mValue.IsWildcardPath())
         {
-            return std::nullopt;
+            // during wildcard expansion, only return a cluster if it is valid
+            // This applies to something like expanding "*/cluster=123/..." where we would accept cluster 123 only if the given
+            // endpoint contains it. this only applies for wildcard expansion.
+            const ConcreteClusterPath clusterPath(mState.mLastOutputPath.mEndpointId, mState.mAttributePath->mValue.mClusterId);
+            if (!mDataModelProvider->GetServerClusterInfo(clusterPath).has_value())
+            {
+                return std::nullopt;
+            }
         }
 
         return mState.mAttributePath->mValue.mClusterId;
@@ -210,6 +208,7 @@ std::optional<ClusterId> AttributePathExpandIterator::NextEndpointId()
         return mState.mAttributePath->mValue.mEndpointId;
     }
 
+    // expand endpoints only if it is a wildcard on the endpoint specifically
     VerifyOrReturnValue(mState.mAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
 
     EndpointEntry ep = mDataModelProvider->NextEndpoint(mState.mLastOutputPath.mEndpointId);
