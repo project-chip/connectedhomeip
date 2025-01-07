@@ -504,7 +504,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
     if (CHIP_END_OF_TLV == err)
     {
         mManagementCallback.GetInteractionModelEngine()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
-        mAttributePathExpandState = AttributePathExpandIterator2::State::StartIterating(mpAttributePathList);
+        mAttributePathExpandState = AttributePathExpandIterator::State::StartIterating(mpAttributePathList);
         err                       = CHIP_NO_ERROR;
     }
     return err;
@@ -847,7 +847,7 @@ void ReadHandler::PersistSubscription()
 
 void ReadHandler::ResetPathIterator()
 {
-    mAttributePathExpandState = AttributePathExpandIterator2::State::StartIterating(mpAttributePathList);
+    mAttributePathExpandState = AttributePathExpandIterator::State::StartIterating(mpAttributePathList);
     mAttributeEncoderState.Reset();
 }
 
@@ -862,7 +862,7 @@ void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const 
         // Inside a separate block, to allow the read and rollback to happen as one unit.
         // we want to look at what `next` would be but not actually change state as we need to reset the
         // current cluster
-        PeekAttributePathExpandIterator2 iterator(apDataModel, mAttributePathExpandState);
+        PeekAttributePathExpandIterator iterator(apDataModel, mAttributePathExpandState);
         bHasNext = iterator.Next(path);
     }
 

@@ -315,7 +315,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         uint32_t attributesRead = 0;
 #endif
 
-        PeekAttributePathExpandIterator2 iterator(mpImEngine->GetDataModelProvider(), apReadHandler->AttributeIterationState());
+        PeekAttributePathExpandIterator iterator(mpImEngine->GetDataModelProvider(), apReadHandler->AttributeIterationState());
 
         // For each path included in the interested path of the read handler...
         while (iterator.Next(readPath))

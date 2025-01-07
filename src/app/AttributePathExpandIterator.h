@@ -31,19 +31,19 @@ namespace app {
 ///
 /// - Start iterating by creating an iteration state
 ///
-///      mState =  AttributePathExpandIterator2::State::StartIterating(path);
+///      mState =  AttributePathExpandIterator::State::StartIterating(path);
 ///
 /// - Use the iteration state in a for loop:
 ///
 ///      ConcreteAttributePath path;
-///      for (AttributePathExpandIterator2 iterator(mState); iterator->Next(path);) {
+///      for (AttributePathExpandIterator iterator(mState); iterator->Next(path);) {
 ///         // use `path` here`
 ///      }
 ///
 ///   OR:
 ///
 ///      ConcreteAttributePath path;
-///      AttributePathExpandIterator2 iterator(mState);
+///      AttributePathExpandIterator iterator(mState);
 ///
 ///      while (iterator.Next(path)) {
 ///         // use `path` here`
@@ -51,19 +51,19 @@ namespace app {
 ///
 /// USAGE requirements and assumptions:
 ///
-///    - There should be only one single AttributePathExpandIterator2 for a state  at a time.
+///    - There should be only one single AttributePathExpandIterator for a state  at a time.
 ///
-///    - `State` is automatically updated by the AttributePathExpandIterator2, so
+///    - `State` is automatically updated by the AttributePathExpandIterator, so
 ///      calling `Next` on the iterator will update the state variable.
 ///
 ///
-class AttributePathExpandIterator2
+class AttributePathExpandIterator
 {
 public:
     class State
     {
     public:
-        friend class AttributePathExpandIterator2;
+        friend class AttributePathExpandIterator;
 
         /// External callers can only ever start iterating on a new path from the beginning
         static State StartIterating(SingleLinkedListNode<AttributePathParams> * path) { return State(path); }
@@ -97,12 +97,12 @@ public:
         ConcreteAttributePath mLastOutputPath;
     };
 
-    AttributePathExpandIterator2(DataModel::Provider * dataModel, State & state) : mDataModelProvider(dataModel), mState(state) {}
+    AttributePathExpandIterator(DataModel::Provider * dataModel, State & state) : mDataModelProvider(dataModel), mState(state) {}
 
     // this class may not be copied. A new one should be created when needed and they
     // should not overlap
-    AttributePathExpandIterator2(const AttributePathExpandIterator2 &)             = delete;
-    AttributePathExpandIterator2 & operator=(const AttributePathExpandIterator2 &) = delete;
+    AttributePathExpandIterator(const AttributePathExpandIterator &)             = delete;
+    AttributePathExpandIterator & operator=(const AttributePathExpandIterator &) = delete;
 
     /// Get the next path of the expansion (if one exists).
     ///
@@ -147,7 +147,7 @@ private:
     bool IsValidAttributeId(AttributeId attributeId);
 };
 
-/// Wraps around an AttributePathExpandIterator2 however it rolls back Next() to one
+/// Wraps around an AttributePathExpandIterator however it rolls back Next() to one
 /// step back whenever Next() is not run to completion (until it returns false)
 ///
 /// Example use cases:
@@ -155,7 +155,7 @@ private:
 /// - Iterate over all attributes and process one-by-one, however when the iteration fails, resume at
 ///   the last failure point:
 ///
-///      PeekAttributePathExpandIterator2 iterator(....);
+///      PeekAttributePathExpandIterator iterator(....);
 ///      ConcreteAttributePath path;
 ///
 ///      while (iterator.Next(path)) {
@@ -170,19 +170,19 @@ private:
 /// -  Grab what the next output path would be WITHOUT advancing a state;
 ///
 ///      {
-///        PeekAttributePathExpandIterator2 iterator(...., state);
+///        PeekAttributePathExpandIterator iterator(...., state);
 ///        if (iterator.Next(...)) { ... }
 ///      }
 ///      // state here is ROLLED BACK (i.e. next calls the same value)
 ///
 ///
-class PeekAttributePathExpandIterator2
+class PeekAttributePathExpandIterator
 {
 public:
-    PeekAttributePathExpandIterator2(DataModel::Provider * dataModel, AttributePathExpandIterator2::State & state) :
+    PeekAttributePathExpandIterator(DataModel::Provider * dataModel, AttributePathExpandIterator::State & state) :
         mAttributePathExpandIterator(dataModel, state), mStateTarget(state), mOldState(state)
     {}
-    ~PeekAttributePathExpandIterator2() { mStateTarget = mOldState; }
+    ~PeekAttributePathExpandIterator() { mStateTarget = mOldState; }
 
     bool Next(ConcreteAttributePath & path)
     {
@@ -194,9 +194,9 @@ public:
     void MarkCompleted() { mOldState = mStateTarget; }
 
 private:
-    AttributePathExpandIterator2 mAttributePathExpandIterator;
-    AttributePathExpandIterator2::State & mStateTarget;
-    AttributePathExpandIterator2::State mOldState;
+    AttributePathExpandIterator mAttributePathExpandIterator;
+    AttributePathExpandIterator::State & mStateTarget;
+    AttributePathExpandIterator::State mOldState;
 };
 
 } // namespace app

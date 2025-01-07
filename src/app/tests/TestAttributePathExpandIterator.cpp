@@ -40,7 +40,7 @@ namespace {
 
 using P = app::ConcreteAttributePath;
 
-TEST(TestAttributePathExpandIterator2, TestAllWildcard)
+TEST(TestAttributePathExpandIterator, TestAllWildcard)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
 
@@ -107,8 +107,8 @@ TEST(TestAttributePathExpandIterator2, TestAllWildcard)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
         while (iter.Next(path))
         {
@@ -125,12 +125,12 @@ TEST(TestAttributePathExpandIterator2, TestAllWildcard)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
 
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
             if (!iter.Next(path))
             {
@@ -147,7 +147,7 @@ TEST(TestAttributePathExpandIterator2, TestAllWildcard)
     }
 }
 
-TEST(TestAttributePathExpandIterator2, TestWildcardEndpoint)
+TEST(TestAttributePathExpandIterator, TestWildcardEndpoint)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mClusterId   = chip::Test::MockClusterId(3);
@@ -161,8 +161,8 @@ TEST(TestAttributePathExpandIterator2, TestWildcardEndpoint)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
         while (iter.Next(path))
         {
@@ -179,11 +179,11 @@ TEST(TestAttributePathExpandIterator2, TestWildcardEndpoint)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
             if (!iter.Next(path))
             {
@@ -199,7 +199,7 @@ TEST(TestAttributePathExpandIterator2, TestWildcardEndpoint)
     }
 }
 
-TEST(TestAttributePathExpandIterator2, TestWildcardCluster)
+TEST(TestAttributePathExpandIterator, TestWildcardCluster)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId  = chip::Test::kMockEndpoint3;
@@ -216,8 +216,8 @@ TEST(TestAttributePathExpandIterator2, TestWildcardCluster)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
         while (iter.Next(path))
         {
@@ -234,11 +234,11 @@ TEST(TestAttributePathExpandIterator2, TestWildcardCluster)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
             if (!iter.Next(path))
             {
@@ -254,7 +254,7 @@ TEST(TestAttributePathExpandIterator2, TestWildcardCluster)
     }
 }
 
-TEST(TestAttributePathExpandIterator2, TestWildcardClusterGlobalAttributeNotInMetadata)
+TEST(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMetadata)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId  = chip::Test::kMockEndpoint3;
@@ -271,8 +271,8 @@ TEST(TestAttributePathExpandIterator2, TestWildcardClusterGlobalAttributeNotInMe
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
         while (iter.Next(path))
         {
@@ -288,12 +288,12 @@ TEST(TestAttributePathExpandIterator2, TestWildcardClusterGlobalAttributeNotInMe
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
 
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
             if (!iter.Next(path))
             {
@@ -309,7 +309,7 @@ TEST(TestAttributePathExpandIterator2, TestWildcardClusterGlobalAttributeNotInMe
     }
 }
 
-TEST(TestAttributePathExpandIterator2, TestWildcardAttribute)
+TEST(TestAttributePathExpandIterator, TestWildcardAttribute)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId = chip::Test::kMockEndpoint2;
@@ -330,8 +330,8 @@ TEST(TestAttributePathExpandIterator2, TestWildcardAttribute)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
         while (iter.Next(path))
         {
@@ -347,12 +347,12 @@ TEST(TestAttributePathExpandIterator2, TestWildcardAttribute)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
 
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
             if (!iter.Next(path))
             {
@@ -368,7 +368,7 @@ TEST(TestAttributePathExpandIterator2, TestWildcardAttribute)
     }
 }
 
-TEST(TestAttributePathExpandIterator2, TestNoWildcard)
+TEST(TestAttributePathExpandIterator, TestNoWildcard)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId  = chip::Test::kMockEndpoint2;
@@ -383,8 +383,8 @@ TEST(TestAttributePathExpandIterator2, TestNoWildcard)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
         while (iter.Next(path))
         {
@@ -401,11 +401,11 @@ TEST(TestAttributePathExpandIterator2, TestNoWildcard)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
             if (!iter.Next(path))
             {
@@ -421,7 +421,7 @@ TEST(TestAttributePathExpandIterator2, TestNoWildcard)
     }
 }
 
-TEST(TestAttributePathExpandIterator2, TestMultipleClusInfo)
+TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
 {
 
     SingleLinkedListNode<app::AttributePathParams> clusInfo1;
@@ -525,8 +525,8 @@ TEST(TestAttributePathExpandIterator2, TestMultipleClusInfo)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo1);
-        app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo1);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
         while (iter.Next(path))
         {
@@ -542,11 +542,11 @@ TEST(TestAttributePathExpandIterator2, TestMultipleClusInfo)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator2::State::StartIterating(&clusInfo1);
+        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo1);
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator2 iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
 
             if (!iter.Next(path))
             {

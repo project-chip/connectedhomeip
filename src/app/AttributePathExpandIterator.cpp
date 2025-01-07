@@ -24,7 +24,7 @@ using namespace chip::app::DataModel;
 namespace chip {
 namespace app {
 
-bool AttributePathExpandIterator2::AdvanceOutputPath()
+bool AttributePathExpandIterator::AdvanceOutputPath()
 {
     if (!mState.mAttributePath->mValue.IsWildcardPath())
     {
@@ -77,7 +77,7 @@ bool AttributePathExpandIterator2::AdvanceOutputPath()
     }
 }
 
-bool AttributePathExpandIterator2::Next(ConcreteAttributePath & path)
+bool AttributePathExpandIterator::Next(ConcreteAttributePath & path)
 {
     while (mState.mAttributePath != nullptr)
     {
@@ -94,7 +94,7 @@ bool AttributePathExpandIterator2::Next(ConcreteAttributePath & path)
     return false;
 }
 
-bool AttributePathExpandIterator2::IsValidAttributeId(AttributeId attributeId)
+bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
 {
     switch (attributeId)
     {
@@ -110,7 +110,7 @@ bool AttributePathExpandIterator2::IsValidAttributeId(AttributeId attributeId)
     return mDataModelProvider->GetAttributeInfo(attributePath).has_value();
 }
 
-std::optional<AttributeId> AttributePathExpandIterator2::NextAttributeId()
+std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 {
     if (mState.mLastOutputPath.mAttributeId == kInvalidAttributeId)
     {
@@ -165,7 +165,7 @@ std::optional<AttributeId> AttributePathExpandIterator2::NextAttributeId()
     return GlobalAttributesNotInMetadata[0];
 }
 
-std::optional<ClusterId> AttributePathExpandIterator2::NextClusterId()
+std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
 {
 
     if (mState.mLastOutputPath.mClusterId == kInvalidClusterId)
@@ -192,7 +192,7 @@ std::optional<ClusterId> AttributePathExpandIterator2::NextClusterId()
     return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
 }
 
-std::optional<ClusterId> AttributePathExpandIterator2::NextEndpointId()
+std::optional<ClusterId> AttributePathExpandIterator::NextEndpointId()
 {
     if (mState.mLastOutputPath.mEndpointId == kInvalidEndpointId)
     {

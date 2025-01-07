@@ -583,8 +583,8 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
         if (paramsList.mValue.IsWildcardPath())
         {
 
-            AttributePathExpandIterator2::State state = AttributePathExpandIterator2::State::StartIterating(&paramsList);
-            AttributePathExpandIterator2 pathIterator(GetDataModelProvider(), state);
+            AttributePathExpandIterator::State state = AttributePathExpandIterator::State::StartIterating(&paramsList);
+            AttributePathExpandIterator pathIterator(GetDataModelProvider(), state);
             ConcreteAttributePath readPath;
 
             // The definition of "valid path" is "path exists and ACL allows access". The "path exists" part is handled by
