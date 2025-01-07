@@ -20,10 +20,143 @@
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/Provider.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/LinkedList.h>
 
 namespace chip {
 namespace app {
+
+/// Handles attribute path expansions
+/// Usage:
+///
+/// - Start iterating by creating an iteration state
+///
+///      mState =  AttributePathExpandIterator2::State::StartIterating(path);
+///
+/// - Use the iteration state in a for loop:
+///
+///      ConcreteAttributePath path;
+///      for (AttributePathExpandIterator2 iterator(mState); iterator->Next(path);) {
+///         // use `path` here`
+///      }
+///
+///   OR:
+///
+///      ConcreteAttributePath path;
+///      AttributePathExpandIterator2 iterator(mState);
+///
+///      while (iterator.Next(path)) {
+///         // use `path` here`
+///      }
+///
+/// USAGE requirements and assumptions:
+///
+///    - There should be only one single AttributePathExpandIterator2 for a state  at a time.
+///
+///    - `State` is automatically updated by the AttributePathExpandIterator2, so
+///      calling `Next` on the iterator will update the state variable.
+///
+///
+class AttributePathExpandIterator2
+{
+public:
+    class State
+    {
+    public:
+        friend class AttributePathExpandIterator2;
+
+        /// External callers can only ever start iterating on a new path from the beginning
+        static State StartIterating(SingleLinkedListNode<AttributePathParams> * path) { return State(path); }
+
+        /// Copies are allowed
+        State(const State &)             = default;
+        State & operator=(const State &) = default;
+
+        State() : mAttributePath(nullptr) {}
+
+        /// Reset the iterator to the beginning of current cluster if we are in the middle of expanding a wildcard attribute id for
+        /// some cluster.
+        ///
+        /// When attributes are changed in the middle of expanding a wildcard attribute, we need to reset the iterator, to provide
+        /// the client with a consistent state of the cluster.
+        void IterateFromTheStartOfTheCurrentCluster()
+        {
+            VerifyOrReturn(mAttributePath != nullptr && mAttributePath->mValue.HasWildcardAttributeId());
+            mLastOutputPath.mAttributeId = kInvalidAttributeId;
+            mLastOutputPath.mExpanded    = true;
+        }
+
+        /// Fetch the last output path by this expand iterator. MAY contain an invalid path (i.e. using
+        /// kInvalidEndpointId/kInvalidClusterId/kInvalidAttributeId) in case the expansion was not started (i.e. Next on a linked
+        /// iterator was never called)
+        ///
+        /// Returns false if the current iteration is completed
+        bool GetLastOutputPath(ConcreteAttributePath & path)
+        {
+            path = mLastOutputPath;
+            return (mAttributePath != nullptr);
+        }
+
+    protected:
+        State(SingleLinkedListNode<AttributePathParams> * path) :
+            mAttributePath(path), mLastOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
+        {
+            mLastOutputPath.mExpanded = true;
+        }
+
+        SingleLinkedListNode<AttributePathParams> * mAttributePath;
+        ConcreteAttributePath mLastOutputPath;
+    };
+
+    AttributePathExpandIterator2(DataModel::Provider * dataModel, State & state) : mDataModelProvider(dataModel), mState(state) {}
+
+    // this class may not be copied. A new one should be created when needed and they
+    // should not overlap
+    AttributePathExpandIterator2(const AttributePathExpandIterator2 &)             = delete;
+    AttributePathExpandIterator2 & operator=(const AttributePathExpandIterator2 &) = delete;
+
+    /// Get the next path of the expansion (if one exists).
+    ///
+    /// On success, true is returned and `path` is filled with the next path in the
+    /// expansion.
+    /// On iteration completion, false is returned and the content of path IS NOT DEFINED.
+    bool Next(ConcreteAttributePath & path);
+
+private:
+    DataModel::Provider * mDataModelProvider;
+    State & mState;
+
+    /// Move to the next endpoint/cluster/attribute triplet that is valid given
+    /// the current mOutputPath and mpAttributePath
+    ///
+    /// returns true if such a next value was found.
+    bool AdvanceOutputPath();
+
+    /// Get the next attribute ID in mOutputPath(endpoint/cluster) if one is available.
+    /// Will start from the beginning if current mOutputPath.mAttributeId is kInvalidAttributeId
+    ///
+    /// Respects path expansion/values in mpAttributePath
+    ///
+    /// Handles Global attributes (which are returned at the end)
+    std::optional<AttributeId> NextAttributeId();
+
+    /// Get the next cluster ID in mOutputPath(endpoint) if one is available.
+    /// Will start from the beginning if current mOutputPath.mClusterId is kInvalidClusterId
+    ///
+    /// Respects path expansion/values in mpAttributePath
+    std::optional<ClusterId> NextClusterId();
+
+    /// Get the next endpoint ID in mOutputPath if one is available.
+    /// Will start from the beginning if current mOutputPath.mEndpointId is kInvalidEndpointId
+    ///
+    /// Respects path expansion/values in mpAttributePath
+    std::optional<ClusterId> NextEndpointId();
+
+    /// Checks if the given attributeId is valid for the current mOutputPath(endpoint/cluster)
+    ///
+    /// Meaning that it is known to the data model OR it is a always-there global attribute.
+    bool IsValidAttributeId(AttributeId attributeId);
+};
 
 /**
  * AttributePathExpandIterator is used to iterate over a linked list of AttributePathParams-s.
