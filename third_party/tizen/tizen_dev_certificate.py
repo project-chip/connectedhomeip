@@ -28,6 +28,23 @@ tizen_cli = os.path.join(tizen_sdk_root, "tools", "ide", "bin", "tizen")
 logging.basicConfig(level=logging.DEBUG)
 
 
+def run(cmd):
+    logging.debug("Run: %s", " ".join(cmd))
+    with subprocess.Popen(cmd, errors='replace',
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE) as proc:
+        for line in proc.stderr.readlines():
+            logging.error("%s", line.rstrip())
+        if proc.wait() != 0:
+            return None
+        output = []
+        for line in proc.stdout.readlines():
+            line = line.rstrip()
+            logging.info("%s", line)
+            output.append(line)
+        return output
+
+
 def create_author_certificate(alias: str, password: str,
                               name: str = "", email: str = ""):
     cmd = [tizen_cli, "certificate", "--alias", alias, "--password", password]
@@ -35,14 +52,12 @@ def create_author_certificate(alias: str, password: str,
         cmd.extend(["--name", name])
     if email:
         cmd.extend(["--email", email])
-    logging.debug("Execute: %s", " ".join(cmd))
-    with subprocess.Popen(cmd, stdout=subprocess.PIPE) as proc:
-        for line in proc.stdout.readlines():
-            line = line.decode().rstrip()
+    if output := run(cmd) is not None:
+        for line in output:
             if line.startswith("Working path:"):
                 wd = line[len("Working path:"):].strip()
-            print(line)
-    return os.path.join(wd, "author.p12")
+        return os.path.join(wd, "author.p12")
+    return None
 
 
 def check_security_profile(profile):
@@ -69,23 +84,13 @@ def check_security_profile(profile):
             f.write('<profiles/>')
 
     cmd = [tizen_cli, "security-profiles", "list", "--name", profile]
-    logging.debug("Execute: %s", " ".join(cmd))
-    with subprocess.Popen(cmd, stdout=subprocess.PIPE) as proc:
-        for line in proc.stdout.readlines():
-            line = line.decode().rstrip()
-            print(line)
-        return proc.wait() == 0
+    return run(cmd) is not None
 
 
 def add_security_profile(profile: str, certificate: str, password: str):
     cmd = [tizen_cli, "security-profiles", "add", "--active",
            "--name", profile, "--author", certificate, "--password", password]
-    logging.debug("Execute: %s", " ".join(cmd))
-    with subprocess.Popen(cmd, stdout=subprocess.PIPE) as proc:
-        for line in proc.stdout.readlines():
-            line = line.decode().rstrip()
-            print(line)
-        return proc.wait() == 0
+    return run(cmd) is not None
 
 
 def update_stamp_file(path: str, message: str):
