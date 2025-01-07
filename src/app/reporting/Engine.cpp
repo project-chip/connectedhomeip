@@ -218,22 +218,6 @@ bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const Concrete
     return (info->dataVersion == dataVersion);
 }
 
-/// handles the ability to rollback an iteration state to a previous value
-/// as RAII
-class ExpandStateRollback
-{
-public:
-    ExpandStateRollback(AttributePathExpandIterator2::State & target) : mTargetState(target), mOldState(target) {}
-    ~ExpandStateRollback() { mTargetState = mOldState; }
-
-    /// Move the state to the newer version, so rollback is a noop.
-    void Advance() { mOldState = mTargetState; }
-
-private:
-    AttributePathExpandIterator2::State & mTargetState;
-    AttributePathExpandIterator2::State mOldState;
-};
-
 } // namespace
 
 Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
@@ -331,12 +315,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         uint32_t attributesRead = 0;
 #endif
 
-        AttributePathExpandIterator2 iterator =
-            AttributePathExpandIterator2(mpImEngine->GetDataModelProvider(), apReadHandler->AttributeIterationState());
+        PeekAttributePathExpandIterator2 iterator(mpImEngine->GetDataModelProvider(), apReadHandler->AttributeIterationState());
 
-        // If processing an attribute fails (e.g. insufficient space in the output buffer), the
-        // value returned by "Next" of the iterator is not considered valid, so iterator should not advance.
-        ExpandStateRollback rollback(apReadHandler->AttributeIterationState());
 
         // For each path included in the interested path of the read handler...
         for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
@@ -459,7 +439,6 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             SuccessOrExit(err);
             // Successfully encoded the attribute, clear the internal state.
             apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
-            rollback.Advance();
         }
 
         {
@@ -467,8 +446,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             VerifyOrDie(!iterator.Next(readPath2));
         }
 
-        // commit the fully parsed path
-        rollback.Advance();
+        iterator.MarkCompleted();
 
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
         // chunks for this report.
@@ -1085,7 +1063,8 @@ CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
     BumpDirtySetGeneration();
 
     bool intersectsInterestPath = false;
-    mpImEngine->mReadHandlers.ForEachActiveObject([&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
+    DataModel::Provider *dataModel = mpImEngine->GetDataModelProvider();
+    mpImEngine->mReadHandlers.ForEachActiveObject([&dataModel, &aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
         // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
         // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
         // waiting for a response to the last message chunk for read interactions.
@@ -1095,7 +1074,7 @@ CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
             {
                 if (object->mValue.Intersects(aAttributePath))
                 {
-                    handler->AttributePathIsDirty(aAttributePath);
+                    handler->AttributePathIsDirty(dataModel, aAttributePath);
                     intersectsInterestPath = true;
                     break;
                 }

@@ -86,17 +86,6 @@ public:
             mLastOutputPath.mExpanded    = true;
         }
 
-        /// Fetch the last output path by this expand iterator. MAY contain an invalid path (i.e. using
-        /// kInvalidEndpointId/kInvalidClusterId/kInvalidAttributeId) in case the expansion was not started (i.e. Next on a linked
-        /// iterator was never called)
-        ///
-        /// Returns false if the current iteration is completed
-        bool GetLastOutputPath(ConcreteAttributePath & path)
-        {
-            path = mLastOutputPath;
-            return (mAttributePath != nullptr);
-        }
-
     protected:
         State(SingleLinkedListNode<AttributePathParams> * path) :
             mAttributePath(path), mLastOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
@@ -156,6 +145,51 @@ private:
     ///
     /// Meaning that it is known to the data model OR it is a always-there global attribute.
     bool IsValidAttributeId(AttributeId attributeId);
+};
+
+/// Wraps around an AttributePathExpandIterator2 however it rolls back Next() to one
+/// step back whenever Next() is not run to completion (until it returns false)
+///
+/// Example use cases:
+///
+/// - Iterate over all attributes and process one-by-one, however when the iteration fails, resume at
+///   the last failure point:
+///
+///      PeekAttributePathExpandIterator2 iterator(....);
+///      ConcreteAttributePath path;
+///
+///      while (iterator.Next(path)) {
+///         if (!CanProcess(path)) {
+///             // iterator state IS PRESERVED so that Next() will return the SAME path on the next call.
+///             return CHIP_ERROR_TRY_AGAIN_LATER;
+///         }
+///      }
+///      // this will make Next() NOT return the previous value.
+///      iterator.MarkCompleted();
+///
+/// -  Grab the last output path
+///
+class PeekAttributePathExpandIterator2
+{
+public:
+    PeekAttributePathExpandIterator2(DataModel::Provider * dataModel, AttributePathExpandIterator2::State & state) :
+        mAttributePathExpandIterator(dataModel, state), mStateTarget(state), mOldState(state)
+    {}
+    ~PeekAttributePathExpandIterator2() { mStateTarget = mOldState; }
+
+    bool Next(ConcreteAttributePath & path)
+    {
+        mOldState = mStateTarget;
+        return mAttributePathExpandIterator.Next(path);
+    }
+
+    /// Marks the current iteration completed (so peek does not actually roll back)
+    void MarkCompleted() { mOldState = mStateTarget; }
+
+private:
+    AttributePathExpandIterator2 mAttributePathExpandIterator;
+    AttributePathExpandIterator2::State & mStateTarget;
+    AttributePathExpandIterator2::State mOldState;
 };
 
 /**

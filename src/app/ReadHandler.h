@@ -413,7 +413,7 @@ private:
     /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine
     /// run if the change to the attribute path makes the ReadHandler reportable.
     /// @param aAttributeChanged Path to the attribute that was changed.
-    void AttributePathIsDirty(const AttributePathParams & aAttributeChanged);
+    void AttributePathIsDirty(DataModel::Provider *apDataModel, const AttributePathParams & aAttributeChanged);
     bool IsDirty() const
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);

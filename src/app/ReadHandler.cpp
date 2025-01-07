@@ -853,7 +853,7 @@ void ReadHandler::ResetPathIterator()
     mAttributeEncoderState.Reset();
 }
 
-void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeChanged)
+void ReadHandler::AttributePathIsDirty(DataModel::Provider *apDataModel, const AttributePathParams & aAttributeChanged)
 {
     ConcreteAttributePath path;
 
@@ -862,10 +862,12 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
     // check that regular and state-based iteration are IDENTICAL
     // to be enabled ONLY WHEN we use both iteration styles in parallel
     {
+        PeekAttributePathExpandIterator2 iterator(apDataModel, mAttributePathExpandState);
+
         ConcreteAttributePath pathA;
         ConcreteAttributePath pathB;
         bool hasA = mLegacyAttributePathExpandIterator.Get(pathA);
-        bool hasB = mAttributePathExpandState.GetLastOutputPath(pathB);
+        bool hasB = iterator.Next(pathB);
 
         VerifyOrDie(hasA == hasB);
 
