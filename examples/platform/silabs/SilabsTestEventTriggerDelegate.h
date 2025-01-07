@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include <stdint.h>
-
+#include <ProvisionStorage.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <stdint.h>
 
 namespace chip {
 
@@ -33,11 +33,24 @@ public:
     explicit SilabsTestEventTriggerDelegate() = default;
 
     /**
+     * @brief Configures the Silabs Test Event trigger
+     *
+     * @param storage pointer to the global provisioning storage
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR, if the init was succesful
+     *                    CHIP_ERROR_INVALID_ARGUMENT, if the manager input is equal to nullptr
+     */
+    CHIP_ERROR Init(DeviceLayer::Silabs::Provision::Storage * storage);
+
+    /**
      * @brief Checks to see if `enableKey` provided matches value chosen by the manufacturer.
      * @param enableKey Buffer of the key to verify.
      * @return True or False.
      */
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
+
+private:
+    DeviceLayer::Silabs::Provision::Storage * mStorage = nullptr;
 };
 
 } // namespace chip
