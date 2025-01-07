@@ -13,74 +13,26 @@
 # limitations under the License.
 
 import logging
-import re
 from dataclasses import dataclass
 from io import StringIO
-from typing import Any, Dict, List
+from typing import Dict, List, Optional
 
 import yaml
-
-
-# TODO #35787: Remove support for non-YAML format
-def cast_to_bool(value: Any) -> bool:
-    """Convert True/true/False/false strings to bool."""
-    if isinstance(value, str):
-        return value.strip().lower() == "true"
-    return bool(value)
 
 
 @dataclass
 class Metadata:
     py_script_path: str
     run: str
-    app: str
-    app_args: str
-    script_args: str
-    script_start_delay: int = 0
-    factoryreset: bool = False
-    factoryreset_app_only: bool = False
+    app: str = ""
+    app_args: Optional[str] = None
+    app_ready_pattern: Optional[str] = None
+    app_stdin_pipe: Optional[str] = None
+    script_args: Optional[str] = None
+    factory_reset: bool = False
+    factory_reset_app_only: bool = False
     script_gdb: bool = False
-    quiet: bool = True
-
-    def copy_from_dict(self, attr_dict: Dict[str, Any]) -> None:
-        """
-        Sets the value of the attributes from a dictionary.
-
-        Attributes:
-
-        attr_dict:
-         Dictionary that stores attributes value that should
-         be transferred to this class.
-        """
-        if "app" in attr_dict:
-            self.app = attr_dict["app"]
-
-        if "run" in attr_dict:
-            self.run = attr_dict["run"]
-
-        if "app-args" in attr_dict:
-            self.app_args = attr_dict["app-args"]
-
-        if "script-args" in attr_dict:
-            self.script_args = attr_dict["script-args"]
-
-        if "script-start-delay" in attr_dict:
-            self.script_start_delay = int(attr_dict["script-start-delay"])
-
-        if "py_script_path" in attr_dict:
-            self.py_script_path = attr_dict["py_script_path"]
-
-        if "factoryreset" in attr_dict:
-            self.factoryreset = cast_to_bool(attr_dict["factoryreset"])
-
-        if "factoryreset_app_only" in attr_dict:
-            self.factoryreset_app_only = cast_to_bool(attr_dict["factoryreset_app_only"])
-
-        if "script_gdb" in attr_dict:
-            self.script_gdb = cast_to_bool(attr_dict["script_gdb"])
-
-        if "quiet" in attr_dict:
-            self.quiet = cast_to_bool(attr_dict["quiet"])
+    quiet: bool = False
 
 
 class NamedStringIO(StringIO):
@@ -89,56 +41,31 @@ class NamedStringIO(StringIO):
         self.name = name
 
 
-def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
+def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
     """Extract the run arguments from the CI test arguments blocks."""
 
     found_ci_args_section = False
-    done_ci_args_section = False
-
-    runs_def_ptrn = re.compile(r'^\s*#\s*test-runner-runs:\s*(?P<run_id>.*)$')
-    arg_def_ptrn = re.compile(
-        r'^\s*#\s*test-runner-run/(?P<run_id>[a-zA-Z0-9_]+)/(?P<arg_name>[a-zA-Z0-9_\-]+):\s*(?P<arg_val>.*)$')
-
     runs_arg_lines: Dict[str, Dict[str, str]] = {}
 
     ci_args_section_lines = []
     with open(py_script_path, 'r', encoding='utf8') as py_script:
         for line_idx, line in enumerate(py_script.readlines()):
             line = line.strip()
-            line_num = line_idx + 1
 
             # Append empty line to the line capture, so during YAML parsing
             # line numbers will match the original file.
             ci_args_section_lines.append("")
 
             # Detect the single CI args section, to skip the lines otherwise.
-            if not done_ci_args_section and line.startswith("# === BEGIN CI TEST ARGUMENTS ==="):
+            if line.startswith("# === BEGIN CI TEST ARGUMENTS ==="):
                 found_ci_args_section = True
                 continue
-            elif found_ci_args_section and line.startswith("# === END CI TEST ARGUMENTS ==="):
-                done_ci_args_section = True
-                found_ci_args_section = False
-                continue
+            if line.startswith("# === END CI TEST ARGUMENTS ==="):
+                break
 
             if found_ci_args_section:
                 # Update the last line in the line capture.
                 ci_args_section_lines[-1] = " " + line.lstrip("#")
-
-            runs_match = runs_def_ptrn.match(line)
-            args_match = arg_def_ptrn.match(line)
-
-            if not found_ci_args_section and (runs_match or args_match):
-                logging.warning(f"{py_script_path}:{line_num}: Found CI args outside of CI TEST ARGUMENTS block")
-                continue
-
-            if runs_match:
-                for run in runs_match.group("run_id").strip().split():
-                    runs_arg_lines[run] = {}
-                    runs_arg_lines[run]['run'] = run
-                    runs_arg_lines[run]['py_script_path'] = py_script_path
-
-            elif args_match:
-                runs_arg_lines[args_match.group("run_id")][args_match.group("arg_name")] = args_match.group("arg_val")
 
     if not runs_arg_lines:
         try:
@@ -146,7 +73,6 @@ def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
             for run, args in runs.get("test-runner-runs", {}).items():
                 runs_arg_lines[run] = {}
                 runs_arg_lines[run]['run'] = run
-                runs_arg_lines[run]['py_script_path'] = py_script_path
                 runs_arg_lines[run].update(args)
         except yaml.YAMLError as e:
             logging.error(f"Failed to parse CI arguments YAML: {e}")
@@ -213,24 +139,20 @@ class MetadataReader:
          the script file.
         """
         runs_metadata: List[Metadata] = []
-        runs_arg_lines = extract_runs_arg_lines(py_script_path)
+        runs_args = extract_runs_args(py_script_path)
 
-        for run, attr in runs_arg_lines.items():
+        for run, attr in runs_args.items():
             self.__resolve_env_vals__(attr)
-
-            metadata = Metadata(
-                py_script_path=attr.get("py_script_path", ""),
+            runs_metadata.append(Metadata(
+                py_script_path=py_script_path,
                 run=run,
                 app=attr.get("app", ""),
-                app_args=attr.get("app_args", ""),
-                script_args=attr.get("script_args", ""),
-                script_start_delay=int(attr.get("script_start_delay", 0)),
-                factoryreset=bool(attr.get("factoryreset", False)),
-                factoryreset_app_only=bool(attr.get("factoryreset_app_only", False)),
-                script_gdb=bool(attr.get("script_gdb", False)),
-                quiet=bool(attr.get("quiet", True))
-            )
-            metadata.copy_from_dict(attr)
-            runs_metadata.append(metadata)
+                app_args=attr.get("app-args"),
+                app_ready_pattern=attr.get("app-ready-pattern"),
+                app_stdin_pipe=attr.get("app-stdin-pipe"),
+                script_args=attr.get("script-args"),
+                factory_reset=attr.get("factory-reset", False),
+                quiet=attr.get("quiet", True),
+            ))
 
         return runs_metadata

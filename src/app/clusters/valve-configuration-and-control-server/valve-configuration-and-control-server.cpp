@@ -360,7 +360,8 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
     if (!isDelegateNull(delegate))
     {
         DataModel::Nullable<Percent> cLevel = delegate->HandleOpenValve(level);
-        if (!cLevel.IsNull()) {
+        if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel) && !cLevel.IsNull())
+        {
             UpdateCurrentLevel(ep, cLevel.Value());
         }
     }
@@ -378,7 +379,8 @@ CHIP_ERROR UpdateCurrentLevel(EndpointId ep, Percent currentLevel)
     }
     DataModel::Nullable<Percent> targetLevel = DataModel::NullNullable;
     TargetLevel::Get(ep, targetLevel);
-    if (!targetLevel.IsNull() && currentLevel == targetLevel.Value()) {
+    if (!targetLevel.IsNull() && currentLevel == targetLevel.Value())
+    {
         targetLevel = DataModel::NullNullable;
         TargetLevel::Set(ep, targetLevel);
         UpdateCurrentState(ep, currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
@@ -391,7 +393,8 @@ CHIP_ERROR UpdateCurrentState(EndpointId ep, ValveConfigurationAndControl::Valve
     VerifyOrReturnError(Status::Success == CurrentState::Set(ep, currentState), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     DataModel::Nullable<ValveStateEnum> targetState = DataModel::NullNullable;
     TargetState::Get(ep, targetState);
-    if (currentState == targetState.ValueOr(ValveStateEnum::kUnknownEnumValue)) {
+    if (currentState == targetState.ValueOr(ValveStateEnum::kUnknownEnumValue))
+    {
         targetState = DataModel::NullNullable;
         TargetState::Set(ep, targetState);
     }

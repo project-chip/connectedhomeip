@@ -96,7 +96,7 @@ void TxtResponderFuzz(const std::vector<std::uint8_t> & aRecord)
     auto equal_sign_pos     = aRecord.end();
 
     // This test is only giving a set of values, it can be gives more
-    vector<uint8_t> prefixedRecord{ static_cast<uint8_t>(aRecord.size()) };
+    std::vector<uint8_t> prefixedRecord{ static_cast<std::uint8_t>(aRecord.size()) };
 
     prefixedRecord.insert(prefixedRecord.end(), aRecord.begin(), aRecord.end());
 
@@ -126,6 +126,6 @@ void TxtResponderFuzz(const std::vector<std::uint8_t> & aRecord)
     }
 }
 
-FUZZ_TEST(MinimalmDNS, TxtResponderFuzz).WithDomains(Arbitrary<vector<uint8_t>>().WithMaxSize(254));
+FUZZ_TEST(MinimalmDNS, TxtResponderFuzz).WithDomains(Arbitrary<std::vector<std::uint8_t>>().WithMaxSize(254));
 
 } // namespace

@@ -141,13 +141,11 @@ class NrfConnectBuilder(Builder):
                  app: NrfApp = NrfApp.LIGHT,
                  board: NrfBoard = NrfBoard.NRF52840DK,
                  enable_rpcs: bool = False,
-                 use_data_model_interface: Optional[bool] = None,
                  ):
         super(NrfConnectBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
-        self.use_data_model_interface = use_data_model_interface
 
     def generate(self):
         if not os.path.exists(self.output_dir):
@@ -191,10 +189,6 @@ class NrfConnectBuilder(Builder):
             if self.options.pregen_dir:
                 flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
-            if self.use_data_model_interface is not None:
-                value = 'y' if self.use_data_model_interface else 'n'
-                flags.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={value}")
-
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
             cmd = 'source "$ZEPHYR_BASE/zephyr-env.sh";\nexport ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'
@@ -215,8 +209,12 @@ class NrfConnectBuilder(Builder):
     def _build(self):
         logging.info('Compiling NrfConnect at %s', self.output_dir)
 
-        self._Execute(['ninja', '-C', self.output_dir],
-                      title='Building ' + self.identifier)
+        cmd = ['ninja', '-C', self.output_dir]
+
+        if self.ninja_jobs is not None:
+            cmd.append('-j' + str(self.ninja_jobs))
+
+        self._Execute(cmd, title='Building ' + self.identifier)
 
         if self.app == NrfApp.UNIT_TESTS:
             # Note: running zephyr/zephyr.elf has the same result except it creates

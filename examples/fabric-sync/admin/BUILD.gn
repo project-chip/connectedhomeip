@@ -1,0 +1,64 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
+
+config("config") {
+  include_dirs = [
+    ".",
+    "${chip_root}/examples/fabric-sync",
+    "${chip_root}/examples/platform/linux",
+    "${chip_root}/src/lib",
+  ]
+}
+
+source_set("fabric-admin-lib") {
+  public_configs = [ ":config" ]
+
+  sources = [
+    "BridgeSubscription.cpp",
+    "BridgeSubscription.h",
+    "CommissionerControl.cpp",
+    "CommissionerControl.h",
+    "DeviceManager.cpp",
+    "DeviceManager.h",
+    "DeviceSubscription.cpp",
+    "DeviceSubscription.h",
+    "DeviceSubscriptionManager.cpp",
+    "DeviceSubscriptionManager.h",
+    "DeviceSynchronization.cpp",
+    "DeviceSynchronization.h",
+    "FabricAdmin.cpp",
+    "FabricAdmin.h",
+    "FabricSyncGetter.cpp",
+    "FabricSyncGetter.h",
+    "IcdManager.cpp",
+    "IcdManager.h",
+    "PairingManager.cpp",
+    "PairingManager.h",
+    "StayActiveSender.cpp",
+    "StayActiveSender.h",
+    "UniqueIdGetter.cpp",
+    "UniqueIdGetter.h",
+  ]
+
+  deps = [
+    "${chip_root}/examples/fabric-sync/bridge:fabric-bridge-lib",
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/icd/client:handler",
+    "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/lib",
+  ]
+}

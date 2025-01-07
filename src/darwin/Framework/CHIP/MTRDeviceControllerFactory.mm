@@ -58,6 +58,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
@@ -70,13 +71,6 @@ using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Tracing::DarwinFramework;
 
-static bool sExitHandlerRegistered = false;
-static void ShutdownOnExit()
-{
-    MTR_LOG("ShutdownOnExit invoked on exit");
-    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
-}
-
 @interface MTRDeviceControllerFactoryParams ()
 
 // Flag to keep track of whether our .storage is real consumer-provided storage
@@ -84,6 +78,18 @@ static void ShutdownOnExit()
 @property (nonatomic, assign) BOOL hasStorage;
 
 @end
+
+class MTRApplicationCallback : public app::ReadHandler::ApplicationCallback {
+    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & readHandler, Transport::SecureSession & secureSession) override
+    {
+        uint16_t requestedMinInterval = 0;
+        uint16_t requestedMaxInterval = 0;
+        readHandler.GetReportingIntervals(requestedMinInterval, requestedMaxInterval);
+
+        uint16_t maximumMaxInterval = std::max(kSubscriptionMaxIntervalPublisherLimit, requestedMaxInterval);
+        return readHandler.SetMaxReportingInterval(maximumMaxInterval);
+    }
+};
 
 MTR_DIRECT_MEMBERS
 @interface MTRDeviceControllerFactory ()
@@ -97,6 +103,7 @@ MTR_DIRECT_MEMBERS
 
     Credentials::IgnoreCertificateValidityPeriodPolicy _certificateValidityPolicy;
     Crypto::RawKeySessionKeystore _sessionKeystore;
+    MTRApplicationCallback _applicationCallback;
     // We use TestPersistentStorageDelegate just to get an in-memory store to back
     // our group data provider impl.  We initialize this store correctly on every
     // controller startup, so don't need to actually persist it.
@@ -246,6 +253,8 @@ MTR_DIRECT_MEMBERS
 
     // Make sure the deinit order here is the reverse of the init order in
     // startControllerFactory:
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+
     _certificationDeclarationCertificates = nil;
     _productAttestationAuthorityCertificates = nil;
 
@@ -334,6 +343,7 @@ MTR_DIRECT_MEMBERS
                           error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+    [self _maybeLogBacktrace:@"Controller Factory Start"];
 
     __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     dispatch_sync(_chipWorkQueue, ^{
@@ -373,6 +383,8 @@ MTR_DIRECT_MEMBERS
         _productAttestationAuthorityCertificates = [startupParams.productAttestationAuthorityCertificates copy];
         _certificationDeclarationCertificates = [startupParams.certificationDeclarationCertificates copy];
 
+        app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&_applicationCallback);
+
         {
             chip::Controller::FactoryInitParams params;
             if (startupParams.port != nil) {
@@ -387,20 +399,10 @@ MTR_DIRECT_MEMBERS
             params.opCertStore = _opCertStore;
             params.certificateValidityPolicy = &_certificateValidityPolicy;
             params.sessionResumptionStorage = _sessionResumptionStorage;
+            params.dataModelProvider = app::CodegenDataModelProviderInstance(_persistentStorageDelegate);
             SuccessOrExit(err = _controllerFactory->Init(params));
         }
 
-        // This needs to happen after DeviceControllerFactory::Init,
-        // because that creates (lazily, by calling functions with
-        // static variables in them) some static-lifetime objects.
-        if (!sExitHandlerRegistered) {
-            if (atexit(ShutdownOnExit) != 0) {
-                char error[128];
-                strerror_r(errno, error, sizeof(error));
-                MTR_LOG_ERROR("Warning: Failed to register atexit handler: %s", error);
-            }
-            sExitHandlerRegistered = true;
-        }
         HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
 
         // Make sure we don't leave a system state running while we have no
@@ -436,9 +438,10 @@ MTR_DIRECT_MEMBERS
 - (void)stopControllerFactory
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+    [self _maybeLogBacktrace:@"Controller Factory Stop"];
 
-    while ([_controllers count] != 0) {
-        [_controllers[0] shutdown];
+    for (MTRDeviceController * controller in [_controllers copy]) {
+        [controller shutdown];
     }
 
     dispatch_sync(_chipWorkQueue, ^{
@@ -818,7 +821,7 @@ MTR_DIRECT_MEMBERS
     } else {
         // No root certificate means the nocSigner is using the root keys, because
         // consumers must provide a root certificate whenever an ICA is used.
-        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(params.nocSigner.publicKey, &pubKey);
+        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromMTRKeypair(params.nocSigner, &pubKey);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Can't extract public key from MTRKeypair: %s", ErrorStr(err));
             return NO;
@@ -1132,7 +1135,7 @@ MTR_DIRECT_MEMBERS
         if (compressedFabricId != nil && compressedFabricId.unsignedLongLongValue == operationalID.GetCompressedFabricId()) {
             ChipLogProgress(Controller, "Notifying controller at fabric index %u about new operational node 0x" ChipLogFormatX64,
                 controller.fabricIndex, ChipLogValueX64(operationalID.GetNodeId()));
-            [controller operationalInstanceAdded:operationalID.GetNodeId()];
+            [controller operationalInstanceAdded:@(operationalID.GetNodeId())];
         }
 
         // Keep going: more than one controller might match a given compressed
@@ -1261,6 +1264,13 @@ MTR_DIRECT_MEMBERS
     }
 
     return systemState->Fabrics();
+}
+
+- (void)_maybeLogBacktrace:(NSString *)message
+{
+    @autoreleasepool {
+        MTR_LOG("[%@]: %@", message, [NSThread callStackSymbols]);
+    }
 }
 
 @end

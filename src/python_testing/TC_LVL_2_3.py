@@ -18,13 +18,23 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
+# FIXME: https://github.com/project-chip/connectedhomeip/issues/36885
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_MICROWAVE_OVEN_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_MICROWAVE_OVEN_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -32,8 +42,8 @@ import time
 
 import chip.clusters as Clusters
 import test_plan_support
-from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                    has_cluster, run_if_endpoint_matches)
+from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
+                                         has_cluster, run_if_endpoint_matches)
 from mobly import asserts
 
 
@@ -122,7 +132,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(6)
         sub_handler = ClusterAttributeChangeAccumulator(lvl)
-        await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint)
+        await sub_handler.start(self.default_controller, self.dut_node_id, self.get_endpoint())
 
         self.step(7)
         cmd = lvl.Commands.MoveToLevelWithOnOff(level=max_level, transitionTime=100, optionsMask=0, optionsOverride=0)

@@ -42,7 +42,7 @@ using namespace TLV;
 using namespace Credentials;
 using namespace Crypto;
 
-MTROperationalCredentialsDelegate::MTROperationalCredentialsDelegate(MTRDeviceController * deviceController)
+MTROperationalCredentialsDelegate::MTROperationalCredentialsDelegate(MTRDeviceController_Concrete * deviceController)
     : mWeakController(deviceController)
 {
 }
@@ -129,7 +129,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
 
     VerifyOrReturnError(mCppCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    MTRDeviceController * strongController = mWeakController;
+    MTRDeviceController_Concrete * strongController = mWeakController;
     VerifyOrReturnError(strongController != nil, CHIP_ERROR_INCORRECT_STATE);
 
     mOnNOCCompletionCallback = onCompletion;
@@ -168,14 +168,14 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
                          certificationDeclaration:AsData(certificationDeclarationSpan)
                                      firmwareInfo:firmwareInfo];
 
-    MTRDeviceController * __weak weakController = mWeakController;
+    MTRDeviceController_Concrete * __weak weakController = mWeakController;
     dispatch_async(mOperationalCertificateIssuerQueue, ^{
         [mOperationalCertificateIssuer
             issueOperationalCertificateForRequest:csrInfo
                                   attestationInfo:attestationInfo
                                        controller:strongController
                                        completion:^(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error) {
-                                           MTRDeviceController * strongController = weakController;
+                                           MTRDeviceController_Concrete * strongController = weakController;
                                            if (strongController == nil || !strongController.isRunning) {
                                                // No longer safe to touch "this"
                                                return;

@@ -16,8 +16,9 @@ name: Build example - stm32
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -40,7 +41,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:80
+            image: ghcr.io/project-chip/chip-build:94
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:

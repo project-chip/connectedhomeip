@@ -23,14 +23,14 @@
 #import <Matter/Matter.h>
 
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase+ServerAppRunner.h"
+#import "MTRTestCase.h"
 #import "MTRTestKeys.h"
-#import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
 
 #import <math.h> // For INFINITY
 
 // system dependencies
-#import <XCTest/XCTest.h>
 #import <os/lock.h>
 
 static uint16_t kTestVendorId = 0xFFF1u;
@@ -418,7 +418,9 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
-static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
+static NSString * kOnboardingPayload = @"MT:Y.K90SO527JA0648G00";
+static NSString * _Nullable sLogContentFilePath;
+static NSString * kSimpleLogContent = @"This is a simple log\n";
 static const uint16_t kLocalPort = 5541;
 
 // This test suite reuses a device object to speed up the test process for CI.
@@ -501,25 +503,42 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 }
 @end
 
-@interface MTRXPCListenerSampleTests : XCTestCase
+@interface MTRXPCListenerSampleTests : MTRTestCase
 
 @end
 
 static BOOL sStackInitRan = NO;
-static BOOL sNeedsStackShutdown = YES;
 
 @implementation MTRXPCListenerSampleTests
+
++ (void)setUp
+{
+    // Global setup, runs once.
+    [super setUp];
+
+    __auto_type * uniqueName = [[NSUUID UUID] UUIDString];
+    sLogContentFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:uniqueName];
+    [[NSFileManager defaultManager] createFileAtPath:sLogContentFilePath
+                                            contents:[kSimpleLogContent dataUsingEncoding:NSUTF8StringEncoding]
+                                          attributes:nil];
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[
+                                    @"--end_user_support_log",
+                                    sLogContentFilePath,
+                                ]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
+}
 
 + (void)tearDown
 {
     // Global teardown, runs once
-    if (sNeedsStackShutdown) {
-        // We don't need to worry about ResetCommissionee.  If we get here,
-        // we're running only one of our test methods (using
-        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
-        // we did not run test999_TearDown.
-        //        [self shutdownStack];
+    if (sLogContentFilePath != nil) {
+        [[NSFileManager defaultManager] removeItemAtPath:sLogContentFilePath error:nil];
     }
+
+    [self shutdownStack];
+    [super tearDown];
 }
 
 - (void)setUp
@@ -591,8 +610,6 @@ static BOOL sNeedsStackShutdown = YES;
 
 + (void)shutdownStack
 {
-    sNeedsStackShutdown = NO;
-
     [mSampleListener stop];
     mSampleListener = nil;
 
@@ -1953,7 +1970,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                        NSError * readError;
                        NSString * fileContent = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:&readError];
                        XCTAssertNil(readError);
-                       XCTAssertEqualObjects(fileContent, @"This is a simple log\n");
+                       XCTAssertEqualObjects(fileContent, kSimpleLogContent);
                        [expectation fulfill];
                    }];
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
@@ -2077,13 +2094,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               [expectation fulfill];
                           }];
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
-}
-
-- (void)test999_TearDown
-{
-    ResetCommissionee(
-        [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:sController], dispatch_get_main_queue(), self, kTimeoutInSeconds);
-    [[self class] shutdownStack];
 }
 
 @end

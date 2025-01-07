@@ -16,6 +16,9 @@ name: Build example - NuttX
 
 on:
   push:
+    branches:
+      - master
+      - 'v*-branch'
   pull_request:
   merge_group:
   workflow_dispatch:
@@ -35,7 +38,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build-nuttx:80
+      image: ghcr.io/project-chip/chip-build-nuttx:94
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:

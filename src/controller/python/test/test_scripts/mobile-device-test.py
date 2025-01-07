@@ -23,12 +23,18 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --log-level INFO -t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --log-level INFO
+#       --timeout 3600
+#       --disable-test ClusterObjectTests.TestTimedRequestTimeout
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -260,8 +266,11 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
               type=int,
               default=0,
               help="The PID of the app against which the test is going to run")
+@click.option('--fail-on-skipped',
+              is_flag=True,
+              help="Fail the test if any test cases are skipped")
 def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level,
-        log_format, print_test_list, paa_trust_store_path, trace_to, app_pid):
+        log_format, print_test_list, paa_trust_store_path, trace_to, app_pid, fail_on_skipped):
     coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
 
     if print_test_list:

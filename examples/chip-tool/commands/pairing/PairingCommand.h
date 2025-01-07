@@ -244,7 +244,7 @@ private:
     const PairingNetworkType mNetworkType;
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
-    NodeId mNodeId;
+    NodeId mNodeId = chip::kUndefinedNodeId;
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<bool> mDiscoverOnce;
     chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
@@ -266,7 +266,7 @@ private:
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
         mComplex_DSTOffsets;
 
-    uint16_t mRemotePort;
+    uint16_t mRemotePort = 0;
     // mDiscriminator is only used for some situations, but in those situations
     // it's mandatory.  Track whether we're actually using it; the cases that do
     // will emplace this optional.
@@ -275,15 +275,15 @@ private:
     // it's mandatory.  Track whether we're actually using it; the cases that do
     // will emplace this optional.
     std::optional<uint32_t> mSetupPINCode;
-    uint16_t mIndex;
+    uint16_t mIndex = 0;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
-    char * mOnboardingPayload;
-    uint64_t mDiscoveryFilterCode;
-    char * mDiscoveryFilterInstanceName;
+    char * mOnboardingPayload           = nullptr;
+    uint64_t mDiscoveryFilterCode       = 0;
+    char * mDiscoveryFilterInstanceName = nullptr;
 
-    bool mDeviceIsICD;
+    bool mDeviceIsICD = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     // For unpair

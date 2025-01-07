@@ -126,7 +126,7 @@ Status ServerInstance::HandleSetPendingDatasetRequest(CommandHandlerInterface::H
     Thread::OperationalDataset pendingDataset;
     // If any of the parameters in the PendingDataset is invalid, the command SHALL fail with a status code
     // of INVALID_COMMAND.
-    ReturnErrorCodeIf(pendingDataset.Init(req.pendingDataset) != CHIP_NO_ERROR, Status::InvalidCommand);
+    VerifyOrReturnError(pendingDataset.Init(req.pendingDataset) == CHIP_NO_ERROR, Status::InvalidCommand);
     CHIP_ERROR err = mDelegate->SetPendingDataset(pendingDataset);
     return StatusIB(err).mStatus;
 }
@@ -363,7 +363,7 @@ void ServerInstance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent *
 
 CHIP_ERROR ServerInstance::Init()
 {
-    ReturnErrorCodeIf(!mDelegate, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mDelegate, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));

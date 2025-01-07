@@ -219,6 +219,7 @@ message AttributeData {
     int32 data_int8 = 6;
     int32 data_int16 = 7;
     int32 data_int32 = 8;
+    float data_single = 10;
   };
   optional bytes tlv_data = 9;
 }

@@ -41,6 +41,7 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
   private final ChipMdnsCallback chipMdnsCallback;
   private final MulticastLock multicastLock;
   private final ScheduledFuture<?> resolveTimeoutExecutor;
+  private NsdServiceInfo discoveredServiceInfo = null;
 
   @Nullable
   private final NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState;
@@ -94,14 +95,14 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
 
   @Override
   public void onServiceFound(NsdServiceInfo service) {
-    if (targetServiceInfo.getServiceName().equals(service.getServiceName())) {
+    if (discoveredServiceInfo == null
+        && targetServiceInfo.getServiceName().equals(service.getServiceName())) {
       Log.d(TAG, "onServiceFound: found target service " + service);
 
       if (stopDiscoveryRunnable.cancel(false)) {
         nsdManager.stopServiceDiscovery(this);
       }
-
-      resolveService(service, callbackHandle, contextHandle, chipMdnsCallback);
+      discoveredServiceInfo = service;
     } else {
       Log.d(TAG, "onServiceFound: found service not a target for resolution, ignoring " + service);
     }
@@ -206,7 +207,13 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
 
   @Override
   public void onDiscoveryStopped(String serviceType) {
-    Log.i(TAG, "Discovery stopped: " + serviceType);
+    Log.i(
+        TAG,
+        "Discovery stopped: " + serviceType + ", discoveredServiceInfo: " + discoveredServiceInfo);
+    if (discoveredServiceInfo != null) {
+      resolveService(discoveredServiceInfo, callbackHandle, contextHandle, chipMdnsCallback);
+      discoveredServiceInfo = null;
+    }
   }
 
   @Override

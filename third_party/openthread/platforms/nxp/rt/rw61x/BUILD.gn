@@ -52,7 +52,6 @@ config("openthread_rw61x_config") {
       "OPENTHREAD_CONFIG_BORDER_AGENT_ENABLE=1",
       "OPENTHREAD_CONFIG_BORDER_AGENT_ID_ENABLE=1",
       "OPENTHREAD_CONFIG_BORDER_ROUTING_DHCP6_PD_ENABLE=1",
-      "OPENTHREAD_CONFIG_GENERIC_TASKLET_ENABLE=1",
       "OPENTHREAD_CONFIG_SRP_SERVER_ADVERTISING_PROXY_ENABLE=1",
       "OPENTHREAD_CONFIG_DNSSD_DISCOVERY_PROXY_ENABLE=1",
       "OPENTHREAD_CONFIG_MULTICAST_DNS_ENABLE=1",
@@ -60,7 +59,7 @@ config("openthread_rw61x_config") {
       "OT_APP_BR_LWIP_HOOKS_EN=1",
     ]
 
-    if (chip_enable_matter_cli) {
+    if (nxp_enable_matter_cli) {
       defines += [
         "OPENTHREAD_CONFIG_BORDER_AGENT_EPHEMERAL_KEY_ENABLE=1",
         "OT_APP_CLI_EPHEMERAL_KEY_ADDON=1",
@@ -100,7 +99,7 @@ source_set("libopenthread-rw61x") {
       "${openthread_nxp_root}/src/common/br/utils.c",
     ]
 
-    if (chip_enable_matter_cli) {
+    if (nxp_enable_matter_cli) {
       sources += [
         "${openthread_nxp_root}/examples/utils/cli_addons/addons_cli.c",
         "${openthread_nxp_root}/examples/utils/cli_addons/ephemeral_key/ephemeral_key_cli.c",

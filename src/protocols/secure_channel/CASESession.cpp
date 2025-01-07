@@ -428,12 +428,20 @@ void CASESession::Clear()
     mTCPConnCbCtxt.connClosedCb   = nullptr;
     mTCPConnCbCtxt.connReceivedCb = nullptr;
 
-    if (mPeerConnState && mPeerConnState->mConnectionState != Transport::TCPState::kConnected)
+    if (mPeerConnState)
     {
-        // Abort the connection if the CASESession is being destroyed and the
-        // connection is in the middle of being set up.
-        mSessionManager->TCPDisconnect(mPeerConnState, /* shouldAbort = */ true);
-        mPeerConnState = nullptr;
+        // Set the app state callback object in the Connection state to null
+        // to prevent any dangling pointer to memory(mTCPConnCbCtxt) owned
+        // by the CASESession object, that is now getting cleared.
+        mPeerConnState->mAppState = nullptr;
+
+        if (mPeerConnState->mConnectionState != Transport::TCPState::kConnected)
+        {
+            // Abort the connection if the CASESession is being destroyed and the
+            // connection is in the middle of being set up.
+            mSessionManager->TCPDisconnect(mPeerConnState, /* shouldAbort = */ true);
+            mPeerConnState = nullptr;
+        }
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
@@ -523,15 +531,15 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Return early on error here, as we have not initialized any state yet
-    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, fabricTable == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnErrorWithMetric(kMetricDeviceCASESession, exchangeCtxt != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnErrorWithMetric(kMetricDeviceCASESession, fabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Use FabricTable directly to avoid situation of dangling index from stale FabricInfo
     // until we factor-out any FabricInfo direct usage.
-    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, peerScopedNodeId.GetFabricIndex() == kUndefinedFabricIndex,
-                                CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnErrorWithMetric(kMetricDeviceCASESession, peerScopedNodeId.GetFabricIndex() != kUndefinedFabricIndex,
+                                  CHIP_ERROR_INVALID_ARGUMENT);
     const auto * fabricInfo = fabricTable->FindFabricWithIndex(peerScopedNodeId.GetFabricIndex());
-    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, fabricInfo == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnErrorWithMetric(kMetricDeviceCASESession, fabricInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     err = Init(sessionManager, policy, delegate, peerScopedNodeId);
 
@@ -784,7 +792,7 @@ CHIP_ERROR CASESession::SendSigma1()
 
     // Lookup fabric info.
     const auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
-    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Validate that we have a session ID allocated.
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
@@ -872,7 +880,12 @@ CHIP_ERROR CASESession::SendSigma1()
         mState = State::kSentSigma1;
     }
 
-    ChipLogProgress(SecureChannel, "Sent Sigma1 msg to " ChipLogFormatScopedNodeId, ChipLogValueScopedNodeId(GetPeer()));
+#if CHIP_PROGRESS_LOGGING
+    const auto localMRPConfig = mLocalMRPConfig.Value();
+#endif // CHIP_PROGRESS_LOGGING
+    ChipLogProgress(SecureChannel, "Sent Sigma1 msg to " ChipLogFormatScopedNodeId " [II:%" PRIu32 "ms AI:%" PRIu32 "ms AT:%ums]",
+                    ChipLogValueScopedNodeId(GetPeer()), localMRPConfig.mIdleRetransTimeout.count(),
+                    localMRPConfig.mActiveRetransTimeout.count(), localMRPConfig.mActiveThresholdTime.count());
 
     mDelegate->OnSessionEstablishmentStarted();
 

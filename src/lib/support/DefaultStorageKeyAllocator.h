@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -257,12 +257,16 @@ public:
     // when client init DefaultICDClientStorage, this table needs to be loaded.
     static StorageKeyName ICDFabricList() { return StorageKeyName::FromConst("g/icdfl"); }
 
+    // Terms and Conditions Acceptance Key
+    // Stores the terms and conditions acceptance including terms and conditions revision, TLV encoded
+    static StorageKeyName TermsAndConditionsAcceptance() { return StorageKeyName::FromConst("g/tc"); }
+
     // Valve configuration and control
+    static StorageKeyName VCCDefaultOpenLevel(EndpointId endpoint) { return StorageKeyName::Formatted("g/vcc/dol/%x", endpoint); }
     static StorageKeyName VCCDefaultOpenDuration(EndpointId endpoint)
     {
         return StorageKeyName::Formatted("g/vcc/dod/%x", endpoint);
     }
-    static StorageKeyName VCCDefaultOpenLevel(EndpointId endpoint) { return StorageKeyName::Formatted("g/vcc/dol/%x", endpoint); }
 };
 
 } // namespace chip

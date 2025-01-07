@@ -13,100 +13,132 @@
 # limitations under the License.
 
 import logging
+import re
+import shlex
 import subprocess
 import sys
 import threading
-import typing
+from typing import BinaryIO, Callable, Optional, Union
 
 
-def forward_f(prefix: bytes,
-              f_in: typing.BinaryIO,
-              f_out: typing.BinaryIO,
-              cb: typing.Optional[typing.Callable[[bytes, bool], None]] = None,
+def forward_f(f_in: BinaryIO,
+              f_out: BinaryIO,
+              cb: Optional[Callable[[bytes, bool], bytes]] = None,
               is_stderr: bool = False):
-    """Forward f_in to f_out with a prefix attached.
+    """Forward f_in to f_out.
 
-    This function can optionally feed received lines to a callback function.
+    This function can optionally post-process received lines using a callback
+    function.
     """
+
+    # NOTE: readlines would block here, so read line by line instead
     while line := f_in.readline():
         if cb is not None:
-            cb(line, is_stderr)
-        f_out.buffer.write(prefix)
-        f_out.buffer.write(line)
+            line = cb(line, is_stderr)
+        f_out.write(line)
         f_out.flush()
 
 
 class Subprocess(threading.Thread):
-    """Run a subprocess and optionally prefix its output."""
+    """Run a subprocess in a thread."""
 
-    def __init__(self, program: str, *args: typing.List[str], prefix: str = "",
-                 output_cb: typing.Optional[typing.Callable[[bytes, bool], None]] = None):
+    def __init__(self, program: str, *args,
+                 output_cb: Optional[Callable[[bytes, bool], bytes]] = None,
+                 f_stdout: BinaryIO = sys.stdout.buffer,
+                 f_stderr: BinaryIO = sys.stderr.buffer):
         """Initialize the subprocess.
 
         Args:
             program: The program to run.
             args: The arguments to the program.
-            prefix: A prefix to attach to the output.
             output_cb: A callback function to process the output. It should take two
                 arguments: the output line bytes and the boolean indicating if the
-                output comes from stderr.
+                output comes from stderr. It should return the processed output.
+            f_stdout: The file to forward the stdout to.
+            f_stderr: The file to forward the stderr to.
         """
         super().__init__()
         self.event = threading.Event()
-        self.prefix = prefix.encode()
+        self.event_started = threading.Event()
         self.program = program
         self.args = args
         self.output_cb = output_cb
-        self.expected_output = None
+        self.f_stdout = f_stdout
+        self.f_stderr = f_stderr
+        self.output_match: Optional[re.Pattern] = None
+        self.returncode = None
+
+    def _set_output_match(self, pattern: Union[str, re.Pattern]):
+        if isinstance(pattern, str):
+            self.output_match = re.compile(re.escape(pattern.encode()))
+        else:
+            self.output_match = pattern
 
     def _check_output(self, line: bytes, is_stderr: bool):
-        if self.output_cb is not None:
-            self.output_cb(line, is_stderr)
-        if self.expected_output is not None and self.expected_output in line:
+        if self.output_match is not None and self.output_match.search(line):
             self.event.set()
+        if self.output_cb is not None:
+            line = self.output_cb(line, is_stderr)
+        return line
 
     def run(self):
         """Thread entry point."""
 
-        logging.info("RUN: %s %s", self.program, " ".join(self.args))
-        self.p = subprocess.Popen([self.program] + list(self.args),
+        command = [self.program] + list(self.args)
+
+        logging.info("RUN: %s", shlex.join(command))
+        self.p = subprocess.Popen(command,
                                   stdin=subprocess.PIPE,
                                   stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE)
+                                  stderr=subprocess.PIPE,
+                                  bufsize=0)
+        self.event_started.set()
 
         # Forward stdout and stderr with a tag attached.
         forwarding_stdout_thread = threading.Thread(
             target=forward_f,
-            args=(self.prefix, self.p.stdout, sys.stdout, self._check_output))
+            args=(self.p.stdout, self.f_stdout, self._check_output))
         forwarding_stdout_thread.start()
         forwarding_stderr_thread = threading.Thread(
             target=forward_f,
-            args=(self.prefix, self.p.stderr, sys.stderr, self._check_output, True))
+            args=(self.p.stderr, self.f_stderr, self._check_output, True))
         forwarding_stderr_thread.start()
 
         # Wait for the process to finish.
-        self.p.wait()
+        self.returncode = self.p.wait()
 
         forwarding_stdout_thread.join()
         forwarding_stderr_thread.join()
 
-    def start(self, expected_output: str = None, timeout: float = None):
+    def start(self,
+              expected_output: Optional[Union[str, re.Pattern]] = None,
+              timeout: Optional[float] = None):
         """Start a subprocess and optionally wait for a specific output."""
+
         if expected_output is not None:
-            self.expected_output = expected_output.encode()
+            self._set_output_match(expected_output)
             self.event.clear()
+
         super().start()
+        # Wait for the thread to start, so the self.p attribute is available.
+        self.event_started.wait()
+
         if expected_output is not None:
             if self.event.wait(timeout) is False:
-                raise TimeoutError("Expected output not found")
+                # Terminate the process, so the Python interpreter will not
+                # hang on the join call in our thread entry point in case of
+                # Python process termination (not-caught exception).
+                self.p.terminate()
+                raise TimeoutError("Expected output '%r' not found within %s seconds" % (expected_output, timeout))
             self.expected_output = None
 
     def send(self, message: str, end: str = "\n",
-             expected_output: str = None, timeout: float = None):
+             expected_output: Optional[Union[str, re.Pattern]] = None,
+             timeout: Optional[float] = None):
         """Send a message to a process and optionally wait for a response."""
 
         if expected_output is not None:
-            self.expected_output = expected_output.encode()
+            self._set_output_match(expected_output)
             self.event.clear()
 
         self.p.stdin.write((message + end).encode())
@@ -121,3 +153,8 @@ class Subprocess(threading.Thread):
         """Terminate the subprocess and wait for it to finish."""
         self.p.terminate()
         self.join()
+
+    def wait(self, timeout: Optional[float] = None) -> int:
+        """Wait for the subprocess to finish."""
+        self.join(timeout)
+        return self.returncode

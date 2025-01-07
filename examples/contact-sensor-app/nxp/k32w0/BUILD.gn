@@ -100,7 +100,7 @@ k32w0_executable("contact_sensor_app") {
     "main/main.cpp",
   ]
 
-  if (chip_with_factory_data == 1 && use_custom_factory_provider == 1) {
+  if (nxp_use_factory_data && use_custom_factory_provider == 1) {
     sources += [
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.cpp",
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
@@ -199,12 +199,17 @@ action("binsign") {
   output_name = "bignsign.log"
   outputs = [ "${root_build_dir}/${output_name}" ]
 
+  args = [
+    "--sdk-root",
+    rebase_path(k32w0_sdk_root),
+  ]
+
   if (chip_simple_hash_verification == 1) {
-    args = [ "--simple-hash" ]
+    args += [ "--simple-hash" ]
   }
 
   if (chip_enable_ota_requestor) {
-    args = [ "--ota-enabled" ]
+    args += [ "--ota-enabled" ]
   }
 }
 

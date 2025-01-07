@@ -16,8 +16,9 @@ name: Tests
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -37,7 +38,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-tsan-clang]
+                build_variant: [no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -49,7 +50,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:80
+            image: ghcr.io/project-chip/chip-build:94
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -91,6 +92,7 @@ jobs:
                       --no-print \
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
+                      src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
@@ -109,6 +111,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information.xml \
+                      src/app/zap-templates/zcl/data-model/chip/camera-av-stream-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-ota.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-types.xml \
                       src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
@@ -197,6 +200,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/washer-controls-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/water-heater-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/webrtc-requestor-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/webrtc-provider-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/window-covering.xml \
@@ -206,6 +211,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \
                     "
             - name: Build Apps
               run: |
@@ -331,7 +337,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-asan-clang, no-ble-tsan-clang]
+                build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -451,7 +457,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:80
+            image: ghcr.io/project-chip/chip-build:94
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -481,15 +487,16 @@ jobs:
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
-                      --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test-data-model-check-check-failure-die \
+                      --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-microwave-oven-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-rvc-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-network-manager-ipv6only-no-ble-no-wifi-tsan-clang-test \
-                      --target linux-x64-fabric-admin-rpc-ipv6only-clang \
+                      --target linux-x64-fabric-admin-rpc-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang \
+                      --target linux-x64-fabric-sync-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-python-bindings \
                       build \
@@ -498,38 +505,41 @@ jobs:
             - name: Generate an argument environment file
               run: |
                   echo -n "" >/tmp/test_env.yaml
-                  echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test-data-model-check-check-failure-die/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app" >> /tmp/test_env.yaml
                   echo "ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
                   echo "LIT_ICD_APP: out/linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
                   echo "CHIP_MICROWAVE_OVEN_APP: out/linux-x64-microwave-oven-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-microwave-oven-app" >> /tmp/test_env.yaml
                   echo "CHIP_RVC_APP: out/linux-x64-rvc-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-rvc-app" >> /tmp/test_env.yaml
                   echo "NETWORK_MANAGEMENT_APP: out/linux-x64-network-manager-ipv6only-no-ble-no-wifi-tsan-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
-                  echo "FABRIC_ADMIN_APP: out/linux-x64-fabric-admin-rpc-ipv6only-clang/fabric-admin" >> /tmp/test_env.yaml
+                  echo "FABRIC_ADMIN_APP: out/linux-x64-fabric-admin-rpc-ipv6only-no-ble-no-wifi-clang/fabric-admin" >> /tmp/test_env.yaml
                   echo "FABRIC_BRIDGE_APP: out/linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang/fabric-bridge-app" >> /tmp/test_env.yaml
+                  echo "FABRIC_SYNC_APP: out/linux-x64-fabric-sync-ipv6only-no-ble-no-wifi-clang/fabric-sync" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: out/linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
 
+            - name: Verify Testing Support
+              run: |
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_IDM_10_4.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_SC_7_1.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestChoiceConformanceSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestConformanceSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestConformanceTest.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestIdChecks.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestMatterTestingSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingDeviceType.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSupport.py'
+
             - name: Run Tests
               run: |
                   mkdir -p out/trace_data
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/test/test_scripts/mobile-device-test.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing'
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test-data-model-check-check-failure-die/chip-all-clusters-app'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestIdChecks.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestSpecParsingDeviceType.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestConformanceSupport.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestConformanceTest.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestChoiceConformanceSupport.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestMatterTestingSupport.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestSpecParsingSupport.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/test_TC_ICDM_2_1.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/test_IDM_10_4.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/test_TC_SC_7_1.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/TestDecorators.py'
-
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/test/test_scripts/mobile-device-test.py'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing'
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app'
 
             - name: Uploading core files
               uses: actions/upload-artifact@v4
@@ -591,7 +601,7 @@ jobs:
                    "
             - name: Run Tests
               run: |
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factory-reset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}

@@ -564,88 +564,78 @@ void ResolveContext::DispatchSuccess()
     };
 #endif // TARGET_OS_TV
 
-    for (auto interfaceIndex : priorityInterfaceIndices)
+    std::vector<InterfaceKey> interfacesOrder;
+    for (auto priorityInterfaceIndex : priorityInterfaceIndices)
     {
-        if (interfaceIndex == 0)
+        if (priorityInterfaceIndex == 0)
         {
             // Not actually an interface we have, since if_nametoindex
             // returned 0.
             continue;
         }
 
-        if (TryReportingResultsForInterfaceIndex(static_cast<uint32_t>(interfaceIndex)))
+        for (auto & interface : interfaces)
         {
-            return;
-        }
-    }
-
-    for (auto & interface : interfaces)
-    {
-        if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname,
-                                                 interface.first.isSRPResult))
-        {
-            return;
-        }
-    }
-
-    ChipLogError(Discovery, "Successfully finalizing resolve for %s without finding any actual IP addresses.",
-                 instanceName.c_str());
-}
-
-bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResult)
-{
-    InterfaceKey interfaceKey = { interfaceIndex, hostname, isSRPResult };
-    auto & interface          = interfaces[interfaceKey];
-    auto & ips                = interface.addresses;
-
-    // Some interface may not have any ips, just ignore them.
-    if (ips.size() == 0)
-    {
-        return false;
-    }
-
-    ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interfaceIndex);
-
-    auto & service = interface.service;
-    auto addresses = Span<Inet::IPAddress>(ips.data(), ips.size());
-    if (nullptr == callback)
-    {
-        auto delegate = static_cast<DiscoverNodeDelegate *>(context);
-        DiscoveredNodeData nodeData;
-
-        // Check whether mType (service name) exactly matches with operational service name
-        if (strcmp(service.mType, kOperationalServiceName) == 0)
-        {
-            service.ToDiscoveredOperationalNodeBrowseData(nodeData);
-        }
-        else
-        {
-            service.ToDiscoveredCommissionNodeData(addresses, nodeData);
-        }
-        delegate->OnNodeDiscovered(nodeData);
-    }
-    else
-    {
-        callback(context, &service, addresses, CHIP_NO_ERROR);
-    }
-
-    return true;
-}
-
-bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex)
-{
-    for (auto & interface : interfaces)
-    {
-        if (interface.first.interfaceId == interfaceIndex)
-        {
-            if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname,
-                                                     interface.first.isSRPResult))
+            if (interface.second.HasAddresses() && priorityInterfaceIndex == interface.first.interfaceId)
             {
-                return true;
+                interfacesOrder.push_back(interface.first);
             }
         }
     }
-    return false;
+
+    for (auto & interface : interfaces)
+    {
+        // Skip interfaces that have already been prioritized to avoid duplicate results
+        auto interfaceKey = std::find(std::begin(interfacesOrder), std::end(interfacesOrder), interface.first);
+        if (interfaceKey != std::end(interfacesOrder))
+        {
+            continue;
+        }
+
+        // Some interface may not have any ips, just ignore them.
+        if (!interface.second.HasAddresses())
+        {
+            continue;
+        }
+
+        interfacesOrder.push_back(interface.first);
+    }
+
+    for (auto & interfaceKey : interfacesOrder)
+    {
+        auto & interfaceInfo = interfaces[interfaceKey];
+        auto & service       = interfaceInfo.service;
+        auto & ips           = interfaceInfo.addresses;
+        auto addresses       = Span<Inet::IPAddress>(ips.data(), ips.size());
+
+        ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interfaceKey.interfaceId);
+
+        if (nullptr == callback)
+        {
+            auto delegate = static_cast<DiscoverNodeDelegate *>(context);
+            DiscoveredNodeData nodeData;
+
+            // Check whether mType (service name) exactly matches with operational service name
+            if (strcmp(service.mType, kOperationalServiceName) == 0)
+            {
+                service.ToDiscoveredOperationalNodeBrowseData(nodeData);
+            }
+            else
+            {
+                service.ToDiscoveredCommissionNodeData(addresses, nodeData);
+            }
+            delegate->OnNodeDiscovered(nodeData);
+        }
+        else
+        {
+            CHIP_ERROR error = &interfaceKey == &interfacesOrder.back() ? CHIP_NO_ERROR : CHIP_ERROR_IN_PROGRESS;
+            callback(context, &service, addresses, error);
+        }
+    }
+
+    VerifyOrDo(interfacesOrder.size(),
+               ChipLogError(Discovery, "Successfully finalizing resolve for %s without finding any actual IP addresses.",
+                            instanceName.c_str()));
 }
 
 void ResolveContext::SRPTimerExpiredCallback(chip::System::Layer * systemLayer, void * callbackContext)
@@ -732,7 +722,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
         size_t len = *txtRecordIter;
         ++txtRecordIter;
         --remainingLen;
-        len = min(len, remainingLen);
+        len = std::min(len, remainingLen);
         chip::Span<const unsigned char> bytes(txtRecordIter, len);
         if (txtString.size() > 0)
         {

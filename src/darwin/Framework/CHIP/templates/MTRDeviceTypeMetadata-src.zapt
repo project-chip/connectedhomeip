@@ -5,25 +5,11 @@
 using namespace chip;
 
 namespace {
-enum class DeviceTypeClass {
-  Utility,
-  Simple,
-  Node, // Might not be a real class, but we have it for Root Node for now.
-  // If new classes get added, plase audit MTRIsKnownUtilityDeviceType below.
-};
 
-struct DeviceTypeData {
-  DeviceTypeId id;
-  DeviceTypeClass deviceClass;
-  const char * name;
-};
-
-constexpr DeviceTypeData knownDeviceTypes[] = {
+constexpr MTRDeviceTypeData knownDeviceTypes[] = {
   {{#zcl_device_types}}
   {{#if class}}
-  {{! For now work around the "Dynamic Utility" thing on Aggregator by just
-      taking the last word. }}
-  { {{asHex code 8}}, DeviceTypeClass::{{asLastWord class}}, "{{caption}}" },
+  { {{asHex code 8}}, MTRDeviceTypeClass::{{class}}, "{{caption}}" },
   {{/if}}
   {{/zcl_device_types}}
 };
@@ -36,12 +22,12 @@ static_assert(ExtractVendorFromMEI({{asHex code 8}}) != 0, "Must have class defi
 
 } // anonymous namespace
 
-BOOL MTRIsKnownUtilityDeviceType(DeviceTypeId aDeviceTypeId)
+const MTRDeviceTypeData * _Nullable MTRDeviceTypeDataForID(chip::DeviceTypeId aDeviceTypeId)
 {
     for (auto & deviceType : knownDeviceTypes) {
         if (deviceType.id == aDeviceTypeId) {
-            return deviceType.deviceClass != DeviceTypeClass::Simple;
+            return &deviceType;
         }
     }
-    return NO;
+    return nullptr;
 }

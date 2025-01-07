@@ -19,6 +19,8 @@
 #import <dns_sd.h>
 #import <os/lock.h>
 
+#import "MTRDefines_Internal.h"
+#import "MTRDeviceClusterData.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
@@ -401,13 +403,18 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertNil(*error);
     XCTAssertNotNil(root);
 
+    __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
+    XCTAssert(operationalPublicKey != NULL);
+
     __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
                                                            signingCertificate:root
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:operationalPublicKey
                                                                      fabricID:fabricID
                                                                        nodeID:nodeID
                                                         caseAuthenticatedTags:caseAuthenticatedTags
                                                                         error:error];
+    CFRelease(operationalPublicKey);
+
     XCTAssertNil(*error);
     XCTAssertNotNil(operational);
 
@@ -1685,6 +1692,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [self waitForExpectations:@[ newDeviceSubscriptionExpectation ] timeout:60];
     if (!disableStorageBehaviorOptimization) {
         [self waitForExpectations:@[ newDeviceGotClusterDataPersisted ] timeout:60];
+        newDelegate.onClusterDataPersisted = nil;
     }
     newDelegate.onReportEnd = nil;
 
@@ -1944,6 +1952,128 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [controller shutdown];
 
     [operationalBrowser shutdown];
+}
+
+- (void)test014_TestDataStoreMTRDeviceInvalidateFlush
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = [MTRDeviceStorageBehaviorConfiguration configurationWithDefaultStorageBehavior];
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer
+                                            storageBehaviorConfiguration:storageBehaviorConfiguration];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(17);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+
+    delegate.skipSetupSubscription = YES;
+
+    // Read the base storage key count (case session resumption etc.)
+    NSUInteger baseStorageKeyCount = storageDelegate.count;
+
+    [device setDelegate:delegate queue:queue];
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(1) attributeID:@(1)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : @(1),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(1),
+        }
+    } ];
+
+    // Inject first report as priming report, which gets persisted immediately
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+
+    // No additional entries immediately after injected report
+    XCTAssertEqual(storageDelegate.count, baseStorageKeyCount);
+
+    sleep(1);
+
+    // Verify priming report persisted before hitting storage delay
+    XCTAssertGreaterThan(storageDelegate.count, baseStorageKeyCount);
+    // Now set the base count to the after-priming number
+    baseStorageKeyCount = storageDelegate.count;
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport2 = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(2) attributeID:@(2)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : @(2),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(2),
+        }
+    } ];
+
+    // Inject second report with different cluster
+    [device unitTestInjectAttributeReport:attributeReport2 fromSubscription:YES];
+
+    sleep(1);
+
+    // No additional entries a second after report - under storage delay
+    XCTAssertEqual(storageDelegate.count, baseStorageKeyCount);
+
+    // Immediately shut down controller and force flush to storage
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    // Make sure there are more than base count entries
+    XCTAssertGreaterThan(storageDelegate.count, baseStorageKeyCount);
+
+    // Now restart controller to decommission the device
+    controller = [self startControllerWithRootKeys:rootKeys
+                                   operationalKeys:operationalKeys
+                                          fabricID:fabricID
+                                            nodeID:nodeID
+                                           storage:storageDelegate
+                                             error:&error
+                                 certificateIssuer:&certificateIssuer
+                      storageBehaviorConfiguration:storageBehaviorConfiguration];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
 }
 
 // TODO: This might want to go in a separate test file, with some shared setup
@@ -2634,7 +2764,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
 
-    NSArray<NSNumber *> * orderedDeviceIDs = @[ @(101), @(102), @(103), @(104), @(105) ];
+    NSArray<NSNumber *> * orderedDeviceIDs = [deviceOnboardingPayloads allKeys];
 
     // Commission 5 devices
     for (NSNumber * deviceID in orderedDeviceIDs) {
@@ -2662,21 +2792,16 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     // Set up expectations and delegates
 
-    NSDictionary<NSNumber *, XCTestExpectation *> * subscriptionExpectations = @{
-        @(101) : [self expectationWithDescription:@"Subscription 1 has been set up"],
-        @(102) : [self expectationWithDescription:@"Subscription 2 has been set up"],
-        @(103) : [self expectationWithDescription:@"Subscription 3 has been set up"],
-        @(104) : [self expectationWithDescription:@"Subscription 4 has been set up"],
-        @(105) : [self expectationWithDescription:@"Subscription 5 has been set up"],
-    };
+    NSMutableDictionary<NSNumber *, XCTestExpectation *> * subscriptionExpectations = [NSMutableDictionary dictionary];
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        NSString * expectationDescription = [NSString stringWithFormat:@"Subscription 1 has been set up %@", deviceID];
+        subscriptionExpectations[deviceID] = [self expectationWithDescription:expectationDescription];
+    }
 
-    NSDictionary<NSNumber *, MTRDeviceTestDelegate *> * deviceDelegates = @{
-        @(101) : [[MTRDeviceTestDelegate alloc] init],
-        @(102) : [[MTRDeviceTestDelegate alloc] init],
-        @(103) : [[MTRDeviceTestDelegate alloc] init],
-        @(104) : [[MTRDeviceTestDelegate alloc] init],
-        @(105) : [[MTRDeviceTestDelegate alloc] init],
-    };
+    NSMutableDictionary<NSNumber *, MTRDeviceTestDelegate *> * deviceDelegates = [NSMutableDictionary dictionary];
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        deviceDelegates[deviceID] = [[MTRDeviceTestDelegate alloc] init];
+    }
 
     // Test with counters
     __block os_unfair_lock counterLock = OS_UNFAIR_LOCK_INIT;
@@ -2704,8 +2829,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
             // Given the base device read is happening on the 5th device, at the completion
             // time of the first [pool size] subscriptions, the BaseDevice's request to
-            // read can't have completed, as it should be gated on its call to the
-            // MTRDeviceController's getSessionForNode: call.
+            // read can't have completed, as it should be gated on its call to
+            // MTRDeviceController_Concrete's getSessionForNode:.
             if (subscriptionDequeueCount <= (orderedDeviceIDs.count - subscriptionPoolSize)) {
                 XCTAssertFalse(baseDeviceReadCompleted);
             }
@@ -2777,6 +2902,74 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     [self doTestSubscriptionPoolWithSize:1 deviceOnboardingPayloads:deviceOnboardingPayloads];
     [self doTestSubscriptionPoolWithSize:2 deviceOnboardingPayloads:deviceOnboardingPayloads];
+}
+
+- (void)testSubscriptionPoolManyDevices
+{
+    // QRCodes generated for discriminators 1111~1150 and passcodes 1001~1050
+    NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
+        @(101) : @"MT:00000I9K17U0D900000",
+        @(102) : @"MT:0000000000BED900000",
+        @(103) : @"MT:000008C801TRD900000",
+        @(104) : @"MT:00000GOG0293E900000",
+        @(105) : @"MT:00000O-O03RGE900000",
+        @(106) : @"MT:00000WAX047UE900000",
+        @(107) : @"MT:000002N315P5F900000",
+        @(108) : @"MT:00000AZB165JF900000",
+        @(109) : @"MT:00000I9K17NWF900000",
+        @(110) : @"MT:000000000048G900000",
+        @(111) : @"MT:000008C801MLG900000",
+        @(112) : @"MT:00000GOG022ZG900000",
+        @(113) : @"MT:00000O-O03KAH900000",
+        @(114) : @"MT:00000WAX040OH900000",
+        @(115) : @"MT:000002N315I.H900000",
+        @(116) : @"MT:00000AZB16-CI900000",
+        @(117) : @"MT:00000I9K17GQI900000",
+        @(118) : @"MT:0000000000Z1J900000",
+        @(119) : @"MT:000008C801FFJ900000",
+        @(120) : @"MT:00000GOG02XSJ900000",
+        @(121) : @"MT:00000O-O03D4K900000",
+        @(122) : @"MT:00000WAX04VHK900000",
+        @(123) : @"MT:000002N315BVK900000",
+        @(124) : @"MT:00000AZB16T6L900000",
+        @(125) : @"MT:00000I9K179KL900000",
+        @(126) : @"MT:0000000000SXL900000",
+        @(127) : @"MT:000008C80189M900000",
+        @(128) : @"MT:00000GOG02QMM900000",
+        @(129) : @"MT:00000O-O036-M900000",
+        @(130) : @"MT:00000WAX04OBN900000",
+        @(131) : @"MT:000002N3154PN900000",
+        @(132) : @"MT:00000AZB16M0O900000",
+        @(133) : @"MT:00000I9K172EO900000",
+        @(134) : @"MT:0000000000LRO900000",
+        @(135) : @"MT:000008C80113P900000",
+        @(136) : @"MT:00000GOG02JGP900000",
+        @(137) : @"MT:00000O-O03.TP900000",
+        @(138) : @"MT:00000WAX04H5Q900000",
+        @(139) : @"MT:000002N315ZIQ900000",
+        @(140) : @"MT:00000AZB16FWQ900000",
+        @(141) : @"MT:00000I9K17X7R900000",
+        @(142) : @"MT:0000000000ELR900000",
+        @(143) : @"MT:000008C801WYR900000",
+        @(144) : @"MT:00000GOG02CAS900000",
+        @(145) : @"MT:00000O-O03UNS900000",
+        @(146) : @"MT:00000WAX04A.S900000",
+        @(147) : @"MT:000002N315SCT900000",
+        @(148) : @"MT:00000AZB168QT900000",
+        @(149) : @"MT:00000I9K17Q1U900000",
+        @(150) : @"MT:00000000007FU900000",
+    };
+
+    // Start our helper apps.
+    __auto_type * sortedKeys = [[deviceOnboardingPayloads allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    for (NSNumber * deviceID in sortedKeys) {
+        BOOL started = [self startAppWithName:@"all-clusters"
+                                    arguments:@[]
+                                      payload:deviceOnboardingPayloads[deviceID]];
+        XCTAssertTrue(started);
+    }
+
+    [self doTestSubscriptionPoolWithSize:3 deviceOnboardingPayloads:deviceOnboardingPayloads];
 }
 
 - (MTRDevice *)getMTRDevice:(NSNumber *)deviceID

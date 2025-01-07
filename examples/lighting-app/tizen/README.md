@@ -13,7 +13,7 @@ Generating tizen-arm-light
 ```sh
 gn gen --check \
     --fail-on-unused-args \
-    --export-compile-commands \
+    --add-export-compile-commands=* \
     --root=$PW_PROJECT_ROOT/examples/lighting-app/tizen \
     "--args=target_os=\"tizen\" target_cpu=\"arm\" tizen_sdk_root=\"$TIZEN_SDK_ROOT\" tizen_sdk_sysroot=\"$TIZEN_SDK_SYSROOT\"" \
     $PW_PROJECT_ROOT/out/tizen-arm-light

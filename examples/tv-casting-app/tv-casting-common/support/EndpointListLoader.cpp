@@ -51,9 +51,17 @@ void EndpointListLoader::Initialize(chip::Messaging::ExchangeManager * exchangeM
     mExchangeMgr   = exchangeMgr;
     mSessionHandle = sessionHandle;
 
+    chip::NodeId targetCastingPlayerNodeId           = CastingPlayer::GetTargetCastingPlayer()->GetNodeId();
+    chip::FabricIndex targetCastingPlayerFabricIndex = CastingPlayer::GetTargetCastingPlayer()->GetFabricIndex();
+    ChipLogProgress(AppServer,
+                    "EndpointListLoader::Initialize() targetCastingPlayerNodeId: 0x" ChipLogFormatX64
+                    ", targetCastingPlayerFabricIndex: %d",
+                    ChipLogValueX64(targetCastingPlayerNodeId), targetCastingPlayerFabricIndex);
+
     for (const auto & binding : chip::BindingTable::GetInstance())
     {
-        if (binding.type == MATTER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
+        if (binding.type == MATTER_UNICAST_BINDING && targetCastingPlayerNodeId == binding.nodeId &&
+            targetCastingPlayerFabricIndex == binding.fabricIndex)
         {
             // check to see if we discovered a new endpoint in the bindings
             chip::EndpointId endpointId                     = binding.remote;
@@ -66,6 +74,8 @@ void EndpointListLoader::Initialize(chip::Messaging::ExchangeManager * exchangeM
             }
         }
     }
+    ChipLogProgress(AppServer, "EndpointListLoader::Initialize() mNewEndpointsToLoad++, mNewEndpointsToLoad: %lu",
+                    mNewEndpointsToLoad);
 
     mPendingAttributeReads  = mNewEndpointsToLoad * kTotalDesiredAttributes;
     mEndpointAttributesList = new EndpointAttributes[mNewEndpointsToLoad];
@@ -78,16 +88,24 @@ CHIP_ERROR EndpointListLoader::Load()
 
     VerifyOrReturnError(CastingPlayer::GetTargetCastingPlayer() != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    chip::NodeId targetCastingPlayerNodeId           = CastingPlayer::GetTargetCastingPlayer()->GetNodeId();
+    chip::FabricIndex targetCastingPlayerFabricIndex = CastingPlayer::GetTargetCastingPlayer()->GetFabricIndex();
+    ChipLogProgress(AppServer,
+                    "EndpointListLoader::Load() targetCastingPlayerNodeId: 0x" ChipLogFormatX64
+                    ", targetCastingPlayerFabricIndex: %d",
+                    ChipLogValueX64(targetCastingPlayerNodeId), targetCastingPlayerFabricIndex);
+
     int endpointIndex      = -1;
     bool isLoadingRequired = false;
     for (const auto & binding : chip::BindingTable::GetInstance())
     {
         ChipLogProgress(AppServer,
-                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        "EndpointListLoader::Load() Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-        if (binding.type == MATTER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
+        if (binding.type == MATTER_UNICAST_BINDING && targetCastingPlayerNodeId == binding.nodeId &&
+            targetCastingPlayerFabricIndex == binding.fabricIndex)
         {
             // if we discovered a new Endpoint from the bindings, read its EndpointAttributes
             chip::EndpointId endpointId = binding.remote;
@@ -98,7 +116,8 @@ CHIP_ERROR EndpointListLoader::Load()
                 }) == endpoints.end())
             {
                 // Read attributes and mEndpointAttributesList for (endpointIndex + 1)
-                ChipLogProgress(AppServer, "EndpointListLoader::Load Reading attributes for endpointId %d", endpointId);
+                ChipLogProgress(AppServer, "EndpointListLoader::Load() Reading attributes for endpointId: %d, on fabricIndex: %d",
+                                endpointId, binding.fabricIndex);
                 isLoadingRequired                            = true;
                 mEndpointAttributesList[++endpointIndex].mId = endpointId;
                 ReadVendorId(&mEndpointAttributesList[endpointIndex]);
@@ -121,7 +140,7 @@ CHIP_ERROR EndpointListLoader::Load()
 
 void EndpointListLoader::Complete()
 {
-    ChipLogProgress(AppServer, "EndpointListLoader::Complete called with mPendingAttributeReads %lu", mPendingAttributeReads);
+    ChipLogProgress(AppServer, "EndpointListLoader::Complete() called with mPendingAttributeReads: %lu", mPendingAttributeReads);
     if (mPendingAttributeReads > 0)
     {
         mPendingAttributeReads--;
@@ -161,7 +180,7 @@ void EndpointListLoader::Complete()
 
         // callback client OnCompleted
         VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted,
-                       ChipLogError(AppServer, "EndpointListLoader::Complete mOnCompleted() not found"));
+                       ChipLogError(AppServer, "EndpointListLoader::Complete() mOnCompleted() not found"));
         CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_NO_ERROR, CastingPlayer::GetTargetCastingPlayer());
     }
 }
@@ -180,7 +199,8 @@ CHIP_ERROR EndpointListLoader::ReadVendorId(EndpointAttributes * endpointAttribu
         },
         [](void * context, CHIP_ERROR err) {
             EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
-            ChipLogError(AppServer, "EndpointListLoader ReadAttribute(VendorID) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
+            ChipLogError(AppServer,
+                         "EndpointListLoader::ReadAttribute(VendorID) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
                          _endpointAttributes->mId, err.Format());
             EndpointListLoader::GetInstance()->Complete();
         });
@@ -201,7 +221,7 @@ CHIP_ERROR EndpointListLoader::ReadProductId(EndpointAttributes * endpointAttrib
         [](void * context, CHIP_ERROR err) {
             EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
             ChipLogError(AppServer,
-                         "EndpointListLoader ReadAttribute(ProductID) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
+                         "EndpointListLoader::ReadAttribute(ProductID) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
                          _endpointAttributes->mId, err.Format());
             EndpointListLoader::GetInstance()->Complete();
         });
@@ -227,7 +247,7 @@ CHIP_ERROR EndpointListLoader::ReadDeviceTypeList(EndpointAttributes * endpointA
         [](void * context, CHIP_ERROR err) {
             EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
             ChipLogError(AppServer,
-                         "EndpointListLoader ReadAttribute(DeviceTypeList) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
+                         "EndpointListLoader::ReadAttribute(DeviceTypeList) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
                          _endpointAttributes->mId, err.Format());
             EndpointListLoader::GetInstance()->Complete();
         });
@@ -251,7 +271,9 @@ CHIP_ERROR EndpointListLoader::ReadServerList(std::vector<chip::ClusterId> * end
             EndpointListLoader::GetInstance()->Complete();
         },
         [](void * context, CHIP_ERROR err) {
-            ChipLogError(AppServer, "EndpointListLoader ReadAttribute(ServerList) failed. Err: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(AppServer,
+                         "EndpointListLoader::ReadServerList() ReadAttribute(ServerList) failed. Err: %" CHIP_ERROR_FORMAT,
+                         err.Format());
             EndpointListLoader::GetInstance()->Complete();
         });
 }

@@ -16,8 +16,9 @@ name: Minimal Build (Linux / configure)
 
 on:
     push:
-        branches-ignore:
-            - "dependabot/**"
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -33,7 +34,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-minimal:80
+            image: ghcr.io/project-chip/chip-build-minimal:94
 
         steps:
             - name: Checkout
@@ -55,7 +56,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-minimal:80
+            image: ghcr.io/project-chip/chip-build-minimal:94
 
         steps:
             - name: Checkout

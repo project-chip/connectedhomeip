@@ -28,7 +28,7 @@ from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
-from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpOsUsed
+from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
@@ -113,8 +113,8 @@ def BuildHostTarget():
         TargetPart('chip-tool', app=HostApp.CHIP_TOOL),
         TargetPart('thermostat', app=HostApp.THERMOSTAT),
         # TODO: controllers depending on a datamodel is odd. For now fix compile dependencies on ember.
-        TargetPart('java-matter-controller', app=HostApp.JAVA_MATTER_CONTROLLER, data_model_interface="disabled"),
-        TargetPart('kotlin-matter-controller', app=HostApp.KOTLIN_MATTER_CONTROLLER, data_model_interface="disabled"),
+        TargetPart('java-matter-controller', app=HostApp.JAVA_MATTER_CONTROLLER),
+        TargetPart('kotlin-matter-controller', app=HostApp.KOTLIN_MATTER_CONTROLLER),
         TargetPart('minmdns', app=HostApp.MIN_MDNS),
         TargetPart('light', app=HostApp.LIGHT),
         TargetPart('light-data-model-no-unique-id', app=HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID),
@@ -133,6 +133,7 @@ def BuildHostTarget():
         TargetPart('bridge', app=HostApp.BRIDGE),
         TargetPart('fabric-admin', app=HostApp.FABRIC_ADMIN).OnlyIfRe("-rpc"),
         TargetPart('fabric-bridge', app=HostApp.FABRIC_BRIDGE).OnlyIfRe("-rpc"),
+        TargetPart('fabric-sync', app=HostApp.FABRIC_SYNC),
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
@@ -146,6 +147,7 @@ def BuildHostTarget():
         TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
         TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
         TargetPart('energy-management', app=HostApp.ENERGY_MANAGEMENT),
+        TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -169,6 +171,7 @@ def BuildHostTarget():
     target.AppendModifier("no-ble", enable_ble=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
+    target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
         "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
     target.AppendModifier(
@@ -193,10 +196,8 @@ def BuildHostTarget():
     target.AppendModifier('enable-dnssd-tests', enable_dnssd_tests=True).OnlyIfRe('-tests')
     target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
-    target.AppendModifier('data-model-check', data_model_interface="check").ExceptIfRe('-data-model-(enabled|disabled)')
-    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-(check|enabled)')
-    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-(check|disabled)')
-    target.AppendModifier('check-failure-die', chip_data_model_check_die_on_failure=True).OnlyIfRe('-data-model-check')
+    target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
+    target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
 
     return target
 
@@ -232,8 +233,6 @@ def BuildEsp32Target():
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('ipv6only', enable_ipv4=False)
     target.AppendModifier('tracing', enable_insights_trace=True).OnlyIfRe("light")
-    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -256,6 +255,7 @@ def BuildEfr32Target():
         TargetPart('brd2703a', board=Efr32Board.BRD2703A),
         TargetPart('brd4338a', board=Efr32Board.BRD4338A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd2605a', board=Efr32Board.BRD2605A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd4343a', board=Efr32Board.BRD4343A, enable_wifi=True, enable_917_soc=True),
     ])
 
     # apps
@@ -266,7 +266,8 @@ def BuildEfr32Target():
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
-        TargetPart('pump', app=Efr32App.PUMP)
+        TargetPart('pump', app=Efr32App.PUMP),
+        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -333,8 +334,6 @@ def BuildNrfTarget():
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
-    target.AppendModifier('data-model-disabled', use_data_model_interface=False).ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', use_data_model_interface=True).ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -420,8 +419,6 @@ def BuildMbedTarget():
         '-(release|debug)')
     target.AppendModifier('debug', profile=MbedProfile.DEBUG).ExceptIfRe(
         '-(release|develop)')
-    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -514,6 +511,8 @@ def BuildNxpTarget():
     target.AppendFixedTargets([
         TargetPart('k32w0', board=NxpBoard.K32W0),
         TargetPart('k32w1', board=NxpBoard.K32W1),
+        TargetPart('rt1060', board=NxpBoard.RT1060),
+        TargetPart('rt1170', board=NxpBoard.RT1170),
         TargetPart('rw61x', board=NxpBoard.RW61X),
         TargetPart('rw61x_eth', board=NxpBoard.RW61X_ETH),
         TargetPart('mcxw71', board=NxpBoard.MCXW71)
@@ -530,9 +529,9 @@ def BuildNxpTarget():
         TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('(k32w0|k32w1|mcxw71)'),
         TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('(k32w0|k32w1|mcxw71)'),
         TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('(k32w1|mcxw71)'),
-        TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rw61x'),
-        TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rw61x'),
-        TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rw61x')
+        TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rt1060|rt1170|rw61x'),
+        TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rt1060|rt1170|rw61x'),
+        TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rt1060|rt1170|rw61x')
     ])
 
     target.AppendModifier(name="factory", enable_factory_data=True)
@@ -544,15 +543,21 @@ def BuildNxpTarget():
     target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
     target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
-    target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rw61x')
+    target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x_eth-zephyr')
     target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
-    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
-    target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rw61x')
+    target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x')
     target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).OnlyIfRe('rw61x')
+    target.AppendModifier(name="evkc", board_variant=NxpBoardVariant.EVKC).OnlyIfRe('rt1060')
+    target.AppendModifier(name="iw416", iw416_transceiver=True).OnlyIfRe('rt1060')
+    target.AppendModifier(name="w8801", w8801_transceiver=True).OnlyIfRe('rt1060')
+    target.AppendModifier(name="iwx12", iwx12_transceiver=True).OnlyIfRe('rt1060|rt1170')
+    target.AppendModifier(name="log-all", log_level=NxpLogLevel.ALL).ExceptIfRe("-log-(progress|error|none)")
+    target.AppendModifier(name="log-progress", log_level=NxpLogLevel.PROGRESS).ExceptIfRe("-log-(all|error|none)")
+    target.AppendModifier(name="log-error", log_level=NxpLogLevel.ERROR).ExceptIfRe("-log-(progress|all|none)")
+    target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
 
     return target
 
@@ -633,8 +638,6 @@ def BuildQorvoTarget():
     ])
 
     target.AppendModifier('updateimage', update_image=True)
-    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -666,7 +669,6 @@ def BuildTizenTarget():
     # apps
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=TizenApp.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=TizenApp.CHIP_TOOL),
         TargetPart('light', app=TizenApp.LIGHT),
         TargetPart('tests', app=TizenApp.TESTS),
@@ -677,6 +679,8 @@ def BuildTizenTarget():
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("asan", use_asan=True)
     target.AppendModifier("ubsan", use_ubsan=True)
+    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
+        '-tests')
     target.AppendModifier('with-ui', with_ui=True)
 
     return target
@@ -711,6 +715,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('wifi', enable_wifi=True)
     target.AppendModifier('thread', enable_thread=True)
     target.AppendModifier('easyflash', enable_easyflash=True)
+    target.AppendModifier('littlefs', enable_littlefs=True)
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('mfd', enable_mfd=True)
     target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
@@ -766,6 +771,7 @@ def BuildTelinkTarget():
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
         TargetPart('tlsr9258a', board=TelinkBoard.TLSR9258A),
         TargetPart('tlsr9258a_retention', board=TelinkBoard.TLSR9258A_RETENTION),
+        TargetPart('tl3218x', board=TelinkBoard.TL3218X),
     ])
 
     target.AppendFixedTargets([
@@ -796,8 +802,8 @@ def BuildTelinkTarget():
     target.AppendModifier('4mb', enable_4mb_flash=True)
     target.AppendModifier('mars', mars_board_config=True)
     target.AppendModifier('usb', usb_board_config=True)
-    target.AppendModifier('data-model-disabled', use_data_model_interface=False).ExceptIfRe('-data-model-enabled')
-    target.AppendModifier('data-model-enabled', use_data_model_interface=True).ExceptIfRe('-data-model-disabled')
+    target.AppendModifier('compress-lzma', compress_lzma_config=True)
+    target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
 
     return target
 

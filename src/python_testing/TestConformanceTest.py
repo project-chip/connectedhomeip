@@ -18,12 +18,12 @@
 from typing import Any
 
 import chip.clusters as Clusters
-from basic_composition_support import arls_populated
-from conformance_support import ConformanceDecision
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.basic_composition import arls_populated
+from chip.testing.conformance import ConformanceDecision
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.spec_parsing import build_xml_clusters, build_xml_device_types
 from mobly import asserts
-from spec_parsing_support import build_xml_clusters, build_xml_device_types
 from TC_DeviceConformance import DeviceConformanceTests
 
 

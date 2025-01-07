@@ -48,7 +48,9 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/SystemTimer.h>
 
+#ifndef CONFIG_IDF_TARGET_ESP32P4
 #include "esp_bt.h"
+#endif
 #include "esp_log.h"
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
@@ -1021,6 +1023,11 @@ CHIP_ERROR BLEManagerImpl::DeinitBLE()
     return MapBLEError(err);
 }
 
+#ifdef CONFIG_IDF_TARGET_ESP32P4
+// Stub function to avoid link error
+extern "C" void ble_transport_ll_deinit(void) {}
+#endif
+
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
     CHIP_ERROR err;
@@ -1111,7 +1118,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureScanResponseData(ByteSpan data)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     memcpy(scanResponseBuffer, data.data(), data.size());
-    ByteSpan scanResponseSpan(scanResponseBuffer);
+    ByteSpan scanResponseSpan(scanResponseBuffer, data.size());
     mScanResponse = chip::Optional<ByteSpan>(scanResponseSpan);
     return CHIP_NO_ERROR;
 }
@@ -1563,7 +1570,7 @@ void BLEManagerImpl::HandleC3CharRead(struct ble_gatt_char_context * param)
                                                                          additionalDataFields);
     SuccessOrExit(err);
 
-    os_mbuf_append(param->ctxt->om, bufferHandle->Start(), bufferHandle->DataLength());
+    os_mbuf_append(param->ctxt->om, bufferHandle->Start(), static_cast<uint16_t>(bufferHandle->DataLength()));
 
 exit:
     if (err != CHIP_NO_ERROR)

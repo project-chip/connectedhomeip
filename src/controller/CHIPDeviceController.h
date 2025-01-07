@@ -204,6 +204,16 @@ public:
         return nullptr;
     }
 
+    CASESessionManager * CASESessionMgr()
+    {
+        if (mSystemState)
+        {
+            return mSystemState->CASESessionMgr();
+        }
+
+        return nullptr;
+    }
+
     Messaging::ExchangeManager * ExchangeMgr()
     {
         if (mSystemState != nullptr)
@@ -828,8 +838,11 @@ private:
     DeviceProxy * mDeviceBeingCommissioned               = nullptr;
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
+    Optional<System::Clock::Timeout> mCommissioningStepTimeout; // Note: For multi-interaction steps this is per interaction
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
-    bool mRunCommissioningAfterConnection  = false;
+    uint8_t mReadCommissioningInfoProgress = 0; // see ContinueReadingCommissioningInfo()
+
+    bool mRunCommissioningAfterConnection = false;
     Internal::InvokeCancelFn mInvokeCancelFn;
     Internal::WriteCancelFn mWriteCancelFn;
 
@@ -1040,16 +1053,14 @@ private:
     void CancelCASECallbacks();
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-    void ParseCommissioningInfo();
-    // Parsing attributes read in kReadCommissioningInfo stage.
-    CHIP_ERROR ParseCommissioningInfo1(ReadCommissioningInfo & info);
-    // Parsing attributes read in kReadCommissioningInfo2 stage.
-    CHIP_ERROR ParseCommissioningInfo2(ReadCommissioningInfo & info);
-    // Called by ParseCommissioningInfo2
+    void ContinueReadingCommissioningInfo(const CommissioningParameters & params);
+    void FinishReadingCommissioningInfo();
+    CHIP_ERROR ParseGeneralCommissioningInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
-    // Called by ParseCommissioningInfo
-    void ParseTimeSyncInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     static CHIP_ERROR

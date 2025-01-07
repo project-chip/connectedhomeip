@@ -29,6 +29,7 @@ limitations under the License.
       <description>Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding.</description>
       <arg name="Data" type="char_string" optional="true"/>
       <arg name="EncodingHint" type="char_string" optional="false"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x01" name="ContentAppMessageResponse" optional="false" apiMaturity="provisional">
@@ -36,6 +37,7 @@ limitations under the License.
       <arg name="Status" type="StatusEnum" optional="false"/>
       <arg name="Data" type="char_string" optional="true"/>
       <arg name="EncodingHint" type="char_string" optional="true"/>
+      <mandatoryConform/>
     </command>
 
   </cluster>

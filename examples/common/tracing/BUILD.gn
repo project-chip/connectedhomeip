@@ -79,7 +79,6 @@ source_set("trace_handlers") {
 source_set("trace_handlers_decoder") {
   sources = [
     "TraceDecoder.cpp",
-    "TraceHandlers.cpp",
     "decoder/TraceDecoderProtocols.cpp",
     "decoder/bdx/Decoder.cpp",
     "decoder/echo/Decoder.cpp",
@@ -94,6 +93,7 @@ source_set("trace_handlers_decoder") {
   public_configs = [ ":default_config" ]
 
   deps = [
+    ":trace_handlers",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core:types",
   ]

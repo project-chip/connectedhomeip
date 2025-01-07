@@ -18,9 +18,12 @@
 
 #pragma once
 
+#include <lib/core/ScopedNodeId.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
+
+namespace admin {
 
 /**
  * @brief Sets the RPC server port to which the RPC client will connect.
@@ -57,25 +60,25 @@ CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data);
  * It logs the progress and checks if a `RemoveSynchronizedDevice` operation is already in progress.
  * If an operation is in progress, it returns `CHIP_ERROR_BUSY`.
  *
- * @param nodeId The Node ID of the device to be removed.
+ * @param scopedNodeId The Scoped Node ID of the device to be removed.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
  * - CHIP_NO_ERROR: The RPC command was successfully processed.
  * - CHIP_ERROR_BUSY: Another operation is currently in progress.
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
-CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId);
+CHIP_ERROR RemoveSynchronizedDevice(chip::ScopedNodeId scopedNodeId);
 
 /**
  * @brief Received StayActiveResponse on behalf of client that previously called KeepActive
  *
- * @param nodeId The Node ID of the device we recieved a StayActiveResponse.
+ * @param scopedNodeId The Scoped Node ID of the device we recieved a StayActiveResponse.
  * @param promisedActiveDurationMs the computed duration (in milliseconds) that the ICD intends to stay active for.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
  * - CHIP_NO_ERROR: The RPC command was successfully processed.
  * - CHIP_ERROR_BUSY: Another operation is currently in progress.
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
-CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDurationMs);
+CHIP_ERROR ActiveChanged(chip::ScopedNodeId scopedNodeId, uint32_t promisedActiveDurationMs);
 
 /**
  * @brief CADMIN attribute has changed of one of the bridged devices that was previously added.
@@ -87,3 +90,16 @@ CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDurationMs)
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
 CHIP_ERROR AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & data);
+
+/**
+ * @brief Notify that reachachability of the bridged device has changed
+ *
+ * @param data information regarding change in reachability of the bridged device.
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
+ * - CHIP_ERROR_BUSY: Another operation is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
+ */
+CHIP_ERROR DeviceReachableChanged(const chip_rpc_ReachabilityChanged & data);
+
+} // namespace admin

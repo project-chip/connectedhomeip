@@ -16,21 +16,28 @@
 #
 
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -62,7 +69,7 @@ class TC_VALCC_4_2(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.ValveConfigurationAndControl))
     async def test_TC_VALCC_4_2(self):
 
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint(default=1)
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
@@ -72,7 +79,7 @@ class TC_VALCC_4_2(MatterBaseTest):
 
         self.step("2b")
         defaultOpenDuration = 60
-        await self.write_single_attribute(attributes.DefaultOpenDuration(defaultOpenDuration))
+        await self.write_single_attribute(attributes.DefaultOpenDuration(defaultOpenDuration), endpoint_id=endpoint)
 
         self.step(3)
         try:
@@ -120,7 +127,7 @@ class TC_VALCC_4_2(MatterBaseTest):
         asserts.assert_true(remaining_duration_dut is NullValue, "RemainingDuration is not null")
 
         self.step(11)
-        await self.write_single_attribute(attributes.DefaultOpenDuration(originalDefaultOpenDuration))
+        await self.write_single_attribute(attributes.DefaultOpenDuration(originalDefaultOpenDuration), endpoint_id=endpoint)
 
 
 if __name__ == "__main__":

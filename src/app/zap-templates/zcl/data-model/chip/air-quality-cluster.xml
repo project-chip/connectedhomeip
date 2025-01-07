@@ -41,7 +41,9 @@ limitations under the License.
     </features>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="AIR_QUALITY" type="AirQualityEnum" min="0" max="6" writable="false" isNullable="false" default="0" optional="false">AirQuality</attribute>
+    <attribute side="server" code="0x0000" name="AirQuality" define="AIR_QUALITY" type="AirQualityEnum" min="0" max="6" default="0">
+      <mandatoryConform/>
+    </attribute>
   </cluster>
 
   <!-- Cluster Data Types -->

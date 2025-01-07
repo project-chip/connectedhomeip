@@ -16,12 +16,20 @@
 #
 
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -29,8 +37,8 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches,
-                                    utc_time_in_matter_epoch)
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches,
+                                         utc_time_in_matter_epoch)
 from mobly import asserts
 
 
@@ -67,7 +75,7 @@ class TC_VALCC_4_4(MatterBaseTest):
     @run_if_endpoint_matches(has_feature(Clusters.ValveConfigurationAndControl, Clusters.ValveConfigurationAndControl.Bitmaps.Feature.kTimeSync))
     async def test_TC_VALCC_4_4(self):
 
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint(default=1)
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
@@ -144,17 +152,17 @@ class TC_VALCC_4_4(MatterBaseTest):
             pass
 
         self.step(11)
-        utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
+        utcTime2 = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
 
-        asserts.assert_true(utcTime is not NullValue, "OpenDuration is null")
+        asserts.assert_true(utcTime2 is not NullValue, "OpenDuration is null")
 
         self.step(12)
         auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
 
         asserts.assert_true(auto_close_time_dut is not NullValue, "AutoCloseTime is null")
-        asserts.assert_greater_equal(auto_close_time_dut, (utcTime + ((defaultOpenDuration - 5) * 1000000)),
+        asserts.assert_greater_equal(auto_close_time_dut, (utcTime2 + ((defaultOpenDuration - 5) * 1000000)),
                                      "AutoCloseTime is not in the expected range")
-        asserts.assert_less_equal(auto_close_time_dut, (utcTime + (defaultOpenDuration * 1000000)),
+        asserts.assert_less_equal(auto_close_time_dut, (utcTime2 + (defaultOpenDuration * 1000000)),
                                   "AutoCloseTime is not in the expected range")
 
         self.step(13)

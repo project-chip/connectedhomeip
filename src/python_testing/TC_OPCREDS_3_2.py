@@ -19,18 +19,26 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from test_plan_support import (commission_from_existing, commission_if_required, read_attribute, remove_fabric,
                                verify_commissioning_successful, verify_success)
@@ -86,10 +94,11 @@ class TC_OPCREDS_3_2(MatterBaseTest):
 
         cr2_new_admin_ctrl = cr2_new_fabric_admin.NewController(
             nodeId=cr2_nodeid)
-        success, nocResp, rcacResp = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(
+        success, nocResp, chain = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(
             commissionerDevCtrl=dev_ctrl, newFabricDevCtrl=cr2_new_admin_ctrl,
             existingNodeId=self.dut_node_id, newNodeId=cr2_dut_node_id
         )
+        rcacResp = chain.rcacBytes
 
         fabric_index_CR2 = nocResp.fabricIndex
         tlvReaderRCAC_CR2 = TLVReader(rcacResp).get()["Any"]
@@ -106,10 +115,11 @@ class TC_OPCREDS_3_2(MatterBaseTest):
 
         cr3_new_admin_ctrl = cr3_new_fabric_admin.NewController(
             nodeId=cr3_nodeid)
-        success, nocResp, rcacResp = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(
+        success, nocResp, chain = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(
             commissionerDevCtrl=dev_ctrl, newFabricDevCtrl=cr3_new_admin_ctrl,
             existingNodeId=self.dut_node_id, newNodeId=cr3_dut_node_id
         )
+        rcacResp = chain.rcacBytes
 
         fabric_index_CR3 = nocResp.fabricIndex
         tlvReaderRCAC_CR3 = TLVReader(rcacResp).get()["Any"]

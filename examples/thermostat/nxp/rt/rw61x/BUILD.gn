@@ -1,5 +1,5 @@
 # Copyright (c) 2021 Project CHIP Authors
-# Copyright 2023 NXP
+# Copyright 2023-2024 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,15 +57,6 @@ app_common_folder = "thermostat/nxp/zap"
 # Particular sources/defines/includes could be added/changed depending on the target application.
 rt_sdk("sdk") {
   defines = []
-
-  # To be moved, temporary mbedtls config fix to build app with factory data
-  if (chip_enable_secure_dac_private_key_storage ||
-      chip_enable_secure_whole_factory_data) {
-    defines += [
-      "MBEDTLS_NIST_KW_C",
-      "MBEDTLS_PSA_CRYPTO_CLIENT",
-    ]
-  }
 
   cflags = []
   public_deps = []
@@ -154,6 +145,22 @@ rt_executable("thermostat") {
     "../../common/main/main.cpp",
   ]
 
+  if (chip_enable_ble) {
+    defines += [ "APP_BT_DEVICE_NAME=\"NXP-ThermostatApp\"" ]
+    include_dirs += [ "${common_example_dir}/app_ble/include" ]
+    if (ble_adv_data_custom) {
+      # to customize BLE advertising data
+      defines += [ "CONFIG_CHIP_CUSTOM_BLE_ADV_DATA=1" ]
+      include_dirs += [ "${chip_root}/src/platform/nxp/common/ble_zephyr" ]
+      sources += [ "../../common/main/BleZephyrManagerApp.cpp" ]
+    } else {
+      # Empty implementation, default matter advertising data
+      sources += [
+        "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
+      ]
+    }
+  }
+
   if (chip_with_diag_logs_demo) {
     include_dirs += [
       "${common_example_dir}/diagnostic_logs/include",
@@ -165,10 +172,10 @@ rt_executable("thermostat") {
     ]
   }
 
-  if (chip_enable_secure_dac_private_key_storage ||
-      chip_enable_secure_whole_factory_data) {
+  if (nxp_enable_secure_whole_factory_data ||
+      nxp_enable_secure_EL2GO_factory_data) {
     sources += [ "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp" ]
-    if (chip_enable_secure_whole_factory_data) {
+    if (nxp_enable_secure_whole_factory_data) {
       defines += [ "ENABLE_SECURE_WHOLE_FACTORY_DATA" ]
     }
   } else {
@@ -194,7 +201,7 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
-    "${common_example_dir}/matter_button/source/AppMatterButtonEmpty.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
   ]
 
   deps = [
@@ -202,7 +209,7 @@ rt_executable("thermostat") {
     "${chip_root}/src/platform/logging:default",
   ]
 
-  if (chip_enable_matter_cli) {
+  if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
     deps += [
       "${chip_root}/examples/shell/shell_common:shell_common",

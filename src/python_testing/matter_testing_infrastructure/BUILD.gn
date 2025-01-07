@@ -14,28 +14,57 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-
 import("//build_overrides/pigweed.gni")
+import("//src/python_testing/matter_testing_infrastructure/data_model_xmls.gni")
 import("$dir_pw_build/python.gni")
+import("$dir_pw_build/python_dist.gni")
 
-# Python package for CHIP testing support.
-pw_python_package("chip-testing") {
-  setup = [
-    "setup.py",
-    "setup.cfg",
-    "pyproject.toml",
-  ]
+pw_python_package("chip-testing-module") {
+  generate_setup = {
+    metadata = {
+      name = "chip-testing-module"
+      version = "1.4.0"
+      author = "Project CHIP Authors"
+      license_expression = "Apache-2.0"  # Consistent license format
+      url = "https://github.com/project-chip/connectedhomeip"
+    }
+  }
 
   inputs = [ "env_test.yaml" ]
 
   sources = [
     "chip/testing/__init__.py",
+    "chip/testing/apps.py",
+    "chip/testing/basic_composition.py",
+    "chip/testing/choice_conformance.py",
+    "chip/testing/conformance.py",
+    "chip/testing/global_attribute_ids.py",
+    "chip/testing/matter_testing.py",
     "chip/testing/metadata.py",
+    "chip/testing/pics.py",
+    "chip/testing/spec_parsing.py",
+    "chip/testing/taglist_and_topology_test.py",
     "chip/testing/tasks.py",
   ]
-
   tests = [
     "chip/testing/test_metadata.py",
     "chip/testing/test_tasks.py",
   ]
+}
+
+pw_python_distribution("chip-testing") {
+  packages = [ ":chip-testing-module" ]
+
+  generate_setup_cfg = {
+    name = "chip-testing"
+    version = "1.4.0"
+    include_default_pyproject_file = true
+    include_extra_files_in_package_data = true
+  }
+
+  # Use the imported data_model_XMLS directly
+  extra_files = []
+  foreach(file, data_model_XMLS) {
+    extra_files += [ "${file} > chip/testing/${file}" ]
+  }
 }

@@ -16,20 +16,25 @@
 #
 
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
-
-import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from chip.testing.matter_testing import AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -43,15 +48,15 @@ class TC_VALCC_3_1(MatterBaseTest):
 
     def steps_TC_VALCC_3_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commission DUT if required", is_commissioning=True),
             TestStep(2, "Set up a subscription to all attributes on the DUT"),
             TestStep(3, "Send a close command to the DUT and wait until the CurrentState is closed", "DUT returns SUCCESS"),
             TestStep(4, "Send Open command", "DUT returns SUCCESS"),
-            TestStep(5, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Open (ordering does not matter)",
+            TestStep(5, "Wait until TH receives the following reports (ordering does not matter): TargetState set to NULL, CurrentState set to Open",
                      "Expected attribute reports are received"),
             TestStep(6, "Read CurrentState and TargetState attribute", "CurrentState is Open, TargetState is NULL"),
             TestStep(7, "Send Close command", "DUT returns SUCCESS"),
-            TestStep(8, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Closed (ordering does not matter)",
+            TestStep(8, "Wait until TH receives the following reports  (ordering does not matter): TargetState set to NULL, CurrentState set to Closed",
                      "Expected attribute reports are received"),
             TestStep(9, "Read CurrentState and TargetState attribute", "CurrentState is Closed, TargetState is NULL"),
         ]
@@ -60,7 +65,7 @@ class TC_VALCC_3_1(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.ValveConfigurationAndControl))
     async def test_TC_VALCC_3_1(self):
 
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint(default=1)
 
         self.step(1)  # commissioning - already done
 
@@ -71,12 +76,15 @@ class TC_VALCC_3_1(MatterBaseTest):
         await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
+        # Wait for the entire duration of the test because this valve may be slow. The test will time out before this does. That's fine.
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
         await self.send_single_cmd(cmd=cluster.Commands.Close(), endpoint=endpoint)
         current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
         if current_state_dut != cluster.Enums.ValveStateEnum.kClosed:
             current_state_closed = AttributeValue(
                 endpoint_id=endpoint, attribute=attributes.CurrentState, value=cluster.Enums.ValveStateEnum.kClosed)
-            attribute_subscription.await_all_final_values_reported(expected_final_values=[current_state_closed])
+            attribute_subscription.await_all_final_values_reported(
+                expected_final_values=[current_state_closed], timeout_sec=timeout)
 
         self.step(4)
         attribute_subscription.reset()
@@ -84,8 +92,6 @@ class TC_VALCC_3_1(MatterBaseTest):
 
         self.step(5)
         # Wait until the current state is open and the target state is Null.
-        # Wait for the entire duration of the test because this valve may be slow. The test will time out before this does. That's fine.
-        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
         expected_final_state = [AttributeValue(endpoint_id=endpoint, attribute=attributes.TargetState, value=NullValue), AttributeValue(
             endpoint_id=endpoint, attribute=attributes.CurrentState, value=cluster.Enums.ValveStateEnum.kOpen)]
         attribute_subscription.await_all_final_values_reported(expected_final_values=expected_final_state, timeout_sec=timeout)

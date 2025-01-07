@@ -159,3 +159,19 @@ private:
     // TODO: possibly 32-bit - see spec issue #3226
     uint16_t mDeviceType;
 };
+
+class DiscoverCommissionableByInstanceNameCommand : public DiscoverCommissionablesCommandBase
+{
+public:
+    DiscoverCommissionableByInstanceNameCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        DiscoverCommissionablesCommandBase("find-commissionable-by-instance-name", credsIssuerConfig)
+    {
+        AddArgument("value", &mInstanceName);
+    }
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+private:
+    char * mInstanceName;
+};

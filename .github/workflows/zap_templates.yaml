@@ -16,8 +16,9 @@ name: ZAP
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -34,7 +35,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: ghcr.io/project-chip/chip-build:80
+            image: ghcr.io/project-chip/chip-build:94
         defaults:
             run:
                 shell: sh
@@ -61,7 +62,7 @@ jobs:
             - name: Generate all
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
             - name: Generate script-maintained items (ERROR_CODES.md)
-              run: ./scripts/run_in_build_env.sh "scripts/error_table.py > docs/ERROR_CODES.md"
+              run: ./scripts/run_in_build_env.sh "scripts/error_table.py > docs/ids_and_codes/ERROR_CODES.md"
             - name: Ensure git works in current working directory
               run: git config --global --add safe.directory `pwd`
             - name: Check for uncommited changes

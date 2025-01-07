@@ -83,74 +83,274 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="5"/>
 
-    <attribute side="server" code="0x0000" define="OCCUPANCY" type="OccupancyBitmap" min="0x00" max="0x01" writable="false" reportable="true" optional="false">Occupancy</attribute>
-    <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="OccupancySensorTypeEnum" min="0x00" max="0xFE" writable="false" optional="false">OccupancySensorType</attribute>
-    <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="OccupancySensorTypeBitmap" min="0x00" max="0x07" writable="false" optional="false">OccupancySensorTypeBitmap</attribute>
-
-    <attribute side="server" code="0x0003" define="HOLD_TIME" type="int16u" writable="true" optional="true">
-        <description>HoldTime</description>
-        <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0000" name="Occupancy" define="OCCUPANCY" type="OccupancyBitmap" min="0x00" max="0x01" reportable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="OccupancySensorType" define="OCCUPANCY_SENSOR_TYPE" type="OccupancySensorTypeEnum" min="0x00" max="0xFE">
+      <otherwiseConform>
+        <mandatoryConform/>
+        <deprecateConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="OccupancySensorTypeBitmap" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="OccupancySensorTypeBitmap" min="0x00" max="0x07">
+      <otherwiseConform>
+        <mandatoryConform/>
+        <deprecateConform/>
+      </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0004" define="HOLD_TIME_LIMITS" type="HoldTimeLimitsStruct" writable="false" optional="true">HoldTimeLimits</attribute>
-
-    <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>PIROccupiedToUnoccupiedDelay</description>
-      <access op="read" role="view"/>
-      <access op="write" role="manage"/>
+    <attribute side="server" code="0x0003" name="HoldTime" define="HOLD_TIME" type="int16u" writable="true" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
 
-    <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>PIRUnoccupiedToOccupiedDelay</description>
+    <attribute side="server" code="0x0004" name="HoldTimeLimits" define="HOLD_TIME_LIMITS" type="HoldTimeLimitsStruct" optional="true">
+      <mandatoryConform>
+        <attribute name="HoldTime"/>
+      </mandatoryConform>
+    </attribute>
+    
+    <attribute side="server" code="0x0010" name="PIROccupiedToUnoccupiedDelay" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <otherwiseConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <orTerm>
+              <feature name="PIR"/>
+              <andTerm>
+                <notTerm>
+                  <feature name="PIR"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="US"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="PHY"/>
+                </notTerm>
+              </andTerm>
+            </orTerm>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0012" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>PIRUnoccupiedToOccupiedThreshold</description>
+    <attribute side="server" code="0x0011" name="PIRUnoccupiedToOccupiedDelay" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <andTerm>
+              <attribute name="HoldTime"/>
+              <orTerm>
+                <feature name="PIR"/>
+                <andTerm>
+                  <notTerm>
+                    <feature name="PIR"/>
+                  </notTerm>
+                  <notTerm>
+                    <feature name="US"/>
+                  </notTerm>
+                  <notTerm>
+                    <feature name="PHY"/>
+                  </notTerm>
+                </andTerm>
+              </orTerm>
+            </andTerm>
+            <attribute name="PIRUnoccupiedToOccupiedThreshold"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <orTerm>
+              <feature name="PIR"/>
+              <andTerm>
+                <notTerm>
+                  <feature name="PIR"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="US"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="PHY"/>
+                </notTerm>
+              </andTerm>
+            </orTerm>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>UltrasonicOccupiedToUnoccupiedDelay</description>
+    <attribute side="server" code="0x0012" name="PIRUnoccupiedToOccupiedThreshold" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <andTerm>
+              <attribute name="HoldTime"/>
+              <orTerm>
+                <feature name="PIR"/>
+                <andTerm>
+                  <notTerm>
+                    <feature name="PIR"/>
+                  </notTerm>
+                  <notTerm>
+                    <feature name="US"/>
+                  </notTerm>
+                  <notTerm>
+                    <feature name="PHY"/>
+                  </notTerm>
+                </andTerm>
+              </orTerm>
+            </andTerm>
+            <attribute name="PIRUnoccupiedToOccupiedDelay"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <orTerm>
+              <feature name="PIR"/>
+              <andTerm>
+                <notTerm>
+                  <feature name="PIR"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="US"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="PHY"/>
+                </notTerm>
+              </andTerm>
+            </orTerm>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>UltrasonicUnoccupiedToOccupiedDelay</description>
+    <attribute side="server" code="0x0020" name="UltrasonicOccupiedToUnoccupiedDelay" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <otherwiseConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="US"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0022" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>UltrasonicUnoccupiedToOccupiedThreshold</description>
+    <attribute side="server" code="0x0021" name="UltrasonicUnoccupiedToOccupiedDelay" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="US"/>
+            <attribute name="UltrasonicUnoccupiedToOccupiedThreshold"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="US"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>PhysicalContactOccupiedToUnoccupiedDelay</description>
+    <attribute side="server" code="0x0022" name="UltrasonicUnoccupiedToOccupiedThreshold" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="US"/>
+            <attribute name="UltrasonicUnoccupiedToOccupiedDelay"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="US"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
-      <description>PhysicalContactUnoccupiedToOccupiedDelay</description>
+    <attribute side="server" code="0x0030" name="PhysicalContactOccupiedToUnoccupiedDelay" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <otherwiseConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="PHY"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
     </attribute>
 
-    <attribute side="server" code="0x0032" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
-      <description>PhysicalContactUnoccupiedToOccupiedThreshold</description>
+    <attribute side="server" code="0x0031" name="PhysicalContactUnoccupiedToOccupiedDelay" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="PHY"/>
+            <attribute name="PhysicalContactUnoccupiedToOccupiedThreshold"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="PHY"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
+    </attribute>
+
+    <attribute side="server" code="0x0032" name="PhysicalContactUnoccupiedToOccupiedThreshold" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="PHY"/>
+            <attribute name="PhysicalContactUnoccupiedToOccupiedDelay"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="PHY"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
     </attribute>
 
     <event side="server" code="0x00" priority="info" name="OccupancyChanged" optional="true">
       <description>If this event is supported, it SHALL be generated when the Occupancy attribute changes.</description>
       <field id="0" name="Occupancy" type="OccupancyBitmap"/>
+      <optionalConform/>
     </event>
   </cluster>
 </configurator>

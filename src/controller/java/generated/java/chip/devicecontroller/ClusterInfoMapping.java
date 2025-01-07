@@ -11742,48 +11742,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedEnergyEvseModeClusterStartUpModeAttributeCallback implements ChipClusters.EnergyEvseModeCluster.StartUpModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedEnergyEvseModeClusterOnModeAttributeCallback implements ChipClusters.EnergyEvseModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedEnergyEvseModeClusterGeneratedCommandListAttributeCallback implements ChipClusters.EnergyEvseModeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -11913,48 +11871,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedWaterHeaterModeClusterStartUpModeAttributeCallback implements ChipClusters.WaterHeaterModeCluster.StartUpModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedWaterHeaterModeClusterOnModeAttributeCallback implements ChipClusters.WaterHeaterModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedWaterHeaterModeClusterGeneratedCommandListAttributeCallback implements ChipClusters.WaterHeaterModeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -12075,48 +11991,6 @@ public class ClusterInfoMapping {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DeviceEnergyManagementModeClusterModeOptionStruct>");
       responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDeviceEnergyManagementModeClusterStartUpModeAttributeCallback implements ChipClusters.DeviceEnergyManagementModeCluster.StartUpModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDeviceEnergyManagementModeClusterOnModeAttributeCallback implements ChipClusters.DeviceEnergyManagementModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
 
@@ -19994,6 +19868,969 @@ public class ClusterInfoMapping {
     }
   }
 
+
+  public static class DelegatedZoneManagementClusterCreateTwoDCartesianZoneResponseCallback implements ChipClusters.ZoneManagementCluster.CreateTwoDCartesianZoneResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer zoneID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo zoneIDResponseValue = new CommandResponseInfo("zoneID", "Integer");
+      responseValues.put(zoneIDResponseValue, zoneID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedZoneManagementClusterGetTwoDCartesianZoneResponseCallback implements ChipClusters.ZoneManagementCluster.GetTwoDCartesianZoneResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> zones) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // zones: TwoDCartesianZoneStruct
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedZoneManagementClusterSupportedZoneSourcesAttributeCallback implements ChipClusters.ZoneManagementCluster.SupportedZoneSourcesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedZoneManagementClusterZonesAttributeCallback implements ChipClusters.ZoneManagementCluster.ZonesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ZoneManagementClusterZoneInformationStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ZoneManagementClusterZoneInformationStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedZoneManagementClusterTriggersAttributeCallback implements ChipClusters.ZoneManagementCluster.TriggersAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedZoneManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.ZoneManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedZoneManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.ZoneManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedZoneManagementClusterEventListAttributeCallback implements ChipClusters.ZoneManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedZoneManagementClusterAttributeListAttributeCallback implements ChipClusters.ZoneManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
+  public static class DelegatedCameraAvStreamManagementClusterAudioStreamAllocateResponseCallback implements ChipClusters.CameraAvStreamManagementCluster.AudioStreamAllocateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer audioStreamID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo audioStreamIDResponseValue = new CommandResponseInfo("audioStreamID", "Integer");
+      responseValues.put(audioStreamIDResponseValue, audioStreamID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterVideoStreamAllocateResponseCallback implements ChipClusters.CameraAvStreamManagementCluster.VideoStreamAllocateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer videoStreamID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo videoStreamIDResponseValue = new CommandResponseInfo("videoStreamID", "Integer");
+      responseValues.put(videoStreamIDResponseValue, videoStreamID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterSnapshotStreamAllocateResponseCallback implements ChipClusters.CameraAvStreamManagementCluster.SnapshotStreamAllocateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer snapshotStreamID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo snapshotStreamIDResponseValue = new CommandResponseInfo("snapshotStreamID", "Integer");
+      responseValues.put(snapshotStreamIDResponseValue, snapshotStreamID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedCameraAvStreamManagementClusterVideoSensorParamsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.VideoSensorParamsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.CameraAvStreamManagementClusterVideoSensorParamsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CameraAvStreamManagementClusterVideoSensorParamsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterMinViewportAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.MinViewportAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterRateDistortionTradeOffPointsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.RateDistortionTradeOffPointsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterMicrophoneCapabilitiesAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.MicrophoneCapabilitiesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.CameraAvStreamManagementClusterAudioCapabilitiesStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CameraAvStreamManagementClusterAudioCapabilitiesStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterSpeakerCapabilitiesAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.SpeakerCapabilitiesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.CameraAvStreamManagementClusterAudioCapabilitiesStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CameraAvStreamManagementClusterAudioCapabilitiesStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterSupportedSnapshotParamsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.SupportedSnapshotParamsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterFabricsUsingCameraAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.FabricsUsingCameraAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterAllocatedVideoStreamsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.AllocatedVideoStreamsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterVideoStreamStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvStreamManagementClusterVideoStreamStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterAllocatedAudioStreamsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.AllocatedAudioStreamsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterAudioStreamStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvStreamManagementClusterAudioStreamStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterAllocatedSnapshotStreamsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.AllocatedSnapshotStreamsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotStreamStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvStreamManagementClusterSnapshotStreamStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterRankedVideoStreamPrioritiesListAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.RankedVideoStreamPrioritiesListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterViewportAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.ViewportAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.CameraAvStreamManagementClusterViewportStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CameraAvStreamManagementClusterViewportStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterEventListAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvStreamManagementClusterAttributeListAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
+  public static class DelegatedWebRTCTransportProviderClusterSolicitOfferResponseCallback implements ChipClusters.WebRTCTransportProviderCluster.SolicitOfferResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer webRTCSessionID, Boolean deferredOffer, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo webRTCSessionIDResponseValue = new CommandResponseInfo("webRTCSessionID", "Integer");
+      responseValues.put(webRTCSessionIDResponseValue, webRTCSessionID);
+      CommandResponseInfo deferredOfferResponseValue = new CommandResponseInfo("deferredOffer", "Boolean");
+      responseValues.put(deferredOfferResponseValue, deferredOffer);
+      CommandResponseInfo videoStreamIDResponseValue = new CommandResponseInfo("videoStreamID", "Optional<Integer>");
+      responseValues.put(videoStreamIDResponseValue, videoStreamID);
+      CommandResponseInfo audioStreamIDResponseValue = new CommandResponseInfo("audioStreamID", "Optional<Integer>");
+      responseValues.put(audioStreamIDResponseValue, audioStreamID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportProviderClusterProvideOfferResponseCallback implements ChipClusters.WebRTCTransportProviderCluster.ProvideOfferResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer webRTCSessionID, Integer videoStreamID, Integer audioStreamID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo webRTCSessionIDResponseValue = new CommandResponseInfo("webRTCSessionID", "Integer");
+      responseValues.put(webRTCSessionIDResponseValue, webRTCSessionID);
+      CommandResponseInfo videoStreamIDResponseValue = new CommandResponseInfo("videoStreamID", "Integer");
+      responseValues.put(videoStreamIDResponseValue, videoStreamID);
+      CommandResponseInfo audioStreamIDResponseValue = new CommandResponseInfo("audioStreamID", "Integer");
+      responseValues.put(audioStreamIDResponseValue, audioStreamID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedWebRTCTransportProviderClusterCurrentSessionsAttributeCallback implements ChipClusters.WebRTCTransportProviderCluster.CurrentSessionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.WebRTCTransportProviderClusterWebRTCSessionStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.WebRTCTransportProviderClusterWebRTCSessionStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportProviderClusterGeneratedCommandListAttributeCallback implements ChipClusters.WebRTCTransportProviderCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportProviderClusterAcceptedCommandListAttributeCallback implements ChipClusters.WebRTCTransportProviderCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportProviderClusterEventListAttributeCallback implements ChipClusters.WebRTCTransportProviderCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportProviderClusterAttributeListAttributeCallback implements ChipClusters.WebRTCTransportProviderCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportRequestorClusterCurrentSessionsAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.CurrentSessionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.WebRTCTransportRequestorClusterWebRTCSessionStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.WebRTCTransportRequestorClusterWebRTCSessionStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportRequestorClusterGeneratedCommandListAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportRequestorClusterAcceptedCommandListAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportRequestorClusterEventListAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportRequestorClusterAttributeListAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedChimeClusterInstalledChimeSoundsAttributeCallback implements ChipClusters.ChimeCluster.InstalledChimeSoundsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ChimeClusterChimeSoundStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ChimeClusterChimeSoundStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedChimeClusterGeneratedCommandListAttributeCallback implements ChipClusters.ChimeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedChimeClusterAcceptedCommandListAttributeCallback implements ChipClusters.ChimeCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedChimeClusterEventListAttributeCallback implements ChipClusters.ChimeCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedChimeClusterAttributeListAttributeCallback implements ChipClusters.ChimeCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedEcosystemInformationClusterDeviceDirectoryAttributeCallback implements ChipClusters.EcosystemInformationCluster.DeviceDirectoryAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -22330,6 +23167,26 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ContentAppObserverCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("contentAppObserver", contentAppObserverClusterInfo);
 
+    ClusterInfo zoneManagementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ZoneManagementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("zoneManagement", zoneManagementClusterInfo);
+
+    ClusterInfo cameraAvStreamManagementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.CameraAvStreamManagementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("cameraAvStreamManagement", cameraAvStreamManagementClusterInfo);
+
+    ClusterInfo webRTCTransportProviderClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.WebRTCTransportProviderCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("webRTCTransportProvider", webRTCTransportProviderClusterInfo);
+
+    ClusterInfo webRTCTransportRequestorClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.WebRTCTransportRequestorCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("webRTCTransportRequestor", webRTCTransportRequestorClusterInfo);
+
+    ClusterInfo chimeClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ChimeCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("chime", chimeClusterInfo);
+
     ClusterInfo ecosystemInformationClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.EcosystemInformationCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("ecosystemInformation", ecosystemInformationClusterInfo);
@@ -22471,6 +23328,11 @@ public class ClusterInfoMapping {
     destination.get("accountLogin").combineCommands(source.get("accountLogin"));
     destination.get("contentControl").combineCommands(source.get("contentControl"));
     destination.get("contentAppObserver").combineCommands(source.get("contentAppObserver"));
+    destination.get("zoneManagement").combineCommands(source.get("zoneManagement"));
+    destination.get("cameraAvStreamManagement").combineCommands(source.get("cameraAvStreamManagement"));
+    destination.get("webRTCTransportProvider").combineCommands(source.get("webRTCTransportProvider"));
+    destination.get("webRTCTransportRequestor").combineCommands(source.get("webRTCTransportRequestor"));
+    destination.get("chime").combineCommands(source.get("chime"));
     destination.get("ecosystemInformation").combineCommands(source.get("ecosystemInformation"));
     destination.get("commissionerControl").combineCommands(source.get("commissionerControl"));
     destination.get("unitTesting").combineCommands(source.get("unitTesting"));
@@ -28628,6 +29490,665 @@ public class ClusterInfoMapping {
     contentAppObserverClusterInteractionInfoMap.put("contentAppMessage", contentAppObservercontentAppMessageInteractionInfo);
 
     commandMap.put("contentAppObserver", contentAppObserverClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> zoneManagementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> zoneManagementcreateTwoDCartesianZoneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo zoneManagementcreateTwoDCartesianZoneInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ZoneManagementCluster) cluster)
+          .createTwoDCartesianZone((ChipClusters.ZoneManagementCluster.CreateTwoDCartesianZoneResponseCallback) callback
+           , (ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct)
+             commandArguments.get("zone")
+
+            );
+        },
+        () -> new DelegatedZoneManagementClusterCreateTwoDCartesianZoneResponseCallback(),
+        zoneManagementcreateTwoDCartesianZoneCommandParams
+      );
+    zoneManagementClusterInteractionInfoMap.put("createTwoDCartesianZone", zoneManagementcreateTwoDCartesianZoneInteractionInfo);
+
+    Map<String, CommandParameterInfo> zoneManagementupdateTwoDCartesianZoneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo zoneManagementupdateTwoDCartesianZonezoneIDCommandParameterInfo = new CommandParameterInfo("zoneID", Integer.class, Integer.class);
+    zoneManagementupdateTwoDCartesianZoneCommandParams.put("zoneID",zoneManagementupdateTwoDCartesianZonezoneIDCommandParameterInfo);
+
+    InteractionInfo zoneManagementupdateTwoDCartesianZoneInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ZoneManagementCluster) cluster)
+        .updateTwoDCartesianZone((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("zoneID")
+        , (ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct)
+        commandArguments.get("zone")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        zoneManagementupdateTwoDCartesianZoneCommandParams
+    );
+    zoneManagementClusterInteractionInfoMap.put("updateTwoDCartesianZone", zoneManagementupdateTwoDCartesianZoneInteractionInfo);
+
+    Map<String, CommandParameterInfo> zoneManagementgetTwoDCartesianZoneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo zoneManagementgetTwoDCartesianZonezoneIDCommandParameterInfo = new CommandParameterInfo("zoneID", Optional.class, Integer.class);
+    zoneManagementgetTwoDCartesianZoneCommandParams.put("zoneID",zoneManagementgetTwoDCartesianZonezoneIDCommandParameterInfo);
+    InteractionInfo zoneManagementgetTwoDCartesianZoneInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ZoneManagementCluster) cluster)
+          .getTwoDCartesianZone((ChipClusters.ZoneManagementCluster.GetTwoDCartesianZoneResponseCallback) callback
+           , (Optional<Integer>)
+             commandArguments.get("zoneID")
+
+            );
+        },
+        () -> new DelegatedZoneManagementClusterGetTwoDCartesianZoneResponseCallback(),
+        zoneManagementgetTwoDCartesianZoneCommandParams
+      );
+    zoneManagementClusterInteractionInfoMap.put("getTwoDCartesianZone", zoneManagementgetTwoDCartesianZoneInteractionInfo);
+
+    Map<String, CommandParameterInfo> zoneManagementremoveZoneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo zoneManagementremoveZonezoneIDCommandParameterInfo = new CommandParameterInfo("zoneID", Integer.class, Integer.class);
+    zoneManagementremoveZoneCommandParams.put("zoneID",zoneManagementremoveZonezoneIDCommandParameterInfo);
+    InteractionInfo zoneManagementremoveZoneInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ZoneManagementCluster) cluster)
+        .removeZone((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("zoneID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        zoneManagementremoveZoneCommandParams
+    );
+    zoneManagementClusterInteractionInfoMap.put("removeZone", zoneManagementremoveZoneInteractionInfo);
+
+    commandMap.put("zoneManagement", zoneManagementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> cameraAvStreamManagementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> cameraAvStreamManagementaudioStreamAllocateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvStreamManagementaudioStreamAllocatestreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
+    cameraAvStreamManagementaudioStreamAllocateCommandParams.put("streamType",cameraAvStreamManagementaudioStreamAllocatestreamTypeCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementaudioStreamAllocateaudioCodecCommandParameterInfo = new CommandParameterInfo("audioCodec", Integer.class, Integer.class);
+    cameraAvStreamManagementaudioStreamAllocateCommandParams.put("audioCodec",cameraAvStreamManagementaudioStreamAllocateaudioCodecCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementaudioStreamAllocatechannelCountCommandParameterInfo = new CommandParameterInfo("channelCount", Integer.class, Integer.class);
+    cameraAvStreamManagementaudioStreamAllocateCommandParams.put("channelCount",cameraAvStreamManagementaudioStreamAllocatechannelCountCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementaudioStreamAllocatesampleRateCommandParameterInfo = new CommandParameterInfo("sampleRate", Long.class, Long.class);
+    cameraAvStreamManagementaudioStreamAllocateCommandParams.put("sampleRate",cameraAvStreamManagementaudioStreamAllocatesampleRateCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementaudioStreamAllocatebitRateCommandParameterInfo = new CommandParameterInfo("bitRate", Long.class, Long.class);
+    cameraAvStreamManagementaudioStreamAllocateCommandParams.put("bitRate",cameraAvStreamManagementaudioStreamAllocatebitRateCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementaudioStreamAllocatebitDepthCommandParameterInfo = new CommandParameterInfo("bitDepth", Integer.class, Integer.class);
+    cameraAvStreamManagementaudioStreamAllocateCommandParams.put("bitDepth",cameraAvStreamManagementaudioStreamAllocatebitDepthCommandParameterInfo);
+    InteractionInfo cameraAvStreamManagementaudioStreamAllocateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
+          .audioStreamAllocate((ChipClusters.CameraAvStreamManagementCluster.AudioStreamAllocateResponseCallback) callback
+           , (Integer)
+             commandArguments.get("streamType")
+
+           , (Integer)
+             commandArguments.get("audioCodec")
+
+           , (Integer)
+             commandArguments.get("channelCount")
+
+           , (Long)
+             commandArguments.get("sampleRate")
+
+           , (Long)
+             commandArguments.get("bitRate")
+
+           , (Integer)
+             commandArguments.get("bitDepth")
+
+            );
+        },
+        () -> new DelegatedCameraAvStreamManagementClusterAudioStreamAllocateResponseCallback(),
+        cameraAvStreamManagementaudioStreamAllocateCommandParams
+      );
+    cameraAvStreamManagementClusterInteractionInfoMap.put("audioStreamAllocate", cameraAvStreamManagementaudioStreamAllocateInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvStreamManagementaudioStreamDeallocateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvStreamManagementaudioStreamDeallocateaudioStreamIDCommandParameterInfo = new CommandParameterInfo("audioStreamID", Integer.class, Integer.class);
+    cameraAvStreamManagementaudioStreamDeallocateCommandParams.put("audioStreamID",cameraAvStreamManagementaudioStreamDeallocateaudioStreamIDCommandParameterInfo);
+    InteractionInfo cameraAvStreamManagementaudioStreamDeallocateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
+        .audioStreamDeallocate((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("audioStreamID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        cameraAvStreamManagementaudioStreamDeallocateCommandParams
+    );
+    cameraAvStreamManagementClusterInteractionInfoMap.put("audioStreamDeallocate", cameraAvStreamManagementaudioStreamDeallocateInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvStreamManagementvideoStreamAllocateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatestreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("streamType",cameraAvStreamManagementvideoStreamAllocatestreamTypeCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatevideoCodecCommandParameterInfo = new CommandParameterInfo("videoCodec", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("videoCodec",cameraAvStreamManagementvideoStreamAllocatevideoCodecCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocateminFrameRateCommandParameterInfo = new CommandParameterInfo("minFrameRate", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("minFrameRate",cameraAvStreamManagementvideoStreamAllocateminFrameRateCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxFrameRateCommandParameterInfo = new CommandParameterInfo("maxFrameRate", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxFrameRate",cameraAvStreamManagementvideoStreamAllocatemaxFrameRateCommandParameterInfo);
+
+
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocateminBitRateCommandParameterInfo = new CommandParameterInfo("minBitRate", Long.class, Long.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("minBitRate",cameraAvStreamManagementvideoStreamAllocateminBitRateCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxBitRateCommandParameterInfo = new CommandParameterInfo("maxBitRate", Long.class, Long.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxBitRate",cameraAvStreamManagementvideoStreamAllocatemaxBitRateCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocateminFragmentLenCommandParameterInfo = new CommandParameterInfo("minFragmentLen", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("minFragmentLen",cameraAvStreamManagementvideoStreamAllocateminFragmentLenCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxFragmentLenCommandParameterInfo = new CommandParameterInfo("maxFragmentLen", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxFragmentLen",cameraAvStreamManagementvideoStreamAllocatemaxFragmentLenCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatewatermarkEnabledCommandParameterInfo = new CommandParameterInfo("watermarkEnabled", Optional.class, Boolean.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("watermarkEnabled",cameraAvStreamManagementvideoStreamAllocatewatermarkEnabledCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocateOSDEnabledCommandParameterInfo = new CommandParameterInfo("OSDEnabled", Optional.class, Boolean.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("OSDEnabled",cameraAvStreamManagementvideoStreamAllocateOSDEnabledCommandParameterInfo);
+    InteractionInfo cameraAvStreamManagementvideoStreamAllocateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
+          .videoStreamAllocate((ChipClusters.CameraAvStreamManagementCluster.VideoStreamAllocateResponseCallback) callback
+           , (Integer)
+             commandArguments.get("streamType")
+
+           , (Integer)
+             commandArguments.get("videoCodec")
+
+           , (Integer)
+             commandArguments.get("minFrameRate")
+
+           , (Integer)
+             commandArguments.get("maxFrameRate")
+
+           , (ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct)
+             commandArguments.get("minResolution")
+
+           , (ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct)
+             commandArguments.get("maxResolution")
+
+           , (Long)
+             commandArguments.get("minBitRate")
+
+           , (Long)
+             commandArguments.get("maxBitRate")
+
+           , (Integer)
+             commandArguments.get("minFragmentLen")
+
+           , (Integer)
+             commandArguments.get("maxFragmentLen")
+
+           , (Optional<Boolean>)
+             commandArguments.get("watermarkEnabled")
+
+           , (Optional<Boolean>)
+             commandArguments.get("OSDEnabled")
+
+            );
+        },
+        () -> new DelegatedCameraAvStreamManagementClusterVideoStreamAllocateResponseCallback(),
+        cameraAvStreamManagementvideoStreamAllocateCommandParams
+      );
+    cameraAvStreamManagementClusterInteractionInfoMap.put("videoStreamAllocate", cameraAvStreamManagementvideoStreamAllocateInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvStreamManagementvideoStreamModifyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamModifyvideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamModifyCommandParams.put("videoStreamID",cameraAvStreamManagementvideoStreamModifyvideoStreamIDCommandParameterInfo);
+
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamModifywatermarkEnabledCommandParameterInfo = new CommandParameterInfo("watermarkEnabled", Optional.class, Boolean.class);
+    cameraAvStreamManagementvideoStreamModifyCommandParams.put("watermarkEnabled",cameraAvStreamManagementvideoStreamModifywatermarkEnabledCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamModifyOSDEnabledCommandParameterInfo = new CommandParameterInfo("OSDEnabled", Optional.class, Boolean.class);
+    cameraAvStreamManagementvideoStreamModifyCommandParams.put("OSDEnabled",cameraAvStreamManagementvideoStreamModifyOSDEnabledCommandParameterInfo);
+    InteractionInfo cameraAvStreamManagementvideoStreamModifyInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
+        .videoStreamModify((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("videoStreamID")
+        , (Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct>)
+        commandArguments.get("resolution")
+        , (Optional<Boolean>)
+        commandArguments.get("watermarkEnabled")
+        , (Optional<Boolean>)
+        commandArguments.get("OSDEnabled")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        cameraAvStreamManagementvideoStreamModifyCommandParams
+    );
+    cameraAvStreamManagementClusterInteractionInfoMap.put("videoStreamModify", cameraAvStreamManagementvideoStreamModifyInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvStreamManagementvideoStreamDeallocateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvStreamManagementvideoStreamDeallocatevideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamDeallocateCommandParams.put("videoStreamID",cameraAvStreamManagementvideoStreamDeallocatevideoStreamIDCommandParameterInfo);
+    InteractionInfo cameraAvStreamManagementvideoStreamDeallocateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
+        .videoStreamDeallocate((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("videoStreamID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        cameraAvStreamManagementvideoStreamDeallocateCommandParams
+    );
+    cameraAvStreamManagementClusterInteractionInfoMap.put("videoStreamDeallocate", cameraAvStreamManagementvideoStreamDeallocateInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvStreamManagementsnapshotStreamAllocateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocateimageCodecCommandParameterInfo = new CommandParameterInfo("imageCodec", Integer.class, Integer.class);
+    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("imageCodec",cameraAvStreamManagementsnapshotStreamAllocateimageCodecCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatemaxFrameRateCommandParameterInfo = new CommandParameterInfo("maxFrameRate", Integer.class, Integer.class);
+    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("maxFrameRate",cameraAvStreamManagementsnapshotStreamAllocatemaxFrameRateCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatebitRateCommandParameterInfo = new CommandParameterInfo("bitRate", Long.class, Long.class);
+    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("bitRate",cameraAvStreamManagementsnapshotStreamAllocatebitRateCommandParameterInfo);
+
+
+
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatequalityCommandParameterInfo = new CommandParameterInfo("quality", Integer.class, Integer.class);
+    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("quality",cameraAvStreamManagementsnapshotStreamAllocatequalityCommandParameterInfo);
+    InteractionInfo cameraAvStreamManagementsnapshotStreamAllocateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
+          .snapshotStreamAllocate((ChipClusters.CameraAvStreamManagementCluster.SnapshotStreamAllocateResponseCallback) callback
+           , (Integer)
+             commandArguments.get("imageCodec")
+
+           , (Integer)
+             commandArguments.get("maxFrameRate")
+
+           , (Long)
+             commandArguments.get("bitRate")
+
+           , (ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct)
+             commandArguments.get("minResolution")
+
+           , (ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct)
+             commandArguments.get("maxResolution")
+
+           , (Integer)
+             commandArguments.get("quality")
+
+            );
+        },
+        () -> new DelegatedCameraAvStreamManagementClusterSnapshotStreamAllocateResponseCallback(),
+        cameraAvStreamManagementsnapshotStreamAllocateCommandParams
+      );
+    cameraAvStreamManagementClusterInteractionInfoMap.put("snapshotStreamAllocate", cameraAvStreamManagementsnapshotStreamAllocateInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvStreamManagementsnapshotStreamDeallocateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamDeallocatesnapshotStreamIDCommandParameterInfo = new CommandParameterInfo("snapshotStreamID", Integer.class, Integer.class);
+    cameraAvStreamManagementsnapshotStreamDeallocateCommandParams.put("snapshotStreamID",cameraAvStreamManagementsnapshotStreamDeallocatesnapshotStreamIDCommandParameterInfo);
+    InteractionInfo cameraAvStreamManagementsnapshotStreamDeallocateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
+        .snapshotStreamDeallocate((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("snapshotStreamID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        cameraAvStreamManagementsnapshotStreamDeallocateCommandParams
+    );
+    cameraAvStreamManagementClusterInteractionInfoMap.put("snapshotStreamDeallocate", cameraAvStreamManagementsnapshotStreamDeallocateInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvStreamManagementsetStreamPrioritiesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvStreamManagementsetStreamPrioritiesstreamPrioritiesCommandParameterInfo = new CommandParameterInfo("streamPriorities", ArrayList.class, ArrayList.class);
+    cameraAvStreamManagementsetStreamPrioritiesCommandParams.put("streamPriorities",cameraAvStreamManagementsetStreamPrioritiesstreamPrioritiesCommandParameterInfo);
+    InteractionInfo cameraAvStreamManagementsetStreamPrioritiesInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
+        .setStreamPriorities((DefaultClusterCallback) callback
+        , (ArrayList<Integer>)
+        commandArguments.get("streamPriorities")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        cameraAvStreamManagementsetStreamPrioritiesCommandParams
+    );
+    cameraAvStreamManagementClusterInteractionInfoMap.put("setStreamPriorities", cameraAvStreamManagementsetStreamPrioritiesInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvStreamManagementcaptureSnapshotCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvStreamManagementcaptureSnapshotsnapshotStreamIDCommandParameterInfo = new CommandParameterInfo("snapshotStreamID", Integer.class, Integer.class);
+    cameraAvStreamManagementcaptureSnapshotCommandParams.put("snapshotStreamID",cameraAvStreamManagementcaptureSnapshotsnapshotStreamIDCommandParameterInfo);
+
+    InteractionInfo cameraAvStreamManagementcaptureSnapshotInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
+        .captureSnapshot((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("snapshotStreamID")
+        , (ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct)
+        commandArguments.get("requestedResolution")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        cameraAvStreamManagementcaptureSnapshotCommandParams
+    );
+    cameraAvStreamManagementClusterInteractionInfoMap.put("captureSnapshot", cameraAvStreamManagementcaptureSnapshotInteractionInfo);
+
+    commandMap.put("cameraAvStreamManagement", cameraAvStreamManagementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> webRTCTransportProviderClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> webRTCTransportProvidersolicitOfferCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportProvidersolicitOfferstreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("streamType",webRTCTransportProvidersolicitOfferstreamTypeCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProvidersolicitOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("videoStreamID",webRTCTransportProvidersolicitOffervideoStreamIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProvidersolicitOfferaudioStreamIDCommandParameterInfo = new CommandParameterInfo("audioStreamID", Optional.class, Integer.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("audioStreamID",webRTCTransportProvidersolicitOfferaudioStreamIDCommandParameterInfo);
+
+
+    CommandParameterInfo webRTCTransportProvidersolicitOfferICETransportPolicyCommandParameterInfo = new CommandParameterInfo("ICETransportPolicy", Optional.class, String.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("ICETransportPolicy",webRTCTransportProvidersolicitOfferICETransportPolicyCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProvidersolicitOffermetadataOptionsCommandParameterInfo = new CommandParameterInfo("metadataOptions", Optional.class, Integer.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("metadataOptions",webRTCTransportProvidersolicitOffermetadataOptionsCommandParameterInfo);
+    InteractionInfo webRTCTransportProvidersolicitOfferInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportProviderCluster) cluster)
+          .solicitOffer((ChipClusters.WebRTCTransportProviderCluster.SolicitOfferResponseCallback) callback
+           , (Integer)
+             commandArguments.get("streamType")
+
+           , (Optional<Integer>)
+             commandArguments.get("videoStreamID")
+
+           , (Optional<Integer>)
+             commandArguments.get("audioStreamID")
+
+           , (Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>>)
+             commandArguments.get("ICEServers")
+
+           , (Optional<String>)
+             commandArguments.get("ICETransportPolicy")
+
+           , (Optional<Integer>)
+             commandArguments.get("metadataOptions")
+
+            );
+        },
+        () -> new DelegatedWebRTCTransportProviderClusterSolicitOfferResponseCallback(),
+        webRTCTransportProvidersolicitOfferCommandParams
+      );
+    webRTCTransportProviderClusterInteractionInfoMap.put("solicitOffer", webRTCTransportProvidersolicitOfferInteractionInfo);
+
+    Map<String, CommandParameterInfo> webRTCTransportProviderprovideOfferCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportProviderprovideOfferwebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideOfferwebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProviderprovideOffersdpCommandParameterInfo = new CommandParameterInfo("sdp", String.class, String.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("sdp",webRTCTransportProviderprovideOffersdpCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProviderprovideOfferstreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("streamType",webRTCTransportProviderprovideOfferstreamTypeCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("videoStreamID",webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProviderprovideOfferaudioStreamIDCommandParameterInfo = new CommandParameterInfo("audioStreamID", Optional.class, Integer.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("audioStreamID",webRTCTransportProviderprovideOfferaudioStreamIDCommandParameterInfo);
+
+
+    CommandParameterInfo webRTCTransportProviderprovideOfferICETransportPolicyCommandParameterInfo = new CommandParameterInfo("ICETransportPolicy", Optional.class, String.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("ICETransportPolicy",webRTCTransportProviderprovideOfferICETransportPolicyCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProviderprovideOffermetadataOptionsCommandParameterInfo = new CommandParameterInfo("metadataOptions", Optional.class, Integer.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("metadataOptions",webRTCTransportProviderprovideOffermetadataOptionsCommandParameterInfo);
+    InteractionInfo webRTCTransportProviderprovideOfferInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportProviderCluster) cluster)
+          .provideOffer((ChipClusters.WebRTCTransportProviderCluster.ProvideOfferResponseCallback) callback
+           , (Integer)
+             commandArguments.get("webRTCSessionID")
+
+           , (String)
+             commandArguments.get("sdp")
+
+           , (Integer)
+             commandArguments.get("streamType")
+
+           , (Optional<Integer>)
+             commandArguments.get("videoStreamID")
+
+           , (Optional<Integer>)
+             commandArguments.get("audioStreamID")
+
+           , (Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>>)
+             commandArguments.get("ICEServers")
+
+           , (Optional<String>)
+             commandArguments.get("ICETransportPolicy")
+
+           , (Optional<Integer>)
+             commandArguments.get("metadataOptions")
+
+            );
+        },
+        () -> new DelegatedWebRTCTransportProviderClusterProvideOfferResponseCallback(),
+        webRTCTransportProviderprovideOfferCommandParams
+      );
+    webRTCTransportProviderClusterInteractionInfoMap.put("provideOffer", webRTCTransportProviderprovideOfferInteractionInfo);
+
+    Map<String, CommandParameterInfo> webRTCTransportProviderprovideAnswerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportProviderprovideAnswerwebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportProviderprovideAnswerCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideAnswerwebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProviderprovideAnswersdpCommandParameterInfo = new CommandParameterInfo("sdp", String.class, String.class);
+    webRTCTransportProviderprovideAnswerCommandParams.put("sdp",webRTCTransportProviderprovideAnswersdpCommandParameterInfo);
+    InteractionInfo webRTCTransportProviderprovideAnswerInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportProviderCluster) cluster)
+        .provideAnswer((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (String)
+        commandArguments.get("sdp")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportProviderprovideAnswerCommandParams
+    );
+    webRTCTransportProviderClusterInteractionInfoMap.put("provideAnswer", webRTCTransportProviderprovideAnswerInteractionInfo);
+
+    Map<String, CommandParameterInfo> webRTCTransportProviderprovideICECandidateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportProviderprovideICECandidatewebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportProviderprovideICECandidateCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideICECandidatewebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProviderprovideICECandidateICECandidateCommandParameterInfo = new CommandParameterInfo("ICECandidate", String.class, String.class);
+    webRTCTransportProviderprovideICECandidateCommandParams.put("ICECandidate",webRTCTransportProviderprovideICECandidateICECandidateCommandParameterInfo);
+    InteractionInfo webRTCTransportProviderprovideICECandidateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportProviderCluster) cluster)
+        .provideICECandidate((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (String)
+        commandArguments.get("ICECandidate")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportProviderprovideICECandidateCommandParams
+    );
+    webRTCTransportProviderClusterInteractionInfoMap.put("provideICECandidate", webRTCTransportProviderprovideICECandidateInteractionInfo);
+
+    Map<String, CommandParameterInfo> webRTCTransportProviderendSessionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportProviderendSessionwebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportProviderendSessionCommandParams.put("webRTCSessionID",webRTCTransportProviderendSessionwebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProviderendSessionreasonCommandParameterInfo = new CommandParameterInfo("reason", Integer.class, Integer.class);
+    webRTCTransportProviderendSessionCommandParams.put("reason",webRTCTransportProviderendSessionreasonCommandParameterInfo);
+    InteractionInfo webRTCTransportProviderendSessionInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportProviderCluster) cluster)
+        .endSession((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (Integer)
+        commandArguments.get("reason")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportProviderendSessionCommandParams
+    );
+    webRTCTransportProviderClusterInteractionInfoMap.put("endSession", webRTCTransportProviderendSessionInteractionInfo);
+
+    commandMap.put("webRTCTransportProvider", webRTCTransportProviderClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> webRTCTransportRequestorClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> webRTCTransportRequestorofferCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportRequestorofferwebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportRequestorofferCommandParams.put("webRTCSessionID",webRTCTransportRequestorofferwebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportRequestoroffersdpCommandParameterInfo = new CommandParameterInfo("sdp", String.class, String.class);
+    webRTCTransportRequestorofferCommandParams.put("sdp",webRTCTransportRequestoroffersdpCommandParameterInfo);
+
+
+    CommandParameterInfo webRTCTransportRequestorofferICETransportPolicyCommandParameterInfo = new CommandParameterInfo("ICETransportPolicy", Optional.class, String.class);
+    webRTCTransportRequestorofferCommandParams.put("ICETransportPolicy",webRTCTransportRequestorofferICETransportPolicyCommandParameterInfo);
+    InteractionInfo webRTCTransportRequestorofferInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
+        .offer((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (String)
+        commandArguments.get("sdp")
+        , (Optional<ArrayList<ChipStructs.WebRTCTransportRequestorClusterICEServerStruct>>)
+        commandArguments.get("ICEServers")
+        , (Optional<String>)
+        commandArguments.get("ICETransportPolicy")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportRequestorofferCommandParams
+    );
+    webRTCTransportRequestorClusterInteractionInfoMap.put("offer", webRTCTransportRequestorofferInteractionInfo);
+
+    Map<String, CommandParameterInfo> webRTCTransportRequestoranswerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportRequestoranswerwebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportRequestoranswerCommandParams.put("webRTCSessionID",webRTCTransportRequestoranswerwebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportRequestoranswersdpCommandParameterInfo = new CommandParameterInfo("sdp", String.class, String.class);
+    webRTCTransportRequestoranswerCommandParams.put("sdp",webRTCTransportRequestoranswersdpCommandParameterInfo);
+    InteractionInfo webRTCTransportRequestoranswerInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
+        .answer((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (String)
+        commandArguments.get("sdp")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportRequestoranswerCommandParams
+    );
+    webRTCTransportRequestorClusterInteractionInfoMap.put("answer", webRTCTransportRequestoranswerInteractionInfo);
+
+    Map<String, CommandParameterInfo> webRTCTransportRequestorICECandidateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportRequestorICECandidatewebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportRequestorICECandidateCommandParams.put("webRTCSessionID",webRTCTransportRequestorICECandidatewebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportRequestorICECandidateICECandidateCommandParameterInfo = new CommandParameterInfo("ICECandidate", String.class, String.class);
+    webRTCTransportRequestorICECandidateCommandParams.put("ICECandidate",webRTCTransportRequestorICECandidateICECandidateCommandParameterInfo);
+    InteractionInfo webRTCTransportRequestorICECandidateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
+        .ICECandidate((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (String)
+        commandArguments.get("ICECandidate")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportRequestorICECandidateCommandParams
+    );
+    webRTCTransportRequestorClusterInteractionInfoMap.put("ICECandidate", webRTCTransportRequestorICECandidateInteractionInfo);
+
+    Map<String, CommandParameterInfo> webRTCTransportRequestorendCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportRequestorendwebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportRequestorendCommandParams.put("webRTCSessionID",webRTCTransportRequestorendwebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportRequestorendreasonCommandParameterInfo = new CommandParameterInfo("reason", Integer.class, Integer.class);
+    webRTCTransportRequestorendCommandParams.put("reason",webRTCTransportRequestorendreasonCommandParameterInfo);
+    InteractionInfo webRTCTransportRequestorendInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
+        .end((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (Integer)
+        commandArguments.get("reason")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportRequestorendCommandParams
+    );
+    webRTCTransportRequestorClusterInteractionInfoMap.put("end", webRTCTransportRequestorendInteractionInfo);
+
+    commandMap.put("webRTCTransportRequestor", webRTCTransportRequestorClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> chimeClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> chimeplayChimeSoundCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo chimeplayChimeSoundInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ChimeCluster) cluster)
+        .playChimeSound((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        chimeplayChimeSoundCommandParams
+    );
+    chimeClusterInteractionInfoMap.put("playChimeSound", chimeplayChimeSoundInteractionInfo);
+
+    commandMap.put("chime", chimeClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> ecosystemInformationClusterInteractionInfoMap = new LinkedHashMap<>();
 

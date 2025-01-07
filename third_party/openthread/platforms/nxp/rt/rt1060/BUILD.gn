@@ -1,0 +1,150 @@
+# Copyright (c) 2020-2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/nxp_sdk.gni")
+import("//build_overrides/openthread.gni")
+
+#allows to get common NXP SDK gn options
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+# Allows to get various RT gn options
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
+
+config("openthread_rt1060_config") {
+  defines = []
+  include_dirs = [
+    "${openthread_nxp_root}/src/common",
+    "${openthread_nxp_root}/src/common/br",
+    "${openthread_nxp_root}/src/common/spinel",
+    "${openthread_nxp_root}/src/imx_rt/rt1060",
+    "${openthread_nxp_root}/third_party/mbedtls/configs",
+    "${openthread_root}/third_party/mbedtls",
+    "${openthread_root}/examples/platforms",
+    "${openthread_nxp_root}/examples/utils/cli_addons",
+    "${openthread_nxp_root}/examples/utils/cli_addons/ephemeral_key",
+    "${openthread_nxp_root}/examples/utils/cli_addons/lwip",
+  ]
+
+  if (chip_enable_wifi && chip_enable_openthread) {
+    defines += [
+      "OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE=1",
+      "OPENTHREAD_CONFIG_COMMISSIONER_ENABLE=1",
+      "OPENTHREAD_CONFIG_BORDER_ROUTING_ENABLE=1",
+      "OPENTHREAD_CONFIG_PLATFORM_UDP_ENABLE=1",
+      "OPENTHREAD_CONFIG_BACKBONE_ROUTER_ENABLE=1",
+      "OPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=3",
+      "OPENTHREAD_CONFIG_BORDER_AGENT_ENABLE=1",
+      "OPENTHREAD_CONFIG_BORDER_AGENT_ID_ENABLE=1",
+      "OPENTHREAD_CONFIG_BORDER_ROUTING_DHCP6_PD_ENABLE=1",
+      "OPENTHREAD_CONFIG_SRP_SERVER_ADVERTISING_PROXY_ENABLE=1",
+      "OPENTHREAD_CONFIG_DNSSD_DISCOVERY_PROXY_ENABLE=1",
+      "OPENTHREAD_CONFIG_MULTICAST_DNS_ENABLE=1",
+      "OPENTHREAD_CONFIG_MULTICAST_DNS_PUBLIC_API_ENABLE=1",
+      "OT_APP_BR_LWIP_HOOKS_EN=1",
+    ]
+
+    if (nxp_enable_matter_cli) {
+      defines += [
+        "OPENTHREAD_CONFIG_BORDER_AGENT_EPHEMERAL_KEY_ENABLE=1",
+        "OT_APP_CLI_EPHEMERAL_KEY_ADDON=1",
+        "OT_APP_CLI_LWIP_ADDON=1",
+      ]
+    }
+  }
+
+  # ot cli configs
+  defines += [ "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1" ]
+}
+
+#Config used by the openthread stack to get the path to OpenthreadConfig.h
+source_set("openthread_core_config_rt1060") {
+  public_configs = [ ":openthread_rt1060_config" ]
+  public_deps = [ nxp_sdk_target ]
+}
+
+source_set("libopenthread-rt1060") {
+  deps = []
+  sources = [
+    "${openthread_nxp_root}/src/common/alarm_freertos.c",
+    "${openthread_nxp_root}/src/common/diag.c",
+    "${openthread_nxp_root}/src/common/entropy.c",
+    "${openthread_nxp_root}/src/common/logging.c",
+    "${openthread_nxp_root}/src/common/spinel/misc.c",
+    "${openthread_nxp_root}/src/common/spinel/radio.cpp",
+    "${openthread_nxp_root}/src/common/spinel/spinel_hdlc.cpp",
+    "${openthread_nxp_root}/src/common/spinel/system.c",
+    "${openthread_root}/src/lib/hdlc/hdlc.cpp",
+    "${openthread_root}/src/lib/url/url.cpp",
+  ]
+
+  if (chip_enable_wifi && chip_enable_openthread) {
+    sources += [
+      "${openthread_nxp_root}/src/common/br/border_agent.c",
+      "${openthread_nxp_root}/src/common/br/br_rtos_manager.c",
+      "${openthread_nxp_root}/src/common/br/infra_if.c",
+      "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
+      "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
+      "${openthread_nxp_root}/src/common/br/mdns_socket.c",
+      "${openthread_nxp_root}/src/common/br/udp_plat.c",
+      "${openthread_nxp_root}/src/common/br/utils.c",
+    ]
+
+    if (nxp_enable_matter_cli) {
+      sources += [
+        "${openthread_nxp_root}/examples/utils/cli_addons/addons_cli.c",
+        "${openthread_nxp_root}/examples/utils/cli_addons/ephemeral_key/ephemeral_key_cli.c",
+        "${openthread_nxp_root}/examples/utils/cli_addons/lwip/lwip_cli.c",
+      ]
+    }
+
+    deps += [ "${nxp_sdk_build_root}:nxp_lwip" ]
+  }
+
+  if (nxp_nvm_component == "nvm_fwk") {
+    sources += [ "${openthread_nxp_root}/src/common/flash_nvm.c" ]
+  } else {
+    sources += [ "${openthread_nxp_root}/src/common/flash_littlefs.c" ]
+  }
+
+  defines = [ "OPENTHREAD_FTD" ]
+
+  if (hci_spinel_single_uart) {
+    defines += [ "OT_PLAT_SPINEL_HCI_OVER_HDLC" ]
+    sources +=
+        [ "${openthread_nxp_root}/src/common/spinel/spinel_hci_hdlc.cpp" ]
+  } else if (spinel_over_spi == true) {
+    defines += [
+      "OT_PLAT_SPINEL_OVER_SPI",
+      "OT_PLATFORM_CONFIG_SPI_INSTANCE=4",
+      "OT_PLATFORM_CONFIG_SPI_INT_PORT=2",
+      "OT_PLATFORM_CONFIG_SPI_INT_PIN=4",
+      "LPSPI_MASTER_CLK_FREQ=CLOCK_GetClockRootFreq(kCLOCK_LpspiClkRoot)",
+    ]
+    sources += [ "${openthread_nxp_root}/src/common/spinel/spi_interface.cpp" ]
+  } else {
+    defines += [ "OT_PLAT_SPINEL_OVER_HDLC" ]
+  }
+
+  public_configs = [ ":openthread_rt1060_config" ]
+
+  deps += [
+    "${nxp_sdk_build_root}:nxp_mbedtls",
+    "${openthread_root}:libopenthread-spinel-rcp",
+    "../../..:libopenthread-platform-utils",
+    nxp_sdk_target,
+  ]
+}

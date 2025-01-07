@@ -46,23 +46,25 @@ RUN set -x \
     && cd *linux-kernel-* \
     && zcat ../*-to-*.diff.gz | patch -p1 \
     && patch -p1 < $TIZEN_SDK_ROOT/files/0001-smack-add-permissive-mode.patch \
-    # Compile
+    # Configure
     && export MAKEFLAGS=-j$(nproc) \
     && export ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- \
     && make tizen_bcm2711_defconfig \
-    && ./scripts/config -e ARCH_VIRT \
-    && ./scripts/config -e VIRTIO_MMIO -e HW_RANDOM_VIRTIO \
+    # Add support for QEMU VirtIO devices
+    && ./scripts/config -e ARCH_VIRT -e VIRTIO_MMIO \
     && ./scripts/config -e VIRTIO_PCI -e VIRTIO_BLK \
     && ./scripts/config -e VIRTIO_NET -e VETH \
-    && ./scripts/config -e IKCONFIG -e IKCONFIG_PROC \
+    && ./scripts/config -e HW_RANDOM_VIRTIO \
+    # Use ARM PL031 RTC and synchronize time during boot
+    && ./scripts/config -e RTC_DRV_PL031 -e RTC_HCTOSYS \
+    # Enable vHCI driver to add support for Bluetooth virtualization
     && ./scripts/config -e BT_HCIVHCI -e CRYPTO_USER_API_HASH -e CRYPTO_USER_API_SKCIPHER \
-    && ./scripts/config -e OVERLAY_FS \
-    && ./scripts/config -e SECURITY_SMACK_PERMISSIVE_MODE \
-    && ./scripts/config -e NET_9P -e NET_9P_VIRTIO \
-    && ./scripts/config -e INET \
-    && ./scripts/config -e 9P_FS -e 9P_FS_POSIX_ACL \
-    && ./scripts/config -e PCI_HOST_GENERIC \
+    # Enable overlay FS and disable SMACK to workaround permission issues
+    && ./scripts/config -e OVERLAY_FS -e SECURITY_SMACK_PERMISSIVE_MODE \
+    # Enable 9P filesystem support to share files between host and guest
+    && ./scripts/config -e INET -e PCI_HOST_GENERIC -e NET_9P -e NET_9P_VIRTIO -e 9P_FS \
     && make olddefconfig \
+    # Compile
     && make -j$(nproc) zImage \
     && mv arch/arm/boot/zImage $TIZEN_IOT_QEMU_KERNEL \
     # Cleanup
@@ -180,9 +182,13 @@ RUN set -x \
     && echo -n \
     "#!/bin/bash\n" \
     "grep -q 'rootshell' /proc/cmdline && exit\n" \
-    "if [[ -x /mnt/chip/runner.sh ]]; then\n" \
+    "runner=\$(grep -o 'runner=[^ ]*' /proc/cmdline | sed 's/runner=//')\n" \
+    "if [[ -z \"\$runner\" ]]; then\n" \
+    "  runner='/mnt/chip/runner.sh' \n" \
+    "fi\n" \
+    "if [[ -x \"\$runner\" ]]; then\n" \
     "  echo '### RUNNER START ###'\n" \
-    "  /mnt/chip/runner.sh\n" \
+    "  \"\$runner\"\n" \
     "  echo '### RUNNER STOP:' \$?\n" \
     "else\n" \
     "  read -r -t 5 -p 'Press ENTER to access root shell...' && exit || echo ' timeout.'\n" \
