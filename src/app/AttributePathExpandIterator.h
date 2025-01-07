@@ -167,7 +167,14 @@ private:
 ///      // this will make Next() NOT return the previous value.
 ///      iterator.MarkCompleted();
 ///
-/// -  Grab the last output path
+/// -  Grab what the next output path would be WITHOUT advancing a state;
+///
+///      {
+///        PeekAttributePathExpandIterator2 iterator(...., state);
+///        if (iterator.Next(...)) { ... }
+///      }
+///      // state here is ROLLED BACK (i.e. next calls the same value)
+///
 ///
 class PeekAttributePathExpandIterator2
 {
