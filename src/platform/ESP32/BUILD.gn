@@ -211,12 +211,6 @@ static_library("ESP32") {
       "ESP32CHIPCryptoPAL.h",
     ]
   }
-  if (chip_inet_config_enable_tcp_endpoint) {
-    sources += [
-      "ESP32TCPEndPointImplLwIP.cpp",
-      "ESP32TCPEndPointImplLwIP.h",
-    ]
-  }
 
   cflags = [
     "-Wconversion",
