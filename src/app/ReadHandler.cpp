@@ -49,7 +49,6 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType, Observer * observer, DataModel::Provider * apDataModel) :
-    mLegacyAttributePathExpandIterator(apDataModel, nullptr),
     mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     VerifyOrDie(apExchangeContext != nullptr);
@@ -75,7 +74,7 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer, DataModel::Provider * apDataModel) :
-    mLegacyAttributePathExpandIterator(apDataModel, nullptr), mExchangeCtx(*this), mManagementCallback(apCallback)
+    mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     mInteractionType = InteractionType::Subscribe;
     mFlags.ClearAll();
@@ -505,7 +504,6 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
     if (CHIP_END_OF_TLV == err)
     {
         mManagementCallback.GetInteractionModelEngine()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
-        mLegacyAttributePathExpandIterator.ResetTo(mpAttributePathList);
         mAttributePathExpandState = AttributePathExpandIterator2::State::StartIterating(mpAttributePathList);
         err                       = CHIP_NO_ERROR;
     }
@@ -849,7 +847,6 @@ void ReadHandler::PersistSubscription()
 
 void ReadHandler::ResetPathIterator()
 {
-    mLegacyAttributePathExpandIterator.ResetTo(mpAttributePathList);
     mAttributePathExpandState = AttributePathExpandIterator2::State::StartIterating(mpAttributePathList);
     mAttributeEncoderState.Reset();
 }
@@ -887,7 +884,6 @@ void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const 
         // If we're currently in the middle of generating reports for a given cluster and that in turn is marked dirty, let's reset
         // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
         // the state of the cluster as present on the server
-        mLegacyAttributePathExpandIterator.ResetCurrentCluster();
         mAttributePathExpandState.IterateFromTheStartOfTheCurrentCluster();
 
         mAttributeEncoderState.Reset();
