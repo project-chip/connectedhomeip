@@ -232,6 +232,7 @@ private:
 
 class LayerFreeRTOS : public Layer
 {
+public:
     CHIP_ERROR RunOnMatterContext(std::function<CHIP_ERROR()>);
 };
 
