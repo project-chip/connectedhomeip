@@ -613,10 +613,6 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
                     break;
                 }
             }
-            {
-                ConcreteAttributePath readPath2;
-                VerifyOrDie(!pathIterator2.Next(readPath2));
-            }
         }
         else
         {

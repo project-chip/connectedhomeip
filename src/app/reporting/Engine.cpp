@@ -19,6 +19,7 @@
 #include <access/AccessRestrictionProvider.h>
 #include <access/Privilege.h>
 #include <app/AppConfig.h>
+#include <app/AttributePathExpandIterator.h>
 #include <app/ConcreteEventPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
@@ -217,6 +218,22 @@ bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const Concrete
     return (info->dataVersion == dataVersion);
 }
 
+/// handles the ability to rollback an iteration state to a previous value
+/// as RAII
+class ExpandStateRollback
+{
+public:
+    ExpandStateRollback(AttributePathExpandIterator2::State & target) : mTargetState(target), mOldState(target) {}
+    ~ExpandStateRollback() { mTargetState = mOldState; }
+
+    /// Move the state to the newer version, so rollback is a noop.
+    void Advance() { mOldState = mTargetState; }
+
+private:
+    AttributePathExpandIterator2::State & mTargetState;
+    AttributePathExpandIterator2::State mOldState;
+};
+
 } // namespace
 
 Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
@@ -314,7 +331,12 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         uint32_t attributesRead = 0;
 #endif
 
-        AttributePathExpandIterator2 iterator = apReadHandler->IterateAttributePaths(mpImEngine->GetDataModelProvider());
+        AttributePathExpandIterator2 iterator =
+            AttributePathExpandIterator2(mpImEngine->GetDataModelProvider(), apReadHandler->AttributeIterationState());
+
+        // If processing an attribute fails (e.g. insufficient space in the output buffer), the
+        // value returned by "Next" of the iterator is not considered valid, so iterator should not advance.
+        ExpandStateRollback rollback(apReadHandler->AttributeIterationState());
 
         // For each path included in the interested path of the read handler...
         for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
@@ -437,12 +459,16 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             SuccessOrExit(err);
             // Successfully encoded the attribute, clear the internal state.
             apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
+            rollback.Advance();
         }
 
         {
             ConcreteAttributePath readPath2;
             VerifyOrDie(!iterator.Next(readPath2));
         }
+
+        // commit the fully parsed path
+        rollback.Advance();
 
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
         // chunks for this report.

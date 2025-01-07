@@ -407,12 +407,7 @@ private:
     bool IsFabricFiltered() const { return mFlags.Has(ReadHandlerFlags::FabricFiltered); }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
-
-    AttributePathExpandIterator2 IterateAttributePaths(DataModel::Provider * provider)
-    {
-        return AttributePathExpandIterator2(provider, mAttributePathExpandState);
-    }
-
+    AttributePathExpandIterator2::State & AttributeIterationState() { return mAttributePathExpandState; }
     AttributePathExpandIteratorLegacy * GetAttributePathExpandIterator() { return &mLegacyAttributePathExpandIterator; }
 
     /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine
