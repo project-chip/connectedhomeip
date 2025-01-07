@@ -117,7 +117,7 @@ TEST_F(TestPairingSession, PairingSessionTryDecodeMissingMRPParams)
 
 struct DecodeSessionParamsTestCase
 {
-    char testCaseName[100];
+    std::string testCaseName;
     ReliableMessageProtocolConfig mrpConfig;
     bool includeVersionInfo;
     uint16_t dataModelRev;
@@ -364,11 +364,11 @@ TEST_F(TestPairingSession, TestDecodeSessionParameters)
 
         if (!testCaseFailed)
         {
-            printf("\n[PASSED] TestCaseName%s\n\n", testCase.testCaseName);
+            printf("\n[PASSED] TestCaseName%s\n\n", testCase.testCaseName.c_str());
         }
         else
         {
-            printf("\n[FAILED] TestCaseName: %s\n\n", testCase.testCaseName);
+            printf("\n[FAILED] TestCaseName: %s\n\n", testCase.testCaseName.c_str());
             testFailed = true;
         }
     }
