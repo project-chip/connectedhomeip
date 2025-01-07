@@ -44,6 +44,7 @@ CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, System::Clock::T
     return PlatformMgr().StartChipTimer(delay);
 }
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 void PlatformEventing::LockMatterStack(System::Layer & aLayer)
 {
     PlatformMgr().LockChipStack();
@@ -53,6 +54,7 @@ void PlatformEventing::UnlockMatterStack(System::Layer & aLayer)
 {
     PlatformMgr().UnlockChipStack();
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 } // namespace System
 } // namespace chip
