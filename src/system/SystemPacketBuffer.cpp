@@ -637,6 +637,9 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 #if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
     lPacket->alloc_size = lAllocSize;
 #endif
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP
+    lPacket->next = nullptr;
+#endif
     // Set current packet and chained buffers' length and total length to 0
     for (PacketBuffer * pktBuf = lPacket; pktBuf != nullptr; pktBuf = pktBuf->ChainedBuffer())
     {
@@ -664,7 +667,7 @@ PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aD
 #endif
         PacketBuffer * currentBuffer = buffer.mBuffer;
         const uint8_t * dataPtr      = static_cast<const uint8_t *>(aData);
-        while (aDataSize > 0)
+        while (currentBuffer && aDataSize > 0)
         {
             size_t copyLen = currentBuffer->MaxDataLength() > aDataSize ? aDataSize : currentBuffer->MaxDataLength();
             memcpy(currentBuffer->payload, dataPtr, copyLen);
