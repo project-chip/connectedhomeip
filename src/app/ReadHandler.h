@@ -124,14 +124,14 @@ public:
         /*
          * Called after a subscription has been fully established.
          */
-        virtual void OnSubscriptionEstablished(ReadHandler & aReadHandler) {};
+        virtual void OnSubscriptionEstablished(ReadHandler & aReadHandler){};
 
         /*
          * Called right before a subscription is about to get terminated. This is only called on subscriptions that were terminated
          * after they had been fully established (and therefore had called OnSubscriptionEstablished).
          * OnSubscriptionEstablishment().
          */
-        virtual void OnSubscriptionTerminated(ReadHandler & aReadHandler) {};
+        virtual void OnSubscriptionTerminated(ReadHandler & aReadHandler){};
     };
 
     /*
@@ -413,7 +413,7 @@ private:
     /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine
     /// run if the change to the attribute path makes the ReadHandler reportable.
     /// @param aAttributeChanged Path to the attribute that was changed.
-    void AttributePathIsDirty(DataModel::Provider *apDataModel, const AttributePathParams & aAttributeChanged);
+    void AttributePathIsDirty(DataModel::Provider * apDataModel, const AttributePathParams & aAttributeChanged);
     bool IsDirty() const
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);

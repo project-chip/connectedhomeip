@@ -49,7 +49,8 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType, Observer * observer, DataModel::Provider * apDataModel) :
-    mLegacyAttributePathExpandIterator(apDataModel, nullptr), mExchangeCtx(*this), mManagementCallback(apCallback)
+    mLegacyAttributePathExpandIterator(apDataModel, nullptr),
+    mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     VerifyOrDie(apExchangeContext != nullptr);
 
@@ -853,7 +854,7 @@ void ReadHandler::ResetPathIterator()
     mAttributeEncoderState.Reset();
 }
 
-void ReadHandler::AttributePathIsDirty(DataModel::Provider *apDataModel, const AttributePathParams & aAttributeChanged)
+void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const AttributePathParams & aAttributeChanged)
 {
     ConcreteAttributePath path;
 
