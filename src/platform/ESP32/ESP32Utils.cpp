@@ -369,6 +369,30 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     }
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR ESP32Utils::DeInitWiFiStack(void)
+{
+    esp_err_t err = esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent);
+    if (err != ESP_OK)
+    {
+        return ESP32Utils::MapError(err);
+    }
+
+    // Deinitialize the ESP WiFi layer.
+    err = esp_wifi_stop();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_wifi_stop (0x%x)", err);
+        return ESP32Utils::MapError(err);
+    }
+    err = esp_wifi_deinit();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_wifi_deinit (0x%x)", err);
+        return ESP32Utils::MapError(err);
+    }
+    return CHIP_NO_ERROR;
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 struct netif * ESP32Utils::GetNetif(const char * ifKey)

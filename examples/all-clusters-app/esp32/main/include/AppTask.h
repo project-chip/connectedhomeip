@@ -34,6 +34,7 @@ class AppTask
 {
 public:
     CHIP_ERROR StartAppTask();
+    void DeleteAppTask();
     static void AppTaskMain(void * pvParameter);
     void PostEvent(const AppEvent * event);
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
