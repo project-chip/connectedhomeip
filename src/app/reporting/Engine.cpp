@@ -318,17 +318,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         PeekAttributePathExpandIterator2 iterator(mpImEngine->GetDataModelProvider(), apReadHandler->AttributeIterationState());
 
         // For each path included in the interested path of the read handler...
-        for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
-             apReadHandler->GetAttributePathExpandIterator()->Next())
+        while (iterator.Next(readPath))
         {
-            // Validate that iteration is IDENTICAL
-            {
-                ConcreteAttributePath readPath2;
-                VerifyOrDie(iterator.Next(readPath2));
-                VerifyOrDie(readPath == readPath2);
-                VerifyOrDie(readPath.mExpanded == readPath2.mExpanded);
-            }
-
             if (!apReadHandler->IsPriming())
             {
                 bool concretePathDirty = false;
@@ -439,12 +430,6 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             // Successfully encoded the attribute, clear the internal state.
             apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
         }
-
-        {
-            ConcreteAttributePath readPath2;
-            VerifyOrDie(!iterator.Next(readPath2));
-        }
-
         iterator.MarkCompleted();
 
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
