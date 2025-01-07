@@ -58,8 +58,11 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
             std::optional<ClusterId> nextCluster = NextClusterId();
             if (nextCluster.has_value())
             {
+                // A new cluster ID is to be processed. This sets the cluster ID to the new value and
+                // ALSO resets the attribute ID to "invalid", to trigger an attribute set/expansion from
+                // the beginning.
                 mState.mLastOutputPath.mClusterId   = *nextCluster;
-                mState.mLastOutputPath.mAttributeId = kInvalidAttributeId; // restarts attributes
+                mState.mLastOutputPath.mAttributeId = kInvalidAttributeId;
                 continue;
             }
         }
@@ -68,8 +71,11 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
         std::optional<EndpointId> nextEndpoint = NextEndpointId();
         if (nextEndpoint.has_value())
         {
+            // A new endpoint ID is to be processed. This sets the endpoint ID to the new value and
+            // ALSO resets the cluster ID to "invalid", to trigger a cluster set/expansion from
+            // the beginning.
             mState.mLastOutputPath.mEndpointId = *nextEndpoint;
-            mState.mLastOutputPath.mClusterId  = kInvalidClusterId; // restarts clusters
+            mState.mLastOutputPath.mClusterId  = kInvalidClusterId;
             continue;
         }
         return false;
