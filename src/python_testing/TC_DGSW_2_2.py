@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${LIGHTING_APP}
+#     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -45,17 +45,6 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from mobly import asserts
 
 
-def get_pid(name):
-    pid = None
-
-    for proc in psutil.process_iter():
-        if name in proc.name():
-            pid = proc.pid
-            break
-
-    return pid
-
-
 class TC_DGSW_2_2(MatterBaseTest):
 
     @staticmethod
@@ -66,22 +55,8 @@ class TC_DGSW_2_2(MatterBaseTest):
     def is_valid_octet_string(value):
         return isinstance(value, (bytes, bytearray))
 
-    async def send_software_fault_event(self, endpoint, pid):
-       # Construct the FIFO path. The PID should be known beforehand or discovered as part of the setup.
-        fifo_path = f"/tmp/chip_lighting_fifo_{pid}"
-
-        # Construct the shell command that simulates the software fault event
-        command = f'echo \'{{"Name":"SoftwareFault"}}\' > {fifo_path}'
-
-        logging.info(f"Sending SoftwareFault event: {command}")
-
-        try:
-            # Run the command locally. If this code is not running on the DUT itself,
-            # you may need an SSH command or a test framework method to run it remotely.
-            subprocess.run(command, shell=True, check=True)
-        except subprocess.CalledProcessError as e:
-            logging.exception(f"Failed to send SoftwareFault event via FIFO: {e}")
-            asserts.fail("Failed to send SoftwareFault event")
+    async def send_software_fault_test_event_trigger(self):
+        await self.send_test_event_triggers(eventTrigger=0x0034000000000000)
 
     async def read_software_fault_events(self, endpoint):
         event_path = [(endpoint, Clusters.SoftwareDiagnostics.Events.SoftwareFault, 1)]
@@ -113,14 +88,8 @@ class TC_DGSW_2_2(MatterBaseTest):
         # STEP 2: DUT sends an event report to TH. TH reads a list of SoftwareFault structs from DUT.
         self.step(2)
 
-        app_pid = self.matter_test_config.app_pid
-        if app_pid == 0:
-            app_pid = get_pid("chip-lighting-app")
-            if app_pid is None:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
-
         # Trigger a SoftwareFault event on the DUT
-        await self.send_software_fault_event(endpoint, app_pid)
+        await self.send_software_fault_test_event_trigger()
 
         # Allow some time for the event to be processed
         await asyncio.sleep(1)

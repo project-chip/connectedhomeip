@@ -171,7 +171,6 @@ def _do_build_apps():
         f"{target_prefix}-fabric-admin-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
         f"{target_prefix}-fabric-bridge-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
         f"{target_prefix}-fabric-sync-no-ble-no-wifi-ipv6only-clang-boringssl",
-        f"{target_prefix}-light-ipv6only-no-ble-no-wifi-clang",
         f"{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang",
         f"{target_prefix}-lit-icd-no-ble-clang-boringssl",
         f"{target_prefix}-lock-no-ble-clang-boringssl",
@@ -387,7 +386,6 @@ def python_tests(
                 as_runner(f'out/{target_prefix}-fabric-bridge-no-ble-no-wifi-rpc-ipv6only-clang-boringssl/fabric-bridge-app')}
             FABRIC_SYNC_APP: {
                 as_runner(f'out/{target_prefix}-fabric-sync-no-ble-no-wifi-ipv6only-clang-boringssl/fabric-sync')}
-            LIGHTING_APP: {as_runner(f'out/{target_prefix}-light-ipv6only-no-ble-no-wifi-clang/chip-lighting-app')}                
             LIGHTING_APP_NO_UNIQUE_ID: {as_runner(f'out/{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app')}
             TRACE_APP: out/trace_data/app-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_JSON: out/trace_data/test-{{SCRIPT_BASE_NAME}}
