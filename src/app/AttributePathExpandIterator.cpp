@@ -94,9 +94,8 @@ bool AttributePathExpandIterator::Next(ConcreteAttributePath & path)
             path = mPosition.mOutputPath;
             return true;
         }
-        mPosition.mAttributePath        = mPosition.mAttributePath->mpNext;
-        mPosition.mOutputPath           = ConcreteReadAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId);
-        mPosition.mOutputPath.mExpanded = true; // this is reset to false on advancement if needed
+        mPosition.mAttributePath = mPosition.mAttributePath->mpNext;
+        mPosition.mOutputPath    = ConcreteReadAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId);
     }
 
     return false;
