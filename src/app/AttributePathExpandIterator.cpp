@@ -17,8 +17,8 @@
 #include <app/AttributePathExpandIterator.h>
 
 #include <app/GlobalAttributes.h>
-#include <cmath>
 #include <lib/support/CodeUtils.h>
+
 #include <optional>
 
 using namespace chip::app::DataModel;
