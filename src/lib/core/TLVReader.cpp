@@ -51,8 +51,8 @@ static const uint8_t sTagSizes[] = { 0, 1, 2, 4, 2, 4, 6, 8 };
 
 TLVReader::TLVReader() :
     ImplicitProfileId(kProfileIdNotSpecified), AppData(nullptr), mElemLenOrVal(0), mBackingStore(nullptr), mReadPoint(nullptr),
-    mBufEnd(nullptr), mLenRead(0), mMaxLen(0), mContainerType(kTLVType_NotSpecified), mControlByte(kTLVControlByte_NotSpecified),
-    mContainerOpen(false)
+    mBufEnd(nullptr), mLenRead(0), mMaxLen(0), mContainerType(kTLVType_NotSpecified), mContainerOpen(false),
+    mControlByte(kTLVControlByte_NotSpecified)
 {}
 
 void TLVReader::Init(const uint8_t * data, size_t dataLen)

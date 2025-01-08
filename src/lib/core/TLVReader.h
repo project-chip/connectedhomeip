@@ -961,10 +961,13 @@ protected:
     uint32_t mLenRead;
     uint32_t mMaxLen;
     TLVType mContainerType;
-    uint16_t mControlByte;
 
+    // NOTE: odd nesting to optimize size for ARM32 (save 8 bytes of struct size)
 private:
     bool mContainerOpen;
+
+protected:
+    uint16_t mControlByte;
 
 protected:
     bool IsContainerOpen() const { return mContainerOpen; }
