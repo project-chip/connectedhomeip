@@ -566,7 +566,6 @@ private:
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber = 0;
 
-
     /// State for any on-going path expansion for handling wildcard reads/subscriptions
     AttributePathExpandIterator::State mAttributePathExpandState;
 
