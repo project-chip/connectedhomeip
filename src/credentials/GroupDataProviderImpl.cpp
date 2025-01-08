@@ -536,15 +536,15 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
     }
 };
 
-struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersistentBufferMax>
+struct EndpointData : PersistentData<kPersistentBufferMax>, GroupDataProvider::GroupEndpoint
 {
     static constexpr TLV::Tag TagEndpoint() { return TLV::ContextTag(1); }
     static constexpr TLV::Tag TagNext() { return TLV::ContextTag(2); }
 
-    chip::FabricIndex fabric_index = kUndefinedFabricIndex;
     uint16_t index                 = 0;
     chip::EndpointId next          = 0;
     chip::EndpointId prev          = 0;
+    chip::FabricIndex fabric_index = kUndefinedFabricIndex;
     bool first                     = true;
 
     EndpointData() = default;
