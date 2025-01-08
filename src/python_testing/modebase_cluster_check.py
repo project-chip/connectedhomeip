@@ -17,8 +17,8 @@
 
 import logging
 
-from mobly import asserts
 from chip.clusters.Types import NullValue
+from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
