@@ -240,7 +240,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:94
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:97
 
         steps:
             - name: Checkout

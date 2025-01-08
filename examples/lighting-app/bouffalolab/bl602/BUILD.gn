@@ -107,7 +107,6 @@ bouffalolab_executable("lighting_app") {
     defines += [ "BOOT_PIN_RESET=8" ]
   }
 
-  defines += [ "CONF_ENABLE_FRAME_PTR=${enable_debug_frame_ptr}" ]
   defines +=
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
 
