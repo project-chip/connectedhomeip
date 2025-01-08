@@ -85,15 +85,12 @@ public:
         {
             VerifyOrReturn(mAttributePath != nullptr && mAttributePath->mValue.HasWildcardAttributeId());
             mOutputPath.mAttributeId = kInvalidAttributeId;
-            mOutputPath.mExpanded    = true;
         }
 
     protected:
         Position(SingleLinkedListNode<AttributePathParams> * path) :
             mAttributePath(path), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
-        {
-            mOutputPath.mExpanded = true;
-        }
+        {}
 
         SingleLinkedListNode<AttributePathParams> * mAttributePath;
         ConcreteAttributePath mOutputPath;
