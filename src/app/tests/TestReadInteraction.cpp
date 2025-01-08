@@ -565,8 +565,7 @@ void TestReadInteraction::TestReadHandler()
 
     {
         Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
-        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelProviderInstance(nullptr /* delegate */));
+        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
 
         GenerateReportData(reportDatabuf, ReportType::kValid, false /* aSuppressResponse*/);
         EXPECT_EQ(readHandler.SendReportData(std::move(reportDatabuf), false), CHIP_ERROR_INCORRECT_STATE);
@@ -624,8 +623,7 @@ void TestReadInteraction::TestReadHandlerSetMaxReportingInterval()
         uint16_t maxInterval;
 
         // Configure ReadHandler
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelProviderInstance(nullptr /* delegate */));
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -842,8 +840,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath()
 
     {
         Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
-        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelProviderInstance(nullptr /* delegate */));
+        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
 
         GenerateReportData(reportDatabuf, ReportType::kValid, false /* aSuppressResponse*/);
         EXPECT_EQ(readHandler.SendReportData(std::move(reportDatabuf), false), CHIP_ERROR_INCORRECT_STATE);
@@ -1592,8 +1589,7 @@ void TestReadInteraction::TestProcessSubscribeRequest()
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelProviderInstance(nullptr /* delegate */));
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1654,8 +1650,7 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling()
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelProviderInstance(nullptr /* delegate */));
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1724,8 +1719,7 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling()
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelProviderInstance(nullptr /* delegate */));
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1794,8 +1788,7 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval()
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelProviderInstance(nullptr /* delegate */));
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1864,8 +1857,7 @@ void TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval()
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelProviderInstance(nullptr /* delegate */));
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1932,8 +1924,7 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeDuration(
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelProviderInstance(nullptr /* delegate */));
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);

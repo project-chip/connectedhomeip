@@ -19,6 +19,7 @@
 #include <access/AccessRestrictionProvider.h>
 #include <access/Privilege.h>
 #include <app/AppConfig.h>
+#include <app/AttributePathExpandIterator.h>
 #include <app/ConcreteEventPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
@@ -335,10 +336,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         uint32_t attributesRead = 0;
 #endif
 
+        PeekAttributePathExpandIterator iterator(mpImEngine->GetDataModelProvider(), apReadHandler->AttributeIterationPosition());
+
         // For each path included in the interested path of the read handler...
-        auto session = apReadHandler->GetAttributePathExpandIterator()->PrepareSearch();
-        for (; apReadHandler->GetAttributePathExpandIterator()->Get(session, readPath);
-             apReadHandler->GetAttributePathExpandIterator()->Next(session))
+        while (iterator.Next(readPath))
         {
             if (!apReadHandler->IsPriming())
             {
@@ -450,6 +451,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             // Successfully encoded the attribute, clear the internal state.
             apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
         }
+        iterator.MarkCompleted();
+
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
         // chunks for this report.
         hasMoreChunks = false;
@@ -1064,8 +1067,9 @@ CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
 {
     BumpDirtySetGeneration();
 
-    bool intersectsInterestPath = false;
-    mpImEngine->mReadHandlers.ForEachActiveObject([&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
+    bool intersectsInterestPath     = false;
+    DataModel::Provider * dataModel = mpImEngine->GetDataModelProvider();
+    mpImEngine->mReadHandlers.ForEachActiveObject([&dataModel, &aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
         // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
         // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
         // waiting for a response to the last message chunk for read interactions.
@@ -1075,7 +1079,7 @@ CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
             {
                 if (object->mValue.Intersects(aAttributePath))
                 {
-                    handler->AttributePathIsDirty(aAttributePath);
+                    handler->AttributePathIsDirty(dataModel, aAttributePath);
                     intersectsInterestPath = true;
                     break;
                 }
