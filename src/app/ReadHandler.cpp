@@ -857,7 +857,7 @@ void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const 
 {
     mDirtyGeneration = mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().GetDirtySetGeneration();
 
-    // we want to get the value, but not advance the state
+    // We want to get the value, but not advance the iterator position.
     AttributePathExpandIterator::Position tempPosition = mAttributePathExpandPosition;
     ConcreteAttributePath path;
 

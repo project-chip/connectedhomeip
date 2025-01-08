@@ -31,17 +31,17 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
     /// Output path invariants
     ///    - kInvalid* constants are used to define "no value available (yet)" and
     ///      iteration loop will fill the first value when such a value is seen (fixed for non-wildcard
-    ///      or iteration-based in case of wildcadrs)
-    ///    - Fill of the output path is done in order: first endpoint, then cluster, then attribute.
+    ///      or iteration-based in case of wildcards).
+    ///    - Iteration of the output path is done in breadth-first order: first endpoint, then cluster, then attribute.
     /// Processing works like:
-    ///    - First state will start of as kInvalidEndpointId/kInvalidClusterId/kInvalidAttributeId
-    ///    - First loop pass fills in endointID, followed by clusterId, followed by attributeID
-    ///    - whenever one item fails to continue iterating (there is no "next") the following
+    ///    - Initial state is kInvalidEndpointId/kInvalidClusterId/kInvalidAttributeId
+    ///    - First loop pass fills-in endointID, followed by clusterID, followed by attributeID
+    ///    - Whenever one level is done iterating (there is no "next") the following
     ///      "higher path component" is updated:
     ///         - once a valid path exists, try to advance attributeID
     ///         - if attributeID fails to advance, try to advance clusterID (and restart attributeID)
     ///         - if clusterID fails to advance, try to advance endpointID (and restart clusterID)
-    ///         - if endpointID fails to advance, assume iteration done
+    ///         - if endpointID fails to advance, iteration is done
     while (true)
     {
         if (mPosition.mOutputPath.mClusterId != kInvalidClusterId)
