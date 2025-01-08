@@ -732,6 +732,7 @@ class TestMatterTestingSupport(MatterBaseTest):
         PIXITValidator.validate_hex_pixit_value("1234")  # Should pass
         PIXITValidator.validate_hex_pixit_value("ABCD")  # Should pass
         PIXITValidator.validate_hex_pixit_value("abcd")  # Should pass
+        PIXITValidator.validate_hex_pixit_value("hex:12ab")  # Should pass
 
         try:
             PIXITValidator.validate_hex_pixit_value("0x123")  # Odd number of digits
@@ -782,6 +783,69 @@ class TestMatterTestingSupport(MatterBaseTest):
         )
 
         PIXITValidator.validate_value(None, optional_pixit)  # Should pass as it's optional
+
+    def test_pixits_validation(self):
+        """Test bulk PIXIT validation functionality"""
+        pixits = [
+            PIXITDefinition(
+                name="PIXIT.TEST.INT",
+                pixit_type=PIXITType.INT,
+                description="Test integer PIXIT"
+            ),
+            PIXITDefinition(
+                name="PIXIT.TEST.STRING",
+                pixit_type=PIXITType.STRING,
+                description="Test string PIXIT",
+                required=False
+            ),
+            PIXITDefinition(
+                name="PIXIT.TEST.HEX",
+                pixit_type=PIXITType.HEX,
+                description="Test hex PIXIT"
+            )
+        ]
+
+        # Test valid values
+        valid_values = {
+            "PIXIT.TEST.INT": "42",
+            "PIXIT.TEST.STRING": "test string",
+            "PIXIT.TEST.HEX": "0x1234"
+        }
+        PIXITValidator.validate_pixits(pixits, valid_values)  # Should pass
+
+        # Test missing required PIXIT
+        missing_required = {
+            "PIXIT.TEST.STRING": "test string",
+            "PIXIT.TEST.HEX": "0x1234"
+        }
+        try:
+            PIXITValidator.validate_pixits(pixits, missing_required)
+            asserts.fail("Expected PIXITValidationError for missing required PIXIT")
+        except PIXITValidationError as e:
+            asserts.assert_true("PIXIT.TEST.INT" in str(e),
+                                "Error message should indicate missing PIXIT")
+
+        # Test missing optional PIXIT (should pass)
+        missing_optional = {
+            "PIXIT.TEST.INT": "42",
+            "PIXIT.TEST.HEX": "0x1234"
+        }
+        PIXITValidator.validate_pixits(pixits, missing_optional)  # Should pass
+
+        # Test multiple validation errors
+        multiple_errors = {
+            "PIXIT.TEST.INT": "not a number",
+            "PIXIT.TEST.HEX": "invalid hex"
+        }
+        try:
+            PIXITValidator.validate_pixits(pixits, multiple_errors)
+            asserts.fail("Expected PIXITValidationError for multiple validation errors")
+        except PIXITValidationError as e:
+            error_msg = str(e)
+            asserts.assert_true("Invalid value for PIXIT.TEST.INT" in error_msg,
+                                "Error message should indicate invalid INT PIXIT value")
+            asserts.assert_true("Invalid value for PIXIT.TEST.HEX" in error_msg,
+                                "Error message should indicate invalid HEX PIXIT value")
 
 
 if __name__ == "__main__":

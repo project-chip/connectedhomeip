@@ -734,18 +734,23 @@ class PIXITValidator:
         """Validates that a value represents valid hexadecimal data.
 
         Args:
-            value: Value to validate. Can include optional "0x" prefix.
+            value: Value to validate. Can include optional "0x" prefix or "hex:" prefix
 
         Raises:
             ValueError: If value is not valid hexadecimal or has odd number of digits
         """
+        # Remove optional "0x" or "hex:" prefix
+        if value.startswith("0x"):
+            hex_value = value[2:]
+        elif value.startswith("hex:"):
+            hex_value = value[4:]
+        else:
+            hex_value = value
+
         try:
-            hex_str = value.lower().replace("0x", "")
-            int(hex_str, 16)  # Validate hex format
-
-            if len(hex_str) % 2 != 0:
-                raise ValueError(f"Hex string must have even number of digits, got {len(hex_str)} digits")
-
+            int(hex_value, 16)  # Validate hex format
+            if len(hex_value) % 2 != 0:
+                raise ValueError("Hex string must have even number of digits")
         except (ValueError, TypeError) as e:
             raise ValueError(f"Invalid hex value: {e}")
 
