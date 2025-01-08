@@ -65,7 +65,7 @@ public:
     public:
         // Position is treated as a direct member access by the AttributePathExpandIterator, however it is opaque (except copying)
         // for external code. We allow friendship here to not have specific get/set for methods (clearer interface and less
-        // likelyhood of extra code usage).
+        // likelihood of extra code usage).
         friend class AttributePathExpandIterator;
 
         /// External callers can only ever start iterating on a new path from the beginning
