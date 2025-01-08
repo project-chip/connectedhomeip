@@ -232,7 +232,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         script_command = ("gdb -batch -return-child-result -q -ex run -ex "
                           "thread|apply|all|bt --args python3".split() + script_command)
     else:
-        script_command = "/usr/bin/env python3".split() + script_command
+        script_command = "/usr/bin/env python3 -X faulthandler".split() + script_command
 
     final_script_command = [i.replace('|', ' ') for i in script_command]
 
