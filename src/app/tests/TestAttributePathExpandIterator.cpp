@@ -443,7 +443,7 @@ TEST(TestAttributePathExpandIterator, TestFixedPathExpansion)
     // invalid cluster with a valid attribute (featuremap) returns empty
     {
         SingleLinkedListNode<app::AttributePathParams> clusInfo;
-        clusInfo.mValue.mClusterId   = 122333;
+        clusInfo.mValue.mClusterId   = 122344;
         clusInfo.mValue.mAttributeId = Clusters::Globals::Attributes::FeatureMap::Id;
 
         auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
@@ -469,7 +469,7 @@ TEST(TestAttributePathExpandIterator, TestFixedPathExpansion)
     {
         SingleLinkedListNode<app::AttributePathParams> clusInfo;
         clusInfo.mValue.mEndpointId  = 1;
-        clusInfo.mValue.mClusterId   = 122333;
+        clusInfo.mValue.mClusterId   = 122344;
         clusInfo.mValue.mAttributeId = 122333;
 
         auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
