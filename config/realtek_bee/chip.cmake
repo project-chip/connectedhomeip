@@ -28,7 +28,7 @@ list(
 #    -DCONFIG_FUNCION_O0_OPTIMIZE
 #    -DCONFIG_ENABLE_FACTORY_DATA=1
     -DDM_ODM_SUPPORT_TYPE=32
-    -DCHIP_DEVICE_LAYER_TARGET=Realtek_bee
+    -DCHIP_DEVICE_LAYER_TARGET=realtek_bee
 #    -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -D_POSIX_REALTIME_SIGNALS
     -DCHIP_SHELL_MAX_TOKENS=11
@@ -70,7 +70,7 @@ list(
     ${CHIP_ROOT}/src
     ${CHIP_ROOT}/src/system
     ${CHIP_ROOT}/src/app
-    ${CHIP_ROOT}/src/platform/Realtek_bee
+    ${CHIP_ROOT}/src/platform/realtek_bee
     ${CHIP_ROOT}/src/platform/OpenThread
 #    ${CHIP_ROOT}/src/lwip/bee
 #    ${CHIP_ROOT}/src/lwip/bee/arch

@@ -25,14 +25,14 @@
 #include "DeviceCallbacks.h"
 #include "Globals.h"
 
-#include "CHIPDeviceManager.h"
-#include <app/server/Dnssd.h>
 #include "BoltLockManager.h"
+#include "CHIPDeviceManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
+#include <app/server/Dnssd.h>
 #include <assert.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -58,7 +58,7 @@ uint32_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS     = 250;
 constexpr uint32_t kInitOTARequestorDelaySec = 3;
 
-constexpr EndpointId kLightEndpointId          = 1;
+constexpr EndpointId kLightEndpointId = 1;
 
 bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
@@ -118,7 +118,7 @@ void DeviceCallbacks::UpdateStatusLED()
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
-    //ChipLogProgress(Zcl, "DeviceEventCallback event_type 0x%x", event->Type);
+    // ChipLogProgress(Zcl, "DeviceEventCallback event_type 0x%x", event->Type);
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
@@ -150,7 +150,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
         UpdateStatusLED();
         break;
-    
+
     case DeviceEventType::kCommissioningComplete:
         break;
 
@@ -217,8 +217,7 @@ exit:
     return;
 }
 
-void DeviceCallbacks::OnLockPostAttributeChangeCallback(chip::EndpointId endpointId,
-                                           chip::AttributeId attributeId, uint8_t *value)
+void DeviceCallbacks::OnLockPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value)
 {
     if (attributeId == app::Clusters::DoorLock::Attributes::LockState::Id)
     {
@@ -229,7 +228,7 @@ void DeviceCallbacks::OnLockPostAttributeChangeCallback(chip::EndpointId endpoin
         // case to_underlying(DlLockState::kLocked):
         //     BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
         // break;
-            
+
         // case to_underlying(DlLockState::kUnlocked):
         //     BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
         // break;
@@ -259,8 +258,8 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
     }
 }
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, 
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
@@ -268,11 +267,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     ChipLogProgress(Zcl,
                     "MatterPostAttributeChangeCallback - Cluster ID: " ChipLogFormatMEI
                     ", EndPoint ID: '0x%02x', Attribute ID: " ChipLogFormatMEI,
-                    ChipLogValueMEI(attributePath.mClusterId), attributePath.mEndpointId, ChipLogValueMEI(attributePath.mAttributeId));
+                    ChipLogValueMEI(attributePath.mClusterId), attributePath.mEndpointId,
+                    ChipLogValueMEI(attributePath.mAttributeId));
 
     if (cb != nullptr)
     {
-        cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type, size, value);
+        cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type, size,
+                                        value);
     }
 }
 
@@ -324,7 +325,7 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
     ChipLogProgress(Zcl, "Door Lock App: UnLock Command endpoint=%d", endpointId);
 
     bool status = BoltLockMgr().Unlock(endpointId, fabricIdx, nodeId, pinCode, err);
-    if (status)    
+    if (status)
     {
         BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::UNLOCK_ACTION);
     }
@@ -355,4 +356,3 @@ void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
     // Apply the relock state in the application control
     BoltLockMgr().InitiateAction(AppEvent::kEventType_Timer, BoltLockManager::LOCK_ACTION);
 }
-

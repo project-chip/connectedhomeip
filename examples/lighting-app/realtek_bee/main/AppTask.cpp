@@ -23,16 +23,17 @@
 #include "AppTask.h"
 #include "Globals.h"
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
-#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -65,7 +66,7 @@ using namespace ::chip::DeviceLayer;
 #include <platform/CHIPDeviceLayer.h>
 
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3500
-#define RESET_TRIGGER_TIMEOUT   1500
+#define RESET_TRIGGER_TIMEOUT 1500
 #define BLE_ADV_TRIGGER_TIMEOUT 1500
 
 #if CONFIG_DAC_KEY_ENC
@@ -146,7 +147,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
 void OnIdentifyStart(Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
-    identifyLED.Blink(500,500);
+    identifyLED.Blink(500, 500);
 }
 
 void OnIdentifyStop(Identify *)
@@ -156,10 +157,7 @@ void OnIdentifyStop(Identify *)
 }
 
 Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    OnIdentifyStart, 
-    OnIdentifyStop, 
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    chip::EndpointId{ 1 },   OnIdentifyStart, OnIdentifyStop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnTriggerIdentifyEffect,
 };
 
@@ -213,6 +211,7 @@ void AppTask::InitServer(intptr_t arg)
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -251,7 +250,7 @@ void AppTask::InitGpio()
 
 CHIP_ERROR AppTask::Init()
 {
-    size_t check_mem_peak; 
+    size_t check_mem_peak;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "Lighting App Demo!");
 
@@ -259,8 +258,8 @@ CHIP_ERROR AppTask::Init()
     chip::rpc::Init();
 #endif
 
-	chip::DeviceManager::CHIPDeviceManager & deviceMgr = chip::DeviceManager::CHIPDeviceManager::GetInstance();
-    err = deviceMgr.Init(&EchoCallbacks);
+    chip::DeviceManager::CHIPDeviceManager & deviceMgr = chip::DeviceManager::CHIPDeviceManager::GetInstance();
+    err                                                = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!");
@@ -278,10 +277,10 @@ CHIP_ERROR AppTask::Init()
     chip::Shell::Engine::Root().RunMainLoop();
 #endif
 
-	check_mem_peak = os_mem_peek(RAM_TYPE_DATA_ON);
-	ChipLogProgress(DeviceLayer, "os_mem_peek(RAM_TYPE_DATA_ON) : (%u)", check_mem_peak);
+    check_mem_peak = os_mem_peek(RAM_TYPE_DATA_ON);
+    ChipLogProgress(DeviceLayer, "os_mem_peek(RAM_TYPE_DATA_ON) : (%u)", check_mem_peak);
 
-    //Setup light
+    // Setup light
     err = LightingMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -292,7 +291,6 @@ CHIP_ERROR AppTask::Init()
 
     return err;
 }
-
 
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
@@ -352,10 +350,7 @@ void AppTask::BLEAdvEventHandler(AppEvent * aEvent)
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
 {
-    if (btnIdx != APP_TOGGLE_BUTTON &&
-        btnIdx != APP_FUNCTION_BUTTON &&
-        btnIdx != APP_LEVEL_BUTTON &&
-        btnIdx != APP_BLE_ADV_BUTTON)
+    if (btnIdx != APP_TOGGLE_BUTTON && btnIdx != APP_FUNCTION_BUTTON && btnIdx != APP_LEVEL_BUTTON && btnIdx != APP_BLE_ADV_BUTTON)
     {
         return;
     }
@@ -365,7 +360,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
     AppEvent button_event              = {};
     button_event.Type                  = AppEvent::kEventType_Button;
     button_event.ButtonEvent.ButtonIdx = btnIdx;
-    button_event.ButtonEvent.Action    = btnPressed ? true:false;
+    button_event.ButtonEvent.Action    = btnPressed ? true : false;
 
     if (btnIdx == APP_TOGGLE_BUTTON && btnPressed == 1)
     {
@@ -383,7 +378,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
         // Hand off to Functionality handler - depends on duration of press
         button_event.Handler = FunctionHandler;
     }
-    else if(btnIdx == APP_BLE_ADV_BUTTON)
+    else if (btnIdx == APP_BLE_ADV_BUTTON)
     {
         button_event.Handler = BLEAdvEventHandler;
     }
@@ -424,7 +419,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         systemStatusLED.Set(false);
         systemStatusLED.Blink(50, 950);
     }
-    else if(sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_BLEAdv)
+    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_BLEAdv)
     {
         ChipLogProgress(NotSpecified, "[BTN] Factory Reset selected. Release within %us to cancel.",
                         FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
@@ -435,7 +430,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Turn off all LEDs before starting blink to make sure blink is coordinated.
         systemStatusLED.Set(false);
-        systemStatusLED.Blink(500,500);
+        systemStatusLED.Blink(500, 500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -476,7 +471,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             chip::DeviceManager::CHIPDeviceManager::GetInstance().Shutdown();
             WDT_SystemReset(RESET_ALL, SW_RESET_APP_START);
         }
-        else if(sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_BLEAdv)
+        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_BLEAdv)
         {
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
@@ -559,7 +554,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         if (xPortIsInsideInterrupt())
         {
             BaseType_t higherPrioTaskWoken = pdFALSE;
-            status              = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
             portYIELD_FROM_ISR(higherPrioTaskWoken);
         }
         else

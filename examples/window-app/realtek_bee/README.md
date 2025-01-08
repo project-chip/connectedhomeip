@@ -1,6 +1,7 @@
 # CHIP Realtek Window Covering Example
 
-This example demonstrates the Matter Window Covering application on Realtek platform.
+This example demonstrates the Matter Window Covering application on Realtek
+platform.
 
 ---
 

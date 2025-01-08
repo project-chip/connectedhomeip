@@ -30,13 +30,13 @@
 
 #define APP_TASK_NAME "APP"
 
-#define APP_LOCK_BUTTON        SW1_BUTTON
-#define APP_FUNCTION_BUTTON    SW2_BUTTON
+#define APP_LOCK_BUTTON SW1_BUTTON
+#define APP_FUNCTION_BUTTON SW2_BUTTON
 #define APP_LOCK_JAMMED_BUTTON SW3_BUTTON
 
-#define LOCK_STATE_LED         D1_LED
-#define IDENTIFY_STATE_LED     D2_LED
-#define SYSTEM_STATE_LED       D3_LED
+#define LOCK_STATE_LED D1_LED
+#define IDENTIFY_STATE_LED D2_LED
+#define SYSTEM_STATE_LED D3_LED
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.

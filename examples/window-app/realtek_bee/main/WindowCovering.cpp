@@ -310,13 +310,13 @@ uint8_t WindowCovering::PositionToBrightness(uint16_t aPosition, MoveType aMoveT
     {
         pwmLimits.open   = mLiftIndicator.GetMinLevel();
         pwmLimits.closed = mLiftIndicator.GetMaxLevel();
-        brightness = mLiftIndicator.GetMaxLevel() - Percent100thsToValue(pwmLimits, aPosition);
+        brightness       = mLiftIndicator.GetMaxLevel() - Percent100thsToValue(pwmLimits, aPosition);
     }
     else if (aMoveType == MoveType::TILT)
     {
         pwmLimits.open   = mTiltIndicator.GetMinLevel();
         pwmLimits.closed = mTiltIndicator.GetMaxLevel();
-        brightness = mTiltIndicator.GetMaxLevel() - Percent100thsToValue(pwmLimits, aPosition);
+        brightness       = mTiltIndicator.GetMaxLevel() - Percent100thsToValue(pwmLimits, aPosition);
     }
 
     return brightness;

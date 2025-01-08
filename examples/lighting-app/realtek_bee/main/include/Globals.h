@@ -22,4 +22,3 @@
 extern LEDWidget lightStatusLED;
 extern LEDWidget identifyLED;
 extern LEDWidget systemStatusLED;
-

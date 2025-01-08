@@ -36,7 +36,7 @@ void LightSwitch::Init()
 
 void LightSwitch::InitiateActionSwitch(chip::EndpointId endpointId, uint8_t action)
 {
-    BindingTable & bindingTable = BindingTable::GetInstance();
+    BindingTable & bindingTable        = BindingTable::GetInstance();
     BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
     if (data)
     {
@@ -89,7 +89,7 @@ void LightSwitch::GenericSwitchReleasePress()
 
 #if CONFIG_ENABLE_ATTRIBUTE_SUBSCRIBE
 void LightSwitch::SubscribeRequestForOneNode(chip::EndpointId endpointId)
- {
+{
     BindingTable & bindingTable = BindingTable::GetInstance();
 
     if (!bindingTable.Size())
@@ -98,24 +98,24 @@ void LightSwitch::SubscribeRequestForOneNode(chip::EndpointId endpointId)
         return;
     }
     DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction2, endpointId);
- }
+}
 
- void LightSwitch::ShutdownSubscribeRequestForOneNode(chip::EndpointId endpointId)
- {
+void LightSwitch::ShutdownSubscribeRequestForOneNode(chip::EndpointId endpointId)
+{
     BindingTable & bindingTable = BindingTable::GetInstance();
     for (auto & entry : bindingTable)
     {
-        ChipLogError(DeviceLayer, "entry.local %d",entry.local);
-        if(endpointId == entry.local)
+        ChipLogError(DeviceLayer, "entry.local %d", entry.local);
+        if (endpointId == entry.local)
         {
             BindingHandler::SubscribeCommandData * data = Platform::New<BindingHandler::SubscribeCommandData>();
-            data->localEndpointId       = endpointId;
-            data->nodeId                = entry.nodeId;
-            data->fabricIndex           = entry.fabricIndex;
- 
+            data->localEndpointId                       = endpointId;
+            data->nodeId                                = entry.nodeId;
+            data->fabricIndex                           = entry.fabricIndex;
+
             DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction3, reinterpret_cast<intptr_t>(data));
             break;
         }
     }
- }
- #endif
+}
+#endif

@@ -23,16 +23,17 @@
 #include "AppTask.h"
 #include "Globals.h"
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
-#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -46,7 +47,6 @@
 #include <CHIPDeviceManager.h>
 #include <DeviceCallbacks.h>
 #include <os_mem.h>
-
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
@@ -146,7 +146,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
 void OnIdentifyStart(Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
-    identifyLED.Blink(500,500);
+    identifyLED.Blink(500, 500);
 }
 
 void OnIdentifyStop(Identify *)
@@ -156,10 +156,7 @@ void OnIdentifyStop(Identify *)
 }
 
 Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    OnIdentifyStart, 
-    OnIdentifyStop, 
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    chip::EndpointId{ 1 },   OnIdentifyStart, OnIdentifyStop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnTriggerIdentifyEffect,
 };
 
@@ -213,6 +210,7 @@ void AppTask::InitServer(intptr_t arg)
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -250,12 +248,12 @@ void AppTask::InitGpio()
 
 CHIP_ERROR AppTask::Init()
 {
-    size_t check_mem_peak; 
+    size_t check_mem_peak;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "Lock App Demo!");
 
-	chip::DeviceManager::CHIPDeviceManager & deviceMgr = chip::DeviceManager::CHIPDeviceManager::GetInstance();
-    err = deviceMgr.Init(&EchoCallbacks);
+    chip::DeviceManager::CHIPDeviceManager & deviceMgr = chip::DeviceManager::CHIPDeviceManager::GetInstance();
+    err                                                = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!");
@@ -273,8 +271,8 @@ CHIP_ERROR AppTask::Init()
     chip::Shell::Engine::Root().RunMainLoop();
 #endif
 
-	check_mem_peak = os_mem_peek(RAM_TYPE_DATA_ON);
-	ChipLogProgress(DeviceLayer, "os_mem_peek(RAM_TYPE_DATA_ON) : (%u)", check_mem_peak);
+    check_mem_peak = os_mem_peek(RAM_TYPE_DATA_ON);
+    ChipLogProgress(DeviceLayer, "os_mem_peek(RAM_TYPE_DATA_ON) : (%u)", check_mem_peak);
 
     // Setup Bolt
     err = BoltLockMgr().Init();
@@ -359,7 +357,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
     AppEvent button_event              = {};
     button_event.Type                  = AppEvent::kEventType_Button;
     button_event.ButtonEvent.ButtonIdx = btnIdx;
-    button_event.ButtonEvent.Action    = btnPressed ? true:false;
+    button_event.ButtonEvent.Action    = btnPressed ? true : false;
 
     if (btnIdx == APP_LOCK_BUTTON && btnPressed == 1)
     {
@@ -411,8 +409,8 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         systemStatusLED.Set(false);
         lockLED.Set(false);
 
-        systemStatusLED.Blink(500,500);
-        lockLED.Blink(500,500);
+        systemStatusLED.Blink(500, 500);
+        lockLED.Blink(500, 500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -424,7 +422,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
 void AppTask::FunctionHandler(AppEvent * aEvent)
 {
-   if (aEvent->ButtonEvent.ButtonIdx != APP_FUNCTION_BUTTON)
+    if (aEvent->ButtonEvent.ButtonIdx != APP_FUNCTION_BUTTON)
     {
         return;
     }
@@ -508,8 +506,8 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
     {
         sAppTask.mNotifyState = true;
     }
-    
-    lockLED.Blink(50,50);
+
+    lockLED.Blink(50, 50);
 }
 
 void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
@@ -529,7 +527,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        sAppTask.UpdateClusterState();   
+        sAppTask.UpdateClusterState();
     }
 }
 
@@ -541,7 +539,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         if (xPortIsInsideInterrupt())
         {
             BaseType_t higherPrioTaskWoken = pdFALSE;
-            status              = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
             portYIELD_FROM_ISR(higherPrioTaskWoken);
         }
         else

@@ -31,7 +31,7 @@
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <platform/Realtek_bee/FactoryDataProvider.h>
+#include <platform/realtek_bee/FactoryDataProvider.h>
 
 class AppTask
 {
@@ -40,16 +40,16 @@ public:
     CHIP_ERROR StartAppTask();
     void InitGpio();
 
-    static void AppTaskMain(void *pvParameter);
+    static void AppTaskMain(void * pvParameter);
 
-    //void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);//for shell
-    void PostEvent(const AppEvent *event);
+    // void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);//for shell
+    void PostEvent(const AppEvent * event);
     void UpdateClusterState();
 
     static void ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed);
 
 private:
-    friend AppTask &GetAppTask(void);
+    friend AppTask & GetAppTask(void);
 
     static void InitServer(intptr_t arg);
 
@@ -59,23 +59,23 @@ private:
     void StartTimer(uint32_t aTimeoutMs);
     void CancelTimer(void);
 
-    void DispatchEvent(AppEvent *event);
+    void DispatchEvent(AppEvent * event);
 
-    static void FunctionTimerEventHandler(AppEvent *aEvent);
-    static void FunctionHandler(AppEvent *aEvent);
+    static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void FunctionHandler(AppEvent * aEvent);
 
-    static void LightingActionEventHandler(AppEvent *aEvent);
-    static void TimerEventHandler(chip::System::Layer *aLayer, void *aAppState);
+    static void LightingActionEventHandler(AppEvent * aEvent);
+    static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
 
     static void BLEStartAdvertising(intptr_t arg);
-    static void BLEAdvEventHandler(AppEvent *aEvent);
+    static void BLEAdvEventHandler(AppEvent * aEvent);
 
     enum Function_t
     {
-        kFunction_NoneSelected   = 0,
-        kFunction_Reset          = 1,
-        kFunction_BLEAdv         = 2,
-        kFunction_FactoryReset   = 3,
+        kFunction_NoneSelected = 0,
+        kFunction_Reset        = 1,
+        kFunction_BLEAdv       = 2,
+        kFunction_FactoryReset = 3,
         kFunction_Invalid
     } Function;
 
@@ -86,7 +86,7 @@ private:
     static AppTask sAppTask;
 };
 
-inline AppTask &GetAppTask(void)
+inline AppTask & GetAppTask(void)
 {
     return AppTask::sAppTask;
 }

@@ -21,8 +21,8 @@
 
 #include "AppConfig.h"
 #include "AppTask.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <FreeRTOS.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace chip;
 using BeeConfig = chip::DeviceLayer::Internal::BeeConfig;
@@ -71,16 +71,16 @@ bool BoltLockManager::ReadConfigValues()
 {
     size_t outLen;
     BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(mUsers),
-                                     sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mUsers), outLen);
+                                  sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mUsers), outLen);
 
     BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_LockUserData, reinterpret_cast<uint8_t *>(mUserData),
-                                     sizeof(UserData) * ArraySize(mUserData), outLen);
+                                  sizeof(UserData) * ArraySize(mUserData), outLen);
 
     BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(mCredentials),
-                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mCredentials), outLen);
+                                  sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mCredentials), outLen);
 
     BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
-                                     sizeof(mCredentialData), outLen);
+                                  sizeof(mCredentialData), outLen);
 
     return true;
 }
@@ -105,8 +105,8 @@ bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricInd
     VerifyOrReturnError(userName.size() <= DOOR_LOCK_MAX_USER_NAME_SIZE, false);
     VerifyOrReturnError(totalCredentials <= CONFIG_LOCK_NUM_CREDENTIALS_PER_USER, false);
 
-    UserData & userData     = mUserData[userIndex - 1];
-    auto & user             = mUsers[userIndex - 1];
+    UserData & userData = mUserData[userIndex - 1];
+    auto & user         = mUsers[userIndex - 1];
 
     Platform::CopyString(userData.mName, userName);
     memcpy(userData.mCredentials, credentials, totalCredentials * sizeof(CredentialStruct));
@@ -124,12 +124,12 @@ bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricInd
 
     // Save user information in NVM flash
     BeeConfig::WriteConfigValueBin(BeeConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(mUsers),
-                                      sizeof(EmberAfPluginDoorLockUserInfo) * CONFIG_LOCK_NUM_USERS);
+                                   sizeof(EmberAfPluginDoorLockUserInfo) * CONFIG_LOCK_NUM_USERS);
 
     BeeConfig::WriteConfigValueBin(BeeConfig::kConfigKey_LockUserData, reinterpret_cast<const uint8_t *>(mUserData),
-                                      sizeof(UserData) * CONFIG_LOCK_NUM_USERS);
+                                   sizeof(UserData) * CONFIG_LOCK_NUM_USERS);
 
-    ChipLogProgress(Zcl, "Successfully set the user [index=%d]",  userIndex);
+    ChipLogProgress(Zcl, "Successfully set the user [index=%d]", userIndex);
 
     return true;
 }
@@ -153,8 +153,8 @@ bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creato
     VerifyOrReturnError(credentialIndex > 0 && credentialIndex <= CONFIG_LOCK_NUM_CREDENTIALS, false);
     VerifyOrReturnError(secret.size() <= kMaxCredentialLength, false);
 
-    auto & credentialData           = mCredentialData[credentialIndex - 1];
-    auto & credential               = mCredentials[credentialIndex - 1];
+    auto & credentialData = mCredentialData[credentialIndex - 1];
+    auto & credential     = mCredentials[credentialIndex - 1];
 
     memcpy(credentialData, secret.data(), secret.size());
 
@@ -167,10 +167,10 @@ bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creato
     credential.lastModifiedBy     = modifier;
 
     BeeConfig::WriteConfigValueBin(BeeConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(mCredentials),
-                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * CONFIG_LOCK_NUM_CREDENTIALS);
+                                   sizeof(EmberAfPluginDoorLockCredentialInfo) * CONFIG_LOCK_NUM_CREDENTIALS);
 
     BeeConfig::WriteConfigValueBin(BeeConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(mCredentialData),
-                                      CONFIG_LOCK_NUM_CREDENTIALS * kMaxCredentialLength);
+                                   CONFIG_LOCK_NUM_CREDENTIALS * kMaxCredentialLength);
 
     ChipLogProgress(Zcl, "Setting lock credential %u: %s", static_cast<unsigned>(credentialIndex),
                     credential.status == DlCredentialStatus::kAvailable ? "available" : "occupied");
@@ -279,9 +279,8 @@ void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
     }
 }
 
-bool BoltLockManager::setLockState(EndpointId endpointId, const Nullable<FabricIndex> & fabricIdx,
-                               const Nullable<NodeId> & nodeId, DlLockState lockState, const Optional<ByteSpan> & pinCode,
-                               OperationErrorEnum & err)
+bool BoltLockManager::setLockState(EndpointId endpointId, const Nullable<FabricIndex> & fabricIdx, const Nullable<NodeId> & nodeId,
+                                   DlLockState lockState, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
 {
     // Assume pin is required until told otherwise
     bool requirePin = true;
@@ -320,7 +319,7 @@ bool BoltLockManager::setLockState(EndpointId endpointId, const Nullable<FabricI
 
             DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, NullNullable, NullNullable,
                                                     fabricIdx, nodeId);
-                                                    
+
             return true;
         }
     }
@@ -331,14 +330,14 @@ bool BoltLockManager::setLockState(EndpointId endpointId, const Nullable<FabricI
     return false;
 }
 
-bool BoltLockManager::Lock(EndpointId endpointId, const Nullable<FabricIndex> & fabricIdx,
-                       const Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pin, OperationErrorEnum & err)
+bool BoltLockManager::Lock(EndpointId endpointId, const Nullable<FabricIndex> & fabricIdx, const Nullable<NodeId> & nodeId,
+                           const Optional<ByteSpan> & pin, OperationErrorEnum & err)
 {
     return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kLocked, pin, err);
 }
 
-bool BoltLockManager::Unlock(EndpointId endpointId, const Nullable<FabricIndex> & fabricIdx,
-                         const Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pin, OperationErrorEnum & err)
+bool BoltLockManager::Unlock(EndpointId endpointId, const Nullable<FabricIndex> & fabricIdx, const Nullable<NodeId> & nodeId,
+                             const Optional<ByteSpan> & pin, OperationErrorEnum & err)
 {
     if (DoorLockServer::Instance().SupportsUnbolt(endpointId))
     {

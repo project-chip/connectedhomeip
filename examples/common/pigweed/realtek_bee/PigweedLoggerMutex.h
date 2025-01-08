@@ -22,17 +22,15 @@
 #include "RpcService.h"
 #include "semphr.h"
 
-namespace chip
-{
-namespace rpc
-{
+namespace chip {
+namespace rpc {
 class PigweedLoggerMutex : public chip::rpc::Mutex
 {
 
 public:
     void Lock() override
     {
-        SemaphoreHandle_t *sem = (SemaphoreHandle_t *)PigweedLogger::getSemaphore();
+        SemaphoreHandle_t * sem = (SemaphoreHandle_t *) PigweedLogger::getSemaphore();
         if (sem)
         {
             xSemaphoreTake(*sem, portMAX_DELAY);
@@ -40,7 +38,7 @@ public:
     }
     void Unlock() override
     {
-        SemaphoreHandle_t *sem = (SemaphoreHandle_t *)PigweedLogger::getSemaphore();
+        SemaphoreHandle_t * sem = (SemaphoreHandle_t *) PigweedLogger::getSemaphore();
         if (sem)
         {
             xSemaphoreGive(*sem);

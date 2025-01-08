@@ -23,21 +23,21 @@
  *
  **/
 #include "DeviceCallbacks.h"
-#include "Globals.h"
 #include "AppTask.h"
+#include "Globals.h"
 
+#include "BindingHandler.h"
 #include "CHIPDeviceManager.h"
-#include <app/server/Dnssd.h>
+#include "app/clusters/bindings/BindingManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
+#include <app/server/Dnssd.h>
 #include <assert.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include "BindingHandler.h"
-#include "app/clusters/bindings/BindingManager.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <ota/OTAInitializer.h>
@@ -121,10 +121,10 @@ void DeviceCallbacks::TriggerSubscribe()
 {
     for (const auto & binding : BindingTable::GetInstance())
     {
-        if (binding.type == MATTER_UNICAST_BINDING && 
+        if (binding.type == MATTER_UNICAST_BINDING &&
             (!binding.clusterId.has_value() || binding.clusterId.value() == Clusters::OnOff::Id))
         {
-            ChipLogProgress(DeviceLayer, "binding.local = %d",  binding.local);
+            ChipLogProgress(DeviceLayer, "binding.local = %d", binding.local);
             DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction2, binding.local);
         }
     }
@@ -133,7 +133,7 @@ void DeviceCallbacks::TriggerSubscribe()
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
-    //ChipLogProgress(Zcl, "DeviceEventCallback event_type 0x%x", event->Type); 
+    // ChipLogProgress(Zcl, "DeviceEventCallback event_type 0x%x", event->Type);
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
@@ -165,34 +165,32 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
         UpdateStatusLED();
         break;
-    
+
     case DeviceEventType::kCommissioningComplete:
         break;
 
-    case DeviceEventType::kServerReady:
-        {
+    case DeviceEventType::kServerReady: {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-            if (!isOTAInitialized)
-            {
-                chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
-                                                            InitOTARequestorHandler, nullptr);
-                isOTAInitialized = true;
-            }
+        if (!isOTAInitialized)
+        {
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
+                                                        InitOTARequestorHandler, nullptr);
+            isOTAInitialized = true;
+        }
 #endif
 
 #if CONFIG_ENABLE_ATTRIBUTE_SUBSCRIBE
-            //TriggerSubscribe();
+        // TriggerSubscribe();
 #endif
-        }
+    }
 
-        break;
+    break;
 
 #if CONFIG_ENABLE_ATTRIBUTE_SUBSCRIBE
     case DeviceEventType::kBindingsChangedViaCluster:
-        //TriggerSubscribe();
+        // TriggerSubscribe();
         break;
 #endif
-
     }
 }
 
@@ -261,14 +259,15 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
     }
 }
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, 
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
 
     if (cb != nullptr)
     {
-        cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type, size, value);
+        cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type, size,
+                                        value);
     }
 }

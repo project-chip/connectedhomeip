@@ -249,7 +249,7 @@ list(
 
     -DINET_CONFIG_ENABLE_IPV4=0
     -DCHIP_PROJECT=1
-    -DCHIP_DEVICE_LAYER_TARGET=Realtek_bee
+    -DCHIP_DEVICE_LAYER_TARGET=realtek_bee
     -DCHIP_HAVE_CONFIG_H
 #    -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
 )

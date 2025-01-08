@@ -31,7 +31,7 @@
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <platform/Realtek_bee/FactoryDataProvider.h>
+#include <platform/realtek_bee/FactoryDataProvider.h>
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x01)
@@ -46,7 +46,7 @@ public:
 
     static void AppTaskMain(void * pvParameter);
 
-    //void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);//for shell
+    // void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);//for shell
     void PostEvent(const AppEvent * event);
     void UpdateClusterState();
 
@@ -70,24 +70,24 @@ private:
     static void JammedLockEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
 
-    //static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-    //static void UpdateLEDs(void);
+    // static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    // static void UpdateLEDs(void);
 
     void StartTimer(uint32_t aTimeoutMs);
 
     enum Function_t
     {
-        kFunction_NoneSelected   = 0,
-        kFunction_Reset          = 1,
-        kFunction_FactoryReset   = 2,
-       
+        kFunction_NoneSelected = 0,
+        kFunction_Reset        = 1,
+        kFunction_FactoryReset = 2,
+
         kFunction_Invalid
     } Function;
 
-    Function_t mFunction                 = Function_t::kFunction_NoneSelected;
-    bool mFunctionTimerActive            = false;
-    bool mSyncClusterToButtonAction      = false;
-    bool mNotifyState                    = false;
+    Function_t mFunction            = Function_t::kFunction_NoneSelected;
+    bool mFunctionTimerActive       = false;
+    bool mSyncClusterToButtonAction = false;
+    bool mNotifyState               = false;
 
     chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 

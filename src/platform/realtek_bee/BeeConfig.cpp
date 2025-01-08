@@ -20,7 +20,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <core/CHIPEncoding.h>
-#include <platform/Realtek_bee/BeeConfig.h>
+#include <platform/realtek_bee/BeeConfig.h>
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>

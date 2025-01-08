@@ -23,9 +23,9 @@
  * It also updates the display widget if it's enabled
  */
 
-#include <stdlib.h>
-#include "matter_led.h"
 #include "LEDWidget.h"
+#include "matter_led.h"
+#include <stdlib.h>
 
 void LEDWidget::InitGpio()
 {
@@ -61,7 +61,7 @@ void LEDWidget::Invert(void)
 
 void LEDWidget::Set(bool state)
 {
-    if(mLEDHandle)
+    if (mLEDHandle)
     {
         mState = state;
         matter_led_state_set(mLEDHandle, state);
@@ -70,7 +70,7 @@ void LEDWidget::Set(bool state)
 
 void LEDWidget::Blink(uint32_t changeRateMS)
 {
-    if(mLEDHandle)
+    if (mLEDHandle)
     {
         matter_led_blink_start(mLEDHandle, changeRateMS, changeRateMS, 0xFFFF);
     }
@@ -78,7 +78,7 @@ void LEDWidget::Blink(uint32_t changeRateMS)
 
 void LEDWidget::Blink(uint32_t onTimeMS, uint32_t offTimeMS)
 {
-    if(mLEDHandle)
+    if (mLEDHandle)
     {
         matter_led_blink_start(mLEDHandle, onTimeMS, offTimeMS, 0xFFFF);
     }
@@ -86,7 +86,7 @@ void LEDWidget::Blink(uint32_t onTimeMS, uint32_t offTimeMS)
 
 void LEDWidget::BlinkStop()
 {
-    if(mLEDHandle)
+    if (mLEDHandle)
     {
         matter_led_blink_stop(mLEDHandle);
     }
@@ -94,11 +94,11 @@ void LEDWidget::BlinkStop()
 
 void LEDWidget::SetLevel(uint8_t aLevel)
 {
-    if(mLEDHandle)
+    if (mLEDHandle)
     {
         uint16_t brightness;
 
-        mLevel = aLevel;
+        mLevel     = aLevel;
         brightness = (aLevel * 65535.0) / mMaxLevel;
         matter_led_brightness_set(mLEDHandle, brightness);
     }

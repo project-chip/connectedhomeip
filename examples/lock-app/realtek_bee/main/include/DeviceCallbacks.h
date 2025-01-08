@@ -33,16 +33,13 @@
 class DeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
 {
 public:
-    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent *event, intptr_t arg);
-    void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                     chip::AttributeId attributeId,
-                                     uint8_t type, uint16_t size, uint8_t *value) override;
+    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                     uint8_t type, uint16_t size, uint8_t * value) override;
     static void UpdateStatusLED();
 
 private:
-    void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent *event);
-    void OnLockPostAttributeChangeCallback(chip::EndpointId endpointId,
-                                           chip::AttributeId attributeId, uint8_t *value);
-    void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId,
-                                               chip::AttributeId attributeId, uint8_t *value);
+    void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
+    void OnLockPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
+    void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 };

@@ -23,9 +23,9 @@
 #include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 
+#include "chip_porting.h"
 #include <stdio.h>
 #include <string.h>
-#include "chip_porting.h"
 
 namespace chip {
 namespace Shell {
@@ -45,7 +45,7 @@ ssize_t streamer_bee_read(streamer_t * streamer, char * buffer, size_t length)
 
 ssize_t streamer_bee_write(streamer_t * streamer, const char * buffer, size_t length)
 {
-    return MatterPlatUartSend(buffer, (uint16_t)length);
+    return MatterPlatUartSend(buffer, (uint16_t) length);
 }
 
 static streamer_t streamer_bee = {

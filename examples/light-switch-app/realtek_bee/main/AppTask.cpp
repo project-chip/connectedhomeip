@@ -21,19 +21,20 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
-#include "Globals.h"
 #include "BindingHandler.h"
+#include "Globals.h"
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
-#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -145,7 +146,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
 void OnIdentifyStart(Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
-    identifyLED.Blink(500,500);
+    identifyLED.Blink(500, 500);
 }
 
 void OnIdentifyStop(Identify *)
@@ -155,10 +156,7 @@ void OnIdentifyStop(Identify *)
 }
 
 Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    OnIdentifyStart, 
-    OnIdentifyStop, 
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    chip::EndpointId{ 1 },   OnIdentifyStart, OnIdentifyStop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnTriggerIdentifyEffect,
 };
 
@@ -209,9 +207,10 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::InitServer(intptr_t arg)
 {
-     // Init ZCL Data Model and start server
+    // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -243,7 +242,7 @@ void AppTask::InitGpio()
 
     appStatusLED.Init(APP_LED);
     appStatusLED.Set(true);
-    
+
     identifyLED.Init(IDENTIFY_STATE_LED);
     systemStatusLED.Init(SYSTEM_STATE_LED);
 
@@ -252,12 +251,12 @@ void AppTask::InitGpio()
 
 CHIP_ERROR AppTask::Init()
 {
-    size_t check_mem_peak; 
+    size_t check_mem_peak;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "Light switch App Demo!");
 
-	chip::DeviceManager::CHIPDeviceManager & deviceMgr = chip::DeviceManager::CHIPDeviceManager::GetInstance();
-    err = deviceMgr.Init(&EchoCallbacks);
+    chip::DeviceManager::CHIPDeviceManager & deviceMgr = chip::DeviceManager::CHIPDeviceManager::GetInstance();
+    err                                                = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!");
@@ -275,25 +274,24 @@ CHIP_ERROR AppTask::Init()
     chip::Shell::Engine::Root().RunMainLoop();
 #endif
 
-	check_mem_peak = os_mem_peek(RAM_TYPE_DATA_ON);
-	ChipLogProgress(DeviceLayer, "os_mem_peek(RAM_TYPE_DATA_ON) : (%u)", check_mem_peak);
+    check_mem_peak = os_mem_peek(RAM_TYPE_DATA_ON);
+    ChipLogProgress(DeviceLayer, "os_mem_peek(RAM_TYPE_DATA_ON) : (%u)", check_mem_peak);
 
-    //Setup switch
+    // Setup switch
     LightSwitch::GetInstance().Init();
 
     return err;
 }
 
-
 void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if(aEvent->ButtonEvent.ButtonIdx == APP_TOGGLE_BUTTON)
+        if (aEvent->ButtonEvent.ButtonIdx == APP_TOGGLE_BUTTON)
         {
             LightSwitch::GetInstance().InitiateActionSwitch(1, Action::Toggle);
         }
-        else if(aEvent->ButtonEvent.ButtonIdx == APP_GENERIC_SWITCH_BUTTON)
+        else if (aEvent->ButtonEvent.ButtonIdx == APP_GENERIC_SWITCH_BUTTON)
         {
             if (aEvent->ButtonEvent.Action == true)
             {
@@ -305,12 +303,12 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
                 ChipLogProgress(NotSpecified, "Switch initial press");
                 LightSwitch::GetInstance().GenericSwitchInitialPress();
             }
-        }   
+        }
     }
 }
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
-{ 
+{
     if (btnIdx != APP_FUNCTION_BUTTON && btnIdx != APP_TOGGLE_BUTTON && btnIdx != APP_GENERIC_SWITCH_BUTTON)
     {
         return;
@@ -319,7 +317,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
     AppEvent button_event              = {};
     button_event.Type                  = AppEvent::kEventType_Button;
     button_event.ButtonEvent.ButtonIdx = btnIdx;
-    button_event.ButtonEvent.Action    = btnPressed ? true:false;
+    button_event.ButtonEvent.Action    = btnPressed ? true : false;
 
     switch (btnIdx)
     {
@@ -377,7 +375,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         sAppTask.mFunction = kFunction_FactoryReset;
         // Turn off all LEDs before starting blink to make sure blink is coordinated.
         systemStatusLED.Set(false);
-        systemStatusLED.Blink(500,500);
+        systemStatusLED.Blink(500, 500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -461,7 +459,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         if (xPortIsInsideInterrupt())
         {
             BaseType_t higherPrioTaskWoken = pdFALSE;
-            status              = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
             portYIELD_FROM_ISR(higherPrioTaskWoken);
         }
         else
@@ -495,4 +493,4 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 /**
  * Update cluster status after application level changes
  */
-void AppTask::UpdateClusterState(void){}
+void AppTask::UpdateClusterState(void) {}

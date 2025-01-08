@@ -25,7 +25,7 @@
 
 #include <lib/support/CHIPMemString.h>
 #include <platform/PlatformManager.h>
-#include <platform/Realtek_bee/DiagnosticDataProviderImpl.h>
+#include <platform/realtek_bee/DiagnosticDataProviderImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>

@@ -23,9 +23,9 @@
  *
  **/
 #include "DeviceCallbacks.h"
-#include "WindowCovering.h"
 #include "CHIPDeviceManager.h"
 #include "LEDWidget.h"
+#include "WindowCovering.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>

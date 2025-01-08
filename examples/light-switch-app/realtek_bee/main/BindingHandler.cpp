@@ -53,7 +53,6 @@ Engine sShellSwitchBindingSubCommands;
 extern void UpdateLightingStatetoGUI(EndpointId endpointId, uint8_t status);
 #endif
 
-
 void BindingHandler::Init()
 {
     // The initialization of binding manager will try establishing connection with unicast peers
@@ -71,7 +70,7 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
 
     if (aError == CHIP_ERROR_TIMEOUT && !BindingHandler::GetInstance().mCaseSessionRecovered)
     {
-         ChipLogProgress(NotSpecified,"Response timeout for invoked command, trying to recover CASE session.");
+        ChipLogProgress(NotSpecified, "Response timeout for invoked command, trying to recover CASE session.");
 
         // Set flag to not try recover session multiple times.
         BindingHandler::GetInstance().mCaseSessionRecovered = true;
@@ -86,13 +85,13 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
 
         if (CHIP_NO_ERROR != error)
         {
-            ChipLogProgress(NotSpecified,"NotifyBoundClusterChanged failed due to: %" CHIP_ERROR_FORMAT, error.Format());
+            ChipLogProgress(NotSpecified, "NotifyBoundClusterChanged failed due to: %" CHIP_ERROR_FORMAT, error.Format());
             return;
         }
     }
     else
     {
-         ChipLogProgress(NotSpecified,"Binding command was not applied! Reason: %" CHIP_ERROR_FORMAT, aError.Format());
+        ChipLogProgress(NotSpecified, "Binding command was not applied! Reason: %" CHIP_ERROR_FORMAT, aError.Format());
     }
 }
 
@@ -103,7 +102,7 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
     BindingData * data = reinterpret_cast<BindingData *>(aContext);
 
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
-         ChipLogProgress(NotSpecified,"Binding command applied successfully!");
+        ChipLogProgress(NotSpecified, "Binding command applied successfully!");
 
         // If session was recovered and communication works, reset flag to the initial state.
         if (BindingHandler::GetInstance().mCaseSessionRecovered)
@@ -163,21 +162,20 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
         }
         break;
     default:
-         ChipLogProgress(NotSpecified,"Invalid binding command data - commandId is not supported");
+        ChipLogProgress(NotSpecified, "Invalid binding command data - commandId is not supported");
         break;
     }
     if (CHIP_NO_ERROR != ret)
     {
-         ChipLogProgress(NotSpecified,"Invoke OnOff Command Request ERROR: %s", ErrorStr(ret));
+        ChipLogProgress(NotSpecified, "Invoke OnOff Command Request ERROR: %s", ErrorStr(ret));
     }
 }
 
-void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aBinding,
-                                               OperationalDeviceProxy * deviceProxy,
+void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aBinding, OperationalDeviceProxy * deviceProxy,
                                                void * context)
 {
 #if CONFIG_ENABLE_ATTRIBUTE_SUBSCRIBE
-    if(context == nullptr)
+    if (context == nullptr)
     {
         chip::EndpointId localEndpointId = aBinding.local;
         ChipLogProgress(NotSpecified, "localEndpointId=%d", localEndpointId);
@@ -185,41 +183,31 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aB
         if (aBinding.type == MATTER_UNICAST_BINDING &&
             (!aBinding.clusterId.has_value() || aBinding.clusterId.value() == Clusters::OnOff::Id))
         {
-            auto onReport = [localEndpointId](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse)
-            {
+            auto onReport = [localEndpointId](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
                 ChipLogProgress(NotSpecified, "SubscribeAttribute onReport OnOff=%d", dataResponse);
-                UpdateLightingStatetoGUI(localEndpointId,(uint8_t)dataResponse);
+                UpdateLightingStatetoGUI(localEndpointId, (uint8_t) dataResponse);
             };
 
-            auto onError = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError)
-            {
-                ChipLogError(NotSpecified, "SubscribeAttribute failed: %" CHIP_ERROR_FORMAT, aError.Format());      
-                //todo
+            auto onError = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+                ChipLogError(NotSpecified, "SubscribeAttribute failed: %" CHIP_ERROR_FORMAT, aError.Format());
+                // todo
             };
 
-            auto onSubscriptionEstablishedCb = [localEndpointId](const app::ReadClient & readClient,SubscriptionId subscriptionId)
-            {
-                ChipLogProgress(NotSpecified, "onSubscriptionEstablishedCb %d",localEndpointId);//online            
+            auto onSubscriptionEstablishedCb = [localEndpointId](const app::ReadClient & readClient,
+                                                                 SubscriptionId subscriptionId) {
+                ChipLogProgress(NotSpecified, "onSubscriptionEstablishedCb %d", localEndpointId); // online
                 UpdateLightingStatetoGUI(localEndpointId, 3);
             };
 
-            auto onResubscriptionAttemptCb = [localEndpointId](const app::ReadClient & readClient, CHIP_ERROR aError,uint32_t aNextResubscribeIntervalMsec)
-            {
-                ChipLogProgress(NotSpecified, "onResubscriptionAttemptCb %d",localEndpointId);//offline
+            auto onResubscriptionAttemptCb = [localEndpointId](const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                               uint32_t aNextResubscribeIntervalMsec) {
+                ChipLogProgress(NotSpecified, "onResubscriptionAttemptCb %d", localEndpointId); // offline
                 UpdateLightingStatetoGUI(localEndpointId, 2);
             };
 
             Controller::SubscribeAttribute<Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-                deviceProxy->GetExchangeManager(),
-                deviceProxy->GetSecureSession().Value(),
-                aBinding.remote,
-                onReport,
-                onError,
-                1,
-                15,
-                onSubscriptionEstablishedCb,
-                onResubscriptionAttemptCb
-            );
+                deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(), aBinding.remote, onReport, onError, 1,
+                15, onSubscriptionEstablishedCb, onResubscriptionAttemptCb);
         }
 
         return;
@@ -264,7 +252,7 @@ void BindingHandler::LightSwitchContextReleaseHandler(void * context)
 
 void BindingHandler::InitInternal(intptr_t arg)
 {
-     ChipLogProgress(NotSpecified,"Initialize binding Handler");
+    ChipLogProgress(NotSpecified, "Initialize binding Handler");
     auto & server = chip::Server::GetInstance();
     chip::BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
@@ -331,9 +319,9 @@ CHIP_ERROR BindingHandler::OnOffSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR BindingHandler::OnSwitchCommandHandler(int argc, char ** argv)
 {
     BindingData * data = Platform::New<BindingData>();
-    data->EndpointId     = atoi(argv[0]) + 1;
-    data->CommandId           = Clusters::OnOff::Commands::On::Id;
-    data->ClusterId           = Clusters::OnOff::Id;
+    data->EndpointId   = atoi(argv[0]) + 1;
+    data->CommandId    = Clusters::OnOff::Commands::On::Id;
+    data->ClusterId    = Clusters::OnOff::Id;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
@@ -342,9 +330,9 @@ CHIP_ERROR BindingHandler::OnSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR BindingHandler::OffSwitchCommandHandler(int argc, char ** argv)
 {
     BindingData * data = Platform::New<BindingData>();
-    data->EndpointId     = atoi(argv[0]) + 1;
-    data->CommandId           = Clusters::OnOff::Commands::Off::Id;
-    data->ClusterId           = Clusters::OnOff::Id;
+    data->EndpointId   = atoi(argv[0]) + 1;
+    data->CommandId    = Clusters::OnOff::Commands::Off::Id;
+    data->ClusterId    = Clusters::OnOff::Id;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
@@ -353,9 +341,9 @@ CHIP_ERROR BindingHandler::OffSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR BindingHandler::ToggleSwitchCommandHandler(int argc, char ** argv)
 {
     BindingData * data = Platform::New<BindingData>();
-    data->EndpointId     = atoi(argv[0]) + 1;
-    data->CommandId           = Clusters::OnOff::Commands::Toggle::Id;
-    data->ClusterId           = Clusters::OnOff::Id;
+    data->EndpointId   = atoi(argv[0]) + 1;
+    data->CommandId    = Clusters::OnOff::Commands::Toggle::Id;
+    data->ClusterId    = Clusters::OnOff::Id;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
@@ -406,7 +394,7 @@ CHIP_ERROR BindingHandler::BindingUnicastBindCommandHandler(int argc, char ** ar
     entry->nodeId                  = atoi(argv[1]);
     entry->local                   = 1; // Hardcoded to endpoint 1 for now
     entry->remote                  = atoi(argv[2]);
-    entry->clusterId.emplace(6);  // Hardcode to OnOff cluster for now
+    entry->clusterId.emplace(6); // Hardcode to OnOff cluster for now
 
     DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
@@ -455,10 +443,10 @@ CHIP_ERROR BindingHandler::GroupsOnOffSwitchCommandHandler(int argc, char ** arg
 CHIP_ERROR BindingHandler::GroupOnSwitchCommandHandler(int argc, char ** argv)
 {
     BindingData * data = Platform::New<BindingData>();
-    data->EndpointId          = 1;
-    data->CommandId           = Clusters::OnOff::Commands::On::Id;
-    data->ClusterId           = Clusters::OnOff::Id;
-    data->IsGroup             = true;
+    data->EndpointId   = 1;
+    data->CommandId    = Clusters::OnOff::Commands::On::Id;
+    data->ClusterId    = Clusters::OnOff::Id;
+    data->IsGroup      = true;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
@@ -467,10 +455,10 @@ CHIP_ERROR BindingHandler::GroupOnSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR BindingHandler::GroupOffSwitchCommandHandler(int argc, char ** argv)
 {
     BindingData * data = Platform::New<BindingData>();
-    data->EndpointId          = 1;
-    data->CommandId           = Clusters::OnOff::Commands::Off::Id;
-    data->ClusterId           = Clusters::OnOff::Id;
-    data->IsGroup             = true;
+    data->EndpointId   = 1;
+    data->CommandId    = Clusters::OnOff::Commands::Off::Id;
+    data->ClusterId    = Clusters::OnOff::Id;
+    data->IsGroup      = true;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
@@ -479,10 +467,10 @@ CHIP_ERROR BindingHandler::GroupOffSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR BindingHandler::GroupToggleSwitchCommandHandler(int argc, char ** argv)
 {
     BindingData * data = Platform::New<BindingData>();
-    data->EndpointId     = 1;
-    data->CommandId           = Clusters::OnOff::Commands::Toggle::Id;
-    data->ClusterId           = Clusters::OnOff::Id;
-    data->IsGroup             = true;
+    data->EndpointId   = 1;
+    data->CommandId    = Clusters::OnOff::Commands::Toggle::Id;
+    data->ClusterId    = Clusters::OnOff::Id;
+    data->IsGroup      = true;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
@@ -505,8 +493,8 @@ CHIP_ERROR BindingHandler::TableCommandHelper(int argc, char ** argv)
             \t+ ClusterId %d \r\n \
             \t+ RemoteEndpointId %d \r\n \
             \t+ NodeId %d\r\n",
-                    (int) entry.fabricIndex, (int) entry.local,  (int) entry.clusterId.value_or(kInvalidClusterId), (int) entry.remote,
-                    (int) entry.nodeId);
+                            (int) entry.fabricIndex, (int) entry.local, (int) entry.clusterId.value_or(kInvalidClusterId),
+                            (int) entry.remote, (int) entry.nodeId);
             break;
         case MATTER_MULTICAST_BINDING:
             streamer_printf(streamer_get(), "[%d] GROUP:\r\n", i++);
@@ -514,11 +502,11 @@ CHIP_ERROR BindingHandler::TableCommandHelper(int argc, char ** argv)
             \t+ LocalEndpoint %d \r\n \
             \t+ RemoteEndpointId %d \r\n \
             \t+ GroupId %d\r\n",
-                    (int) entry.fabricIndex, (int) entry.local, (int) entry.remote, (int) entry.groupId);
+                            (int) entry.fabricIndex, (int) entry.local, (int) entry.remote, (int) entry.groupId);
             break;
         case MATTER_UNUSED_BINDING:
             streamer_printf(streamer_get(), "[%d] UNUSED\r\n", i++);
-            break;       
+            break;
         default:
             break;
         }
@@ -547,9 +535,9 @@ void BindingHandler::RegisterSwitchCommands()
         { &ToggleSwitchCommandHandler, "toggle", "Sends toggle command to bound lighting app" }
     };
 
-    static const shell_command_t sSwitchGroupsSubCommands[] = { 
-        { &GroupsHelpHandler, "help", "Usage: switch groups <subcommand>" },
-        { &GroupsOnOffSwitchCommandHandler, "onoff", "Usage: switch groups onoff <subcommand>" } };
+    static const shell_command_t sSwitchGroupsSubCommands[] = { { &GroupsHelpHandler, "help", "Usage: switch groups <subcommand>" },
+                                                                { &GroupsOnOffSwitchCommandHandler, "onoff",
+                                                                  "Usage: switch groups onoff <subcommand>" } };
 
     static const shell_command_t sSwitchGroupsOnOffSubCommands[] = {
         { &GroupsOnOffHelpHandler, "help", "Usage: switch groups onoff <subcommand>" },
@@ -564,8 +552,8 @@ void BindingHandler::RegisterSwitchCommands()
         { &BindingUnicastBindCommandHandler, "unicast", "Usage: switch binding unicast <fabric index> <node id> <endpoint>" }
     };
 
-    static const shell_command_t sSwitchCommand = { 
-        &SwitchCommandHandler, "switch","Light-switch commands. Usage: switch <subcommand>" };
+    static const shell_command_t sSwitchCommand = { &SwitchCommandHandler, "switch",
+                                                    "Light-switch commands. Usage: switch <subcommand>" };
 
     sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwitchGroupsOnOffSubCommands, ArraySize(sSwitchGroupsOnOffSubCommands));
     sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, ArraySize(sSwitchOnOffSubCommands));

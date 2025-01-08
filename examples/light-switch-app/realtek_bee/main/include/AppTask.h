@@ -31,7 +31,7 @@
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <platform/Realtek_bee/FactoryDataProvider.h>
+#include <platform/realtek_bee/FactoryDataProvider.h>
 
 class AppTask
 {
@@ -68,9 +68,9 @@ private:
 
     enum Function_t
     {
-        kFunction_NoneSelected   = 0,
-        kFunction_Reset = 1,
-        kFunction_FactoryReset   = 2,
+        kFunction_NoneSelected = 0,
+        kFunction_Reset        = 1,
+        kFunction_FactoryReset = 2,
         kFunction_Invalid
     } Function;
 

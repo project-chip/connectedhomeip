@@ -20,13 +20,13 @@
 #include "FreeRTOS.h"
 #include "PigweedLoggerMutex.h"
 #include "RpcService.h"
-#include "pw_sys_io_bee/init.h"
-#include "wdt.h"
-#include "task.h"
 #include "pw_log/log.h"
 #include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
+#include "pw_sys_io_bee/init.h"
 #include "support/CodeUtils.h"
+#include "task.h"
+#include "wdt.h"
 #include <string.h>
 
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -34,7 +34,7 @@
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
-//#include "ScreenManager.h"
+// #include "ScreenManager.h"
 #include "pigweed/rpc_services/Button.h"
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 
@@ -94,10 +94,10 @@ private:
     TimerHandle_t mRebootTimer;
 
     static void RebootHandler(TimerHandle_t)
-	{
-		ChipLogProgress(NotSpecified, "Reboot by Device funcion");
-		WDT_SystemReset(RESET_ALL, SW_RESET_APP_START);
-	}
+    {
+        ChipLogProgress(NotSpecified, "Reboot by Device funcion");
+        WDT_SystemReset(RESET_ALL, SW_RESET_APP_START);
+    }
 };
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 
@@ -106,7 +106,7 @@ namespace {
 #define RPC_TASK_STACK_SIZE (8 * 1024)
 #define RPC_TASK_PRIORITY 1
 static TaskHandle_t sRpcTaskHandle;
-//StaticTask_t sRpcTaskBuffer;
+// StaticTask_t sRpcTaskBuffer;
 StackType_t sRpcTaskStack[RPC_TASK_STACK_SIZE];
 
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -173,8 +173,7 @@ void Init()
     PigweedLogger::init();
 
     // Start App task.
-    xTaskCreate(RunRpcService, "RPC_TASK", RPC_TASK_STACK_SIZE/sizeof(StackType_t), nullptr, RPC_TASK_PRIORITY,
-                &sRpcTaskHandle);
+    xTaskCreate(RunRpcService, "RPC_TASK", RPC_TASK_STACK_SIZE / sizeof(StackType_t), nullptr, RPC_TASK_PRIORITY, &sRpcTaskHandle);
 }
 
 } // namespace rpc

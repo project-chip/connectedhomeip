@@ -37,7 +37,9 @@ group("default") {
     } else if (chip_device_platform == "ameba") {
       deps += [ "${chip_root}/src/platform/Ameba:logging" ]
     } else if (chip_device_platform == "realtek_bee") {
-      deps += [ "${chip_root}/src/platform/Realtek_bee:logging" ]
+      deps += [ "${chip_root}/src/platform/realtek_bee:logging" ]
+    } else if (chip_device_platform == "realtek_bee_zephyr") {
+      deps += [ "${chip_root}/src/platform/realtek_bee/zephyr:logging" ]
     } else if (chip_device_platform == "asr") {
       deps += [ "${chip_root}/src/platform/ASR:logging" ]
     } else if (chip_device_platform == "webos") {

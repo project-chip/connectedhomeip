@@ -23,17 +23,17 @@
  *
  **/
 #include "DeviceCallbacks.h"
-#include "Globals.h"
 #include "AppTask.h"
+#include "Globals.h"
 
 #include "CHIPDeviceManager.h"
-#include <app/server/Dnssd.h>
 #include "LightingManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
+#include <app/server/Dnssd.h>
 #include <assert.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -125,8 +125,8 @@ void DeviceCallbacks::UpdateStatusLED()
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
-    //ChipLogProgress(Zcl, "DeviceEventCallback event_type 0x%x", event->Type);
-   
+    // ChipLogProgress(Zcl, "DeviceEventCallback event_type 0x%x", event->Type);
+
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
@@ -159,30 +159,26 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         UpdateStatusLED();
         break;
 
-    case DeviceEventType::kServerReady:
+    case DeviceEventType::kServerReady: {
+        if (!sHaveBLEConnections)
         {
-            if(!sHaveBLEConnections)
-            {
-                chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kBLEHandoverDelaySec),
-                                                            HandOverBLE, nullptr);
-            }
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kBLEHandoverDelaySec), HandOverBLE, nullptr);
+        }
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-            if (!isOTAInitialized)
-            {
-                chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
-                                                            InitOTARequestorHandler, nullptr);
-                isOTAInitialized = true;
-            }
-#endif         
-        }
-        break;
-
-    case DeviceEventType::kCommissioningComplete:
+        if (!isOTAInitialized)
         {
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kBLEHandoverDelaySec),
-                                                        HandOverBLE, nullptr);
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
+                                                        InitOTARequestorHandler, nullptr);
+            isOTAInitialized = true;
         }
-        break;
+#endif
+    }
+    break;
+
+    case DeviceEventType::kCommissioningComplete: {
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kBLEHandoverDelaySec), HandOverBLE, nullptr);
+    }
+    break;
     }
 }
 
@@ -239,8 +235,7 @@ void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, 
 {
     VerifyOrExit(attributeId == app::Clusters::OnOff::Attributes::OnOff::Id,
                  ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
-    VerifyOrExit(endpointId == 1,
-                 ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+    VerifyOrExit(endpointId == 1, ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 0, value);
 
@@ -253,8 +248,7 @@ void DeviceCallbacks::OnLevelPostAttributeChangeCallback(EndpointId endpointId, 
 {
     VerifyOrExit(attributeId == app::Clusters::LevelControl::Attributes::CurrentLevel::Id,
                  ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
-    VerifyOrExit(endpointId == 1 , 
-                 ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+    VerifyOrExit(endpointId == 1, ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     if (size == 1)
     {
@@ -295,9 +289,8 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
     }
 
     ChipLogProgress(DeviceLayer, "New hue: %d, New saturation: %d", hue, saturation);
-    //statusLED1.SetColor(hue, saturation);
+    // statusLED1.SetColor(hue, saturation);
 }
-
 
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t type,
                                                   uint16_t size, uint8_t * value)
@@ -326,8 +319,8 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
     }
 }
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, 
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
@@ -335,11 +328,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     // ChipLogProgress(DeviceLayer,
     //                 "MatterPostAttributeChangeCallback - Cluster ID: " ChipLogFormatMEI
     //                 ", EndPoint ID: '0x%02x', Attribute ID: " ChipLogFormatMEI,
-    //                 ChipLogValueMEI(attributePath.mClusterId), attributePath.mEndpointId, ChipLogValueMEI(attributePath.mAttributeId));
+    //                 ChipLogValueMEI(attributePath.mClusterId), attributePath.mEndpointId,
+    //                 ChipLogValueMEI(attributePath.mAttributeId));
 
     if (cb != nullptr)
     {
-        cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type, size, value);
+        cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type, size,
+                                        value);
     }
 }
 

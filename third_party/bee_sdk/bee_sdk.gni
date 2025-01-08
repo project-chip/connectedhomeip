@@ -14,11 +14,10 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
+
 #import("//build_overrides/openthread.gni")
 import("//build_overrides/bee_sdk.gni")
-
 declare_args() {
   # Location of the BEE SDK.
   bee_sdk_root = "${chip_root}/third_party/bee_sdk"
 }
-

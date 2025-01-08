@@ -51,8 +51,8 @@ following features are available:
     The bootloader image files are stored in
     `out/realtek-bee-pigweed/asdk/bootloader` folder.
 
--   After building the application, **Realtek Image Tool** is used to flash it to
-    Realtek board.
+-   After building the application, **Realtek Image Tool** is used to flash it
+    to Realtek board.
 
 1. Connect your device via USB and open Realtek Image Tool.
 2. Select correct serial port and set baudrate as **115200**.
@@ -72,8 +72,8 @@ Connect a USB-TTL Adapter as shown below
 Build the
 [chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
 
-Reset Realtek board, then launch the chip-rpc console, where the Echo RPC commands
-can be invoked
+Reset Realtek board, then launch the chip-rpc console, where the Echo RPC
+commands can be invoked
 
         python -m pw_hdlc.rpc_console --device /dev/tty<USB-TTL port> -b 115200
 

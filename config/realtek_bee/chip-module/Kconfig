@@ -1,0 +1,200 @@
+#
+#   Copyright (c) 2023 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+rsource "../../zephyr/Kconfig"
+
+if CHIP
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_DEVICE_VENDOR_NAME
+	default "Realtek Semiconductor"
+
+config CHIP_APP_LOG_LEVEL
+	int "Logging level in application"
+	default LOG_DEFAULT_LEVEL
+	depends on LOG
+	help
+	  Sets the logging level in the Matter application. Use this configuration
+	  option only within the application. To set the logging level for the
+	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
+
+config CHIP_NFC_COMMISSIONING
+	bool "Share onboarding payload in NFC tag"
+	default n
+	imply I2C
+	imply ST25DVXXKC
+	imply NFC		
+	imply NFC_NDEF
+	imply NFC_NDEF_MSG
+	imply NFC_NDEF_RECORD
+	imply NFC_NDEF_URI_REC
+	imply NFC_NDEF_URI_MSG
+	help
+	  Enables sharing the onboarding payload in the NFC tag.
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_OTA_IMAGE_BUILD
+	bool
+	default y if CHIP_OTA_REQUESTOR
+
+config CHIP_ROTATING_DEVICE_ID
+	bool "Generate rotating device ID"
+	default y
+	help
+	  Enables the rotating device identifier that provides a non-trackable
+	  identifier. The identifier is unique per device and rotates at pre-defined
+	  moments.
+
+config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+	bool "Include default device information provider build"
+	default y
+
+config CHIP_MALLOC_SYS_HEAP
+	default y if !ARCH_POSIX
+
+config CHIP_FACTORY_DATA
+	bool "Enable Factory Data support"
+	select ZCBOR
+	help
+	  Enables support for reading factory data from flash memory partition.
+	  It requires factory_data partition to exist.
+
+config CHIP_FACTORY_DATA_CUSTOM_BACKEND
+	bool "Enable Factory Data custom backend"
+	depends on !CHIP_FACTORY_DATA
+	help
+	  Enables user custom factory data implementation. It cannot be used
+	  with the CHIP_FACTORY_DATA that enabled default Telink factory data
+	  implementation.
+
+config CHIP_FACTORY_DATA_BUILD
+	bool "Enable Factory Data build"
+	default n
+	help
+	  Enables generation of factory data during the building.
+	  It requires factory_data partition to exist.
+	  As a result a new output file factory_data.bin will be created.
+
+config CHIP_FACTORY_DATA_VERSION
+	int
+	default 1
+	help
+	  The Factory data version contains a current version of a factory data 
+	  parameter set that the user cannot change. 
+	  After moving to the next version of the factory data set, change the default value. 
+	  This config is used to validate the version of a factory data set on a device-side 
+	  with the version of factory data saved in the Flash memory.
+
+if CHIP_FACTORY_DATA_BUILD
+
+# Factory data definitions
+config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
+	bool "Enable merging generated factory data with the build target .bin file"
+	default y
+	help
+	  Enables merging generated factory data with the build target zephyr.bin file.
+	  As a result, output file zephyr.bin will consist of all partitions including 
+	  factory data.
+
+# Use default certificates without generating or providing them
+config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
+	bool "Use default certificates located in Matter repository"
+	default y
+	help
+	  Pre-generated certificates can be used for development purpose.
+	  This config includes default pre-generated certificates 
+	  which are located in credentials/development/attestation/ directory 
+	  instead of generating new ones.
+	  If this config is set to `n` new certificates will be generated.
+
+# Configs for SPAKE2 generation
+config CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER
+	bool "Enable spake2 verifier generation"
+	help
+	  Enables generation of spake2 verifier according to 
+	  given iteration counter, salt and passcode.
+	  To generate Spake2 verifier a spake2p executable must be available 
+	  from system variables environment.
+
+config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
+	bool "Enable generation of a new Rotating device id unique id"
+	default y
+	help
+	  Enables generation of a new Rotating device id unique id.
+
+endif #CHIP_FACTORY_DATA_BUILD
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_FACTORY_RESET_ERASE_NVS
+	bool
+	default y
+
+endif
+
+config CHIP_LOG_SIZE_OPTIMIZATION
+	bool "Disable some detailed logs to decrease flash usage"
+	help
+	  Disables some log levels for specific Matter log modules that provide
+	  information that is too detailed to be used in most cases. You can find
+	  full configuration enabled by this option in the
+	  platform/telink/CHIPPlatformConfig.h file.
+
+config CHIP_BUTTON_MANAGER_IRQ_MODE
+	bool "Use GPIO in an IRQ mode instead of polling the GPIO"
+	default PM
+	help
+	  Use GPIO in an IRQ mode to avoid button polling loop and extend the battery lifetime by waking up by GPIO event. 
+	  GPIO events are working only with GPIO IRQ. This option changes button matrix configuration. 
+	
+config CHIP_ENABLE_APPLICATION_STATUS_LED
+	bool "Enable application status LED"
+	default !(PM)
+	help
+	  Enable application status LED.
+
+config CHIP_ENABLE_PM_DURING_BLE
+	bool "Enable PM during BLE operation"
+	default PM
+	help
+	  Enable PM during BLE operation.
+
+config CHIP_OPENTHREAD_TX_POWER
+	int "OpenThread Transmission power"
+	range -30 9
+	default 0
+	help
+	  OpenThread Transmission power in dBm.
+
+config SHELL_BACKEND_SERIAL_RX_RING_BUFFER_SIZE
+	int
+	default 255 if SHELL_BACKEND_SERIAL
+
+config CHIP_ENABLE_POWER_ON_FACTORY_RESET
+	bool "Enable power on factory reset sequence"
+	default n
+	help
+	  Enable power on factory reset sequence. If device power triggered off during
+	  first 5 seconds after power on and this sequence repeated 5 times - factory
+	  reset will be involved.
+
+config CHIP_TASK_STACK_SIZE
+	int
+	default 8192
+
+config REALTEK_OTA_BANK1
+	bool "OTA BANK1 APP"
+	default n
+	depends on CHIP_OTA_REQUESTOR

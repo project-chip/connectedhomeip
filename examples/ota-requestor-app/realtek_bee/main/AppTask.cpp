@@ -21,29 +21,31 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#include "Server.h"
 #include "LEDWidget.h"
+#include "Server.h"
 #include <DeviceInfoProviderImpl.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/util/endpoint-config-api.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/util/endpoint-config-api.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <support/CHIPMem.h>
+
+#include <inet/EndPointStateOpenThread.h>
 #include <lib/core/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <inet/EndPointStateOpenThread.h>
 
 #include <CHIPDeviceManager.h>
 #include <DeviceCallbacks.h>
 
-#include <os_mem.h>
 #include "matter_gpio.h"
+#include <os_mem.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
@@ -83,7 +85,7 @@ LEDWidget identifyLED;
 void OnIdentifyStart(Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
-    identifyLED.Blink(500,500);
+    identifyLED.Blink(500, 500);
 }
 
 void OnIdentifyStop(Identify *)
@@ -122,7 +124,6 @@ static Identify gIdentify1 = {
 // NOTE! This key is for test/certification only and should not be available in production devices!
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
-
 
 void LockOpenThreadTask(void)
 {
@@ -174,6 +175,7 @@ void AppTask::InitServer(intptr_t context)
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -208,7 +210,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         if (xPortIsInsideInterrupt())
         {
             BaseType_t higherPrioTaskWoken = pdFALSE;
-            status              = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
             portYIELD_FROM_ISR(higherPrioTaskWoken);
         }
         else
@@ -246,16 +248,15 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
     AppEvent button_event              = {};
     button_event.ButtonEvent.ButtonIdx = btnIdx;
     button_event.Type                  = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.Action    = btnPressed ? true:false;
+    button_event.ButtonEvent.Action    = btnPressed ? true : false;
 
     switch (btnIdx)
     {
-    case APP_FUNCTION_BUTTON:
-        {
-            // Hand off to Functionality handler - depends on duration of press
-            button_event.Handler = FunctionHandler;
-        }
-        break;
+    case APP_FUNCTION_BUTTON: {
+        // Hand off to Functionality handler - depends on duration of press
+        button_event.Handler = FunctionHandler;
+    }
+    break;
 
     default:
         return;
@@ -331,7 +332,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         sAppTask.mFunction = kFunction_FactoryReset;
         // Turn off all LEDs before starting blink to make sure blink is coordinated.
         identifyLED.Set(false);
-        identifyLED.Blink(500,500);
+        identifyLED.Blink(500, 500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -384,8 +385,8 @@ CHIP_ERROR AppTask::Init()
     ChipLogProgress(DeviceLayer, "OTA Requestor App Demo!");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    CHIPDeviceManager &deviceMgr = CHIPDeviceManager::GetInstance();
-    err = deviceMgr.Init(&EchoCallbacks);
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    err                           = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!");

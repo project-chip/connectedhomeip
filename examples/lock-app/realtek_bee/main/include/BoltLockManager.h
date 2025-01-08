@@ -81,8 +81,8 @@ public:
     bool SetCredential(uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
                        DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType, const chip::ByteSpan & secret);
 
-    bool Lock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
-                       const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
+    bool Lock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+              const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
     bool Unlock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
                 const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
     bool setLockState(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,

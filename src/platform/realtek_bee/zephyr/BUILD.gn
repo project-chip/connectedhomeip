@@ -1,0 +1,128 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/realtek_bee/zephyr/args.gni")
+
+assert(chip_device_platform == "realtek_bee_zephyr")
+
+static_library("realtek_bee_zephyr") {
+  sources = [
+    "../../SingletonConfigurationManager.cpp",
+    "../../Zephyr/BLEAdvertisingArbiter.cpp",
+    "../../Zephyr/BLEAdvertisingArbiter.h",
+    "../../Zephyr/BLEManagerImpl.cpp",
+    "../../Zephyr/ConfigurationManagerImpl.cpp",
+    "../../Zephyr/DiagnosticDataProviderImpl.cpp",
+    "../../Zephyr/DiagnosticDataProviderImpl.h",
+    "../../Zephyr/DiagnosticDataProviderImplGetter.cpp",
+    "../../Zephyr/KeyValueStoreManagerImpl.cpp",
+    "../../Zephyr/Logging.cpp",
+    "../../Zephyr/PlatformManagerImpl.cpp",
+    "../../Zephyr/SysHeapMalloc.h",
+    "../../Zephyr/SystemTimeSupport.cpp",
+    "../../Zephyr/ZephyrConfig.cpp",
+    "../../Zephyr/ZephyrConfig.h",
+    "BLEManagerImpl.h",
+    "BlePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPPlatformConfig.h",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DiagnosticDataProviderImpl.h",
+    "KeyValueStoreManagerImpl.h",
+    "InetPlatformConfig.h",
+    "PlatformManagerImpl.h",
+    "SystemPlatformConfig.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/platform/logging:headers",
+  ]
+
+  public = [
+    "${chip_root}/src/credentials/CHIPCert.h",
+    "${chip_root}/src/credentials/CertificationDeclaration.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "${chip_root}/src/credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h",
+    "${chip_root}/src/credentials/attestation_verifier/DeviceAttestationVerifier.h",
+    "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
+    "${chip_root}/src/credentials/examples/ExampleDACs.h",
+    "${chip_root}/src/credentials/examples/ExamplePAI.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  if (chip_enable_factory_data) {
+    sources += [
+      "FactoryDataDecoder.cpp",
+      "FactoryDataDecoder.h",
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
+    ]
+  } else {
+    sources += [
+      "DeviceInstanceInfoProviderImpl.cpp",
+      "DeviceInstanceInfoProviderImpl.h",
+    ]
+  }
+
+  if (chip_malloc_sys_heap) {
+    sources += [ "../../Zephyr/SysHeapMalloc.cpp" ]
+  }
+
+  if (chip_enable_openthread) {
+    sources += [
+      "../../OpenThread/OpenThreadUtils.cpp",
+      "../../Zephyr/ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+      "hw_acc/crypto_engine_nsc.h",
+      "hw_acc/ecp_alt.h",
+      "hw_acc/ecp_alt.c",
+      "hw_acc/ecp_curves_alt.c",
+      "hw_acc/mbedtls_hw_interface.h",
+      "hw_acc/mbedtls_hw_interface.c",
+    ]
+
+    if (chip_mdns == "platform") {
+      sources += [
+        "../../OpenThread/DnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.h",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+  }
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "ota/OTAImageProcessorImpl.cpp",
+      "ota/OTAImageProcessorImpl.h",
+      "ota/matter_ota.c",
+      "ota/matter_ota.h",
+    ]
+  }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "../../Zephyr/Logging.cpp" ]
+}
