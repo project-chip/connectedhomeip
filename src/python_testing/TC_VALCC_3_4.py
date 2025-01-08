@@ -59,6 +59,12 @@ class TC_VALCC_3_4(MatterBaseTest):
         ]
         return steps
 
+    def pics_TC_VALCC_3_4(self) -> list[str]:
+        pics = [
+            "VALCC.S",
+        ]
+        return pics
+
     @run_if_endpoint_matches(has_attribute(Clusters.ValveConfigurationAndControl.Attributes.LevelStep))
     async def test_TC_VALCC_3_4(self):
 
@@ -68,6 +74,8 @@ class TC_VALCC_3_4(MatterBaseTest):
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
         self.step(2)
+        attribute_list = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+
         self.step(3)
         # Steps 2 and three are handled by the decorator
 

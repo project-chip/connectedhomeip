@@ -63,6 +63,12 @@ class TC_VALCC_4_3(MatterBaseTest):
         ]
         return steps
 
+    def pics_TC_VALCC_4_3(self) -> list[str]:
+        pics = [
+            "VALCC.S",
+        ]
+        return pics
+
     @run_if_endpoint_matches(has_feature(Clusters.ValveConfigurationAndControl, Clusters.ValveConfigurationAndControl.Bitmaps.Feature.kTimeSync))
     async def test_TC_VALCC_4_3(self):
 
