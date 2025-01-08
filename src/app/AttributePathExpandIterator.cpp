@@ -114,7 +114,7 @@ bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
         break;
     }
 
-    const ConcreteAttributePath attributePath(mState.mOutputPath.mEndpointId, mState.mLastOutputPath.mClusterId, attributeId);
+    const ConcreteAttributePath attributePath(mState.mOutputPath.mEndpointId, mState.mOutputPath.mClusterId, attributeId);
     return mDataModelProvider->GetAttributeInfo(attributePath).has_value();
 }
 
