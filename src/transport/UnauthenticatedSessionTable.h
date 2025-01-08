@@ -47,10 +47,9 @@ public:
 protected:
     UnauthenticatedSession(SessionRole sessionRole, NodeId ephemeralInitiatorNodeID, const Transport::PeerAddress & peerAddress,
                            const ReliableMessageProtocolConfig & config) :
-        mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID),
-        mSessionRole(sessionRole), mPeerAddress(peerAddress), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
-        mLastPeerActivityTime(System::Clock::kZero), // Start at zero to default to IDLE state
-        mRemoteSessionParams(config)
+        mPeerAddress(peerAddress), mRemoteSessionParams(config), mSessionRole(sessionRole),
+        mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
+        mLastPeerActivityTime(System::Clock::kZero) // Start at zero to default to IDLE state
     {}
     ~UnauthenticatedSession() override { VerifyOrDie(GetReferenceCount() == 0); }
 
@@ -182,13 +181,13 @@ public:
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 private:
-    const NodeId mEphemeralInitiatorNodeId;
-    const SessionRole mSessionRole;
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
-    System::Clock::Timestamp mLastPeerActivityTime; ///< Timestamp of last rx
     SessionParameters mRemoteSessionParams;
     PeerMessageCounter mPeerMessageCounter;
+    const SessionRole mSessionRole;
+    const NodeId mEphemeralInitiatorNodeId;
+    System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
+    System::Clock::Timestamp mLastPeerActivityTime; ///< Timestamp of last rx
 };
 
 template <size_t kMaxSessionCount>
