@@ -107,8 +107,8 @@ TEST(TestAttributePathExpandIterator, TestAllWildcard)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
         while (iter.Next(path))
         {
@@ -121,16 +121,16 @@ TEST(TestAttributePathExpandIterator, TestAllWildcard)
         EXPECT_EQ(index, ArraySize(paths));
     }
 
-    // identical test, but re-using state and re-creating iterators
+    // identical test, but re-using position and re-creating iterators
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
 
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
             if (!iter.Next(path))
             {
@@ -161,8 +161,8 @@ TEST(TestAttributePathExpandIterator, TestWildcardEndpoint)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
         while (iter.Next(path))
         {
@@ -175,15 +175,15 @@ TEST(TestAttributePathExpandIterator, TestWildcardEndpoint)
         EXPECT_EQ(index, ArraySize(paths));
     }
 
-    // identical test, but re-using state and re-creating iterators
+    // identical test, but re-using position and re-creating iterators
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
             if (!iter.Next(path))
             {
@@ -216,8 +216,8 @@ TEST(TestAttributePathExpandIterator, TestWildcardCluster)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
         while (iter.Next(path))
         {
@@ -230,15 +230,15 @@ TEST(TestAttributePathExpandIterator, TestWildcardCluster)
         EXPECT_EQ(index, ArraySize(paths));
     }
 
-    // identical test, but re-using state and re-creating iterators
+    // identical test, but re-using position and re-creating iterators
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
             if (!iter.Next(path))
             {
@@ -271,8 +271,8 @@ TEST(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMet
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
         while (iter.Next(path))
         {
@@ -284,16 +284,16 @@ TEST(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMet
         }
         EXPECT_EQ(index, ArraySize(paths));
     }
-    // identical test, but re-using state and re-creating iterators
+    // identical test, but re-using position and re-creating iterators
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
 
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
             if (!iter.Next(path))
             {
@@ -330,8 +330,8 @@ TEST(TestAttributePathExpandIterator, TestWildcardAttribute)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
         while (iter.Next(path))
         {
@@ -343,16 +343,16 @@ TEST(TestAttributePathExpandIterator, TestWildcardAttribute)
         }
         EXPECT_EQ(index, ArraySize(paths));
     }
-    // identical test, but re-using state and re-creating iterators
+    // identical test, but re-using position and re-creating iterators
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
 
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
             if (!iter.Next(path))
             {
@@ -383,8 +383,8 @@ TEST(TestAttributePathExpandIterator, TestNoWildcard)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
         while (iter.Next(path))
         {
@@ -397,15 +397,15 @@ TEST(TestAttributePathExpandIterator, TestNoWildcard)
         EXPECT_EQ(index, ArraySize(paths));
     }
 
-    // identical test, but re-using state and re-creating iterators
+    // identical test, but re-using position and re-creating iterators
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
             if (!iter.Next(path))
             {
@@ -525,8 +525,8 @@ TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo1);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo1);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
         while (iter.Next(path))
         {
@@ -538,15 +538,15 @@ TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
         }
         EXPECT_EQ(index, ArraySize(paths));
     }
-    // identical test, but re-using state and re-creating iterators
+    // identical test, but re-using position and re-creating iterators
     {
         size_t index = 0;
 
-        auto state = AttributePathExpandIterator::State::StartIterating(&clusInfo1);
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo1);
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), state);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
             if (!iter.Next(path))
             {

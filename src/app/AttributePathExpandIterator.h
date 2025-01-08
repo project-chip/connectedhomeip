@@ -31,19 +31,19 @@ namespace app {
 ///
 /// - Start iterating by creating an iteration state
 ///
-///      mState =  AttributePathExpandIterator::State::StartIterating(path);
+///      mPosition =  AttributePathExpandIterator::Position::StartIterating(path);
 ///
 /// - Use the iteration state in a for loop:
 ///
 ///      ConcreteAttributePath path;
-///      for (AttributePathExpandIterator iterator(mState); iterator->Next(path);) {
+///      for (AttributePathExpandIterator iterator(mPosition); iterator->Next(path);) {
 ///         // use `path` here`
 ///      }
 ///
 ///   OR:
 ///
 ///      ConcreteAttributePath path;
-///      AttributePathExpandIterator iterator(mState);
+///      AttributePathExpandIterator iterator(mPosition);
 ///
 ///      while (iterator.Next(path)) {
 ///         // use `path` here`
@@ -53,29 +53,29 @@ namespace app {
 ///
 ///    - There should be only one single AttributePathExpandIterator for a state  at a time.
 ///
-///    - `State` is automatically updated by the AttributePathExpandIterator, so
+///    - `Position` is automatically updated by the AttributePathExpandIterator, so
 ///      calling `Next` on the iterator will update the state variable.
 ///
 ///
 class AttributePathExpandIterator
 {
 public:
-    class State
+    class Position
     {
     public:
-        // State is treated as a direct member access by the AttributePathExpandIterator, however it is opaque (except copying) for
-        // external code. We allow friendship here to not have specific get/set for methods (clearer interface and less likelyhood
-        // of extra code usage).
+        // Position is treated as a direct member access by the AttributePathExpandIterator, however it is opaque (except copying)
+        // for external code. We allow friendship here to not have specific get/set for methods (clearer interface and less
+        // likelyhood of extra code usage).
         friend class AttributePathExpandIterator;
 
         /// External callers can only ever start iterating on a new path from the beginning
-        static State StartIterating(SingleLinkedListNode<AttributePathParams> * path) { return State(path); }
+        static Position StartIterating(SingleLinkedListNode<AttributePathParams> * path) { return Position(path); }
 
         /// Copies are allowed
-        State(const State &)             = default;
-        State & operator=(const State &) = default;
+        Position(const Position &)             = default;
+        Position & operator=(const Position &) = default;
 
-        State() : mAttributePath(nullptr) {}
+        Position() : mAttributePath(nullptr) {}
 
         /// Reset the iterator to the beginning of current cluster if we are in the middle of expanding a wildcard attribute id for
         /// some cluster.
@@ -90,7 +90,7 @@ public:
         }
 
     protected:
-        State(SingleLinkedListNode<AttributePathParams> * path) :
+        Position(SingleLinkedListNode<AttributePathParams> * path) :
             mAttributePath(path), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
         {
             mOutputPath.mExpanded = true;
@@ -100,7 +100,8 @@ public:
         ConcreteAttributePath mOutputPath;
     };
 
-    AttributePathExpandIterator(DataModel::Provider * dataModel, State & state) : mDataModelProvider(dataModel), mState(state) {}
+    AttributePathExpandIterator(DataModel::Provider * dataModel, Position & state) : mDataModelProvider(dataModel), mPosition(state)
+    {}
 
     // This class may not be copied. A new one should be created when needed and they
     // should not overlap.
@@ -116,7 +117,7 @@ public:
 
 private:
     DataModel::Provider * mDataModelProvider;
-    State & mState;
+    Position & mPosition;
 
     /// Move to the next endpoint/cluster/attribute triplet that is valid given
     /// the current mOutputPath and mpAttributePath.
@@ -182,7 +183,7 @@ private:
 class PeekAttributePathExpandIterator
 {
 public:
-    PeekAttributePathExpandIterator(DataModel::Provider * dataModel, AttributePathExpandIterator::State & state) :
+    PeekAttributePathExpandIterator(DataModel::Provider * dataModel, AttributePathExpandIterator::Position & state) :
         mAttributePathExpandIterator(dataModel, state), mStateTarget(state), mOldState(state)
     {}
     ~PeekAttributePathExpandIterator() { mStateTarget = mOldState; }
@@ -198,8 +199,8 @@ public:
 
 private:
     AttributePathExpandIterator mAttributePathExpandIterator;
-    AttributePathExpandIterator::State & mStateTarget;
-    AttributePathExpandIterator::State mOldState;
+    AttributePathExpandIterator::Position & mStateTarget;
+    AttributePathExpandIterator::Position mOldState;
 };
 
 } // namespace app

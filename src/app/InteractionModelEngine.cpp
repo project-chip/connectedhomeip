@@ -583,7 +583,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
         if (paramsList.mValue.IsWildcardPath())
         {
 
-            AttributePathExpandIterator::State state = AttributePathExpandIterator::State::StartIterating(&paramsList);
+            AttributePathExpandIterator::Position state = AttributePathExpandIterator::Position::StartIterating(&paramsList);
             AttributePathExpandIterator pathIterator(GetDataModelProvider(), state);
             ConcreteAttributePath readPath;
 

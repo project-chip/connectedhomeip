@@ -407,7 +407,7 @@ private:
     bool IsFabricFiltered() const { return mFlags.Has(ReadHandlerFlags::FabricFiltered); }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
-    AttributePathExpandIterator::State & AttributeIterationState() { return mAttributePathExpandState; }
+    AttributePathExpandIterator::Position & AttributeIterationState() { return mAttributePathExpandPosition; }
 
     /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine
     /// run if the change to the attribute path makes the ReadHandler reportable.
@@ -567,7 +567,7 @@ private:
     EventNumber mLastScheduledEventNumber = 0;
 
     /// State for any on-going path expansion for handling wildcard reads/subscriptions
-    AttributePathExpandIterator::State mAttributePathExpandState;
+    AttributePathExpandIterator::Position mAttributePathExpandPosition;
 
     Messaging::ExchangeHolder mExchangeCtx;
 #if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
