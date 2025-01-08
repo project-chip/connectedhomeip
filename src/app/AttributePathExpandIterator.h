@@ -151,8 +151,10 @@ private:
     bool IsValidAttributeId(AttributeId attributeId);
 };
 
-/// Wraps around an AttributePathExpandIterator however it rolls back Next() to one
-/// step back whenever Next() is not run to completion (until it returns false)
+/// PeekAttributePathExpandIterator is an AttributePathExpandIterator wrapper that rolls back the Next()
+/// call whenever a new `MarkCompleted()` method is not called (until Next() returns false). This is useful
+/// to allow pausing iteration in cases the next path was not ready to be used yet and iteration needs to
+/// continue later.
 ///
 /// Example use cases:
 ///
