@@ -93,14 +93,14 @@ source_set("libopenthread-rw61x") {
     sources += [
       "${openthread_nxp_root}/src/common/br/border_agent.c",
       "${openthread_nxp_root}/src/common/br/br_rtos_manager.c",
+      "${openthread_nxp_root}/src/common/br/dns_upstream_resolver.c",
       "${openthread_nxp_root}/src/common/br/infra_if.c",
       "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
       "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
       "${openthread_nxp_root}/src/common/br/mdns_socket.c",
+      "${openthread_nxp_root}/src/common/br/trel_plat.c",
       "${openthread_nxp_root}/src/common/br/udp_plat.c",
       "${openthread_nxp_root}/src/common/br/utils.c",
-      "${openthread_nxp_root}/src/common/br/trel_plat.c",
-      "${openthread_nxp_root}/src/common/br/dns_upstream_resolver.c",
     ]
 
     if (nxp_enable_matter_cli) {
