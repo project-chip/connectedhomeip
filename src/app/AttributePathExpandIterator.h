@@ -100,7 +100,7 @@ public:
         ConcreteAttributePath mOutputPath;
     };
 
-    AttributePathExpandIterator(DataModel::Provider * dataModel, Position & state) : mDataModelProvider(dataModel), mPosition(state)
+    AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position) : mDataModelProvider(dataModel), mPosition(position)
     {}
 
     // This class may not be copied. A new one should be created when needed and they
