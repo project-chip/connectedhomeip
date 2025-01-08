@@ -738,21 +738,21 @@ private:
 
     constexpr bool HaveVendorId() const { return mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_VendorIdPresent); }
 
-    /// Packet type (application data, security control packets, e.g. pairing,
-    /// configuration, rekey etc)
-    uint8_t mMessageType = 0;
-
-    /// Security session identifier
-    uint16_t mExchangeID = 0;
+    /// Message counter of a previous message that is being acknowledged by the current message
+    Optional<uint32_t> mAckMessageCounter;
 
     /// Protocol identifier
     Protocols::Id mProtocolID = Protocols::NotSpecified;
 
+    /// Security session identifier
+    uint16_t mExchangeID = 0;
+
     /// Bit flag indicators for CHIP Exchange header
     Header::ExFlags mExchangeFlags;
 
-    /// Message counter of a previous message that is being acknowledged by the current message
-    Optional<uint32_t> mAckMessageCounter;
+    /// Packet type (application data, security control packets, e.g. pairing,
+    /// configuration, rekey etc)
+    uint8_t mMessageType = 0;
 };
 
 /** Handles encoding/decoding of CHIP message headers */
