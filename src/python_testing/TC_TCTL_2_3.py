@@ -93,8 +93,8 @@ class TC_TCTL_2_3(MatterBaseTest):
         for level in supported_temps:
             asserts.assert_true(isinstance(level, str),
                                 f"Temperature level {level} is not a string")
-        asserts.assert_true(len(level) <= 16,
-                            f"Temperature level string '{level}' exceeds maximum length of 16")
+            asserts.assert_true(len(level) <= 16,
+                                f"Temperature level string '{level}' exceeds maximum length of 16")
 
 
 if __name__ == "__main__":
