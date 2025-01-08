@@ -192,8 +192,13 @@ public:
 
     Access::SubjectDescriptor GetSubjectDescriptor() const
     {
-        Access::SubjectDescriptor subjectDescriptor = { kUndefinedFabricIndex, Access::AuthMode::kNone, kUndefinedNodeId,
-                                                        kUndefinedCATs };
+        Access::SubjectDescriptor subjectDescriptor = {
+            .cats            = kUndefinedCATs,
+            .fabricIndex     = kUndefinedFabricIndex,
+            .authMode        = Access::AuthMode::kNone,
+            .isCommissioning = false,
+            .subject         = kUndefinedNodeId,
+        };
         return subjectDescriptor;
     }
 
