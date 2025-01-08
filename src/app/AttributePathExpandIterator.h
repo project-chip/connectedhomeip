@@ -31,31 +31,30 @@ namespace app {
 ///
 /// - Start iterating by creating an iteration state
 ///
-///      mPosition =  AttributePathExpandIterator::Position::StartIterating(path);
+///      AttributePathExpandIterator::Position position = AttributePathExpandIterator::Position::StartIterating(path);
 ///
 /// - Use the iteration state in a for loop:
 ///
 ///      ConcreteAttributePath path;
-///      for (AttributePathExpandIterator iterator(mPosition); iterator->Next(path);) {
+///      for (AttributePathExpandIterator iterator(position); iterator->Next(path);) {
 ///         // use `path` here`
 ///      }
 ///
 ///   OR:
 ///
 ///      ConcreteAttributePath path;
-///      AttributePathExpandIterator iterator(mPosition);
+///      AttributePathExpandIterator iterator(position);
 ///
 ///      while (iterator.Next(path)) {
 ///         // use `path` here`
 ///      }
 ///
-/// USAGE requirements and assumptions:
+/// Usage requirements and assumptions:
 ///
-///    - There should be only one single AttributePathExpandIterator for a state  at a time.
+///    - An ` AttributePathExpandIterator::Position` can only be used by a single AttributePathExpandIterator at a time.
 ///
-///    - `Position` is automatically updated by the AttributePathExpandIterator, so
-///      calling `Next` on the iterator will update the state variable.
-///
+///    - `position` is automatically updated by the AttributePathExpandIterator, so
+///      calling `Next` on the iterator will update the position cursor variable.
 ///
 class AttributePathExpandIterator
 {
