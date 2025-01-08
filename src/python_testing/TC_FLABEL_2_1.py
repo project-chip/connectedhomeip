@@ -33,7 +33,7 @@
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, run_if_endpoint_matches, has_attribute, has_cluster, default_matter_test_main
 from mobly import asserts
 
 
@@ -49,7 +49,7 @@ class Test_TC_FLABEL_2_1(MatterBaseTest):
             TestStep(4, "Verify LabelList hasn't changed", "LabelList matches initial read")
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(has_attribute(Clusters.FixedLabel.Attributes.LabelList) and has_cluster(Clusters.FixedLabel))
     async def test_TC_FLABEL_2_1(self):
         # Step 1: Commission DUT (already done)
         self.step(1)
