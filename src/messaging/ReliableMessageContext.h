@@ -186,8 +186,6 @@ protected:
         kFlagWaitingForResponseOrAck = (1u << 11),
     };
 
-    BitFlags<Flags> mFlags; // Internal state flags
-
 private:
     void HandleRcvdAck(uint32_t ackMessageCounter);
     CHIP_ERROR HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags);
@@ -214,8 +212,13 @@ private:
     friend class ::chip::app::TestReadInteraction;
     friend class ::chip::app::TestWriteInteraction;
 
-    System::Clock::Timestamp mNextAckTime; // Next time for triggering Solo Ack
     uint32_t mPendingPeerAckMessageCounter;
+    // NOTE: odd nesting of members to save structure size due to padding. On ARM32:
+    // mFlags is 2 bytes, mPendingPeerAckMessageCounter is 4 bytes, mNextAckTime is 8 bytes
+protected:
+    BitFlags<Flags> mFlags; // Internal state flags
+private:
+    System::Clock::Timestamp mNextAckTime; // Next time for triggering Solo Ack
 };
 
 inline bool ReliableMessageContext::AutoRequestAck() const

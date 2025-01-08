@@ -41,7 +41,7 @@ using namespace chip::DeviceLayer;
 namespace chip {
 namespace Messaging {
 
-ReliableMessageContext::ReliableMessageContext() : mNextAckTime(0), mPendingPeerAckMessageCounter(0) {}
+ReliableMessageContext::ReliableMessageContext() : mPendingPeerAckMessageCounter(0), mNextAckTime(0) {}
 
 ExchangeContext * ReliableMessageContext::GetExchangeContext()
 {
