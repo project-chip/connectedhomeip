@@ -337,6 +337,23 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR StartWifiTask(void)
+{
+    if (wifi_extra & WE_ST_STARTED)
+    {
+        ChipLogDetail(DeviceLayer, "WIFI: Already started");
+        return SL_STATUS_OK;
+    }
+    wifi_extra |= WE_ST_STARTED;
+
+    VerifyOrReturnError(wfx_soft_init() == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "Failed to execute the WFX software init."));
+    VerifyOrReturnError(wfx_wifi_hw_start() == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "Failed to execute the WFX HW start."));
+
+    return SL_STATUS_OK;
+}
+
 /***************************************************************************
  * @brief
  * Creates WFX events processing task.
@@ -1005,25 +1022,6 @@ int32_t wfx_reset_counts(void)
     return -1;
 }
 
-/*************************************************************************
- * @brief
- * I think that this is getting called before FreeRTOS threads are ready
- * @return  returns SL_STATUS_OK
- **************************************************************************/
-sl_status_t wfx_wifi_start(void)
-{
-    if (wifi_extra & WE_ST_STARTED)
-    {
-        ChipLogDetail(DeviceLayer, "WIFI: Already started");
-        return SL_STATUS_OK;
-    }
-    wifi_extra |= WE_ST_STARTED;
-    wfx_soft_init();
-    wfx_wifi_hw_start();
-
-    return SL_STATUS_OK;
-}
-
 /****************************************************************************
  * @brief
  *      getnetif using interface
@@ -1239,7 +1237,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
      */
     uint8_t ip4_addr[4];
 
-    ip4_addr[0] = (ip) &0xFF;
+    ip4_addr[0] = (ip) & 0xFF;
     ip4_addr[1] = (ip >> 8) & 0xFF;
     ip4_addr[2] = (ip >> 16) & 0xFF;
     ip4_addr[3] = (ip >> 24) & 0xFF;

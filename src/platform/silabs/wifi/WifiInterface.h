@@ -249,9 +249,17 @@ CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & a
  */
 CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback);
 
+/**
+ * @brief Creates and starts the WiFi task that processes Wifi events and operations
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR if the task was successfully started and initialized
+ *         CHIP_ERROR_NO_MEMORY if the task failed to be created
+ *         CHIP_ERROR_INTERNAL if software or hardware initialization failed
+ */
+CHIP_ERROR StartWifiTask();
+
 /* Function to update */
 
-sl_status_t wfx_wifi_start(void);
 void wfx_enable_sta_mode(void);
 void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig);
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig);

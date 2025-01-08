@@ -218,8 +218,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetPollingInterval(System::Clock::Milliseco
 
 void ConnectivityManagerImpl::DriveStationState()
 {
-    sl_status_t serr;
-    bool stationConnected;
+    bool stationConnected = false;
 
     // Refresh the current station mode.
     GetWiFiStationMode();
@@ -227,13 +226,11 @@ void ConnectivityManagerImpl::DriveStationState()
     // If the station interface is NOT under application control...
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        // Ensure that the WFX is started.
-        if ((serr = wfx_wifi_start()) != SL_STATUS_OK)
-        {
-            ChipLogError(DeviceLayer, "wfx_wifi_start() failed: %lx", serr);
-            return;
-        }
-        // Ensure that station mode is enabled in the WFX WiFi layer.
+        // Ensure that the Wifi task is started.
+        CHIP_ERROR error = StartWifiTask();
+        VerifyOrExit(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartWifiTask() failed: %s", ErrorStr(error)));
+
+        // Ensure that station mode is enabled in the WiFi layer.
         wfx_enable_sta_mode();
     }
 

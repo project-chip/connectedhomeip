@@ -81,27 +81,17 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
     return CHIP_NO_ERROR;
 }
 
-/*********************************************************************
- * @fn  sl_status_t wfx_wifi_start(void)
- * @brief
- * Called from ConnectivityManagerImpl.cpp - to enable the device
- * Create the RSI task and let it deal with life.
- * @param[in]  None
- * @return  Returns SL_STATUS_OK if successful,
- *          SL_STATUS_FAIL otherwise
- ***********************************************************************/
-sl_status_t wfx_wifi_start(void)
+CHIP_ERROR StartWifiTask()
 {
-    VerifyOrReturnError(!(wfx_rsi.dev_state.Has(WifiState::kStationStarted)), SL_STATUS_OK);
+    // Verify that the Wifi task has not already been started.
+    VerifyOrReturnError(!(wfx_rsi.dev_state.Has(WifiState::kStationStarted)), CHIP_NO_ERROR);
     wfx_rsi.dev_state.Set(WifiState::kStationStarted);
 
-    // Creating a Wi-Fi driver thread
+    // Creating a Wi-Fi task thread
     sWlanThread = osThreadNew(sl_matter_wifi_task, NULL, &kWlanTaskAttr);
+    VerifyOrReturnError(sWlanThread != NULL, CHIP_ERROR_NO_MEMORY, ChipLogError(DeviceLayer, "Unable to create the WifiTask."););
 
-    VerifyOrReturnError(sWlanThread != NULL, SL_STATUS_FAIL);
-
-    ChipLogProgress(DeviceLayer, "sl_matter_wifi_task created successfully");
-    return SL_STATUS_OK;
+    return CHIP_NO_ERROR;
 }
 
 /*********************************************************************
