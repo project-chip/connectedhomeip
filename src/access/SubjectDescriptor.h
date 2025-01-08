@@ -29,23 +29,23 @@ namespace Access {
 
 struct SubjectDescriptor
 {
+    // CASE Authenticated Tags (CATs) only valid if auth mode is CASE.
+    CATValues cats;
+
     // Holds FabricIndex of fabric, 0 if no fabric.
     FabricIndex fabricIndex = kUndefinedFabricIndex;
 
     // Holds AuthMode of subject(s), kNone if no access.
     AuthMode authMode = AuthMode::kNone;
 
-    // NOTE: due to packing there should be free bytes here
-
-    // Holds subject according to auth mode.
-    NodeId subject = kUndefinedNodeId;
-
-    // CASE Authenticated Tags (CATs) only valid if auth mode is CASE.
-    CATValues cats;
-
     // Whether the subject is currently a pending commissionee. See `IsCommissioning`
     // definition in Core Specification's ACL Architecture pseudocode.
     bool isCommissioning = false;
+
+    // NOTE: due to packing there should be 1 free byte here
+
+    // Holds subject according to auth mode.
+    NodeId subject = kUndefinedNodeId;
 };
 
 } // namespace Access
