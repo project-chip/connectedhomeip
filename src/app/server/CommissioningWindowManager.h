@@ -191,8 +191,6 @@ private:
 
     bool mIsBLE = true;
 
-    PASESession mPairingSession;
-
     uint8_t mFailedCommissioningAttempts = 0;
 
     bool mUseECM = false;
@@ -221,6 +219,8 @@ private:
     // removed.
     app::DataModel::Nullable<VendorId> mOpenerVendorId;
     app::DataModel::Nullable<FabricIndex> mOpenerFabricIndex;
+
+    PASESession mPairingSession;
 };
 
 } // namespace chip
