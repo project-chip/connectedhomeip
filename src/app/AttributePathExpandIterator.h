@@ -85,25 +85,25 @@ public:
         void IterateFromTheStartOfTheCurrentCluster()
         {
             VerifyOrReturn(mAttributePath != nullptr && mAttributePath->mValue.HasWildcardAttributeId());
-            mLastOutputPath.mAttributeId = kInvalidAttributeId;
-            mLastOutputPath.mExpanded    = true;
+            mOutputPath.mAttributeId = kInvalidAttributeId;
+            mOutputPath.mExpanded    = true;
         }
 
     protected:
         State(SingleLinkedListNode<AttributePathParams> * path) :
-            mAttributePath(path), mLastOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
+            mAttributePath(path), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
         {
-            mLastOutputPath.mExpanded = true;
+            mOutputPath.mExpanded = true;
         }
 
         SingleLinkedListNode<AttributePathParams> * mAttributePath;
-        ConcreteAttributePath mLastOutputPath;
+        ConcreteAttributePath mOutputPath;
     };
 
     AttributePathExpandIterator(DataModel::Provider * dataModel, State & state) : mDataModelProvider(dataModel), mState(state) {}
 
-    // this class may not be copied. A new one should be created when needed and they
-    // should not overlap
+    // This class may not be copied. A new one should be created when needed and they
+    // should not overlap.
     AttributePathExpandIterator(const AttributePathExpandIterator &)             = delete;
     AttributePathExpandIterator & operator=(const AttributePathExpandIterator &) = delete;
 
@@ -119,7 +119,7 @@ private:
     State & mState;
 
     /// Move to the next endpoint/cluster/attribute triplet that is valid given
-    /// the current mOutputPath and mpAttributePath
+    /// the current mOutputPath and mpAttributePath.
     ///
     /// returns true if such a next value was found.
     bool AdvanceOutputPath();
