@@ -43,7 +43,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-java:94
+            image: ghcr.io/project-chip/chip-build-java:97
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -260,9 +260,6 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Onnetwork and get diagnostic log Test
-              # TODO: test below is disabled because it seems flaky (crashes on pool not being empty on app exit)
-              #       See: https://github.com/project-chip/connectedhomeip/issues/36734
-              if: false
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
