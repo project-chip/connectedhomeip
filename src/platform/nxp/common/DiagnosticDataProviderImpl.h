@@ -75,8 +75,8 @@ public:
     uint32_t mPacketMulticastRxCount = 0;
     uint32_t mPacketMulticastTxCount = 0;
     uint32_t mPacketUnicastTxCount   = 0;
-    uint32_t mPacketUnicastRxCount = 0;
-    uint64_t mOverrunCount         = 0;
+    uint32_t mPacketUnicastRxCount   = 0;
+    uint64_t mOverrunCount           = 0;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 };
 
