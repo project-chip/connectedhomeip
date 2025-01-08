@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <stdint.h>
-#include <string>
+#include <string.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
@@ -405,6 +405,10 @@ void NetworkEventHandler(const ChipDeviceEvent * event, intptr_t arg)
     case kWiFiOnScanDone:
         BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
         break;
+    case kWiFiOnConnecting:
+        ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Connecting);
+        ConnectivityMgrImpl().OnConnectivityChanged(deviceInterface_getNetif());
+        break;
     case kWiFiOnConnected:
         BLWiFiDriver::GetInstance().OnNetworkStatusChange();
         break;
@@ -445,6 +449,10 @@ extern "C" void wifi_event_handler(uint32_t code)
         break;
     case CODE_WIFI_ON_SCAN_DONE:
         event.Type = kWiFiOnScanDone;
+        PlatformMgr().PostEventOrDie(&event);
+        break;
+    case CODE_WIFI_ON_CONNECTING:
+        event.Type = kWiFiOnConnecting;
         PlatformMgr().PostEventOrDie(&event);
         break;
     case CODE_WIFI_ON_CONNECTED:

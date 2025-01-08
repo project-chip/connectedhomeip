@@ -21,7 +21,13 @@
 
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+extern "C" {
+#include <bl_sys.h>
+}
+#else
 extern "C" void hal_reboot(void);
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -202,8 +208,11 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
-
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+    bl_sys_reset_por();
+#else
     hal_reboot();
+#endif
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

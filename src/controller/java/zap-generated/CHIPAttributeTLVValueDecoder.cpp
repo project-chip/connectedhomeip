@@ -40541,13 +40541,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_videoStreamIDClassName.c_str(), newElement_0_videoStreamIDCtorSignature.c_str(),
                     jninewElement_0_videoStreamID, newElement_0_videoStreamID);
-                jobject newElement_0_streamType;
-                std::string newElement_0_streamTypeClassName     = "java/lang/Integer";
-                std::string newElement_0_streamTypeCtorSignature = "(I)V";
-                jint jninewElement_0_streamType                  = static_cast<jint>(entry_0.streamType);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_streamTypeClassName.c_str(),
-                                                                           newElement_0_streamTypeCtorSignature.c_str(),
-                                                                           jninewElement_0_streamType, newElement_0_streamType);
+                jobject newElement_0_streamUsage;
+                std::string newElement_0_streamUsageClassName     = "java/lang/Integer";
+                std::string newElement_0_streamUsageCtorSignature = "(I)V";
+                jint jninewElement_0_streamUsage                  = static_cast<jint>(entry_0.streamUsage);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_streamUsageClassName.c_str(),
+                                                                           newElement_0_streamUsageCtorSignature.c_str(),
+                                                                           jninewElement_0_streamUsage, newElement_0_streamUsage);
                 jobject newElement_0_videoCodec;
                 std::string newElement_0_videoCodecClassName     = "java/lang/Integer";
                 std::string newElement_0_videoCodecCtorSignature = "(I)V";
@@ -40754,7 +40754,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 = env->NewObject(
                         videoStreamStructStructClass_1, videoStreamStructStructCtor_1, newElement_0_videoStreamID,
-                        newElement_0_streamType, newElement_0_videoCodec, newElement_0_minFrameRate, newElement_0_maxFrameRate,
+                        newElement_0_streamUsage, newElement_0_videoCodec, newElement_0_minFrameRate, newElement_0_maxFrameRate,
                         newElement_0_minResolution, newElement_0_maxResolution, newElement_0_minBitRate, newElement_0_maxBitRate,
                         newElement_0_minFragmentLen, newElement_0_maxFragmentLen, newElement_0_watermarkEnabled,
                         newElement_0_OSDEnabled, newElement_0_referenceCount);
@@ -40786,13 +40786,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_audioStreamIDClassName.c_str(), newElement_0_audioStreamIDCtorSignature.c_str(),
                     jninewElement_0_audioStreamID, newElement_0_audioStreamID);
-                jobject newElement_0_streamType;
-                std::string newElement_0_streamTypeClassName     = "java/lang/Integer";
-                std::string newElement_0_streamTypeCtorSignature = "(I)V";
-                jint jninewElement_0_streamType                  = static_cast<jint>(entry_0.streamType);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_streamTypeClassName.c_str(),
-                                                                           newElement_0_streamTypeCtorSignature.c_str(),
-                                                                           jninewElement_0_streamType, newElement_0_streamType);
+                jobject newElement_0_streamUsage;
+                std::string newElement_0_streamUsageClassName     = "java/lang/Integer";
+                std::string newElement_0_streamUsageCtorSignature = "(I)V";
+                jint jninewElement_0_streamUsage                  = static_cast<jint>(entry_0.streamUsage);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_streamUsageClassName.c_str(),
+                                                                           newElement_0_streamUsageCtorSignature.c_str(),
+                                                                           jninewElement_0_streamUsage, newElement_0_streamUsage);
                 jobject newElement_0_audioCodec;
                 std::string newElement_0_audioCodecClassName     = "java/lang/Integer";
                 std::string newElement_0_audioCodecCtorSignature = "(I)V";
@@ -40861,7 +40861,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_0 = env->NewObject(audioStreamStructStructClass_1, audioStreamStructStructCtor_1,
-                                                  newElement_0_audioStreamID, newElement_0_streamType, newElement_0_audioCodec,
+                                                  newElement_0_audioStreamID, newElement_0_streamUsage, newElement_0_audioCodec,
                                                   newElement_0_channelCount, newElement_0_sampleRate, newElement_0_bitRate,
                                                   newElement_0_bitDepth, newElement_0_referenceCount);
                 }
@@ -41620,13 +41620,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_peerFabricIndexClassName.c_str(), newElement_0_peerFabricIndexCtorSignature.c_str(),
                     jninewElement_0_peerFabricIndex, newElement_0_peerFabricIndex);
-                jobject newElement_0_streamType;
-                std::string newElement_0_streamTypeClassName     = "java/lang/Integer";
-                std::string newElement_0_streamTypeCtorSignature = "(I)V";
-                jint jninewElement_0_streamType                  = static_cast<jint>(entry_0.streamType);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_streamTypeClassName.c_str(),
-                                                                           newElement_0_streamTypeCtorSignature.c_str(),
-                                                                           jninewElement_0_streamType, newElement_0_streamType);
+                jobject newElement_0_streamUsage;
+                std::string newElement_0_streamUsageClassName     = "java/lang/Integer";
+                std::string newElement_0_streamUsageCtorSignature = "(I)V";
+                jint jninewElement_0_streamUsage                  = static_cast<jint>(entry_0.streamUsage);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_streamUsageClassName.c_str(),
+                                                                           newElement_0_streamUsageCtorSignature.c_str(),
+                                                                           jninewElement_0_streamUsage, newElement_0_streamUsage);
                 jobject newElement_0_videoStreamID;
                 if (entry_0.videoStreamID.IsNull())
                 {
@@ -41689,7 +41689,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 =
                         env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
-                                       newElement_0_peerNodeID, newElement_0_peerFabricIndex, newElement_0_streamType,
+                                       newElement_0_peerNodeID, newElement_0_peerFabricIndex, newElement_0_streamUsage,
                                        newElement_0_videoStreamID, newElement_0_audioStreamID, newElement_0_metadataOptions);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
@@ -41849,13 +41849,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_peerFabricIndexClassName.c_str(), newElement_0_peerFabricIndexCtorSignature.c_str(),
                     jninewElement_0_peerFabricIndex, newElement_0_peerFabricIndex);
-                jobject newElement_0_streamType;
-                std::string newElement_0_streamTypeClassName     = "java/lang/Integer";
-                std::string newElement_0_streamTypeCtorSignature = "(I)V";
-                jint jninewElement_0_streamType                  = static_cast<jint>(entry_0.streamType);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_streamTypeClassName.c_str(),
-                                                                           newElement_0_streamTypeCtorSignature.c_str(),
-                                                                           jninewElement_0_streamType, newElement_0_streamType);
+                jobject newElement_0_streamUsage;
+                std::string newElement_0_streamUsageClassName     = "java/lang/Integer";
+                std::string newElement_0_streamUsageCtorSignature = "(I)V";
+                jint jninewElement_0_streamUsage                  = static_cast<jint>(entry_0.streamUsage);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_streamUsageClassName.c_str(),
+                                                                           newElement_0_streamUsageCtorSignature.c_str(),
+                                                                           jninewElement_0_streamUsage, newElement_0_streamUsage);
                 jobject newElement_0_videoStreamID;
                 if (entry_0.videoStreamID.IsNull())
                 {
@@ -41918,7 +41918,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 =
                         env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
-                                       newElement_0_peerNodeID, newElement_0_peerFabricIndex, newElement_0_streamType,
+                                       newElement_0_peerNodeID, newElement_0_peerFabricIndex, newElement_0_streamUsage,
                                        newElement_0_videoStreamID, newElement_0_audioStreamID, newElement_0_metadataOptions);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
