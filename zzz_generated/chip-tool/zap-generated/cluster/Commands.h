@@ -13784,7 +13784,7 @@ public:
     CameraAvStreamManagementAudioStreamAllocate(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("audio-stream-allocate", credsIssuerConfig)
     {
-        AddArgument("StreamType", 0, UINT8_MAX, &mRequest.streamType);
+        AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
         AddArgument("AudioCodec", 0, UINT8_MAX, &mRequest.audioCodec);
         AddArgument("ChannelCount", 0, UINT8_MAX, &mRequest.channelCount);
         AddArgument("SampleRate", 0, UINT32_MAX, &mRequest.sampleRate);
@@ -13866,7 +13866,7 @@ public:
         ClusterCommand("video-stream-allocate", credsIssuerConfig), mComplex_MinResolution(&mRequest.minResolution),
         mComplex_MaxResolution(&mRequest.maxResolution)
     {
-        AddArgument("StreamType", 0, UINT8_MAX, &mRequest.streamType);
+        AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
         AddArgument("VideoCodec", 0, UINT8_MAX, &mRequest.videoCodec);
         AddArgument("MinFrameRate", 0, UINT16_MAX, &mRequest.minFrameRate);
         AddArgument("MaxFrameRate", 0, UINT16_MAX, &mRequest.maxFrameRate);
@@ -13917,10 +13917,9 @@ class CameraAvStreamManagementVideoStreamModify : public ClusterCommand
 {
 public:
     CameraAvStreamManagementVideoStreamModify(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("video-stream-modify", credsIssuerConfig), mComplex_Resolution(&mRequest.resolution)
+        ClusterCommand("video-stream-modify", credsIssuerConfig)
     {
         AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
-        AddArgument("Resolution", &mComplex_Resolution, "", Argument::kOptional);
         AddArgument("WatermarkEnabled", 0, 1, &mRequest.watermarkEnabled);
         AddArgument("OSDEnabled", 0, 1, &mRequest.OSDEnabled);
         ClusterCommand::AddArguments();
@@ -13949,8 +13948,6 @@ public:
 
 private:
     chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamModify::Type mRequest;
-    TypedComplexArgument<chip::Optional<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>>
-        mComplex_Resolution;
 };
 
 /*
@@ -14113,7 +14110,7 @@ public:
 
 private:
     chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriorities::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamTypeEnum>>
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>>
         mComplex_StreamPriorities;
 };
 
@@ -14188,7 +14185,7 @@ public:
     WebRTCTransportProviderSolicitOffer(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("solicit-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers)
     {
-        AddArgument("StreamType", 0, UINT8_MAX, &mRequest.streamType);
+        AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
         AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
         AddArgument("AudioStreamID", 0, UINT16_MAX, &mRequest.audioStreamID);
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);
@@ -14236,7 +14233,7 @@ public:
     {
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
         AddArgument("Sdp", &mRequest.sdp);
-        AddArgument("StreamType", 0, UINT8_MAX, &mRequest.streamType);
+        AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
         AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
         AddArgument("AudioStreamID", 0, UINT16_MAX, &mRequest.audioStreamID);
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);
@@ -26855,7 +26852,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
             Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamTypeEnum>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>>>(
             Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id,
             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "soft-recording-privacy-mode-enabled", 0, 1,
