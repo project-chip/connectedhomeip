@@ -26,7 +26,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
   val id: UInt,
   val peerNodeID: ULong,
   val peerFabricIndex: UInt,
-  val streamType: UInt,
+  val streamUsage: UInt,
   val videoStreamID: UInt?,
   val audioStreamID: UInt?,
   val metadataOptions: UInt,
@@ -36,7 +36,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
     append("\tid : $id\n")
     append("\tpeerNodeID : $peerNodeID\n")
     append("\tpeerFabricIndex : $peerFabricIndex\n")
-    append("\tstreamType : $streamType\n")
+    append("\tstreamUsage : $streamUsage\n")
     append("\tvideoStreamID : $videoStreamID\n")
     append("\taudioStreamID : $audioStreamID\n")
     append("\tmetadataOptions : $metadataOptions\n")
@@ -49,7 +49,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
       put(ContextSpecificTag(TAG_ID), id)
       put(ContextSpecificTag(TAG_PEER_NODE_ID), peerNodeID)
       put(ContextSpecificTag(TAG_PEER_FABRIC_INDEX), peerFabricIndex)
-      put(ContextSpecificTag(TAG_STREAM_TYPE), streamType)
+      put(ContextSpecificTag(TAG_STREAM_USAGE), streamUsage)
       if (videoStreamID != null) {
         put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), videoStreamID)
       } else {
@@ -69,7 +69,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
     private const val TAG_ID = 1
     private const val TAG_PEER_NODE_ID = 2
     private const val TAG_PEER_FABRIC_INDEX = 3
-    private const val TAG_STREAM_TYPE = 4
+    private const val TAG_STREAM_USAGE = 4
     private const val TAG_VIDEO_STREAM_ID = 5
     private const val TAG_AUDIO_STREAM_ID = 6
     private const val TAG_METADATA_OPTIONS = 7
@@ -82,7 +82,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
       val id = tlvReader.getUInt(ContextSpecificTag(TAG_ID))
       val peerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PEER_NODE_ID))
       val peerFabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_PEER_FABRIC_INDEX))
-      val streamType = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_TYPE))
+      val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
       val videoStreamID =
         if (!tlvReader.isNull()) {
           tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
@@ -105,7 +105,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
         id,
         peerNodeID,
         peerFabricIndex,
-        streamType,
+        streamUsage,
         videoStreamID,
         audioStreamID,
         metadataOptions,

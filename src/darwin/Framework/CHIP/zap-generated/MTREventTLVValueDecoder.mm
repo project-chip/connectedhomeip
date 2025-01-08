@@ -4649,12 +4649,12 @@ static id _Nullable DecodeEventPayloadForCameraAVStreamManagementCluster(EventId
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
-            if (cppValue.streamType.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamType.Value())];
+            if (cppValue.streamUsage.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamUsage.Value())];
             } else {
                 memberValue = nil;
             }
-            value.streamType = memberValue;
+            value.streamUsage = memberValue;
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
@@ -4760,12 +4760,12 @@ static id _Nullable DecodeEventPayloadForCameraAVStreamManagementCluster(EventId
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
-            if (cppValue.streamType.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamType.Value())];
+            if (cppValue.streamUsage.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamUsage.Value())];
             } else {
                 memberValue = nil;
             }
-            value.streamType = memberValue;
+            value.streamUsage = memberValue;
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
