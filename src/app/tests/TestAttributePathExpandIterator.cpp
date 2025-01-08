@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "pw_unit_test/framework.h"
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/ConcreteAttributePath.h>
@@ -418,6 +419,69 @@ TEST(TestAttributePathExpandIterator, TestNoWildcard)
             index++;
         }
         EXPECT_EQ(index, ArraySize(paths));
+    }
+}
+
+TEST(TestAttributePathExpandIterator, TestFixedPathExpansion)
+{
+    // expansion logic requires that:
+    //   - paths for wildcard expansion ARE VALIDATED
+    //   - path WITHOUT wildcard expansion ARE NOT VALIDATED
+
+    // invalid attribute across all clusters returns empty
+    {
+        SingleLinkedListNode<app::AttributePathParams> clusInfo;
+        clusInfo.mValue.mAttributeId = 122333;
+
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        ConcreteAttributePath path;
+
+        EXPECT_FALSE(iter.Next(path));
+    }
+
+    // invalid cluster with a valid attribute (featuremap) returns empty
+    {
+        SingleLinkedListNode<app::AttributePathParams> clusInfo;
+        clusInfo.mValue.mClusterId   = 122333;
+        clusInfo.mValue.mAttributeId = Clusters::Globals::Attributes::FeatureMap::Id;
+
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        ConcreteAttributePath path;
+
+        EXPECT_FALSE(iter.Next(path));
+    }
+
+    // invalid cluster with wildcard attribute returns empty
+    {
+        SingleLinkedListNode<app::AttributePathParams> clusInfo;
+        clusInfo.mValue.mClusterId = 122333;
+
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        ConcreteAttributePath path;
+
+        EXPECT_FALSE(iter.Next(path));
+    }
+
+    // even though all above WERE invalid, if we specify a non-wildcard path it is returned as-is
+    {
+        SingleLinkedListNode<app::AttributePathParams> clusInfo;
+        clusInfo.mValue.mEndpointId  = 1;
+        clusInfo.mValue.mClusterId   = 122333;
+        clusInfo.mValue.mAttributeId = 122333;
+
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        ConcreteAttributePath path;
+
+        EXPECT_TRUE(iter.Next(path));
+        EXPECT_EQ(path.mEndpointId, clusInfo.mValue.mEndpointId);
+        EXPECT_EQ(path.mClusterId, clusInfo.mValue.mClusterId);
+        EXPECT_EQ(path.mAttributeId, clusInfo.mValue.mAttributeId);
+
+        EXPECT_FALSE(iter.Next(path));
     }
 }
 
