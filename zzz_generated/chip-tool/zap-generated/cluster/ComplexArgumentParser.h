@@ -741,6 +741,18 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::VideoSensorParamsStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request,
                         Json::Value & value);
 

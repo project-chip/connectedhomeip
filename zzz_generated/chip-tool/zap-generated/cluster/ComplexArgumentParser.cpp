@@ -6477,6 +6477,88 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.maxHDRFPS);
 }
 
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    char labelWithMember[kMaxLabelLength];
+    if (value.isMember("pan"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "pan");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.pan, value["pan"]));
+    }
+    valueCopy.removeMember("pan");
+
+    if (value.isMember("tilt"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "tilt");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.tilt, value["tilt"]));
+    }
+    valueCopy.removeMember("tilt");
+
+    if (value.isMember("zoom"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "zoom");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.zoom, value["zoom"]));
+    }
+    valueCopy.removeMember("zoom");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.pan);
+    ComplexArgumentParser::Finalize(request.tilt);
+    ComplexArgumentParser::Finalize(request.zoom);
+}
+
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("MPTZPresetStruct.presetID", "presetID", value.isMember("presetID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MPTZPresetStruct.name", "name", value.isMember("name")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("MPTZPresetStruct.settings", "settings", value.isMember("settings")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetID, value["presetID"]));
+    valueCopy.removeMember("presetID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    valueCopy.removeMember("name");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "settings");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.settings, value["settings"]));
+    valueCopy.removeMember("settings");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.presetID);
+    ComplexArgumentParser::Finalize(request.name);
+    ComplexArgumentParser::Finalize(request.settings);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request,
                                         Json::Value & value)
 {

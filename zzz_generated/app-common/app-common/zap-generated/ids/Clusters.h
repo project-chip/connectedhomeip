@@ -382,6 +382,9 @@ static constexpr ClusterId Id = 0x00000550;
 namespace CameraAvStreamManagement {
 static constexpr ClusterId Id = 0x00000551;
 } // namespace CameraAvStreamManagement
+namespace CameraAvSettingsUserLevelManagement {
+static constexpr ClusterId Id = 0x00000552;
+} // namespace CameraAvSettingsUserLevelManagement
 namespace WebRTCTransportProvider {
 static constexpr ClusterId Id = 0x00000553;
 } // namespace WebRTCTransportProvider
