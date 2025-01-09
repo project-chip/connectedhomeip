@@ -17,15 +17,15 @@
 #pragma once
 
 #include "ProvisionStorageGeneric.h"
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <platform/CommissionableDataProvider.h>
-#include <platform/DeviceInstanceInfoProvider.h>
-
 #include <app/data-model/Nullable.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/Span.h>
+#include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/silabs/provision/ProvisionedDataProvider.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -131,7 +131,8 @@ constexpr size_t kPaddingFieldLengthInBits              = 4;
 struct Storage : public GenericStorage,
                  public chip::DeviceLayer::DeviceInstanceInfoProvider,
                  public chip::DeviceLayer::CommissionableDataProvider,
-                 public chip::Credentials::DeviceAttestationCredentialsProvider
+                 public chip::Credentials::DeviceAttestationCredentialsProvider,
+                 public ProvisionedDataProvider
 {
     static constexpr size_t kArgumentSizeMax             = 512;
     static constexpr size_t kVersionLengthMax            = 16;
@@ -228,6 +229,15 @@ public:
     CHIP_ERROR SetProductAttestationIntermediateCert(const ByteSpan & value);
     CHIP_ERROR SetDeviceAttestationCert(const ByteSpan & value);
     CHIP_ERROR SetDeviceAttestationKey(const ByteSpan & value);
+
+    //
+    // ProvisionedDataProvider
+    //
+
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+    CHIP_ERROR GetTestEventTriggerKey(MutableByteSpan & keySpan) override;
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+
     //
     // Other
     //
@@ -237,16 +247,6 @@ public:
     CHIP_ERROR GetSetupPayload(chip::MutableCharSpan & value);
     CHIP_ERROR SetProvisionRequest(bool value);
     CHIP_ERROR GetProvisionRequest(bool & value);
-
-#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
-    /**
-     * @brief Reads the test event trigger key from NVM. If the key isn't present, returns default value if defined.
-     *
-     * @param[out] keySpan output buffer. Must be at least large enough for 16 bytes (key length)
-     * @return CHIP_ERROR
-     */
-    virtual CHIP_ERROR GetTestEventTriggerKey(MutableByteSpan & keySpan);
-#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 private:
     // Generic Interface

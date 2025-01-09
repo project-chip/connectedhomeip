@@ -17,11 +17,12 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <ProvisionStorage.h>
 #include <SilabsTestEventTriggerDelegate.h>
 #include <lib/support/Span.h>
+#include <platform/silabs/provision/ProvisionedDataProvider.h>
 
 using namespace chip;
+using namespace chip::DeviceLayer::Silabs::Provision;
 
 namespace {
 const uint8_t kTestEnableKey1[TestEventTriggerDelegate::kEnableKeyLength]       = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
@@ -32,7 +33,7 @@ const uint8_t kInvalidEnableKey[TestEventTriggerDelegate::kEnableKeyLength - 1] 
                                                                                     0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 const uint8_t kZeroEnableKey[TestEventTriggerDelegate::kEnableKeyLength]        = { 0 };
 
-class StorageStub : public chip::DeviceLayer::Silabs::Provision::Storage
+class ProviderStub : public ProvisionedDataProvider
 {
 public:
     CHIP_ERROR GetTestEventTriggerKey(MutableByteSpan & keySpan) override
@@ -64,11 +65,11 @@ private:
 // Test that a valid key matches
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_ValidKey)
 {
-    StorageStub storageStub;
-    storageStub.SetEnableKey(kTestEnableKey1);
+    ProviderStub provider;
+    provider.SetEnableKey(kTestEnableKey1);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&storageStub);
+    delegate.Init(&provider);
 
     ByteSpan validKeySpan(kTestEnableKey1);
     EXPECT_TRUE(delegate.DoesEnableKeyMatch(validKeySpan));
@@ -77,11 +78,11 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_ValidKey)
 // Test that an invalid key does not match
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_InvalidKey)
 {
-    StorageStub storageStub;
-    storageStub.SetEnableKey(kTestEnableKey1);
+    ProviderStub provider;
+    provider.SetEnableKey(kTestEnableKey1);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&storageStub);
+    delegate.Init(&provider);
 
     ByteSpan invalidKeySpan(kInvalidEnableKey);
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(invalidKeySpan));
@@ -90,11 +91,11 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_InvalidKey)
 // Test that an empty key does not match
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_EmptyKey)
 {
-    StorageStub storageStub;
-    storageStub.SetEnableKey(kTestEnableKey1);
+    ProviderStub provider;
+    provider.SetEnableKey(kTestEnableKey1);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&storageStub);
+    delegate.Init(&provider);
 
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(ByteSpan(kZeroEnableKey)));
 }
@@ -102,11 +103,11 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_EmptyKey)
 // Test that a different valid key does not match
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_DifferentValidKey)
 {
-    StorageStub storageStub;
-    storageStub.SetEnableKey(kTestEnableKey1);
+    ProviderStub provider;
+    provider.SetEnableKey(kTestEnableKey1);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&storageStub);
+    delegate.Init(&provider);
 
     ByteSpan differentValidKeySpan(kTestEnableKey2);
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(differentValidKeySpan));
@@ -115,10 +116,10 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_DifferentValidKe
 // Test that an empty key matchs when no enable key is set
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoKeySet_EmptyKey)
 {
-    StorageStub storageStub;
+    ProviderStub provider;
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&storageStub);
+    delegate.Init(&provider);
 
     EXPECT_TRUE(delegate.DoesEnableKeyMatch(ByteSpan(kZeroEnableKey)));
 }
@@ -126,16 +127,16 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoKeySet_EmptyKe
 // Test that a valid key does not match when no enable key is set
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoKeySet_ValidKey)
 {
-    StorageStub storageStub;
+    ProviderStub provider;
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&storageStub);
+    delegate.Init(&provider);
 
     ByteSpan validKeySpan(kTestEnableKey1);
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(validKeySpan));
 }
 
-// Test that a valid key does not match when storage is not set
+// Test that a valid key does not match when provider is not set
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoStorage_ValidKey)
 {
     SilabsTestEventTriggerDelegate delegate;
@@ -144,7 +145,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoStorage_ValidK
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(validKeySpan));
 }
 
-// Test that an invalid key does not match when storage is not set
+// Test that an invalid key does not match when provider is not set
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoStorage_InvalidKey)
 {
     SilabsTestEventTriggerDelegate delegate;
@@ -153,7 +154,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoStorage_Invali
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(invalidKeySpan));
 }
 
-// Test that an empty key matchs when storage is not set
+// Test that an empty key matchs when provider is not set
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoStorage_EmptyKey)
 {
     SilabsTestEventTriggerDelegate delegate;
@@ -164,11 +165,11 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoStorage_EmptyK
 // Test that a valid key does not match when GetTestEventTriggerKey returns an error
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_ValidKey)
 {
-    StorageStub storageStub;
-    storageStub.SetForceError(true);
+    ProviderStub provider;
+    provider.SetForceError(true);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&storageStub);
+    delegate.Init(&provider);
 
     ByteSpan validKeySpan(kTestEnableKey1);
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(validKeySpan));
@@ -177,11 +178,11 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_Vali
 // Test that an invalid key does not match when GetTestEventTriggerKey returns an error
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_InvalidKey)
 {
-    StorageStub storageStub;
-    storageStub.SetForceError(true);
+    ProviderStub provider;
+    provider.SetForceError(true);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&storageStub);
+    delegate.Init(&provider);
 
     ByteSpan invalidKeySpan(kInvalidEnableKey);
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(invalidKeySpan));
@@ -190,11 +191,11 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_Inva
 // Test that an empty key matchs when GetTestEventTriggerKey returns an error
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_EmptyKey)
 {
-    StorageStub storageStub;
-    storageStub.SetForceError(true);
+    ProviderStub provider;
+    provider.SetForceError(true);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&storageStub);
+    delegate.Init(&provider);
 
     EXPECT_TRUE(delegate.DoesEnableKeyMatch(ByteSpan(kZeroEnableKey)));
 }

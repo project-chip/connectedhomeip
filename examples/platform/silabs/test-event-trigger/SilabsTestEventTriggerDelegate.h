@@ -35,12 +35,12 @@ public:
     /**
      * @brief Configures the Silabs Test Event trigger
      *
-     * @param storage pointer to the global provisioning storage
+     * @param provider pointer to the silabs provisionned data provider
      *
      * @return CHIP_ERROR CHIP_NO_ERROR, if the init was succesful
      *                    CHIP_ERROR_INVALID_ARGUMENT, if the manager input is equal to nullptr
      */
-    CHIP_ERROR Init(DeviceLayer::Silabs::Provision::Storage * storage);
+    CHIP_ERROR Init(DeviceLayer::Silabs::Provision::ProvisionedDataProvider * provider);
 
     /**
      * @brief Checks to see if `enableKey` provided matches value chosen by the manufacturer.
@@ -50,7 +50,7 @@ public:
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
 
 private:
-    DeviceLayer::Silabs::Provision::Storage * mStorage = nullptr;
+    DeviceLayer::Silabs::Provision::ProvisionedDataProvider * mProvider = nullptr;
 };
 
 } // namespace chip
