@@ -27,12 +27,12 @@ chip_test_group("silabs_example_platform_tests") {
   tests = []
 
   if (sl_build_unit_tests) {
-    tests += [ "${chip_root}/examples/platform/silabs/tests" ]
+    tests += [ "${chip_root}/examples/platform/silabs/tests:examples_tests" ]
   }
 }
 
 if (sl_build_unit_tests) {
-  chip_test_suite("silabs_example_tests") {
+  chip_test_suite("examples_tests") {
     output_name = "libSilabsExamplesPlatformTests"
 
     test_sources = [ "TestSilabsTestEventTrigger.cpp" ]
