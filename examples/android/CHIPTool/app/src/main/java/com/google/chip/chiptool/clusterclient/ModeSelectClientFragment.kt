@@ -119,14 +119,14 @@ class ModeSelectClientFragment : Fragment() {
 
           requireActivity().runOnUiThread {
             val description = attributeStates[ClusterIDMapping.ModeSelect.Attribute.Description.id]
-            binding.descriptionEd.setText(description?.value.toString())
+            binding.descriptionEd.setText(description?.value?.toString())
 
             val standardNamespace =
               attributeStates[ClusterIDMapping.ModeSelect.Attribute.StandardNamespace.id]
-            binding.standardNamespaceEd.setText(standardNamespace?.value.toString())
+            binding.standardNamespaceEd.setText(standardNamespace?.value?.toString())
 
             val currentMode = attributeStates[ClusterIDMapping.ModeSelect.Attribute.CurrentMode.id]
-            binding.currentModeEd.setText(currentMode?.value.toString())
+            binding.currentModeEd.setText(currentMode?.value?.toString())
 
             setVisibility(
               attributeStates[ClusterIDMapping.ModeSelect.Attribute.StartUpMode.id],
@@ -145,7 +145,7 @@ class ModeSelectClientFragment : Fragment() {
               attributeStates[ClusterIDMapping.ModeSelect.Attribute.SupportedModes.id]?.tlv
 
             supportedModesTlv?.let {
-              setSupportedModeSpinner(it, currentMode?.value.toString().toUInt())
+              setSupportedModeSpinner(it, currentMode?.value?.toString()?.toUInt())
             }
           }
         }
@@ -164,7 +164,7 @@ class ModeSelectClientFragment : Fragment() {
   ) {
     val modeVisibility =
       if (attribute != null) {
-        modeEd.setText(attribute.value.toString())
+        modeEd.setText(attribute.value?.toString() ?: "NULL")
         View.VISIBLE
       } else {
         View.GONE
