@@ -80,6 +80,7 @@ private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
     CHIP_ERROR _InitThreadStack(void);
+    void _DeinitThreadStack(){};
     CHIP_ERROR _StartThreadTask(void);
     void _LockThreadStack(void);
     bool _TryLockThreadStack(void);
