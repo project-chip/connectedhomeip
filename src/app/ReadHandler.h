@@ -407,7 +407,7 @@ private:
     bool IsFabricFiltered() const { return mFlags.Has(ReadHandlerFlags::FabricFiltered); }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
-    AttributePathExpandIterator::State & AttributeIterationState() { return mAttributePathExpandState; }
+    AttributePathExpandIterator::Position & AttributeIterationPosition() { return mAttributePathExpandPosition; }
 
     /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine
     /// run if the change to the attribute path makes the ReadHandler reportable.
@@ -519,8 +519,7 @@ private:
     /// @param aFlag Flag to clear
     void ClearStateFlag(ReadHandlerFlags aFlag);
 
-    /// State for any on-going path expansion for handling wildcard reads/subscriptions
-    AttributePathExpandIterator::State mAttributePathExpandState;
+    SubscriptionId mSubscriptionId = 0;
 
     // The current generation of the reporting engine dirty set the last time we were notified that a path we're interested in was
     // marked dirty.
@@ -562,18 +561,13 @@ private:
     // engine, the "oldest" subscription is the subscription with the smallest generation.
     uint64_t mTransactionStartGeneration = 0;
 
-    SubscriptionId mSubscriptionId           = 0;
-    uint16_t mMinIntervalFloorSeconds        = 0;
-    uint16_t mMaxInterval                    = 0;
-    uint16_t mSubscriberRequestedMaxInterval = 0;
-
     EventNumber mEventMin = 0;
 
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber = 0;
 
-    // TODO: We should shutdown the transaction when the session expires.
-    SessionHolder mSessionHandle;
+    /// Iterator position state for any on-going path expansion for handling wildcard reads/subscriptions.
+    AttributePathExpandIterator::Position mAttributePathExpandPosition;
 
     Messaging::ExchangeHolder mExchangeCtx;
 #if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
@@ -588,11 +582,18 @@ private:
 
     ManagementCallback & mManagementCallback;
 
+    // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
+    Observer * mObserver = nullptr;
+
     uint32_t mLastWrittenEventsBytes = 0;
 
     // The detailed encoding state for a single attribute, used by list chunking feature.
     // The size of AttributeEncoderState is 2 bytes for now.
     AttributeEncodeState mAttributeEncoderState;
+
+    uint16_t mMinIntervalFloorSeconds        = 0;
+    uint16_t mMaxInterval                    = 0;
+    uint16_t mSubscriberRequestedMaxInterval = 0;
 
     // Current Handler state
     HandlerState mState            = HandlerState::Idle;
@@ -600,8 +601,8 @@ private:
     BitFlags<ReadHandlerFlags> mFlags;
     InteractionType mInteractionType = InteractionType::Read;
 
-    // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
-    Observer * mObserver = nullptr;
+    // TODO: We should shutdown the transaction when the session expires.
+    SessionHolder mSessionHandle;
 };
 
 } // namespace app

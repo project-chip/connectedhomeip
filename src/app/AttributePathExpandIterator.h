@@ -31,51 +31,50 @@ namespace app {
 ///
 /// - Start iterating by creating an iteration state
 ///
-///      mState =  AttributePathExpandIterator::State::StartIterating(path);
+///      AttributePathExpandIterator::Position position = AttributePathExpandIterator::Position::StartIterating(path);
 ///
 /// - Use the iteration state in a for loop:
 ///
 ///      ConcreteAttributePath path;
-///      for (AttributePathExpandIterator iterator(mState); iterator->Next(path);) {
+///      for (AttributePathExpandIterator iterator(position); iterator->Next(path);) {
 ///         // use `path` here`
 ///      }
 ///
 ///   OR:
 ///
 ///      ConcreteAttributePath path;
-///      AttributePathExpandIterator iterator(mState);
+///      AttributePathExpandIterator iterator(position);
 ///
 ///      while (iterator.Next(path)) {
 ///         // use `path` here`
 ///      }
 ///
-/// USAGE requirements and assumptions:
+/// Usage requirements and assumptions:
 ///
-///    - There should be only one single AttributePathExpandIterator for a state  at a time.
+///    - An ` AttributePathExpandIterator::Position` can only be used by a single AttributePathExpandIterator at a time.
 ///
-///    - `State` is automatically updated by the AttributePathExpandIterator, so
-///      calling `Next` on the iterator will update the state variable.
-///
+///    - `position` is automatically updated by the AttributePathExpandIterator, so
+///      calling `Next` on the iterator will update the position cursor variable.
 ///
 class AttributePathExpandIterator
 {
 public:
-    class State
+    class Position
     {
     public:
-        // State is treated as a direct member access by the AttributePathExpandIterator, however it is opaque (except copying) for
-        // external code. We allow friendship here to not have specific get/set for methods (clearer interface and less likelyhood
-        // of extra code usage).
+        // Position is treated as a direct member access by the AttributePathExpandIterator, however it is opaque (except copying)
+        // for external code. We allow friendship here to not have specific get/set for methods (clearer interface and less
+        // likelihood of extra code usage).
         friend class AttributePathExpandIterator;
 
         /// External callers can only ever start iterating on a new path from the beginning
-        static State StartIterating(SingleLinkedListNode<AttributePathParams> * path) { return State(path); }
+        static Position StartIterating(SingleLinkedListNode<AttributePathParams> * path) { return Position(path); }
 
         /// Copies are allowed
-        State(const State &)             = default;
-        State & operator=(const State &) = default;
+        Position(const Position &)             = default;
+        Position & operator=(const Position &) = default;
 
-        State() : mAttributePath(nullptr) {}
+        Position() : mAttributePath(nullptr) {}
 
         /// Reset the iterator to the beginning of current cluster if we are in the middle of expanding a wildcard attribute id for
         /// some cluster.
@@ -85,25 +84,24 @@ public:
         void IterateFromTheStartOfTheCurrentCluster()
         {
             VerifyOrReturn(mAttributePath != nullptr && mAttributePath->mValue.HasWildcardAttributeId());
-            mLastOutputPath.mAttributeId = kInvalidAttributeId;
-            mLastOutputPath.mExpanded    = true;
+            mOutputPath.mAttributeId = kInvalidAttributeId;
         }
 
     protected:
-        State(SingleLinkedListNode<AttributePathParams> * path) :
-            mAttributePath(path), mLastOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
-        {
-            mLastOutputPath.mExpanded = true;
-        }
+        Position(SingleLinkedListNode<AttributePathParams> * path) :
+            mAttributePath(path), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
+        {}
 
         SingleLinkedListNode<AttributePathParams> * mAttributePath;
-        ConcreteAttributePath mLastOutputPath;
+        ConcreteAttributePath mOutputPath;
     };
 
-    AttributePathExpandIterator(DataModel::Provider * dataModel, State & state) : mDataModelProvider(dataModel), mState(state) {}
+    AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position) :
+        mDataModelProvider(dataModel), mPosition(position)
+    {}
 
-    // this class may not be copied. A new one should be created when needed and they
-    // should not overlap
+    // This class may not be copied. A new one should be created when needed and they
+    // should not overlap.
     AttributePathExpandIterator(const AttributePathExpandIterator &)             = delete;
     AttributePathExpandIterator & operator=(const AttributePathExpandIterator &) = delete;
 
@@ -116,10 +114,10 @@ public:
 
 private:
     DataModel::Provider * mDataModelProvider;
-    State & mState;
+    Position & mPosition;
 
     /// Move to the next endpoint/cluster/attribute triplet that is valid given
-    /// the current mOutputPath and mpAttributePath
+    /// the current mOutputPath and mpAttributePath.
     ///
     /// returns true if such a next value was found.
     bool AdvanceOutputPath();
@@ -150,8 +148,10 @@ private:
     bool IsValidAttributeId(AttributeId attributeId);
 };
 
-/// Wraps around an AttributePathExpandIterator however it rolls back Next() to one
-/// step back whenever Next() is not run to completion (until it returns false)
+/// PeekAttributePathExpandIterator is an AttributePathExpandIterator wrapper that rolls back the Next()
+/// call whenever a new `MarkCompleted()` method is not called (until Next() returns false). This is useful
+/// to allow pausing iteration in cases the next path was not ready to be used yet and iteration needs to
+/// continue later.
 ///
 /// Example use cases:
 ///
@@ -182,24 +182,24 @@ private:
 class PeekAttributePathExpandIterator
 {
 public:
-    PeekAttributePathExpandIterator(DataModel::Provider * dataModel, AttributePathExpandIterator::State & state) :
-        mAttributePathExpandIterator(dataModel, state), mStateTarget(state), mOldState(state)
+    PeekAttributePathExpandIterator(DataModel::Provider * dataModel, AttributePathExpandIterator::Position & position) :
+        mAttributePathExpandIterator(dataModel, position), mPositionTarget(position), mOldPosition(position)
     {}
-    ~PeekAttributePathExpandIterator() { mStateTarget = mOldState; }
+    ~PeekAttributePathExpandIterator() { mPositionTarget = mOldPosition; }
 
     bool Next(ConcreteAttributePath & path)
     {
-        mOldState = mStateTarget;
+        mOldPosition = mPositionTarget;
         return mAttributePathExpandIterator.Next(path);
     }
 
     /// Marks the current iteration completed (so peek does not actually roll back)
-    void MarkCompleted() { mOldState = mStateTarget; }
+    void MarkCompleted() { mOldPosition = mPositionTarget; }
 
 private:
     AttributePathExpandIterator mAttributePathExpandIterator;
-    AttributePathExpandIterator::State & mStateTarget;
-    AttributePathExpandIterator::State mOldState;
+    AttributePathExpandIterator::Position & mPositionTarget;
+    AttributePathExpandIterator::Position mOldPosition;
 };
 
 } // namespace app

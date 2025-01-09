@@ -506,8 +506,8 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
     if (CHIP_END_OF_TLV == err)
     {
         mManagementCallback.GetInteractionModelEngine()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
-        mAttributePathExpandState = AttributePathExpandIterator::State::StartIterating(mpAttributePathList);
-        err                       = CHIP_NO_ERROR;
+        mAttributePathExpandPosition = AttributePathExpandIterator::Position::StartIterating(mpAttributePathList);
+        err                          = CHIP_NO_ERROR;
     }
     return err;
 }
@@ -849,7 +849,7 @@ void ReadHandler::PersistSubscription()
 
 void ReadHandler::ResetPathIterator()
 {
-    mAttributePathExpandState = AttributePathExpandIterator::State::StartIterating(mpAttributePathList);
+    mAttributePathExpandPosition = AttributePathExpandIterator::Position::StartIterating(mpAttributePathList);
     mAttributeEncoderState.Reset();
 }
 
@@ -857,8 +857,8 @@ void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const 
 {
     mDirtyGeneration = mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().GetDirtySetGeneration();
 
-    // we want to get the value, but not advance the state
-    AttributePathExpandIterator::State tempState = mAttributePathExpandState;
+    // We want to get the value, but not advance the iterator position.
+    AttributePathExpandIterator::Position tempPosition = mAttributePathExpandPosition;
     ConcreteAttributePath path;
 
     // We won't reset the path iterator for every AttributePathIsDirty call to reduce the number of full data reports.
@@ -870,7 +870,7 @@ void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const 
     // TODO (#16699): Currently we can only guarantee the reports generated from a single path in the request are consistent. The
     // data might be inconsistent if the user send a request with two paths from the same cluster. We need to clearify the behavior
     // or make it consistent.
-    if (AttributePathExpandIterator(apDataModel, tempState).Next(path) &&
+    if (AttributePathExpandIterator(apDataModel, tempPosition).Next(path) &&
         (aAttributeChanged.HasWildcardEndpointId() || aAttributeChanged.mEndpointId == path.mEndpointId) &&
         (aAttributeChanged.HasWildcardClusterId() || aAttributeChanged.mClusterId == path.mClusterId))
     {
@@ -880,7 +880,7 @@ void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const 
         // If we're currently in the middle of generating reports for a given cluster and that in turn is marked dirty, let's reset
         // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
         // the state of the cluster as present on the server
-        mAttributePathExpandState.IterateFromTheStartOfTheCurrentCluster();
+        mAttributePathExpandPosition.IterateFromTheStartOfTheCurrentCluster();
 
         mAttributeEncoderState.Reset();
     }
