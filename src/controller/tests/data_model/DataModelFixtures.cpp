@@ -574,16 +574,5 @@ MetadataList<CommandId> CustomDataModel::GeneratedCommands(const ConcreteCluster
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GeneratedCommands(path);
 }
 
-
-ConcreteCommandPath CustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstGeneratedCommand(cluster);
-}
-
-ConcreteCommandPath CustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextGeneratedCommand(before);
-}
-
 } // namespace app
 } // namespace chip

@@ -218,11 +218,6 @@ public:
     virtual CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before)                = 0;
     virtual std::optional<CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) = 0;
 
-    // "generated" commands are purely for reporting what types of command ids can be
-    // returned as responses.
-    virtual ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) = 0;
-    virtual ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before)   = 0;
-
     /// List items. TODO: convert ALL items above to the new format
 
     /// List all the generated commands for the given path

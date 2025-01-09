@@ -128,11 +128,6 @@ const CommandId * GetAcceptedCommands(const EmberAfCluster & cluster)
     return cluster.acceptedCommandList;
 }
 
-const CommandId * GetGeneratedCommands(const EmberAfCluster & cluster)
-{
-    return cluster.generatedCommandList;
-}
-
 /// Load the cluster information into the specified destination
 std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster)
 {
@@ -844,9 +839,6 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
 
 MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path)
 {
-    // For fixed:
-    //   ???? depends on how it looks like
-    //
     CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
@@ -905,7 +897,7 @@ MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(const Concre
     }
 
     const EmberAfCluster * cluster = FindServerCluster(path);
-    if (cluster == nullptr)
+    if ((cluster == nullptr) || (cluster->generatedCommandList == nullptr))
     {
         return {};
     }
@@ -916,28 +908,6 @@ MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(const Concre
     }
     size_t commandCount = static_cast<size_t>(endOfList - cluster->generatedCommandList);
     return MetadataList<CommandId>::FromConstSpan({ cluster->generatedCommandList, commandCount });
-}
-
-ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const ConcreteClusterPath & path)
-{
-    EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateGeneratedCommands);
-    CommandId commandId =
-        FindCommand(ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId), handlerFinder,
-                    detail::EnumeratorCommandFinder::Operation::kFindFirst, mGeneratedCommandsIterator, GetGeneratedCommands);
-
-    VerifyOrReturnValue(commandId != kInvalidCommandId, kInvalidCommandPath);
-    return ConcreteCommandPath(path.mEndpointId, path.mClusterId, commandId);
-}
-
-ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const ConcreteCommandPath & before)
-{
-    EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateGeneratedCommands);
-
-    CommandId commandId = FindCommand(before, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindNext,
-                                      mGeneratedCommandsIterator, GetGeneratedCommands);
-
-    VerifyOrReturnValue(commandId != kInvalidCommandId, kInvalidCommandPath);
-    return ConcreteCommandPath(before.mEndpointId, before.mClusterId, commandId);
 }
 
 void CodegenDataModelProvider::InitDataModelForTesting()

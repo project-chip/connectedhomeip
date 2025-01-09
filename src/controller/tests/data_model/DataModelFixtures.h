@@ -143,8 +143,6 @@ public:
     DataModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
     DataModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
     std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
-    ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
-    ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override {}
 };
 

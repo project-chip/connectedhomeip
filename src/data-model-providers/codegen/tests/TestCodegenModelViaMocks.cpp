@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "app/data-model-provider/MetadataList.h"
 #include <pw_unit_test/framework.h>
 
 #include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
@@ -138,6 +139,12 @@ bool operator==(const Access::SubjectDescriptor & a, const Access::SubjectDescri
     }
     return true;
 }
+
+struct TestCodegenModelViaMocks : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
 
 class TestProviderChangeListener : public ProviderChangeListener
 {
@@ -892,7 +899,7 @@ void WriteLe16(void * buffer, uint16_t value)
 
 } // namespace
 
-TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
+TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -958,7 +965,7 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
     EXPECT_EQ(ep.id, kInvalidEndpointId);
 }
 
-TEST(TestCodegenModelViaMocks, GetEndpointInfo)
+TEST_F(TestCodegenModelViaMocks, GetEndpointInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -986,7 +993,7 @@ TEST(TestCodegenModelViaMocks, GetEndpointInfo)
     EXPECT_FALSE(info.has_value());
 }
 
-TEST(TestCodegenModelViaMocks, IterateOverServerClusters)
+TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1048,7 +1055,7 @@ TEST(TestCodegenModelViaMocks, IterateOverServerClusters)
     }
 }
 
-TEST(TestCodegenModelViaMocks, GetServerClusterInfo)
+TEST_F(TestCodegenModelViaMocks, GetServerClusterInfo)
 {
 
     UseMockNodeConfig config(gTestNodeConfig);
@@ -1074,7 +1081,7 @@ TEST(TestCodegenModelViaMocks, GetServerClusterInfo)
     EXPECT_EQ(info->flags.Raw(), 0u); // NOLINT(bugprone-unchecked-optional-access)
 }
 
-TEST(TestCodegenModelViaMocks, IterateOverClientClusters)
+TEST_F(TestCodegenModelViaMocks, IterateOverClientClusters)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1128,7 +1135,7 @@ TEST(TestCodegenModelViaMocks, IterateOverClientClusters)
     }
 }
 
-TEST(TestCodegenModelViaMocks, IterateOverAttributes)
+TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1199,7 +1206,7 @@ TEST(TestCodegenModelViaMocks, IterateOverAttributes)
     }
 }
 
-TEST(TestCodegenModelViaMocks, GetAttributeInfo)
+TEST_F(TestCodegenModelViaMocks, GetAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1239,7 +1246,7 @@ TEST(TestCodegenModelViaMocks, GetAttributeInfo)
 }
 
 // global attributes are EXPLICITLY not supported
-TEST(TestCodegenModelViaMocks, GlobalAttributeInfo)
+TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1254,7 +1261,7 @@ TEST(TestCodegenModelViaMocks, GlobalAttributeInfo)
     ASSERT_FALSE(info.has_value());
 }
 
-TEST(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
+TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1319,7 +1326,7 @@ TEST(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
     }
 }
 
-TEST(TestCodegenModelViaMocks, AcceptedCommandInfo)
+TEST_F(TestCodegenModelViaMocks, AcceptedCommandInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1351,66 +1358,29 @@ TEST(TestCodegenModelViaMocks, AcceptedCommandInfo)
     ASSERT_FALSE(info.has_value());
 }
 
-TEST(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
+TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
     // invalid paths should return in "no more data"
-    ASSERT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).HasValidIds());
-    ASSERT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).HasValidIds());
-    ASSERT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).HasValidIds());
-    ASSERT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).HasValidIds());
+    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).empty());
+    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).empty());
+    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).empty());
+    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).empty());
 
     // should be able to iterate over valid paths
-    ConcreteCommandPath path = model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
-    ASSERT_TRUE(path.HasValidIds());
-    EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
-    EXPECT_EQ(path.mClusterId, MockClusterId(2));
-    EXPECT_EQ(path.mCommandId, 2u);
 
-    path = model.NextGeneratedCommand(path);
-    ASSERT_TRUE(path.HasValidIds());
-    EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
-    EXPECT_EQ(path.mClusterId, MockClusterId(2));
-    EXPECT_EQ(path.mCommandId, 10u);
+    MetadataList<CommandId> cmds = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
+    const CommandId expectedCommands2[] = { 2, 10 };
+    ASSERT_TRUE(cmds.GetSpanValidForLifetime().data_equal(Span<const CommandId>(expectedCommands2)));
 
-    path = model.NextGeneratedCommand(path);
-    ASSERT_FALSE(path.HasValidIds());
-
-    // attempt some out-of-order requests as well
-    path = model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
-    ASSERT_TRUE(path.HasValidIds());
-    EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
-    EXPECT_EQ(path.mClusterId, MockClusterId(3));
-    EXPECT_EQ(path.mCommandId, 4u);
-
-    for (int i = 0; i < 10; i++)
-    {
-        path = model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 2));
-        ASSERT_TRUE(path.HasValidIds());
-        EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
-        EXPECT_EQ(path.mClusterId, MockClusterId(2));
-        EXPECT_EQ(path.mCommandId, 10u);
-    }
-
-    for (int i = 0; i < 10; i++)
-    {
-        path = model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(3), 4));
-        ASSERT_TRUE(path.HasValidIds());
-        EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
-        EXPECT_EQ(path.mClusterId, MockClusterId(3));
-        EXPECT_EQ(path.mCommandId, 6u);
-    }
-
-    for (int i = 0; i < 10; i++)
-    {
-        path = model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(3), 6));
-        EXPECT_FALSE(path.HasValidIds());
-    }
+    cmds = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
+    const CommandId expectedCommands3[] = { 4, 6 };
+    ASSERT_TRUE(cmds.GetSpanValidForLifetime().data_equal(Span<const CommandId>(expectedCommands3)));
 }
 
-TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
+TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
 {
 
     UseMockNodeConfig config(gTestNodeConfig);
@@ -1421,8 +1391,8 @@ TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
     CustomListCommandHandler handler(MakeOptional(kMockEndpoint1), MockClusterId(1));
 
     // At this point, without overrides, there should be no accepted/generated commands
+    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).empty());
     EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
-    EXPECT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).HasValidIds());
     EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
 
     handler.SetOverrideAccepted(true);
@@ -1430,7 +1400,6 @@ TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
 
     // with overrides, the list is still empty ...
     EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
-    EXPECT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).HasValidIds());
     EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
 
     // set some overrides
@@ -1452,11 +1421,9 @@ TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
     entry = model.NextAcceptedCommand(entry.path);
     EXPECT_FALSE(entry.IsValid());
 
-    ConcreteCommandPath path = model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
-    EXPECT_TRUE(path.HasValidIds());
-    EXPECT_EQ(path, ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 33));
-    path = model.NextGeneratedCommand(path);
-    EXPECT_FALSE(path.HasValidIds());
+    MetadataList<CommandId> generatedCommands = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
+    const CommandId expectedGeneratedCommands[] = { 33};
+    ASSERT_TRUE(generatedCommands.GetSpanValidForLifetime().data_equal(Span<const CommandId>(expectedGeneratedCommands)));
 
     // Command finding should work
     EXPECT_TRUE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
@@ -1464,7 +1431,7 @@ TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
     EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 33)).has_value());
 }
 
-TEST(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
+TEST_F(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1487,7 +1454,7 @@ TEST(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
     }
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1521,7 +1488,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
     }
 }
 
-TEST(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead)
+TEST_F(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1544,63 +1511,63 @@ TEST(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead)
     ASSERT_FALSE(encoder->TriedEncode());
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadInt32S)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadInt32S)
 {
     TestEmberScalarTypeRead<int32_t, ZCL_INT32S_ATTRIBUTE_TYPE>(-1234);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadEnum16)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadEnum16)
 {
     TestEmberScalarTypeRead<uint16_t, ZCL_ENUM16_ATTRIBUTE_TYPE>(0x1234);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadFloat)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadFloat)
 {
     TestEmberScalarTypeRead<float, ZCL_SINGLE_ATTRIBUTE_TYPE>(0.625);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadDouble)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadDouble)
 {
     TestEmberScalarTypeRead<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>(0.625);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadInt24U)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadInt24U)
 {
     TestEmberScalarTypeRead<OddSizedInteger<3, false>, ZCL_INT24U_ATTRIBUTE_TYPE>(0x1234AB);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadInt32U)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadInt32U)
 {
     TestEmberScalarTypeRead<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>(0x1234ABCD);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadInt40U)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadInt40U)
 {
     TestEmberScalarTypeRead<OddSizedInteger<5, false>, ZCL_INT40U_ATTRIBUTE_TYPE>(0x1122334455);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadInt48U)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadInt48U)
 {
     TestEmberScalarTypeRead<OddSizedInteger<6, false>, ZCL_INT48U_ATTRIBUTE_TYPE>(0xAABB11223344);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadInt56U)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadInt56U)
 {
     TestEmberScalarTypeRead<OddSizedInteger<7, false>, ZCL_INT56U_ATTRIBUTE_TYPE>(0xAABB11223344);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadBool)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadBool)
 {
     TestEmberScalarTypeRead<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE>(true);
     TestEmberScalarTypeRead<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE>(false);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadInt8U)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadInt8U)
 {
     TestEmberScalarTypeRead<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>(0x12);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadNulls)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadNulls)
 {
     TestEmberScalarNullRead<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<uint16_t, ZCL_INT16U_ATTRIBUTE_TYPE>();
@@ -1626,7 +1593,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNulls)
     TestEmberScalarNullRead<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>();
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1660,7 +1627,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
     chip::Test::SetEmberReadOutput(ByteSpan());
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1695,7 +1662,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
     ASSERT_TRUE(actual.IsNull());
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1733,7 +1700,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
     ASSERT_TRUE(actual.data_equal(expected));
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadLongOctetString)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadLongOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1770,7 +1737,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongOctetString)
     ASSERT_TRUE(actual.data_equal(expected));
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadShortString)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadShortString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1806,7 +1773,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadShortString)
     ASSERT_TRUE(actual.data_equal("abcde"_span));
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeReadLongString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1842,7 +1809,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
     ASSERT_TRUE(actual.data_equal("abcde"_span));
 }
 
-TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
+TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1887,7 +1854,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
     ASSERT_TRUE(actual.e.data_equal("foo"_span));
 }
 
-TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceReadError)
+TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceReadError)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1904,7 +1871,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceReadError)
     ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), CHIP_ERROR_KEY_NOT_FOUND);
 }
 
-TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListRead)
+TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceListRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -1958,7 +1925,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListRead)
     }
 }
 
-TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListOverflowRead)
+TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceListOverflowRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2018,7 +1985,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListOverflowRead)
     }
 }
 
-TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
+TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2083,7 +2050,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
     }
 }
 
-TEST(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
+TEST_F(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2139,7 +2106,7 @@ TEST(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
     }
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2162,7 +2129,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
     ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
 {
     TestEmberScalarTypeWrite<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>(0x12);
     TestEmberScalarTypeWrite<uint16_t, ZCL_ENUM16_ATTRIBUTE_TYPE>(0x1234);
@@ -2188,7 +2155,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
     TestEmberScalarTypeWrite<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>(0.625);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteInvalidValueToNullable)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteInvalidValueToNullable)
 {
     TestEmberScalarTypeWriteNullValueToNullable<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>();
     TestEmberScalarTypeWriteNullValueToNullable<uint16_t, ZCL_ENUM16_ATTRIBUTE_TYPE>();
@@ -2214,7 +2181,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteInvalidValueToNullable)
     TestEmberScalarTypeWriteNullValueToNullable<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>();
 }
 
-TEST(TestCodegenModelViaMocks, EmberTestWriteReservedNullPlaceholderToNullable)
+TEST_F(TestCodegenModelViaMocks, EmberTestWriteReservedNullPlaceholderToNullable)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2231,7 +2198,7 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteReservedNullPlaceholderToNullable)
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::ConstraintError);
 }
 
-TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNonNullable)
+TEST_F(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNonNullable)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2247,7 +2214,7 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNo
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 }
 
-TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNullable)
+TEST_F(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNullable)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2263,7 +2230,7 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNu
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 }
 
-TEST(TestCodegenModelViaMocksNullValueToNullables, EmberAttributeWriteBasicTypesLowestValue)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypesLowestValue)
 {
     TestEmberScalarTypeWrite<int8_t, ZCL_INT8S_ATTRIBUTE_TYPE>(-127);
     TestEmberScalarTypeWrite<int16_t, ZCL_INT16S_ATTRIBUTE_TYPE>(-32767);
@@ -2275,7 +2242,7 @@ TEST(TestCodegenModelViaMocksNullValueToNullables, EmberAttributeWriteBasicTypes
     TestEmberScalarTypeWrite<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>(-9223372036854775807);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteNulls)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteNulls)
 {
     TestEmberScalarNullWrite<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>();
     TestEmberScalarNullWrite<uint16_t, ZCL_ENUM16_ATTRIBUTE_TYPE>();
@@ -2299,7 +2266,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteNulls)
     TestEmberScalarNullWrite<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>();
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortString)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteShortString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2316,7 +2283,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortString)
     ASSERT_TRUE(asCharSpan.data_equal("\x0Bhello world"_span));
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongStringOutOfBounds)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteLongStringOutOfBounds)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2333,7 +2300,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongStringOutOfBounds)
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::InvalidValue);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongString)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteLongString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2355,7 +2322,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongString)
     ASSERT_TRUE(asCharSpan.data_equal("text"_span));
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteNullableLongStringValue)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteNullableLongStringValue)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2377,7 +2344,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteNullableLongStringValue)
     ASSERT_TRUE(asCharSpan.data_equal("text"_span));
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongNullableStringNull)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteLongNullableStringNull)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2395,7 +2362,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongNullableStringNull)
     ASSERT_EQ(writtenData[1], 0xFF);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortBytes)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteShortBytes)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2417,7 +2384,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortBytes)
     EXPECT_EQ(writtenData[3], 13u);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongBytes)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteLongBytes)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2442,7 +2409,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongBytes)
     EXPECT_EQ(writtenData[4], 13u);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteTimedWrite)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteTimedWrite)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2460,7 +2427,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteTimedWrite)
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteReadOnlyAttribute)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteReadOnlyAttribute)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2478,7 +2445,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteReadOnlyAttribute)
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteDataVersion)
+TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteDataVersion)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2504,7 +2471,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteDataVersion)
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
 }
 
-TEST(TestCodegenModelViaMocks, WriteToInvalidPath)
+TEST_F(TestCodegenModelViaMocks, WriteToInvalidPath)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2534,7 +2501,7 @@ TEST(TestCodegenModelViaMocks, WriteToInvalidPath)
     }
 }
 
-TEST(TestCodegenModelViaMocks, WriteToGlobalAttribute)
+TEST_F(TestCodegenModelViaMocks, WriteToGlobalAttribute)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2547,7 +2514,7 @@ TEST(TestCodegenModelViaMocks, WriteToGlobalAttribute)
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedWrite);
 }
 
-TEST(TestCodegenModelViaMocks, EmberWriteFailure)
+TEST_F(TestCodegenModelViaMocks, EmberWriteFailure)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2570,7 +2537,7 @@ TEST(TestCodegenModelViaMocks, EmberWriteFailure)
     chip::Test::SetEmberReadOutput(ByteSpan());
 }
 
-TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
+TEST_F(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2609,7 +2576,7 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
     TestEmberScalarNullWrite<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
 }
 
-TEST(TestCodegenModelViaMocks, EmberInvokeTest)
+TEST_F(TestCodegenModelViaMocks, EmberInvokeTest)
 {
     // Ember invoke is fully code-generated - there is a single function for Dispatch
     // that will do a `switch` on the path elements and invoke a corresponding `emberAf*`
@@ -2650,7 +2617,7 @@ TEST(TestCodegenModelViaMocks, EmberInvokeTest)
     }
 }
 
-TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceReturningError)
+TEST_F(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceReturningError)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2676,7 +2643,7 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceReturningError)
     ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
 }
 
-TEST(TestCodegenModelViaMocks, EmberWriteInvalidDataType)
+TEST_F(TestCodegenModelViaMocks, EmberWriteInvalidDataType)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2704,7 +2671,7 @@ TEST(TestCodegenModelViaMocks, EmberWriteInvalidDataType)
     ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
 }
 
-TEST(TestCodegenModelViaMocks, DeviceTypeIteration)
+TEST_F(TestCodegenModelViaMocks, DeviceTypeIteration)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2749,7 +2716,7 @@ TEST(TestCodegenModelViaMocks, DeviceTypeIteration)
     ASSERT_FALSE(entry.has_value());
 }
 
-TEST(TestCodegenModelViaMocks, SemanticTagIteration)
+TEST_F(TestCodegenModelViaMocks, SemanticTagIteration)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
