@@ -372,7 +372,7 @@ exit:
 
 CHIP_ERROR ResolveAsync(chip::Dnssd::ResolveContext * rCtx)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int ret;
 
     assertChipStackLockedByCurrentThread();
