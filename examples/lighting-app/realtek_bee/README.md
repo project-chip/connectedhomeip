@@ -7,7 +7,7 @@ orphan: true
 ## Realtek SDK
 
 More detailed information on the Bee4 SDK can be found in the
-[Bee4 Matter SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk).
+[Realtek Matter SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk).
 
 ## More information
 
