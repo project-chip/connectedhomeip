@@ -50,6 +50,7 @@ public:
     }
 
     CHIP_ERROR _InitThreadStack();
+    void _DeinitThreadStack(){};
     void _ProcessThreadActivity();
 
     CHIP_ERROR _StartThreadTask() { return CHIP_NO_ERROR; } // Intentionally left blank
