@@ -30,6 +30,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --enable-key 000102030405060708090a0b0c0d0e0f
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===

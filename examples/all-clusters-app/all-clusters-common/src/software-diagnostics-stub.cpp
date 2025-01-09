@@ -58,7 +58,7 @@ bool HandleSoftwareDiagnosticsTestEventTrigger(uint64_t eventTrigger)
     case SoftwareDiagnosticsTrigger::kSoftwareFault:
         ChipLogProgress(Support, "[Software-Diagnostics-Test-Event] => Software Fault occurred");
         SetTestEventTrigger_SoftwareFaultOccurred();
-        break;        
+        break;
     default:
 
         return false;
