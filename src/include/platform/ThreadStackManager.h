@@ -95,6 +95,7 @@ public:
     void DeinitThreadStack();
     void ProcessThreadActivity();
     CHIP_ERROR StartThreadTask();
+    void StopThreadStack();
     void LockThreadStack();
     bool TryLockThreadStack();
     void UnlockThreadStack();
@@ -255,6 +256,11 @@ inline void ThreadStackManager::ProcessThreadActivity()
 inline CHIP_ERROR ThreadStackManager::StartThreadTask()
 {
     return static_cast<ImplClass *>(this)->_StartThreadTask();
+}
+
+inline void ThreadStackManager::StopThreadStack()
+{
+    static_cast<ImplClass *>(this)->_StopThreadStack();
 }
 
 inline void ThreadStackManager::LockThreadStack()
