@@ -92,6 +92,7 @@ public:
     // ===== Members that define the public interface of the ThreadStackManager
 
     CHIP_ERROR InitThreadStack();
+    void DeinitThreadStack();
     void ProcessThreadActivity();
     CHIP_ERROR StartThreadTask();
     void LockThreadStack();
@@ -239,6 +240,11 @@ namespace DeviceLayer {
 inline CHIP_ERROR ThreadStackManager::InitThreadStack()
 {
     return static_cast<ImplClass *>(this)->_InitThreadStack();
+}
+
+inline void ThreadStackManager::DeinitThreadStack()
+{
+    static_cast<ImplClass *>(this)->_DeinitThreadStack();
 }
 
 inline void ThreadStackManager::ProcessThreadActivity()

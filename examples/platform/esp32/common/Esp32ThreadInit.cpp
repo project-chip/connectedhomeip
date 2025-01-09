@@ -98,3 +98,13 @@ void ESPOpenThreadInit()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 }
+
+void ESPOpenThreadDeinit()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
+    openthread_deinit_br_rcp();
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
+    ThreadStackMgr().DeinitThreadStack();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+}
