@@ -1267,63 +1267,17 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
     CodegenDataModelProviderWithContext model;
 
     // invalid paths should return in "no more data"
-    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).path.HasValidIds());
-    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).path.HasValidIds());
-    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).path.HasValidIds());
-    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).path.HasValidIds());
+    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).empty());
+    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).empty());
+    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).empty());
+    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).empty());
 
-    // should be able to iterate over valid paths
-    CommandEntry entry = model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-    EXPECT_EQ(entry.path.mCommandId, 1u);
-
-    entry = model.NextAcceptedCommand(entry.path);
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-    EXPECT_EQ(entry.path.mCommandId, 2u);
-
-    entry = model.NextAcceptedCommand(entry.path);
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-    EXPECT_EQ(entry.path.mCommandId, 23u);
-
-    entry = model.NextAcceptedCommand(entry.path);
-    ASSERT_FALSE(entry.path.HasValidIds());
-
-    // attempt some out-of-order requests as well
-    entry = model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(3));
-    EXPECT_EQ(entry.path.mCommandId, 11u);
-
-    for (int i = 0; i < 10; i++)
-    {
-        entry = model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 2));
-        ASSERT_TRUE(entry.path.HasValidIds());
-        EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-        EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-        EXPECT_EQ(entry.path.mCommandId, 23u);
-    }
-
-    for (int i = 0; i < 10; i++)
-    {
-        entry = model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1));
-        ASSERT_TRUE(entry.path.HasValidIds());
-        EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-        EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-        EXPECT_EQ(entry.path.mCommandId, 2u);
-    }
-
-    for (int i = 0; i < 10; i++)
-    {
-        entry = model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(3), 10));
-        EXPECT_FALSE(entry.path.HasValidIds());
-    }
+    MetadataList<DataModel::AcceptedCommandEntry> cmds =
+        model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
+    ASSERT_EQ(cmds.size(), 3u);
+    ASSERT_EQ(cmds[0].commandId, 1u);
+    ASSERT_EQ(cmds[1].commandId, 2u);
+    ASSERT_EQ(cmds[2].commandId, 23u);
 }
 
 TEST_F(TestCodegenModelViaMocks, AcceptedCommandInfo)
@@ -1370,12 +1324,11 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
     ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).empty());
 
     // should be able to iterate over valid paths
-
-    MetadataList<CommandId> cmds = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
+    MetadataList<CommandId> cmds        = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
     const CommandId expectedCommands2[] = { 2, 10 };
     ASSERT_TRUE(cmds.GetSpanValidForLifetime().data_equal(Span<const CommandId>(expectedCommands2)));
 
-    cmds = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
+    cmds                                = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
     const CommandId expectedCommands3[] = { 4, 6 };
     ASSERT_TRUE(cmds.GetSpanValidForLifetime().data_equal(Span<const CommandId>(expectedCommands3)));
 }
@@ -1392,15 +1345,14 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
 
     // At this point, without overrides, there should be no accepted/generated commands
     ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).empty());
-    EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
-    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
+    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).empty());
 
     handler.SetOverrideAccepted(true);
     handler.SetOverrideGenerated(true);
 
     // with overrides, the list is still empty ...
-    EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
-    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
+    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).empty());
+    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).empty());
 
     // set some overrides
     handler.AcceptedVec().push_back(1234);
@@ -1408,27 +1360,16 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
 
     handler.GeneratedVec().push_back(33);
 
-    DataModel::CommandEntry entry;
+    MetadataList<DataModel::AcceptedCommandEntry> acceptedCommands =
+        model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
 
-    entry = model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
-    EXPECT_TRUE(entry.IsValid());
-    EXPECT_EQ(entry.path, ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234));
+    ASSERT_EQ(acceptedCommands.size(), 2u);
+    ASSERT_EQ(acceptedCommands[0].commandId, 1234u);
+    ASSERT_EQ(acceptedCommands[1].commandId, 999u);
 
-    entry = model.NextAcceptedCommand(entry.path);
-    EXPECT_TRUE(entry.IsValid());
-    EXPECT_EQ(entry.path, ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 999));
-
-    entry = model.NextAcceptedCommand(entry.path);
-    EXPECT_FALSE(entry.IsValid());
-
-    MetadataList<CommandId> generatedCommands = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
-    const CommandId expectedGeneratedCommands[] = { 33};
+    MetadataList<CommandId> generatedCommands   = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
+    const CommandId expectedGeneratedCommands[] = { 33 };
     ASSERT_TRUE(generatedCommands.GetSpanValidForLifetime().data_equal(Span<const CommandId>(expectedGeneratedCommands)));
-
-    // Command finding should work
-    EXPECT_TRUE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
-    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 88)).has_value());
-    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 33)).has_value());
 }
 
 TEST_F(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
