@@ -16,7 +16,7 @@
 
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
+#include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
 
 extern WfxRsi_t wfx_rsi;
 
