@@ -94,28 +94,19 @@ CHIP_ERROR StartWifiTask()
     return CHIP_NO_ERROR;
 }
 
-/*********************************************************************
- * @fn  void wfx_enable_sta_mode(void)
- * @brief
- *      driver enable the STA mode
- * @param[in]  None
- * @return   None
- ***********************************************************************/
-void wfx_enable_sta_mode(void)
+void ConfigureStationMode()
 {
     wfx_rsi.dev_state.Set(WifiState::kStationMode);
 }
 
-/*********************************************************************
- * @fn  bool wfx_is_sta_mode_enabled(void)
- * @brief
- *      driver enabled the STA mode
- * @param[in]  None
- * @return   mode
- ***********************************************************************/
-bool wfx_is_sta_mode_enabled(void)
+bool IsStationModeEnabled()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationMode);
+}
+
+bool wfx_is_sta_connected()
+{
+    return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
 /*********************************************************************
@@ -195,19 +186,6 @@ void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
      * TODO: Implement IPV6 setup, currently in sl_matter_wifi_task()
      * This is hooked with MATTER code.
      */
-}
-
-/*********************************************************************
- * @fn  bool wfx_is_sta_connected(void)
- * @brief
- *      called fuction when driver is connected to STA
- * @param[in]  None
- * @return  returns ture if successful,
- *          false otherwise
- ***********************************************************************/
-bool wfx_is_sta_connected(void)
-{
-    return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
 /*********************************************************************

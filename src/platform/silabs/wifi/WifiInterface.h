@@ -84,7 +84,7 @@ enum class WifiState : uint16_t
     kStationMode        = (1 << 7), /* Enable Station Mode */
     kAPMode             = (1 << 8), /* Enable AP Mode */
     kStationReady       = (kStationConnected | kStationDhcpDone),
-    kStationStarted     = (1 << 9),  /* RSI task started */
+    kStationStarted     = (1 << 9),
     kScanStarted        = (1 << 10), /* Scan Started */
 };
 
@@ -258,19 +258,37 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback);
  */
 CHIP_ERROR StartWifiTask();
 
+/**
+ * @brief Configures the Wi-Fi devices as a Wi-Fi station
+ */
+void ConfigureStationMode();
+
+/**
+ * @brief Returns the state of the Wi-Fi connection
+ *
+ * @return true, if the Wi-Fi device is connected to an AP
+ *         false, otherwise
+ */
+bool IsStationConnected();
+
+/**
+ * @brief Returns the state of the Wi-Fi Station configuration of the Wi-Fi device
+ *
+ * @return true, if the Wi-Fi Station mode is enabled
+ *         false, otherwise
+ */
+bool IsStationModeEnabled(void);
+
 /* Function to update */
 
-void wfx_enable_sta_mode(void);
 void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig);
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig);
-bool wfx_is_sta_mode_enabled(void);
 int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_reset_counts();
 void wfx_clear_wifi_provision(void);
 sl_status_t wfx_connect_to_ap(void);
 void wfx_setup_ip6_link_local(sl_wfx_interface_t);
-bool wfx_is_sta_connected(void);
 sl_status_t sl_matter_wifi_disconnect(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
