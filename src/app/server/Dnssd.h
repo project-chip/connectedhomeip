@@ -98,7 +98,7 @@ public:
 #endif
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    void SetTCPServerEnabled(const bool serverEnabled) { mTCPServerEnabled = serverEnabled; };
+    void SetTCPServerEnabled(bool serverEnabled) { mTCPServerEnabled = serverEnabled; };
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /// Start operational advertising
