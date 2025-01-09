@@ -153,6 +153,7 @@ static void Shutdown(TimerHandle_t xTimer)
     DeviceLayer::StackLock lock;
 
     Esp32AppServer::Shutdown();
+    ESPOpenThreadDeinit();
     GetAppTask().StopAppTask();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

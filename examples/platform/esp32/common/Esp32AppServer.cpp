@@ -117,7 +117,9 @@ void Esp32AppServer::DeInitBLEIfCommissioned(void)
 
 void Esp32AppServer::Shutdown()
 {
+#if CONFIG_BT_NIMBLE_ENABLED
     chip::DeviceLayer::Internal::BLEMgr().Shutdown();
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     chip::app::DnssdServer::Instance().StopServer();
 #endif
