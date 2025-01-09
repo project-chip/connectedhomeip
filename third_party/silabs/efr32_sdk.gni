@@ -982,6 +982,7 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
         "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/block_cipher.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/hmac_drbg.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_ecp.c",
       ]

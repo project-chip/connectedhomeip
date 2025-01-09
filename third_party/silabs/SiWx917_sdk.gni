@@ -389,6 +389,7 @@ template("siwx917_sdk") {
           "SLI_TRNG_DEVICE_SI91X=1",
           "SLI_SECURE_KEY_STORAGE_DEVICE_SI91X=1",
           "SLI_MULTITHREAD_DEVICE_SI91X=1",
+          "SLI_SI91X_TRNG_DUPLICATE_CHECK=0",
         ]
 
         include_dirs = [
