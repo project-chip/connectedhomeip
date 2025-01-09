@@ -174,21 +174,24 @@ be useful for quick filtering like `[TC-ABC-1.2]` to tag test changes.
 
 Examples of descriptive titles:
 
-> [!TIP] > `[Silabs] Fix compile of SiWx917 if LED and BUTTON are disabled` >
-> `[Telink] Update build Dockerfile with new Zeprhy SHA: c05c4.....` >
-> `General Commissioning Cluster: use AttributeAccessInterface/CommandHandlerInterface for processing` >
-> `Scenes Management/CopyScene: set access as manage instead of default to match the spec` >
-> `Fix build errors due to ChipDeviceEvent default constructor not being available` >
-> `Fix crash during DNSSD processing due to malformed packet` >
-> `[NRF] Fix crash due to stack overflow during logging for PW-RPC builds` >
-> `[TC-ABC-2.3] added new python test case based on test plan` >
-> `[TC-ABC] migrate tests from yaml to python`
+-   `[Silabs] Fix compile of SiWx917 if LED and BUTTON are disabled`
+-   `[Telink] Update build Dockerfile with new Zeprhy SHA: c05c4.....`
+-   `General Commissioning Cluster: use AttributeAccessInterface/CommandHandlerInterface for processing`
+-   `Scenes Management/CopyScene: set access as manage instead of default to match the spec`
+-   `Fix build errors due to ChipDeviceEvent default constructor not being available`
+-   `Fix crash during DNSSD processing due to malformed packet`
+-   `[NRF] Fix crash due to stack overflow during logging for PW-RPC builds`
+-   `[TC-ABC-2.3] added new python test case based on test plan`
+-   `[TC-ABC] migrate tests from yaml to python`
 
 Examples of titles that are vague (not clear what the change is, one would need
 to open the pull request for details or open additional issue in GitHub)
 
-> [!CAUTION] > `Work on issue 1234` > `Fix android JniTypeWrappers` >
-> `Fix segfault in BLE` > `Fix TC-ABC-1.2` > `Update Readme`
+-   `Work on issue 1234`
+-   `Fix android JniTypeWrappers`
+-   `Fix segfault in BLE`
+-   `Fix TC-ABC-1.2`
+-   `Update Readme`
 
 ##### Summary contents
 
