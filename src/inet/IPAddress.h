@@ -63,8 +63,8 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
-#include <zephyr/net/socket.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#include "ZephyrSocket.h" // nogncheck
+#endif
 
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT && INET_CONFIG_ENABLE_IPV4
 #error Forbidden : native Open Thread implementation with IPV4 enabled
