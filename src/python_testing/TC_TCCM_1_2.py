@@ -40,14 +40,14 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
 
+CLUSTER = Clusters.RefrigeratorAndTemperatureControlledCabinetMode
 
 class TC_TCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
 
     def __init__(self, *args):
-        self.cluster = Clusters.RefrigeratorAndTemperatureControlledCabinetMode
-        super().__init__(*args)
+        MatterBaseTest.__init__(self, *args)
         ModeBaseClusterChecks.__init__(self,
-                                       modebase_derived_cluster=self.cluster)
+                                       modebase_derived_cluster=CLUSTER)
 
     def desc_TC_TCCM_1_2(self) -> str:
         return "[TC-TCCM-1.2] Cluster attributes with DUT as Server"
@@ -81,8 +81,8 @@ class TC_TCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         supported_modes = await self.check_supported_modes_and_labels(endpoint=endpoint)
         # According to the spec, there should be at least one RapidCool or RapidFreeze tag in
         # the ones supported.
-        additional_tags = [self.cluster.Enums.ModeTag.kRapidCool,
-                           self.cluster.Enums.ModeTag.kRapidFreeze]
+        additional_tags = [CLUSTER.Enums.ModeTag.kRapidCool,
+                           CLUSTER.Enums.ModeTag.kRapidFreeze]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)

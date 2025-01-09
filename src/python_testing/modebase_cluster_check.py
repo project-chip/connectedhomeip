@@ -45,7 +45,7 @@ class ModeBaseClusterChecks:
 
     def __init__(self, modebase_derived_cluster):
         self.mode_tags = [tag.value for tag in modebase_derived_cluster.Enums.ModeTag]
-        self.modebase_derived_cluster = modebase_derived_cluster
+        self.cluster = modebase_derived_cluster
         self.attributes = modebase_derived_cluster.Attributes
 
     async def check_supported_modes_and_labels(self, endpoint):
@@ -64,7 +64,7 @@ class ModeBaseClusterChecks:
         """
         # Get the supported modes
         supported_modes = await self.read_single_attribute_check_success(endpoint=endpoint,
-                                                                         cluster=self.modebase_derived_cluster,
+                                                                         cluster=self.cluster,
                                                                          attribute=self.attributes.SupportedModes)
 
         # Check if the list of supported modes is larger than 2
@@ -118,7 +118,7 @@ class ModeBaseClusterChecks:
 
                 # Check if is tag is common, derived or mfg.
                 is_mfg = (START_MFGTAGS_RANGE <= tag.value <= END_MFGTAGS_RANGE)
-                if (tag.value not in self.modeTags and
+                if (tag.value not in self.mode_tags and
                         not is_mfg):
                     asserts.fail("Mode tag value is not a common, derived or vendor tag.")
 
@@ -150,7 +150,7 @@ class ModeBaseClusterChecks:
           is_nullable: Optional argument to indicate if the tested mode allows NullValue
         """
         mode_value = await self.read_single_attribute_check_success(endpoint=endpoint,
-                                                                    cluster=self.modebase_derived_cluster,
+                                                                    cluster=self.cluster,
                                                                     attribute=mode)
         supported_modes_dut = {mode_option_struct.mode for mode_option_struct in supported_modes}
         is_valid = mode_value in supported_modes_dut
