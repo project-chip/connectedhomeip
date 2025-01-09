@@ -26,7 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
-//#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+// #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
 
 #include <platform/OpenThread/OpenThreadUtils.h>
@@ -38,7 +38,7 @@
 #include <openthread/heap.h>
 #include <platforms/openthread-system.h>
 
-extern void otSysInit(int argc, char *argv[]);
+extern void otSysInit(int argc, char * argv[]);
 
 namespace chip {
 namespace DeviceLayer {
@@ -56,17 +56,17 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-	ChipLogProgress(DeviceLayer, "ThreadStackManagerImpl::InitThreadStack");
-	// Initialize the OpenThread platform layer
-	otSysInit(0, NULL);
+    ChipLogProgress(DeviceLayer, "ThreadStackManagerImpl::InitThreadStack");
+    // Initialize the OpenThread platform layer
+    otSysInit(0, NULL);
 
     // Initialize the generic implementation base classes.
-	ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit");
+    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit");
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-//  err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
-	ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit");
-	err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    //  err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
+    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit");
+    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
 exit:
@@ -79,7 +79,7 @@ void ThreadStackManagerImpl::GetExtAddress(otExtAddress & aExtAddr)
     LockThreadStack();
     extAddr = otLinkGetExtendedAddress(OTInstance());
     UnlockThreadStack();
- 
+
     memcpy(aExtAddr.m8, extAddr->m8, OT_EXT_ADDRESS_SIZE);
 }
 
@@ -87,7 +87,6 @@ bool ThreadStackManagerImpl::IsInitialized()
 {
     return sInstance.mThreadStackLock != NULL;
 }
-
 
 } // namespace DeviceLayer
 } // namespace chip

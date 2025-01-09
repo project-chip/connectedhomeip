@@ -85,8 +85,8 @@ public:
 class DLL_EXPORT CHIPDeviceManager
 {
 public:
-    CHIPDeviceManager(const CHIPDeviceManager &)  = delete;
-    CHIPDeviceManager(const CHIPDeviceManager &&) = delete;
+    CHIPDeviceManager(const CHIPDeviceManager &)             = delete;
+    CHIPDeviceManager(const CHIPDeviceManager &&)            = delete;
     CHIPDeviceManager & operator=(const CHIPDeviceManager &) = delete;
 
     static CHIPDeviceManager & GetInstance()

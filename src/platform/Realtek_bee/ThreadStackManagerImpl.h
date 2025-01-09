@@ -25,7 +25,7 @@
 #pragma once
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
-//#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+// #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
 
 #include <openthread/tasklet.h>

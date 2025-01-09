@@ -14,10 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- 
-#include <stdlib.h>
-#include "CHIPDeviceManager.h"
+
 #include "AppTask.h"
+#include "CHIPDeviceManager.h"
+#include <stdlib.h>
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -51,7 +51,7 @@ extern "C" void ChipTest(void)
 
 extern "C" void InitiateSingleSwitch(uint8_t index, uint8_t action)
 {
-    if(index >= MAX_SUPPORTED_LIGHT_NUM)
+    if (index >= MAX_SUPPORTED_LIGHT_NUM)
     {
         ChipLogError(DeviceLayer, "Endpoint index exceed!");
         return;
@@ -70,23 +70,22 @@ extern "C" void InitiateGroupSwitch2(uint8_t index, uint8_t action)
     LightSwitch::GetInstance().InitiateActionSwitch(kLightSwitchEndpointId[index], action);
 }
 
-
 #if CONFIG_ENABLE_ATTRIBUTE_SUBSCRIBE
 
 extern "C" void ShutdownSubscribeRequestForOneNode(uint8_t index)
 {
-    if(index >= MAX_SUPPORTED_LIGHT_NUM)
+    if (index >= MAX_SUPPORTED_LIGHT_NUM)
     {
         ChipLogError(DeviceLayer, "Endpoint index exceed!");
         return;
-    }   
-    
-     LightSwitch::GetInstance().ShutdownSubscribeRequestForOneNode(kLightSwitchEndpointId[index]);
+    }
+
+    LightSwitch::GetInstance().ShutdownSubscribeRequestForOneNode(kLightSwitchEndpointId[index]);
 }
 
 extern "C" void SubscribeRequestForOneNode(uint8_t index)
 {
-    if(index >= MAX_SUPPORTED_LIGHT_NUM)
+    if (index >= MAX_SUPPORTED_LIGHT_NUM)
     {
         ChipLogError(DeviceLayer, "Endpoint index exceed!");
         return;
@@ -101,17 +100,17 @@ void UpdateLightingStatetoGUI(EndpointId endpointId, uint8_t status)
 {
     uint8_t index;
 
-    for(index = 0; index < MAX_SUPPORTED_LIGHT_NUM; index++)
+    for (index = 0; index < MAX_SUPPORTED_LIGHT_NUM; index++)
     {
-        if(endpointId == kLightSwitchEndpointId[index])
+        if (endpointId == kLightSwitchEndpointId[index])
         {
             break;
         }
     }
-    
-    if(g_NotifyUpperStatusChange)
+
+    if (g_NotifyUpperStatusChange)
     {
-        g_NotifyUpperStatusChange(status,index);
+        g_NotifyUpperStatusChange(status, index);
     }
 }
 

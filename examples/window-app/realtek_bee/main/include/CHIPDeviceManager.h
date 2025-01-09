@@ -38,10 +38,8 @@
 
 #include <app/util/af-types.h>
 
-namespace chip
-{
-namespace DeviceManager
-{
+namespace chip {
+namespace DeviceManager {
 
 /**
  * @brief
@@ -60,7 +58,7 @@ public:
      * @param event   ChipDeviceEvent that occurred
      * @param arg     arguments specific to the event, if any
      */
-    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent *event, intptr_t arg) {}
+    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg) {}
 
     /**
      * @brief
@@ -74,9 +72,8 @@ public:
      * @param size               size of the attribute
      * @param value              pointer to the new value
      */
-    virtual void PostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                             chip::AttributeId attributeId,
-                                             uint8_t type, uint16_t size, uint8_t *value)
+    virtual void PostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                             uint8_t type, uint16_t size, uint8_t * value)
     {}
     virtual ~CHIPDeviceManagerCallbacks() {}
 };
@@ -88,11 +85,11 @@ public:
 class DLL_EXPORT CHIPDeviceManager
 {
 public:
-    CHIPDeviceManager(const CHIPDeviceManager &)  = delete;
-    CHIPDeviceManager(const CHIPDeviceManager &&) = delete;
-    CHIPDeviceManager &operator=(const CHIPDeviceManager &) = delete;
+    CHIPDeviceManager(const CHIPDeviceManager &)             = delete;
+    CHIPDeviceManager(const CHIPDeviceManager &&)            = delete;
+    CHIPDeviceManager & operator=(const CHIPDeviceManager &) = delete;
 
-    static CHIPDeviceManager &GetInstance()
+    static CHIPDeviceManager & GetInstance()
     {
         static CHIPDeviceManager instance;
         return instance;
@@ -104,22 +101,22 @@ public:
      *
      * @param cb Application's instance of the CHIPDeviceManagerCallbacks for consuming events
      */
-    CHIP_ERROR Init(CHIPDeviceManagerCallbacks *cb);
+    CHIP_ERROR Init(CHIPDeviceManagerCallbacks * cb);
     void Shutdown();
     /**
      * @brief
      *   Fetch a pointer to the registered CHIPDeviceManagerCallbacks object.
      *
      */
-    CHIPDeviceManagerCallbacks *GetCHIPDeviceManagerCallbacks() { return mCB; }
+    CHIPDeviceManagerCallbacks * GetCHIPDeviceManagerCallbacks() { return mCB; }
 
     /**
      * Use internally for registration of the ChipDeviceEvents
      */
-    static void CommonDeviceEventHandler(const chip::DeviceLayer::ChipDeviceEvent *event, intptr_t arg);
+    static void CommonDeviceEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 private:
-    CHIPDeviceManagerCallbacks *mCB = nullptr;
+    CHIPDeviceManagerCallbacks * mCB = nullptr;
     CHIPDeviceManager() {}
 };
 

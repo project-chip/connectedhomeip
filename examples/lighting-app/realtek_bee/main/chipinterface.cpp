@@ -14,10 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- 
-#include <stdlib.h>
-#include "CHIPDeviceManager.h"
+
 #include "AppTask.h"
+#include "CHIPDeviceManager.h"
+#include <stdlib.h>
 
 using namespace ::chip;
 using namespace ::chip::app;

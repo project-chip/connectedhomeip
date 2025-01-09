@@ -33,11 +33,10 @@
 class DeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
 {
 public:
-    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent *event, intptr_t arg);
+    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void UpdateStatusLED();
 
 private:
-    void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent *event);
-    void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId,
-                                               chip::AttributeId attributeId, uint8_t *value);
+    void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
+    void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 };

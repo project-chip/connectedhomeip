@@ -35,22 +35,22 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int32_t result = -1;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    int32_t result           = -1;
     size_t actual_read_bytes = 0;
 
     VerifyOrExit(key, err = CHIP_ERROR_INVALID_ARGUMENT);
-    if(value_size)
+    if (value_size)
     {
         VerifyOrExit(value, err = CHIP_ERROR_INVALID_ARGUMENT);
     }
     else
     {
-        if(matter_kvs_key_find(key))
+        if (matter_kvs_key_find(key))
         {
             return err = CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        return  err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        return err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
     if (offset_bytes > 0)
@@ -61,11 +61,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
 
     result = matter_kvs_get(key, value, value_size, &actual_read_bytes);
-    if(MATTER_KVS_LOOKUP_NOT_FOUND == result)//to add 
+    if (MATTER_KVS_LOOKUP_NOT_FOUND == result) // to add
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
-    if(read_bytes_size)
+    if (read_bytes_size)
     {
         *read_bytes_size = actual_read_bytes;
     }
@@ -77,15 +77,15 @@ exit:
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-	int32_t error;
+    int32_t error;
     int32_t result = -1;
 
-    //ChipLogError(DeviceLayer, "[KeyValueStoreManagerImpl_Put] Bee4 put key(%s)", key);
+    // ChipLogError(DeviceLayer, "[KeyValueStoreManagerImpl_Put] Bee4 put key(%s)", key);
     VerifyOrExit((key != NULL) && (value != NULL), err = CHIP_ERROR_INVALID_ARGUMENT);
     result = matter_kvs_put(key, value, value_size);
-    if(MATTER_KVS_LOOKUP_NOT_FOUND == result)//to add
+    if (MATTER_KVS_LOOKUP_NOT_FOUND == result) // to add
     {
-        //ChipLogError(DeviceLayer, "[KeyValueStoreManagerImpl_Put] Bee4 put key");
+        // ChipLogError(DeviceLayer, "[KeyValueStoreManagerImpl_Put] Bee4 put key");
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
@@ -97,12 +97,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t result = -1;
-    //ChipLogProgress(DeviceLayer, "[KeyValueStoreManagerImpl_Delete][INFO] Bee4 delete key (%s)", key);
+    // ChipLogProgress(DeviceLayer, "[KeyValueStoreManagerImpl_Delete][INFO] Bee4 delete key (%s)", key);
     VerifyOrExit(key != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
     result = matter_kvs_key_delete(key);
-    if(MATTER_KVS_LOOKUP_NOT_FOUND == result)//to add
+    if (MATTER_KVS_LOOKUP_NOT_FOUND == result) // to add
     {
-       // ChipLogProgress(DeviceLayer, "[KeyValueStoreManagerImpl_Delete][INFO] Bee4 delete key");
+        // ChipLogProgress(DeviceLayer, "[KeyValueStoreManagerImpl_Delete][INFO] Bee4 delete key");
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 

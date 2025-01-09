@@ -19,7 +19,6 @@
 
 #include "util/LEDWidget.h"
 
-
 extern LEDWidget lockLED;
 extern LEDWidget identifyLED;
 extern LEDWidget systemStatusLED;

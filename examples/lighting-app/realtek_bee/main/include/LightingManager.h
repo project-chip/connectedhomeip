@@ -23,8 +23,8 @@
 
 #include <functional>
 
-#include "Globals.h"
 #include "AppEvent.h"
+#include "Globals.h"
 
 #include "ColorFormat.h"
 #include "FreeRTOS.h"

@@ -4,19 +4,19 @@
 #include <core/CHIPConfig.h>
 #include <support/logging/Constants.h>
 
+#include "chip_porting.h"
 #include <cstdio>
 #include <ctype.h>
 #include <string.h>
-#include "chip_porting.h"
 
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"
 #endif
 
-#include <openthread/logging.h>
 #include <openthread/cli.h>
+#include <openthread/logging.h>
 
-extern "C" int dbg_vprintf(const char * module, const char *format, va_list va);
+extern "C" int dbg_vprintf(const char * module, const char * format, va_list va);
 
 namespace chip {
 namespace DeviceLayer {
@@ -32,7 +32,6 @@ void __attribute__((weak)) OnLogOutput(void) {}
 } // namespace DeviceLayer
 } // namespace chip
 
-
 namespace chip {
 namespace Logging {
 namespace Platform {
@@ -43,7 +42,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     // uint8_t level = otLoggingGetLevel();
     // if (category && category <= level)
     // {
-    //     dbg_vprintf(module, msg, v);  
+    //     dbg_vprintf(module, msg, v);
     // }
 }
 

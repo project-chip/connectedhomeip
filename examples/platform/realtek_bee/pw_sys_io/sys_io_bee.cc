@@ -26,8 +26,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-int bee_putchar(const uint8_t *aBuf);
-int bee_getchar(uint8_t *read_byte);
+int bee_putchar(const uint8_t * aBuf);
+int bee_getchar(uint8_t * read_byte);
 #ifdef __cplusplus
 }
 #endif

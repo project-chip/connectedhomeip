@@ -122,7 +122,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(!mFlags.Has(Flags::kAMEBABLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
     err = MapBLEError(matter_ble_init(APP_MAX_LINKS));
-    matter_ble_cback_register((P_MATTER_BLE_CBACK)(ble_callback_dispatcher));
+    matter_ble_cback_register((P_MATTER_BLE_CBACK) (ble_callback_dispatcher));
 
     SuccessOrExit(err);
 
@@ -179,8 +179,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(int conn_id, int indicationsEnabled)
     // whether the client is enabling or disabling indications.
     {
         ChipDeviceEvent event;
-        event.Type = indicationsEnabled ? DeviceEventType::kCHIPoBLESubscribe
-                                        : DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.Type = indicationsEnabled ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = conn_id;
         PlatformMgr().PostEventOrDie(&event);
     }
@@ -480,13 +479,15 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
 }
 
-CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                   const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic() not supported");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic() not supported");
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -518,7 +519,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 }
 
 CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBufferHandle pBuf)
+                                            PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -531,7 +532,7 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 }
 
 CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBufferHandle data)
+                                          PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -550,8 +551,8 @@ exit:
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData()
 {
     CHIP_ERROR err;
-    uint8_t advData[MAX_ADV_DATA_LEN] = { 0 };
-    uint8_t rspData[MAX_RSP_DATA_LEN] = { 0 };
+    uint8_t advData[MAX_ADV_DATA_LEN]                                                      = { 0 };
+    uint8_t rspData[MAX_RSP_DATA_LEN]                                                      = { 0 };
     char serialNumberString[DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1] = { 0 };
     ChipBLEDeviceIdentificationInfo deviceIdInfo;
     uint8_t index = 0;
@@ -610,10 +611,10 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData()
     index = 0;
 
     /**************** Prepare scan response data *******************************************/
-    rspData[index++] = 0x00;           // length
-    rspData[index++] = 0xFF;           // GAP_ADTYPE_MANUFACTURER_SPECIFIC
+    rspData[index++] = 0x00; // length
+    rspData[index++] = 0xFF; // GAP_ADTYPE_MANUFACTURER_SPECIFIC
     rspData[index++] = 0x5D;
-    rspData[index++] = 0x00;           // Company Id
+    rspData[index++] = 0x00; // Company Id
 
     err = GetDeviceInstanceInfoProvider()->GetSerialNumber(serialNumberString, sizeof(serialNumberString));
     if (err == CHIP_NO_ERROR)
@@ -858,14 +859,14 @@ CHIP_ERROR BLEManagerImpl::HandleGapMsg(T_IO_MSG * p_gap_msg)
 {
     T_LE_GAP_MSG gap_msg;
     memcpy(&gap_msg, &p_gap_msg->u.param, sizeof(p_gap_msg->u.param));
-    CHIP_ERROR err      = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(DeviceLayer, "HandleGapMsg subtype: %d", p_gap_msg->subtype);
     switch (p_gap_msg->subtype)
     {
     case GAP_MSG_LE_CONN_STATE_CHANGE:
         /* A new connection was established or a connection attempt failed */
-         {
+        {
             uint16_t conn_id    = gap_msg.msg_data.gap_conn_state_change.conn_id;
             uint16_t new_state  = gap_msg.msg_data.gap_conn_state_change.new_state;
             uint16_t disc_cause = gap_msg.msg_data.gap_conn_state_change.disc_cause;
@@ -881,30 +882,29 @@ CHIP_ERROR BLEManagerImpl::HandleGapMsg(T_IO_MSG * p_gap_msg)
                 err = sInstance.HandleGAPDisconnect(conn_id, disc_cause);
                 SuccessOrExit(err);
             }
-         }
-        break;
-
-    case GAP_MSG_LE_DEV_STATE_CHANGE:
-        {
-            T_GAP_DEV_STATE new_state =  gap_msg.msg_data.gap_dev_state_change.new_state;
-            ChipLogProgress(DeviceLayer, "HandleGapMsg: init state %d, adv state %d, cause 0x%x",
-                            new_state.gap_init_state, new_state.gap_adv_state, gap_msg.msg_data.gap_dev_state_change.cause);        
-            
-            if (new_state.gap_init_state == GAP_INIT_STATE_STACK_READY)
-            {
-                ChipLogProgress(DeviceLayer, "GAP stack ready");
-            }
-
-            if (new_state.gap_adv_state == GAP_ADV_STATE_IDLE)
-            {
-                ChipLogProgress(DeviceLayer,"GAP adv stoped");
-            }
-            else if (new_state.gap_adv_state == GAP_ADV_STATE_ADVERTISING)
-            {
-                ChipLogProgress(DeviceLayer,"GAP adv start");
-            }
         }
         break;
+
+    case GAP_MSG_LE_DEV_STATE_CHANGE: {
+        T_GAP_DEV_STATE new_state = gap_msg.msg_data.gap_dev_state_change.new_state;
+        ChipLogProgress(DeviceLayer, "HandleGapMsg: init state %d, adv state %d, cause 0x%x", new_state.gap_init_state,
+                        new_state.gap_adv_state, gap_msg.msg_data.gap_dev_state_change.cause);
+
+        if (new_state.gap_init_state == GAP_INIT_STATE_STACK_READY)
+        {
+            ChipLogProgress(DeviceLayer, "GAP stack ready");
+        }
+
+        if (new_state.gap_adv_state == GAP_ADV_STATE_IDLE)
+        {
+            ChipLogProgress(DeviceLayer, "GAP adv stoped");
+        }
+        else if (new_state.gap_adv_state == GAP_ADV_STATE_ADVERTISING)
+        {
+            ChipLogProgress(DeviceLayer, "GAP adv start");
+        }
+    }
+    break;
 
     default:
         break;
@@ -951,31 +951,26 @@ CHIP_ERROR BLEManagerImpl::gatt_svr_chr_access(T_SERVER_ID service_id, TBTCONFIG
             break;
 
         case SERVICE_CALLBACK_TYPE_WRITE_CHAR_VALUE:
-            sInstance.HandleRXCharWrite(p_data->msg_data.write.p_value,
-                                        p_data->msg_data.write.len,
-                                        p_data->conn_id);
+            sInstance.HandleRXCharWrite(p_data->msg_data.write.p_value, p_data->msg_data.write.len, p_data->conn_id);
             break;
 
-        case SERVICE_CALLBACK_TYPE_INDIFICATION_NOTIFICATION:
+        case SERVICE_CALLBACK_TYPE_INDIFICATION_NOTIFICATION: {
+            T_MATTER_BLE_CBACK_DATA * pp_data = (T_MATTER_BLE_CBACK_DATA *) p_data;
+
+            switch (pp_data->msg_data.indication_index)
             {
-                T_MATTER_BLE_CBACK_DATA * pp_data = (T_MATTER_BLE_CBACK_DATA *)p_data;
-
-                switch (pp_data->msg_data.indication_index)
-                {
-                case MATTER_BLE_SERVICE_INDICATE_V3_ENABLE:
-                    {
-                        sInstance.HandleTXCharCCCDWrite(p_data->conn_id, 1);
-                    }
-                    break;
-
-                case MATTER_BLE_SERVICE_INDICATE_V3_DISABLE:
-                    {
-                        sInstance.HandleTXCharCCCDWrite(p_data->conn_id, 0);
-                    }
-                    break;
-                }
+            case MATTER_BLE_SERVICE_INDICATE_V3_ENABLE: {
+                sInstance.HandleTXCharCCCDWrite(p_data->conn_id, 1);
             }
             break;
+
+            case MATTER_BLE_SERVICE_INDICATE_V3_DISABLE: {
+                sInstance.HandleTXCharCCCDWrite(p_data->conn_id, 0);
+            }
+            break;
+            }
+        }
+        break;
 
         default:
             break;

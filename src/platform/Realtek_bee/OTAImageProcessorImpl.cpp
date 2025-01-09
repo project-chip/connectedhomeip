@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/ota-requestor/OTADownloader.h>
-#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include "OTAImageProcessorImpl.h"
 #include "matter_ota.h"
+#include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 namespace chip {
 
@@ -78,8 +78,8 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
         mParams.totalFileBytes = header.mPayloadSize;
         mHeaderParser.Clear();
 
-        ChipLogProgress(SoftwareUpdate, "ProcessHeader: vendorId 0x%x, productId 0x%x, payloadSize 0x%x",
-                        header.mVendorId, header.mProductId, header.mPayloadSize);
+        ChipLogProgress(SoftwareUpdate, "ProcessHeader: vendorId 0x%x, productId 0x%x, payloadSize 0x%x", header.mVendorId,
+                        header.mProductId, header.mPayloadSize);
     }
 
     return CHIP_NO_ERROR;
@@ -88,7 +88,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
     ChipLogProgress(SoftwareUpdate, "Finalize");
-    
+
     DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
@@ -144,7 +144,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     // Initialize tracking variables
     imageProcessor->mParams.downloadedBytes = 0;
 
-    if(rtk_matter_ota_prepare() != 0)
+    if (rtk_matter_ota_prepare() != 0)
     {
         ChipLogError(SoftwareUpdate, "HandlePrepareDownload: rtk_matter_ota_prepare failed");
         return;
@@ -204,8 +204,8 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    ByteSpan block       = imageProcessor->mBlock;
-    CHIP_ERROR error     = imageProcessor->ProcessHeader(block);
+    ByteSpan block   = imageProcessor->mBlock;
+    CHIP_ERROR error = imageProcessor->ProcessHeader(block);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Failed to process OTA image header");
@@ -213,8 +213,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    if (0 != rtk_matter_ota_process_block((uint8_t *)block.data(),
-                                          static_cast<std::uint16_t>(block.size())))
+    if (0 != rtk_matter_ota_process_block((uint8_t *) block.data(), static_cast<std::uint16_t>(block.size())))
     {
         ChipLogError(SoftwareUpdate, "Flash write failed");
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
@@ -240,8 +239,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Seconds32(10),
-        [](chip::System::Layer *, void *)
-        {
+        [](chip::System::Layer *, void *) {
             ChipLogProgress(SoftwareUpdate, "Rebooting...");
             rtk_matter_ota_apply();
         },

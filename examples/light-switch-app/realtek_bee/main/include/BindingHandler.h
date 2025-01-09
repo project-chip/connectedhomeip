@@ -43,7 +43,6 @@
 //     chip::FabricIndex fabricIndex;
 // };
 
-
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app-common/zap-generated/ids/Commands.h"
 #include "lib/core/CHIPError.h"
@@ -66,10 +65,9 @@ public:
     struct SubscribeCommandData
     {
         chip::EndpointId localEndpointId;
-        chip::NodeId nodeId;//remote nodeid
+        chip::NodeId nodeId; // remote nodeid
         chip::FabricIndex fabricIndex;
     };
-
 
     void Init();
     bool IsGroupBound();
@@ -97,21 +95,21 @@ private:
 
     static CHIP_ERROR SwitchHelpHandler(int argc, char ** argv);
     static CHIP_ERROR SwitchCommandHandler(int argc, char ** argv);
-    //OnOff switch shell functions
+    // OnOff switch shell functions
     static CHIP_ERROR OnOffHelpHandler(int argc, char ** argv);
     static CHIP_ERROR OnOffSwitchCommandHandler(int argc, char ** argv);
     static CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv);
     static CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv);
     static CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv);
-    //bind switch shell functions
+    // bind switch shell functions
     static CHIP_ERROR BindingHelpHandler(int argc, char ** argv);
     static CHIP_ERROR BindingSwitchCommandHandler(int argc, char ** argv);
     static CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv);
     static CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv);
-    //Groups switch shell functions
+    // Groups switch shell functions
     static CHIP_ERROR GroupsHelpHandler(int argc, char ** argv);
     static CHIP_ERROR GroupsSwitchCommandHandler(int argc, char ** argv);
-    //Groups OnOff switch shell functions
+    // Groups OnOff switch shell functions
     static CHIP_ERROR GroupsOnOffHelpHandler(int argc, char ** argv);
     static CHIP_ERROR GroupsOnOffSwitchCommandHandler(int argc, char ** argv);
     static CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv);
@@ -122,6 +120,4 @@ private:
     //
     static void RegisterSwitchCommands();
 #endif // ENABLE_CHIP_SHELL
-    
 };
-

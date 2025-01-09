@@ -23,8 +23,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
-namespace chip
-{
+namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
@@ -34,15 +33,15 @@ public:
     CHIP_ERROR Finalize() override;
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
-    CHIP_ERROR ProcessBlock(ByteSpan &block) override;
+    CHIP_ERROR ProcessBlock(ByteSpan & block) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
 
-    void SetOTADownloader(OTADownloader *downloader) { mDownloader = downloader; }
+    void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
-    CHIP_ERROR  ProcessHeader(ByteSpan &block);
+    CHIP_ERROR ProcessHeader(ByteSpan & block);
     static void HandlePrepareDownload(intptr_t context);
     static void HandleFinalize(intptr_t context);
     static void HandleAbort(intptr_t context);
@@ -52,7 +51,7 @@ private:
     /**
      * Called to allocate memory for mBlock if necessary and set it to block
      */
-    CHIP_ERROR SetBlock(ByteSpan &block);
+    CHIP_ERROR SetBlock(ByteSpan & block);
 
     /**
      * Called to release allocated memory for mBlock
@@ -63,7 +62,7 @@ private:
     std::uint32_t mHwVer;
 
     MutableByteSpan mBlock;
-    OTADownloader *mDownloader = nullptr;
+    OTADownloader * mDownloader = nullptr;
     OTAImageHeaderParser mHeaderParser;
 };
 

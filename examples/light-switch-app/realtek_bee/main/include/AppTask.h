@@ -68,9 +68,9 @@ private:
 
     enum Function_t
     {
-        kFunction_NoneSelected   = 0,
-        kFunction_Reset = 1,
-        kFunction_FactoryReset   = 2,
+        kFunction_NoneSelected = 0,
+        kFunction_Reset        = 1,
+        kFunction_FactoryReset = 2,
         kFunction_Invalid
     } Function;
 

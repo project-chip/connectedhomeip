@@ -22,7 +22,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 

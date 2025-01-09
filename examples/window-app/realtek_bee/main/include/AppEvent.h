@@ -44,7 +44,7 @@ struct AppEvent
         } ButtonEvent;
         struct
         {
-            void *Context;
+            void * Context;
         } TimerEvent;
     };
 

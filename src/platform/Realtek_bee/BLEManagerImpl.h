@@ -20,26 +20,22 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include "FreeRTOS.h"
-#include "event_groups.h"
-#include "timers.h"
 #include "app_msg.h"
+#include "event_groups.h"
 #include "matter_ble.h"
 #include "matter_ble_service.h"
+#include "timers.h"
 
-namespace chip
-{
-namespace DeviceLayer
-{
-namespace Internal
-{
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
 
 using namespace chip::Ble;
 
 /**
  * Concrete implementation of the BLEManager singleton object for the Realtek platforms.
  */
-class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate,
-    private BleApplicationDelegate
+class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -54,26 +50,24 @@ private:
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
     CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
-    CHIP_ERROR _GetDeviceName(char *buf, size_t bufSize);
-    CHIP_ERROR _SetDeviceName(const char *deviceName);
+    CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
+    CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
-    void _OnPlatformEvent(const ChipDeviceEvent *event);
-    BleLayer *_GetBleLayer(void);
+    void _OnPlatformEvent(const ChipDeviceEvent * event);
+    BleLayer * _GetBleLayer(void);
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID *svcId,
-                                 const Ble::ChipBleUUID *charId) override;
-    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID *svcId,
-                                   const Ble::ChipBleUUID *charId) override;
+    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                       const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                         const Ble::ChipBleUUID * charId) override;
     CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
-    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID *svcId,
-                        const Ble::ChipBleUUID *charId,
-                        System::PacketBufferHandle pBuf) override;
-    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID *svcId,
-                          const Ble::ChipBleUUID *charId,
-                          System::PacketBufferHandle pBuf) override;
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                              System::PacketBufferHandle pBuf) override;
+    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                                System::PacketBufferHandle pBuf) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -81,8 +75,8 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-    friend BLEManager &BLEMgr(void);
-    friend BLEManagerImpl &BLEMgrImpl(void);
+    friend BLEManager & BLEMgr(void);
+    friend BLEManagerImpl & BLEMgrImpl(void);
 
     static BLEManagerImpl sInstance;
 
@@ -132,12 +126,12 @@ private:
     CHIP_ERROR StopAdvertising(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
 
-    static void HandleFastAdvertisementTimer(System::Layer *systemLayer, void *context);
+    static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleFastAdvertisementTimer();
 
     void HandleRXCharWrite(uint8_t *, uint16_t, uint8_t);
-    void HandleTXCharRead(void *param);
-    void HandleTXCharCCCDRead(void *param);
+    void HandleTXCharRead(void * param);
+    void HandleTXCharCCCDRead(void * param);
     void HandleTXCharCCCDWrite(int, int);
     CHIP_ERROR HandleTXComplete(int);
     CHIP_ERROR HandleGAPConnect(uint16_t);
@@ -149,16 +143,14 @@ private:
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle);
 
-    BLEManagerImpl::CHIPoBLEConState *GetConnectionState(uint8_t connectionHandle, bool allocate);
+    BLEManagerImpl::CHIPoBLEConState * GetConnectionState(uint8_t connectionHandle, bool allocate);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    void HandleC3CharRead(TBTCONFIG_CALLBACK_DATA *p_data);
+    void HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data);
 #endif
-    static CHIP_ERROR HandleGapMsg(T_IO_MSG *p_gap_msg);
-    static CHIP_ERROR gatt_svr_chr_access(T_SERVER_ID service_id,
-                                          TBTCONFIG_CALLBACK_DATA  *p_data);
-    static int ble_callback_dispatcher(void *p_cb_data, int type,
-                                       T_CHIP_BLEMGR_CALLBACK_TYPE callback_type);
+    static CHIP_ERROR HandleGapMsg(T_IO_MSG * p_gap_msg);
+    static CHIP_ERROR gatt_svr_chr_access(T_SERVER_ID service_id, TBTCONFIG_CALLBACK_DATA * p_data);
+    static int ble_callback_dispatcher(void * p_cb_data, int type, T_CHIP_BLEMGR_CALLBACK_TYPE callback_type);
 
     static void DriveBLEState(intptr_t arg);
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
@@ -172,7 +164,7 @@ private:
  * Internal components should use this to access features of the BLEManager object
  * that are common to all platforms.
  */
-inline BLEManager &BLEMgr(void)
+inline BLEManager & BLEMgr(void)
 {
     return BLEManagerImpl::sInstance;
 }
@@ -183,12 +175,12 @@ inline BLEManager &BLEMgr(void)
  * Internal components can use this to gain access to features of the BLEManager
  * that are specific to the platforms.
  */
-inline BLEManagerImpl &BLEMgrImpl(void)
+inline BLEManagerImpl & BLEMgrImpl(void)
 {
     return BLEManagerImpl::sInstance;
 }
 
-inline BleLayer *BLEManagerImpl::_GetBleLayer()
+inline BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
 }

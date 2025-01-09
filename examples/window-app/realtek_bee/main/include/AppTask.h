@@ -39,35 +39,35 @@ public:
     CHIP_ERROR StartAppTask();
     void InitGpio();
 
-    static void AppTaskMain(void *pvParameter);
+    static void AppTaskMain(void * pvParameter);
 
-    void PostEvent(const AppEvent *event);
+    void PostEvent(const AppEvent * event);
 
     static void ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed);
 
 private:
-    friend AppTask &GetAppTask(void);
+    friend AppTask & GetAppTask(void);
 
     static void InitServer(intptr_t arg);
 
     void StartTimer(uint32_t aTimeoutMs);
     void CancelTimer(void);
 
-    void DispatchEvent(AppEvent *event);
+    void DispatchEvent(AppEvent * event);
 
-    static void FunctionTimerEventHandler(AppEvent *aEvent);
-    static void FunctionHandler(AppEvent *aEvent);
+    static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void FunctionHandler(AppEvent * aEvent);
 
     static void OpenHandler(intptr_t);
     static void CloseHandler(intptr_t);
-    static void WindowActionEventHandler(AppEvent *aEvent);
-    static void TimerEventHandler(chip::System::Layer *aLayer, void *aAppState);
+    static void WindowActionEventHandler(AppEvent * aEvent);
+    static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
 
     enum Function_t
     {
-        kFunction_NoneSelected   = 0,
-        kFunction_Reset          = 1,
-        kFunction_FactoryReset   = 2,
+        kFunction_NoneSelected = 0,
+        kFunction_Reset        = 1,
+        kFunction_FactoryReset = 2,
         kFunction_Invalid
     } Function;
 
@@ -77,7 +77,7 @@ private:
     static AppTask sAppTask;
 };
 
-inline AppTask &GetAppTask(void)
+inline AppTask & GetAppTask(void)
 {
     return AppTask::sAppTask;
 }

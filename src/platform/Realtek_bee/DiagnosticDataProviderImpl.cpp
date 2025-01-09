@@ -54,14 +54,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
     size_t usedHeapSize = NS_HEAP_SIZE - os_mem_peek(RAM_TYPE_DATA_ON);
-    currentHeapUsed = static_cast<uint64_t>(usedHeapSize);
+    currentHeapUsed     = static_cast<uint64_t>(usedHeapSize);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
     size_t highestHeapUsageRecorded = NS_HEAP_SIZE - xPortGetMinimumEverFreeHeapSize(RAM_TYPE_DATA_ON);
-    currentHeapHighWatermark = static_cast<uint64_t>(highestHeapUsageRecorded);
+    currentHeapHighWatermark        = static_cast<uint64_t>(highestHeapUsageRecorded);
     return CHIP_NO_ERROR;
 }
 
@@ -82,7 +82,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
 
     arraySize = uxTaskGetNumberOfTasks();
 
-    taskStatusArray = (TaskStatus_t *)os_mem_alloc(RAM_TYPE_DATA_ON, arraySize * sizeof(TaskStatus_t));
+    taskStatusArray = (TaskStatus_t *) os_mem_alloc(RAM_TYPE_DATA_ON, arraySize * sizeof(TaskStatus_t));
 
     if (taskStatusArray != NULL)
     {
@@ -93,7 +93,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
 
         for (x = 0; x < arraySize; x++)
         {
-            ThreadMetrics * thread = (ThreadMetrics *)os_mem_alloc(RAM_TYPE_DATA_ON, sizeof(ThreadMetrics));
+            ThreadMetrics * thread = (ThreadMetrics *) os_mem_alloc(RAM_TYPE_DATA_ON, sizeof(ThreadMetrics));
 
             Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
             thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
@@ -151,7 +151,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
 {
     uint32_t reason = 0;
 
-    CHIP_ERROR err  = ConfigurationMgr().GetBootReason(reason);
+    CHIP_ERROR err = ConfigurationMgr().GetBootReason(reason);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -241,7 +241,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->isOperational             = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;;
+    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
+    ;
 
     otExtAddress extAddr;
     ThreadStackMgrImpl().GetExtAddress(extAddr);

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <cstdint>
 #include "LEDWidget.h"
+#include <cstdint>
 
 #include <app/clusters/window-covering-server/window-covering-server.h>
 
@@ -41,14 +41,14 @@ public:
     };
 
     WindowCovering();
-    static WindowCovering &Instance()
+    static WindowCovering & Instance()
     {
         static WindowCovering sInstance;
         return sInstance;
     }
 
-    LEDWidget &GetLiftIndicator() { return mLiftIndicator; }
-    LEDWidget &GetTiltIndicator() { return mTiltIndicator; }
+    LEDWidget & GetLiftIndicator() { return mLiftIndicator; }
+    LEDWidget & GetTiltIndicator() { return mTiltIndicator; }
 
     void StartMove(MoveType aMoveType);
     void SetSingleStepTarget(OperationalState aDirection);
@@ -70,7 +70,7 @@ private:
     static chip::Percent100ths CalculateNextPosition(MoveType aMoveType);
     static void DriveCurrentLiftPosition(intptr_t);
     static void DriveCurrentTiltPosition(intptr_t);
-    static void MoveTimerTimeoutCallback(chip::System::Layer *systemLayer, void *appState);
+    static void MoveTimerTimeoutCallback(chip::System::Layer * systemLayer, void * appState);
     static void DoPostAttributeChange(intptr_t aArg);
 
     MoveType mCurrentUIMoveType;

@@ -108,7 +108,7 @@ void DeviceCallbacks::UpdateStatusLED()
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
-    //ChipLogProgress(Zcl, "DeviceEventCallback event_type 0x%x", event->Type);
+    // ChipLogProgress(Zcl, "DeviceEventCallback event_type 0x%x", event->Type);
 
     switch (event->Type)
     {
@@ -173,4 +173,3 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         ChipLogProgress(DeviceLayer, "Lost IPv6 connectivity...");
     }
 }
-

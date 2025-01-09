@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
 arm_arch = "armv8.1-m.main+dsp+mve+fp"
+
 #arm_abi = "aapcs"
 #arm_cpu = "cortex-m4"
 

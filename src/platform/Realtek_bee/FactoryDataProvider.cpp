@@ -23,10 +23,10 @@
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/Span.h>
-#include <platform/Realtek_bee/CHIPDevicePlatformConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/Realtek_bee/CHIPDevicePlatformConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
@@ -38,29 +38,23 @@ namespace chip {
 namespace DeviceLayer {
 
 #if FACTORY_TEST
-void buf_dump(const char *title, uint8_t *buf, uint32_t data_len)
+void buf_dump(const char * title, uint8_t * buf, uint32_t data_len)
 {
     const uint32_t bat_num = 8;
-    uint32_t times = data_len / bat_num;
-    uint32_t residue = data_len % bat_num;
-    uint8_t *residue_buf = buf + times * bat_num;
+    uint32_t times         = data_len / bat_num;
+    uint32_t residue       = data_len % bat_num;
+    uint8_t * residue_buf  = buf + times * bat_num;
 
-    ChipLogProgress(DeviceLayer, "buf_dump: data_len %d, times %d, residue %d", data_len,
-                     times, residue);
-    ChipLogProgress(DeviceLayer, "buf_dump: buf is 0x%08x, residue_buf is 0x%08x\r\n",
-                     (uint32_t)buf,
-                     (uint32_t)residue_buf);
+    ChipLogProgress(DeviceLayer, "buf_dump: data_len %d, times %d, residue %d", data_len, times, residue);
+    ChipLogProgress(DeviceLayer, "buf_dump: buf is 0x%08x, residue_buf is 0x%08x\r\n", (uint32_t) buf, (uint32_t) residue_buf);
 
     ChipLogProgress(DeviceLayer, "@@@@@@@@@@@@@@@@@@@@@%s@@@@@@@@@@@@@@@@@@@@@@@@@@@", title);
 
     for (int32_t i = 0; i < times; i++)
     {
         ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x\r\n",
-                         buf[i * bat_num], buf[i * bat_num + 1], buf[i * bat_num + 2],
-                         buf[i * bat_num + 3],
-                         buf[i * bat_num + 4], buf[i * bat_num + 5],
-                         buf[i * bat_num + 6],
-                         buf[i * bat_num + 7]);
+                        buf[i * bat_num], buf[i * bat_num + 1], buf[i * bat_num + 2], buf[i * bat_num + 3], buf[i * bat_num + 4],
+                        buf[i * bat_num + 5], buf[i * bat_num + 6], buf[i * bat_num + 7]);
     }
 
     switch (residue)
@@ -72,25 +66,23 @@ void buf_dump(const char *title, uint8_t *buf, uint32_t data_len)
         ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x\r\n", residue_buf[0], residue_buf[1]);
         break;
     case 3:
-        ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x, 0x%02x\r\n", residue_buf[0], residue_buf[1],
-                         residue_buf[2]);
+        ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x, 0x%02x\r\n", residue_buf[0], residue_buf[1], residue_buf[2]);
         break;
     case 4:
-        ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x, 0x%02x, 0x%02x\r\n", residue_buf[0],
-                         residue_buf[1], residue_buf[2], residue_buf[3]);
+        ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x, 0x%02x, 0x%02x\r\n", residue_buf[0], residue_buf[1], residue_buf[2],
+                        residue_buf[3]);
         break;
     case 5:
-        ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x\r\n",
-                         residue_buf[0], residue_buf[1], residue_buf[2], residue_buf[3], residue_buf[4]);
+        ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x\r\n", residue_buf[0], residue_buf[1],
+                        residue_buf[2], residue_buf[3], residue_buf[4]);
         break;
     case 6:
-        ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x\r\n",
-                         residue_buf[0], residue_buf[1], residue_buf[2], residue_buf[3], residue_buf[4], residue_buf[5]);
+        ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x\r\n", residue_buf[0], residue_buf[1],
+                        residue_buf[2], residue_buf[3], residue_buf[4], residue_buf[5]);
         break;
     case 7:
-        ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x\r\n",
-                         residue_buf[0], residue_buf[1], residue_buf[2], residue_buf[3], residue_buf[4], residue_buf[5],
-                         residue_buf[6]);
+        ChipLogProgress(DeviceLayer, "buf_dump: 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x\r\n", residue_buf[0],
+                        residue_buf[1], residue_buf[2], residue_buf[3], residue_buf[4], residue_buf[5], residue_buf[6]);
         break;
 
     default:
@@ -100,7 +92,6 @@ void buf_dump(const char *title, uint8_t *buf, uint32_t data_len)
     ChipLogProgress(DeviceLayer, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 }
 #endif
-
 
 // TODO: This should be moved to a method of P256Keypair
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
@@ -117,11 +108,11 @@ CHIP_ERROR FactoryDataProvider::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CONFIG_FACTORY_DATA
-    #define BUFFER_LEN (1024*3)
-    uint8_t* buffer = (uint8_t*)malloc(BUFFER_LEN); // FactoryData won't overflow 2KB
+#define BUFFER_LEN (1024 * 3)
+    uint8_t * buffer         = (uint8_t *) malloc(BUFFER_LEN); // FactoryData won't overflow 2KB
     uint16_t factorydata_len = 0x5A5A;
 
-    if(buffer)
+    if (buffer)
     {
         FactoryDataDecoder decoder = FactoryDataDecoder::GetInstance();
         err                        = decoder.ReadFactoryData(buffer, BUFFER_LEN, &factorydata_len);
@@ -157,7 +148,6 @@ CHIP_ERROR FactoryDataProvider::Init()
 
         free(buffer);
     }
-
 
 #endif // CONFIG_FACTORY_DATA
 
@@ -449,7 +439,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf
     verifierB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER);
     VerifyOrReturnError(verifierB64Len <= sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(verifierB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER, verifierB64Len);
-    err           = CHIP_NO_ERROR;
+    err = CHIP_NO_ERROR;
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
 #endif // CONFIG_FACTORY_DATA
 
@@ -592,7 +582,7 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
     VerifyOrReturnError(serialNumLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
     VerifyOrReturnError(buf[serialNumLen] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
 
-    err = CHIP_NO_ERROR;
+    err             = CHIP_NO_ERROR;
 #endif // CONFIG_FACTORY_DATA
 
     return err;
@@ -603,37 +593,37 @@ CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & 
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    #if FACTORY_TEST
-        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    #else
-        enum
-        {
-            kDateStringLength = 10 // YYYY-MM-DD
-        };
-        char * parseEnd;
-        size_t dateLen;
-        dateLen = mFactoryData.dii.mfg_date.len;
-        VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        // Cast does not lose information, because we then check that we only parsed
-        // 4 digits, so our number can't be bigger than 9999.
-        year = static_cast<uint16_t>(strtoul((char *) mFactoryData.dii.mfg_date.value, &parseEnd, 10));
-        VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        // Cast does not lose information, because we then check that we only parsed
-        // 2 digits, so our number can't be bigger than 99.
-        month = static_cast<uint8_t>(strtoul((char *) mFactoryData.dii.mfg_date.value + 5, &parseEnd, 10));
-        VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        // Cast does not lose information, because we then check that we only parsed
-        // 2 digits, so our number can't be bigger than 99.
-        day = static_cast<uint8_t>(strtoul((char *) mFactoryData.dii.mfg_date.value + 8, &parseEnd, 10));
-        VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        err = CHIP_NO_ERROR;
-    #endif
-#else
+#if FACTORY_TEST
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else
+    enum
+    {
+        kDateStringLength = 10 // YYYY-MM-DD
+    };
+    char * parseEnd;
+    size_t dateLen;
+    dateLen = mFactoryData.dii.mfg_date.len;
+    VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 4 digits, so our number can't be bigger than 9999.
+    year = static_cast<uint16_t>(strtoul((char *) mFactoryData.dii.mfg_date.value, &parseEnd, 10));
+    VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    month = static_cast<uint8_t>(strtoul((char *) mFactoryData.dii.mfg_date.value + 5, &parseEnd, 10));
+    VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    day = static_cast<uint8_t>(strtoul((char *) mFactoryData.dii.mfg_date.value + 8, &parseEnd, 10));
+    VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    err             = CHIP_NO_ERROR;
+#endif
+#else
+    err             = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CONFIG_FACTORY_DATA
 
 exit:
@@ -649,12 +639,12 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    #if FACTORY_TEST
+#if FACTORY_TEST
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    #else
-        hardwareVersion = mFactoryData.dii.hw_ver;
-        err             = CHIP_NO_ERROR;
-    #endif
+#else
+    hardwareVersion = mFactoryData.dii.hw_ver;
+    err             = CHIP_NO_ERROR;
+#endif
 #else
     hardwareVersion = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION);
     err             = CHIP_NO_ERROR;

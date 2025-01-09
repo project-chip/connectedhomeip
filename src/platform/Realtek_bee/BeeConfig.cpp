@@ -19,13 +19,13 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include "chip_porting.h"
 #include <core/CHIPEncoding.h>
 #include <platform/Realtek_bee/BeeConfig.h>
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include "chip_porting.h"
 
 enum
 {

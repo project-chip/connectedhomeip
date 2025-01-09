@@ -28,15 +28,12 @@
 namespace chip {
 namespace DeviceLayer {
 
-
-
 /**
  * Represents platform-specific event information
  */
 struct ChipDevicePlatformEvent final
 {
     // TODO - add platform specific definition extension
-
 };
 
 } // namespace DeviceLayer

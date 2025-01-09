@@ -53,7 +53,6 @@
 //     return SwitchManager::sSwitch;
 // }
 
-
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
@@ -81,39 +80,25 @@ using namespace ::chip;
 
 #if CONFIG_DEFAULT_ZAP
 #define MAX_SUPPORTED_LIGHT_NUM 1
-constexpr EndpointId kLightSwitchForGroupEndpointId = 1;
-constexpr EndpointId kLightGenericSwitchEndpointId = 2;
-constexpr EndpointId kLightSwitchEndpointId[MAX_SUPPORTED_LIGHT_NUM] =
-{
-    1
-};
+constexpr EndpointId kLightSwitchForGroupEndpointId                  = 1;
+constexpr EndpointId kLightGenericSwitchEndpointId                   = 2;
+constexpr EndpointId kLightSwitchEndpointId[MAX_SUPPORTED_LIGHT_NUM] = { 1 };
 #elif CONFIG_1_TO_2_ZAP
 #define MAX_SUPPORTED_LIGHT_NUM 2
-constexpr EndpointId kLightSwitchForGroupEndpointId = 1;
-constexpr EndpointId kLightGenericSwitchEndpointId = 4;
-constexpr EndpointId kLightSwitchEndpointId[MAX_SUPPORTED_LIGHT_NUM] =
-{
-    2, 3
-};
+constexpr EndpointId kLightSwitchForGroupEndpointId                  = 1;
+constexpr EndpointId kLightGenericSwitchEndpointId                   = 4;
+constexpr EndpointId kLightSwitchEndpointId[MAX_SUPPORTED_LIGHT_NUM] = { 2, 3 };
 #elif CONFIG_1_TO_8_ZAP
 #define MAX_SUPPORTED_LIGHT_NUM 8
-constexpr EndpointId kLightSwitchForGroupEndpointId = 1;
-constexpr EndpointId kLightGenericSwitchEndpointId = 10;
-constexpr EndpointId kLightSwitchEndpointId[MAX_SUPPORTED_LIGHT_NUM] =
-{
-    2, 3, 4, 5, 6, 7, 8, 9
-};
+constexpr EndpointId kLightSwitchForGroupEndpointId                  = 1;
+constexpr EndpointId kLightGenericSwitchEndpointId                   = 10;
+constexpr EndpointId kLightSwitchEndpointId[MAX_SUPPORTED_LIGHT_NUM] = { 2, 3, 4, 5, 6, 7, 8, 9 };
 #elif CONFIG_1_TO_11_ZAP
 #define MAX_SUPPORTED_LIGHT_NUM 11
-constexpr EndpointId kLightSwitchForGroupEndpointId = 1;
-constexpr EndpointId kLightGenericSwitchEndpointId = 10;
-constexpr EndpointId kLightSwitchEndpointId[MAX_SUPPORTED_LIGHT_NUM] =
-{
-    2, 3, 4, 5, 6, 7, 8, 9,
-    11, 12, 13
-};
+constexpr EndpointId kLightSwitchForGroupEndpointId                  = 1;
+constexpr EndpointId kLightGenericSwitchEndpointId                   = 10;
+constexpr EndpointId kLightSwitchEndpointId[MAX_SUPPORTED_LIGHT_NUM] = { 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13 };
 #endif
-
 
 enum Action : uint8_t
 {
@@ -130,7 +115,7 @@ public:
     void GenericSwitchInitialPress();
     void GenericSwitchReleasePress();
 
-#if CONFIG_ENABLE_ATTRIBUTE_SUBSCRIBE   
+#if CONFIG_ENABLE_ATTRIBUTE_SUBSCRIBE
     void SubscribeRequestForOneNode(chip::EndpointId endpointId);
     void ShutdownSubscribeRequestForOneNode(chip::EndpointId endpointId);
 #endif
@@ -142,5 +127,4 @@ public:
     }
 
 private:
-
 };

@@ -24,9 +24,9 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/Realtek_bee/BeeConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/Realtek_bee/BeeConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -117,8 +117,6 @@ CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 {
     return WriteConfigValue(BeeConfig::kCounterKey_BootReason, bootReason);
 }
-
-
 
 bool ConfigurationManagerImpl::CanFactoryReset()
 {

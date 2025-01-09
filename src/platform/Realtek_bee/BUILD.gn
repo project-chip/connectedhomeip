@@ -24,6 +24,8 @@ static_library("Realtek_bee") {
     "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
+    "BeeConfig.cpp",
+    "BeeConfig.h",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
@@ -38,18 +40,16 @@ static_library("Realtek_bee") {
     "FactoryDataDecoder.h",
     "FactoryDataProvider.cpp",
     "FactoryDataProvider.h",
+    "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "InetPlatformConfig.h",
     "OTAImageProcessorImpl.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-    "BeeConfig.cpp",
-    "BeeConfig.h",
   ]
 
- deps = [
+  deps = [
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
@@ -62,13 +62,12 @@ static_library("Realtek_bee") {
   public_configs = []
 
   if (chip_enable_openthread) {
-
     sources += [
-      "../OpenThread/OpenThreadUtils.cpp",
       "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
       "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
-      "../OpenThread/OpenThreadDnssdImpl.h",
       "../OpenThread/OpenThreadDnssdImpl.cpp",
+      "../OpenThread/OpenThreadDnssdImpl.h",
+      "../OpenThread/OpenThreadUtils.cpp",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
@@ -85,7 +84,5 @@ source_set("logging") {
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/platform/logging:headers",
   ]
-  sources = [
-    "Logging.cpp",
-  ]
+  sources = [ "Logging.cpp" ]
 }

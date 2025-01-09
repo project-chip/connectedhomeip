@@ -19,14 +19,13 @@
 
 #pragma once
 
-#include <cstdio>
-#include <app/util/basic-types.h>
 #include "matter_led.h"
+#include <app/util/basic-types.h>
+#include <cstdio>
 
 class LEDWidget
 {
 public:
-
     LEDWidget() : mLEDHandle(NULL) {}
 
     static void InitGpio();

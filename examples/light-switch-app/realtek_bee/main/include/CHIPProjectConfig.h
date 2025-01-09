@@ -165,17 +165,17 @@
 #define CONFIG_DEFAULT_ZAP 1
 #endif
 
-//You must copy light-switch-app-1_to_2 to example/light-switch-app/light-switch-common
+// You must copy light-switch-app-1_to_2 to example/light-switch-app/light-switch-common
 #ifndef CONFIG_1_TO_2_ZAP
 #define CONFIG_1_TO_2_ZAP 0
 #endif
 
-//You must copy light-switch-app-1_to_8 to example/light-switch-app/light-switch-common
+// You must copy light-switch-app-1_to_8 to example/light-switch-app/light-switch-common
 #ifndef CONFIG_1_TO_8_ZAP
 #define CONFIG_1_TO_8_ZAP 0
 #endif
 
-//You must copy light-switch-app-1_to_11 to example/light-switch-app/light-switch-common
+// You must copy light-switch-app-1_to_11 to example/light-switch-app/light-switch-common
 #ifndef CONFIG_1_TO_11_ZAP
 #define CONFIG_1_TO_11_ZAP 0
 #define MATTER_BINDING_TABLE_SIZE 20

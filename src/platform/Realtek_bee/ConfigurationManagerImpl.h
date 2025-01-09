@@ -24,8 +24,8 @@
 
 #pragma once
 
-#include <platform/Realtek_bee/BeeConfig.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/Realtek_bee/BeeConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
 namespace chip {
@@ -50,7 +50,7 @@ private:
     // ===== Members that implement the ConfigurationManager public interface.
 
     CHIP_ERROR Init(void) override;
-    //CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
+    // CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     bool CanFactoryReset(void) override;
     void InitiateFactoryReset(void) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
