@@ -1191,6 +1191,7 @@ READMEs
 readonly
 readthedocs
 Reag
+Realtek
 rebase
 recommand
 recommanded
