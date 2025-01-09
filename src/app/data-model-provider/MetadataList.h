@@ -27,6 +27,8 @@
 #include <lib/support/Span.h>
 
 namespace chip {
+namespace app {
+namespace DataModel {
 
 template <typename T>
 class MetadataList
@@ -172,4 +174,6 @@ protected:
     mutable bool mIsImmutable = false;
 };
 
+} // namespace DataModel
+} // namespace app
 } // namespace chip

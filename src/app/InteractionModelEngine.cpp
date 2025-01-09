@@ -1786,7 +1786,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 {
     auto provider = GetDataModelProvider();
 
-    MetadataList<DataModel::AcceptedCommandEntry> acceptedCommands = provider->AcceptedCommands(aCommandPath);
+    DataModel::MetadataList<DataModel::AcceptedCommandEntry> acceptedCommands = provider->AcceptedCommands(aCommandPath);
     for (auto existing : acceptedCommands.GetSpanValidForLifetime())
     {
         if (existing.commandId == aCommandPath.mCommandId)

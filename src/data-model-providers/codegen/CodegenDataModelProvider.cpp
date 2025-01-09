@@ -14,8 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model-provider/MetadataList.h"
-#include "lib/support/logging/TextOnlyLogging.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -26,6 +24,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/util/DataModelHandler.h>
@@ -691,7 +690,8 @@ std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeIn
     return std::make_optional(info);
 }
 
-MetadataList<DataModel::AcceptedCommandEntry> CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path)
+DataModel::MetadataList<DataModel::AcceptedCommandEntry>
+CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path)
 {
     CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
@@ -712,7 +712,7 @@ MetadataList<DataModel::AcceptedCommandEntry> CodegenDataModelProvider::Accepted
             typedef struct
             {
                 ConcreteCommandPath commandPath;
-                MetadataList<DataModel::AcceptedCommandEntry> acceptedCommandList;
+                DataModel::MetadataList<DataModel::AcceptedCommandEntry> acceptedCommandList;
             } EnumerationData;
 
             EnumerationData enumerationData;
@@ -796,7 +796,7 @@ MetadataList<DataModel::AcceptedCommandEntry> CodegenDataModelProvider::Accepted
     }
     const size_t commandCount = static_cast<size_t>(endOfList - cluster->acceptedCommandList);
 
-    MetadataList<DataModel::AcceptedCommandEntry> result;
+    DataModel::MetadataList<DataModel::AcceptedCommandEntry> result;
     CHIP_ERROR err = result.reserve(commandCount);
 
     if (err != CHIP_NO_ERROR)
@@ -839,7 +839,7 @@ MetadataList<DataModel::AcceptedCommandEntry> CodegenDataModelProvider::Accepted
     return result;
 }
 
-MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path)
+DataModel::MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path)
 {
     CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
@@ -857,7 +857,7 @@ MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(const Concre
 
         if (err == CHIP_NO_ERROR)
         {
-            MetadataList<CommandId> result;
+            DataModel::MetadataList<CommandId> result;
             err = result.reserve(commandCount);
             if (err != CHIP_NO_ERROR)
             {
@@ -871,7 +871,7 @@ MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(const Concre
             err = interface->EnumerateGeneratedCommands(
                 path,
                 [](CommandId id, void * context) -> Loop {
-                    CHIP_ERROR appendError = reinterpret_cast<MetadataList<CommandId> *>(context)->Append(id);
+                    CHIP_ERROR appendError = reinterpret_cast<DataModel::MetadataList<CommandId> *>(context)->Append(id);
                     if (appendError != CHIP_NO_ERROR)
                     {
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
@@ -917,7 +917,7 @@ MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(const Concre
         endOfList++;
     }
     const size_t commandCount = static_cast<size_t>(endOfList - cluster->generatedCommandList);
-    return MetadataList<CommandId>::FromConstSpan({ cluster->generatedCommandList, commandCount });
+    return DataModel::MetadataList<CommandId>::FromConstSpan({ cluster->generatedCommandList, commandCount });
 }
 
 void CodegenDataModelProvider::InitDataModelForTesting()

@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <algorithm>
 #include <functional>
 #include <stdint.h>
 #include <utility>
@@ -32,6 +31,7 @@
 #include <lib/support/Span.h>
 
 using namespace chip;
+using namespace chip::app::DataModel;
 
 namespace {
 

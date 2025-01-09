@@ -122,8 +122,8 @@ public:
     std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
                                                         chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
-    MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path) override;
-    MetadataList<DataModel::AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) override;
+    DataModel::MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path) override;
+    DataModel::MetadataList<DataModel::AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) override;
 
     DataModel::EndpointEntry FirstEndpoint() override;
     DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
