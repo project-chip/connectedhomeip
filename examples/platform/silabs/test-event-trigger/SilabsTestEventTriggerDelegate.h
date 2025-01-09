@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <ProvisionStorage.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <platform/silabs/provision/ProvisionedDataProvider.h>
 #include <stdint.h>
 
 namespace chip {
