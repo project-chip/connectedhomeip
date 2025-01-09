@@ -31816,7 +31816,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _streamType = @(0);
+        _streamUsage = @(0);
 
         _audioCodec = @(0);
 
@@ -31837,7 +31837,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRCameraAVStreamManagementClusterAudioStreamAllocateParams alloc] init];
 
-    other.streamType = self.streamType;
+    other.streamUsage = self.streamUsage;
     other.audioCodec = self.audioCodec;
     other.channelCount = self.channelCount;
     other.sampleRate = self.sampleRate;
@@ -31851,7 +31851,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamType:%@; audioCodec:%@; channelCount:%@; sampleRate:%@; bitRate:%@; bitDepth:%@; >", NSStringFromClass([self class]), _streamType, _audioCodec, _channelCount, _sampleRate, _bitRate, _bitDepth];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; audioCodec:%@; channelCount:%@; sampleRate:%@; bitRate:%@; bitDepth:%@; >", NSStringFromClass([self class]), _streamUsage, _audioCodec, _channelCount, _sampleRate, _bitRate, _bitDepth];
     return descriptionString;
 }
 
@@ -31864,7 +31864,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocate::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.streamType = static_cast<std::remove_reference_t<decltype(encodableStruct.streamType)>>(self.streamType.unsignedCharValue);
+        encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
     }
     {
         encodableStruct.audioCodec = static_cast<std::remove_reference_t<decltype(encodableStruct.audioCodec)>>(self.audioCodec.unsignedCharValue);
@@ -32083,7 +32083,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _streamType = @(0);
+        _streamUsage = @(0);
 
         _videoCodec = @(0);
 
@@ -32116,7 +32116,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRCameraAVStreamManagementClusterVideoStreamAllocateParams alloc] init];
 
-    other.streamType = self.streamType;
+    other.streamUsage = self.streamUsage;
     other.videoCodec = self.videoCodec;
     other.minFrameRate = self.minFrameRate;
     other.maxFrameRate = self.maxFrameRate;
@@ -32136,7 +32136,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamType:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minFragmentLen:%@; maxFragmentLen:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _streamType, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minFragmentLen, _maxFragmentLen, _watermarkEnabled, _osdEnabled];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minFragmentLen:%@; maxFragmentLen:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _streamUsage, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minFragmentLen, _maxFragmentLen, _watermarkEnabled, _osdEnabled];
     return descriptionString;
 }
 
@@ -32149,7 +32149,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocate::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.streamType = static_cast<std::remove_reference_t<decltype(encodableStruct.streamType)>>(self.streamType.unsignedCharValue);
+        encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
     }
     {
         encodableStruct.videoCodec = static_cast<std::remove_reference_t<decltype(encodableStruct.videoCodec)>>(self.videoCodec.unsignedCharValue);
@@ -32317,8 +32317,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _videoStreamID = @(0);
 
-        _resolution = nil;
-
         _watermarkEnabled = nil;
 
         _osdEnabled = nil;
@@ -32333,7 +32331,6 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRCameraAVStreamManagementClusterVideoStreamModifyParams alloc] init];
 
     other.videoStreamID = self.videoStreamID;
-    other.resolution = self.resolution;
     other.watermarkEnabled = self.watermarkEnabled;
     other.osdEnabled = self.osdEnabled;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -32344,7 +32341,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; resolution:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _videoStreamID, _resolution, _watermarkEnabled, _osdEnabled];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _videoStreamID, _watermarkEnabled, _osdEnabled];
     return descriptionString;
 }
 
@@ -32358,13 +32355,6 @@ NS_ASSUME_NONNULL_BEGIN
     ListFreer listFreer;
     {
         encodableStruct.videoStreamID = self.videoStreamID.unsignedShortValue;
-    }
-    {
-        if (self.resolution != nil) {
-            auto & definedValue_0 = encodableStruct.resolution.Emplace();
-            definedValue_0.width = self.resolution.width.unsignedShortValue;
-            definedValue_0.height = self.resolution.height.unsignedShortValue;
-        }
     }
     {
         if (self.watermarkEnabled != nil) {
@@ -33690,7 +33680,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _streamType = @(0);
+        _streamUsage = @(0);
 
         _videoStreamID = nil;
 
@@ -33711,7 +33701,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRWebRTCTransportProviderClusterSolicitOfferParams alloc] init];
 
-    other.streamType = self.streamType;
+    other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.iceServers = self.iceServers;
@@ -33725,7 +33715,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamType:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _streamType, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
     return descriptionString;
 }
 
@@ -33738,7 +33728,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.streamType = static_cast<std::remove_reference_t<decltype(encodableStruct.streamType)>>(self.streamType.unsignedCharValue);
+        encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
     }
     {
         if (self.videoStreamID != nil) {
@@ -33997,7 +33987,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sdp = @"";
 
-        _streamType = @(0);
+        _streamUsage = @(0);
 
         _videoStreamID = nil;
 
@@ -34020,7 +34010,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.webRTCSessionID = self.webRTCSessionID;
     other.sdp = self.sdp;
-    other.streamType = self.streamType;
+    other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.iceServers = self.iceServers;
@@ -34034,7 +34024,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamType:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamType, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
     return descriptionString;
 }
 
@@ -34058,7 +34048,7 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.sdp = AsCharSpan(self.sdp);
     }
     {
-        encodableStruct.streamType = static_cast<std::remove_reference_t<decltype(encodableStruct.streamType)>>(self.streamType.unsignedCharValue);
+        encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
     }
     {
         if (self.videoStreamID != nil) {

@@ -12392,7 +12392,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "AudioStreamAllocate",
                 "args": {
-                    "streamType": "int",
+                    "streamUsage": "int",
                     "audioCodec": "int",
                     "channelCount": "int",
                     "sampleRate": "int",
@@ -12411,7 +12411,7 @@ class ChipClusters:
                 "commandId": 0x00000003,
                 "commandName": "VideoStreamAllocate",
                 "args": {
-                    "streamType": "int",
+                    "streamUsage": "int",
                     "videoCodec": "int",
                     "minFrameRate": "int",
                     "maxFrameRate": "int",
@@ -12430,7 +12430,6 @@ class ChipClusters:
                 "commandName": "VideoStreamModify",
                 "args": {
                     "videoStreamID": "int",
-                    "resolution": "VideoResolutionStruct",
                     "watermarkEnabled": "bool",
                     "OSDEnabled": "bool",
                 },
@@ -12932,7 +12931,7 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "SolicitOffer",
                 "args": {
-                    "streamType": "int",
+                    "streamUsage": "int",
                     "videoStreamID": "int",
                     "audioStreamID": "int",
                     "ICEServers": "ICEServerStruct",
@@ -12946,7 +12945,7 @@ class ChipClusters:
                 "args": {
                     "webRTCSessionID": "int",
                     "sdp": "str",
-                    "streamType": "int",
+                    "streamUsage": "int",
                     "videoStreamID": "int",
                     "audioStreamID": "int",
                     "ICEServers": "ICEServerStruct",

@@ -535,10 +535,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("StreamType", indent + 1, value.streamType);
+        CHIP_ERROR err = LogValue("StreamUsage", indent + 1, value.streamUsage);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StreamType'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StreamUsage'");
             return err;
         }
     }
@@ -5336,10 +5336,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("StreamType", indent + 1, value.streamType);
+        CHIP_ERROR err = LogValue("StreamUsage", indent + 1, value.streamUsage);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StreamType'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StreamUsage'");
             return err;
         }
     }
@@ -5642,10 +5642,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("StreamType", indent + 1, value.streamType);
+        CHIP_ERROR err = LogValue("StreamUsage", indent + 1, value.streamUsage);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StreamType'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StreamUsage'");
             return err;
         }
     }
@@ -8805,10 +8805,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("StreamType", indent + 1, value.streamType);
+        CHIP_ERROR err = DataModelLogger::LogValue("StreamUsage", indent + 1, value.streamUsage);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'StreamType'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'StreamUsage'");
             return err;
         }
     }
@@ -8901,10 +8901,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("StreamType", indent + 1, value.streamType);
+        CHIP_ERROR err = DataModelLogger::LogValue("StreamUsage", indent + 1, value.streamUsage);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'StreamType'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'StreamUsage'");
             return err;
         }
     }
@@ -18658,7 +18658,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AllocatedSnapshotStreams", 1, value);
         }
         case CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamTypeEnum> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RankedVideoStreamPrioritiesList", 1, value);
         }

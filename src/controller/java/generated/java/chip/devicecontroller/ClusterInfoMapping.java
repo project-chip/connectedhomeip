@@ -20126,6 +20126,32 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedCameraAvStreamManagementClusterCaptureSnapshotResponseCallback implements ChipClusters.CameraAvStreamManagementCluster.CaptureSnapshotResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] data, Integer imageCodec, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct resolution) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "byte[]");
+      responseValues.put(dataResponseValue, data);
+      CommandResponseInfo imageCodecResponseValue = new CommandResponseInfo("imageCodec", "Integer");
+      responseValues.put(imageCodecResponseValue, imageCodec);
+      // resolution: Struct VideoResolutionStruct
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedCameraAvStreamManagementClusterVideoSensorParamsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.VideoSensorParamsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -29722,8 +29748,8 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> cameraAvStreamManagementaudioStreamAllocateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvStreamManagementaudioStreamAllocatestreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
-    cameraAvStreamManagementaudioStreamAllocateCommandParams.put("streamType",cameraAvStreamManagementaudioStreamAllocatestreamTypeCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementaudioStreamAllocatestreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
+    cameraAvStreamManagementaudioStreamAllocateCommandParams.put("streamUsage",cameraAvStreamManagementaudioStreamAllocatestreamUsageCommandParameterInfo);
 
     CommandParameterInfo cameraAvStreamManagementaudioStreamAllocateaudioCodecCommandParameterInfo = new CommandParameterInfo("audioCodec", Integer.class, Integer.class);
     cameraAvStreamManagementaudioStreamAllocateCommandParams.put("audioCodec",cameraAvStreamManagementaudioStreamAllocateaudioCodecCommandParameterInfo);
@@ -29744,7 +29770,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.CameraAvStreamManagementCluster) cluster)
           .audioStreamAllocate((ChipClusters.CameraAvStreamManagementCluster.AudioStreamAllocateResponseCallback) callback
            , (Integer)
-             commandArguments.get("streamType")
+             commandArguments.get("streamUsage")
 
            , (Integer)
              commandArguments.get("audioCodec")
@@ -29787,8 +29813,8 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> cameraAvStreamManagementvideoStreamAllocateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatestreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
-    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("streamType",cameraAvStreamManagementvideoStreamAllocatestreamTypeCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatestreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("streamUsage",cameraAvStreamManagementvideoStreamAllocatestreamUsageCommandParameterInfo);
 
     CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatevideoCodecCommandParameterInfo = new CommandParameterInfo("videoCodec", Integer.class, Integer.class);
     cameraAvStreamManagementvideoStreamAllocateCommandParams.put("videoCodec",cameraAvStreamManagementvideoStreamAllocatevideoCodecCommandParameterInfo);
@@ -29823,7 +29849,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.CameraAvStreamManagementCluster) cluster)
           .videoStreamAllocate((ChipClusters.CameraAvStreamManagementCluster.VideoStreamAllocateResponseCallback) callback
            , (Integer)
-             commandArguments.get("streamType")
+             commandArguments.get("streamUsage")
 
            , (Integer)
              commandArguments.get("videoCodec")
@@ -29870,7 +29896,6 @@ public class ClusterInfoMapping {
     CommandParameterInfo cameraAvStreamManagementvideoStreamModifyvideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Integer.class, Integer.class);
     cameraAvStreamManagementvideoStreamModifyCommandParams.put("videoStreamID",cameraAvStreamManagementvideoStreamModifyvideoStreamIDCommandParameterInfo);
 
-
     CommandParameterInfo cameraAvStreamManagementvideoStreamModifywatermarkEnabledCommandParameterInfo = new CommandParameterInfo("watermarkEnabled", Optional.class, Boolean.class);
     cameraAvStreamManagementvideoStreamModifyCommandParams.put("watermarkEnabled",cameraAvStreamManagementvideoStreamModifywatermarkEnabledCommandParameterInfo);
 
@@ -29882,8 +29907,6 @@ public class ClusterInfoMapping {
         .videoStreamModify((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("videoStreamID")
-        , (Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct>)
-        commandArguments.get("resolution")
         , (Optional<Boolean>)
         commandArguments.get("watermarkEnabled")
         , (Optional<Boolean>)
@@ -29998,16 +30021,18 @@ public class ClusterInfoMapping {
     InteractionInfo cameraAvStreamManagementcaptureSnapshotInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CameraAvStreamManagementCluster) cluster)
-        .captureSnapshot((DefaultClusterCallback) callback
-        , (Integer)
-        commandArguments.get("snapshotStreamID")
-        , (ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct)
-        commandArguments.get("requestedResolution")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
+          .captureSnapshot((ChipClusters.CameraAvStreamManagementCluster.CaptureSnapshotResponseCallback) callback
+           , (Integer)
+             commandArguments.get("snapshotStreamID")
+
+           , (ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct)
+             commandArguments.get("requestedResolution")
+
+            );
+        },
+        () -> new DelegatedCameraAvStreamManagementClusterCaptureSnapshotResponseCallback(),
         cameraAvStreamManagementcaptureSnapshotCommandParams
-    );
+      );
     cameraAvStreamManagementClusterInteractionInfoMap.put("captureSnapshot", cameraAvStreamManagementcaptureSnapshotInteractionInfo);
 
     commandMap.put("cameraAvStreamManagement", cameraAvStreamManagementClusterInteractionInfoMap);
@@ -30182,8 +30207,8 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> webRTCTransportProvidersolicitOfferCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo webRTCTransportProvidersolicitOfferstreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
-    webRTCTransportProvidersolicitOfferCommandParams.put("streamType",webRTCTransportProvidersolicitOfferstreamTypeCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProvidersolicitOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("streamUsage",webRTCTransportProvidersolicitOfferstreamUsageCommandParameterInfo);
 
     CommandParameterInfo webRTCTransportProvidersolicitOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
     webRTCTransportProvidersolicitOfferCommandParams.put("videoStreamID",webRTCTransportProvidersolicitOffervideoStreamIDCommandParameterInfo);
@@ -30202,7 +30227,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
           .solicitOffer((ChipClusters.WebRTCTransportProviderCluster.SolicitOfferResponseCallback) callback
            , (Integer)
-             commandArguments.get("streamType")
+             commandArguments.get("streamUsage")
 
            , (Optional<Integer>)
              commandArguments.get("videoStreamID")
@@ -30234,8 +30259,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProviderprovideOffersdpCommandParameterInfo = new CommandParameterInfo("sdp", String.class, String.class);
     webRTCTransportProviderprovideOfferCommandParams.put("sdp",webRTCTransportProviderprovideOffersdpCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideOfferstreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
-    webRTCTransportProviderprovideOfferCommandParams.put("streamType",webRTCTransportProviderprovideOfferstreamTypeCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("streamUsage",webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo);
 
     CommandParameterInfo webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
     webRTCTransportProviderprovideOfferCommandParams.put("videoStreamID",webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo);
@@ -30260,7 +30285,7 @@ public class ClusterInfoMapping {
              commandArguments.get("sdp")
 
            , (Integer)
-             commandArguments.get("streamType")
+             commandArguments.get("streamUsage")
 
            , (Optional<Integer>)
              commandArguments.get("videoStreamID")

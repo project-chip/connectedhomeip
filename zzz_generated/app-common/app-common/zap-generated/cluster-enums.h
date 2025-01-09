@@ -139,8 +139,8 @@ enum class ProductIdentifierTypeEnum : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for StreamTypeEnum
-enum class StreamTypeEnum : uint8_t
+// Enum for StreamUsageEnum
+enum class StreamUsageEnum : uint8_t
 {
     kInternal  = 0x00,
     kRecording = 0x01,
@@ -5555,7 +5555,7 @@ enum class ImageCodecEnum : uint8_t
     kUnknownEnumValue = 1,
 };
 
-using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 // Enum for TriStateAutoEnum
 enum class TriStateAutoEnum : uint8_t
@@ -5627,7 +5627,7 @@ enum class Feature : uint32_t
 
 namespace WebRTCTransportProvider {
 
-using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 
@@ -5636,7 +5636,7 @@ using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
 
 namespace WebRTCTransportRequestor {
 
-using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 

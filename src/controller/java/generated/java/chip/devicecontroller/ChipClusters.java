@@ -59782,17 +59782,17 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void audioStreamAllocate(AudioStreamAllocateResponseCallback callback, Integer streamType, Integer audioCodec, Integer channelCount, Long sampleRate, Long bitRate, Integer bitDepth) {
-      audioStreamAllocate(callback, streamType, audioCodec, channelCount, sampleRate, bitRate, bitDepth, 0);
+    public void audioStreamAllocate(AudioStreamAllocateResponseCallback callback, Integer streamUsage, Integer audioCodec, Integer channelCount, Long sampleRate, Long bitRate, Integer bitDepth) {
+      audioStreamAllocate(callback, streamUsage, audioCodec, channelCount, sampleRate, bitRate, bitDepth, 0);
     }
 
-    public void audioStreamAllocate(AudioStreamAllocateResponseCallback callback, Integer streamType, Integer audioCodec, Integer channelCount, Long sampleRate, Long bitRate, Integer bitDepth, int timedInvokeTimeoutMs) {
+    public void audioStreamAllocate(AudioStreamAllocateResponseCallback callback, Integer streamUsage, Integer audioCodec, Integer channelCount, Long sampleRate, Long bitRate, Integer bitDepth, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long streamTypeFieldID = 0L;
-      BaseTLVType streamTypetlvValue = new UIntType(streamType);
-      elements.add(new StructElement(streamTypeFieldID, streamTypetlvValue));
+      final long streamUsageFieldID = 0L;
+      BaseTLVType streamUsagetlvValue = new UIntType(streamUsage);
+      elements.add(new StructElement(streamUsageFieldID, streamUsagetlvValue));
 
       final long audioCodecFieldID = 1L;
       BaseTLVType audioCodectlvValue = new UIntType(audioCodec);
@@ -59852,17 +59852,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void videoStreamAllocate(VideoStreamAllocateResponseCallback callback, Integer streamType, Integer videoCodec, Integer minFrameRate, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Long minBitRate, Long maxBitRate, Integer minFragmentLen, Integer maxFragmentLen, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
-      videoStreamAllocate(callback, streamType, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution, minBitRate, maxBitRate, minFragmentLen, maxFragmentLen, watermarkEnabled, OSDEnabled, 0);
+    public void videoStreamAllocate(VideoStreamAllocateResponseCallback callback, Integer streamUsage, Integer videoCodec, Integer minFrameRate, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Long minBitRate, Long maxBitRate, Integer minFragmentLen, Integer maxFragmentLen, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
+      videoStreamAllocate(callback, streamUsage, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution, minBitRate, maxBitRate, minFragmentLen, maxFragmentLen, watermarkEnabled, OSDEnabled, 0);
     }
 
-    public void videoStreamAllocate(VideoStreamAllocateResponseCallback callback, Integer streamType, Integer videoCodec, Integer minFrameRate, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Long minBitRate, Long maxBitRate, Integer minFragmentLen, Integer maxFragmentLen, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
+    public void videoStreamAllocate(VideoStreamAllocateResponseCallback callback, Integer streamUsage, Integer videoCodec, Integer minFrameRate, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Long minBitRate, Long maxBitRate, Integer minFragmentLen, Integer maxFragmentLen, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long streamTypeFieldID = 0L;
-      BaseTLVType streamTypetlvValue = new UIntType(streamType);
-      elements.add(new StructElement(streamTypeFieldID, streamTypetlvValue));
+      final long streamUsageFieldID = 0L;
+      BaseTLVType streamUsagetlvValue = new UIntType(streamUsage);
+      elements.add(new StructElement(streamUsageFieldID, streamUsagetlvValue));
 
       final long videoCodecFieldID = 1L;
       BaseTLVType videoCodectlvValue = new UIntType(videoCodec);
@@ -59926,11 +59926,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void videoStreamModify(DefaultClusterCallback callback, Integer videoStreamID, Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> resolution, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
-      videoStreamModify(callback, videoStreamID, resolution, watermarkEnabled, OSDEnabled, 0);
+    public void videoStreamModify(DefaultClusterCallback callback, Integer videoStreamID, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
+      videoStreamModify(callback, videoStreamID, watermarkEnabled, OSDEnabled, 0);
     }
 
-    public void videoStreamModify(DefaultClusterCallback callback, Integer videoStreamID, Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> resolution, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
+    public void videoStreamModify(DefaultClusterCallback callback, Integer videoStreamID, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
       final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -59938,15 +59938,11 @@ public class ChipClusters {
       BaseTLVType videoStreamIDtlvValue = new UIntType(videoStreamID);
       elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
 
-      final long resolutionFieldID = 1L;
-      BaseTLVType resolutiontlvValue = resolution.<BaseTLVType>map((nonOptionalresolution) -> nonOptionalresolution.encodeTlv()).orElse(new EmptyType());
-      elements.add(new StructElement(resolutionFieldID, resolutiontlvValue));
-
-      final long watermarkEnabledFieldID = 2L;
+      final long watermarkEnabledFieldID = 1L;
       BaseTLVType watermarkEnabledtlvValue = watermarkEnabled.<BaseTLVType>map((nonOptionalwatermarkEnabled) -> new BooleanType(nonOptionalwatermarkEnabled)).orElse(new EmptyType());
       elements.add(new StructElement(watermarkEnabledFieldID, watermarkEnabledtlvValue));
 
-      final long OSDEnabledFieldID = 3L;
+      final long OSDEnabledFieldID = 2L;
       BaseTLVType OSDEnabledtlvValue = OSDEnabled.<BaseTLVType>map((nonOptionalOSDEnabled) -> new BooleanType(nonOptionalOSDEnabled)).orElse(new EmptyType());
       elements.add(new StructElement(OSDEnabledFieldID, OSDEnabledtlvValue));
 
@@ -60068,11 +60064,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void captureSnapshot(DefaultClusterCallback callback, Integer snapshotStreamID, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct requestedResolution) {
+    public void captureSnapshot(CaptureSnapshotResponseCallback callback, Integer snapshotStreamID, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct requestedResolution) {
       captureSnapshot(callback, snapshotStreamID, requestedResolution, 0);
     }
 
-    public void captureSnapshot(DefaultClusterCallback callback, Integer snapshotStreamID, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct requestedResolution, int timedInvokeTimeoutMs) {
+    public void captureSnapshot(CaptureSnapshotResponseCallback callback, Integer snapshotStreamID, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct requestedResolution, int timedInvokeTimeoutMs) {
       final long commandId = 11L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -60088,7 +60084,31 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
+          final long dataFieldID = 0L;
+          byte[] data = null;
+          final long imageCodecFieldID = 1L;
+          Integer imageCodec = null;
+          final long resolutionFieldID = 2L;
+          ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct resolution = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == dataFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                data = castingValue.value(byte[].class);
+              }
+            } else if (element.contextTagNum() == imageCodecFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                imageCodec = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == resolutionFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+                StructType castingValue = element.value(StructType.class);
+                resolution = ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct.decodeTlv(castingValue);
+              }
+            }
+          }
+          callback.onSuccess(data, imageCodec, resolution);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -60102,6 +60122,10 @@ public class ChipClusters {
 
     public interface SnapshotStreamAllocateResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer snapshotStreamID);
+    }
+
+    public interface CaptureSnapshotResponseCallback extends BaseClusterCallback {
+      void onSuccess(byte[] data, Integer imageCodec, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct resolution);
     }
 
     public interface VideoSensorParamsAttributeCallback extends BaseAttributeCallback {
@@ -62198,17 +62222,17 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamType, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
-      solicitOffer(callback, streamType, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
+      solicitOffer(callback, streamUsage, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
     }
 
-    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamType, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long streamTypeFieldID = 0L;
-      BaseTLVType streamTypetlvValue = new UIntType(streamType);
-      elements.add(new StructElement(streamTypeFieldID, streamTypetlvValue));
+      final long streamUsageFieldID = 0L;
+      BaseTLVType streamUsagetlvValue = new UIntType(streamUsage);
+      elements.add(new StructElement(streamUsageFieldID, streamUsagetlvValue));
 
       final long videoStreamIDFieldID = 1L;
       BaseTLVType videoStreamIDtlvValue = videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType();
@@ -62269,11 +62293,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamType, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
-      provideOffer(callback, webRTCSessionID, sdp, streamType, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
+      provideOffer(callback, webRTCSessionID, sdp, streamUsage, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamType, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -62285,9 +62309,9 @@ public class ChipClusters {
       BaseTLVType sdptlvValue = new StringType(sdp);
       elements.add(new StructElement(sdpFieldID, sdptlvValue));
 
-      final long streamTypeFieldID = 2L;
-      BaseTLVType streamTypetlvValue = new UIntType(streamType);
-      elements.add(new StructElement(streamTypeFieldID, streamTypetlvValue));
+      final long streamUsageFieldID = 2L;
+      BaseTLVType streamUsagetlvValue = new UIntType(streamUsage);
+      elements.add(new StructElement(streamUsageFieldID, streamUsagetlvValue));
 
       final long videoStreamIDFieldID = 3L;
       BaseTLVType videoStreamIDtlvValue = videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType();
