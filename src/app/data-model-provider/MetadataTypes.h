@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "app/data-model-provider/MetadataList.h"
 #include <cstdint>
 #include <optional>
 
@@ -221,6 +222,12 @@ public:
     // returned as responses.
     virtual ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) = 0;
     virtual ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before)   = 0;
+
+    /// List items. TODO: convert ALL items above to the new format
+
+    /// List all the generated commands for the given path
+    virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath &path) = 0;
+
 
     /// Workaround function to report attribute change.
     ///

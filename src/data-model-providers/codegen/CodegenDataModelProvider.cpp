@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/MetadataList.h"
+#include "lib/support/logging/TextOnlyLogging.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -121,12 +123,12 @@ struct ByDeviceType
     }
 };
 
-const CommandId * AcceptedCommands(const EmberAfCluster & cluster)
+const CommandId * GetAcceptedCommands(const EmberAfCluster & cluster)
 {
     return cluster.acceptedCommandList;
 }
 
-const CommandId * GeneratedCommands(const EmberAfCluster & cluster)
+const CommandId * GetGeneratedCommands(const EmberAfCluster & cluster)
 {
     return cluster.generatedCommandList;
 }
@@ -812,7 +814,7 @@ DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const Con
 
     CommandId commandId =
         FindCommand(ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId), handlerFinder,
-                    detail::EnumeratorCommandFinder::Operation::kFindFirst, mAcceptedCommandsIterator, AcceptedCommands);
+                    detail::EnumeratorCommandFinder::Operation::kFindFirst, mAcceptedCommandsIterator, GetAcceptedCommands);
 
     VerifyOrReturnValue(commandId != kInvalidCommandId, DataModel::CommandEntry::kInvalid);
     return CommandEntryFrom(path, commandId);
@@ -823,7 +825,7 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
 
     EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateAcceptedCommands);
     CommandId commandId = FindCommand(before, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindNext,
-                                      mAcceptedCommandsIterator, AcceptedCommands);
+                                      mAcceptedCommandsIterator, GetAcceptedCommands);
 
     VerifyOrReturnValue(commandId != kInvalidCommandId, DataModel::CommandEntry::kInvalid);
     return CommandEntryFrom(before, commandId);
@@ -834,10 +836,86 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
 
     EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateAcceptedCommands);
     CommandId commandId = FindCommand(path, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindExact,
-                                      mAcceptedCommandsIterator, AcceptedCommands);
+                                      mAcceptedCommandsIterator, GetAcceptedCommands);
 
     VerifyOrReturnValue(commandId != kInvalidCommandId, std::nullopt);
     return CommandEntryFrom(path, commandId).info;
+}
+
+MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path)
+{
+    // For fixed:
+    //   ???? depends on how it looks like
+    //
+    CommandHandlerInterface * interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+    if (interface != nullptr)
+    {
+        size_t commandCount = 0;
+
+        CHIP_ERROR err = interface->EnumerateGeneratedCommands(
+            path,
+            [](CommandId id, void * context) -> Loop {
+                *reinterpret_cast<size_t *>(context) += 1;
+                return Loop::Continue;
+            },
+            reinterpret_cast<void *>(&commandCount));
+
+        if (err == CHIP_NO_ERROR)
+        {
+            MetadataList<CommandId> result;
+            result.reserve(commandCount);
+
+            err = interface->EnumerateGeneratedCommands(
+                path,
+                [](CommandId id, void * context) -> Loop {
+                    CHIP_ERROR appendError = reinterpret_cast<MetadataList<CommandId> *>(context)->Append(id);
+                    if (appendError != CHIP_NO_ERROR)
+                    {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+                        ChipLogError(DataManagement, "Failed to append generated command: %" CHIP_ERROR_FORMAT,
+                                     appendError.Format());
+#endif
+                        return Loop::Break;
+                    }
+                    return Loop::Continue;
+                },
+                reinterpret_cast<void *>(&result));
+
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "Failed to run generated command appending: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+            if (result.size() != commandCount)
+            {
+                ChipLogError(DataManagement, "Unexpected (likely short) number of generated commands fetched");
+            }
+#endif
+            return result;
+        }
+
+        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+            ChipLogError(DataManagement, "Failed to enumerate generated commands: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+            return {};
+        }
+    }
+
+    const EmberAfCluster * cluster = FindServerCluster(path);
+    if (cluster == nullptr)
+    {
+        return {};
+    }
+    const chip::CommandId * endOfList = cluster->generatedCommandList;
+    while (*endOfList != kInvalidCommandId)
+    {
+        endOfList++;
+    }
+    size_t commandCount = static_cast<size_t>(endOfList - cluster->generatedCommandList);
+    return MetadataList<CommandId>::FromConstSpan({ cluster->generatedCommandList, commandCount });
 }
 
 ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const ConcreteClusterPath & path)
@@ -845,7 +923,7 @@ ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const Concre
     EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateGeneratedCommands);
     CommandId commandId =
         FindCommand(ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId), handlerFinder,
-                    detail::EnumeratorCommandFinder::Operation::kFindFirst, mGeneratedCommandsIterator, GeneratedCommands);
+                    detail::EnumeratorCommandFinder::Operation::kFindFirst, mGeneratedCommandsIterator, GetGeneratedCommands);
 
     VerifyOrReturnValue(commandId != kInvalidCommandId, kInvalidCommandPath);
     return ConcreteCommandPath(path.mEndpointId, path.mClusterId, commandId);
@@ -856,7 +934,7 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
     EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateGeneratedCommands);
 
     CommandId commandId = FindCommand(before, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindNext,
-                                      mGeneratedCommandsIterator, GeneratedCommands);
+                                      mGeneratedCommandsIterator, GetGeneratedCommands);
 
     VerifyOrReturnValue(commandId != kInvalidCommandId, kInvalidCommandPath);
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, commandId);

@@ -155,6 +155,8 @@ public:
                                                         CommandHandler * handler) override;
 
     /// attribute tree iteration
+    MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath &path) override;
+
     DataModel::EndpointEntry FirstEndpoint() override;
     DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
     std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
