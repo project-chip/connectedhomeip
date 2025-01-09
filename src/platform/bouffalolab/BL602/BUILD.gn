@@ -76,4 +76,5 @@ static_library("BL602") {
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  cflags_c = [ "-Wno-conversion" ]
 }

@@ -244,6 +244,11 @@ template("ti_simplelink_sdk") {
     configs = [ ":${ti_simplelink_device_family}_sdk_config" ]
   }
 
+  config("${sdk_target_name}_no_conversion_config") {
+    # SwiP_freertos.c and others do not compile with -Wconversion
+    cflags = [ "-Wno-conversion" ]
+  }
+
   source_set("${sdk_target_name}_dpl") {
     defines = []
     include_dirs = []
@@ -285,6 +290,8 @@ template("ti_simplelink_sdk") {
     public_deps = [ "${chip_root}/third_party/ti_simplelink_sdk:freertos" ]
 
     public_configs = [ ":${sdk_target_name}_config" ]
+
+    configs += [ ":${sdk_target_name}_no_conversion_config" ]
   }
 
   config("${sdk_target_name}_posix_config") {
@@ -325,6 +332,8 @@ template("ti_simplelink_sdk") {
     ]
 
     public_configs = [ ":${sdk_target_name}_config" ]
+
+    configs += [ ":${sdk_target_name}_no_conversion_config" ]
   }
 
   if (ti_simplelink_device_family == "cc13x4_26x4") {

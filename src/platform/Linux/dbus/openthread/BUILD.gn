@@ -22,4 +22,7 @@ gdbus_library("openthread") {
   c_namespace = "Openthread"
   c_generate_object_manager = false
   dbus_out_dir = "platform/Linux/dbus/openthread"
+
+  # The generated code here is not -Wconversion-clean.
+  no_wconversion = true
 }

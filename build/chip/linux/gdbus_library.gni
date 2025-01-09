@@ -33,6 +33,13 @@ template("gdbus_library") {
 
   config("${library_name}_config") {
     include_dirs = [ "${root_gen_dir}/include" ]
+
+    cflags = []
+
+    # Some invokers generate code that triggers warnings for -Wconversion.
+    if (defined(invoker.no_wconversion) && invoker.no_wconversion) {
+      cflags += [ "-Wno-conversion" ]
+    }
   }
 
   config("${library_name}_compile_config") {

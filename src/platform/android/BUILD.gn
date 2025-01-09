@@ -22,6 +22,10 @@ import("${chip_root}/build/chip/java/rules.gni")
 
 assert(chip_device_platform == "android")
 
+config("android_no_conversion_config") {
+  cflags = [ "-Wno-conversion" ]
+}
+
 source_set("tracing") {
   sources = [
     "tracing.cpp",
@@ -91,6 +95,8 @@ static_library("android") {
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   public_configs = []
+
+  configs += [ ":android_no_conversion_config" ]
 }
 
 source_set("inet") {

@@ -15,7 +15,10 @@
 config("qrcode-common_config") {
   include_dirs = [ "repo/c" ]
 
-  cflags = [ "-Wno-type-limits" ]
+  cflags = [
+    "-Wno-type-limits",
+    "-Wno-conversion",
+  ]
 }
 
 static_library("QRCode") {

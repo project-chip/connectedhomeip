@@ -12,8 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+config("segger-rtt-syscalls-config") {
+  cflags = [ "-Wno-conversion" ]
+}
+
 source_set("Syscalls") {
   sources = [ "SEGGER_RTT_Syscalls_GCC.c" ]
 
   public_deps = [ "../RTT" ]
+
+  configs += [ ":segger-rtt-syscalls-config" ]
 }

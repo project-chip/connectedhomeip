@@ -687,7 +687,10 @@ template("efr32_sdk") {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
 
-    cflags += [ "-Wno-shadow" ]
+    cflags += [
+      "-Wno-shadow",
+      "-Wno-conversion",
+    ]
 
     if (is_series_2) {
       cflags += [ "-mcmse" ]

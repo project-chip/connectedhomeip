@@ -53,6 +53,11 @@ config("qpg_freertos_config") {
   ]
 }
 
+config("qpg_freertos_no_conversion_config") {
+  # The FreeRTOS port.c file does not compile with -Wconversion.
+  cflags = [ "-Wno-conversion" ]
+}
+
 freertos_target("freertos") {
   sources = [
     "${freertos_root}/repo/portable/GCC/ARM_CM3/port.c",
@@ -60,6 +65,8 @@ freertos_target("freertos") {
   ]
 
   public_configs = [ ":qpg_freertos_config" ]
+
+  public_configs += [ ":qpg_freertos_no_conversion_config" ]
 }
 
 template("qpg_make_build") {

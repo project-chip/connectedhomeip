@@ -21,6 +21,10 @@ config("libopenthread-platform_config") {
   include_dirs = [ "${openthread_root}/examples/platforms" ]
 }
 
+config("libopenthread-platform_no_conversion_config") {
+  cflags = [ "-Wno-conversion" ]
+}
+
 copy("copy_openthread_system") {
   sources = [ "${openthread_root}/examples/platforms/openthread-system.h" ]
 
@@ -67,4 +71,6 @@ static_library("libopenthread-platform-utils") {
   }
 
   public_configs = [ ":libopenthread-platform_config" ]
+
+  configs += [ ":libopenthread-platform_no_conversion_config" ]
 }
