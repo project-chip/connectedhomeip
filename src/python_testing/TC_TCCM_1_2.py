@@ -42,6 +42,7 @@ from modebase_cluster_check import ModeBaseClusterChecks
 
 CLUSTER = Clusters.RefrigeratorAndTemperatureControlledCabinetMode
 
+
 class TC_TCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
 
     def __init__(self, *args):
