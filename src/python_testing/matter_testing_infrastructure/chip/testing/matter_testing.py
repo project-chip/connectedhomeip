@@ -1698,6 +1698,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         new_controller = current_fabric_admin.NewController(nodeId=nodeid)
         return new_controller
 
+
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
     test_run_config = TestRunConfig()
     # We use a default name. We don't use Mobly YAML configs, so that we can be
@@ -1953,6 +1954,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
         config.case_admin_subject = args.case_admin_subject
 
     return True
+
 
 def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config = MatterTestConfig()
