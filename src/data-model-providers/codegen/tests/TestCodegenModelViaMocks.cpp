@@ -1301,7 +1301,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
     ASSERT_TRUE(cmds.GetSpanValidForLifetime().data_equal(Span<const CommandId>(expectedCommands3)));
 }
 
-TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
+TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
 {
 
     UseMockNodeConfig config(gTestNodeConfig);

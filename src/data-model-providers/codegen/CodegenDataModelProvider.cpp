@@ -39,7 +39,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SpanSearchValue.h>
 
-#include <memory>
 #include <optional>
 #include <variant>
 
@@ -73,6 +72,163 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
     entry.flags.Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId));
 
     return entry;
+}
+
+/// Fills `result` with accepted command data. In case of failures,
+/// returns the first failure (and stops filling the result, which may
+/// be partial)
+CHIP_ERROR FetchAcceptedCommands(const ConcreteClusterPath & path, const EmberAfCluster * serverCluster,
+                                 DataModel::MetadataList<DataModel::AcceptedCommandEntry> & result)
+{
+
+    CommandHandlerInterface * interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+    if (interface != nullptr)
+    {
+        size_t commandCount = 0;
+
+        CHIP_ERROR err = interface->EnumerateAcceptedCommands(
+            path,
+            [](CommandId id, void * context) -> Loop {
+                *reinterpret_cast<size_t *>(context) += 1;
+                return Loop::Continue;
+            },
+            reinterpret_cast<void *>(&commandCount));
+
+        if (err == CHIP_NO_ERROR)
+        {
+            typedef struct
+            {
+                ConcreteCommandPath commandPath;
+                DataModel::MetadataList<DataModel::AcceptedCommandEntry> acceptedCommandList;
+                CHIP_ERROR processingError;
+            } EnumerationData;
+
+            EnumerationData enumerationData;
+            enumerationData.commandPath     = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
+            enumerationData.processingError = CHIP_NO_ERROR;
+
+            ReturnErrorOnFailure(enumerationData.acceptedCommandList.reserve(commandCount));
+
+            ReturnErrorOnFailure(interface->EnumerateAcceptedCommands(
+                path,
+                [](CommandId commandId, void * context) -> Loop {
+                    auto input                    = reinterpret_cast<EnumerationData *>(context);
+                    input->commandPath.mCommandId = commandId;
+                    CHIP_ERROR appendError        = input->acceptedCommandList.Append(AcceptedCommandEntryFor(input->commandPath));
+                    if (appendError != CHIP_NO_ERROR)
+                    {
+                        input->processingError = appendError;
+                        return Loop::Break;
+                    }
+                    return Loop::Continue;
+                },
+                reinterpret_cast<void *>(&enumerationData)));
+            ReturnErrorOnFailure(enumerationData.processingError);
+
+            // the two invocations MUST return the same sizes.
+            VerifyOrReturnError(enumerationData.acceptedCommandList.size() == commandCount, CHIP_ERROR_INTERNAL);
+
+            result = std::move(enumerationData.acceptedCommandList);
+            return CHIP_NO_ERROR;
+        }
+        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
+    }
+
+    if ((serverCluster == nullptr) || (serverCluster->acceptedCommandList == nullptr))
+    {
+        // No data if cluster is not valid.
+        return CHIP_NO_ERROR;
+    }
+    const chip::CommandId * endOfList = serverCluster->acceptedCommandList;
+    while (*endOfList != kInvalidCommandId)
+    {
+        endOfList++;
+    }
+    const size_t commandCount = static_cast<size_t>(endOfList - serverCluster->acceptedCommandList);
+
+    ReturnErrorOnFailure(result.reserve(commandCount));
+
+    ConcreteCommandPath commandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
+    for (const chip::CommandId * p = serverCluster->acceptedCommandList; p != endOfList; p++)
+    {
+        commandPath.mCommandId = *p;
+        ReturnErrorOnFailure(result.Append(AcceptedCommandEntryFor(commandPath)));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+/// Fills `result` with generated command data. In case of failures,
+/// returns the first failure (and stops filling the result, which may
+/// be partial)
+CHIP_ERROR FetchGeneratedCommands(const ConcreteClusterPath & path, const EmberAfCluster * serverCluster,
+                                  DataModel::MetadataList<CommandId> & result)
+{
+    CommandHandlerInterface * interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+    if (interface != nullptr)
+    {
+        size_t commandCount = 0;
+
+        CHIP_ERROR err = interface->EnumerateGeneratedCommands(
+            path,
+            [](CommandId id, void * context) -> Loop {
+                *reinterpret_cast<size_t *>(context) += 1;
+                return Loop::Continue;
+            },
+            reinterpret_cast<void *>(&commandCount));
+
+        if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(result.reserve(commandCount));
+
+            typedef struct
+            {
+                DataModel::MetadataList<CommandId> generatedCommandList;
+                CHIP_ERROR processingError;
+            } EnumerationData;
+            EnumerationData enumerationData;
+            enumerationData.processingError = CHIP_NO_ERROR;
+
+            ReturnErrorOnFailure(interface->EnumerateGeneratedCommands(
+                path,
+                [](CommandId id, void * context) -> Loop {
+                    auto input = reinterpret_cast<EnumerationData *>(context);
+
+                    CHIP_ERROR appendError = input->generatedCommandList.Append(id);
+                    if (appendError != CHIP_NO_ERROR)
+                    {
+                        input->processingError = appendError;
+                        return Loop::Break;
+                    }
+                    return Loop::Continue;
+                },
+                reinterpret_cast<void *>(&result)));
+            ReturnErrorOnFailure(enumerationData.processingError);
+
+            // the two invocations MUST return the same sizes.
+            VerifyOrReturnError(enumerationData.generatedCommandList.size() == commandCount, CHIP_ERROR_INTERNAL);
+
+            result = std::move(enumerationData.generatedCommandList);
+            return CHIP_NO_ERROR;
+        }
+        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
+    }
+
+    if ((serverCluster == nullptr) || (serverCluster->generatedCommandList == nullptr))
+    {
+        return {};
+    }
+    const chip::CommandId * endOfList = serverCluster->generatedCommandList;
+    while (*endOfList != kInvalidCommandId)
+    {
+        endOfList++;
+    }
+    const size_t commandCount = static_cast<size_t>(endOfList - serverCluster->generatedCommandList);
+    result = DataModel::MetadataList<CommandId>::FromConstSpan({ serverCluster->generatedCommandList, commandCount });
+
+    return CHIP_NO_ERROR;
 }
 
 /// Load the cluster information into the specified destination
@@ -708,203 +864,34 @@ std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeIn
 DataModel::MetadataList<DataModel::AcceptedCommandEntry>
 CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path)
 {
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-    if (interface != nullptr)
-    {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateAcceptedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            typedef struct
-            {
-                ConcreteCommandPath commandPath;
-                DataModel::MetadataList<DataModel::AcceptedCommandEntry> acceptedCommandList;
-            } EnumerationData;
-
-            EnumerationData enumerationData;
-            enumerationData.commandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
-
-            err = enumerationData.acceptedCommandList.reserve(commandCount);
-            if (err != CHIP_NO_ERROR)
-            {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-                ChipLogError(DataManagement, "Failed to reserve space for %u generated commands: %" CHIP_ERROR_FORMAT,
-                             (unsigned) commandCount, err.Format());
-#endif
-                return {};
-            }
-
-            err = interface->EnumerateAcceptedCommands(
-                path,
-                [](CommandId commandId, void * context) -> Loop {
-                    auto input                    = reinterpret_cast<EnumerationData *>(context);
-                    input->commandPath.mCommandId = commandId;
-                    CHIP_ERROR appendError        = input->acceptedCommandList.Append(AcceptedCommandEntryFor(input->commandPath));
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-                        ChipLogError(DataManagement, "Failed to append generated command: %" CHIP_ERROR_FORMAT,
-                                     appendError.Format());
-#endif
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&enumerationData));
-
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(DataManagement, "Failed to run generated command appending: %" CHIP_ERROR_FORMAT, err.Format());
-            }
-            if (enumerationData.acceptedCommandList.size() != commandCount)
-            {
-                ChipLogError(DataManagement, "Unexpected (likely short) number of generated commands fetched");
-            }
-#endif
-            return std::move(enumerationData.acceptedCommandList);
-        }
-
-        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(DataManagement, "Failed to enumerate generated commands: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-            return {};
-        }
-    }
-
-    const EmberAfCluster * cluster = FindServerCluster(path);
-    if ((cluster == nullptr) || (cluster->acceptedCommandList == nullptr))
-    {
-        return {};
-    }
-    const chip::CommandId * endOfList = cluster->acceptedCommandList;
-    while (*endOfList != kInvalidCommandId)
-    {
-        endOfList++;
-    }
-    const size_t commandCount = static_cast<size_t>(endOfList - cluster->acceptedCommandList);
-
     DataModel::MetadataList<DataModel::AcceptedCommandEntry> result;
-    CHIP_ERROR err = result.reserve(commandCount);
 
+    CHIP_ERROR err = FetchAcceptedCommands(path, FindServerCluster(path), result);
+
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
     if (err != CHIP_NO_ERROR)
     {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(DataManagement, "Failed to reserve space for %u accepted commands: %" CHIP_ERROR_FORMAT,
-                     (unsigned) commandCount, err.Format());
-#endif
-        return {};
+        ChipLogError(DataManagement, "Failed to fetch accepted commands: %" CHIP_ERROR_FORMAT, err.Format());
     }
-
-    ConcreteCommandPath commandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
-
-    for (const chip::CommandId * p = cluster->acceptedCommandList; p != endOfList; p++)
-    {
-        commandPath.mCommandId = *p;
-
-        err = result.Append(AcceptedCommandEntryFor(commandPath));
-        if (err != CHIP_NO_ERROR)
-        {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(DataManagement, "Failed to append accepted command value: %" CHIP_ERROR_FORMAT, err.Format());
 #endif
-            break;
-        }
-    }
 
     return result;
 }
 
 DataModel::MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path)
 {
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-    if (interface != nullptr)
+    DataModel::MetadataList<CommandId> result;
+
+    CHIP_ERROR err = FetchGeneratedCommands(path, FindServerCluster(path), result);
+
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+    if (err != CHIP_NO_ERROR)
     {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateGeneratedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            DataModel::MetadataList<CommandId> result;
-            err = result.reserve(commandCount);
-            if (err != CHIP_NO_ERROR)
-            {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-                ChipLogError(DataManagement, "Failed to reserve space for %u generated commands: %" CHIP_ERROR_FORMAT,
-                             (unsigned) commandCount, err.Format());
-#endif
-                return {};
-            }
-
-            err = interface->EnumerateGeneratedCommands(
-                path,
-                [](CommandId id, void * context) -> Loop {
-                    CHIP_ERROR appendError = reinterpret_cast<DataModel::MetadataList<CommandId> *>(context)->Append(id);
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-                        ChipLogError(DataManagement, "Failed to append generated command: %" CHIP_ERROR_FORMAT,
-                                     appendError.Format());
-#endif
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&result));
-
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(DataManagement, "Failed to run generated command appending: %" CHIP_ERROR_FORMAT, err.Format());
-            }
-            if (result.size() != commandCount)
-            {
-                ChipLogError(DataManagement, "Unexpected (likely short) number of generated commands fetched");
-            }
-#endif
-            return result;
-        }
-
-        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(DataManagement, "Failed to enumerate generated commands: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-            return {};
-        }
+        ChipLogError(DataManagement, "Failed to fetch generated commands: %" CHIP_ERROR_FORMAT, err.Format());
     }
+#endif
 
-    const EmberAfCluster * cluster = FindServerCluster(path);
-    if ((cluster == nullptr) || (cluster->generatedCommandList == nullptr))
-    {
-        return {};
-    }
-    const chip::CommandId * endOfList = cluster->generatedCommandList;
-    while (*endOfList != kInvalidCommandId)
-    {
-        endOfList++;
-    }
-    const size_t commandCount = static_cast<size_t>(endOfList - cluster->generatedCommandList);
-    return DataModel::MetadataList<CommandId>::FromConstSpan({ cluster->generatedCommandList, commandCount });
+    return result;
 }
 
 void CodegenDataModelProvider::InitDataModelForTesting()
