@@ -20,78 +20,103 @@
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/Provider.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/LinkedList.h>
 
 namespace chip {
 namespace app {
 
-/**
- * AttributePathExpandIterator is used to iterate over a linked list of AttributePathParams-s.
- * The AttributePathExpandIterator is copiable, however, the given cluster info must be valid when calling Next().
- *
- * AttributePathExpandIterator will expand attribute paths with wildcards, and only emit existing paths for
- * AttributePathParams with wildcards. For AttributePathParams with a concrete path (i.e. does not contain wildcards),
- * AttributePathExpandIterator will emit them as-is.
- *
- * The typical use of AttributePathExpandIterator may look like:
- * ConcreteAttributePath path;
- * for (AttributePathExpandIterator iterator(AttributePathParams); iterator.Get(path); iterator.Next()) {...}
- *
- * The iterator does not copy the given AttributePathParams. The given AttributePathParams must remain valid when using the
- * iterator. If the set of endpoints, clusters, or attributes that are supported changes, AttributePathExpandIterator must be
- * reinitialized.
- *
- * A initialized iterator will return the first valid path, no need to call Next() before calling Get() for the first time.
- *
- * Note: Next() and Get() are two separate operations by design since a possible call of this iterator might be:
- * - Get()
- * - Chunk full, return
- * - In a new chunk, Get()
- *
- * TODO: The AttributePathParams may support a group id, the iterator should be able to call group data provider to expand the group
- * id.
- */
+/// Handles attribute path expansions
+/// Usage:
+///
+/// - Start iterating by creating an iteration state
+///
+///      mState =  AttributePathExpandIterator::State::StartIterating(path);
+///
+/// - Use the iteration state in a for loop:
+///
+///      ConcreteAttributePath path;
+///      for (AttributePathExpandIterator iterator(mState); iterator->Next(path);) {
+///         // use `path` here`
+///      }
+///
+///   OR:
+///
+///      ConcreteAttributePath path;
+///      AttributePathExpandIterator iterator(mState);
+///
+///      while (iterator.Next(path)) {
+///         // use `path` here`
+///      }
+///
+/// USAGE requirements and assumptions:
+///
+///    - There should be only one single AttributePathExpandIterator for a state  at a time.
+///
+///    - `State` is automatically updated by the AttributePathExpandIterator, so
+///      calling `Next` on the iterator will update the state variable.
+///
+///
 class AttributePathExpandIterator
 {
 public:
-    AttributePathExpandIterator(DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath);
-
-    /**
-     * Proceed the iterator to the next attribute path in the given cluster info.
-     *
-     * Returns false if AttributePathExpandIteratorDataModeDataModel has exhausted all paths in the given AttributePathParams list.
-     */
-    bool Next();
-
-    /**
-     * Fills the aPath with the path the iterator currently points to.
-     * Returns false if the iterator is not pointing to a valid path (i.e. it has exhausted the cluster info).
-     */
-    bool Get(ConcreteAttributePath & aPath)
+    class State
     {
-        aPath = mOutputPath;
-        return (mpAttributePath != nullptr);
-    }
+    public:
+        // State is treated as a direct member access by the AttributePathExpandIterator, however it is opaque (except copying) for
+        // external code. We allow friendship here to not have specific get/set for methods (clearer interface and less likelyhood
+        // of extra code usage).
+        friend class AttributePathExpandIterator;
 
-    /**
-     * Reset the iterator to the beginning of current cluster if we are in the middle of expanding a wildcard attribute id for some
-     * cluster.
-     *
-     * When attributes are changed in the middle of expanding a wildcard attribute, we need to reset the iterator, to provide the
-     * client with a consistent state of the cluster.
-     */
-    void ResetCurrentCluster();
+        /// External callers can only ever start iterating on a new path from the beginning
+        static State StartIterating(SingleLinkedListNode<AttributePathParams> * path) { return State(path); }
 
-    /** Start iterating over the given `paths` */
-    inline void ResetTo(SingleLinkedListNode<AttributePathParams> * paths)
-    {
-        *this = AttributePathExpandIterator(mDataModelProvider, paths);
-    }
+        /// Copies are allowed
+        State(const State &)             = default;
+        State & operator=(const State &) = default;
+
+        State() : mAttributePath(nullptr) {}
+
+        /// Reset the iterator to the beginning of current cluster if we are in the middle of expanding a wildcard attribute id for
+        /// some cluster.
+        ///
+        /// When attributes are changed in the middle of expanding a wildcard attribute, we need to reset the iterator, to provide
+        /// the client with a consistent state of the cluster.
+        void IterateFromTheStartOfTheCurrentCluster()
+        {
+            VerifyOrReturn(mAttributePath != nullptr && mAttributePath->mValue.HasWildcardAttributeId());
+            mLastOutputPath.mAttributeId = kInvalidAttributeId;
+            mLastOutputPath.mExpanded    = true;
+        }
+
+    protected:
+        State(SingleLinkedListNode<AttributePathParams> * path) :
+            mAttributePath(path), mLastOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
+        {
+            mLastOutputPath.mExpanded = true;
+        }
+
+        SingleLinkedListNode<AttributePathParams> * mAttributePath;
+        ConcreteAttributePath mLastOutputPath;
+    };
+
+    AttributePathExpandIterator(DataModel::Provider * dataModel, State & state) : mDataModelProvider(dataModel), mState(state) {}
+
+    // this class may not be copied. A new one should be created when needed and they
+    // should not overlap
+    AttributePathExpandIterator(const AttributePathExpandIterator &)             = delete;
+    AttributePathExpandIterator & operator=(const AttributePathExpandIterator &) = delete;
+
+    /// Get the next path of the expansion (if one exists).
+    ///
+    /// On success, true is returned and `path` is filled with the next path in the
+    /// expansion.
+    /// On iteration completion, false is returned and the content of path IS NOT DEFINED.
+    bool Next(ConcreteAttributePath & path);
 
 private:
     DataModel::Provider * mDataModelProvider;
-    SingleLinkedListNode<AttributePathParams> * mpAttributePath;
-    ConcreteAttributePath mOutputPath;
+    State & mState;
 
     /// Move to the next endpoint/cluster/attribute triplet that is valid given
     /// the current mOutputPath and mpAttributePath
@@ -123,6 +148,58 @@ private:
     ///
     /// Meaning that it is known to the data model OR it is a always-there global attribute.
     bool IsValidAttributeId(AttributeId attributeId);
+};
+
+/// Wraps around an AttributePathExpandIterator however it rolls back Next() to one
+/// step back whenever Next() is not run to completion (until it returns false)
+///
+/// Example use cases:
+///
+/// - Iterate over all attributes and process one-by-one, however when the iteration fails, resume at
+///   the last failure point:
+///
+///      PeekAttributePathExpandIterator iterator(....);
+///      ConcreteAttributePath path;
+///
+///      while (iterator.Next(path)) {
+///         if (!CanProcess(path)) {
+///             // iterator state IS PRESERVED so that Next() will return the SAME path on the next call.
+///             return CHIP_ERROR_TRY_AGAIN_LATER;
+///         }
+///      }
+///      // this will make Next() NOT return the previous value.
+///      iterator.MarkCompleted();
+///
+/// -  Grab what the next output path would be WITHOUT advancing a state;
+///
+///      {
+///        PeekAttributePathExpandIterator iterator(...., state);
+///        if (iterator.Next(...)) { ... }
+///      }
+///      // state here is ROLLED BACK (i.e. next calls the same value)
+///
+///
+class PeekAttributePathExpandIterator
+{
+public:
+    PeekAttributePathExpandIterator(DataModel::Provider * dataModel, AttributePathExpandIterator::State & state) :
+        mAttributePathExpandIterator(dataModel, state), mStateTarget(state), mOldState(state)
+    {}
+    ~PeekAttributePathExpandIterator() { mStateTarget = mOldState; }
+
+    bool Next(ConcreteAttributePath & path)
+    {
+        mOldState = mStateTarget;
+        return mAttributePathExpandIterator.Next(path);
+    }
+
+    /// Marks the current iteration completed (so peek does not actually roll back)
+    void MarkCompleted() { mOldState = mStateTarget; }
+
+private:
+    AttributePathExpandIterator mAttributePathExpandIterator;
+    AttributePathExpandIterator::State & mStateTarget;
+    AttributePathExpandIterator::State mOldState;
 };
 
 } // namespace app
