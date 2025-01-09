@@ -18,8 +18,8 @@
 #pragma once
 
 #include <algorithm>
-#include <type_traits>
 #include <stddef.h>
+#include <type_traits>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
@@ -29,8 +29,9 @@
 namespace chip {
 
 template <typename T>
-class MetadataList {
-  public:
+class MetadataList
+{
+public:
     using SpanType = Span<const T>;
 
     MetadataList() {}
@@ -46,13 +47,13 @@ class MetadataList {
             this->mBackingStorage.Free();
 
             this->mBackingStorage = std::move(other.mBackingStorage);
-            this->mSize = other.mSize;
-            this->mIsImmutable = other.mIsImmutable;
-            this->mSpan = other.mSpan;
+            this->mSize           = other.mSize;
+            this->mIsImmutable    = other.mIsImmutable;
+            this->mSpan           = other.mSpan;
 
             other.mIsImmutable = true;
-            other.mSize = 0;
-            other.mSpan = Span<T>{};
+            other.mSize        = 0;
+            other.mSpan        = Span<T>{};
         }
         return *this;
     }
@@ -63,7 +64,7 @@ class MetadataList {
 
         if (this->mBackingStorage)
         {
-            return Span<const T>{mBackingStorage.Get(), mSize}[index];
+            return Span<const T>{ mBackingStorage.Get(), mSize }[index];
         }
         else
         {
@@ -72,7 +73,8 @@ class MetadataList {
     }
 
     template <size_t N>
-    static MetadataList FromArray(const std::array<T, N> & arr) {
+    static MetadataList FromArray(const std::array<T, N> & arr)
+    {
         MetadataList<T> list;
 
         if (list.reserve(N) != CHIP_NO_ERROR)
@@ -81,7 +83,7 @@ class MetadataList {
             return list;
         }
 
-        for (const auto & item: arr)
+        for (const auto & item : arr)
         {
             if (list.Append(item) != CHIP_NO_ERROR)
             {
@@ -95,25 +97,28 @@ class MetadataList {
     }
 
     template <size_t N>
-    static MetadataList FromConstArray(const std::array<const T, N> & arr) {
+    static MetadataList FromConstArray(const std::array<const T, N> & arr)
+    {
         MetadataList<T> list;
-        list.mSpan = Span<const T>{arr.data(), arr.size()};
-        list.mSize = arr.size();
+        list.mSpan        = Span<const T>{ arr.data(), arr.size() };
+        list.mSize        = arr.size();
         list.mIsImmutable = true;
 
         return list;
     }
 
-    static MetadataList FromConstSpan(const Span<const T> & span) {
+    static MetadataList FromConstSpan(const Span<const T> & span)
+    {
         MetadataList<T> list;
-        list.mSpan = span;
-        list.mSize = span.size();
+        list.mSpan        = span;
+        list.mSize        = span.size();
         list.mIsImmutable = true;
 
         return list;
     }
 
-    CHIP_ERROR reserve(size_t numElements) {
+    CHIP_ERROR reserve(size_t numElements)
+    {
         VerifyOrReturnError(!mIsImmutable, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mSize == 0, CHIP_ERROR_INCORRECT_STATE);
         if (!mBackingStorage.Calloc(numElements))
@@ -124,31 +129,25 @@ class MetadataList {
         return CHIP_NO_ERROR;
     }
 
-    size_t size() const {
-        return mSize;
-    }
+    size_t size() const { return mSize; }
 
-    bool empty() const
-    {
-        return size() == 0u;
-    }
+    bool empty() const { return size() == 0u; }
 
-    size_t capacity() const {
-        return std::max(mSize, mBackingStorage.AllocatedSize());
-    }
+    size_t capacity() const { return std::max(mSize, mBackingStorage.AllocatedSize()); }
 
     void Invalidate()
     {
         mBackingStorage.Free();
-        mSize = 0;
+        mSize        = 0;
         mIsImmutable = true;
     }
 
-    Span<const T> GetSpanValidForLifetime() const {
+    Span<const T> GetSpanValidForLifetime() const
+    {
         static_assert(std::is_same<SpanType, Span<const T>>::value, "SpanType must remain Span<const T>");
         if (mBackingStorage)
         {
-            mSpan = Span<const T>{mBackingStorage.Get(), mSize};
+            mSpan = Span<const T>{ mBackingStorage.Get(), mSize };
         }
 
         mIsImmutable = true;
@@ -164,7 +163,7 @@ class MetadataList {
         return CHIP_NO_ERROR;
     }
 
-  protected:
+protected:
     chip::Platform::ScopedMemoryBufferWithSize<T> mBackingStorage;
     mutable Span<const T> mSpan;
     size_t mSize = 0;

@@ -100,8 +100,8 @@ public:
                                                         CommandHandler * handler) override;
 
     /// attribute tree iteration
-    MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath &path) override;
-    MetadataList<DataModel::AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath &path) override;
+    MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path) override;
+    MetadataList<DataModel::AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) override;
 
     DataModel::EndpointEntry FirstEndpoint() override;
     DataModel::EndpointEntry NextEndpoint(EndpointId before) override;

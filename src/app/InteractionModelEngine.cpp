@@ -1728,7 +1728,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
     return CheckCommandFlags(request, acceptedCommandEntry);
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry &entry)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest,
+                                                                               const DataModel::AcceptedCommandEntry & entry)
 {
     if (aRequest.subjectDescriptor == nullptr)
     {
@@ -1753,7 +1754,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry &entry)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest,
+                                                                              const DataModel::AcceptedCommandEntry & entry)
 {
     const bool commandNeedsTimedInvoke = entry.flags.Has(DataModel::CommandQualityFlags::kTimed);
     const bool commandIsFabricScoped   = entry.flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
@@ -1779,7 +1781,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistence(const ConcreteCommandPath & aCommandPath, DataModel::AcceptedCommandEntry &entry)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistence(const ConcreteCommandPath & aCommandPath,
+                                                                                  DataModel::AcceptedCommandEntry & entry)
 {
     auto provider = GetDataModelProvider();
 

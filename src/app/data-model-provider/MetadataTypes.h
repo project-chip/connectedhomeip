@@ -132,7 +132,8 @@ enum class CommandQualityFlags : uint32_t
     kLargeMessage = 0x0004, // `L` quality on commands
 };
 
-struct AcceptedCommandEntry {
+struct AcceptedCommandEntry
+{
     CommandId commandId;
 
     // TODO: this can be more compact (use some flags for privilege)
@@ -209,9 +210,8 @@ public:
     /// List items. TODO: convert ALL items above to the new format
 
     /// List all the generated commands for the given path
-    virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath &path) = 0;
-    virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath &path) = 0;
-
+    virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
+    virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
 
     /// Workaround function to report attribute change.
     ///
