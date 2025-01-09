@@ -118,7 +118,6 @@ class TC_EPREF_2_1(MatterBaseTest):
                 logging.info(f"Step: {balance_struct.step}")
                 if hasattr(balance_struct, 'label') and balance_struct.label is not None:
                     logging.info(f"Label: {balance_struct.label}")
-                logging.info(f"}}")
 
             #Verify the DUT response contains a list of BalanceStruct Type
             asserts.assert_true(isinstance(energy_balances, list), "EnergyBalances should be a list of BalanceStructs")
@@ -196,7 +195,7 @@ class TC_EPREF_2_1(MatterBaseTest):
             asserts.assert_equal(status, Status.ConstraintError, "CurrentEnergyBalance write failed")
             # Logging the CurrentEnergyBalance Attribute write responses from the DUT:
             if status == Status.ConstraintError:
-                logging.info(f"CurrentEnergyBalance Attribute Write Response - Status: 0x87 (CONSTRAINT_ERROR)")
+                logging.info("CurrentEnergyBalance Attribute Write Response - Status: 0x87 (CONSTRAINT_ERROR)")
 
         else:
             logging.info("Test step skipped")
@@ -249,8 +248,6 @@ class TC_EPREF_2_1(MatterBaseTest):
                 logging.info(f"  Step: {balance_struct.step}")
                 if hasattr(balance_struct, 'label') and balance_struct.label is not None:
                     logging.info(f"  Label: {balance_struct.label}")
-                logging.info(f"}}")
-            logging.info("")
 
             # Verify the DUT response contains a list of BalanceStruct Type
             asserts.assert_true(
@@ -325,7 +322,7 @@ class TC_EPREF_2_1(MatterBaseTest):
             asserts.assert_equal(status, Status.ConstraintError, "CurrentLowPowerModeSensitivity write failed")
             # Logging the CurrentLowPowerModeSensitivity Attribute write responses from the DUT:
             if status == Status.ConstraintError:
-                logging.info(f"CurrentLowPowerModeSensitivity Attribute Write Response - Status: 0x87 (CONSTRAINT_ERROR)")
+                logging.info("CurrentLowPowerModeSensitivity Attribute Write Response - Status: 0x87 (CONSTRAINT_ERROR)")
 
         else:
             logging.info("Test step skipped")
