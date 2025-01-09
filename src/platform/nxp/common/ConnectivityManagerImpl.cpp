@@ -483,7 +483,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
 
         ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
     }
-
 }
 
 void ConnectivityManagerImpl::_NetifExtCallback(struct netif * netif, netif_nsc_reason_t reason,
