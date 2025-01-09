@@ -1057,9 +1057,9 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
             (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
             //
-            // Select the active session with the most recent activity to return back to the caller.
+            // Select the active session with the most recent activity of peer to return back to the caller.
             //
-            if ((found == nullptr) || (found->GetLastActivityTime() < session->GetLastActivityTime()))
+            if ((found == nullptr) || (found->GetLastPeerActivityTime() < session->GetLastPeerActivityTime()))
             {
                 found = session;
             }
