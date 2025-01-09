@@ -148,6 +148,15 @@ struct CommandEntry
     static const CommandEntry kInvalid;
 };
 
+struct AcceptedCommandEntry {
+    CommandId commandId;
+
+    // TODO: this can be more compact (use some flags for privilege)
+    //       to make this compact, add a compact enum and make flags/invokePrivilege getters (to still be type safe)
+    BitFlags<CommandQualityFlags> flags;
+    Access::Privilege invokePrivilege = Access::Privilege::kOperate;
+};
+
 /// Represents a device type that resides on an endpoint
 struct DeviceTypeEntry
 {
@@ -222,6 +231,7 @@ public:
 
     /// List all the generated commands for the given path
     virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath &path) = 0;
+    virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath &path) = 0;
 
 
     /// Workaround function to report attribute change.

@@ -569,6 +569,11 @@ std::optional<CommandInfo> CustomDataModel::GetAcceptedCommandInfo(const Concret
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAcceptedCommandInfo(path);
 }
 
+MetadataList<DataModel::AcceptedCommandEntry> CustomDataModel::AcceptedCommands(const ConcreteClusterPath & path)
+{
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->AcceptedCommands(path);
+}
+
 MetadataList<CommandId> CustomDataModel::GeneratedCommands(const ConcreteClusterPath & path)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GeneratedCommands(path);
