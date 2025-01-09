@@ -20,7 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 
 declare_args() {
   # Build argument to enable Silabs specific unit tests
-  sl_build_unit_tests = true
+  sl_build_unit_tests = chip_build_tests
 }
 
 chip_test_group("silabs_example_platform_tests") {
