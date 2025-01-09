@@ -1,0 +1,293 @@
+From ec39cda40e839ced936fa4ca7a2796a7df4824e3 Mon Sep 17 00:00:00 2001
+From: tyrone_shen <tyrone_shen@realsil.com.cn>
+Date: Thu, 9 Jan 2025 14:58:34 +0800
+Subject: [PATCH] [Realtek] Modify README.md
+
+---
+ .../light-switch-app/realtek_bee/README.md    | 15 ++++
+ examples/lighting-app/realtek_bee/README.md   | 15 ++++
+ examples/lock-app/realtek_bee/README.md       | 15 ++++
+ .../ota-requestor-app/realtek_bee/README.md   | 15 ++++
+ examples/pigweed-app/realtek_bee/README.md    | 84 ++----------------
+ examples/window-app/realtek_bee/README.md     | 86 ++-----------------
+ 6 files changed, 76 insertions(+), 154 deletions(-)
+ create mode 100644 examples/ota-requestor-app/realtek_bee/README.md
+
+diff --git a/examples/light-switch-app/realtek_bee/README.md b/examples/light-switch-app/realtek_bee/README.md
+index e69de29bb2..315291beae 100644
+--- a/examples/light-switch-app/realtek_bee/README.md
++++ b/examples/light-switch-app/realtek_bee/README.md
+@@ -0,0 +1,15 @@
++---
++orphan: true
++---
++
++# Matter BEE4 SDK
++
++## Realtek SDK
++
++More detailed information on the Bee4 SDK can be found in the
++[Realtek Matter SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk).
++
++## More information
++
++For more information on our product line and support options, please visit
++[www.realmcu.com](https://www.realmcu.com/)
+diff --git a/examples/lighting-app/realtek_bee/README.md b/examples/lighting-app/realtek_bee/README.md
+index e69de29bb2..73b83448e6 100644
+--- a/examples/lighting-app/realtek_bee/README.md
++++ b/examples/lighting-app/realtek_bee/README.md
+@@ -0,0 +1,15 @@
++---
++orphan: true
++---
++
++# Matter BEE4 SDK
++
++## Realtek SDK
++
++More detailed information on the Bee4 SDK can be found in the
++[Bee4 Matter SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk).
++
++## More information
++
++For more information on our product line and support options, please visit
++[www.realmcu.com](https://www.realmcu.com/)
+diff --git a/examples/lock-app/realtek_bee/README.md b/examples/lock-app/realtek_bee/README.md
+index e69de29bb2..315291beae 100644
+--- a/examples/lock-app/realtek_bee/README.md
++++ b/examples/lock-app/realtek_bee/README.md
+@@ -0,0 +1,15 @@
++---
++orphan: true
++---
++
++# Matter BEE4 SDK
++
++## Realtek SDK
++
++More detailed information on the Bee4 SDK can be found in the
++[Realtek Matter SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk).
++
++## More information
++
++For more information on our product line and support options, please visit
++[www.realmcu.com](https://www.realmcu.com/)
+diff --git a/examples/ota-requestor-app/realtek_bee/README.md b/examples/ota-requestor-app/realtek_bee/README.md
+new file mode 100644
+index 0000000000..315291beae
+--- /dev/null
++++ b/examples/ota-requestor-app/realtek_bee/README.md
+@@ -0,0 +1,15 @@
++---
++orphan: true
++---
++
++# Matter BEE4 SDK
++
++## Realtek SDK
++
++More detailed information on the Bee4 SDK can be found in the
++[Realtek Matter SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk).
++
++## More information
++
++For more information on our product line and support options, please visit
++[www.realmcu.com](https://www.realmcu.com/)
+diff --git a/examples/pigweed-app/realtek_bee/README.md b/examples/pigweed-app/realtek_bee/README.md
+index 7de1f40803..315291beae 100644
+--- a/examples/pigweed-app/realtek_bee/README.md
++++ b/examples/pigweed-app/realtek_bee/README.md
+@@ -1,83 +1,15 @@
+-# CHIP Realtek Pigweed Example Application
+-
+-This example demonstrates the usage of Pigweed module functionalities in an
+-application.
+-
+-The example is based on [CHIP](https://github.com/project-chip/connectedhomeip),
+-the [Pigweed](https://pigweed.googlesource.com/pigweed/pigweed) module, which is
+-a collection of libraries that provide different functionalities for embedded
+-systems, and the Realtek platform.
+-
+-You can use this example as a training ground for making experiments, testing
+-Pigweed module features and checking what actions are necessary to fully
+-integrate Pigweed in a CHIP project.
+-
+-Pigweed functionalities are being gradually integrated into CHIP. Currently, the
+-following features are available:
+-
+--   **Echo RPC** - Creates a Remote Procedure Call server and allows sending
+-    commands through the serial port to the device, which makes echo and sends
+-    the received commands back.
+-
+ ---
+-
+--   [CHIP Realtek Pigweed Example Application](#chip-realtek-pigweed-example-application)
+-    -   [Building the Example Application](#building-the-example-application)
+-    -   [Testing the Example Application](#testing-the-example-application)
+-
++orphan: true
+ ---
+ 
+-## Building the Example Application
+-
+--   Pull docker image:
+-
+-          $ docker pull ghcr.io/project-chip/chip-build-realtek:22
+-
+--   Run docker container:
+-
+-          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-realtek:22
+-
+--   Setup build environment:
+-
+-          $ source ./scripts/bootstrap.sh
+-
+--   To build the demo application:
+-
+-          $ ./scripts/build/build_examples.py --target realtek-bee-pigweed build
+-
+-    The output image files are stored in `out/realtek-bee-pigweed/asdk/image`
+-    folder.
+-
+-    The bootloader image files are stored in
+-    `out/realtek-bee-pigweed/asdk/bootloader` folder.
+-
+--   After building the application, **Realtek Image Tool** is used to flash it
+-    to Realtek board.
+-
+-1. Connect your device via USB and open Realtek Image Tool.
+-2. Select correct serial port and set baudrate as **115200**.
+-3. Browse and add the corresponding image files in the Flash Download list to
+-   the correct locations
+-4. Click **Download** button.
+-
+-## Testing the Example Application
+-
+-Connect a USB-TTL Adapter as shown below
+-
+-          Realtek       USB-TTL
+-          A19           TX
+-          A18           RX
+-          GND           GND
+-
+-Build the
+-[chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
++# Matter BEE4 SDK
+ 
+-Reset Realtek board, then launch the chip-rpc console, where the Echo RPC
+-commands can be invoked
++## Realtek SDK
+ 
+-        python -m pw_hdlc.rpc_console --device /dev/tty<USB-TTL port> -b 115200
++More detailed information on the Bee4 SDK can be found in the
++[Realtek Matter SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk).
+ 
+-To send an Echo RPC message, type the following command, where the actual
+-message is the text in quotation marks after the `msg=` phrase:
++## More information
+ 
+-        rpcs.pw.rpc.EchoService.Echo(msg="hi")
++For more information on our product line and support options, please visit
++[www.realmcu.com](https://www.realmcu.com/)
+diff --git a/examples/window-app/realtek_bee/README.md b/examples/window-app/realtek_bee/README.md
+index 30169909fa..315291beae 100755
+--- a/examples/window-app/realtek_bee/README.md
++++ b/examples/window-app/realtek_bee/README.md
+@@ -1,85 +1,15 @@
+-# CHIP Realtek Window Covering Example
+-
+-This example demonstrates the Matter Window Covering application on Realtek
+-platform.
+-
+ ---
+-
+--   [CHIP Ameba Lighting Example](#chip-ameba-lighting-example)
+-    -   [Supported Device](#supported-device)
+-    -   [Building the Example Application](#building-the-example-application)
+-    -   [Commissioning](#commissioning)
+-        -   [BLE mode](#ble-mode)
+-        -   [IP mode](#ip-mode)
+-    -   [Cluster control](#cluster-control)
+-
++orphan: true
+ ---
+ 
+-## Supported Device
+-
+-The CHIP demo application is supported on
+-[Ameba RTL8722DM Board](https://www.amebaiot.com/en/amebad).
+-
+-## Building the Example Application
+-
+--   Pull docker image:
+-
+-          $ docker pull connectedhomeip/chip-build-ameba:latest
+-
+--   Run docker container:
+-
+-          $ docker run -it -v ${CHIP_DIR}:/root/chip connectedhomeip/chip-build-ameba:latest
+-
+--   Setup build environment:
+-
+-          $ source ./scripts/bootstrap.sh
+-
+--   To build the demo application:
+-
+-          $ ./scripts/build/build_examples.py --target ameba-amebad-lighting build
+-
+-    The output image files are stored in `out/ameba-amebad-lighting/asdk/image`
+-    folder.
+-
+-    The bootloader image files are stored in
+-    `out/ameba-amebad-lighting/asdk/bootloader` folder.
+-
+--   After building the application, **Ameba Image Tool** is used to flash it to
+-    Ameba board.
+-
+-1. Connect your device via USB and open Ameba Image Tool.
+-2. Select correct serial port and set baudrate as **115200**.
+-3. Browse and add the corresponding image files in the Flash Download list to
+-   the correct locations
+-4. Click **Download** button.
+-
+-## Commissioning
+-
+-There are two commissioning modes supported by Ameba platform:
+-
+-### BLE mode
+-
+-1. Build and Flash
+-2. The example will run automatically after booting the Ameba board.
+-3. Test with
+-   [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+-
+-### IP mode
+-
+-1. Build and Flash
+-2. The example will run automatically after booting the Ameba board.
+-3. Connect to AP using `ATW0, ATW1, ATWC` commands
+-4. Test with
+-   [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
++# Matter BEE4 SDK
+ 
+-## Cluster Control
++## Realtek SDK
+ 
+-After successful commissioning, use the OnOff cluster command to control the
+-OnOff attribute. This allows you to toggle a parameter implemented by the device
+-to be On or Off.
++More detailed information on the Bee4 SDK can be found in the
++[Realtek Matter SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk).
+ 
+--   Via
+-    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool#using-the-client-to-send-matter-commands)
++## More information
+ 
+-          $ ./chip-tool onoff on ${NODE_ID_TO_ASSIGN} 1
+-          $ ./chip-tool onoff off ${NODE_ID_TO_ASSIGN} 1
++For more information on our product line and support options, please visit
++[www.realmcu.com](https://www.realmcu.com/)
+-- 
+2.34.1
+
