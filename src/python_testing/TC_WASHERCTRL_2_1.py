@@ -94,7 +94,7 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
         list_speed_speeds = await self.read_single_attribute_check_success(endpoint=endpoint,
                                                                            cluster=Clusters.Objects.LaundryWasherControls,
                                                                            attribute=Clusters.LaundryWasherControls.Attributes.SpinSpeeds)
-                                                                           
+
         asserts.assert_true(isinstance(list_speed_speeds, list), "Returned value was not a list")
         numSpinSpeeds = len(list_speed_speeds)
         asserts.assert_less_equal(numSpinSpeeds, MAX_SPIN_SPEEDS, "List of SpinSpeeds larger than maximum allowed")
