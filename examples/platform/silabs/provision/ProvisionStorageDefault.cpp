@@ -77,22 +77,28 @@ size_t RoundNearest(size_t n, size_t multiple)
 
 /**
  * Writes "size" bytes to the flash page. The data is padded with 0xff
- * up to the nearest 32-bit boundary. The "max" argument is used to ensure
- * that the padding won't exceed the limits of the buffer.
+ * up to the nearest 32-bit boundary.
  */
-CHIP_ERROR WritePage(uint32_t addr, const uint8_t * data, size_t size, size_t max)
+CHIP_ERROR WritePage(uint32_t addr, const uint8_t * data, size_t size)
 {
     // The flash driver fails if the size is not a multiple of 4 (32-bits)
     size_t size_32 = RoundNearest(size, 4);
-    // If the input data is smaller than the 32-bit size, pad the buffer with "0xff"
-    if (size_32 != size)
+    if (size_32 == size)
     {
-        uint8_t * p = (uint8_t *) data;
-        VerifyOrReturnError(size_32 <= max, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memset(p + size, 0xff, size_32 - size);
-        size = size_32;
+        // The given data is already aligned to 32-bit
+        return chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, data, size);
     }
-    return chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, data, size);
+    else
+    {
+        // Create a temporary buffer, and pad it with "0xff"
+        uint8_t * p = static_cast<uint8_t *>(Platform::MemoryAlloc(size_32));
+        VerifyOrReturnError(p != nullptr, CHIP_ERROR_INTERNAL);
+        memcpy(p, data, size);
+        memset(p + size, 0xff, size_32 - size);
+        CHIP_ERROR err = chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, p, size_32);
+        Platform::MemoryFree(p);
+        return err;
+    }
 }
 
 CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig::Key size_key, const ByteSpan & value)
@@ -104,7 +110,7 @@ CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig
         ReturnErrorOnFailure(ErasePage(base_addr));
     }
 
-    ReturnErrorOnFailure(WritePage(base_addr + sCredentialsOffset, value.data(), value.size(), store.GetBufferSize()));
+    ReturnErrorOnFailure(WritePage(base_addr + sCredentialsOffset, value.data(), value.size()));
 
     // Store file offset
     ReturnErrorOnFailure(SilabsConfig::WriteConfigValue(offset_key, (uint32_t) sCredentialsOffset));
