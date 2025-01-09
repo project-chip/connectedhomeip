@@ -214,7 +214,8 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
 #endif
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        advertiseParameters.SetTCPSupportModes(chip::Dnssd::TCPModeAdvertise::kTCPClientServer);
+        advertiseParameters.SetTCPSupportModes(mTCPServerEnabled ? chip::Dnssd::TCPModeAdvertise::kTCPClientServer
+                                                                 : chip::Dnssd::TCPModeAdvertise::kTCPClient);
 #endif
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
