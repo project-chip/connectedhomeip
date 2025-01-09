@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +18,7 @@ import chip.devicecontroller.ClusterIDMapping.ModeSelect
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.WriteAttributesCallback
 import chip.devicecontroller.cluster.structs.ModeSelectClusterModeOptionStruct
+import chip.devicecontroller.model.AttributeState
 import chip.devicecontroller.model.AttributeWriteRequest
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
@@ -125,60 +128,24 @@ class ModeSelectClientFragment : Fragment() {
             val currentMode = attributeStates[ClusterIDMapping.ModeSelect.Attribute.CurrentMode.id]
             binding.currentModeEd.setText(currentMode?.value.toString())
 
-            val startUpMode = attributeStates[ClusterIDMapping.ModeSelect.Attribute.StartUpMode.id]
-            val startUpModeVisibility =
-              if (startUpMode != null) {
-                binding.startUpModeEd.setText(startUpMode.value.toString())
-                View.VISIBLE
-              } else {
-                View.GONE
-              }
-            binding.startUpModeEd.visibility = startUpModeVisibility
-            binding.startUpModeTv.visibility = startUpModeVisibility
-            binding.startUpModeWriteBtn.visibility = startUpModeVisibility
-
-            val onMode = attributeStates[ClusterIDMapping.ModeSelect.Attribute.OnMode.id]
-            val onModeVisibility =
-              if (onMode != null) {
-                binding.onModeEd.setText(onMode.value.toString())
-                View.VISIBLE
-              } else {
-                View.GONE
-              }
-            binding.onModeEd.visibility = onModeVisibility
-            binding.onModeTv.visibility = onModeVisibility
-            binding.onModeWriteBtn.visibility = onModeVisibility
+            setVisibility(
+              attributeStates[ClusterIDMapping.ModeSelect.Attribute.StartUpMode.id],
+              binding.startUpModeEd,
+              binding.startUpModeTv,
+              binding.startUpModeWriteBtn
+            )
+            setVisibility(
+              attributeStates[ClusterIDMapping.ModeSelect.Attribute.OnMode.id],
+              binding.onModeEd,
+              binding.onModeTv,
+              binding.onModeWriteBtn
+            )
 
             val supportedModesTlv =
               attributeStates[ClusterIDMapping.ModeSelect.Attribute.SupportedModes.id]?.tlv
-            if (supportedModesTlv != null) {
-              var pos = 0
-              var currentItemId = 0
-              val modeOptionStructList: List<ModeSelectClusterModeOptionStruct>
-              TlvReader(supportedModesTlv).also {
-                modeOptionStructList = buildList {
-                  it.enterArray(AnonymousTag)
-                  while (!it.isEndOfContainer()) {
-                    val struct = ModeSelectClusterModeOptionStruct.fromTlv(AnonymousTag, it)
-                    add(struct)
-                    if (
-                      currentMode != null && struct.mode == currentMode.value.toString().toUInt()
-                    ) {
-                      currentItemId = pos
-                    }
-                    pos++
-                  }
-                  it.exitContainer()
-                }
-                binding.supportedModesSp.adapter =
-                  ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_spinner_dropdown_item,
-                    modeOptionStructList.map { it.show() }
-                  )
-                binding.supportedModesSp.setSelection(currentItemId)
-                binding.currentModeEd.setText(binding.supportedModesSp.selectedItem.toString())
-              }
+
+            supportedModesTlv?.let {
+              setSupportedModeSpinner(it, currentMode?.value.toString().toUInt())
             }
           }
         }
@@ -187,6 +154,52 @@ class ModeSelectClientFragment : Fragment() {
       listOf<ChipAttributePath>(path),
       0
     )
+  }
+
+  private fun setVisibility(
+    attribute: AttributeState?,
+    modeEd: EditText,
+    modeTv: TextView,
+    writeBtn: TextView
+  ) {
+    val modeVisibility =
+      if (attribute != null) {
+        modeEd.setText(attribute.value.toString())
+        View.VISIBLE
+      } else {
+        View.GONE
+      }
+    modeEd.visibility = modeVisibility
+    modeTv.visibility = modeVisibility
+    writeBtn.visibility = modeVisibility
+  }
+
+  private fun setSupportedModeSpinner(supportedModesTlv: ByteArray, currentModeValue: UInt?) {
+    var pos = 0
+    var currentItemId = 0
+    val modeOptionStructList: List<ModeSelectClusterModeOptionStruct>
+    TlvReader(supportedModesTlv).also {
+      modeOptionStructList = buildList {
+        it.enterArray(AnonymousTag)
+        while (!it.isEndOfContainer()) {
+          val struct = ModeSelectClusterModeOptionStruct.fromTlv(AnonymousTag, it)
+          add(struct)
+          if (currentModeValue != null && struct.mode == currentModeValue) {
+            currentItemId = pos
+          }
+          pos++
+        }
+        it.exitContainer()
+      }
+      binding.supportedModesSp.adapter =
+        ArrayAdapter(
+          requireContext(),
+          android.R.layout.simple_spinner_dropdown_item,
+          modeOptionStructList.map { it.show() }
+        )
+      binding.supportedModesSp.setSelection(currentItemId)
+      binding.currentModeEd.setText(binding.supportedModesSp.selectedItem.toString())
+    }
   }
 
   private suspend fun changeToModeBtnClick() {
