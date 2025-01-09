@@ -112,6 +112,7 @@ public:
 
     DataModel::MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path) override;
     DataModel::MetadataList<DataModel::AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) override;
+    DataModel::MetadataList<SemanticTag> SemanticTags(EndpointId endpointId) override;
 
     DataModel::EndpointEntry FirstEndpoint() override;
     DataModel::EndpointEntry NextEndpoint(EndpointId before) override;

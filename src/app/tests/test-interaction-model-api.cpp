@@ -175,6 +175,10 @@ std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::NextDeviceType(
     return std::nullopt;
 }
 
+DataModel::MetadataList<DataModel::Provider::SemanticTag> TestImCustomDataModel::SemanticTags(EndpointId endpointId) {
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->SemanticTags(endpointId);
+}
+
 std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetFirstSemanticTag(EndpointId endpoint)
 {
     return std::nullopt;

@@ -554,6 +554,11 @@ std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAtt
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAttributeInfo(path);
 }
 
+DataModel::MetadataList<DataModel::Provider::SemanticTag> CustomDataModel::SemanticTags(EndpointId endpointId)
+{
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->SemanticTags(endpointId);
+}
+
 MetadataList<DataModel::AcceptedCommandEntry> CustomDataModel::AcceptedCommands(const ConcreteClusterPath & path)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->AcceptedCommands(path);

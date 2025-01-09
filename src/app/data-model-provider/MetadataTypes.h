@@ -17,6 +17,7 @@
 #pragma once
 
 #include "app/data-model-provider/MetadataList.h"
+#include "lib/support/Span.h"
 #include <cstdint>
 #include <optional>
 
@@ -212,6 +213,7 @@ public:
     /// List all the generated commands for the given path
     virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
     virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
+    virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)                         = 0;
 
     /// Workaround function to report attribute change.
     ///
