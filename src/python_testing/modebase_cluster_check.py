@@ -97,7 +97,7 @@ class ModeBaseClusterChecks:
         - Should be maximum 16bits in size.
         - Should be a Mfg tag or one of the supported ones (either common or specific).
         - Should have at least one common or specific tag.
-        - If defined, verify that at least one of the "requiredTags" exists.
+        - If defined, verify that at least one of the "required_tags" exists.
 
         Args:
           supported_modes: A list of ModeOptionStruct.
