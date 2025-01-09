@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 104,
+  "featureLevel": 103,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,16 +41,14 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice",
-        "deviceTypeOrder": 0
+        "name": "MA-rootdevice"
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice",
-          "deviceTypeOrder": 0
+          "name": "MA-rootdevice"
         }
       ],
       "deviceVersions": [
@@ -4579,16 +4577,14 @@
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
-        "name": "MA-onofflightswitch",
-        "deviceTypeOrder": 0
+        "name": "MA-onofflightswitch"
       },
       "deviceTypes": [
         {
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
-          "name": "MA-onofflightswitch",
-          "deviceTypeOrder": 0
+          "name": "MA-onofflightswitch"
         }
       ],
       "deviceVersions": [
@@ -5236,16 +5232,14 @@
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
-        "name": "MA-onofflightswitch",
-        "deviceTypeOrder": 0
+        "name": "MA-onofflightswitch"
       },
       "deviceTypes": [
         {
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
-          "name": "MA-onofflightswitch",
-          "deviceTypeOrder": 0
+          "name": "MA-onofflightswitch"
         }
       ],
       "deviceVersions": [
@@ -5747,16 +5741,14 @@
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
-        "name": "MA-onofflightswitch",
-        "deviceTypeOrder": 0
+        "name": "MA-onofflightswitch"
       },
       "deviceTypes": [
         {
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
-          "name": "MA-onofflightswitch",
-          "deviceTypeOrder": 0
+          "name": "MA-onofflightswitch"
         }
       ],
       "deviceVersions": [
@@ -6242,16 +6234,14 @@
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
-        "name": "MA-onofflightswitch",
-        "deviceTypeOrder": 0
+        "name": "MA-onofflightswitch"
       },
       "deviceTypes": [
         {
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
-          "name": "MA-onofflightswitch",
-          "deviceTypeOrder": 0
+          "name": "MA-onofflightswitch"
         }
       ],
       "deviceVersions": [
@@ -6737,16 +6727,14 @@
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
-        "name": "MA-onofflightswitch",
-        "deviceTypeOrder": 0
+        "name": "MA-onofflightswitch"
       },
       "deviceTypes": [
         {
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
-          "name": "MA-onofflightswitch",
-          "deviceTypeOrder": 0
+          "name": "MA-onofflightswitch"
         }
       ],
       "deviceVersions": [
@@ -7232,16 +7220,14 @@
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
-        "name": "MA-onofflightswitch",
-        "deviceTypeOrder": 0
+        "name": "MA-onofflightswitch"
       },
       "deviceTypes": [
         {
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
-          "name": "MA-onofflightswitch",
-          "deviceTypeOrder": 0
+          "name": "MA-onofflightswitch"
         }
       ],
       "deviceVersions": [
@@ -7727,16 +7713,14 @@
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
-        "name": "MA-onofflightswitch",
-        "deviceTypeOrder": 0
+        "name": "MA-onofflightswitch"
       },
       "deviceTypes": [
         {
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
-          "name": "MA-onofflightswitch",
-          "deviceTypeOrder": 0
+          "name": "MA-onofflightswitch"
         }
       ],
       "deviceVersions": [
@@ -8222,16 +8206,14 @@
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
-        "name": "MA-onofflightswitch",
-        "deviceTypeOrder": 0
+        "name": "MA-onofflightswitch"
       },
       "deviceTypes": [
         {
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
-          "name": "MA-onofflightswitch",
-          "deviceTypeOrder": 0
+          "name": "MA-onofflightswitch"
         }
       ],
       "deviceVersions": [
@@ -8717,16 +8699,14 @@
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
-        "name": "MA-onofflightswitch",
-        "deviceTypeOrder": 0
+        "name": "MA-onofflightswitch"
       },
       "deviceTypes": [
         {
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
-          "name": "MA-onofflightswitch",
-          "deviceTypeOrder": 0
+          "name": "MA-onofflightswitch"
         }
       ],
       "deviceVersions": [
@@ -9212,16 +9192,14 @@
         "code": 15,
         "profileId": 259,
         "label": "MA-genericswitch",
-        "name": "MA-genericswitch",
-        "deviceTypeOrder": 0
+        "name": "MA-genericswitch"
       },
       "deviceTypes": [
         {
           "code": 15,
           "profileId": 259,
           "label": "MA-genericswitch",
-          "name": "MA-genericswitch",
-          "deviceTypeOrder": 0
+          "name": "MA-genericswitch"
         }
       ],
       "deviceVersions": [
