@@ -45,7 +45,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void SetEnableKey(const uint8_t * key, size_t length = TestEventTriggerDelegate::kEnableKeyLength)
+    void SetEnableKey(const uint8_t * key, size_t length)
     {
         if (length == sizeof(mEnableKey))
         {
@@ -66,7 +66,7 @@ private:
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_ValidKey)
 {
     ProviderStub provider;
-    provider.SetEnableKey(kTestEnableKey1);
+    provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
     delegate.Init(&provider);
@@ -79,12 +79,12 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_ValidKey)
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_InvalidKey)
 {
     ProviderStub provider;
-    provider.SetEnableKey(kTestEnableKey1);
+    provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
     delegate.Init(&provider);
 
-    ByteSpan invalidKeySpan(kInvalidEnableKey);
+    ByteSpan invalidKeySpan(kInvalidEnableKey, TestEventTriggerDelegate::kEnableKeyLength - 1);
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(invalidKeySpan));
 }
 
@@ -92,7 +92,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_InvalidKey)
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_EmptyKey)
 {
     ProviderStub provider;
-    provider.SetEnableKey(kTestEnableKey1);
+    provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
     delegate.Init(&provider);
@@ -104,7 +104,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_EmptyKey)
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_DifferentValidKey)
 {
     ProviderStub provider;
-    provider.SetEnableKey(kTestEnableKey1);
+    provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
     delegate.Init(&provider);
@@ -198,4 +198,19 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_Empt
     delegate.Init(&provider);
 
     EXPECT_TRUE(delegate.DoesEnableKeyMatch(ByteSpan(kZeroEnableKey)));
+}
+
+// Test that Init function initializes the delegate with a valid provider
+TEST(TestSilabsTestEventTriggerDelegate, TestInit_ValidProvider)
+{
+    ProviderStub provider;
+    SilabsTestEventTriggerDelegate delegate;
+    EXPECT_EQ(delegate.Init(&provider), CHIP_NO_ERROR);
+}
+
+// Test that Init function returns an error when initialized with a null provider
+TEST(TestSilabsTestEventTriggerDelegate, TestInit_NullProvider)
+{
+    SilabsTestEventTriggerDelegate delegate;
+    EXPECT_EQ(delegate.Init(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
 }
