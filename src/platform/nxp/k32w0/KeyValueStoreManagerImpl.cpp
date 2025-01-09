@@ -172,10 +172,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         err              = GetValStorage(key)->Read(pdmInternalId, 0, (uint8_t *) value, &valueSize);
         *read_bytes_size = valueSize;
     }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "KVS key [%s] not found in persistent storage.", key);
-    }
 
 exit:
     ConvertError(err);
@@ -214,15 +210,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
             ChipLogProgress(DeviceLayer, "KVS key: set [%s][%i][%s]", key, pdmInternalId, GetKeyStorage(key)->GetName());
 
             err = GetKeyStorage(key)->Write(pdmInternalId, (uint8_t *) key, strlen(key) + 1);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogProgress(DeviceLayer, "KVS key: error when setting [%s][%i]", key, pdmInternalId);
-            }
         }
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "KVS val: error when setting [%s][%i]", key, pdmInternalId);
     }
 
 exit:
@@ -255,14 +243,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
             ChipLogProgress(DeviceLayer, "KVS val: del [%s][%i][%s]", key, pdmInternalId, GetValStorage(key)->GetName());
 
             err = GetValStorage(key)->Delete(pdmInternalId, -1);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogProgress(DeviceLayer, "KVS val: error when deleting [%s][%i]", key, pdmInternalId);
-            }
-        }
-        else
-        {
-            ChipLogProgress(DeviceLayer, "KVS key: error when deleting [%s][%i]", key, pdmInternalId);
         }
     }
 exit:
