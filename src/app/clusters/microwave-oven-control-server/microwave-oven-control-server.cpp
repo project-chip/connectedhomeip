@@ -16,6 +16,8 @@
  *
  */
 
+#include "app/ConcreteClusterPath.h"
+#include "app/data-model-provider/MetadataTypes.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -43,9 +45,8 @@ namespace MicrowaveOvenControl {
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
                    BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
                    Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
-    AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
+    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {
     mDelegate->SetInstance(this);
@@ -247,10 +248,16 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
     if (startAfterSetting.HasValue())
     {
-        ConcreteCommandPath commandPath(mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id);
+        MetadataList<DataModel::AcceptedCommandEntry> acceptedCommands =
+            InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
+                ConcreteClusterPath(mEndpointId, OperationalState::Id));
+        Span<const DataModel::AcceptedCommandEntry> acceptedCommandsSpan = acceptedCommands.GetSpanValidForLifetime();
 
-        bool commandExists =
-            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetAcceptedCommandInfo(commandPath).has_value();
+        bool commandExists = std::find_if(acceptedCommandsSpan.begin(), acceptedCommandsSpan.end(),
+                                          [](const DataModel::AcceptedCommandEntry & entry) {
+                                              return entry.commandId == OperationalState::Commands::Start::Id;
+                                          }) != acceptedCommandsSpan.end();
+
         VerifyOrExit(
             commandExists, status = Status::InvalidCommand; ChipLogError(
                 Zcl,

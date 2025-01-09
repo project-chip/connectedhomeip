@@ -129,9 +129,6 @@ public:
     DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
     std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
-    DataModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
-    DataModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
-    std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override {}
 };
 

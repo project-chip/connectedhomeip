@@ -46,69 +46,6 @@
 
 namespace chip {
 namespace app {
-namespace detail {
-
-Loop EnumeratorCommandFinder::HandlerCallback(CommandId id)
-{
-    switch (mOperation)
-    {
-    case Operation::kFindFirst:
-        mFound = id;
-        return Loop::Break;
-    case Operation::kFindExact:
-        if (mTarget == id)
-        {
-            mFound = id; // found it
-            return Loop::Break;
-        }
-        break;
-    case Operation::kFindNext:
-        if (mTarget == id)
-        {
-            // Once we found the ID, get the first
-            mOperation = Operation::kFindFirst;
-        }
-        break;
-    }
-    return Loop::Continue; // keep searching
-}
-
-std::optional<CommandId> EnumeratorCommandFinder::FindCommandId(Operation operation, const ConcreteCommandPath & path)
-{
-    mOperation = operation;
-    mTarget    = path.mCommandId;
-
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-
-    if (interface == nullptr)
-    {
-        return std::nullopt; // no data: no interface
-    }
-
-    CHIP_ERROR err = (interface->*mCallback)(path, HandlerCallbackFn, this);
-    if (err == CHIP_ERROR_NOT_IMPLEMENTED)
-    {
-        return std::nullopt; // no data provided by the interface
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        // Report the error here since we lose actual error. This generally should NOT be possible as CommandHandlerInterface
-        // usually returns unimplemented or should just work for our use case (our callback never fails)
-        ChipLogError(DataManagement, "Enumerate error: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-        return kInvalidCommandId;
-    }
-
-    return mFound.value_or(kInvalidCommandId);
-}
-
-} // namespace detail
-
-using detail::EnumeratorCommandFinder;
-
 namespace {
 
 /// Search by device type within a span of EmberAfDeviceType (finds the device type that matches the given
@@ -123,11 +60,6 @@ struct ByDeviceType
         return (instance.deviceId == id.deviceTypeId) && (instance.deviceVersion == id.deviceTypeRevision);
     }
 };
-
-const CommandId * GetAcceptedCommands(const EmberAfCluster & cluster)
-{
-    return cluster.acceptedCommandList;
-}
 
 /// Load the cluster information into the specified destination
 std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster)
@@ -258,22 +190,6 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     entry.path = ConcreteAttributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
     LoadAttributeInfo(entry.path, attribute, &entry.info);
 
-    return entry;
-}
-
-DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath, CommandId clusterCommandId)
-{
-    DataModel::CommandEntry entry;
-    entry.path                 = ConcreteCommandPath(clusterPath.mEndpointId, clusterPath.mClusterId, clusterCommandId);
-    entry.info.invokePrivilege = RequiredPrivilege::ForInvokeCommand(entry.path);
-
-    entry.info.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(clusterPath.mClusterId, clusterCommandId));
-
-    entry.info.flags.Set(DataModel::CommandQualityFlags::kFabricScoped,
-                         CommandIsFabricScoped(clusterPath.mClusterId, clusterCommandId));
-
-    entry.info.flags.Set(DataModel::CommandQualityFlags::kLargeMessage,
-                         CommandHasLargePayload(clusterPath.mClusterId, clusterCommandId));
     return entry;
 }
 
@@ -730,35 +646,6 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
     return cluster;
 }
 
-CommandId CodegenDataModelProvider::FindCommand(const ConcreteCommandPath & path, detail::EnumeratorCommandFinder & handlerFinder,
-                                                detail::EnumeratorCommandFinder::Operation operation,
-                                                CodegenDataModelProvider::EmberCommandListIterator & emberIterator,
-                                                CommandListGetter commandListGetter)
-{
-
-    std::optional<CommandId> handlerCommandId = handlerFinder.FindCommandId(operation, path);
-    if (handlerCommandId.has_value())
-    {
-        return *handlerCommandId;
-    }
-
-    const EmberAfCluster * cluster = FindServerCluster(path);
-    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandId);
-
-    const CommandId * commandList = commandListGetter(*cluster);
-
-    switch (operation)
-    {
-    case EnumeratorCommandFinder::Operation::kFindFirst:
-        return emberIterator.First(commandList).value_or(kInvalidCommandId);
-    case EnumeratorCommandFinder::Operation::kFindNext:
-        return emberIterator.Next(commandList, path.mCommandId).value_or(kInvalidCommandId);
-    case EnumeratorCommandFinder::Operation::kFindExact:
-    default:
-        return emberIterator.Exists(commandList, path.mCommandId) ? path.mCommandId : kInvalidCommandId;
-    }
-}
-
 DataModel::AttributeEntry CodegenDataModelProvider::NextAttribute(const ConcreteAttributePath & before)
 {
     const EmberAfCluster * cluster = FindServerCluster(before);
@@ -802,40 +689,6 @@ std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeIn
     DataModel::AttributeInfo info;
     LoadAttributeInfo(path, cluster->attributes[*attribute_idx], &info);
     return std::make_optional(info);
-}
-
-DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const ConcreteClusterPath & path)
-{
-    EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateAcceptedCommands);
-
-    CommandId commandId =
-        FindCommand(ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId), handlerFinder,
-                    detail::EnumeratorCommandFinder::Operation::kFindFirst, mAcceptedCommandsIterator, GetAcceptedCommands);
-
-    VerifyOrReturnValue(commandId != kInvalidCommandId, DataModel::CommandEntry::kInvalid);
-    return CommandEntryFrom(path, commandId);
-}
-
-DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const ConcreteCommandPath & before)
-{
-
-    EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateAcceptedCommands);
-    CommandId commandId = FindCommand(before, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindNext,
-                                      mAcceptedCommandsIterator, GetAcceptedCommands);
-
-    VerifyOrReturnValue(commandId != kInvalidCommandId, DataModel::CommandEntry::kInvalid);
-    return CommandEntryFrom(before, commandId);
-}
-
-std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
-{
-
-    EnumeratorCommandFinder handlerFinder(&CommandHandlerInterface::EnumerateAcceptedCommands);
-    CommandId commandId = FindCommand(path, handlerFinder, detail::EnumeratorCommandFinder::Operation::kFindExact,
-                                      mAcceptedCommandsIterator, GetAcceptedCommands);
-
-    VerifyOrReturnValue(commandId != kInvalidCommandId, std::nullopt);
-    return CommandEntryFrom(path, commandId).info;
 }
 
 MetadataList<DataModel::AcceptedCommandEntry> CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path)

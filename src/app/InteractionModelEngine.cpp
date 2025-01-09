@@ -1711,7 +1711,9 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
 {
 
-    Status status = CheckCommandExistence(request.path);
+    DataModel::AcceptedCommandEntry acceptedCommandEntry;
+
+    Status status = CheckCommandExistence(request.path, acceptedCommandEntry);
 
     if (status != Status::Success)
     {
@@ -1720,13 +1722,13 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
         return status;
     }
 
-    status = CheckCommandAccess(request);
+    status = CheckCommandAccess(request, acceptedCommandEntry);
     VerifyOrReturnValue(status == Status::Success, status);
 
-    return CheckCommandFlags(request);
+    return CheckCommandFlags(request, acceptedCommandEntry);
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry &entry)
 {
     if (aRequest.subjectDescriptor == nullptr)
     {
@@ -1737,11 +1739,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
                                      .endpoint    = aRequest.path.mEndpointId,
                                      .requestType = Access::RequestType::kCommandInvokeRequest,
                                      .entityId    = aRequest.path.mCommandId };
-    std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
-    Access::Privilege minimumRequiredPrivilege =
-        commandInfo.has_value() ? commandInfo->invokePrivilege : Access::Privilege::kOperate;
 
-    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, minimumRequiredPrivilege);
+    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, entry.invokePrivilege);
     if (err != CHIP_NO_ERROR)
     {
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
@@ -1754,14 +1753,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry &entry)
 {
-    std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
-    // This is checked by previous validations, so it should not happen
-    VerifyOrDie(commandInfo.has_value());
-
-    const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
-    const bool commandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
+    const bool commandNeedsTimedInvoke = entry.flags.Has(DataModel::CommandQualityFlags::kTimed);
+    const bool commandIsFabricScoped   = entry.flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
 
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
     {
@@ -1784,12 +1779,18 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistence(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistence(const ConcreteCommandPath & aCommandPath, DataModel::AcceptedCommandEntry &entry)
 {
     auto provider = GetDataModelProvider();
-    if (provider->GetAcceptedCommandInfo(aCommandPath).has_value())
+
+    MetadataList<DataModel::AcceptedCommandEntry> acceptedCommands = provider->AcceptedCommands(aCommandPath);
+    for (auto existing : acceptedCommands.GetSpanValidForLifetime())
     {
-        return Protocols::InteractionModel::Status::Success;
+        if (existing.commandId == aCommandPath.mCommandId)
+        {
+            entry = existing;
+            return Protocols::InteractionModel::Status::Success;
+        }
     }
 
     // We failed, figure out why ...

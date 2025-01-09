@@ -132,22 +132,6 @@ enum class CommandQualityFlags : uint32_t
     kLargeMessage = 0x0004, // `L` quality on commands
 };
 
-struct CommandInfo
-{
-    BitFlags<CommandQualityFlags> flags;
-    Access::Privilege invokePrivilege = Access::Privilege::kOperate;
-};
-
-struct CommandEntry
-{
-    ConcreteCommandPath path;
-    CommandInfo info;
-
-    bool IsValid() const { return path.HasValidIds(); }
-
-    static const CommandEntry kInvalid;
-};
-
 struct AcceptedCommandEntry {
     CommandId commandId;
 
@@ -221,11 +205,6 @@ public:
     virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)                = 0;
     virtual AttributeEntry NextAttribute(const ConcreteAttributePath & before)                = 0;
     virtual std::optional<AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) = 0;
-
-    // Command iteration and accessors provide cluster-level access over commands
-    virtual CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster)              = 0;
-    virtual CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before)                = 0;
-    virtual std::optional<CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) = 0;
 
     /// List items. TODO: convert ALL items above to the new format
 

@@ -554,21 +554,6 @@ std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAtt
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAttributeInfo(path);
 }
 
-CommandEntry CustomDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAcceptedCommand(cluster);
-}
-
-CommandEntry CustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextAcceptedCommand(before);
-}
-
-std::optional<CommandInfo> CustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAcceptedCommandInfo(path);
-}
-
 MetadataList<DataModel::AcceptedCommandEntry> CustomDataModel::AcceptedCommands(const ConcreteClusterPath & path)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->AcceptedCommands(path);

@@ -1280,38 +1280,6 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
     ASSERT_EQ(cmds[2].commandId, 23u);
 }
 
-TEST_F(TestCodegenModelViaMocks, AcceptedCommandInfo)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-
-    // invalid paths should return in "no more data"
-    ASSERT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 1)).has_value());
-    ASSERT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kInvalidEndpointId, MockClusterId(1), 1)).has_value());
-    ASSERT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(10), 1)).has_value());
-    ASSERT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, kInvalidClusterId, 1)).has_value());
-    ASSERT_FALSE(
-        model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), kInvalidCommandId)).has_value());
-
-    std::optional<CommandInfo> info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1u));
-    ASSERT_TRUE(info.has_value());
-
-    info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 2u));
-    ASSERT_TRUE(info.has_value());
-
-    info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1u));
-    ASSERT_TRUE(info.has_value());
-
-    info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1u));
-    ASSERT_TRUE(info.has_value());
-
-    info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 23u));
-    ASSERT_TRUE(info.has_value());
-
-    info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1234u));
-    ASSERT_FALSE(info.has_value());
-}
-
 TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
 {
     UseMockNodeConfig config(gTestNodeConfig);

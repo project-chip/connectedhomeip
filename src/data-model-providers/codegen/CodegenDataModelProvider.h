@@ -27,61 +27,6 @@
 namespace chip {
 namespace app {
 
-namespace detail {
-
-/// Handles going through callback-based enumeration of generated/accepted commands
-/// for CommandHandlerInterface based items.
-///
-/// Offers the ability to focus on some operation for finding a given
-/// command id:
-///   - FindFirst will return the first found element
-///   - FindExact finds the element with the given id
-///   - FindNext finds the element following the given id
-class EnumeratorCommandFinder
-{
-public:
-    using HandlerCallbackFunction = CHIP_ERROR (CommandHandlerInterface::*)(const ConcreteClusterPath &,
-                                                                            CommandHandlerInterface::CommandIdCallback, void *);
-
-    enum class Operation
-    {
-        kFindFirst, // Find the first value in the list
-        kFindExact, // Find the given value
-        kFindNext   // Find the value AFTER this value
-    };
-
-    EnumeratorCommandFinder(HandlerCallbackFunction callback) :
-        mCallback(callback), mOperation(Operation::kFindFirst), mTarget(kInvalidCommandId)
-    {}
-
-    /// Find the given command ID that matches the given operation/path.
-    ///
-    /// If operation is kFindFirst, then path commandID is ignored. Otherwise it is used as a key to
-    /// kFindExact or kFindNext.
-    ///
-    /// Returns:
-    ///    - std::nullopt if no command found using the command handler interface
-    ///    - kInvalidCommandId if the find failed (but command handler interface does provide a list)
-    ///    - valid id if command handler interface usage succeeds
-    std::optional<CommandId> FindCommandId(Operation operation, const ConcreteCommandPath & path);
-
-private:
-    HandlerCallbackFunction mCallback;
-    Operation mOperation;
-    CommandId mTarget;
-    std::optional<CommandId> mFound = std::nullopt;
-
-    Loop HandlerCallback(CommandId id);
-
-    static Loop HandlerCallbackFn(CommandId id, void * context)
-    {
-        auto self = static_cast<EnumeratorCommandFinder *>(context);
-        return self->HandlerCallback(id);
-    }
-};
-
-} // namespace detail
-
 /// An implementation of `InteractionModel::Model` that relies on code-generation
 /// via zap/ember.
 ///
@@ -181,10 +126,6 @@ public:
     DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
     std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
 
-    DataModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
-    DataModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
-    std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
-
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
 protected:
@@ -240,12 +181,6 @@ private:
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
-
-    using CommandListGetter = const CommandId *(const EmberAfCluster &);
-
-    CommandId FindCommand(const ConcreteCommandPath & path, detail::EnumeratorCommandFinder & handlerFinder,
-                          detail::EnumeratorCommandFinder::Operation operation,
-                          CodegenDataModelProvider::EmberCommandListIterator & emberIterator, CommandListGetter commandListGetter);
 };
 
 } // namespace app
