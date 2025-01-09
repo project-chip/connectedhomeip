@@ -135,7 +135,6 @@ bouffalolab_executable("lighting_app") {
     "START_ENTRY=bl702_main",
   ]
 
-  defines += [ "CONF_ENABLE_FRAME_PTR=${enable_debug_frame_ptr}" ]
   defines +=
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
   if (chip_config_network_layer_ble) {
