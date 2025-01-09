@@ -37,7 +37,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import random
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
