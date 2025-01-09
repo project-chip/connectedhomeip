@@ -236,9 +236,12 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Provision Manager
     Silabs::Provision::Manager & provision = Silabs::Provision::Manager::GetInstance();
+    Silabs::Provision::Storage & storage   = provision.GetStorage();
+
     ReturnErrorOnFailure(provision.Init());
-    SetDeviceInstanceInfoProvider(&provision.GetStorage());
-    SetCommissionableDataProvider(&provision.GetStorage());
+    SetDeviceInstanceInfoProvider(&storage);
+    SetCommissionableDataProvider(&storage);
+
     ChipLogProgress(DeviceLayer, "Provision mode %s", provision.IsProvisionRequired() ? "ENABLED" : "disabled");
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -264,8 +267,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate;
-    sTestEventTriggerDelegate.Init(&(provision.GetStorage()));
 
+    // TODO: Remove this cast once the new provision structure is done
+    sTestEventTriggerDelegate.Init((reinterpret_cast<DeviceLayer::Silabs::Provision::ProvisionedDataProvider *>(&storage)));
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
