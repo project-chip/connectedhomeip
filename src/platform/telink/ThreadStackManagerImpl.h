@@ -59,7 +59,7 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
 public:
     // ===== Methods that implement the ThreadStackManager abstract interface.
     CHIP_ERROR _InitThreadStack();
-    void _DeinitThreadStack(){};
+    void _DeinitThreadStack() {}
     void SetRadioBlocked(bool state) { mRadioBlocked = state; }
     bool IsReadyToAttach(void) const { return mReadyToAttach; }
     void Finalize(void);
@@ -68,6 +68,7 @@ protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
     CHIP_ERROR _StartThreadTask() { return CHIP_NO_ERROR; }
+    void _StopThreadStack() {}
     void _LockThreadStack();
     bool _TryLockThreadStack();
     void _UnlockThreadStack();

@@ -49,10 +49,11 @@ public:
     ThreadStackManagerImpl();
 
     CHIP_ERROR _InitThreadStack();
-    void _DeinitThreadStack(){};
+    void _DeinitThreadStack() {}
     void _ProcessThreadActivity();
 
     CHIP_ERROR _StartThreadTask() { return CHIP_NO_ERROR; } // Intentionally left blank
+    void _StopThreadStack() {}                              // Intentionally left blank
     void _LockThreadStack() {}                              // Intentionally left blank
     bool _TryLockThreadStack() { return false; }            // Intentionally left blank
     void _UnlockThreadStack() {}                            // Intentionally left blank

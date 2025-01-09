@@ -62,6 +62,7 @@ public:
 
 protected:
     CHIP_ERROR _StartThreadTask();
+    void _StopThreadStack();
     void _LockThreadStack();
     bool _TryLockThreadStack();
     void _UnlockThreadStack();
