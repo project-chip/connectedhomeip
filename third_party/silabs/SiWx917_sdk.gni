@@ -56,6 +56,7 @@ template("siwx917_sdk") {
     _include_dirs = [
       "${chip_root}",
       "${chip_root}/examples/platform/silabs/SiWx917/SiWx917",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/config",
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/service/device_init/inc",
@@ -352,8 +353,6 @@ template("siwx917_sdk") {
       defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
     }
 
-    libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
-
     cflags += [
       "-Wno-shadow",
       "-Wno-unknown-warning-option",
@@ -413,6 +412,8 @@ template("siwx917_sdk") {
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/preset",
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/inc",
           "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/inc",
+          "${efr32_sdk_root}/platform/security/sl_component/sli_crypto/inc",
+          "${efr32_sdk_root}/platform/security/sl_component/sli_psec_osal/inc",
           "${efr32_sdk_root}/util/third_party/mbedtls/include",
           "${efr32_sdk_root}/util/third_party/mbedtls/library",
         ]
@@ -500,6 +501,9 @@ template("siwx917_sdk") {
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/sli_psa_crypto.c",
           "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c",
           "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_psa_trng.c",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_version_dependencies.c",
+          "${efr32_sdk_root}/platform/security/sl_component/sli_psec_osal/src/sli_psec_osal_cmsis_rtos2.c",
+          "${efr32_sdk_root}/util/third_party/mbedtls/include/psa/crypto_compat.h",
 
           # WISECONNECT 3 SDK
           "${sl_si91x_psa_crypto_path}/aead/src/sl_si91x_psa_aead.c",
@@ -549,6 +553,9 @@ template("siwx917_sdk") {
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config",
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/preset",
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/inc",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/inc",
+          "${efr32_sdk_root}/platform/security/sl_component/sli_crypto/inc",
+          "${efr32_sdk_root}/platform/security/sl_component/sli_psec_osal/inc",
 
           # tinycrypt specific headers
           "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
@@ -589,6 +596,7 @@ template("siwx917_sdk") {
           "${_mbedtls_root}/library/platform_util.c",
           "${_mbedtls_root}/library/sha256.c",
           "${_mbedtls_root}/library/sha512.c",
+          "${_mbedtls_root}/library/threading.c",
           "${_mbedtls_root}/library/version.c",
           "${_mbedtls_root}/library/x509_create.c",
 
@@ -607,6 +615,9 @@ template("siwx917_sdk") {
           "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dh.c",
           "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dsa.c",
           "${sdk_support_root}/matter/mbedtls/tinycrypt/src/tinycrypt_util.c",
+
+          # Sisdk platform/security
+          "${efr32_sdk_root}/platform/security/sl_component/sli_psec_osal/src/sli_psec_osal_cmsis_rtos2.c",
         ]
 
         public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
@@ -627,8 +638,18 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
       "${efr32_sdk_root}/platform/common/src/sl_string.c",
       "${efr32_sdk_root}/platform/common/src/sli_cmsis_os2_ext_task_register.c",
+      "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/sl_mbedtls.c",
       "${efr32_sdk_root}/util/third_party/freertos/cmsis/Source/cmsis_os2.c",
       "${wifi_sdk_root}/components/protocol/wifi/si91x/sl_wifi.c",
+
+      # nvm3
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_cache.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default_common_linker.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_object.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_page.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_utils.c",
 
       # wifi component
       "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_basic_credentials.c",
@@ -704,8 +725,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c",
 
       # modified hal
-      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default_common_linker.c",
-      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
       "${efr32_sdk_root}/platform/emlib/src/em_core.c",
       "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_nvic.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
@@ -720,6 +739,7 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
       "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_event_handler.c",
+      "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_iostream_handles.c",
       "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_button_instances.c",
       "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_ulp_timer_init.c",
       "${sdk_support_root}/matter/si91x/support/hal/rsi_hal_mcu_m4.c",
