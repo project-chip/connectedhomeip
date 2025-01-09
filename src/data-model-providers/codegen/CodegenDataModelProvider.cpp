@@ -60,6 +60,21 @@ struct ByDeviceType
     }
 };
 
+DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPath & path)
+{
+    const CommandId commandId = path.mCommandId;
+
+    DataModel::AcceptedCommandEntry entry;
+
+    entry.commandId       = path.mCommandId;
+    entry.invokePrivilege = RequiredPrivilege::ForInvokeCommand(path);
+    entry.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId));
+    entry.flags.Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId));
+    entry.flags.Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId));
+
+    return entry;
+}
+
 /// Load the cluster information into the specified destination
 std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster)
 {
@@ -731,25 +746,9 @@ CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path)
             err = interface->EnumerateAcceptedCommands(
                 path,
                 [](CommandId commandId, void * context) -> Loop {
-                    auto input = reinterpret_cast<EnumerationData *>(context);
-
+                    auto input                    = reinterpret_cast<EnumerationData *>(context);
                     input->commandPath.mCommandId = commandId;
-
-                    DataModel::AcceptedCommandEntry entry;
-
-                    entry.commandId       = commandId;
-                    entry.invokePrivilege = RequiredPrivilege::ForInvokeCommand(input->commandPath);
-                    entry.flags.Set(DataModel::CommandQualityFlags::kTimed,
-                                    CommandNeedsTimedInvoke(input->commandPath.mClusterId, commandId));
-
-                    entry.flags.Set(DataModel::CommandQualityFlags::kFabricScoped,
-                                    CommandIsFabricScoped(input->commandPath.mClusterId, commandId));
-
-                    entry.flags.Set(DataModel::CommandQualityFlags::kLargeMessage,
-
-                                    CommandHasLargePayload(input->commandPath.mClusterId, commandId));
-
-                    CHIP_ERROR appendError = input->acceptedCommandList.Append(entry);
+                    CHIP_ERROR appendError        = input->acceptedCommandList.Append(AcceptedCommandEntryFor(input->commandPath));
                     if (appendError != CHIP_NO_ERROR)
                     {
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
@@ -814,19 +813,7 @@ CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path)
     {
         commandPath.mCommandId = *p;
 
-        DataModel::AcceptedCommandEntry entry;
-
-        entry.commandId       = commandPath.mCommandId;
-        entry.invokePrivilege = RequiredPrivilege::ForInvokeCommand(commandPath);
-        entry.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandPath.mCommandId));
-
-        entry.flags.Set(DataModel::CommandQualityFlags::kFabricScoped,
-                        CommandIsFabricScoped(path.mClusterId, commandPath.mCommandId));
-
-        entry.flags.Set(DataModel::CommandQualityFlags::kLargeMessage,
-                        CommandHasLargePayload(path.mClusterId, commandPath.mCommandId));
-
-        err = result.Append(entry);
+        err = result.Append(AcceptedCommandEntryFor(commandPath));
         if (err != CHIP_NO_ERROR)
         {
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
