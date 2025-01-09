@@ -44,7 +44,7 @@ class ModeBaseClusterChecks:
     """
 
     def __init__(self, modebase_derived_cluster):
-        self.modeTags = [tag.value for tag in modebase_derived_cluster.Enums.ModeTag]
+        self.mode_tags = [tag.value for tag in modebase_derived_cluster.Enums.ModeTag]
         self.modebase_derived_cluster = modebase_derived_cluster
         self.attributes = modebase_derived_cluster.Attributes
 
