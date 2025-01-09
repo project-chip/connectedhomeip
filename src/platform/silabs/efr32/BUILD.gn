@@ -158,6 +158,8 @@ static_library("efr32") {
   if (chip_enable_wifi) {
     sources += [
       "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
+      "${silabs_platform_dir}/EndpointQueueFilter.cpp",
+      "${silabs_platform_dir}/EndpointQueueFilter.h",
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
     ]
