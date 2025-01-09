@@ -20190,11 +20190,11 @@ typedef NS_OPTIONS(uint32_t, MTRCameraAVSettingsUserLevelManagementFeature) {
     MTRCameraAVSettingsUserLevelManagementFeatureMechanicalPresets MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRWebRTCTransportProviderStreamType) {
-    MTRWebRTCTransportProviderStreamTypeInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRWebRTCTransportProviderStreamTypeRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRWebRTCTransportProviderStreamTypeAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRWebRTCTransportProviderStreamTypeLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
+typedef NS_ENUM(uint8_t, MTRWebRTCTransportProviderStreamUsage) {
+    MTRWebRTCTransportProviderStreamUsageInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRWebRTCTransportProviderStreamUsageRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRWebRTCTransportProviderStreamUsageAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRWebRTCTransportProviderStreamUsageLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRWebRTCTransportProviderWebRTCEndReason) {
