@@ -91,7 +91,7 @@ RUN set -x \
 #   - telnet
 #   - srecord
 # For java builds:
-#   - openjdk-8-jdk
+#   - openjdk-11-jdk
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
@@ -99,7 +99,7 @@ RUN set -x \
     expect \
     telnet \
     srecord \
-    openjdk-8-jdk \
+    openjdk-11-jdk \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line

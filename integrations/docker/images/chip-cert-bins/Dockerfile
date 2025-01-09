@@ -78,7 +78,7 @@ RUN set -x \
     make \
     net-tools \
     ninja-build \
-    openjdk-8-jdk \
+    openjdk-11-jdk \
     pkg-config \
     python3 \
     python3-dev \
@@ -302,7 +302,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requir
 RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
 # PIP requires MASON package compilation, which seems to require a JDK
-RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get update; apt-get install -fy openjdk-8-jdk
+RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get update; apt-get install -fy openjdk-11-jdk
 
 RUN pip install --break-system-packages --no-cache-dir \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl \
