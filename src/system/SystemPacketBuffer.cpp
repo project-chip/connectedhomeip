@@ -638,9 +638,12 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     lPacket->alloc_size = lAllocSize;
 #endif
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP
+    // For non-lwip packet buffer, the allocated packet buffer will not have chained buffers, set it to null to avoid potential
+    // issues.
     lPacket->next = nullptr;
 #endif
-    // Set current packet and chained buffers' length and total length to 0
+    // Set ther length and total length of the head packet buffer and all the chained packet buffers to 0
+    // as we don't put any data in them. And set the ref to 1 for all the buffers.
     for (PacketBuffer * pktBuf = lPacket; pktBuf != nullptr; pktBuf = pktBuf->ChainedBuffer())
     {
         pktBuf->len = pktBuf->tot_len = 0;
@@ -665,6 +668,8 @@ PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aD
 #else
         buffer.mBuffer->tot_len = aDataSize;
 #endif
+        // Copy the data to the first packet buffer, if the data size is larger than the MaxDataLength, copy the remaining
+        // data to the chained packet buffers.
         PacketBuffer * currentBuffer = buffer.mBuffer;
         const uint8_t * dataPtr      = static_cast<const uint8_t *>(aData);
         while (currentBuffer && aDataSize > 0)
@@ -728,7 +733,7 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
 #elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
             chip::Platform::MemoryFree(aPacket);
 #endif
-            aPacket       = lNextPacket;
+            aPacket = lNextPacket;
         }
         else
         {
