@@ -179,17 +179,6 @@ DataModel::MetadataList<DataModel::Provider::SemanticTag> TestImCustomDataModel:
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->SemanticTags(endpointId);
 }
 
-std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetFirstSemanticTag(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetNextSemanticTag(EndpointId endpoint,
-                                                                                          const SemanticTag & previous)
-{
-    return std::nullopt;
-}
-
 ClusterEntry TestImCustomDataModel::FirstServerCluster(EndpointId endpoint)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstServerCluster(endpoint);

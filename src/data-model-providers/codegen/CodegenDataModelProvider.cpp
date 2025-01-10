@@ -420,58 +420,6 @@ DataModel::EndpointEntry FirstEndpointEntry(unsigned start_index, uint16_t & fou
     return DataModel::EndpointEntry::kInvalid;
 }
 
-bool operator==(const DataModel::Provider::SemanticTag & tagA, const DataModel::Provider::SemanticTag & tagB)
-{
-    // Label is an optional and nullable value of CharSpan. Optional and Nullable have overload for ==,
-    // But `==` is deleted for CharSpan. Here we only check whether the string is the same.
-    if (tagA.label.HasValue() != tagB.label.HasValue())
-    {
-        return false;
-    }
-    if (tagA.label.HasValue())
-    {
-        if (tagA.label.Value().IsNull() != tagB.label.Value().IsNull())
-        {
-            return false;
-        }
-        if (!tagA.label.Value().IsNull())
-        {
-            if (!tagA.label.Value().Value().data_equal(tagB.label.Value().Value()))
-            {
-                return false;
-            }
-        }
-    }
-    return (tagA.tag == tagB.tag) && (tagA.mfgCode == tagB.mfgCode) && (tagA.namespaceID == tagB.namespaceID);
-}
-
-std::optional<unsigned> FindNextSemanticTagIndex(EndpointId endpoint, const DataModel::Provider::SemanticTag & previous,
-                                                 unsigned hintWherePreviousMayBe)
-{
-    DataModel::Provider::SemanticTag hintTag;
-    // Check whether the hint is the previous tag
-    if (GetSemanticTagForEndpointAtIndex(endpoint, hintWherePreviousMayBe, hintTag) == CHIP_NO_ERROR)
-    {
-        if (previous == hintTag)
-        {
-            return std::make_optional(hintWherePreviousMayBe + 1);
-        }
-    }
-    // If the hint is not the previous tag, iterate over all the tags to find the index for the previous tag
-    unsigned index = 0;
-    // Ensure that the next index is in the range
-    while (GetSemanticTagForEndpointAtIndex(endpoint, index + 1, hintTag) == CHIP_NO_ERROR &&
-           GetSemanticTagForEndpointAtIndex(endpoint, index, hintTag) == CHIP_NO_ERROR)
-    {
-        if (previous == hintTag)
-        {
-            return std::make_optional(index + 1);
-        }
-        index++;
-    }
-    return std::nullopt;
-}
-
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 } // namespace
@@ -939,34 +887,47 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
     return DeviceTypeEntryFromEmber(searchable.Next<ByDeviceType>(previous, mDeviceTypeIterationHint).Value());
 }
 
-DataModel::MetadataList<DataModel::Provider::SemanticTag> CodegenDataModelProvider::SemanticTags(EndpointId endpointId) 
+DataModel::MetadataList<DataModel::Provider::SemanticTag> CodegenDataModelProvider::SemanticTags(EndpointId endpointId)
 {
-    // FIXME: implement
-    return {};
-}
+    DataModel::Provider::SemanticTag semanticTag;
+    size_t count = 0;
 
-std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetFirstSemanticTag(EndpointId endpoint)
-{
-    Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
-    // we start at the beginning
-    mSemanticTagIterationHint = 0;
-    if (GetSemanticTagForEndpointAtIndex(endpoint, 0, tag) == CHIP_NO_ERROR)
+    while (GetSemanticTagForEndpointAtIndex(endpointId, count, semanticTag) == CHIP_NO_ERROR)
     {
-        return std::make_optional(tag);
+        count++;
     }
-    return std::nullopt;
-}
+    DataModel::MetadataList<DataModel::Provider::SemanticTag> result;
 
-std::optional<DataModel::Provider::SemanticTag> CodegenDataModelProvider::GetNextSemanticTag(EndpointId endpoint,
-                                                                                             const SemanticTag & previous)
-{
-    Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
-    std::optional<unsigned> idx = FindNextSemanticTagIndex(endpoint, previous, mSemanticTagIterationHint);
-    if (idx.has_value() && GetSemanticTagForEndpointAtIndex(endpoint, *idx, tag) == CHIP_NO_ERROR)
+    CHIP_ERROR err = result.reserve(count);
+    if (err != CHIP_NO_ERROR)
     {
-        return std::make_optional(tag);
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogError(AppServer, "Failed to reserve semantic tag buffer space: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+        return {};
     }
-    return std::nullopt;
+
+    for (size_t idx = 0; idx < count; idx++)
+    {
+        err = GetSemanticTagForEndpointAtIndex(endpointId, idx, semanticTag);
+        if (err != CHIP_NO_ERROR)
+        {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+            ChipLogError(AppServer, "Failed to get semantic tag data: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+            break;
+        }
+        err = result.Append(semanticTag);
+        if (err != CHIP_NO_ERROR)
+        {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+            ChipLogError(AppServer, "Failed to append semantic tag: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+            break;
+        }
+    }
+
+    return result;
 }
 
 } // namespace app

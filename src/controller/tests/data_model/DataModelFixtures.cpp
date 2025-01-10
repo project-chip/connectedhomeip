@@ -503,17 +503,6 @@ std::optional<DataModel::DeviceTypeEntry> CustomDataModel::NextDeviceType(Endpoi
     return std::nullopt;
 }
 
-std::optional<DataModel::Provider::SemanticTag> CustomDataModel::GetFirstSemanticTag(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::Provider::SemanticTag> CustomDataModel::GetNextSemanticTag(EndpointId endpoint,
-                                                                                    const SemanticTag & previous)
-{
-    return std::nullopt;
-}
-
 ClusterEntry CustomDataModel::FirstServerCluster(EndpointId endpoint)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstServerCluster(endpoint);

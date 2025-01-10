@@ -186,10 +186,6 @@ public:
     virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;
     virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
 
-    // This iteration describes semantic tags registered on an endpoint
-    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
-    virtual std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint)                              = 0;
-    virtual std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) = 0;
 
     // This iteration will list all server clusters on a given endpoint
     virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
@@ -209,6 +205,8 @@ public:
     virtual std::optional<AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) = 0;
 
     /// List items. TODO: convert ALL items above to the new format
+
+    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
     /// List all the generated commands for the given path
     virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;

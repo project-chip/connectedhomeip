@@ -132,8 +132,6 @@ public:
     std::optional<DataModel::DeviceTypeEntry> FirstDeviceType(EndpointId endpoint) override;
     std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,
                                                              const DataModel::DeviceTypeEntry & previous) override;
-    std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint) override;
-    std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) override;
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
     std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;
