@@ -235,8 +235,8 @@ To add new devices for chef:
 ## Manufacturer Extensions / Custom Clusters
 
 You may add vendor-defined features to chef. The
-`rootnode_onofflight_manufacturer_specific_sample*` device showcases its usage by using the Sample
-Manufacturer-specific cluster which is defined in
+`rootnode_onofflight_manufacturer_specific_sample*` device showcases its usage
+by using the Sample Manufacturer-specific cluster which is defined in
 `src/app/zap-templates/zcl/data-model/chip/sample-manufacturer-specific-cluster.xml`
 
 This cluster has
@@ -246,7 +246,8 @@ This cluster has
 -   A command/response pair `add-arguments`. The command takes two uint8
     arguments and the response command returns their sum.
 
-You may test the `Sample Manufacturer Specific Cluster` via chip-tool using the following commands:
+You may test the `Sample Manufacturer Specific Cluster` via chip-tool using the
+following commands:
 
 ```
 # commissioning of on-network chef device
