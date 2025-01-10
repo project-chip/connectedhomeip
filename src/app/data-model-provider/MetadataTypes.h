@@ -199,11 +199,12 @@ public:
     virtual AttributeEntry NextAttribute(const ConcreteAttributePath & before)                = 0;
     virtual std::optional<AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) = 0;
 
-    /// List items. TODO: convert ALL items above to the new format
+    /// List metadata capabilties
+    ///
+    ///  TODO: convert ALL items above to the new format
 
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
-    /// List all the generated commands for the given path
     virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
     virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
     virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)                         = 0;
