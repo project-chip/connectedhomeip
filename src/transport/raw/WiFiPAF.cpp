@@ -79,7 +79,7 @@ CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, Syst
         ChipLogError(Inet, "WiFi-PAF: No valid session whose nodeId: %lu", address.GetRemoteId());
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    DeviceLayer::ConnectivityMgr().WiFiPAFSend(*pTxInfo, std::move(msgBuf));
+    mWiFiPAFLayer->SendMessage(*pTxInfo, std::move(msgBuf));
 
     return CHIP_NO_ERROR;
 }
@@ -122,6 +122,14 @@ void WiFiPAFBase::OnWiFiPAFMessageReceived(chip::WiFiPAF::WiFiPAFSession & RxInf
         return;
     }
     HandleMessageReceived(Transport::PeerAddress(Transport::Type::kWiFiPAF, pPafInfo->nodeId), std::move(buffer));
+}
+
+CHIP_ERROR WiFiPAFBase::WiFiPAFMessageSend(chip::WiFiPAF::WiFiPAFSession & TxInfo, System::PacketBufferHandle && msgBuf)
+{
+    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != chip::WiFiPAF::State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    DeviceLayer::ConnectivityMgr().WiFiPAFSend(TxInfo, std::move(msgBuf));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WiFiPAFBase::SendAfterConnect(System::PacketBufferHandle && msg)

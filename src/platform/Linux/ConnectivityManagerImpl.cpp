@@ -2,6 +2,7 @@
  *
  *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
+ *    Copyright (c) 2025 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -145,6 +146,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     pmWiFiPAF = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+    pmWiFiPAF->Init(&DeviceLayer::SystemLayer());
 #endif
 
     return CHIP_NO_ERROR;
@@ -159,21 +161,18 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     switch (event->Type)
     {
-    case DeviceEventType::kCHIPoWiFiPAFWriteReceived: {
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFWriteReceived");
-        WiFiPAF::WiFiPAFSession RxInfo{ .id      = event->CHIPoWiFiPAFWriteReceived.id,
-                                        .peer_id = event->CHIPoWiFiPAFWriteReceived.peer_id };
-        memcpy(RxInfo.peer_addr, event->CHIPoWiFiPAFWriteReceived.peer_addr, sizeof(uint8_t) * 6);
-        _GetWiFiPAF()->OnWiFiPAFMessageReceived(RxInfo, System::PacketBufferHandle::Adopt(event->CHIPoWiFiPAFWriteReceived.Data));
+    case DeviceEventType::kCHIPoWiFiPAFReceived: {
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFReceived");
+        WiFiPAF::WiFiPAFSession RxInfo;
+        memcpy(&RxInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
+        _GetWiFiPAF()->OnWiFiPAFMessageReceived(RxInfo, System::PacketBufferHandle::Adopt(event->CHIPoWiFiPAFReceived.Data));
         break;
     }
     case DeviceEventType::kCHIPoWiFiPAFConnected: {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFConnected");
-        if (mOnPafSubscribeComplete != nullptr)
-        {
-            mOnPafSubscribeComplete(mAppState);
-            mOnPafSubscribeComplete = nullptr;
-        }
+        WiFiPAF::WiFiPAFSession SessionInfo;
+        memcpy(&SessionInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
+        _GetWiFiPAF()->HandleTransportConnectionInitiated(SessionInfo, mOnPafSubscribeComplete, mAppState, mOnPafSubscribeError);
         break;
     }
     case DeviceEventType::kCHIPoWiFiPAFCancelConnect: {
@@ -183,6 +182,13 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             mOnPafSubscribeError(mAppState, CHIP_ERROR_CANCELLED);
             mOnPafSubscribeError = nullptr;
         }
+        break;
+    }
+    case DeviceEventType::kCHIPoWiFiPAFWriteDone: {
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFWriteDone");
+        WiFiPAF::WiFiPAFSession TxInfo;
+        memcpy(&TxInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
+        _GetWiFiPAF()->HandleWriteConfirmed(TxInfo);
         break;
     }
     }
@@ -1458,16 +1464,15 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
                     peer_addr[3], peer_addr[4], peer_addr[5]);
     ChipLogProgress(DeviceLayer, "\t DevInfo: %x", pPublishSSI->DevInfo);
 
-    pPafInfo->role    = WiFiPAF::WiFiPAFSession::subscriber;
+    pPafInfo->role    = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber;
     pPafInfo->id      = subscribe_id;
     pPafInfo->peer_id = peer_publish_id;
     memcpy(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6);
-
     /*
         Indicate the connection event
     */
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kCHIPoWiFiPAFConnected;
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoWiFiPAFConnected };
+    memcpy(&event.CHIPoWiFiPAFReceived.SessionInfo, pPafInfo, sizeof(chip::WiFiPAF::WiFiPAFSession));
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -1535,7 +1540,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
         ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, no valid session with publish_id: %d", publish_id);
         return;
     }
-    if ((pPafInfo->role = WiFiPAF::WiFiPAFSession::publisher) && (pPafInfo->peer_id == peer_subscribe_id) &&
+    if ((pPafInfo->role == WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher) && (pPafInfo->peer_id == peer_subscribe_id) &&
         !memcmp(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6))
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, reentrance, publish_id: %u ", publish_id);
@@ -1548,13 +1553,13 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     ChipLogProgress(DeviceLayer, "\t (publish_id, peer_subscribe_id): (%u, %u)", publish_id, peer_subscribe_id);
     ChipLogProgress(DeviceLayer, "\t peer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", peer_addr[0], peer_addr[1], peer_addr[2],
                     peer_addr[3], peer_addr[4], peer_addr[5]);
-
     ChipLogProgress(DeviceLayer, "\t DevInfo: %x", pPublishSSI->DevInfo);
 
-    pPafInfo->role    = WiFiPAF::WiFiPAFSession::publisher;
+    pPafInfo->role    = WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher;
     pPafInfo->id      = publish_id;
     pPafInfo->peer_id = peer_subscribe_id;
     memcpy(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6);
+    _GetWiFiPAF()->HandleTransportConnectionInitiated(*pPafInfo);
 }
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
@@ -1596,10 +1601,9 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     buf = System::PacketBufferHandle::NewWithData(rxbuf, bufferLen);
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.
-    ChipDeviceEvent event{ .Type                      = DeviceEventType::kCHIPoWiFiPAFWriteReceived,
-                           .CHIPoWiFiPAFWriteReceived = {
-                               .Data = std::move(buf).UnsafeRelease(), .id = RxInfo.id, .peer_id = RxInfo.peer_id } };
-    memcpy(event.CHIPoWiFiPAFWriteReceived.peer_addr, RxInfo.peer_addr, sizeof(uint8_t) * 6);
+    ChipDeviceEvent event{ .Type                 = DeviceEventType::kCHIPoWiFiPAFReceived,
+                           .CHIPoWiFiPAFReceived = { .Data = std::move(buf).UnsafeRelease() } };
+    memcpy(&event.CHIPoWiFiPAFReceived.SessionInfo, &RxInfo, sizeof(WiFiPAF::WiFiPAFSession));
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -1675,7 +1679,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const SetupDiscriminator &
     if (pPafInfo != nullptr)
     {
         pPafInfo->id   = subscribe_id;
-        pPafInfo->role = WiFiPAF::WiFiPAFSession::subscriber;
+        pPafInfo->role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber;
     }
 
     g_signal_connect(mWpaSupplicant.iface, "nandiscovery-result",
@@ -1765,10 +1769,31 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession &
     g_variant_builder_add(&builder, "{sv}", "peer_addr", g_variant_new_string(peer_mac));
     g_variant_builder_add(&builder, "{sv}", "ssi", ssi_array_variant);
     args = g_variant_builder_end(&builder);
-    wpa_supplicant_1_interface_call_nantransmit_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
-
+    gboolean result =
+        wpa_supplicant_1_interface_call_nantransmit_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
+    if (!result)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: Failed to send message: %s", err == nullptr ? "unknown error" : err->message);
+    }
     ChipLogProgress(Controller, "WiFi-PAF: Outbound message (%lu) done", msgBuf->DataLength());
+
+    // Post an event to the Chip queue to deliver the data into the Chip stack.
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoWiFiPAFWriteDone };
+    memcpy(&event.CHIPoWiFiPAFReceived.SessionInfo, &TxInfo, sizeof(chip::WiFiPAF::WiFiPAFSession));
+    PlatformMgr().PostEventOrDie(&event);
     return ret;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role)
+{
+    switch (role)
+    {
+    case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
+        return _WiFiPAFCancelPublish(id);
+    case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
+        return _WiFiPAFCancelSubscribe(id);
+    }
+    return CHIP_ERROR_INTERNAL;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF

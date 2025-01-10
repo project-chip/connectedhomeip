@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,15 +22,222 @@
  *      stack.
  *
  */
-
 #include "WiFiPAFLayer.h"
+#include "WiFiPAFConfig.h"
+#include "WiFiPAFEndPoint.h"
+#include "WiFiPAFError.h"
 #include <cassert>
+#include <lib/core/CHIPEncoding.h>
+
+// Magic values expected in first 2 bytes of valid PAF transport capabilities request or response:
+// ref: 4.21.3, PAFTP Control Frames
+#define CAPABILITIES_MSG_CHECK_BYTE_1 0b01100101
+#define CAPABILITIES_MSG_CHECK_BYTE_2 0b01101100
+
 namespace chip {
 namespace WiFiPAF {
 
+class WiFiPAFEndPointPool
+{
+public:
+    int Size() const { return WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; }
+
+    WiFiPAFEndPoint * Get(size_t i) const
+    {
+        static union
+        {
+            uint8_t Pool[sizeof(WiFiPAFEndPoint) * WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
+            WiFiPAFEndPoint::AlignT ForceAlignment;
+        } sEndPointPool;
+
+        if (i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS)
+        {
+            return reinterpret_cast<WiFiPAFEndPoint *>(sEndPointPool.Pool + (sizeof(WiFiPAFEndPoint) * i));
+        }
+
+        return nullptr;
+    }
+
+    WiFiPAFEndPoint * Find(WIFIPAF_CONNECTION_OBJECT c) const
+    {
+        if (c == WIFIPAF_CONNECTION_UNINITIALIZED)
+        {
+            return nullptr;
+        }
+
+        for (size_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+        {
+            WiFiPAFEndPoint * elem   = Get(i);
+            WiFiPAFSession * pInInfo = reinterpret_cast<WiFiPAFSession *>(c);
+            if ((elem->mWiFiPafLayer != nullptr) && (elem->mSessionInfo.id == pInInfo->id) &&
+                (elem->mSessionInfo.peer_id == pInInfo->peer_id) &&
+                !memcmp(elem->mSessionInfo.peer_addr, pInInfo->peer_addr, sizeof(uint8_t) * 6))
+            {
+                ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%lu]", i);
+                return elem;
+            }
+            if (memcmp(&elem->mSessionInfo, c, sizeof(WiFiPAFSession)))
+            {
+                WiFiPAFSession * pElmInfo  = &elem->mSessionInfo;
+                WiFiPAFSession * pInInfo_1 = (WiFiPAFSession *) c;
+                ChipLogError(WiFiPAF, "EndPoint[%lu]", i);
+                ChipLogError(WiFiPAF, "Role: [%d, %d]", pElmInfo->role, pInInfo_1->role);
+                ChipLogError(WiFiPAF, "id: [%u, %u]", pElmInfo->id, pInInfo_1->id);
+                ChipLogError(WiFiPAF, "peer_id: [%d, %d]", pElmInfo->peer_id, pInInfo_1->peer_id);
+                ChipLogError(WiFiPAF, "ElmMac: [%02x:%02x:%02x:%02x:%02x:%02x]", pElmInfo->peer_addr[0], pElmInfo->peer_addr[1],
+                             pElmInfo->peer_addr[2], pElmInfo->peer_addr[3], pElmInfo->peer_addr[4], pElmInfo->peer_addr[5]);
+                ChipLogError(WiFiPAF, "InMac: [%02x:%02x:%02x:%02x:%02x:%02x]", pInInfo_1->peer_addr[0], pInInfo_1->peer_addr[1],
+                             pInInfo_1->peer_addr[2], pInInfo_1->peer_addr[3], pInInfo_1->peer_addr[4], pInInfo_1->peer_addr[5]);
+                ChipLogError(WiFiPAF, "nodeId: [%lu, %lu]", pElmInfo->nodeId, pInInfo_1->nodeId);
+                ChipLogError(WiFiPAF, "discriminator: [%d, %d]", pElmInfo->discriminator, pInInfo_1->discriminator);
+            }
+        }
+
+        return nullptr;
+    }
+
+    WiFiPAFEndPoint * GetFree() const
+    {
+        for (size_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+        {
+            WiFiPAFEndPoint * elem = Get(i);
+            if (elem->mWiFiPafLayer == nullptr)
+            {
+                return elem;
+            }
+        }
+        return nullptr;
+    }
+};
+
+// EndPoint Pools
+static WiFiPAFEndPointPool sWiFiPAFEndPointPool;
+
+/*
+ *   PAFTransportCapabilitiesRequestMessage implementation:
+ *   ref: 4.21.3.1, PAFTP Handshake Request
+ */
+void PAFTransportCapabilitiesRequestMessage::SetSupportedProtocolVersion(uint8_t index, uint8_t version)
+{
+    uint8_t mask;
+
+    // If even-index, store version in lower 4 bits; else, higher 4 bits.
+    if (index % 2 == 0)
+    {
+        mask = 0x0F;
+    }
+    else
+    {
+        mask    = 0xF0;
+        version = static_cast<uint8_t>(version << 4);
+    }
+
+    version &= mask;
+
+    uint8_t & slot = mSupportedProtocolVersions[(index / 2)];
+    slot           = static_cast<uint8_t>(slot & ~mask); // Clear version at index; leave other version in same byte alone
+    slot |= version;
+}
+
+CHIP_ERROR PAFTransportCapabilitiesRequestMessage::Encode(const PacketBufferHandle & msgBuf) const
+{
+    uint8_t * p = msgBuf->Start();
+
+    // Verify we can write the fixed-length request without running into the end of the buffer.
+    VerifyOrReturnError(msgBuf->MaxDataLength() >= kCapabilitiesRequestLength, CHIP_ERROR_NO_MEMORY);
+
+    chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_1);
+    chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_2);
+
+    for (uint8_t version : mSupportedProtocolVersions)
+    {
+        chip::Encoding::Write8(p, version);
+    }
+
+    chip::Encoding::LittleEndian::Write16(p, mMtu);
+    chip::Encoding::Write8(p, mWindowSize);
+
+    msgBuf->SetDataLength(kCapabilitiesRequestLength);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PAFTransportCapabilitiesRequestMessage::Decode(const PacketBufferHandle & msgBuf,
+                                                          PAFTransportCapabilitiesRequestMessage & msg)
+{
+    const uint8_t * p = msgBuf->Start();
+
+    // Verify we can read the fixed-length request without running into the end of the buffer.
+    VerifyOrReturnError(msgBuf->DataLength() >= kCapabilitiesRequestLength, CHIP_ERROR_MESSAGE_INCOMPLETE);
+
+    VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), WIFIPAF_ERROR_INVALID_MESSAGE);
+    VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), WIFIPAF_ERROR_INVALID_MESSAGE);
+
+    static_assert(kCapabilitiesRequestSupportedVersionsLength == sizeof(msg.mSupportedProtocolVersions),
+                  "Expected capability sizes and storage must match");
+    for (unsigned char & version : msg.mSupportedProtocolVersions)
+    {
+        version = chip::Encoding::Read8(p);
+    }
+
+    msg.mMtu        = chip::Encoding::LittleEndian::Read16(p);
+    msg.mWindowSize = chip::Encoding::Read8(p);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PAFTransportCapabilitiesResponseMessage::Encode(const PacketBufferHandle & msgBuf) const
+{
+    uint8_t * p = msgBuf->Start();
+
+    // Verify we can write the fixed-length request without running into the end of the buffer.
+    VerifyOrReturnError(msgBuf->MaxDataLength() >= kCapabilitiesResponseLength, CHIP_ERROR_NO_MEMORY);
+
+    chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_1);
+    chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_2);
+
+    chip::Encoding::Write8(p, mSelectedProtocolVersion);
+    chip::Encoding::LittleEndian::Write16(p, mFragmentSize);
+    chip::Encoding::Write8(p, mWindowSize);
+
+    msgBuf->SetDataLength(kCapabilitiesResponseLength);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PAFTransportCapabilitiesResponseMessage::Decode(const PacketBufferHandle & msgBuf,
+                                                           PAFTransportCapabilitiesResponseMessage & msg)
+{
+    const uint8_t * p = msgBuf->Start();
+
+    // Verify we can read the fixed-length response without running into the end of the buffer.
+    VerifyOrReturnError(msgBuf->DataLength() >= kCapabilitiesResponseLength, CHIP_ERROR_MESSAGE_INCOMPLETE);
+
+    VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), WIFIPAF_ERROR_INVALID_MESSAGE);
+    VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), WIFIPAF_ERROR_INVALID_MESSAGE);
+
+    msg.mSelectedProtocolVersion = chip::Encoding::Read8(p);
+    msg.mFragmentSize            = chip::Encoding::LittleEndian::Read16(p);
+    msg.mWindowSize              = chip::Encoding::Read8(p);
+
+    return CHIP_NO_ERROR;
+}
+
+/*
+ * WiFiPAFLayer Implementation
+ */
+
+CHIP_ERROR WiFiPAFLayer::Init(chip::System::Layer * systemLayer)
+{
+    mSystemLayer = systemLayer;
+    memset(&sWiFiPAFEndPointPool, 0, sizeof(sWiFiPAFEndPointPool));
+    ChipLogProgress(WiFiPAF, "WiFiPAF: WiFiPAFLayer::Init()");
+    return CHIP_NO_ERROR;
+}
+
 void WiFiPAFLayer::Shutdown(OnCancelDeviceHandle OnCancelDevice)
 {
-    ChipLogProgress(Inet, "WiFiPAF: Closing all WiFiPAF sessions (%lu)", PafInfoVect.size());
+    ChipLogProgress(WiFiPAF, "WiFiPAF: Closing all WiFiPAF sessions (%lu)", PafInfoVect.size());
     for (WiFiPAFSession & PafInfoElm : PafInfoVect)
     {
         if (PafInfoElm.id == UINT32_MAX)
@@ -38,13 +245,25 @@ void WiFiPAFLayer::Shutdown(OnCancelDeviceHandle OnCancelDevice)
             // Unused session
             continue;
         }
-        ChipLogProgress(Inet, "WiFiPAF: Canceling id: %u", PafInfoElm.id);
+        ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", PafInfoElm.id);
         OnCancelDevice(PafInfoElm.id, PafInfoElm.role);
     }
     PafInfoVect.clear();
 }
 
-void WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)
+bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)
+{
+    WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&RxInfo));
+    VerifyOrReturnError(endPoint != nullptr, false, ChipLogDetail(WiFiPAF, "No endpoint for received indication"));
+
+    CHIP_ERROR err = endPoint->Receive(std::move(msg));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, false,
+                        ChipLogError(WiFiPAF, "Receive failed, err = %" CHIP_ERROR_FORMAT, err.Format()));
+
+    return true;
+}
+
+void WiFiPAFLayer::OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)
 {
     if (mWiFiPAFTransport != nullptr)
     {
@@ -57,10 +276,106 @@ void WiFiPAFLayer::SetWiFiPAFState(State state)
     mAppState = state;
 }
 
+CHIP_ERROR WiFiPAFLayer::SendMessage(WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msg)
+{
+    WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&TxInfo));
+    VerifyOrReturnError(endPoint != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogDetail(WiFiPAF, "No endpoint to send packets"));
+    CHIP_ERROR err = endPoint->Send(std::move(msg));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(WiFiPAF, "Send pakets failed, err = %" CHIP_ERROR_FORMAT, err.Format()));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WiFiPAFLayer::HandleWriteConfirmed(WiFiPAF::WiFiPAFSession & TxInfo)
+{
+    WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&TxInfo));
+    VerifyOrReturnError(endPoint != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogDetail(WiFiPAF, "No endpoint to send packets"));
+    CHIP_ERROR err = endPoint->HandleSendConfirmationReceived();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(WiFiPAF, "Write_Confirm, Send pakets failed, err = %" CHIP_ERROR_FORMAT, err.Format()));
+
+    return CHIP_NO_ERROR;
+}
+
 static WiFiPAFLayer sInstance;
 WiFiPAFLayer * WiFiPAFLayer::GetWiFiPAFLayer()
 {
     return &sInstance;
+}
+
+CHIP_ERROR WiFiPAFLayer::NewEndPoint(WiFiPAFEndPoint ** retEndPoint, WiFiPAFSession & SessionInfo, WiFiPafRole role)
+{
+    *retEndPoint = nullptr;
+
+    *retEndPoint = sWiFiPAFEndPointPool.GetFree();
+    if (*retEndPoint == nullptr)
+    {
+        ChipLogError(WiFiPAF, "endpoint pool FULL");
+        return CHIP_ERROR_ENDPOINT_POOL_FULL;
+    }
+    (*retEndPoint)->Init(this, SessionInfo);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WiFiPAFLayer::HandleTransportConnectionInitiated(WiFiPAF::WiFiPAFSession & SessionInfo,
+                                                            OnSubscribeCompleteFunct OnSubscribeDoneFunc, void * appState,
+                                                            OnSubscribeErrorFunct OnSubscribeErrFunc)
+{
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    WiFiPAFEndPoint * newEndPoint = nullptr;
+
+    ChipLogProgress(WiFiPAF, "Creating WiFiPAFEndPoint");
+    err                                  = NewEndPoint(&newEndPoint, SessionInfo, SessionInfo.role);
+    newEndPoint->mOnPafSubscribeComplete = OnSubscribeDoneFunc;
+    newEndPoint->mOnPafSubscribeError    = OnSubscribeErrFunc;
+    newEndPoint->mAppState               = appState;
+    if (SessionInfo.role == kWiFiPafRole_Subscriber)
+    {
+        err = newEndPoint->StartConnect();
+    }
+
+    return err;
+}
+
+void WiFiPAFLayer::OnEndPointConnectComplete(WiFiPAFEndPoint * endPoint, CHIP_ERROR err)
+{
+    assert(endPoint != nullptr);
+    if (endPoint->mOnPafSubscribeComplete != nullptr)
+    {
+        endPoint->mOnPafSubscribeComplete(endPoint->mAppState);
+        endPoint->mOnPafSubscribeComplete = nullptr;
+    }
+    return;
+}
+
+WiFiPAFTransportProtocolVersion
+WiFiPAFLayer::GetHighestSupportedProtocolVersion(const PAFTransportCapabilitiesRequestMessage & reqMsg)
+{
+    WiFiPAFTransportProtocolVersion retVersion = kWiFiPAFTransportProtocolVersion_None;
+
+    uint8_t shift_width = 4;
+
+    for (int i = 0; i < NUM_PAFTP_SUPPORTED_PROTOCOL_VERSIONS; i++)
+    {
+        shift_width ^= 4;
+
+        uint8_t version = reqMsg.mSupportedProtocolVersions[(i / 2)];
+        version         = static_cast<uint8_t>((version >> shift_width) & 0x0F); // Grab just the nibble we want.
+
+        if ((version >= CHIP_PAF_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION) &&
+            (version <= CHIP_PAF_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION) && (version > retVersion))
+        {
+            retVersion = static_cast<WiFiPAFTransportProtocolVersion>(version);
+        }
+        else if (version == kWiFiPAFTransportProtocolVersion_None) // Signifies end of supported versions list
+        {
+            break;
+        }
+    }
+
+    return retVersion;
 }
 
 void WiFiPAFLayer::AddPafSession(const NodeId nodeId, const uint16_t discriminator)
@@ -74,9 +389,8 @@ void WiFiPAFLayer::AddPafSession(const NodeId nodeId, const uint16_t discriminat
             return;
         }
     }
-    WiFiPAFSession PafInfo{ .id = UINT32_MAX, .peer_id = UINT32_MAX, .nodeId = nodeId, .discriminator = discriminator };
-    PafInfoVect.push_back(PafInfo);
-    ChipLogProgress(Inet, "WiFiPAF: Add session with nodeId: %lu, disc: %x, total %lu sessions", nodeId, discriminator,
+    PafInfoVect.push_back({ .id = UINT32_MAX, .peer_id = UINT32_MAX, .nodeId = nodeId, .discriminator = discriminator });
+    ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with nodeId: %lu, disc: %x, total %lu sessions", nodeId, discriminator,
                     PafInfoVect.size());
 }
 
@@ -90,9 +404,8 @@ void WiFiPAFLayer::AddPafSession(uint32_t id)
             return;
         }
     }
-    WiFiPAFSession PafInfo{ .id = id };
-    PafInfoVect.push_back(PafInfo);
-    ChipLogProgress(Inet, "WiFiPAF: Add session with id: %u, total %lu sessions", id, PafInfoVect.size());
+    PafInfoVect.push_back({ .id = id });
+    ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with id: %u, total %lu sessions", id, PafInfoVect.size());
 }
 
 void WiFiPAFLayer::RmPafSession(uint32_t id)
