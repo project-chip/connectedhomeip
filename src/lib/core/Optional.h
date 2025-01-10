@@ -251,7 +251,6 @@ private:
         union Value
         {
             Value() {}
-            char _unused;
             T mData;
         } mValue;
     };
