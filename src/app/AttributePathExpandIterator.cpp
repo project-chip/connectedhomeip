@@ -131,8 +131,8 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 
         // At this point, the attributeID is NOT a wildcard (i.e. it is fixed).
         //
-        // For wildcard expansion, we validate that this is a valid attribute for for the given
-        // cluster on the given endpoint. If not a wildcard expansion, return it as-is
+        // For wildcard expansion, we validate that this is a valid attribute for the given
+        // cluster on the given endpoint. If not a wildcard expansion, return it as-is.
         if (mPosition.mAttributePath->mValue.IsWildcardPath())
         {
             if (!IsValidAttributeId(mPosition.mAttributePath->mValue.mAttributeId))
