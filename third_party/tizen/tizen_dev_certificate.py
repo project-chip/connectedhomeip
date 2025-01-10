@@ -17,6 +17,7 @@
 import argparse
 import logging
 import os
+import shlex
 import subprocess
 import sys
 
@@ -28,6 +29,17 @@ tizen_cli = os.path.join(tizen_sdk_root, "tools", "ide", "bin", "tizen")
 logging.basicConfig(level=logging.DEBUG)
 
 
+def run(cmd):
+    logging.debug("Run: %s", shlex.join(cmd))
+    proc = subprocess.Popen(cmd, errors='replace',
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    proc.wait()
+    for line in proc.stderr.readlines():
+        logging.error("%s", line.rstrip())
+    return proc
+
+
 def create_author_certificate(alias: str, password: str,
                               name: str = "", email: str = ""):
     cmd = [tizen_cli, "certificate", "--alias", alias, "--password", password]
@@ -35,13 +47,15 @@ def create_author_certificate(alias: str, password: str,
         cmd.extend(["--name", name])
     if email:
         cmd.extend(["--email", email])
-    logging.debug("Execute: %s", " ".join(cmd))
-    with subprocess.Popen(cmd, stdout=subprocess.PIPE) as proc:
+    wd = None
+    with run(cmd) as proc:
         for line in proc.stdout.readlines():
-            line = line.decode().rstrip()
+            line = line.rstrip()
             if line.startswith("Working path:"):
                 wd = line[len("Working path:"):].strip()
             print(line)
+    if not wd:
+        return None
     return os.path.join(wd, "author.p12")
 
 
@@ -69,10 +83,9 @@ def check_security_profile(profile):
             f.write('<profiles/>')
 
     cmd = [tizen_cli, "security-profiles", "list", "--name", profile]
-    logging.debug("Execute: %s", " ".join(cmd))
-    with subprocess.Popen(cmd, stdout=subprocess.PIPE) as proc:
+    with run(cmd) as proc:
         for line in proc.stdout.readlines():
-            line = line.decode().rstrip()
+            line = line.rstrip()
             print(line)
         return proc.wait() == 0
 
@@ -80,10 +93,9 @@ def check_security_profile(profile):
 def add_security_profile(profile: str, certificate: str, password: str):
     cmd = [tizen_cli, "security-profiles", "add", "--active",
            "--name", profile, "--author", certificate, "--password", password]
-    logging.debug("Execute: %s", " ".join(cmd))
-    with subprocess.Popen(cmd, stdout=subprocess.PIPE) as proc:
+    with run(cmd) as proc:
         for line in proc.stdout.readlines():
-            line = line.decode().rstrip()
+            line = line.rstrip()
             print(line)
         return proc.wait() == 0
 

@@ -757,6 +757,7 @@ js
 json
 JTAG
 Jupyter
+judgement
 jupyterlab
 KA
 kAdminister

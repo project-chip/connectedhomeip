@@ -61577,6 +61577,630 @@ public class ChipClusters {
     }
   }
 
+  public static class CameraAvSettingsUserLevelManagementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1362L;
+
+    private static final long MPTZ_POSITION_ATTRIBUTE_ID = 0L;
+    private static final long MAX_PRESETS_ATTRIBUTE_ID = 1L;
+    private static final long MPTZ_PRESETS_ATTRIBUTE_ID = 2L;
+    private static final long DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID = 3L;
+    private static final long ZOOM_MAX_ATTRIBUTE_ID = 4L;
+    private static final long TILT_MIN_ATTRIBUTE_ID = 5L;
+    private static final long TILT_MAX_ATTRIBUTE_ID = 6L;
+    private static final long PAN_MIN_ATTRIBUTE_ID = 7L;
+    private static final long PAN_MAX_ATTRIBUTE_ID = 8L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public CameraAvSettingsUserLevelManagementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
+    }
+
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void MPTZSetPosition(DefaultClusterCallback callback, Optional<Integer> pan, Optional<Integer> tilt, Optional<Integer> zoom) {
+      MPTZSetPosition(callback, pan, tilt, zoom, 0);
+    }
+
+    public void MPTZSetPosition(DefaultClusterCallback callback, Optional<Integer> pan, Optional<Integer> tilt, Optional<Integer> zoom, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long panFieldID = 0L;
+      BaseTLVType pantlvValue = pan.<BaseTLVType>map((nonOptionalpan) -> new IntType(nonOptionalpan)).orElse(new EmptyType());
+      elements.add(new StructElement(panFieldID, pantlvValue));
+
+      final long tiltFieldID = 1L;
+      BaseTLVType tilttlvValue = tilt.<BaseTLVType>map((nonOptionaltilt) -> new IntType(nonOptionaltilt)).orElse(new EmptyType());
+      elements.add(new StructElement(tiltFieldID, tilttlvValue));
+
+      final long zoomFieldID = 2L;
+      BaseTLVType zoomtlvValue = zoom.<BaseTLVType>map((nonOptionalzoom) -> new UIntType(nonOptionalzoom)).orElse(new EmptyType());
+      elements.add(new StructElement(zoomFieldID, zoomtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void MPTZRelativeMove(DefaultClusterCallback callback, Optional<Integer> panDelta, Optional<Integer> tiltDelta, Optional<Integer> zoomDelta) {
+      MPTZRelativeMove(callback, panDelta, tiltDelta, zoomDelta, 0);
+    }
+
+    public void MPTZRelativeMove(DefaultClusterCallback callback, Optional<Integer> panDelta, Optional<Integer> tiltDelta, Optional<Integer> zoomDelta, int timedInvokeTimeoutMs) {
+      final long commandId = 1L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long panDeltaFieldID = 0L;
+      BaseTLVType panDeltatlvValue = panDelta.<BaseTLVType>map((nonOptionalpanDelta) -> new IntType(nonOptionalpanDelta)).orElse(new EmptyType());
+      elements.add(new StructElement(panDeltaFieldID, panDeltatlvValue));
+
+      final long tiltDeltaFieldID = 1L;
+      BaseTLVType tiltDeltatlvValue = tiltDelta.<BaseTLVType>map((nonOptionaltiltDelta) -> new IntType(nonOptionaltiltDelta)).orElse(new EmptyType());
+      elements.add(new StructElement(tiltDeltaFieldID, tiltDeltatlvValue));
+
+      final long zoomDeltaFieldID = 2L;
+      BaseTLVType zoomDeltatlvValue = zoomDelta.<BaseTLVType>map((nonOptionalzoomDelta) -> new IntType(nonOptionalzoomDelta)).orElse(new EmptyType());
+      elements.add(new StructElement(zoomDeltaFieldID, zoomDeltatlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void MPTZMoveToPreset(DefaultClusterCallback callback, Integer presetID) {
+      MPTZMoveToPreset(callback, presetID, 0);
+    }
+
+    public void MPTZMoveToPreset(DefaultClusterCallback callback, Integer presetID, int timedInvokeTimeoutMs) {
+      final long commandId = 2L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long presetIDFieldID = 0L;
+      BaseTLVType presetIDtlvValue = new UIntType(presetID);
+      elements.add(new StructElement(presetIDFieldID, presetIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void MPTZSavePreset(DefaultClusterCallback callback, Optional<Integer> presetID, String name) {
+      MPTZSavePreset(callback, presetID, name, 0);
+    }
+
+    public void MPTZSavePreset(DefaultClusterCallback callback, Optional<Integer> presetID, String name, int timedInvokeTimeoutMs) {
+      final long commandId = 3L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long presetIDFieldID = 0L;
+      BaseTLVType presetIDtlvValue = presetID.<BaseTLVType>map((nonOptionalpresetID) -> new UIntType(nonOptionalpresetID)).orElse(new EmptyType());
+      elements.add(new StructElement(presetIDFieldID, presetIDtlvValue));
+
+      final long nameFieldID = 1L;
+      BaseTLVType nametlvValue = new StringType(name);
+      elements.add(new StructElement(nameFieldID, nametlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void MPTZRemovePreset(DefaultClusterCallback callback, Integer presetID) {
+      MPTZRemovePreset(callback, presetID, 0);
+    }
+
+    public void MPTZRemovePreset(DefaultClusterCallback callback, Integer presetID, int timedInvokeTimeoutMs) {
+      final long commandId = 4L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long presetIDFieldID = 0L;
+      BaseTLVType presetIDtlvValue = new UIntType(presetID);
+      elements.add(new StructElement(presetIDFieldID, presetIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void DPTZSetViewport(DefaultClusterCallback callback, Integer videoStreamID, ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport) {
+      DPTZSetViewport(callback, videoStreamID, viewport, 0);
+    }
+
+    public void DPTZSetViewport(DefaultClusterCallback callback, Integer videoStreamID, ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport, int timedInvokeTimeoutMs) {
+      final long commandId = 5L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long videoStreamIDFieldID = 0L;
+      BaseTLVType videoStreamIDtlvValue = new UIntType(videoStreamID);
+      elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
+
+      final long viewportFieldID = 1L;
+      BaseTLVType viewporttlvValue = viewport.encodeTlv();
+      elements.add(new StructElement(viewportFieldID, viewporttlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void DPTZRelativeMove(DefaultClusterCallback callback, Integer videoStreamID, Optional<Integer> deltaX, Optional<Integer> deltaY, Optional<Integer> zoomDelta) {
+      DPTZRelativeMove(callback, videoStreamID, deltaX, deltaY, zoomDelta, 0);
+    }
+
+    public void DPTZRelativeMove(DefaultClusterCallback callback, Integer videoStreamID, Optional<Integer> deltaX, Optional<Integer> deltaY, Optional<Integer> zoomDelta, int timedInvokeTimeoutMs) {
+      final long commandId = 6L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long videoStreamIDFieldID = 0L;
+      BaseTLVType videoStreamIDtlvValue = new UIntType(videoStreamID);
+      elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
+
+      final long deltaXFieldID = 1L;
+      BaseTLVType deltaXtlvValue = deltaX.<BaseTLVType>map((nonOptionaldeltaX) -> new IntType(nonOptionaldeltaX)).orElse(new EmptyType());
+      elements.add(new StructElement(deltaXFieldID, deltaXtlvValue));
+
+      final long deltaYFieldID = 2L;
+      BaseTLVType deltaYtlvValue = deltaY.<BaseTLVType>map((nonOptionaldeltaY) -> new IntType(nonOptionaldeltaY)).orElse(new EmptyType());
+      elements.add(new StructElement(deltaYFieldID, deltaYtlvValue));
+
+      final long zoomDeltaFieldID = 3L;
+      BaseTLVType zoomDeltatlvValue = zoomDelta.<BaseTLVType>map((nonOptionalzoomDelta) -> new IntType(nonOptionalzoomDelta)).orElse(new EmptyType());
+      elements.add(new StructElement(zoomDeltaFieldID, zoomDeltatlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface MPTZPositionAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct value);
+    }
+
+    public interface MPTZPresetsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct> value);
+    }
+
+    public interface DPTZRelativeMoveAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Integer> value);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readMPTZPositionAttribute(
+        MPTZPositionAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_POSITION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MPTZ_POSITION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMPTZPositionAttribute(
+        MPTZPositionAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_POSITION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MPTZ_POSITION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaxPresetsAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_PRESETS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_PRESETS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaxPresetsAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_PRESETS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_PRESETS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMPTZPresetsAttribute(
+        MPTZPresetsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_PRESETS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MPTZ_PRESETS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMPTZPresetsAttribute(
+        MPTZPresetsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_PRESETS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MPTZ_PRESETS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readDPTZRelativeMoveAttribute(
+        DPTZRelativeMoveAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeDPTZRelativeMoveAttribute(
+        DPTZRelativeMoveAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readZoomMaxAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ZOOM_MAX_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ZOOM_MAX_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeZoomMaxAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ZOOM_MAX_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ZOOM_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTiltMinAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TILT_MIN_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TILT_MIN_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTiltMinAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TILT_MIN_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TILT_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTiltMaxAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TILT_MAX_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TILT_MAX_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTiltMaxAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TILT_MAX_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TILT_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPanMinAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PAN_MIN_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PAN_MIN_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePanMinAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PAN_MIN_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PAN_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPanMaxAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PAN_MAX_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PAN_MAX_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePanMaxAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PAN_MAX_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PAN_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
   public static class WebRTCTransportProviderCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1363L;
 
