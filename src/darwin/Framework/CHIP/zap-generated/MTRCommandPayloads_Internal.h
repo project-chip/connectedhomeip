@@ -2524,19 +2524,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRSampleMEIClusterPingParams (InternalMethods)
+@interface MTRSampleManufacturerSpecificClusterPingParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRSampleMEIClusterAddArgumentsResponseParams (InternalMethods)
+@interface MTRSampleManufacturerSpecificClusterAddArgumentsResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArgumentsResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRSampleMEIClusterAddArgumentsParams (InternalMethods)
+@interface MTRSampleManufacturerSpecificClusterAddArgumentsParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

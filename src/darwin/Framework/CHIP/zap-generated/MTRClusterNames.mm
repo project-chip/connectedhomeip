@@ -396,8 +396,8 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeUnitTestingID:
         result = @"UnitTesting";
         break;
-    case MTRClusterIDTypeSampleMEIID:
-        result = @"SampleMEI";
+    case MTRClusterIDTypeSampleManufacturerSpecificID:
+        result = @"SampleManufacturerSpecific";
         break;
 
     default:
@@ -8529,32 +8529,32 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
-    case MTRClusterIDTypeSampleMEIID:
+    case MTRClusterIDTypeSampleManufacturerSpecificID:
 
         switch (attributeID) {
 
-            // Cluster SampleMEI attributes
-        case MTRAttributeIDTypeClusterSampleMEIAttributeFlipFlopID:
+            // Cluster SampleManufacturerSpecific attributes
+        case MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeFlipFlopID:
             result = @"FlipFlop";
             break;
 
-        case MTRAttributeIDTypeClusterSampleMEIAttributeGeneratedCommandListID:
+        case MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterSampleMEIAttributeAcceptedCommandListID:
+        case MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeAcceptedCommandListID:
             result = @"AcceptedCommandList";
             break;
 
-        case MTRAttributeIDTypeClusterSampleMEIAttributeAttributeListID:
+        case MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeAttributeListID:
             result = @"AttributeList";
             break;
 
-        case MTRAttributeIDTypeClusterSampleMEIAttributeFeatureMapID:
+        case MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeFeatureMapID:
             result = @"FeatureMap";
             break;
 
-        case MTRAttributeIDTypeClusterSampleMEIAttributeClusterRevisionID:
+        case MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
@@ -11098,15 +11098,15 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
-    case MTRClusterIDTypeSampleMEIID:
+    case MTRClusterIDTypeSampleManufacturerSpecificID:
 
         switch (commandID) {
 
-        case MTRCommandIDTypeClusterSampleMEICommandPingID:
+        case MTRCommandIDTypeClusterSampleManufacturerSpecificCommandPingID:
             result = @"Ping";
             break;
 
-        case MTRCommandIDTypeClusterSampleMEICommandAddArgumentsID:
+        case MTRCommandIDTypeClusterSampleManufacturerSpecificCommandAddArgumentsID:
             result = @"AddArguments";
             break;
 
@@ -12740,11 +12740,11 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
-    case MTRClusterIDTypeSampleMEIID:
+    case MTRClusterIDTypeSampleManufacturerSpecificID:
 
         switch (commandID) {
 
-        case MTRCommandIDTypeClusterSampleMEICommandAddArgumentsResponseID:
+        case MTRCommandIDTypeClusterSampleManufacturerSpecificCommandAddArgumentsResponseID:
             result = @"AddArgumentsResponse";
             break;
 
@@ -14523,12 +14523,12 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
-    case MTRClusterIDTypeSampleMEIID:
+    case MTRClusterIDTypeSampleManufacturerSpecificID:
 
         switch (eventID) {
 
-            // Cluster SampleMEI events
-        case MTREventIDTypeClusterSampleMEIEventPingCountEventID:
+            // Cluster SampleManufacturerSpecific events
+        case MTREventIDTypeClusterSampleManufacturerSpecificEventPingCountEventID:
             result = @"PingCountEvent";
             break;
 

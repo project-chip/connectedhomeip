@@ -317,7 +317,7 @@ config CHIP_PROJECT_CONFIG
 	  platform-specific settings.
 
 config  CHIP_PROJECT_APP_COMMON_INCLUDE_DIRS
-	string "Project specific app-common directory for MEI clusters"
+	string "Project specific app-common directory for Manufacturer-specific clusters"
 	help
 	  Provides a directory to the app-common/ folder.
 

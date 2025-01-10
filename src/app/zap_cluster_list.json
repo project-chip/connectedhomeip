@@ -69,7 +69,7 @@
         "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
-        "SAMPLE_MEI_CLUSTER": [],
+        "SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "OCCUPANCY_SENSING_CLUSTER": [],
         "ON_OFF_CLUSTER": [],
@@ -113,7 +113,9 @@
         "TARGET_NAVIGATOR_CLUSTER": [],
         "TEMPERATURE_CONTROL_CLUSTER": [],
         "TEMPERATURE_MEASUREMENT_CLUSTER": [],
-        "THERMOSTAT_CLUSTER": ["thermostat-client"],
+        "THERMOSTAT_CLUSTER": [
+            "thermostat-client"
+        ],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [],
         "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [],
@@ -140,8 +142,12 @@
         "ZONE_MANAGEMENT_CLUSTER": []
     },
     "ServerDirectories": {
-        "ACCESS_CONTROL_CLUSTER": ["access-control-server"],
-        "ACCOUNT_LOGIN_CLUSTER": ["account-login-server"],
+        "ACCESS_CONTROL_CLUSTER": [
+            "access-control-server"
+        ],
+        "ACCOUNT_LOGIN_CLUSTER": [
+            "account-login-server"
+        ],
         "ACTIONS_CLUSTER": [],
         "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER": [
             "resource-monitoring-server"
@@ -149,14 +155,26 @@
         "ADMINISTRATOR_COMMISSIONING_CLUSTER": [
             "administrator-commissioning-server"
         ],
-        "AIR_QUALITY_CLUSTER": ["air-quality-server"],
+        "AIR_QUALITY_CLUSTER": [
+            "air-quality-server"
+        ],
         "ALARM_CLUSTER": [],
-        "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
-        "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],
-        "AUDIO_OUTPUT_CLUSTER": ["audio-output-server"],
+        "APPLICATION_BASIC_CLUSTER": [
+            "application-basic-server"
+        ],
+        "APPLICATION_LAUNCHER_CLUSTER": [
+            "application-launcher-server"
+        ],
+        "AUDIO_OUTPUT_CLUSTER": [
+            "audio-output-server"
+        ],
         "BALLAST_CONFIGURATION_CLUSTER": [],
-        "BASIC_INFORMATION_CLUSTER": ["basic-information"],
-        "BINDING_CLUSTER": ["bindings"],
+        "BASIC_INFORMATION_CLUSTER": [
+            "basic-information"
+        ],
+        "BINDING_CLUSTER": [
+            "bindings"
+        ],
         "BOOLEAN_STATE_CLUSTER": [],
         "BOOLEAN_STATE_CONFIGURATION_CLUSTER": [
             "boolean-state-configuration-server"
@@ -172,79 +190,179 @@
         "CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "CHANNEL_CLUSTER": ["channel-server"],
-        "CHIME_CLUSTER": ["chime-server"],
-        "COLOR_CONTROL_CLUSTER": ["color-control-server"],
-        "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
+        "CHANNEL_CLUSTER": [
+            "channel-server"
+        ],
+        "CHIME_CLUSTER": [
+            "chime-server"
+        ],
+        "COLOR_CONTROL_CLUSTER": [
+            "color-control-server"
+        ],
+        "COMMISSIONER_CONTROL_CLUSTER": [
+            "commissioner-control-server"
+        ],
         "COMMISSIONING_CLUSTER": [],
-        "CONTENT_LAUNCHER_CLUSTER": ["content-launch-server"],
-        "CONTENT_CONTROL_CLUSTER": ["content-control-server"],
-        "CONTENT_APP_OBSERVER_CLUSTER": ["content-app-observer"],
-        "DESCRIPTOR_CLUSTER": ["descriptor"],
-        "DEVICE_ENERGY_MANAGEMENT_CLUSTER": ["device-energy-management-server"],
-        "DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER": ["mode-base-server"],
+        "CONTENT_LAUNCHER_CLUSTER": [
+            "content-launch-server"
+        ],
+        "CONTENT_CONTROL_CLUSTER": [
+            "content-control-server"
+        ],
+        "CONTENT_APP_OBSERVER_CLUSTER": [
+            "content-app-observer"
+        ],
+        "DESCRIPTOR_CLUSTER": [
+            "descriptor"
+        ],
+        "DEVICE_ENERGY_MANAGEMENT_CLUSTER": [
+            "device-energy-management-server"
+        ],
+        "DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER": [
+            "mode-base-server"
+        ],
         "DEVICE_TEMP_CLUSTER": [],
-        "DIAGNOSTIC_LOGS_CLUSTER": ["diagnostic-logs-server"],
-        "DISHWASHER_ALARM_CLUSTER": ["dishwasher-alarm-server"],
-        "DISHWASHER_MODE_CLUSTER": ["mode-base-server"],
-        "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
-        "DOOR_LOCK_CLUSTER": ["door-lock-server"],
-        "ECOSYSTEM_INFORMATION_CLUSTER": ["ecosystem-information-server"],
+        "DIAGNOSTIC_LOGS_CLUSTER": [
+            "diagnostic-logs-server"
+        ],
+        "DISHWASHER_ALARM_CLUSTER": [
+            "dishwasher-alarm-server"
+        ],
+        "DISHWASHER_MODE_CLUSTER": [
+            "mode-base-server"
+        ],
+        "MICROWAVE_OVEN_MODE_CLUSTER": [
+            "mode-base-server"
+        ],
+        "DOOR_LOCK_CLUSTER": [
+            "door-lock-server"
+        ],
+        "ECOSYSTEM_INFORMATION_CLUSTER": [
+            "ecosystem-information-server"
+        ],
         "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [
             "electrical-energy-measurement-server"
         ],
         "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [
             "electrical-power-measurement-server"
         ],
-        "ENERGY_EVSE_CLUSTER": ["energy-evse-server"],
-        "ENERGY_EVSE_MODE_CLUSTER": ["mode-base-server"],
+        "ENERGY_EVSE_CLUSTER": [
+            "energy-evse-server"
+        ],
+        "ENERGY_EVSE_MODE_CLUSTER": [
+            "mode-base-server"
+        ],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [
             "ethernet-network-diagnostics-server"
         ],
-        "ENERGY_PREFERENCE_CLUSTER": ["energy-preference-server"],
-        "FAN_CONTROL_CLUSTER": ["fan-control-server"],
-        "FAULT_INJECTION_CLUSTER": ["fault-injection-server"],
-        "FIXED_LABEL_CLUSTER": ["fixed-label-server"],
+        "ENERGY_PREFERENCE_CLUSTER": [
+            "energy-preference-server"
+        ],
+        "FAN_CONTROL_CLUSTER": [
+            "fan-control-server"
+        ],
+        "FAULT_INJECTION_CLUSTER": [
+            "fault-injection-server"
+        ],
+        "FIXED_LABEL_CLUSTER": [
+            "fixed-label-server"
+        ],
         "FLOW_MEASUREMENT_CLUSTER": [],
         "FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "GENERAL_COMMISSIONING_CLUSTER": ["general-commissioning-server"],
-        "GENERAL_DIAGNOSTICS_CLUSTER": ["general-diagnostics-server"],
-        "GROUPS_CLUSTER": ["groups-server"],
-        "HEPA_FILTER_MONITORING_CLUSTER": ["resource-monitoring-server"],
-        "GROUP_KEY_MANAGEMENT_CLUSTER": ["group-key-mgmt-server"],
-        "ICD_MANAGEMENT_CLUSTER": ["icd-management-server"],
-        "IDENTIFY_CLUSTER": ["identify-server"],
+        "GENERAL_COMMISSIONING_CLUSTER": [
+            "general-commissioning-server"
+        ],
+        "GENERAL_DIAGNOSTICS_CLUSTER": [
+            "general-diagnostics-server"
+        ],
+        "GROUPS_CLUSTER": [
+            "groups-server"
+        ],
+        "HEPA_FILTER_MONITORING_CLUSTER": [
+            "resource-monitoring-server"
+        ],
+        "GROUP_KEY_MANAGEMENT_CLUSTER": [
+            "group-key-mgmt-server"
+        ],
+        "ICD_MANAGEMENT_CLUSTER": [
+            "icd-management-server"
+        ],
+        "IDENTIFY_CLUSTER": [
+            "identify-server"
+        ],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
-        "KEYPAD_INPUT_CLUSTER": ["keypad-input-server"],
-        "LAUNDRY_WASHER_MODE_CLUSTER": ["mode-base-server"],
-        "LEVEL_CONTROL_CLUSTER": ["level-control"],
+        "KEYPAD_INPUT_CLUSTER": [
+            "keypad-input-server"
+        ],
+        "LAUNDRY_WASHER_MODE_CLUSTER": [
+            "mode-base-server"
+        ],
+        "LEVEL_CONTROL_CLUSTER": [
+            "level-control"
+        ],
         "LOCALIZATION_CONFIGURATION_CLUSTER": [
             "localization-configuration-server"
         ],
-        "LOW_POWER_CLUSTER": ["low-power-server"],
-        "MEDIA_INPUT_CLUSTER": ["media-input-server"],
-        "MEDIA_PLAYBACK_CLUSTER": ["media-playback-server"],
-        "MICROWAVE_OVEN_CONTROL_CLUSTER": ["microwave-oven-control-server"],
-        "MESSAGES_CLUSTER": ["messages-server"],
-        "MODE_SELECT_CLUSTER": ["mode-select-server"],
-        "NETWORK_COMMISSIONING_CLUSTER": ["network-commissioning"],
+        "LOW_POWER_CLUSTER": [
+            "low-power-server"
+        ],
+        "MEDIA_INPUT_CLUSTER": [
+            "media-input-server"
+        ],
+        "MEDIA_PLAYBACK_CLUSTER": [
+            "media-playback-server"
+        ],
+        "MICROWAVE_OVEN_CONTROL_CLUSTER": [
+            "microwave-oven-control-server"
+        ],
+        "MESSAGES_CLUSTER": [
+            "messages-server"
+        ],
+        "MODE_SELECT_CLUSTER": [
+            "mode-select-server"
+        ],
+        "NETWORK_COMMISSIONING_CLUSTER": [
+            "network-commissioning"
+        ],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
-        "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
-        "ON_OFF_CLUSTER": ["on-off-server"],
-        "POWER_TOPOLOGY_CLUSTER": ["power-topology-server"],
-        "OPERATIONAL_CREDENTIALS_CLUSTER": ["operational-credentials-server"],
-        "OPERATIONAL_STATE_CLUSTER": ["operational-state-server"],
-        "OPERATIONAL_STATE_OVEN_CLUSTER": ["operational-state-server"],
-        "OPERATIONAL_STATE_RVC_CLUSTER": ["operational-state-server"],
+        "SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER": [
+            "sample-manufacturer-specific-server"
+        ],
+        "OCCUPANCY_SENSING_CLUSTER": [
+            "occupancy-sensor-server"
+        ],
+        "ON_OFF_CLUSTER": [
+            "on-off-server"
+        ],
+        "POWER_TOPOLOGY_CLUSTER": [
+            "power-topology-server"
+        ],
+        "OPERATIONAL_CREDENTIALS_CLUSTER": [
+            "operational-credentials-server"
+        ],
+        "OPERATIONAL_STATE_CLUSTER": [
+            "operational-state-server"
+        ],
+        "OPERATIONAL_STATE_OVEN_CLUSTER": [
+            "operational-state-server"
+        ],
+        "OPERATIONAL_STATE_RVC_CLUSTER": [
+            "operational-state-server"
+        ],
         "OTA_BOOTLOAD_CLUSTER": [],
-        "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": ["ota-provider"],
-        "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER": ["ota-requestor"],
-        "OVEN_MODE_CLUSTER": ["mode-base-server"],
+        "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": [
+            "ota-provider"
+        ],
+        "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER": [
+            "ota-requestor"
+        ],
+        "OVEN_MODE_CLUSTER": [
+            "mode-base-server"
+        ],
         "OZONE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
@@ -260,7 +378,9 @@
         "POLL_CONTROL_CLUSTER": [],
         "POWER_CONFIG_CLUSTER": [],
         "POWER_PROFILE_CLUSTER": [],
-        "POWER_SOURCE_CLUSTER": ["power-source-server"],
+        "POWER_SOURCE_CLUSTER": [
+            "power-source-server"
+        ],
         "POWER_SOURCE_CONFIGURATION_CLUSTER": [
             "power-source-configuration-server"
         ],
@@ -275,22 +395,44 @@
         "RADON_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "REFRIGERATOR_ALARM_CLUSTER": ["refrigerator-alarm-server"],
+        "REFRIGERATOR_ALARM_CLUSTER": [
+            "refrigerator-alarm-server"
+        ],
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER": [
             "mode-base-server"
         ],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
-        "RVC_CLEAN_MODE_CLUSTER": ["mode-base-server"],
-        "RVC_RUN_MODE_CLUSTER": ["mode-base-server"],
-        "SCENES_CLUSTER": ["scenes-server"],
-        "SERVICE_AREA_CLUSTER": ["service-area-server"],
-        "SMOKE_CO_ALARM_CLUSTER": ["smoke-co-alarm-server"],
-        "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],
-        "SWITCH_CLUSTER": ["switch-server"],
-        "TARGET_NAVIGATOR_CLUSTER": ["target-navigator-server"],
-        "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
+        "RVC_CLEAN_MODE_CLUSTER": [
+            "mode-base-server"
+        ],
+        "RVC_RUN_MODE_CLUSTER": [
+            "mode-base-server"
+        ],
+        "SCENES_CLUSTER": [
+            "scenes-server"
+        ],
+        "SERVICE_AREA_CLUSTER": [
+            "service-area-server"
+        ],
+        "SMOKE_CO_ALARM_CLUSTER": [
+            "smoke-co-alarm-server"
+        ],
+        "SOFTWARE_DIAGNOSTICS_CLUSTER": [
+            "software-diagnostics-server"
+        ],
+        "SWITCH_CLUSTER": [
+            "switch-server"
+        ],
+        "TARGET_NAVIGATOR_CLUSTER": [
+            "target-navigator-server"
+        ],
+        "TEMPERATURE_CONTROL_CLUSTER": [
+            "temperature-control-server"
+        ],
         "TEMPERATURE_MEASUREMENT_CLUSTER": [],
-        "THERMOSTAT_CLUSTER": ["thermostat-server"],
+        "THERMOSTAT_CLUSTER": [
+            "thermostat-server"
+        ],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [
             "thermostat-user-interface-configuration-server"
         ],
@@ -300,30 +442,58 @@
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [
             "thread-network-diagnostics-server"
         ],
-        "THREAD_NETWORK_DIRECTORY_CLUSTER": ["thread-network-directory-server"],
+        "THREAD_NETWORK_DIRECTORY_CLUSTER": [
+            "thread-network-directory-server"
+        ],
         "TIME_CLUSTER": [],
-        "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
-        "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
-        "TIMER_CLUSTER": ["timer-server"],
+        "TIME_FORMAT_LOCALIZATION_CLUSTER": [
+            "time-format-localization-server"
+        ],
+        "TIME_SYNCHRONIZATION_CLUSTER": [
+            "time-synchronization-server"
+        ],
+        "TIMER_CLUSTER": [
+            "timer-server"
+        ],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
         "UNIT_LOCALIZATION_CLUSTER": [],
-        "UNIT_TESTING_CLUSTER": ["test-cluster-server"],
-        "USER_LABEL_CLUSTER": ["user-label-server"],
+        "UNIT_TESTING_CLUSTER": [
+            "test-cluster-server"
+        ],
+        "USER_LABEL_CLUSTER": [
+            "user-label-server"
+        ],
         "VALVE_CONFIGURATION_AND_CONTROL_CLUSTER": [
             "valve-configuration-and-control-server"
         ],
-        "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
-        "LAUNDRY_WASHER_CONTROLS_CLUSTER": ["laundry-washer-controls-server"],
-        "LAUNDRY_DRYER_CONTROLS_CLUSTER": ["laundry-dryer-controls-server"],
+        "WAKE_ON_LAN_CLUSTER": [
+            "wake-on-lan-server"
+        ],
+        "LAUNDRY_WASHER_CONTROLS_CLUSTER": [
+            "laundry-washer-controls-server"
+        ],
+        "LAUNDRY_DRYER_CONTROLS_CLUSTER": [
+            "laundry-dryer-controls-server"
+        ],
         "WEB_RTC_PROVIDER_CLUSTER": [],
         "WEBRTC_REQUESTOR_CLUSTER": [],
-        "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
-        "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
-        "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
-        "WATER_HEATER_MANAGEMENT_CLUSTER": ["water-heater-management-server"],
-        "WATER_HEATER_MODE_CLUSTER": ["mode-base-server"],
+        "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [
+            "wifi-network-diagnostics-server"
+        ],
+        "WIFI_NETWORK_MANAGEMENT_CLUSTER": [
+            "wifi-network-management-server"
+        ],
+        "WINDOW_COVERING_CLUSTER": [
+            "window-covering-server"
+        ],
+        "WATER_HEATER_MANAGEMENT_CLUSTER": [
+            "water-heater-management-server"
+        ],
+        "WATER_HEATER_MODE_CLUSTER": [
+            "mode-base-server"
+        ],
         "ZONE_MANAGEMENT_CLUSTER": []
     }
 }

@@ -6200,9 +6200,9 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL AttributeIsSpecifiedInSampleMEICluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInSampleManufacturerSpecificCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::SampleMei;
+    using namespace Clusters::SampleManufacturerSpecific;
     switch (aAttributeId) {
     case Attributes::FlipFlop::Id: {
         return YES;
@@ -6600,8 +6600,8 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);
     }
-    case Clusters::SampleMei::Id: {
-        return AttributeIsSpecifiedInSampleMEICluster(aAttributeId);
+    case Clusters::SampleManufacturerSpecific::Id: {
+        return AttributeIsSpecifiedInSampleManufacturerSpecificCluster(aAttributeId);
     }
     default: {
         return NO;

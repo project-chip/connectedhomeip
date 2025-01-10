@@ -9564,8 +9564,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::SampleMei::Id: {
-        using namespace app::Clusters::SampleMei;
+    case app::Clusters::SampleManufacturerSpecific::Id: {
+        using namespace app::Clusters::SampleManufacturerSpecific;
         switch (aPath.mEventId)
         {
         case Events::PingCountEvent::Id: {
@@ -9592,10 +9592,10 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass pingCountEventStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$SampleMeiClusterPingCountEventEvent", pingCountEventStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$SampleManufacturerSpecificClusterPingCountEventEvent", pingCountEventStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$SampleMeiClusterPingCountEventEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SampleManufacturerSpecificClusterPingCountEventEvent");
                 return nullptr;
             }
 
@@ -9604,7 +9604,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 env, pingCountEventStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V", &pingCountEventStructCtor);
             if (err != CHIP_NO_ERROR || pingCountEventStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$SampleMeiClusterPingCountEventEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SampleManufacturerSpecificClusterPingCountEventEvent constructor");
                 return nullptr;
             }
 

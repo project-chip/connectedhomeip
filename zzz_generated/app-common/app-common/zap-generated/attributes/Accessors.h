@@ -6649,7 +6649,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace FaultInjection
 
-namespace SampleMei {
+namespace SampleManufacturerSpecific {
 namespace Attributes {
 
 namespace FlipFlop {
@@ -6671,7 +6671,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace SampleMei
+} // namespace SampleManufacturerSpecific
 
 } // namespace Clusters
 } // namespace app

@@ -119,7 +119,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/temperature-control-cluster.x
 load "../src/app/zap-templates/zcl/data-model/chip/refrigerator-alarm.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/air-quality-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.xml";
-load "../src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/sample-manufacturer-specific-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml";

@@ -671,7 +671,7 @@ void emberAfFaultInjectionClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleMeiClusterInitCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterInitCallback(chip::EndpointId endpoint);
 
 // Cluster Server/Client Init Functions
 
@@ -5589,22 +5589,22 @@ void emberAfFaultInjectionClusterServerTickCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterServerInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterSampleMeiClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterSampleManufacturerSpecificClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleMeiClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterClientInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param attributePath Concrete attribute path that changed
  */
-void MatterSampleMeiClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterSampleManufacturerSpecificClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /**
  * @param attributePath Concrete attribute path to be changed
@@ -5613,13 +5613,13 @@ void MatterSampleMeiClusterServerAttributeChangedCallback(const chip::app::Concr
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterSampleMeiClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+MatterSampleManufacturerSpecificClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /**
  * @param endpoint  Endpoint that is being served
  */
-void emberAfSampleMeiClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterServerTickCallback(chip::EndpointId endpoint);
 
 // Cluster Commands Callback
 

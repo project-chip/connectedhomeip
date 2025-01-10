@@ -10805,7 +10805,7 @@ internal cluster FaultInjection = 4294048774 {
 }
 
 /** The Sample MEI cluster showcases a cluster manufacturer extensions */
-cluster SampleMei = 4294048800 {
+cluster SampleManufacturerSpecific = 4294048800 {
   revision 1; // NOTE: Default/not specifically set
 
   fabric_sensitive info event PingCountEvent = 0 {
@@ -10835,4 +10835,3 @@ cluster SampleMei = 4294048800 {
   /** Command that takes two uint8 arguments and returns their sum. */
   command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
 }
-
