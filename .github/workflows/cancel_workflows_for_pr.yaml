@@ -49,4 +49,5 @@ jobs:
                     --require "Lint Code Base" \
                     --require "ZAP"            \
                     --require "Run misspell"   \
+                    --require "PR validity"    \
                     --max-pr-age-minutes 20

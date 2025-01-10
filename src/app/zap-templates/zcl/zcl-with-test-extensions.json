@@ -27,6 +27,7 @@
         "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
         "bridged-device-basic-information.xml",
+        "camera-av-settings-user-level-management-cluster.xml",
         "camera-av-stream-management-cluster.xml",
         "chime-cluster.xml",
         "chip-ota.xml",
@@ -685,7 +686,8 @@
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
             "Viewport"
-        ]
+        ],
+        "Camera AV Settings User Level Management": ["MPTZPosition"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
