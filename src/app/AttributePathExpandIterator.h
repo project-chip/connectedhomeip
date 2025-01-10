@@ -176,7 +176,8 @@ private:
 ///        PeekAttributePathExpandIterator iterator(...., state);
 ///        if (iterator.Next(...)) { ... }
 ///      }
-///      // state here is ROLLED BACK (i.e. initializing a new iterator with it will start at the same place as the previous iteration attempt).
+///      // state here is ROLLED BACK (i.e. initializing a new iterator with it will start at the same place as the previous
+///      iteration attempt).
 ///
 ///
 class PeekAttributePathExpandIterator
