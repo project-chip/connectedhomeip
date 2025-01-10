@@ -148,51 +148,43 @@ private:
     bool IsValidAttributeId(AttributeId attributeId);
 };
 
-/// PeekAttributePathExpandIterator is an AttributePathExpandIterator wrapper that rolls back the Next()
-/// call whenever a new `MarkCompleted()` method is not called (until Next() returns false). This is useful
-/// to allow pausing iteration in cases the next path was not ready to be used yet and iteration needs to
-/// continue later.
+/// RollbackAttributePathExpandIterator is an AttributePathExpandIterator wrapper that rolls back the Next()
+/// call whenever a new `MarkCompleted()` method is not called.
 ///
 /// Example use cases:
 ///
 /// - Iterate over all attributes and process one-by-one, however when the iteration fails, resume at
 ///   the last failure point:
 ///
-///      PeekAttributePathExpandIterator iterator(....);
+///      RollbackAttributePathExpandIterator iterator(....);
 ///      ConcreteAttributePath path;
 ///
-///      while (iterator.Next(path)) {
+///      for ( ; iterator.Next(path); iterator.MarkCompleted()) {
 ///         if (!CanProcess(path)) {
 ///             // iterator state IS PRESERVED so that Next() will return the SAME path on the next call.
 ///             return CHIP_ERROR_TRY_AGAIN_LATER;
 ///         }
 ///      }
-///      // this will make Next() NOT return the previous value.
-///      iterator.MarkCompleted();
 ///
 /// -  Grab what the next output path would be WITHOUT advancing a state;
 ///
 ///      {
-///        PeekAttributePathExpandIterator iterator(...., state);
+///        RollbackAttributePathExpandIterator iterator(...., state);
 ///        if (iterator.Next(...)) { ... }
 ///      }
 ///      // state here is ROLLED BACK (i.e. initializing a new iterator with it will start at the same place as the previous
 ///      iteration attempt).
 ///
 ///
-class PeekAttributePathExpandIterator
+class RollbackAttributePathExpandIterator
 {
 public:
-    PeekAttributePathExpandIterator(DataModel::Provider * dataModel, AttributePathExpandIterator::Position & position) :
+    RollbackAttributePathExpandIterator(DataModel::Provider * dataModel, AttributePathExpandIterator::Position & position) :
         mAttributePathExpandIterator(dataModel, position), mPositionTarget(position), mCompletedPosition(position)
     {}
-    ~PeekAttributePathExpandIterator() { mPositionTarget = mCompletedPosition; }
+    ~RollbackAttributePathExpandIterator() { mPositionTarget = mCompletedPosition; }
 
-    bool Next(ConcreteAttributePath & path)
-    {
-        mCompletedPosition = mPositionTarget;
-        return mAttributePathExpandIterator.Next(path);
-    }
+    bool Next(ConcreteAttributePath & path) { return mAttributePathExpandIterator.Next(path); }
 
     /// Marks the current iteration completed (so peek does not actually roll back)
     void MarkCompleted() { mCompletedPosition = mPositionTarget; }
