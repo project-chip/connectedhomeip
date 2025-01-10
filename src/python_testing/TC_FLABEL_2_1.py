@@ -50,6 +50,9 @@ class Test_TC_FLABEL_2_1(MatterBaseTest):
             TestStep(4, "Verify LabelList hasn't changed", "LabelList matches initial read")
         ]
 
+    def desc_TC_FLABEL_2_1(self) -> str:
+        return "[TC-FLABEL-2.1] Fixed Label Cluster [DUT-server]"
+
     @run_if_endpoint_matches(has_attribute(Clusters.FixedLabel.Attributes.LabelList))
     async def test_TC_FLABEL_2_1(self):
         # Step 1: Commission DUT (already done)
