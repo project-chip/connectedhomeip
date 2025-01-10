@@ -49,6 +49,8 @@ DOTFILE=".gn"
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_silabs_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
 
+WIFI_DIR_SUFFIX=""
+
 if [ "$#" == "0" ]; then
     echo "Build script for EFR32 Matter apps
     Format:
@@ -190,10 +192,13 @@ else
                 fi
                 if [ "$2" = "rs9116" ]; then
                     optArgs+="use_rs9116=true "
+                    WIFI_DIR_SUFFIX="_rs9116"
                 elif [ "$2" = "SiWx917" ]; then
                     optArgs+="use_SiWx917=true "
+                    WIFI_DIR_SUFFIX="_SiWx917"
                 elif [ "$2" = "wf200" ]; then
                     optArgs+="use_wf200=true "
+                    WIFI_DIR_SUFFIX="_wf200"
                 else
                     echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
                     exit 1
@@ -322,7 +327,7 @@ else
     fi
 
     PYTHON_PATH="$(which python3)"
-    BUILD_DIR=$OUTDIR/$SILABS_BOARD
+    BUILD_DIR=$OUTDIR/$SILABS_BOARD$WIFI_DIR_SUFFIX
     echo BUILD_DIR="$BUILD_DIR"
 
     if [ "$DIR_CLEAN" == true ]; then
