@@ -186,7 +186,6 @@ public:
     virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;
     virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
 
-
     // This iteration will list all server clusters on a given endpoint
     virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
     virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
