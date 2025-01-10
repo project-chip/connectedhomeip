@@ -32,7 +32,7 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
     ///    - kInvalid* constants are used to define "no value available (yet)" and
     ///      iteration loop will fill the first value when such a value is seen (fixed for non-wildcard
     ///      or iteration-based in case of wildcards).
-    ///    - Iteration of the output path is done in breadth-first order: first endpoint, then cluster, then attribute.
+    ///    - Iteration of the output path is done in order: first endpoint, then cluster, then attribute.
     /// Processing works like:
     ///    - Initial state is kInvalidEndpointId/kInvalidClusterId/kInvalidAttributeId
     ///    - First loop pass fills-in endpointID, followed by clusterID, followed by attributeID
