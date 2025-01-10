@@ -17,6 +17,7 @@
 import argparse
 import logging
 import os
+import shlex
 import subprocess
 import sys
 
@@ -29,7 +30,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 def run(cmd):
-    logging.debug("Run: %s", " ".join(cmd))
+    logging.debug("Run: %s", shlex.join(cmd))
     proc = subprocess.Popen(cmd, errors='replace',
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
