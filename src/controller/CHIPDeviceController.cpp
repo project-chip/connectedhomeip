@@ -572,17 +572,8 @@ void DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer()->Shutdown([](uint32_t id, WiFiPAF::WiFiPAFSession::PAFRole role) {
-        switch (role)
-        {
-        case WiFiPAF::WiFiPAFSession::PAFRole::publisher:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
-            break;
-        case WiFiPAF::WiFiPAFSession::PAFRole::subscriber:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
-            break;
-        }
-    });
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer()->Shutdown(
+        [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
 #endif
 
     // Release everything from the commissionee device pool here.
@@ -719,13 +710,13 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, co
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 static void StopSignalHandler(int signum)
 {
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer()->Shutdown([](uint32_t id, WiFiPAF::WiFiPAFSession::PAFRole role) {
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer()->Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
         switch (role)
         {
-        case WiFiPAF::WiFiPAFSession::PAFRole::publisher:
+        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
             DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
             break;
-        case WiFiPAF::WiFiPAFSession::PAFRole::subscriber:
+        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
             DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
             break;
         }

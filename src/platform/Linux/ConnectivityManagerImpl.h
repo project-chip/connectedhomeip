@@ -49,6 +49,7 @@
 
 #include <mutex>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <wifipaf/WiFiPAFEndPoint.h>
 #include <wifipaf/WiFiPAFLayer.h>
 #endif
 #endif
@@ -153,6 +154,7 @@ public:
     CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
     WiFiPAF::WiFiPAFLayer * _GetWiFiPAF();
     void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
+    CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
 #endif
 
     void PostNetworkConnect();
@@ -236,6 +238,7 @@ private:
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
     WiFiPAF::WiFiPAFLayer * pmWiFiPAF;
+    WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
     void * mAppState;
     uint16_t mApFreq;
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
