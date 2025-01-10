@@ -56,6 +56,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/software-diagnostics-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
