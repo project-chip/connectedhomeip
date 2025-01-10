@@ -69,7 +69,7 @@ target_include_directories(app PUBLIC
 
 chip_configure_data_model(app
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../manufacturer-specific-common/manufacturer-specific-app.zap
-    EXTERNAL_CLUSTERS SAMPLE_EXTERNAL_MEI_CLUSTER
+    EXTERNAL_CLUSTERS SAMPLE_EXTERNAL_MANUFACTURER_SPECIFIC_CLUSTER
     EXTERNAL_APP_COMMON manufacturer-specific/zzz_generated/app-common
 )
 

@@ -22,13 +22,13 @@ static constexpr size_t kNumSupportedEndpoints = SAMPLE_MANUFACTURER_SPECIFIC_NU
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace SampleExternalMei {
+namespace SampleExternalManufacturerSpecific {
 
 // *****************************************************************************
-// SampleExternalMeiContent has the stateful attributes of the cluster: its endpoint
+// SampleExternalManufacturerSpecificContent has the stateful attributes of the cluster: its endpoint
 // and attributes
 
-class SampleExternalMeiContent
+class SampleExternalManufacturerSpecificContent
 {
 public:
     EndpointId endpoint;
@@ -37,22 +37,22 @@ public:
     // Attribute List
     bool flipflop; /* Attributes::FlipFlop::Id */
 
-    SampleExternalMeiContent(EndpointId endpoint);
-    SampleExternalMeiContent();
+    SampleExternalManufacturerSpecificContent(EndpointId endpoint);
+    SampleExternalManufacturerSpecificContent();
 };
 
 // *****************************************************************************
-// SampleExternalMeiServer implements both Attributes and Commands
+// SampleExternalManufacturerSpecificServer implements both Attributes and Commands
 
-class SampleExternalMeiServer : public AttributeAccessInterface, public CommandHandlerInterface
+class SampleExternalManufacturerSpecificServer : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     // Register on all endpoints.
-    SampleExternalMeiServer() :
-        AttributeAccessInterface(Optional<EndpointId>::Missing(), SampleExternalMei::Id),
+    SampleExternalManufacturerSpecificServer() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), SampleExternalManufacturerSpecific::Id),
         CommandHandlerInterface(Optional<EndpointId>(), Id)
     {}
-    static SampleExternalMeiServer & Instance();
+    static SampleExternalManufacturerSpecificServer & Instance();
 
     // Currently not used, but should be called from a whole-cluster shutdown
     // callback once cluster lifecycle is clearer
@@ -67,9 +67,9 @@ public:
 
     // Attribute storage
 #if SAMPLE_EXTERNAL_MEI_NUM_SUPPORTED_ENDPOINTS > 0
-    SampleExternalMeiContent content[kNumSupportedEndpoints];
+    SampleExternalManufacturerSpecificContent content[kNumSupportedEndpoints];
 #else
-    SampleExternalMeiContent * content = nullptr;
+    SampleExternalManufacturerSpecificContent * content = nullptr;
 #endif
 
     size_t GetNumSupportedEndpoints() const;
@@ -82,7 +82,7 @@ private:
     size_t NextEmptyIndex() const;
 };
 
-} // namespace SampleExternalMei
+} // namespace SampleExternalManufacturerSpecific
 } // namespace Clusters
 } // namespace app
 } // namespace chip

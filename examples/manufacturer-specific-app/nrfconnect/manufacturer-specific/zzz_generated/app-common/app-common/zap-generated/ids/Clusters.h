@@ -406,9 +406,9 @@ static constexpr ClusterId Id = 0xFFF1FC06;
 namespace SampleManufacturerSpecific {
 static constexpr ClusterId Id = 0xFFF1FC20;
 } // namespace SampleManufacturerSpecific
-namespace SampleExternalMei {
+namespace SampleExternalManufacturerSpecific {
 static constexpr ClusterId Id = 0xFFF1FC21;
-} // namespace SampleExternalMei
+} // namespace SampleExternalManufacturerSpecific
 
 } // namespace Clusters
 } // namespace app

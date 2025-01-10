@@ -753,7 +753,7 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace SampleManufacturerSpecific
 
-namespace SampleExternalMei {
+namespace SampleExternalManufacturerSpecific {
 namespace Events {
 
 namespace PingCountEvent {
@@ -761,7 +761,7 @@ static constexpr EventId Id = 0x00000000;
 } // namespace PingCountEvent
 
 } // namespace Events
-} // namespace SampleExternalMei
+} // namespace SampleExternalManufacturerSpecific
 
 } // namespace Clusters
 } // namespace app

@@ -25,7 +25,7 @@ limitations under the License.
 
          The LSB 16 bits of <code> are a self-assigned ClusterID -->
     <code>0xFFF1FC21</code>
-    <define>SAMPLE_EXTERNAL_MANUFACTURER_SPECIFIC_MEI_CLUSTER</define>
+    <define>SAMPLE_EXTERNAL_MANUFACTURER_SPECIFIC_CLUSTER</define>
     <description>The Sample External manufacturer-specific cluster showcases an out-of-tree cluster manufacturer extensions</description>
 
     <!-- Attributes -->

@@ -2185,7 +2185,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace Commands
 } // namespace SampleManufacturerSpecific
 
-namespace SampleExternalMei {
+namespace SampleExternalManufacturerSpecific {
 namespace Commands {
 
 namespace Ping {
@@ -2201,7 +2201,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace AddArguments
 
 } // namespace Commands
-} // namespace SampleExternalMei
+} // namespace SampleExternalManufacturerSpecific
 
 } // namespace Clusters
 } // namespace app

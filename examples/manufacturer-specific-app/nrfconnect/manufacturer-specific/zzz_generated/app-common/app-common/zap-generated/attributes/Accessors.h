@@ -6637,7 +6637,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace SampleManufacturerSpecific
 
-namespace SampleExternalMei {
+namespace SampleExternalManufacturerSpecific {
 namespace Attributes {
 
 namespace FlipFlop {
@@ -6659,7 +6659,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace SampleExternalMei
+} // namespace SampleExternalManufacturerSpecific
 
 } // namespace Clusters
 } // namespace app

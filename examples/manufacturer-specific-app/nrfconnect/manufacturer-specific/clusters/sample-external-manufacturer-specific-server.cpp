@@ -19,47 +19,47 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::SampleExternalMei;
-using namespace chip::app::Clusters::SampleExternalMei::Commands;
-using namespace chip::app::Clusters::SampleExternalMei::Attributes;
+using namespace chip::app::Clusters::SampleExternalManufacturerSpecific;
+using namespace chip::app::Clusters::SampleExternalManufacturerSpecific::Commands;
+using namespace chip::app::Clusters::SampleExternalManufacturerSpecific::Attributes;
 
 // *****************************************************************************
 // Init/Shutdown Callbacks
 
-void MatterSampleExternalMeiPluginServerInitCallback()
+void MatterSampleExternalManufacturerSpecificPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", MATTER_DM_SAMPLE_EXTERNAL_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
-    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleExternalMeiServer::Instance()));
-    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleExternalMeiServer::Instance()),
+    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleExternalManufacturerSpecificServer::Instance()));
+    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleExternalManufacturerSpecificServer::Instance()),
                    CHIP_ERROR_INCORRECT_STATE);
 }
 
-void emberAfSampleExternalMeiClusterServerInitCallback(chip::EndpointId endpoint)
+void emberAfSampleExternalManufacturerSpecificClusterServerInitCallback(chip::EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "Creating Sample MEI cluster, Ep %d", endpoint);
-    SampleExternalMeiServer::Instance().RegisterEndpoint(endpoint);
+    SampleExternalManufacturerSpecificServer::Instance().RegisterEndpoint(endpoint);
 }
 
-void MatterSampleExternalMeiClusterServerShutdownCallback(chip::EndpointId endpoint)
+void MatterSampleExternalManufacturerSpecificClusterServerShutdownCallback(chip::EndpointId endpoint)
 {
     // There's currently no whole-cluster shutdown callback. That would trigger
     // call to `Shutdown`. Thus ep-based shutdown calls `UnregisterEndpoint`
     ChipLogProgress(Zcl, "Shutting down Sample MEI cluster, Ep %d", endpoint);
-    SampleExternalMeiServer::Instance().UnregisterEndpoint(endpoint);
+    SampleExternalManufacturerSpecificServer::Instance().UnregisterEndpoint(endpoint);
 }
 
 // *****************************************************************************
-// SampleExternalMeiContent
+// SampleExternalManufacturerSpecificContent
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace SampleExternalMei {
+namespace SampleExternalManufacturerSpecific {
 
-SampleExternalMeiContent::SampleExternalMeiContent() : SampleExternalMeiContent(kInvalidEndpointId) {}
+SampleExternalManufacturerSpecificContent::SampleExternalManufacturerSpecificContent() : SampleExternalManufacturerSpecificContent(kInvalidEndpointId) {}
 
-SampleExternalMeiContent::SampleExternalMeiContent(EndpointId aEndpoint)
+SampleExternalManufacturerSpecificContent::SampleExternalManufacturerSpecificContent(EndpointId aEndpoint)
 {
     endpoint  = aEndpoint;
     pingCount = 10000;
@@ -69,9 +69,9 @@ SampleExternalMeiContent::SampleExternalMeiContent(EndpointId aEndpoint)
 }
 
 // *****************************************************************************
-// SampleExternalMeiServer
+// SampleExternalManufacturerSpecificServer
 
-void SampleExternalMeiServer::InvokeCommand(HandlerContext & ctxt)
+void SampleExternalManufacturerSpecificServer::InvokeCommand(HandlerContext & ctxt)
 {
     auto endpoint      = ctxt.mRequestPath.mEndpointId;
     auto fabricIndex   = ctxt.mCommandHandler.GetAccessingFabricIndex();
@@ -118,7 +118,7 @@ void SampleExternalMeiServer::InvokeCommand(HandlerContext & ctxt)
     }
 }
 
-CHIP_ERROR SampleExternalMeiServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR SampleExternalManufacturerSpecificServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     auto endpoint      = aPath.mEndpointId;
@@ -142,7 +142,7 @@ CHIP_ERROR SampleExternalMeiServer::Read(const ConcreteReadAttributePath & aPath
     return err;
 }
 
-CHIP_ERROR SampleExternalMeiServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR SampleExternalManufacturerSpecificServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     auto endpoint      = aPath.mEndpointId;
@@ -168,13 +168,13 @@ CHIP_ERROR SampleExternalMeiServer::Write(const ConcreteDataAttributePath & aPat
     return err;
 }
 
-SampleExternalMeiServer & SampleExternalMeiServer::Instance()
+SampleExternalManufacturerSpecificServer & SampleExternalManufacturerSpecificServer::Instance()
 {
-    static SampleExternalMeiServer sampleExternalMeiServer;
-    return sampleExternalMeiServer;
+    static SampleExternalManufacturerSpecificServer sampleExternalManufacturerSpecificServer;
+    return sampleExternalManufacturerSpecificServer;
 }
 
-void SampleExternalMeiServer::Shutdown()
+void SampleExternalManufacturerSpecificServer::Shutdown()
 {
     for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
     {
@@ -182,12 +182,12 @@ void SampleExternalMeiServer::Shutdown()
     }
 }
 
-size_t SampleExternalMeiServer::GetNumSupportedEndpoints() const
+size_t SampleExternalManufacturerSpecificServer::GetNumSupportedEndpoints() const
 {
     return kNumSupportedEndpoints;
 }
 
-CHIP_ERROR SampleExternalMeiServer::RegisterEndpoint(EndpointId endpointId)
+CHIP_ERROR SampleExternalManufacturerSpecificServer::RegisterEndpoint(EndpointId endpointId)
 {
     size_t endpointIndex = NextEmptyIndex();
     if (endpointIndex == std::numeric_limits<size_t>::max())
@@ -195,11 +195,11 @@ CHIP_ERROR SampleExternalMeiServer::RegisterEndpoint(EndpointId endpointId)
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    content[endpointIndex] = SampleExternalMeiContent(endpointId);
+    content[endpointIndex] = SampleExternalManufacturerSpecificContent(endpointId);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SampleExternalMeiServer::UnregisterEndpoint(EndpointId endpointId)
+CHIP_ERROR SampleExternalManufacturerSpecificServer::UnregisterEndpoint(EndpointId endpointId)
 {
     size_t endpointIndex = EndpointIndex(endpointId);
     if (endpointIndex == std::numeric_limits<size_t>::max())
@@ -211,7 +211,7 @@ CHIP_ERROR SampleExternalMeiServer::UnregisterEndpoint(EndpointId endpointId)
     return CHIP_NO_ERROR;
 }
 
-size_t SampleExternalMeiServer::EndpointIndex(EndpointId endpointId) const
+size_t SampleExternalManufacturerSpecificServer::EndpointIndex(EndpointId endpointId) const
 {
     for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
     {
@@ -223,7 +223,7 @@ size_t SampleExternalMeiServer::EndpointIndex(EndpointId endpointId) const
     return std::numeric_limits<size_t>::max();
 }
 
-size_t SampleExternalMeiServer::NextEmptyIndex() const
+size_t SampleExternalManufacturerSpecificServer::NextEmptyIndex() const
 {
     for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
     {
@@ -235,7 +235,7 @@ size_t SampleExternalMeiServer::NextEmptyIndex() const
     return std::numeric_limits<size_t>::max();
 }
 
-} // namespace SampleExternalMei
+} // namespace SampleExternalManufacturerSpecific
 } // namespace Clusters
 } // namespace app
 } // namespace chip

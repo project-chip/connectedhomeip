@@ -47536,7 +47536,7 @@ public:
 } // namespace PingCountEvent
 } // namespace Events
 } // namespace SampleManufacturerSpecific
-namespace SampleExternalMei {
+namespace SampleExternalManufacturerSpecific {
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -47569,7 +47569,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Ping::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -47582,7 +47582,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::Ping::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -47598,7 +47598,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddArgumentsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 
     uint8_t returnValue = static_cast<uint8_t>(0);
 
@@ -47613,7 +47613,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddArgumentsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 
     uint8_t returnValue = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -47631,14 +47631,14 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddArguments::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 
     uint8_t arg1 = static_cast<uint8_t>(0);
     uint8_t arg2 = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::SampleExternalMei::Commands::AddArgumentsResponse::DecodableType;
+    using ResponseType = Clusters::SampleExternalManufacturerSpecific::Commands::AddArgumentsResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -47647,7 +47647,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddArguments::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 
     uint8_t arg1 = static_cast<uint8_t>(0);
     uint8_t arg2 = static_cast<uint8_t>(0);
@@ -47665,7 +47665,7 @@ struct TypeInfo
     using DecodableType    = bool;
     using DecodableArgType = bool;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FlipFlop::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -47673,31 +47673,31 @@ struct TypeInfo
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
 struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
 struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 };
 } // namespace ClusterRevision
 
@@ -47705,7 +47705,7 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
@@ -47732,7 +47732,7 @@ struct Type
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::PingCountEvent::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
     static constexpr bool kIsFabricScoped = false;
 
     uint32_t count = static_cast<uint32_t>(0);
@@ -47745,7 +47745,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::PingCountEvent::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
 
     uint32_t count = static_cast<uint32_t>(0);
 
@@ -47753,7 +47753,7 @@ public:
 };
 } // namespace PingCountEvent
 } // namespace Events
-} // namespace SampleExternalMei
+} // namespace SampleExternalManufacturerSpecific
 
 } // namespace Clusters
 

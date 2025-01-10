@@ -7653,7 +7653,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace SampleManufacturerSpecific
 
-namespace SampleExternalMei {
+namespace SampleExternalManufacturerSpecific {
 namespace Attributes {
 
 namespace FlipFlop {
@@ -7681,7 +7681,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace SampleExternalMei
+} // namespace SampleExternalManufacturerSpecific
 
 } // namespace Clusters
 } // namespace app
