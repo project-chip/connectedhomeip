@@ -76,25 +76,29 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
 
     VerifyOrExit(mState == TCPState::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = params.GetEndPointManager()->NewEndPoint(&mListenSocket);
-#else
-    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
-    SuccessOrExit(err);
-
-    err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(),
-                              params.GetInterfaceId().IsPresent());
-    SuccessOrExit(err);
-
-    mListenSocket->mAppState            = reinterpret_cast<void *>(this);
-    mListenSocket->OnConnectionReceived = HandleIncomingConnection;
-    mListenSocket->OnAcceptError        = HandleAcceptError;
-
     mEndpointType = params.GetAddressType();
 
-    err = mListenSocket->Listen(kListenBacklogSize);
+    mIsServerListenEnabled = params.IsServerListenEnabled();
+
+    // Primary socket endpoint created to help get EndPointManager handle for creating multiple
+    // connection endpoints at runtime.
+    err = params.GetEndPointManager()->NewEndPoint(&mListenSocket);
     SuccessOrExit(err);
+
+    if (mIsServerListenEnabled)
+    {
+        err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(),
+                                  params.GetInterfaceId().IsPresent());
+        SuccessOrExit(err);
+
+        mListenSocket->mAppState            = reinterpret_cast<void *>(this);
+        mListenSocket->OnConnectionReceived = HandleIncomingConnection;
+        mListenSocket->OnAcceptError        = HandleAcceptError;
+
+        err = mListenSocket->Listen(kListenBacklogSize);
+        SuccessOrExit(err);
+        ChipLogProgress(Inet, "TCP server listening on port %d for incoming connections", params.GetListenPort());
+    }
 
     mState = TCPState::kInitialized;
 
@@ -671,6 +675,11 @@ void TCPBase::TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool sho
     {
         CloseConnectionInternal(conn, CHIP_NO_ERROR, SuppressCallback::Yes);
     }
+}
+
+bool TCPBase::IsServerListenEnabled()
+{
+    return mIsServerListenEnabled;
 }
 
 bool TCPBase::HasActiveConnections() const
