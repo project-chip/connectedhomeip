@@ -21,7 +21,7 @@
 #include <platform/silabs/OTAImageProcessorImpl.h>
 
 #include <platform/silabs/SilabsConfig.h>
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
