@@ -13,13 +13,21 @@ jobs:
         id: check-testing
         continue-on-error: true
         run: |
-          python -c 'import sys; pr_summary = """${{ github.event.pull_request.body }}"""; sys.exit(0 if "### Testing" in pr_summary else 1)'
+          cat >/tmp/pr-summary.txt << "EndMarkerForPrSummary"
+          ${{ github.event.pull_request.body }}
+          EndMarkerForPrSummary
+
+          python -c 'import sys; pr_summary = open("/tmp/pr-summary.txt", "rt").read(); sys.exit(0 if "### Testing" in pr_summary else 1)'
 
       - name: Check for PR starting instructions
         id: check-instructions
         continue-on-error: true
         run: |
-          python -c 'import sys; pr_summary = """${{ github.event.pull_request.body }}"""; sys.exit(1 if "Make sure you delete these instructions" in pr_summary else 0)'
+          cat >/tmp/pr-summary.txt << "EndMarkerForPrSummary"
+          ${{ github.event.pull_request.body }}
+          EndMarkerForPrSummary
+
+          python -c 'import sys; pr_summary = open("/tmp/pr-summary.txt", "rt").read(); sys.exit(1 if "Make sure you delete these instructions" in pr_summary else 0)'
 
       # NOTE: comments disabled for now as separate permissions are required
       #       failing CI step may be sufficient to start (although it contains less information about why it failed)
