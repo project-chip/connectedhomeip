@@ -31,7 +31,7 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 #endif
 
 namespace chip {
@@ -313,11 +313,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 #ifdef SL_WIFI
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    sl_wfx_mac_address_t macaddr;
-    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
-    memcpy(buf, &macaddr.octet[0], sizeof(macaddr.octet));
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    return CHIP_NO_ERROR;
+    MutableByteSpan byteSpan(buf, kPrimaryMACAddressLength);
+    return GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
 }
 #endif
 

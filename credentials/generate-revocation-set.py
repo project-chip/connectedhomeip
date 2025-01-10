@@ -32,6 +32,7 @@ import click
 import requests
 from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
 from cryptography import x509
+from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.x509.oid import NameOID
 
@@ -510,12 +511,12 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
             "issuer_subject_key_id": certificate_akid_hex,
             "issuer_name": certificate_authority_name_b64,
             "revoked_serial_numbers": serialnumber_list,
-            "crl_signer_cert": revocation_point["crlSignerCertificate"],
+            "crl_signer_cert": base64.b64encode(crl_signer_certificate.public_bytes(serialization.Encoding.DER)).decode('utf-8'),
         }
 
-        if "crlSignerDelegator" in revocation_point:
-            entry["crl_signer_delegator"] = revocation_point["crlSignerDelegator"]
-
+        if crl_signer_delegator_cert:
+            entry["crl_signer_delegator"] = base64.b64encode(
+                crl_signer_delegator_cert.public_bytes(serialization.Encoding.DER)).decode('utf-8'),
         logging.debug(f"Entry to append: {entry}")
         revocation_set.append(entry)
 

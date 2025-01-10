@@ -27,18 +27,6 @@
 #include "sl_wfx_constants.h"
 #else
 
-// These names exists in the Si SDK as typedef enum. If they are present in the WF200 builds, we end up with conflicting
-// definitions but no erros because one is a define the other is a typedef enum. This causes different files to use different
-// values.
-#define SL_WFX_STARTUP_IND_ID (1)
-#define SL_WFX_CONNECT_IND_ID (2)
-#define SL_WFX_DISCONNECT_IND_ID (3)
-#define SL_WFX_SCAN_COMPLETE_ID (4)
-
-typedef struct
-{
-    uint8_t octet[6]; ///< Table to store a MAC address
-} sl_wfx_mac_address_t;
 /**
  * @brief General Message header structure
  *

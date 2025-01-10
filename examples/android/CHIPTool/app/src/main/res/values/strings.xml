@@ -232,6 +232,10 @@
 
     <string name="unpair_device_btn_text">Unpair</string>
 
+    <string name="diagnostic_log_btn_text">Get Diagnostic Log</string>
+    <string name="diagnostic_log_type_title_text">Log Type</string>
+    <string name="diagnostic_log_timeout_title_text">Timeout(Sec)</string>
+
     <string name="group_setting_btn_text">Group Setting</string>
     <string name="group_setting_group_text">Group :</string>
     <string name="group_setting_key_text">Key :</string>
@@ -287,6 +291,17 @@
     <string name="ota_provider_endpoint_id_text">Endpoint ID</string>
     <string name="ota_provider_write_text">Write</string>
     <string name="ota_provider_node_id_text">Node ID</string>
+
+    <string name="mode_select_btn_text">Mode Select</string>
+    <string name="mode_select_description_text">Description</string>
+    <string name="mode_select_standard_namespace_text">Standard Namespace</string>
+    <string name="mode_select_supported_modes_text">Supported Modes</string>
+    <string name="mode_select_current_mode_text">CurrentMode</string>
+    <string name="mode_select_start_up_mode_text">StartUpMode</string>
+    <string name="mode_select_on_mode_text">OnMode</string>
+    <string name="mode_select_read_attribute_text">Read</string>
+    <string name="mode_select_change_to_mode_text">Change</string>
+    <string name="mode_select_write_text">Write</string>
 
     <string name="icd_btn_text">Intermittently Connected Device</string>
     <string name="icd_registration_completed">ICD device registration completed, How to trigger to switch to Active Mode : %1$s</string>

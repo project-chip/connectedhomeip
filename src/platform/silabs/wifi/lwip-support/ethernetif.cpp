@@ -44,7 +44,7 @@ extern "C" {
 #endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #endif // WF200_WIFI
 
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 #ifdef WF200_WIFI
 #include "sl_wfx.h"
 #endif
@@ -88,16 +88,8 @@ static void low_level_init(struct netif * netif)
     netif->hwaddr_len = ETH_HWADDR_LEN;
 
     /* Set netif MAC hardware address */
-    sl_wfx_mac_address_t mac_addr;
-
-    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &mac_addr);
-
-    netif->hwaddr[0] = mac_addr.octet[0];
-    netif->hwaddr[1] = mac_addr.octet[1];
-    netif->hwaddr[2] = mac_addr.octet[2];
-    netif->hwaddr[3] = mac_addr.octet[3];
-    netif->hwaddr[4] = mac_addr.octet[4];
-    netif->hwaddr[5] = mac_addr.octet[5];
+    chip::MutableByteSpan byteSpan(netif->hwaddr, ETH_HWADDR_LEN);
+    GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
 
     /* Set netif maximum transfer unit */
     netif->mtu = 1500;

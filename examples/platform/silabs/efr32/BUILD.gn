@@ -174,7 +174,8 @@ source_set("efr32-common") {
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      sl_uart_log_output) {
     sources += [ "${silabs_common_plat_dir}/uart.cpp" ]
   }
 
@@ -214,8 +215,8 @@ source_set("efr32-common") {
 
   public_deps += [
     "${chip_root}/examples/providers:device_info_provider",
-    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
