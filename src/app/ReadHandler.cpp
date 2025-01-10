@@ -70,6 +70,7 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
     mInteractionType            = aInteractionType;
     mLastWrittenEventsBytes     = 0;
     mTransactionStartGeneration = mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().GetDirtySetGeneration();
+    mLastReportTime = System::SystemClock().GetMonotonicTimestamp();
     mFlags.ClearAll();
     SetStateFlag(ReadHandlerFlags::PrimingReports);
 
@@ -363,6 +364,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         {
             mObserver->OnSubscriptionReportSent(this);
         }
+        mLastReportTime = System::SystemClock().GetMonotonicTimestamp();
     }
     if (!aMoreChunks)
     {

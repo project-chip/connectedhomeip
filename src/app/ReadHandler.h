@@ -435,6 +435,8 @@ private:
 
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
+    auto GetLastReportTime() const { return mLastReportTime; }
+
     /// @brief Forces the read handler into a dirty state, regardless of what's going on with attributes.
     /// This can lead to scheduling of a reporting run immediately, if the min interval has been reached,
     /// or after the min interval is reached if it has not yet been reached.
@@ -560,6 +562,8 @@ private:
     // When we don't have enough resources for a new subscription, the oldest subscription might be evicted by interaction model
     // engine, the "oldest" subscription is the subscription with the smallest generation.
     uint64_t mTransactionStartGeneration = 0;
+    // If not older, the subscription with the longest timestamp might be evicted.
+    System::Clock::Timestamp mLastReportTime;
 
     SubscriptionId mSubscriptionId           = 0;
     uint16_t mMinIntervalFloorSeconds        = 0;

@@ -1128,6 +1128,15 @@ bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex
         {
             candidate = handler;
         }
+        // The last report time of this handler is longer
+        else if (handler->GetLastReportTime() < candidate->GetLastReportTime() &&
+                // Not older and the level of resource usage is the same (both exceed or neither exceed)
+                 handler->GetTransactionStartGeneration() >= candidate->GetTransactionStartGeneration() &&
+                 ((attributePathsUsed > perFabricPathCapacity || eventPathsUsed > perFabricPathCapacity) ==
+                  (candidateAttributePathsUsed > perFabricPathCapacity || candidateEventPathsUsed > perFabricPathCapacity)))
+        {
+            candidate = handler;
+        }
         return Loop::Continue;
     });
 
