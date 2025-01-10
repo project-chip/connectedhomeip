@@ -167,6 +167,8 @@ private:
         VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
 
         CHIP_ERROR err = aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
+            CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
+
             for (auto & fabric : Server::GetInstance().GetFabricTable())
             {
                 auto fabric_index = fabric.GetFabricIndex();
@@ -181,11 +183,19 @@ private:
                         .groupKeySetID = mapping.keyset_id,
                         .fabricIndex   = fabric_index,
                     };
-                    encoder.Encode(key);
+                    encodeStatus = encoder.Encode(key);
+                    if (encodeStatus != CHIP_NO_ERROR)
+                    {
+                        break;
+                    }
                 }
                 iter->Release();
+                if (encodeStatus != CHIP_NO_ERROR)
+                {
+                    break;
+                }
             }
-            return CHIP_NO_ERROR;
+            return encodeStatus;
         });
         return err;
     }
@@ -255,6 +265,8 @@ private:
         VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
 
         CHIP_ERROR err = aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
+            CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
+
             for (auto & fabric : Server::GetInstance().GetFabricTable())
             {
                 auto fabric_index = fabric.GetFabricIndex();
@@ -264,11 +276,19 @@ private:
                 GroupDataProvider::GroupInfo info;
                 while (iter->Next(info))
                 {
-                    encoder.Encode(GroupTableCodec(provider, fabric_index, info));
+                    encodeStatus = encoder.Encode(GroupTableCodec(provider, fabric_index, info));
+                    if (encodeStatus != CHIP_NO_ERROR)
+                    {
+                        break;
+                    }
                 }
                 iter->Release();
+                if (encodeStatus != CHIP_NO_ERROR)
+                {
+                    break;
+                }
             }
-            return CHIP_NO_ERROR;
+            return encodeStatus;
         });
         return err;
     }
