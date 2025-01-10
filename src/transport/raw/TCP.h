@@ -79,11 +79,20 @@ public:
         return *this;
     }
 
+    bool IsServerListenEnabled() const { return mServerListenEnabled; }
+    TcpListenParameters & SetServerListenEnabled(bool listenEnable)
+    {
+        mServerListenEnabled = listenEnable;
+
+        return *this;
+    }
+
 private:
     Inet::EndPointManager<Inet::TCPEndPoint> * mEndPointManager;   ///< Associated endpoint factory
     Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
     uint16_t mListenPort             = CHIP_PORT;                  ///< TCP listen port
     Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();  ///< Interface to listen on
+    bool mServerListenEnabled        = true;                       ///< TCP Server mode enabled
 };
 
 /**
@@ -177,6 +186,8 @@ public:
     // ActiveTCPConnectionState object)
     // and release from the pool.
     void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = false) override;
+
+    bool IsServerListenEnabled() override;
 
     bool CanSendToPeer(const PeerAddress & address) override
     {
@@ -301,6 +312,7 @@ private:
     Inet::TCPEndPoint * mListenSocket = nullptr;                       ///< TCP socket used by the transport
     Inet::IPAddressType mEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type
     TCPState mState                   = TCPState::kNotReady;           ///< State of the TCP transport
+    bool mIsServerListenEnabled       = true;                          ///< TCP Server mode enabled
 
     // The configured timeout for the connection attempt to the peer, before
     // giving up.
