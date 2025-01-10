@@ -796,7 +796,7 @@ CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path)
 {
     DataModel::MetadataList<DataModel::AcceptedCommandEntry> result;
 
-    CHIP_ERROR err = FetchAcceptedCommands(path, FindServerCluster(path), result);
+    [[maybe_unused]] CHIP_ERROR err = FetchAcceptedCommands(path, FindServerCluster(path), result);
 
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
     if (err != CHIP_NO_ERROR)
@@ -812,7 +812,7 @@ DataModel::MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(c
 {
     DataModel::MetadataList<CommandId> result;
 
-    CHIP_ERROR err = FetchGeneratedCommands(path, FindServerCluster(path), result);
+    [[maybe_unused]] CHIP_ERROR err = FetchGeneratedCommands(path, FindServerCluster(path), result);
 
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
     if (err != CHIP_NO_ERROR)
