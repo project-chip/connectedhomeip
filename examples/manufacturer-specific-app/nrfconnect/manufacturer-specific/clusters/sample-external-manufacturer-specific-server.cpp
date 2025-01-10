@@ -30,7 +30,8 @@ void MatterSampleExternalManufacturerSpecificPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", MATTER_DM_SAMPLE_EXTERNAL_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
-    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleExternalManufacturerSpecificServer::Instance()));
+    ReturnOnFailure(
+        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleExternalManufacturerSpecificServer::Instance()));
     VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleExternalManufacturerSpecificServer::Instance()),
                    CHIP_ERROR_INCORRECT_STATE);
 }
@@ -57,7 +58,9 @@ namespace app {
 namespace Clusters {
 namespace SampleExternalManufacturerSpecific {
 
-SampleExternalManufacturerSpecificContent::SampleExternalManufacturerSpecificContent() : SampleExternalManufacturerSpecificContent(kInvalidEndpointId) {}
+SampleExternalManufacturerSpecificContent::SampleExternalManufacturerSpecificContent() :
+    SampleExternalManufacturerSpecificContent(kInvalidEndpointId)
+{}
 
 SampleExternalManufacturerSpecificContent::SampleExternalManufacturerSpecificContent(EndpointId aEndpoint)
 {
@@ -142,7 +145,8 @@ CHIP_ERROR SampleExternalManufacturerSpecificServer::Read(const ConcreteReadAttr
     return err;
 }
 
-CHIP_ERROR SampleExternalManufacturerSpecificServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR SampleExternalManufacturerSpecificServer::Write(const ConcreteDataAttributePath & aPath,
+                                                           AttributeValueDecoder & aDecoder)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     auto endpoint      = aPath.mEndpointId;
