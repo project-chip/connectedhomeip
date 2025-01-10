@@ -221,7 +221,17 @@ public:
     }
 
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-    CHIP_ERROR RunWithMatterContextLock(std::function<CHIP_ERROR()>);
+    /**
+     * @brief
+     *   Call the func with Matter context locked
+     *
+     * CRITICAL: The function should be non-blocking to avoid dead lock.
+     *
+     * @param[in] nonBlockingFunc The non-blocking function to be called with Matter stack lock
+     *
+     * @retval The return value of the non-blocking function
+     */
+    CHIP_ERROR RunWithMatterContextLock(std::function<CHIP_ERROR()> nonBlockingFunc);
 #endif
 
 private:

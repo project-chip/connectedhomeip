@@ -32,11 +32,11 @@ CHIP_ERROR Layer::ScheduleLambdaBridge(LambdaBridge && bridge)
 }
 
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-CHIP_ERROR Layer::RunWithMatterContextLock(std::function<CHIP_ERROR()> func)
+CHIP_ERROR Layer::RunWithMatterContextLock(std::function<CHIP_ERROR()> nonBlockingFunc)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PlatformEventing::LockMatterStack();
-    err = func();
+    err = nonBlockingFunc();
     PlatformEventing::UnlockMatterStack();
     return err;
 }
