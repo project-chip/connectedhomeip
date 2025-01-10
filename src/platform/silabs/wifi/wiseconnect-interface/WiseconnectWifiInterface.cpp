@@ -104,7 +104,7 @@ bool IsStationModeEnabled()
     return wfx_rsi.dev_state.Has(WifiState::kStationMode);
 }
 
-bool wfx_is_sta_connected()
+bool IsStationConnected()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
