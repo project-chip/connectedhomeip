@@ -49,8 +49,8 @@ cc32xx/                          @s-jain2022
 
 /src/platform/mt793x/            @pakls
 nrfconnect/                      @project-chip/reviewers-nordic
-chip-build-nrf-platform/                      @project-chip/reviewers-nordic
-Zephyr/                            @project-chip/reviewers-nordic @project-chip/reviewers-nxp @s07641069
+chip-build-nrf-platform/         @project-chip/reviewers-nordic
+Zephyr/                          @project-chip/reviewers-nordic @project-chip/reviewers-nxp @s07641069
 
 
 nxp/                             @project-chip/reviewers-nxp
