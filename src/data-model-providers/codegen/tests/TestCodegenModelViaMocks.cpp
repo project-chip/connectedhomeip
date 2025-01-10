@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "gtest/gtest.h"
 #include <pw_unit_test/framework.h>
 
 #include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
@@ -2586,43 +2587,27 @@ TEST_F(TestCodegenModelViaMocks, DeviceTypeIteration)
     CodegenDataModelProviderWithContext model;
 
     // Mock endpoint 1 has 3 device types
-    std::optional<DeviceTypeEntry> entry = model.FirstDeviceType(kMockEndpoint1);
-    ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeRevision = kDeviceTypeId1Version }));
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
-    entry = model.NextDeviceType(kMockEndpoint1, *entry);
-    ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version }));
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
-    entry = model.NextDeviceType(kMockEndpoint1, *entry);
-    ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeRevision = kDeviceTypeId3Version }));
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
-    entry = model.NextDeviceType(kMockEndpoint1, *entry);
-    ASSERT_FALSE(entry.has_value());
+    auto deviceTypes = model.DeviceTypes(kMockEndpoint1);
+    ASSERT_EQ(deviceTypes.size(), 3u);
+
+    const DeviceTypeEntry expected1[] = {
+        { .deviceTypeId = kDeviceTypeId1, .deviceTypeRevision = kDeviceTypeId1Version },
+        { .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version },
+        { .deviceTypeId = kDeviceTypeId3, .deviceTypeRevision = kDeviceTypeId3Version },
+    };
+    for (unsigned i = 0; i < 3; i++)
+    {
+        ASSERT_EQ(deviceTypes[i], expected1[i]);
+    }
 
     // Mock endpoint 2 has 1 device types
-    entry = model.FirstDeviceType(kMockEndpoint2);
-    ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version }));
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): Assert above that this is not none
-    entry = model.NextDeviceType(kMockEndpoint2, *entry);
-    ASSERT_FALSE(entry.has_value());
-
-    // out of order query works
-    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version });
-    entry = model.NextDeviceType(kMockEndpoint1, *entry);
-    ASSERT_EQ(entry,
-              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeRevision = kDeviceTypeId3Version }));
-
-    // invalid query fails
-    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeRevision = kDeviceTypeId1Version });
-    entry = model.NextDeviceType(kMockEndpoint2, *entry);
-    ASSERT_FALSE(entry.has_value());
+    deviceTypes = model.DeviceTypes(kMockEndpoint2);
+    ASSERT_EQ(deviceTypes.size(), 1u);
+    const DeviceTypeEntry expected2 = { .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version };
+    ASSERT_EQ(deviceTypes[0], expected2);
 
     // empty endpoint works
-    entry = model.FirstDeviceType(kMockEndpoint3);
-    ASSERT_FALSE(entry.has_value());
+    ASSERT_TRUE(model.DeviceTypes(kMockEndpoint3).empty());
 }
 
 TEST_F(TestCodegenModelViaMocks, SemanticTagIteration)

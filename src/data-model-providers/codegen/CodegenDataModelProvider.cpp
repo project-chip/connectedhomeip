@@ -46,19 +46,6 @@ namespace chip {
 namespace app {
 namespace {
 
-/// Search by device type within a span of EmberAfDeviceType (finds the device type that matches the given
-/// DataModel::DeviceTypeEntry)
-struct ByDeviceType
-{
-    using Key  = DataModel::DeviceTypeEntry;
-    using Type = const EmberAfDeviceType;
-    static Span<Type> GetSpan(Span<const EmberAfDeviceType> & data) { return data; }
-    static bool HasKey(const Key & id, const Type & instance)
-    {
-        return (instance.deviceId == id.deviceTypeId) && (instance.deviceVersion == id.deviceTypeRevision);
-    }
-};
-
 DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPath & path)
 {
     const CommandId commandId = path.mCommandId;
@@ -367,16 +354,11 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
 //       to a common type is probably better. Need to figure out dependencies since
 //       this would make ember return datamodel-provider types.
 //       See: https://github.com/project-chip/connectedhomeip/issues/35889
-std::optional<DataModel::DeviceTypeEntry> DeviceTypeEntryFromEmber(const EmberAfDeviceType * other)
+DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
 {
-    if (other == nullptr)
-    {
-        return std::nullopt;
-    }
-
     return DataModel::DeviceTypeEntry{
-        .deviceTypeId       = other->deviceId,
-        .deviceTypeRevision = other->deviceVersion,
+        .deviceTypeId       = other.deviceId,
+        .deviceTypeRevision = other.deviceVersion,
     };
 }
 
@@ -848,43 +830,39 @@ void CodegenDataModelProvider::InitDataModelForTesting()
     InitDataModelHandler();
 }
 
-std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
+DataModel::MetadataList<DataModel::DeviceTypeEntry> CodegenDataModelProvider::DeviceTypes(EndpointId endpointId)
 {
-    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
-    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
-    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
-    //
-    // Not actually needed for `First`, however this makes First and Next consistent.
-    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
+    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpointId);
     if (!endpoint_index.has_value())
     {
-        return std::nullopt;
+        return {};
     }
 
     CHIP_ERROR err                            = CHIP_NO_ERROR;
     Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
-    SpanSearchValue<chip::Span<const EmberAfDeviceType>> searchable(&deviceTypes);
 
-    return DeviceTypeEntryFromEmber(searchable.First<ByDeviceType>(mDeviceTypeIterationHint).Value());
-}
-
-std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
-                                                                                   const DataModel::DeviceTypeEntry & previous)
-{
-    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
-    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
-    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
-    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
-    if (!endpoint_index.has_value())
+    DataModel::MetadataList<DataModel::DeviceTypeEntry> result;
+    err = result.reserve(deviceTypes.size());
+    if (err != CHIP_NO_ERROR)
     {
-        return std::nullopt;
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogError(AppServer, "Failed to reserve device type buffer space: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+        return {};
+    }
+    for (auto & entry : deviceTypes)
+    {
+        err = result.Append(DeviceTypeEntryFromEmber(entry));
+        if (err != CHIP_NO_ERROR)
+        {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+            ChipLogError(AppServer, "Failed to append device type entry: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+            break;
+        }
     }
 
-    CHIP_ERROR err                                  = CHIP_NO_ERROR;
-    chip::Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
-    SpanSearchValue<chip::Span<const EmberAfDeviceType>> searchable(&deviceTypes);
-
-    return DeviceTypeEntryFromEmber(searchable.Next<ByDeviceType>(previous, mDeviceTypeIterationHint).Value());
+    return result;
 }
 
 DataModel::MetadataList<DataModel::Provider::SemanticTag> CodegenDataModelProvider::SemanticTags(EndpointId endpointId)

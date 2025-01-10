@@ -182,10 +182,6 @@ public:
     virtual std::optional<EndpointInfo> GetEndpointInfo(EndpointId id) = 0;
     virtual bool EndpointExists(EndpointId id);
 
-    // This iteration describes device types registered on an endpoint
-    virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;
-    virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
-
     // This iteration will list all server clusters on a given endpoint
     virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
     virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
@@ -211,6 +207,7 @@ public:
     virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
     virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
     virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)                         = 0;
+    virtual MetadataList<DeviceTypeEntry> DeviceTypes(EndpointId endpointId)                      = 0;
 
     /// Workaround function to report attribute change.
     ///

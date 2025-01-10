@@ -492,15 +492,9 @@ std::optional<DataModel::EndpointInfo> CustomDataModel::GetEndpointInfo(Endpoint
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpointInfo(endpoint);
 }
 
-std::optional<DataModel::DeviceTypeEntry> CustomDataModel::FirstDeviceType(EndpointId endpoint)
+DataModel::MetadataList<DataModel::DeviceTypeEntry> CustomDataModel::DeviceTypes(EndpointId endpointId)
 {
-    return std::nullopt;
-}
-
-std::optional<DataModel::DeviceTypeEntry> CustomDataModel::NextDeviceType(EndpointId endpoint,
-                                                                          const DataModel::DeviceTypeEntry & previous)
-{
-    return std::nullopt;
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->DeviceTypes(endpointId);
 }
 
 ClusterEntry CustomDataModel::FirstServerCluster(EndpointId endpoint)

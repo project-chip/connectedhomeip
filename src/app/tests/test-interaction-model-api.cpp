@@ -164,20 +164,14 @@ std::optional<DataModel::EndpointInfo> TestImCustomDataModel::GetEndpointInfo(En
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpointInfo(endpoint);
 }
 
-std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::FirstDeviceType(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::NextDeviceType(EndpointId endpoint,
-                                                                                const DataModel::DeviceTypeEntry & previous)
-{
-    return std::nullopt;
-}
-
 DataModel::MetadataList<DataModel::Provider::SemanticTag> TestImCustomDataModel::SemanticTags(EndpointId endpointId)
 {
     return CodegenDataModelProviderInstance(nullptr /* delegate */)->SemanticTags(endpointId);
+}
+
+DataModel::MetadataList<DataModel::DeviceTypeEntry> TestImCustomDataModel::DeviceTypes(EndpointId endpointId)
+{
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->DeviceTypes(endpointId);
 }
 
 ClusterEntry TestImCustomDataModel::FirstServerCluster(EndpointId endpoint)
