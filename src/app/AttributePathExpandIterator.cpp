@@ -70,7 +70,7 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
             }
         }
 
-        // No valid cluster, try advance the endpoint, see if a suitable on exists.
+        // No valid cluster, try advance the endpoint, see if a suitable one exists.
         std::optional<EndpointId> nextEndpoint = NextEndpointId();
         if (nextEndpoint.has_value())
         {
