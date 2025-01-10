@@ -46313,8 +46313,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::SampleManufacturerSpecific::Id: {
-        using namespace app::Clusters::SampleManufacturerSpecific;
+    case app::Clusters::SampleManufacturerSpecificCluster::Id: {
+        using namespace app::Clusters::SampleManufacturerSpecificCluster;
         switch (aPath.mAttributeId)
         {
         case Attributes::FlipFlop::Id: {

@@ -167,7 +167,7 @@ __all__ = [
     "CommissionerControl",
     "UnitTesting",
     "FaultInjection",
-    "SampleManufacturerSpecific",
+    "SampleManufacturerSpecificCluster",
 ]
 
 
@@ -50836,7 +50836,7 @@ class FaultInjection(Cluster):
 
 
 @dataclass
-class SampleManufacturerSpecific(Cluster):
+class SampleManufacturerSpecificCluster(Cluster):
     id: typing.ClassVar[int] = 0xFFF1FC20
 
     @ChipUtility.classproperty
@@ -51024,3 +51024,4 @@ class SampleManufacturerSpecific(Cluster):
 
             count: uint = 0
             fabricIndex: uint = 0
+

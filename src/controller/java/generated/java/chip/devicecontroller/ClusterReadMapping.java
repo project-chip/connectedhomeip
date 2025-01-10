@@ -20432,84 +20432,84 @@ public class ClusterReadMapping {
      
        return result;
     }
-    private static Map<String, InteractionInfo> readSampleManufacturerSpecificInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readSampleManufacturerSpecificFlipFlopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readSampleManufacturerSpecificFlipFlopAttributeInteractionInfo = new InteractionInfo(
+    private static Map<String, InteractionInfo> readSampleManufacturerSpecificClusterInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readSampleManufacturerSpecificClusterFlipFlopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleManufacturerSpecificClusterFlipFlopAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.SampleManufacturerSpecificCluster) cluster).readFlipFlopAttribute(
+            ((ChipClusters.SampleManufacturerSpecificClusterCluster) cluster).readFlipFlopAttribute(
               (ChipClusters.BooleanAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readSampleManufacturerSpecificFlipFlopCommandParams
+          readSampleManufacturerSpecificClusterFlipFlopCommandParams
         );
-        result.put("readFlipFlopAttribute", readSampleManufacturerSpecificFlipFlopAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readSampleManufacturerSpecificGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readSampleManufacturerSpecificGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+        result.put("readFlipFlopAttribute", readSampleManufacturerSpecificClusterFlipFlopAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleManufacturerSpecificClusterGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleManufacturerSpecificClusterGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.SampleManufacturerSpecificCluster) cluster).readGeneratedCommandListAttribute(
-              (ChipClusters.SampleManufacturerSpecificCluster.GeneratedCommandListAttributeCallback) callback
+            ((ChipClusters.SampleManufacturerSpecificClusterCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.SampleManufacturerSpecificClusterCluster.GeneratedCommandListAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedSampleManufacturerSpecificClusterGeneratedCommandListAttributeCallback(),
-          readSampleManufacturerSpecificGeneratedCommandListCommandParams
+          () -> new ClusterInfoMapping.DelegatedSampleManufacturerSpecificClusterClusterGeneratedCommandListAttributeCallback(),
+          readSampleManufacturerSpecificClusterGeneratedCommandListCommandParams
         );
-        result.put("readGeneratedCommandListAttribute", readSampleManufacturerSpecificGeneratedCommandListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readSampleManufacturerSpecificAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readSampleManufacturerSpecificAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+        result.put("readGeneratedCommandListAttribute", readSampleManufacturerSpecificClusterGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleManufacturerSpecificClusterAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleManufacturerSpecificClusterAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.SampleManufacturerSpecificCluster) cluster).readAcceptedCommandListAttribute(
-              (ChipClusters.SampleManufacturerSpecificCluster.AcceptedCommandListAttributeCallback) callback
+            ((ChipClusters.SampleManufacturerSpecificClusterCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.SampleManufacturerSpecificClusterCluster.AcceptedCommandListAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedSampleManufacturerSpecificClusterAcceptedCommandListAttributeCallback(),
-          readSampleManufacturerSpecificAcceptedCommandListCommandParams
+          () -> new ClusterInfoMapping.DelegatedSampleManufacturerSpecificClusterClusterAcceptedCommandListAttributeCallback(),
+          readSampleManufacturerSpecificClusterAcceptedCommandListCommandParams
         );
-        result.put("readAcceptedCommandListAttribute", readSampleManufacturerSpecificAcceptedCommandListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readSampleManufacturerSpecificEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readSampleManufacturerSpecificEventListAttributeInteractionInfo = new InteractionInfo(
+        result.put("readAcceptedCommandListAttribute", readSampleManufacturerSpecificClusterAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleManufacturerSpecificClusterEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleManufacturerSpecificClusterEventListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.SampleManufacturerSpecificCluster) cluster).readEventListAttribute(
-              (ChipClusters.SampleManufacturerSpecificCluster.EventListAttributeCallback) callback
+            ((ChipClusters.SampleManufacturerSpecificClusterCluster) cluster).readEventListAttribute(
+              (ChipClusters.SampleManufacturerSpecificClusterCluster.EventListAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedSampleManufacturerSpecificClusterEventListAttributeCallback(),
-          readSampleManufacturerSpecificEventListCommandParams
+          () -> new ClusterInfoMapping.DelegatedSampleManufacturerSpecificClusterClusterEventListAttributeCallback(),
+          readSampleManufacturerSpecificClusterEventListCommandParams
         );
-        result.put("readEventListAttribute", readSampleManufacturerSpecificEventListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readSampleManufacturerSpecificAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readSampleManufacturerSpecificAttributeListAttributeInteractionInfo = new InteractionInfo(
+        result.put("readEventListAttribute", readSampleManufacturerSpecificClusterEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleManufacturerSpecificClusterAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleManufacturerSpecificClusterAttributeListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.SampleManufacturerSpecificCluster) cluster).readAttributeListAttribute(
-              (ChipClusters.SampleManufacturerSpecificCluster.AttributeListAttributeCallback) callback
+            ((ChipClusters.SampleManufacturerSpecificClusterCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.SampleManufacturerSpecificClusterCluster.AttributeListAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedSampleManufacturerSpecificClusterAttributeListAttributeCallback(),
-          readSampleManufacturerSpecificAttributeListCommandParams
+          () -> new ClusterInfoMapping.DelegatedSampleManufacturerSpecificClusterClusterAttributeListAttributeCallback(),
+          readSampleManufacturerSpecificClusterAttributeListCommandParams
         );
-        result.put("readAttributeListAttribute", readSampleManufacturerSpecificAttributeListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readSampleManufacturerSpecificFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readSampleManufacturerSpecificFeatureMapAttributeInteractionInfo = new InteractionInfo(
+        result.put("readAttributeListAttribute", readSampleManufacturerSpecificClusterAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleManufacturerSpecificClusterFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleManufacturerSpecificClusterFeatureMapAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.SampleManufacturerSpecificCluster) cluster).readFeatureMapAttribute(
+            ((ChipClusters.SampleManufacturerSpecificClusterCluster) cluster).readFeatureMapAttribute(
               (ChipClusters.LongAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readSampleManufacturerSpecificFeatureMapCommandParams
+          readSampleManufacturerSpecificClusterFeatureMapCommandParams
         );
-        result.put("readFeatureMapAttribute", readSampleManufacturerSpecificFeatureMapAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readSampleManufacturerSpecificClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readSampleManufacturerSpecificClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+        result.put("readFeatureMapAttribute", readSampleManufacturerSpecificClusterFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleManufacturerSpecificClusterClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleManufacturerSpecificClusterClusterRevisionAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.SampleManufacturerSpecificCluster) cluster).readClusterRevisionAttribute(
+            ((ChipClusters.SampleManufacturerSpecificClusterCluster) cluster).readClusterRevisionAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readSampleManufacturerSpecificClusterRevisionCommandParams
+          readSampleManufacturerSpecificClusterClusterRevisionCommandParams
         );
-        result.put("readClusterRevisionAttribute", readSampleManufacturerSpecificClusterRevisionAttributeInteractionInfo);
+        result.put("readClusterRevisionAttribute", readSampleManufacturerSpecificClusterClusterRevisionAttributeInteractionInfo);
      
        return result;
     }
@@ -20644,6 +20644,7 @@ public class ClusterReadMapping {
             put("commissionerControl", readCommissionerControlInteractionInfo());
             put("unitTesting", readUnitTestingInteractionInfo());
             put("faultInjection", readFaultInjectionInteractionInfo());
-            put("sampleManufacturerSpecific", readSampleManufacturerSpecificInteractionInfo());}};
+            put("sampleManufacturerSpecificCluster", readSampleManufacturerSpecificClusterInteractionInfo());}};
     }
 }
+

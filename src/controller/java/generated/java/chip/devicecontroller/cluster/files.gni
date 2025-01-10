@@ -242,7 +242,7 @@ eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/RefrigeratorAlarmClusterNotifyEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/RvcOperationalStateClusterOperationalErrorEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/RvcOperationalStateClusterOperationCompletionEvent.kt",
-  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/SampleManufacturerSpecificClusterPingCountEventEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/SampleManufacturerSpecificClusterClusterPingCountEventEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/SmokeCoAlarmClusterCOAlarmEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/SmokeCoAlarmClusterInterconnectCOAlarmEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/SmokeCoAlarmClusterInterconnectSmokeAlarmEvent.kt",

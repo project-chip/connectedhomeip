@@ -10394,7 +10394,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRSampleManufacturerSpecificClusterPingCountEventEvent
+@implementation MTRSampleManufacturerSpecificClusterClusterPingCountEventEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -10408,7 +10408,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRSampleManufacturerSpecificClusterPingCountEventEvent alloc] init];
+    auto other = [[MTRSampleManufacturerSpecificClusterClusterPingCountEventEvent alloc] init];
 
     other.count = self.count;
     other.fabricIndex = self.fabricIndex;

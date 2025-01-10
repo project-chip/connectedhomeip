@@ -6200,9 +6200,9 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL AttributeIsSpecifiedInSampleManufacturerSpecificCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInSampleManufacturerSpecificClusterCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::SampleManufacturerSpecific;
+    using namespace Clusters::SampleManufacturerSpecificCluster;
     switch (aAttributeId) {
     case Attributes::FlipFlop::Id: {
         return YES;
@@ -6600,8 +6600,8 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);
     }
-    case Clusters::SampleManufacturerSpecific::Id: {
-        return AttributeIsSpecifiedInSampleManufacturerSpecificCluster(aAttributeId);
+    case Clusters::SampleManufacturerSpecificCluster::Id: {
+        return AttributeIsSpecifiedInSampleManufacturerSpecificClusterCluster(aAttributeId);
     }
     default: {
         return NO;

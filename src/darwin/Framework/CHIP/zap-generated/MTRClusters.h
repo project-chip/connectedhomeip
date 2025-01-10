@@ -7456,16 +7456,16 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 /**
- * Cluster Sample MEI
- *    The Sample MEI cluster showcases a cluster manufacturer extensions
+ * Cluster Sample Manufacturer-specific cluster
+ *    The Sample Manufacturer-specific cluster showcases a cluster manufacturer extensions
  */
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRClusterSampleManufacturerSpecific : MTRGenericCluster
+@interface MTRClusterSampleManufacturerSpecificCluster : MTRGenericCluster
 
-- (void)pingWithParams:(MTRSampleManufacturerSpecificClusterPingParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)pingWithParams:(MTRSampleManufacturerSpecificClusterClusterPingParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)pingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
     MTR_PROVISIONALLY_AVAILABLE;
-- (void)addArgumentsWithParams:(MTRSampleManufacturerSpecificClusterAddArgumentsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRSampleManufacturerSpecificClusterAddArgumentsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)addArgumentsWithParams:(MTRSampleManufacturerSpecificClusterClusterAddArgumentsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRSampleManufacturerSpecificClusterClusterAddArgumentsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeFlipFlopWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeFlipFlopWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
@@ -7486,7 +7486,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @end
 
-@interface MTRClusterSampleManufacturerSpecific (Availability)
+@interface MTRClusterSampleManufacturerSpecificCluster (Availability)
 
 /**
  * For all instance methods that take a completion (i.e. command invocations),

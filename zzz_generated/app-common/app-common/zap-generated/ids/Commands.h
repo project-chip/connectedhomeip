@@ -2201,7 +2201,7 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace FaultInjection
 
-namespace SampleManufacturerSpecific {
+namespace SampleManufacturerSpecificCluster {
 namespace Commands {
 
 namespace Ping {
@@ -2217,7 +2217,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace AddArguments
 
 } // namespace Commands
-} // namespace SampleManufacturerSpecific
+} // namespace SampleManufacturerSpecificCluster
 
 } // namespace Clusters
 } // namespace app

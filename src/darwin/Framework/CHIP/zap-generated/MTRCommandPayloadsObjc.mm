@@ -40512,7 +40512,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRSampleManufacturerSpecificClusterPingParams
+@implementation MTRSampleManufacturerSpecificClusterClusterPingParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -40524,7 +40524,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRSampleManufacturerSpecificClusterPingParams alloc] init];
+    auto other = [[MTRSampleManufacturerSpecificClusterClusterPingParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -40540,11 +40540,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRSampleManufacturerSpecificClusterPingParams (InternalMethods)
+@implementation MTRSampleManufacturerSpecificClusterClusterPingParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::SampleManufacturerSpecific::Commands::Ping::Type encodableStruct;
+    chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::Ping::Type encodableStruct;
     ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -40585,7 +40585,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRSampleManufacturerSpecificClusterAddArgumentsResponseParams
+@implementation MTRSampleManufacturerSpecificClusterClusterAddArgumentsResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -40597,7 +40597,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRSampleManufacturerSpecificClusterAddArgumentsResponseParams alloc] init];
+    auto other = [[MTRSampleManufacturerSpecificClusterClusterAddArgumentsResponseParams alloc] init];
 
     other.returnValue = self.returnValue;
 
@@ -40617,7 +40617,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArgumentsResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::AddArgumentsResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -40652,9 +40652,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRSampleManufacturerSpecificClusterAddArgumentsResponseParams (InternalMethods)
+@implementation MTRSampleManufacturerSpecificClusterClusterAddArgumentsResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArgumentsResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::AddArgumentsResponse::DecodableType &)decodableStruct
 {
     {
         self.returnValue = [NSNumber numberWithUnsignedChar:decodableStruct.returnValue];
@@ -40664,7 +40664,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRSampleManufacturerSpecificClusterAddArgumentsParams
+@implementation MTRSampleManufacturerSpecificClusterClusterAddArgumentsParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -40680,7 +40680,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRSampleManufacturerSpecificClusterAddArgumentsParams alloc] init];
+    auto other = [[MTRSampleManufacturerSpecificClusterClusterAddArgumentsParams alloc] init];
 
     other.arg1 = self.arg1;
     other.arg2 = self.arg2;
@@ -40698,11 +40698,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRSampleManufacturerSpecificClusterAddArgumentsParams (InternalMethods)
+@implementation MTRSampleManufacturerSpecificClusterClusterAddArgumentsParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArguments::Type encodableStruct;
+    chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::AddArguments::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.arg1 = self.arg1.unsignedCharValue;

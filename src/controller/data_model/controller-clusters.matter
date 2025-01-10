@@ -10804,8 +10804,8 @@ internal cluster FaultInjection = 4294048774 {
   command access(invoke: manage) FailRandomlyAtFault(FailRandomlyAtFaultRequest): DefaultSuccess = 1;
 }
 
-/** The Sample MEI cluster showcases a cluster manufacturer extensions */
-cluster SampleManufacturerSpecific = 4294048800 {
+/** The Sample Manufacturer-specific cluster showcases a cluster manufacturer extensions */
+cluster SampleManufacturerSpecificCluster = 4294048800 {
   revision 1; // NOTE: Default/not specifically set
 
   fabric_sensitive info event PingCountEvent = 0 {
@@ -10835,3 +10835,4 @@ cluster SampleManufacturerSpecific = 4294048800 {
   /** Command that takes two uint8 arguments and returns their sum. */
   command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
 }
+

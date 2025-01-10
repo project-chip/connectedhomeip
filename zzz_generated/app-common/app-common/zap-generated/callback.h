@@ -671,7 +671,7 @@ void emberAfFaultInjectionClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleManufacturerSpecificClusterInitCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterClusterInitCallback(chip::EndpointId endpoint);
 
 // Cluster Server/Client Init Functions
 
@@ -5583,28 +5583,29 @@ MatterFaultInjectionClusterServerPreAttributeChangedCallback(const chip::app::Co
 void emberAfFaultInjectionClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// Sample MEI Cluster
+// Sample Manufacturer-specific cluster Cluster
 //
 
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleManufacturerSpecificClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterClusterServerInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterSampleManufacturerSpecificClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterSampleManufacturerSpecificClusterClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleManufacturerSpecificClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterClusterClientInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param attributePath Concrete attribute path that changed
  */
-void MatterSampleManufacturerSpecificClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterSampleManufacturerSpecificClusterClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /**
  * @param attributePath Concrete attribute path to be changed
@@ -5612,14 +5613,13 @@ void MatterSampleManufacturerSpecificClusterServerAttributeChangedCallback(const
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status
-MatterSampleManufacturerSpecificClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSampleManufacturerSpecificClusterClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /**
  * @param endpoint  Endpoint that is being served
  */
-void emberAfSampleManufacturerSpecificClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterClusterServerTickCallback(chip::EndpointId endpoint);
 
 // Cluster Commands Callback
 
@@ -7136,3 +7136,15 @@ bool emberAfFaultInjectionClusterFailAtFaultCallback(
 bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::DecodableType & commandData);
+/**
+ * @brief Sample Manufacturer-specific cluster Cluster Ping Command callback (from client)
+ */
+bool emberAfSampleManufacturerSpecificClusterClusterPingCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::Ping::DecodableType & commandData);
+/**
+ * @brief Sample Manufacturer-specific cluster Cluster AddArguments Command callback (from client)
+ */
+bool emberAfSampleManufacturerSpecificClusterClusterAddArgumentsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::AddArguments::DecodableType & commandData);

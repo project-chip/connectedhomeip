@@ -22752,7 +22752,7 @@ public class ClusterInfoMapping {
   }
 
 
-  public static class DelegatedSampleManufacturerSpecificClusterAddArgumentsResponseCallback implements ChipClusters.SampleManufacturerSpecificCluster.AddArgumentsResponseCallback, DelegatedClusterCallback {
+  public static class DelegatedSampleManufacturerSpecificClusterClusterAddArgumentsResponseCallback implements ChipClusters.SampleManufacturerSpecificClusterCluster.AddArgumentsResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -22773,7 +22773,7 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
-  public static class DelegatedSampleManufacturerSpecificClusterGeneratedCommandListAttributeCallback implements ChipClusters.SampleManufacturerSpecificCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedSampleManufacturerSpecificClusterClusterGeneratedCommandListAttributeCallback implements ChipClusters.SampleManufacturerSpecificClusterCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -22794,7 +22794,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedSampleManufacturerSpecificClusterAcceptedCommandListAttributeCallback implements ChipClusters.SampleManufacturerSpecificCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedSampleManufacturerSpecificClusterClusterAcceptedCommandListAttributeCallback implements ChipClusters.SampleManufacturerSpecificClusterCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -22815,7 +22815,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedSampleManufacturerSpecificClusterEventListAttributeCallback implements ChipClusters.SampleManufacturerSpecificCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedSampleManufacturerSpecificClusterClusterEventListAttributeCallback implements ChipClusters.SampleManufacturerSpecificClusterCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -22836,7 +22836,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedSampleManufacturerSpecificClusterAttributeListAttributeCallback implements ChipClusters.SampleManufacturerSpecificCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedSampleManufacturerSpecificClusterClusterAttributeListAttributeCallback implements ChipClusters.SampleManufacturerSpecificClusterCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -23380,9 +23380,9 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.FaultInjectionCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("faultInjection", faultInjectionClusterInfo);
 
-    ClusterInfo sampleManufacturerSpecificClusterInfo = new ClusterInfo(
-      (ptr, endpointId) -> new ChipClusters.SampleManufacturerSpecificCluster(ptr, endpointId), new HashMap<>());
-    clusterMap.put("sampleManufacturerSpecific", sampleManufacturerSpecificClusterInfo);
+    ClusterInfo sampleManufacturerSpecificClusterClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.SampleManufacturerSpecificClusterCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("sampleManufacturerSpecificCluster", sampleManufacturerSpecificClusterClusterInfo);
 
     return clusterMap;
   }
@@ -23515,7 +23515,7 @@ public class ClusterInfoMapping {
     destination.get("commissionerControl").combineCommands(source.get("commissionerControl"));
     destination.get("unitTesting").combineCommands(source.get("unitTesting"));
     destination.get("faultInjection").combineCommands(source.get("faultInjection"));
-    destination.get("sampleManufacturerSpecific").combineCommands(source.get("sampleManufacturerSpecific"));
+    destination.get("sampleManufacturerSpecificCluster").combineCommands(source.get("sampleManufacturerSpecificCluster"));
   }
 
  @SuppressWarnings("unchecked")
@@ -31210,31 +31210,31 @@ public class ClusterInfoMapping {
 
     commandMap.put("faultInjection", faultInjectionClusterInteractionInfoMap);
 
-    Map<String, InteractionInfo> sampleManufacturerSpecificClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, InteractionInfo> sampleManufacturerSpecificClusterClusterInteractionInfoMap = new LinkedHashMap<>();
 
-    Map<String, CommandParameterInfo> sampleManufacturerSpecificpingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo sampleManufacturerSpecificpingInteractionInfo = new InteractionInfo(
+    Map<String, CommandParameterInfo> sampleManufacturerSpecificClusterpingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo sampleManufacturerSpecificClusterpingInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.SampleManufacturerSpecificCluster) cluster)
+        ((ChipClusters.SampleManufacturerSpecificClusterCluster) cluster)
         .ping((DefaultClusterCallback) callback
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        sampleManufacturerSpecificpingCommandParams
+        sampleManufacturerSpecificClusterpingCommandParams
     );
-    sampleManufacturerSpecificClusterInteractionInfoMap.put("ping", sampleManufacturerSpecificpingInteractionInfo);
+    sampleManufacturerSpecificClusterClusterInteractionInfoMap.put("ping", sampleManufacturerSpecificClusterpingInteractionInfo);
 
-    Map<String, CommandParameterInfo> sampleManufacturerSpecificaddArgumentsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> sampleManufacturerSpecificClusteraddArgumentsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo sampleManufacturerSpecificaddArgumentsarg1CommandParameterInfo = new CommandParameterInfo("arg1", Integer.class, Integer.class);
-    sampleManufacturerSpecificaddArgumentsCommandParams.put("arg1",sampleManufacturerSpecificaddArgumentsarg1CommandParameterInfo);
+    CommandParameterInfo sampleManufacturerSpecificClusteraddArgumentsarg1CommandParameterInfo = new CommandParameterInfo("arg1", Integer.class, Integer.class);
+    sampleManufacturerSpecificClusteraddArgumentsCommandParams.put("arg1",sampleManufacturerSpecificClusteraddArgumentsarg1CommandParameterInfo);
 
-    CommandParameterInfo sampleManufacturerSpecificaddArgumentsarg2CommandParameterInfo = new CommandParameterInfo("arg2", Integer.class, Integer.class);
-    sampleManufacturerSpecificaddArgumentsCommandParams.put("arg2",sampleManufacturerSpecificaddArgumentsarg2CommandParameterInfo);
-    InteractionInfo sampleManufacturerSpecificaddArgumentsInteractionInfo = new InteractionInfo(
+    CommandParameterInfo sampleManufacturerSpecificClusteraddArgumentsarg2CommandParameterInfo = new CommandParameterInfo("arg2", Integer.class, Integer.class);
+    sampleManufacturerSpecificClusteraddArgumentsCommandParams.put("arg2",sampleManufacturerSpecificClusteraddArgumentsarg2CommandParameterInfo);
+    InteractionInfo sampleManufacturerSpecificClusteraddArgumentsInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.SampleManufacturerSpecificCluster) cluster)
-          .addArguments((ChipClusters.SampleManufacturerSpecificCluster.AddArgumentsResponseCallback) callback
+        ((ChipClusters.SampleManufacturerSpecificClusterCluster) cluster)
+          .addArguments((ChipClusters.SampleManufacturerSpecificClusterCluster.AddArgumentsResponseCallback) callback
            , (Integer)
              commandArguments.get("arg1")
 
@@ -31243,12 +31243,12 @@ public class ClusterInfoMapping {
 
             );
         },
-        () -> new DelegatedSampleManufacturerSpecificClusterAddArgumentsResponseCallback(),
-        sampleManufacturerSpecificaddArgumentsCommandParams
+        () -> new DelegatedSampleManufacturerSpecificClusterClusterAddArgumentsResponseCallback(),
+        sampleManufacturerSpecificClusteraddArgumentsCommandParams
       );
-    sampleManufacturerSpecificClusterInteractionInfoMap.put("addArguments", sampleManufacturerSpecificaddArgumentsInteractionInfo);
+    sampleManufacturerSpecificClusterClusterInteractionInfoMap.put("addArguments", sampleManufacturerSpecificClusteraddArgumentsInteractionInfo);
 
-    commandMap.put("sampleManufacturerSpecific", sampleManufacturerSpecificClusterInteractionInfoMap);
+    commandMap.put("sampleManufacturerSpecificCluster", sampleManufacturerSpecificClusterClusterInteractionInfoMap);
 
     return commandMap;
   }

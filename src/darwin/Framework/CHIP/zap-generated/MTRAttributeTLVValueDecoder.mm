@@ -19608,9 +19608,9 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForSampleManufacturerSpecificCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForSampleManufacturerSpecificClusterCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::SampleManufacturerSpecific;
+    using namespace Clusters::SampleManufacturerSpecificCluster;
     switch (aAttributeId) {
     case Attributes::FlipFlop::Id: {
         using TypeInfo = Attributes::FlipFlop::TypeInfo;
@@ -20008,8 +20008,8 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     case Clusters::UnitTesting::Id: {
         return DecodeAttributeValueForUnitTestingCluster(aPath.mAttributeId, aReader, aError);
     }
-    case Clusters::SampleManufacturerSpecific::Id: {
-        return DecodeAttributeValueForSampleManufacturerSpecificCluster(aPath.mAttributeId, aReader, aError);
+    case Clusters::SampleManufacturerSpecificCluster::Id: {
+        return DecodeAttributeValueForSampleManufacturerSpecificClusterCluster(aPath.mAttributeId, aReader, aError);
     }
     default: {
         break;

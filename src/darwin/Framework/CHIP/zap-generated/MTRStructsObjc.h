@@ -2559,7 +2559,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRSampleManufacturerSpecificClusterPingCountEventEvent : NSObject <NSCopying>
+@interface MTRSampleManufacturerSpecificClusterClusterPingCountEventEvent : NSObject <NSCopying>
 @property (nonatomic, copy, getter=getCount) NSNumber * _Nonnull count MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end

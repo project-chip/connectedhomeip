@@ -9564,8 +9564,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::SampleManufacturerSpecific::Id: {
-        using namespace app::Clusters::SampleManufacturerSpecific;
+    case app::Clusters::SampleManufacturerSpecificCluster::Id: {
+        using namespace app::Clusters::SampleManufacturerSpecificCluster;
         switch (aPath.mEventId)
         {
         case Events::PingCountEvent::Id: {
@@ -9592,10 +9592,12 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass pingCountEventStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$SampleManufacturerSpecificClusterPingCountEventEvent", pingCountEventStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$SampleManufacturerSpecificClusterClusterPingCountEventEvent",
+                pingCountEventStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$SampleManufacturerSpecificClusterPingCountEventEvent");
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$SampleManufacturerSpecificClusterClusterPingCountEventEvent");
                 return nullptr;
             }
 
@@ -9604,7 +9606,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 env, pingCountEventStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V", &pingCountEventStructCtor);
             if (err != CHIP_NO_ERROR || pingCountEventStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$SampleManufacturerSpecificClusterPingCountEventEvent constructor");
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$SampleManufacturerSpecificClusterClusterPingCountEventEvent constructor");
                 return nullptr;
             }
 

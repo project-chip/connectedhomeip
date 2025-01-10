@@ -68865,7 +68865,7 @@ public class ChipClusters {
     }
   }
 
-  public static class SampleManufacturerSpecificCluster extends BaseChipCluster {
+  public static class SampleManufacturerSpecificClusterCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 4294048800L;
 
     private static final long FLIP_FLOP_ATTRIBUTE_ID = 0L;
@@ -68876,7 +68876,7 @@ public class ChipClusters {
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
 
-    public SampleManufacturerSpecificCluster(long devicePtr, int endpointId) {
+    public SampleManufacturerSpecificClusterCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId, CLUSTER_ID);
     }
 
