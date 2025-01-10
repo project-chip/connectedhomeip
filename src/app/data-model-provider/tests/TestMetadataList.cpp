@@ -83,9 +83,9 @@ TEST_F(TestMetadataList, MetadataListWorks)
     MetadataList<IdAndValue<int>> list2 = std::move(list1);
 
     // Moved-from list is "empty", un-Metadata and span is empty.
-    EXPECT_EQ(list1.size(), 0u);
-    EXPECT_EQ(list1.capacity(), 0u);
-    EXPECT_TRUE(list1.GetSpanValidForLifetime().empty());
+    EXPECT_EQ(list1.size(), 0u);                          // NOLINT(bugprone-use-after-move)
+    EXPECT_EQ(list1.capacity(), 0u);                      // NOLINT(bugprone-use-after-move)
+    EXPECT_TRUE(list1.GetSpanValidForLifetime().empty()); // NOLINT(bugprone-use-after-move)
 
     // Moved-to list has storage.
     EXPECT_EQ(list2.size(), 2u);
