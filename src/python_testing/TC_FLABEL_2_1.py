@@ -25,6 +25,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -33,7 +34,8 @@
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, run_if_endpoint_matches, has_attribute, has_cluster, default_matter_test_main
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_attribute, has_cluster,
+                                         run_if_endpoint_matches)
 from mobly import asserts
 
 
@@ -49,7 +51,7 @@ class Test_TC_FLABEL_2_1(MatterBaseTest):
             TestStep(4, "Verify LabelList hasn't changed", "LabelList matches initial read")
         ]
 
-    @run_if_endpoint_matches(has_attribute(Clusters.FixedLabel.Attributes.LabelList) and has_cluster(Clusters.FixedLabel))
+    @run_if_endpoint_matches(has_attribute(Clusters.FixedLabel.Attributes.LabelList))
     async def test_TC_FLABEL_2_1(self):
         # Step 1: Commission DUT (already done)
         self.step(1)
