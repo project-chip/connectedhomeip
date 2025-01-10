@@ -22,7 +22,7 @@ Git: 0.9-fall2024-228-g54b1ae035
 -->
 <configurator>
   <domain name="CHIP"/>
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain>Cameras</domain>
     <name>WebRTC Transport Requestor</name>
     <code>0x0554</code>

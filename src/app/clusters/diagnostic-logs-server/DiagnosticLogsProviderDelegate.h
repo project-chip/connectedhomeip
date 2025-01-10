@@ -78,6 +78,8 @@ public:
      * @param[in] error          A CHIP_ERROR value indicating the reason for ending the log collection.
      *                           It is permissible to pass CHIP_NO_ERROR to indicate normal termination.
      * @return CHIP_ERROR_NOT_IMPLEMENTED by default unless overridden.
+     *         CHIP_NO_ERROR on successful termination of the log collection.
+     *         Appropriate CHIP_ERROR code if an error occurs while ending the log collection.
      *
      */
     virtual CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error)
