@@ -228,7 +228,7 @@ void ConnectivityManagerImpl::DriveStationState()
     {
         // Ensure that the Wifi task is started.
         CHIP_ERROR error = StartWifiTask();
-        VerifyOrExit(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartWifiTask() failed: %s", ErrorStr(error)));
+        VerifyOrReturn(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartWifiTask() failed: %s", ErrorStr(error)));
 
         // Ensure that station mode is enabled in the WiFi layer.
         ConfigureStationMode();
