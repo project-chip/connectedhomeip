@@ -41,7 +41,7 @@ namespace Platform {
  */
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    static SemaphoreHandle_t xLoggingSemaphore = xSemaphoreCreateMutex();
+    static SemaphoreHandle_t xLoggingSemaphore          = xSemaphoreCreateMutex();
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = { 0 };
     size_t prefixLen;
 
