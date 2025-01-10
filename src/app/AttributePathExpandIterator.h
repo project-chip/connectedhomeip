@@ -183,23 +183,23 @@ class PeekAttributePathExpandIterator
 {
 public:
     PeekAttributePathExpandIterator(DataModel::Provider * dataModel, AttributePathExpandIterator::Position & position) :
-        mAttributePathExpandIterator(dataModel, position), mPositionTarget(position), mOldPosition(position)
+        mAttributePathExpandIterator(dataModel, position), mPositionTarget(position), mCompletePosition(position)
     {}
-    ~PeekAttributePathExpandIterator() { mPositionTarget = mOldPosition; }
+    ~PeekAttributePathExpandIterator() { mPositionTarget = mCompletePosition; }
 
     bool Next(ConcreteAttributePath & path)
     {
-        mOldPosition = mPositionTarget;
+        mCompletePosition = mPositionTarget;
         return mAttributePathExpandIterator.Next(path);
     }
 
     /// Marks the current iteration completed (so peek does not actually roll back)
-    void MarkCompleted() { mOldPosition = mPositionTarget; }
+    void MarkCompleted() { mCompletePosition = mPositionTarget; }
 
 private:
     AttributePathExpandIterator mAttributePathExpandIterator;
     AttributePathExpandIterator::Position & mPositionTarget;
-    AttributePathExpandIterator::Position mOldPosition;
+    AttributePathExpandIterator::Position mCompletePosition;
 };
 
 } // namespace app
