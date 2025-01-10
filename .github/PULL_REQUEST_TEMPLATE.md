@@ -6,7 +6,9 @@
 > If you do not have an issue number, please have a good description of
 > the problem and the fix. Help the reviewer understand what to expect.
 >
+> Add a `### Testing` section to your PR to describe how testing was done.
+> See <https://github.com/project-chip/connectedhomeip/blob/master/CONTRIBUTING.md#pull-requests>
+>
 > Make sure you delete these instructions (to prove you have read them).
 >
 > !!!!!!!!!! Instructions end
-

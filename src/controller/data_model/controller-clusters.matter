@@ -3017,10 +3017,10 @@ cluster IcdManagement = 70 {
   readonly attribute access(read: administer) optional MonitoringRegistrationStruct registeredClients[] = 3;
   readonly attribute access(read: administer) optional int32u ICDCounter = 4;
   readonly attribute optional int16u clientsSupportedPerFabric = 5;
-  provisional readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
-  provisional readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
-  provisional readonly attribute optional OperatingModeEnum operatingMode = 8;
-  provisional readonly attribute optional int32u maximumCheckInBackOff = 9;
+  readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
+  readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  readonly attribute optional OperatingModeEnum operatingMode = 8;
+  readonly attribute optional int32u maximumCheckInBackOff = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -9541,7 +9541,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kJPEG = 0;
   }
 
-  enum StreamTypeEnum : enum8 {
+  enum StreamUsageEnum : enum8 {
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
@@ -9586,7 +9586,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
 
   struct VideoStreamStruct {
     int16u videoStreamID = 0;
-    StreamTypeEnum streamType = 1;
+    StreamUsageEnum streamUsage = 1;
     VideoCodecEnum videoCodec = 2;
     int16u minFrameRate = 3;
     int16u maxFrameRate = 4;
@@ -9633,7 +9633,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
 
   struct AudioStreamStruct {
     int16u audioStreamID = 0;
-    StreamTypeEnum streamType = 1;
+    StreamUsageEnum streamUsage = 1;
     AudioCodecEnum audioCodec = 2;
     int8u channelCount = 3;
     int32u sampleRate = 4;
@@ -9659,7 +9659,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
 
   info event VideoStreamChanged = 0 {
     int16u videoStreamID = 0;
-    optional StreamTypeEnum streamType = 1;
+    optional StreamUsageEnum streamUsage = 1;
     optional VideoCodecEnum videoCodec = 2;
     optional int16u minFrameRate = 3;
     optional int16u maxFrameRate = 4;
@@ -9673,7 +9673,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
 
   info event AudioStreamChanged = 1 {
     int16u audioStreamID = 0;
-    optional StreamTypeEnum streamType = 1;
+    optional StreamUsageEnum streamUsage = 1;
     optional AudioCodecEnum audioCodec = 2;
     optional int8u channelCount = 3;
     optional int32u sampleRate = 4;
@@ -9709,7 +9709,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional VideoStreamStruct allocatedVideoStreams[] = 15;
   readonly attribute optional AudioStreamStruct allocatedAudioStreams[] = 16;
   readonly attribute optional SnapshotStreamStruct allocatedSnapshotStreams[] = 17;
-  readonly attribute optional StreamTypeEnum rankedVideoStreamPrioritiesList[] = 18;
+  readonly attribute optional StreamUsageEnum rankedVideoStreamPrioritiesList[] = 18;
   attribute optional boolean softRecordingPrivacyModeEnabled = 19;
   attribute optional boolean softLivestreamPrivacyModeEnabled = 20;
   readonly attribute optional boolean hardPrivacyModeOn = 21;
@@ -9740,7 +9740,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AudioStreamAllocateRequest {
-    StreamTypeEnum streamType = 0;
+    StreamUsageEnum streamUsage = 0;
     AudioCodecEnum audioCodec = 1;
     int8u channelCount = 2;
     int32u sampleRate = 3;
@@ -9757,7 +9757,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   }
 
   request struct VideoStreamAllocateRequest {
-    StreamTypeEnum streamType = 0;
+    StreamUsageEnum streamUsage = 0;
     VideoCodecEnum videoCodec = 1;
     int16u minFrameRate = 2;
     int16u maxFrameRate = 3;
@@ -9777,9 +9777,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
 
   request struct VideoStreamModifyRequest {
     int16u videoStreamID = 0;
-    optional VideoResolutionStruct resolution = 1;
-    optional boolean watermarkEnabled = 2;
-    optional boolean OSDEnabled = 3;
+    optional boolean watermarkEnabled = 1;
+    optional boolean OSDEnabled = 2;
   }
 
   request struct VideoStreamDeallocateRequest {
@@ -9804,7 +9803,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   }
 
   request struct SetStreamPrioritiesRequest {
-    StreamTypeEnum streamPriorities[] = 0;
+    StreamUsageEnum streamPriorities[] = 0;
   }
 
   request struct CaptureSnapshotRequest {
@@ -9832,17 +9831,117 @@ provisional cluster CameraAvStreamManagement = 1361 {
   command access(invoke: manage) SnapshotStreamAllocate(SnapshotStreamAllocateRequest): SnapshotStreamAllocateResponse = 7;
   /** This command SHALL deallocate an snapshot stream on the camera, corresponding to the given snapshot stream identifier. */
   command access(invoke: manage) SnapshotStreamDeallocate(SnapshotStreamDeallocateRequest): DefaultSuccess = 9;
-  /** This command SHALL set the relative priorities of the various stream types on the camera. */
+  /** This command SHALL set the relative priorities of the various stream usages on the camera. */
   command access(invoke: administer) SetStreamPriorities(SetStreamPrioritiesRequest): DefaultSuccess = 10;
   /** This command SHALL return a Snapshot from the camera. */
-  command CaptureSnapshot(CaptureSnapshotRequest): DefaultSuccess = 11;
+  command CaptureSnapshot(CaptureSnapshotRequest): CaptureSnapshotResponse = 11;
+}
+
+/** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
+provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kDigitalPTZ = 0x1;
+    kMechanicalPan = 0x2;
+    kMechanicalTilt = 0x4;
+    kMechanicalZoom = 0x8;
+    kMechanicalPresets = 0x10;
+  }
+
+  struct MPTZStruct {
+    optional int16s pan = 0;
+    optional int16s tilt = 1;
+    optional int8u zoom = 2;
+  }
+
+  struct MPTZPresetStruct {
+    int8u presetID = 0;
+    char_string<32> name = 1;
+    MPTZStruct settings = 2;
+  }
+
+  struct ViewportStruct {
+    int16u x1 = 0;
+    int16u y1 = 1;
+    int16u x2 = 2;
+    int16u y2 = 3;
+  }
+
+  readonly attribute optional MPTZStruct MPTZPosition = 0;
+  readonly attribute optional int8u maxPresets = 1;
+  readonly attribute optional MPTZPresetStruct MPTZPresets[] = 2;
+  readonly attribute optional int16u DPTZRelativeMove[] = 3;
+  readonly attribute optional int8u zoomMax = 4;
+  readonly attribute optional int16s tiltMin = 5;
+  readonly attribute optional int16s tiltMax = 6;
+  readonly attribute optional int16s panMin = 7;
+  readonly attribute optional int16s panMax = 8;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct MPTZSetPositionRequest {
+    optional int16s pan = 0;
+    optional int16s tilt = 1;
+    optional int8u zoom = 2;
+  }
+
+  request struct MPTZRelativeMoveRequest {
+    optional int16s panDelta = 0;
+    optional int16s tiltDelta = 1;
+    optional int8s zoomDelta = 2;
+  }
+
+  request struct MPTZMoveToPresetRequest {
+    int8u presetID = 0;
+  }
+
+  request struct MPTZSavePresetRequest {
+    optional int8u presetID = 0;
+    char_string<32> name = 1;
+  }
+
+  request struct MPTZRemovePresetRequest {
+    int8u presetID = 0;
+  }
+
+  request struct DPTZSetViewportRequest {
+    int16u videoStreamID = 0;
+    ViewportStruct viewport = 1;
+  }
+
+  request struct DPTZRelativeMoveRequest {
+    int16u videoStreamID = 0;
+    optional int16s deltaX = 1;
+    optional int16s deltaY = 2;
+    optional int8s zoomDelta = 3;
+  }
+
+  /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
+  command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
+  /** This command SHALL move the device by the delta values relative to the currently defined position. */
+  command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
+  /** This command SHALL move the camera to the positions specified by the Preset passed. */
+  command MPTZMoveToPreset(MPTZMoveToPresetRequest): DefaultSuccess = 2;
+  /** This command allows creating a new preset or updating the values of an existing one. */
+  command MPTZSavePreset(MPTZSavePresetRequest): DefaultSuccess = 3;
+  /** This command SHALL remove a preset entry from the PresetMptzTable. */
+  command MPTZRemovePreset(MPTZRemovePresetRequest): DefaultSuccess = 4;
+  /** This command allows for setting the digital viewport for a specific Video Stream. */
+  command DPTZSetViewport(DPTZSetViewportRequest): DefaultSuccess = 5;
+  /** This command SHALL change the viewports location by the amount specified in a relative fashion. */
+  command DPTZRelativeMove(DPTZRelativeMoveRequest): DefaultSuccess = 6;
 }
 
 /** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */
 provisional cluster WebRTCTransportProvider = 1363 {
   revision 1;
 
-  enum StreamTypeEnum : enum8 {
+  enum StreamUsageEnum : enum8 {
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
@@ -9879,7 +9978,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     int16u id = 1;
     node_id peerNodeID = 2;
     fabric_idx peerFabricIndex = 3;
-    StreamTypeEnum streamType = 4;
+    StreamUsageEnum streamUsage = 4;
     nullable int16u videoStreamID = 5;
     nullable int16u audioStreamID = 6;
     WebRTCMetadataOptions metadataOptions = 7;
@@ -9894,7 +9993,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SolicitOfferRequest {
-    StreamTypeEnum streamType = 0;
+    StreamUsageEnum streamUsage = 0;
     optional nullable int16u videoStreamID = 1;
     optional nullable int16u audioStreamID = 2;
     optional ICEServerStruct ICEServers[] = 3;
@@ -9912,7 +10011,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
   request struct ProvideOfferRequest {
     nullable int16u webRTCSessionID = 0;
     char_string sdp = 1;
-    StreamTypeEnum streamType = 2;
+    StreamUsageEnum streamUsage = 2;
     optional nullable int16u videoStreamID = 3;
     optional nullable int16u audioStreamID = 4;
     optional ICEServerStruct ICEServers[] = 5;
@@ -9954,10 +10053,10 @@ provisional cluster WebRTCTransportProvider = 1363 {
 }
 
 /** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider. */
-cluster WebRTCTransportRequestor = 1364 {
+provisional cluster WebRTCTransportRequestor = 1364 {
   revision 1;
 
-  enum StreamTypeEnum : enum8 {
+  enum StreamUsageEnum : enum8 {
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
@@ -9994,7 +10093,7 @@ cluster WebRTCTransportRequestor = 1364 {
     int16u id = 1;
     node_id peerNodeID = 2;
     fabric_idx peerFabricIndex = 3;
-    StreamTypeEnum streamType = 4;
+    StreamUsageEnum streamUsage = 4;
     nullable int16u videoStreamID = 5;
     nullable int16u audioStreamID = 6;
     WebRTCMetadataOptions metadataOptions = 7;

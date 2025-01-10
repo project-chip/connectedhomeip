@@ -131,13 +131,14 @@ typedef enum
 
 typedef struct wfx_wifi_scan_result
 {
-    char ssid[WFX_MAX_SSID_LENGTH + 1];
+    uint8_t ssid[WFX_MAX_SSID_LENGTH]; // excludes null-character
     size_t ssid_length;
     wfx_sec_t security;
     uint8_t bssid[kWifiMacAddressLength];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
 } wfx_wifi_scan_result_t;
+using ScanCallback = void (*)(wfx_wifi_scan_result_t *);
 
 typedef struct wfx_wifi_scan_ext
 {
@@ -167,11 +168,9 @@ typedef struct wfx_rsi_s
     chip::BitFlags<WifiState> dev_state;
     uint16_t ap_chan; /* The chan our STA is using	*/
     wfx_wifi_provision_t sec;
-#ifdef SL_WFX_CONFIG_SCAN
-    void (*scan_cb)(wfx_wifi_scan_result_t *);
-    char * scan_ssid; /* Which one are we scanning for */
+    ScanCallback scan_cb;
+    uint8_t * scan_ssid; /* Which one are we scanning for */
     size_t scan_ssid_length;
-#endif
 #ifdef SL_WFX_CONFIG_SOFTAP
     MacAddress softap_mac;
 #endif
@@ -234,6 +233,22 @@ void NotifyConnection(const MacAddress & ap);
  */
 CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & addr);
 
+/**
+ * @brief Triggers a network scan
+ *        The function is asynchronous and the result is provided via the callback.
+ *
+ * @param ssid The SSID to scan for. If empty, all networks are scanned
+ * @param callback The callback to be called when the scan is complete. Cannot be nullptr.
+ *                 The callback is called asynchrounously.
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR if the network scan was successfully started
+ *                    CHIP_INVALID_ARGUMENT if the callback is nullptr
+ *                    CHIP_ERROR_IN_PROGRESS, if there is already a network scan in progress
+ *                    CHIP_ERROR_INVALID_STRING_LENGTH, if there SSID length exceeds handled limit
+ *                    other, if there is a platform error when starting the scan
+ */
+CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback);
+
 /* Function to update */
 
 sl_status_t wfx_wifi_start(void);
@@ -256,7 +271,6 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t);
 
 bool wfx_have_ipv6_addr(sl_wfx_interface_t);
 wifi_mode_t wfx_get_wifi_mode(void);
-bool wfx_start_scan(char * ssid, void (*scan_cb)(wfx_wifi_scan_result_t *)); /* true returned if successfully started */
 void wfx_cancel_scan(void);
 
 /*

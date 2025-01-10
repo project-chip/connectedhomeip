@@ -43,7 +43,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-java:94
+            image: ghcr.io/project-chip/chip-build-java:97
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -94,6 +94,7 @@ jobs:
                       --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-java-matter-controller \
                       --target linux-x64-lit-icd-ipv6only \
+                      --target linux-x64-ota-requestor \
                       build \
                    "
             - name: Build Kotlin Matter Controller
@@ -259,10 +260,20 @@ jobs:
                      --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
                      --factoryreset \
                   '
+            - name: Run Pairing ICD Onnetwork and OTA test
+              # Generally completes in seconds
+              timeout-minutes: 2
+              run: |
+                  scripts/run_in_python_env.sh out/venv \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-ota-requestor/chip-ota-requestor-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "ota" \
+                     --tool-args "onnetwork-long-ota-over-bdx  --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '
             - name: Run Pairing Onnetwork and get diagnostic log Test
-              # TODO: test below is disabled because it seems flaky (crashes on pool not being empty on app exit)
-              #       See: https://github.com/project-chip/connectedhomeip/issues/36734
-              if: false
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \

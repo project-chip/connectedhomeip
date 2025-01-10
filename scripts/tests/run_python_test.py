@@ -111,7 +111,7 @@ def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event)
                                                                              'mobile-device-test.py'), help='Test script to use.')
 @click.option("--script-args", type=str, default='',
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
-@click.option("--script-gdb", is_flag=True,
+@click.option("--script-gdb/--no-script-gdb", default=None,
               help='Run script through gdb')
 @click.option("--quiet/--no-quiet", default=None,
               help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
@@ -152,6 +152,8 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             run.factory_reset = factory_reset
         if factory_reset_app_only is not None:
             run.factory_reset_app_only = factory_reset_app_only
+        if script_gdb is not None:
+            run.script_gdb = script_gdb
         if quiet is not None:
             run.quiet = quiet
 
@@ -232,7 +234,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         script_command = ("gdb -batch -return-child-result -q -ex run -ex "
                           "thread|apply|all|bt --args python3".split() + script_command)
     else:
-        script_command = "/usr/bin/env python3".split() + script_command
+        script_command = "/usr/bin/env python3 -X faulthandler".split() + script_command
 
     final_script_command = [i.replace('|', ' ') for i in script_command]
 
