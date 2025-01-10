@@ -53,11 +53,18 @@ public:
      * @param param        Wi-Fi-PAF configuration parameters for this transport
      */
     CHIP_ERROR Init(const WiFiPAFListenParameters & param);
-    CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
     bool CanSendToPeer(const Transport::PeerAddress & address) override;
-    void OnWiFiPAFMessageReceived(WiFiPAF::WiFiPAFSession & RxInfo, System::PacketBufferHandle && buffer) override;
     void SetWiFiPAFLayerTransportToSelf() { mWiFiPAFLayer->mWiFiPAFTransport = this; }
     bool IsWiFiPAFLayerTransportSetToSelf() { return mWiFiPAFLayer->mWiFiPAFTransport == this; }
+    /**
+     * Interface of Base
+     */
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
+    /**
+     * Interfaces of WiFiPAFLayerDelegate
+     */
+    void OnWiFiPAFMessageReceived(WiFiPAF::WiFiPAFSession & RxInfo, System::PacketBufferHandle && buffer) override;
+    CHIP_ERROR WiFiPAFMessageSend(WiFiPAF::WiFiPAFSession & TxInfo, System::PacketBufferHandle && msg) override;
 
 private:
     /**
