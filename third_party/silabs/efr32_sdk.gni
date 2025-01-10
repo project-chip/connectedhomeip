@@ -733,6 +733,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/bootloader/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_core_cortexm.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
+      "${efr32_sdk_root}/platform/common/src/sl_string.c",
       "${efr32_sdk_root}/platform/common/src/sli_cmsis_os2_ext_task_register.c",
       "${efr32_sdk_root}/platform/driver/gpio/src/sl_gpio.c",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
