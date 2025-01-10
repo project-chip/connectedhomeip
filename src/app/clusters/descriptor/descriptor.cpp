@@ -156,17 +156,18 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
     CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
         Descriptor::Structs::DeviceTypeStruct::Type deviceStruct;
 
-        auto deviceTypes = mModelGetter()->DeviceTypes(endpoint);
+        auto deviceTypes = InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint);
         for (auto & type : deviceTypes.GetSpanValidForLifetime())
+        {
             deviceStruct.deviceType = type.deviceTypeId;
-        deviceStruct.revision = type.deviceTypeRevision;
-        ReturnErrorOnFailure(encoder.Encode(deviceStruct));
+            deviceStruct.revision   = type.deviceTypeRevision;
+            ReturnErrorOnFailure(encoder.Encode(deviceStruct));
         }
 
         return CHIP_NO_ERROR;
-});
+    });
 
-return err;
+    return err;
 }
 
 CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server)
