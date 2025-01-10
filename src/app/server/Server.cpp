@@ -214,7 +214,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
                                .SetNativeParams(initParams.endpointNativeParams)
-
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                               ,
+                           TcpListenParameters(DeviceLayer::TCPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(mOperationalServicePort)
+#endif
 #if INET_CONFIG_ENABLE_IPV4
                                ,
                            UdpListenParameters(DeviceLayer::UDPEndPointManager())
@@ -224,12 +229,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if CONFIG_NETWORK_LAYER_BLE
                                ,
                            BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
-#endif
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-                               ,
-                           TcpListenParameters(DeviceLayer::TCPEndPointManager())
-                               .SetAddressType(IPAddressType::kIPv6)
-                               .SetListenPort(mOperationalServicePort)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                                ,
@@ -329,6 +328,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // init is called.
     app::DnssdServer::Instance().SetICDManager(&mICDManager);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    app::DnssdServer::Instance().SetTCPServerEnabled(mTransports.GetTransport().GetImplAtIndex<1>().IsServerListenEnabled());
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if (GetFabricTable().FabricCount() != 0)
     {

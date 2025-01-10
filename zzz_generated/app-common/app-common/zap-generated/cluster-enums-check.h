@@ -388,9 +388,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositi
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::StreamTypeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::StreamUsageEnum val)
 {
-    using EnumType = detail::StreamTypeEnum;
+    using EnumType = detail::StreamUsageEnum;
     switch (val)
     {
     case EnumType::kInternal:

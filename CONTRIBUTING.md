@@ -160,6 +160,99 @@ This will trigger the continuous-integration checks. You can view the results in
 the respective services. Note that the integration checks will report failures
 on occasion.
 
+#### Pull requests
+
+Aim to make pull requests easy to read both when viewed in a list (title only)
+as well as clear in content within the description.
+
+##### Title formatting
+
+Describe the change as a one-line in some descriptive manner. Add sufficient
+context for a reader to understand what is improved. If platform-specific
+consider adding the platform as a prefix, like `[Android]` or any other tags may
+be useful for quick filtering like `[TC-ABC-1.2]` to tag test changes.
+
+Examples of descriptive titles:
+
+-   `[Silabs] Fix compile of SiWx917 if LED and BUTTON are disabled`
+-   `[Telink] Update build Dockerfile with new Zeprhy SHA: c05c4.....`
+-   `General Commissioning Cluster: use AttributeAccessInterface/CommandHandlerInterface for processing`
+-   `Scenes Management/CopyScene: set access as manage instead of default to match the spec`
+-   `Fix build errors due to ChipDeviceEvent default constructor not being available`
+-   `Fix crash during DNSSD processing due to malformed packet`
+-   `[NRF] Fix crash due to stack overflow during logging for PW-RPC builds`
+-   `[TC-ABC-2.3] added new python test case based on test plan`
+-   `[TC-ABC] migrate tests from yaml to python`
+
+Examples of titles that are vague (not clear what the change is, one would need
+to open the pull request for details or open additional issue in GitHub)
+
+-   `Work on issue 1234`
+-   `Fix android JniTypeWrappers`
+-   `Fix segfault in BLE`
+-   `Fix TC-ABC-1.2`
+-   `Update Readme`
+
+##### Summary contents
+
+Ensure that there is sufficient detail in issue summaries to make the content of
+the PR clear:
+
+-   a `TLDR` of the change content. This is a judgement call on details,
+    generally you should include a what was changed and why. The change is
+    trivial/short, this can be very short (i.e. "fixed typos" is perfectly
+    acceptable, however if changing 100-1000s of line, the areas of changes
+    should be explained)
+-   If a crash/error is fixed, explain the root cause and if the fix is not
+    obvious (again, judgement call), explain why the given approach was taken.
+-   Help the reviewer out with any notable information (specific platform
+    issues, extra thoughts or requests for feedback or gotchas on tricky code,
+    followup work or PR dependencies)
+-   TIP: use the syntax of `Fixes #....` to mark issues completed on PR merge or
+    use `#...` to reference issues that are addressed.
+-   TIP: prefer adding some brief description (especially about the content of
+    the changes) instead of just referencing an issue (helps reviewers get
+    context faster without extra clicks).
+
+##### Testing section
+
+All Pull Requests **MUST** contain a `#### Testing` section that describes how
+the pull request was tested. Ideally every test should have automated testing,
+however for platform specific changes or hardware-specific issues we may not be
+able to have such tests (e.g. we may not BLE or NFC capability in CI). As such,
+manual testing is acceptable, however the description has to be detailed
+intentionally to avoid a bias towards marking pull requests as "manually tested"
+out of convenience.
+
+-   Automated testing
+
+    **AWESOME**. You can say "unit tests added/updated" or "Integration tests
+    updated to cover functionality" or "existing tests already cover this" (make
+    sure they do. Integration tests often only cover happy paths).
+
+    Add any notes on not covered things. It is a judgement call on how much can
+    be covered as 100% sounds great however not always possible.
+
+-   Manual testing
+
+    Describe why automated testing is impossible in the current CI environment
+    or difficult to add. If adding later, reference the issue to add automation
+    and a timeline for adding such automation.
+
+    Describe in **DETAIL** how manual testing was done: what environment, what
+    builds were used (`build-example` names are ok such as
+    `flashed qpg-qpg6105-light` and `used linux-x64-chip-tool-clang`). Describe
+    commands ran (often chip-tool) and physical interaction and what was
+    observed.
+
+-   Trivial/obvious change
+
+    In rare cases the change is trivial (e.g. fixing a typo in a `Readme.md`).
+    Scripts still require a `#### Testing` section however you can be brief like
+    `N/A` or `checked new URL opens`. Note that these cases are rare - e.g.
+    fixing a typo in an ID still requires some description on how you checked
+    that the new ID takes effect.
+
 ### Review Requirements
 
 #### Documentation Best Practices
