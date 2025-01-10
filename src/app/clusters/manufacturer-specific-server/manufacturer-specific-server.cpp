@@ -28,10 +28,13 @@ using namespace chip::app::Clusters::SampleManufacturerSpecific::Attributes;
 
 void MatterSampleManufacturerSpecificPluginServerInitCallback()
 {
-    ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", MATTER_DM_SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_SERVER_ENDPOINT_COUNT,
+    ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u",
+                    MATTER_DM_SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
-    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleManufacturerSpecificServer::Instance()));
-    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleManufacturerSpecificServer::Instance()), CHIP_ERROR_INCORRECT_STATE);
+    ReturnOnFailure(
+        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleManufacturerSpecificServer::Instance()));
+    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleManufacturerSpecificServer::Instance()),
+                   CHIP_ERROR_INCORRECT_STATE);
 }
 
 void emberAfSampleManufacturerSpecificClusterServerInitCallback(chip::EndpointId endpoint)
