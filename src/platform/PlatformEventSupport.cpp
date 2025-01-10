@@ -44,17 +44,17 @@ CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, System::Clock::T
     return PlatformMgr().StartChipTimer(delay);
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-void PlatformEventing::LockMatterStack(System::Layer & aLayer)
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+void PlatformEventing::LockMatterStack()
 {
     PlatformMgr().LockChipStack();
 }
 
-void PlatformEventing::UnlockMatterStack(System::Layer & aLayer)
+void PlatformEventing::UnlockMatterStack()
 {
     PlatformMgr().UnlockChipStack();
 }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 } // namespace System
 } // namespace chip

@@ -31,16 +31,16 @@ CHIP_ERROR Layer::ScheduleLambdaBridge(LambdaBridge && bridge)
     return lReturn;
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-CHIP_ERROR LayerFreeRTOS::RunOnMatterContext(std::function<CHIP_ERROR()> func)
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+CHIP_ERROR Layer::RunWithMatterContextLock(std::function<CHIP_ERROR()> func)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    PlatformEventing::LockMatterStack(*this);
+    PlatformEventing::LockMatterStack();
     err = func();
-    PlatformEventing::UnlockMatterStack(*this);
+    PlatformEventing::UnlockMatterStack();
     return err;
 }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 } // namespace System
 } // namespace chip

@@ -788,9 +788,9 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
 
     if (arg != nullptr)
     {
-        TCPEndPointImplLwIP * listenEP       = static_cast<TCPEndPointImplLwIP *>(arg);
-        TCPEndPointImplLwIP * conEP          = nullptr;
-        System::LayerFreeRTOS & lSystemLayer = static_cast<System::LayerFreeRTOS &>(listenEP->GetSystemLayer());
+        TCPEndPointImplLwIP * listenEP = static_cast<TCPEndPointImplLwIP *>(arg);
+        TCPEndPointImplLwIP * conEP    = nullptr;
+        System::Layer & lSystemLayer   = listenEP->GetSystemLayer();
 
         // Tell LwIP we've accepted the connection so it can decrement the listen PCB's pending_accepts counter.
         tcp_accepted(listenEP->mTCP);
@@ -805,8 +805,14 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
         if (err == CHIP_NO_ERROR)
         {
             TCPEndPoint * connectEndPoint = nullptr;
-            err                           = lSystemLayer.RunOnMatterContext(
+#if CHIP_SYSTEM_CONFIG_NO_LOCKING
+            // TODO This should be in Matter context but we cannot use SystemLayer.ScheduleLambda() here as the allocated endpoint
+            // will be used in the following.
+            err = listenEP->GetEndPointManager().NewEndPoint(&connectEndPoint);
+#else
+            err = lSystemLayer.RunWithMatterContextLock(
                 [&listenEP, &connectEndPoint]() { return listenEP->GetEndPointManager().NewEndPoint(&connectEndPoint); });
+#endif
             conEP = static_cast<TCPEndPointImplLwIP *>(connectEndPoint);
         }
 
@@ -954,8 +960,8 @@ void TCPEndPointImplLwIP::LwIPHandleError(void * arg, err_t lwipErr)
 {
     if (arg != nullptr)
     {
-        TCPEndPointImplLwIP * ep             = static_cast<TCPEndPointImplLwIP *>(arg);
-        System::LayerFreeRTOS & lSystemLayer = static_cast<System::LayerFreeRTOS &>(ep->GetSystemLayer());
+        TCPEndPointImplLwIP * ep     = static_cast<TCPEndPointImplLwIP *>(arg);
+        System::Layer & lSystemLayer = ep->GetSystemLayer();
 
         // At this point LwIP has already freed the PCB.  Since the thread that owns the TCPEndPoint may
         // try to use the PCB before it receives the TCPError event posted below, we set the PCB to NULL
