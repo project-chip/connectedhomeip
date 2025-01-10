@@ -81,7 +81,7 @@ public:
         ///
         /// When attributes are changed in the middle of expanding a wildcard attribute, we need to reset the iterator, to provide
         /// the client with a consistent state of the cluster.
-        void IterateFromTheStartOfTheCurrentCluster()
+        void IterateFromTheStartOfTheCurrentClusterIfAttributeWildcard()
         {
             VerifyOrReturn(mAttributePath != nullptr && mAttributePath->mValue.HasWildcardAttributeId());
             mOutputPath.mAttributeId = kInvalidAttributeId;
