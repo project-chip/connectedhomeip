@@ -15,27 +15,27 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines the interface for downcalls from WiFiPAFLayer
- *      to a WiFiPAF transport.
- */
-
 #pragma once
-
-#include "WiFiPAFRole.h"
 #include <lib/core/NodeId.h>
-#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace WiFiPAF {
 
-class WiFiPAFLayerDelegate
+/// Role of end points' associated WiFiPAF connections. Determines means used by end points to send and receive data.
+typedef enum
 {
-public:
-    virtual ~WiFiPAFLayerDelegate()                                                                   = default;
-    virtual void OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) = 0;
-    virtual CHIP_ERROR WiFiPAFMessageSend(WiFiPAFSession & TxInfo, System::PacketBufferHandle && msg) = 0;
+    kWiFiPafRole_Publisher  = 0,
+    kWiFiPafRole_Subscriber = 1
+} WiFiPafRole;
+
+struct WiFiPAFSession
+{
+    WiFiPafRole role;
+    uint32_t id;
+    uint32_t peer_id;
+    uint8_t peer_addr[6];
+    NodeId nodeId;
+    uint16_t discriminator;
 };
 
 } // namespace WiFiPAF
