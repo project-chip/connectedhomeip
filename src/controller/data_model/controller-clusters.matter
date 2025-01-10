@@ -10167,7 +10167,7 @@ cluster PushAvStreamTransport = 1365 {
     kInterleaved = 0;
   }
 
-  enum StreamTypeEnum : enum8 {
+  enum StreamUsageEnum : enum8 {
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
@@ -10240,11 +10240,11 @@ cluster PushAvStreamTransport = 1365 {
   }
 
   struct TransportOptionsStruct {
-    StreamTypeEnum streamType = 0;
+    StreamUsageEnum streamUsage = 0;
     optional int16u videoStreamID = 1;
     optional int16u audioStreamID = 2;
     int16u endpointID = 3;
-    long_char_string<256> url = 4;
+    long_char_string<2000> url = 4;
     TransportTriggerOptionsStruct triggerOptions = 5;
     IngestMethodsEnum ingestMethod = 6;
     ContainerFormatEnum containerFormat = 7;

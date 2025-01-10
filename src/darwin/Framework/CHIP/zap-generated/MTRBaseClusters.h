@@ -20378,11 +20378,11 @@ typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportStreamMultiplexing) {
     MTRPushAVStreamTransportStreamMultiplexingInterleaved MTR_PROVISIONALLY_AVAILABLE = 0x00,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportStreamType) {
-    MTRPushAVStreamTransportStreamTypeInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRPushAVStreamTransportStreamTypeRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRPushAVStreamTransportStreamTypeAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRPushAVStreamTransportStreamTypeLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
+typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportStreamUsage) {
+    MTRPushAVStreamTransportStreamUsageInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRPushAVStreamTransportStreamUsageRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRPushAVStreamTransportStreamUsageAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRPushAVStreamTransportStreamUsageLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportTransportStatus) {

@@ -34983,7 +34983,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.transportOptions.streamType = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.streamType)>>(self.transportOptions.streamType.unsignedCharValue);
+        encodableStruct.transportOptions.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.streamUsage)>>(self.transportOptions.streamUsage.unsignedCharValue);
         if (self.transportOptions.videoStreamID != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.videoStreamID.Emplace();
             definedValue_1 = self.transportOptions.videoStreamID.unsignedShortValue;
@@ -35198,7 +35198,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         self.transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
-        self.transportOptions.streamType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportOptions.streamType)];
+        self.transportOptions.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportOptions.streamUsage)];
         if (decodableStruct.transportOptions.videoStreamID.HasValue()) {
             self.transportOptions.videoStreamID = [NSNumber numberWithUnsignedShort:decodableStruct.transportOptions.videoStreamID.Value()];
         } else {
@@ -35433,7 +35433,7 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.connectionID = self.connectionID.unsignedShortValue;
     }
     {
-        encodableStruct.transportOptions.streamType = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.streamType)>>(self.transportOptions.streamType.unsignedCharValue);
+        encodableStruct.transportOptions.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.streamUsage)>>(self.transportOptions.streamUsage.unsignedCharValue);
         if (self.transportOptions.videoStreamID != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.videoStreamID.Emplace();
             definedValue_1 = self.transportOptions.videoStreamID.unsignedShortValue;
@@ -35917,7 +35917,7 @@ NS_ASSUME_NONNULL_BEGIN
                 newElement_0.connectionID = [NSNumber numberWithUnsignedShort:entry_0.connectionID];
                 newElement_0.transportStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportStatus)];
                 newElement_0.transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
-                newElement_0.transportOptions.streamType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.streamType)];
+                newElement_0.transportOptions.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.streamUsage)];
                 if (entry_0.transportOptions.videoStreamID.HasValue()) {
                     newElement_0.transportOptions.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.videoStreamID.Value()];
                 } else {

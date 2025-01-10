@@ -24,7 +24,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class PushAvStreamTransportClusterTransportOptionsStruct(
-  val streamType: UInt,
+  val streamUsage: UInt,
   val videoStreamID: Optional<UInt>,
   val audioStreamID: Optional<UInt>,
   val endpointID: UInt,
@@ -38,7 +38,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportOptionsStruct {\n")
-    append("\tstreamType : $streamType\n")
+    append("\tstreamUsage : $streamUsage\n")
     append("\tvideoStreamID : $videoStreamID\n")
     append("\taudioStreamID : $audioStreamID\n")
     append("\tendpointID : $endpointID\n")
@@ -55,7 +55,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_STREAM_TYPE), streamType)
+      put(ContextSpecificTag(TAG_STREAM_USAGE), streamUsage)
       if (videoStreamID.isPresent) {
         val optvideoStreamID = videoStreamID.get()
         put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), optvideoStreamID)
@@ -83,7 +83,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
   }
 
   companion object {
-    private const val TAG_STREAM_TYPE = 0
+    private const val TAG_STREAM_USAGE = 0
     private const val TAG_VIDEO_STREAM_ID = 1
     private const val TAG_AUDIO_STREAM_ID = 2
     private const val TAG_ENDPOINT_ID = 3
@@ -100,7 +100,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
       tlvReader: TlvReader,
     ): PushAvStreamTransportClusterTransportOptionsStruct {
       tlvReader.enterStructure(tlvTag)
-      val streamType = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_TYPE))
+      val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
       val videoStreamID =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAM_ID))) {
           Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID)))
@@ -148,7 +148,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterTransportOptionsStruct(
-        streamType,
+        streamUsage,
         videoStreamID,
         audioStreamID,
         endpointID,

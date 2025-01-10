@@ -43850,7 +43850,7 @@ using DecodableType = Type;
 namespace TransportOptionsStruct {
 enum class Fields : uint8_t
 {
-    kStreamType       = 0,
+    kStreamUsage      = 0,
     kVideoStreamID    = 1,
     kAudioStreamID    = 2,
     kEndpointID       = 3,
@@ -43866,7 +43866,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
     Optional<uint16_t> videoStreamID;
     Optional<uint16_t> audioStreamID;
     uint16_t endpointID = static_cast<uint16_t>(0);
@@ -43878,14 +43878,30 @@ public:
     Optional<Structs::MetadataOptionsStruct::Type> metadataOptions;
     Optional<uint32_t> expiryTime;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-using DecodableType = Type;
+struct DecodableType
+{
+public:
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    Optional<uint16_t> videoStreamID;
+    Optional<uint16_t> audioStreamID;
+    uint16_t endpointID = static_cast<uint16_t>(0);
+    chip::CharSpan url;
+    Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions;
+    IngestMethodsEnum ingestMethod      = static_cast<IngestMethodsEnum>(0);
+    ContainerFormatEnum containerFormat = static_cast<ContainerFormatEnum>(0);
+    Structs::ContainerOptionsStruct::DecodableType containerOptions;
+    Optional<Structs::MetadataOptionsStruct::DecodableType> metadataOptions;
+    Optional<uint32_t> expiryTime;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
 
 } // namespace TransportOptionsStruct
 namespace TransportConfigurationStruct {
@@ -43903,14 +43919,22 @@ public:
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
     Structs::TransportOptionsStruct::Type transportOptions;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-using DecodableType = Type;
+struct DecodableType
+{
+public:
+    uint16_t connectionID               = static_cast<uint16_t>(0);
+    TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
+    Structs::TransportOptionsStruct::DecodableType transportOptions;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
 
 } // namespace TransportConfigurationStruct
 } // namespace Structs

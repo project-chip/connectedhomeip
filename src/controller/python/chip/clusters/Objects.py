@@ -47374,7 +47374,7 @@ class PushAvStreamTransport(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 1
 
-        class StreamTypeEnum(MatterIntEnum):
+        class StreamUsageEnum(MatterIntEnum):
             kInternal = 0x00
             kRecording = 0x01
             kAnalysis = 0x02
@@ -47521,7 +47521,7 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="streamType", Tag=0, Type=PushAvStreamTransport.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=0, Type=PushAvStreamTransport.Enums.StreamUsageEnum),
                         ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="endpointID", Tag=3, Type=uint),
@@ -47534,7 +47534,7 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="expiryTime", Tag=10, Type=typing.Optional[uint]),
                     ])
 
-            streamType: 'PushAvStreamTransport.Enums.StreamTypeEnum' = 0
+            streamUsage: 'PushAvStreamTransport.Enums.StreamUsageEnum' = 0
             videoStreamID: 'typing.Optional[uint]' = None
             audioStreamID: 'typing.Optional[uint]' = None
             endpointID: 'uint' = 0

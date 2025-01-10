@@ -9949,7 +9949,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _streamType = @(0);
+        _streamUsage = @(0);
 
         _videoStreamID = nil;
 
@@ -9978,7 +9978,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRPushAVStreamTransportClusterTransportOptionsStruct alloc] init];
 
-    other.streamType = self.streamType;
+    other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.endpointID = self.endpointID;
@@ -9995,7 +9995,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamType:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerFormat:%@; containerOptions:%@; metadataOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamType, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerFormat, _containerOptions, _metadataOptions, _expiryTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerFormat:%@; containerOptions:%@; metadataOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerFormat, _containerOptions, _metadataOptions, _expiryTime];
     return descriptionString;
 }
 

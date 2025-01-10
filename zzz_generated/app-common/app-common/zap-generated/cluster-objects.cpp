@@ -31582,7 +31582,7 @@ namespace TransportOptionsStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kEndpointID), endpointID);
@@ -31610,9 +31610,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kStreamType))
+        if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
-            err = DataModel::Decode(reader, streamType);
+            err = DataModel::Decode(reader, streamUsage);
         }
         else if (__context_tag == to_underlying(Fields::kVideoStreamID))
         {

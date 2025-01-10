@@ -5697,7 +5697,7 @@ enum class StreamMultiplexingEnum : uint8_t
     kUnknownEnumValue = 1,
 };
 
-using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 // Enum for TransportStatusEnum
 enum class TransportStatusEnum : uint8_t

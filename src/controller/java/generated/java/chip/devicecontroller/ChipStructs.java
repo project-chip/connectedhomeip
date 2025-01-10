@@ -15256,7 +15256,7 @@ public static class PushAvStreamTransportClusterContainerOptionsStruct {
   }
 }
 public static class PushAvStreamTransportClusterTransportOptionsStruct {
-  public Integer streamType;
+  public Integer streamUsage;
   public Optional<Integer> videoStreamID;
   public Optional<Integer> audioStreamID;
   public Integer endpointID;
@@ -15267,7 +15267,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
   public ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions;
   public Optional<ChipStructs.PushAvStreamTransportClusterMetadataOptionsStruct> metadataOptions;
   public Optional<Long> expiryTime;
-  private static final long STREAM_TYPE_ID = 0L;
+  private static final long STREAM_USAGE_ID = 0L;
   private static final long VIDEO_STREAM_ID_ID = 1L;
   private static final long AUDIO_STREAM_ID_ID = 2L;
   private static final long ENDPOINT_ID_ID = 3L;
@@ -15280,7 +15280,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
   private static final long EXPIRY_TIME_ID = 10L;
 
   public PushAvStreamTransportClusterTransportOptionsStruct(
-    Integer streamType,
+    Integer streamUsage,
     Optional<Integer> videoStreamID,
     Optional<Integer> audioStreamID,
     Integer endpointID,
@@ -15292,7 +15292,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     Optional<ChipStructs.PushAvStreamTransportClusterMetadataOptionsStruct> metadataOptions,
     Optional<Long> expiryTime
   ) {
-    this.streamType = streamType;
+    this.streamUsage = streamUsage;
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
     this.endpointID = endpointID;
@@ -15307,7 +15307,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(STREAM_TYPE_ID, new UIntType(streamType)));
+    values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType())));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType())));
     values.add(new StructElement(ENDPOINT_ID_ID, new UIntType(endpointID)));
@@ -15326,7 +15326,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer streamType = null;
+    Integer streamUsage = null;
     Optional<Integer> videoStreamID = Optional.empty();
     Optional<Integer> audioStreamID = Optional.empty();
     Integer endpointID = null;
@@ -15338,10 +15338,10 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     Optional<ChipStructs.PushAvStreamTransportClusterMetadataOptionsStruct> metadataOptions = Optional.empty();
     Optional<Long> expiryTime = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == STREAM_TYPE_ID) {
+      if (element.contextTagNum() == STREAM_USAGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          streamType = castingValue.value(Integer.class);
+          streamUsage = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -15396,7 +15396,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
       }
     }
     return new PushAvStreamTransportClusterTransportOptionsStruct(
-      streamType,
+      streamUsage,
       videoStreamID,
       audioStreamID,
       endpointID,
@@ -15414,8 +15414,8 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("PushAvStreamTransportClusterTransportOptionsStruct {\n");
-    output.append("\tstreamType: ");
-    output.append(streamType);
+    output.append("\tstreamUsage: ");
+    output.append(streamUsage);
     output.append("\n");
     output.append("\tvideoStreamID: ");
     output.append(videoStreamID);
