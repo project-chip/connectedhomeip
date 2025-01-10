@@ -601,7 +601,6 @@ private:
     BitFlags<ReadHandlerFlags> mFlags;
     InteractionType mInteractionType = InteractionType::Read;
 
-    // TODO: We should shutdown the transaction when the session expires.
     SessionHolder mSessionHandle;
 };
 
