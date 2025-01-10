@@ -35,7 +35,7 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
     ///    - Iteration of the output path is done in breadth-first order: first endpoint, then cluster, then attribute.
     /// Processing works like:
     ///    - Initial state is kInvalidEndpointId/kInvalidClusterId/kInvalidAttributeId
-    ///    - First loop pass fills-in endointID, followed by clusterID, followed by attributeID
+    ///    - First loop pass fills-in endpointID, followed by clusterID, followed by attributeID
     ///    - Whenever one level is done iterating (there is no "next") the following
     ///      "higher path component" is updated:
     ///         - once a valid path exists, try to advance attributeID
