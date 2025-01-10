@@ -8,7 +8,6 @@ jobs:
   check_testing_header:
     runs-on: ubuntu-latest
     steps:
-
       - name: Check for `### Testing` section in PR
         id: check-testing
         continue-on-error: true
