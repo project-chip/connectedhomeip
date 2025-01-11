@@ -126,7 +126,8 @@ TEST_F(TestMetadataList, MetadataListConvertersWork)
         EXPECT_EQ(list[2], 3);
 
         auto list2 = std::move(list);
-        EXPECT_EQ(list.size(), 0u);
+        EXPECT_EQ(list.size(), 0u);  // NOLINT(bugprone-use-after-move)
+
         auto list2Span = list2.GetSpanValidForLifetime();
         EXPECT_EQ(list2Span.size(), 3u);
         EXPECT_EQ(list2Span[0], 1);
