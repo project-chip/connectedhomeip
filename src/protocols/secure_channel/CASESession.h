@@ -279,6 +279,25 @@ protected:
         bool responderSessionParamStructPresent = false;
     };
 
+    struct HandleSigma3Data
+    {
+        chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
+        size_t msg_r3_signed_len;
+
+        ByteSpan initiatorNOC;
+        ByteSpan initiatorICAC;
+
+        uint8_t rootCertBuf[Credentials::kMaxCHIPCertLength];
+        ByteSpan fabricRCAC;
+
+        Crypto::P256ECDSASignature tbsData3Signature;
+
+        FabricId fabricId;
+        NodeId initiatorNodeId;
+
+        Credentials::ValidationContext validContext;
+    };
+
     /**
      * @brief  Encodes a Sigma1 message into TLV format and allocates a buffer for it, which is owned by the PacketBufferHandle
      *         outparam.
@@ -342,6 +361,11 @@ protected:
      **/
     static CHIP_ERROR EncodeSigma2Resume(System::PacketBufferHandle & outMsg, EncodeSigma2ResumeInputs & inParam);
 
+    static CHIP_ERROR ParseSigma3(TLV::ContiguousBufferTLVReader & tlvReader,
+                                  Platform::ScopedMemoryBufferWithSize<uint8_t> & msgR3Encrypted);
+
+    CHIP_ERROR ParseSigma3TBEData(TLV::ContiguousBufferTLVReader & tlvReader, HandleSigma3Data & data);
+
 private:
     friend class TestCASESession;
 
@@ -385,7 +409,7 @@ private:
     static CHIP_ERROR SendSigma3b(SendSigma3Data & data, bool & cancel);
     CHIP_ERROR SendSigma3c(SendSigma3Data & data, CHIP_ERROR status);
 
-    struct HandleSigma3Data;
+    // struct HandleSigma3Data;
     CHIP_ERROR HandleSigma3a(System::PacketBufferHandle && msg);
     static CHIP_ERROR HandleSigma3b(HandleSigma3Data & data, bool & cancel);
     CHIP_ERROR HandleSigma3c(HandleSigma3Data & data, CHIP_ERROR status);
