@@ -315,10 +315,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         uint32_t attributesRead = 0;
 #endif
 
-        PeekAttributePathExpandIterator iterator(mpImEngine->GetDataModelProvider(), apReadHandler->AttributeIterationPosition());
-
         // For each path included in the interested path of the read handler...
-        while (iterator.Next(readPath))
+        for (RollbackAttributePathExpandIterator iterator(mpImEngine->GetDataModelProvider(),
+                                                          apReadHandler->AttributeIterationPosition());
+             iterator.Next(readPath); iterator.MarkCompleted())
         {
             if (!apReadHandler->IsPriming())
             {
@@ -430,7 +430,6 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             // Successfully encoded the attribute, clear the internal state.
             apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
         }
-        iterator.MarkCompleted();
 
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
         // chunks for this report.

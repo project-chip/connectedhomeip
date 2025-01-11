@@ -566,7 +566,7 @@ private:
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber = 0;
 
-    /// Iterator position state for any on-going path expansion for handling wildcard reads/subscriptions.
+    /// Iterator position state for any ongoing path expansion for handling wildcard reads/subscriptions.
     AttributePathExpandIterator::Position mAttributePathExpandPosition;
 
     Messaging::ExchangeHolder mExchangeCtx;
@@ -601,7 +601,6 @@ private:
     BitFlags<ReadHandlerFlags> mFlags;
     InteractionType mInteractionType = InteractionType::Read;
 
-    // TODO: We should shutdown the transaction when the session expires.
     SessionHolder mSessionHandle;
 };
 
