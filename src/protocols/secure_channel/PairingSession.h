@@ -100,7 +100,6 @@ public:
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteSessionParams.GetMRPConfig(); }
     const SessionParameters & GetRemoteSessionParameters() const { return mRemoteSessionParams; }
-    void SetRemoteSessionParameters(const SessionParameters & sessionParams) { mRemoteSessionParams = sessionParams; }
     void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteSessionParams.SetMRPConfig(config); }
 
     /**
@@ -130,6 +129,9 @@ protected:
     void DiscardExchange(); // Clear our reference to our exchange context pointer so that it can close itself at some later time.
 
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
+
+    void SetRemoteSessionParameters(const SessionParameters & sessionParams) { mRemoteSessionParams = sessionParams; }
+
     virtual void OnSuccessStatusReport() {}
 
     // Handle a failure StatusReport message from the server.  protocolData will
@@ -208,29 +210,17 @@ protected:
     }
 
     /**
-     * Try to decode the current element (pointed by the TLV reader) as MRP parameters.
-     * If the MRP parameters are found, mRemoteSessionParams is updated with the decoded values.
+     * Try to decode the current element (pointed by the TLV reader) as Session parameters (which include MRP parameters).
+     * If the Session parameters are found, outparam sessionParameters is updated with the decoded values.
      *
-     * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,
+     * Session parameters are optional. So, if the TLV reader is not pointing to the Session parameters,
      * the function is a noop.
      *
      * If the parameters are present, but TLV reader fails to correctly parse it, the function will
      * return the corresponding error.
      */
-    CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader);
-
-    /**
-     * Try to decode the current element (pointed by the TLV reader) as MRP parameters.
-     * If the MRP parameters are found, outparam sessionParameters is updated with the decoded values.
-     *
-     * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,
-     * the function is a noop.
-     *
-     * If the parameters are present, but TLV reader fails to correctly parse it, the function will
-     * return the corresponding error.
-     */
-    static CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader,
-                                                   SessionParameters & sessionParameters);
+    static CHIP_ERROR DecodeSessionParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader,
+                                                       SessionParameters & sessionParameters);
 
     bool IsSessionEstablishmentInProgress();
 

@@ -4649,12 +4649,12 @@ static id _Nullable DecodeEventPayloadForCameraAVStreamManagementCluster(EventId
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
-            if (cppValue.streamType.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamType.Value())];
+            if (cppValue.streamUsage.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamUsage.Value())];
             } else {
                 memberValue = nil;
             }
-            value.streamType = memberValue;
+            value.streamUsage = memberValue;
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
@@ -4760,12 +4760,12 @@ static id _Nullable DecodeEventPayloadForCameraAVStreamManagementCluster(EventId
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
-            if (cppValue.streamType.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamType.Value())];
+            if (cppValue.streamUsage.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamUsage.Value())];
             } else {
                 memberValue = nil;
             }
-            value.streamType = memberValue;
+            value.streamUsage = memberValue;
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
@@ -4890,6 +4890,18 @@ static id _Nullable DecodeEventPayloadForCameraAVStreamManagementCluster(EventId
 
         return value;
     }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForCameraAVSettingsUserLevelManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CameraAvSettingsUserLevelManagement;
+    switch (aEventId) {
     default: {
         break;
     }
@@ -5529,6 +5541,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::CameraAvStreamManagement::Id: {
         return DecodeEventPayloadForCameraAVStreamManagementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        return DecodeEventPayloadForCameraAVSettingsUserLevelManagementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WebRTCTransportProvider::Id: {
         return DecodeEventPayloadForWebRTCTransportProviderCluster(aPath.mEventId, aReader, aError);
