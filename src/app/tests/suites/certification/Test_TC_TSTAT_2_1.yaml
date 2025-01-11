@@ -730,3 +730,91 @@ tests:
           value: 0
           constraints:
               type: enum8
+
+    - label: "Step 52: TH reads the PresetTypes attribute from the DUT"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0048
+      command: "readAttribute"
+      attribute: "PresetTypes"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 53: TH reads the ScheduleTypes attribute from the DUT"
+      PICS: TSTAT.S.F07 && TSTAT.S.A0049
+      command: "readAttribute"
+      attribute: "ScheduleTypes"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 54: TH reads the NumberOfPresets attribute from the DUT"
+      PICS: TSTAT.S.F08 && TSTAT.S.A004a
+      command: "readAttribute"
+      attribute: "NumberOfPresets"
+      response:
+          constraints:
+              type: int8u
+
+    - label: "Step 55: TH reads the NumberOfSchedules attribute from the DUT"
+      PICS: TSTAT.S.F07 && TSTAT.S.A004b
+      command: "readAttribute"
+      attribute: "NumberOfSchedules"
+      response:
+          constraints:
+              type: int8u
+
+    - label: "Step 56: TH reads the NumberOfScheduleTransitions attribute from the DUT"
+      PICS: TSTAT.S.F07 && TSTAT.S.A004c
+      command: "readAttribute"
+      attribute: "NumberOfScheduleTransitions"
+      response:
+          constraints:
+              type: int8u
+
+    - label: "Step 57: TH reads the NumberOfScheduleTransitionPerDay attribute from the DUT"
+      PICS: TSTAT.S.F07 && TSTAT.S.A004d
+      command: "readAttribute"
+      attribute: "NumberOfScheduleTransitionPerDay"
+      response:
+          constraints:
+              type: int8u
+
+    - label: "Step 58: TH reads the ActivePresetHandle attribute from the DUT"
+      PICS: TSTAT.S.F08 && TSTAT.S.A004e
+      command: "readAttribute"
+      attribute: "ActivePresetHandle"
+      response:
+          constraints:
+              type: octstr
+
+    - label: "Step 59: TH reads the ActiveScheduleHandle attribute from the DUT"
+      PICS: TSTAT.S.F07 && TSTAT.S.A004f
+      command: "readAttribute"
+      attribute: "ActiveScheduleHandle"
+      response:
+          constraints:
+              type: octstr
+
+    - label: "Step 60: TH reads the Presets attribute from the DUT"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      command: "readAttribute"
+      attribute: "Presets"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 61: TH reads the Schedules attribute from the DUT"
+      PICS: TSTAT.S.F07 && TSTAT.S.A0051
+      command: "readAttribute"
+      attribute: "Schedules"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 62: TH reads the SetpointHoldExpiryTimestamp attribute from the DUT"
+      PICS: TSTAT.S.A0052
+      command: "readAttribute"
+      attribute: "SetpointHoldExpiryTimestamp"
+      response:
+          constraints:
+              type: int32u
