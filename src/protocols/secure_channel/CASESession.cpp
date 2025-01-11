@@ -1097,9 +1097,10 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", parsedSigma1.initiatorSessionId);
     SetPeerSessionId(parsedSigma1.initiatorSessionId);
 
-    // Set the MRP parameters provided in the Sigma1 message
-    if (parsedSigma1.initiatorMrpParamsPresent)
+    // Set the Session parameters provided in the Sigma1 message
+    if (parsedSigma1.initiatorSessionParamStructPresent)
     {
+        SetRemoteSessionParameters(parsedSigma1.initiatorSessionParams);
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
     }
@@ -1436,7 +1437,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
-        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(4), tlvReader));
+        SuccessOrExit(err = DecodeSessionParametersIfPresent(TLV::ContextTag(4), tlvReader, mRemoteSessionParams));
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
     }
@@ -1638,7 +1639,8 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     // Retrieve responderMRPParams if present
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
-        SuccessOrExit(err = DecodeMRPParametersIfPresent(AsTlvContextTag(Sigma2Tags::kResponderSessionParams), tlvReader));
+        SuccessOrExit(err = DecodeSessionParametersIfPresent(AsTlvContextTag(Sigma2Tags::kResponderSessionParams), tlvReader,
+                                                             mRemoteSessionParams));
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
     }
@@ -2324,8 +2326,9 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     CHIP_ERROR err = tlvReader.Next();
     if (err == CHIP_NO_ERROR && tlvReader.GetTag() == AsTlvContextTag(Sigma1Tags::kInitiatorSessionParams))
     {
-        ReturnErrorOnFailure(DecodeMRPParametersIfPresent(AsTlvContextTag(Sigma1Tags::kInitiatorSessionParams), tlvReader));
-        outParsedSigma1.initiatorMrpParamsPresent = true;
+        ReturnErrorOnFailure(DecodeSessionParametersIfPresent(AsTlvContextTag(Sigma1Tags::kInitiatorSessionParams), tlvReader,
+                                                              outParsedSigma1.initiatorSessionParams));
+        outParsedSigma1.initiatorSessionParamStructPresent = true;
 
         err = tlvReader.Next();
     }
