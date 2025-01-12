@@ -27,6 +27,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/BufferReader.h>
 #include <lib/support/DLLUtil.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
@@ -93,7 +94,7 @@ private:
         kTx,
         kRx
     };
-    CHIP_ERROR DebugPktAckSn(const PktDirect_t PktDirect, PacketBufferHandle && buf);
+    CHIP_ERROR DebugPktAckSn(const PktDirect_t PktDirect, Encoding::LittleEndian::Reader & reader, uint8_t * pHead);
 
     WiFiPAFLayer * mWiFiPafLayer; ///< [READ-ONLY] Pointer to the WiFiPAFLayer object that owns this object.
     WiFiPAFSession mSessionInfo;

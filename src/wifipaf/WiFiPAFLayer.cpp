@@ -29,6 +29,7 @@
 #include <cassert>
 #include <lib/core/CHIPEncoding.h>
 
+#undef CHIP_WIFIPAF_LAYER_DEBUG_LOGGING_ENABLED
 // Magic values expected in first 2 bytes of valid PAF transport capabilities request or response:
 // ref: 4.21.3, PAFTP Control Frames
 #define CAPABILITIES_MSG_CHECK_BYTE_1 0b01100101
@@ -76,8 +77,9 @@ public:
                 ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%lu]", i);
                 return elem;
             }
+#ifdef CHIP_WIFIPAF_LAYER_DEBUG_LOGGING_ENABLED
             {
-                WiFiPAFSession * pElmInfo = &elem->mSessionInfo;
+                const WiFiPAFSession * pElmInfo = &elem->mSessionInfo;
                 ChipLogError(WiFiPAF, "EndPoint[%lu]", i);
                 ChipLogError(WiFiPAF, "Role: [%d, %d]", pElmInfo->role, pInInfo->role);
                 ChipLogError(WiFiPAF, "id: [%u, %u]", pElmInfo->id, pInInfo->id);
@@ -89,6 +91,7 @@ public:
                 ChipLogError(WiFiPAF, "nodeId: [%lu, %lu]", pElmInfo->nodeId, pInInfo->nodeId);
                 ChipLogError(WiFiPAF, "discriminator: [%d, %d]", pElmInfo->discriminator, pInInfo->discriminator);
             }
+#endif
         }
 
         return nullptr;
