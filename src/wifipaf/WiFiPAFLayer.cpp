@@ -76,20 +76,18 @@ public:
                 ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%lu]", i);
                 return elem;
             }
-            if (memcmp(&elem->mSessionInfo, c, sizeof(WiFiPAFSession)))
             {
-                WiFiPAFSession * pElmInfo  = &elem->mSessionInfo;
-                WiFiPAFSession * pInInfo_1 = (WiFiPAFSession *) c;
+                WiFiPAFSession * pElmInfo = &elem->mSessionInfo;
                 ChipLogError(WiFiPAF, "EndPoint[%lu]", i);
-                ChipLogError(WiFiPAF, "Role: [%d, %d]", pElmInfo->role, pInInfo_1->role);
-                ChipLogError(WiFiPAF, "id: [%u, %u]", pElmInfo->id, pInInfo_1->id);
-                ChipLogError(WiFiPAF, "peer_id: [%d, %d]", pElmInfo->peer_id, pInInfo_1->peer_id);
+                ChipLogError(WiFiPAF, "Role: [%d, %d]", pElmInfo->role, pInInfo->role);
+                ChipLogError(WiFiPAF, "id: [%u, %u]", pElmInfo->id, pInInfo->id);
+                ChipLogError(WiFiPAF, "peer_id: [%d, %d]", pElmInfo->peer_id, pInInfo->peer_id);
                 ChipLogError(WiFiPAF, "ElmMac: [%02x:%02x:%02x:%02x:%02x:%02x]", pElmInfo->peer_addr[0], pElmInfo->peer_addr[1],
                              pElmInfo->peer_addr[2], pElmInfo->peer_addr[3], pElmInfo->peer_addr[4], pElmInfo->peer_addr[5]);
-                ChipLogError(WiFiPAF, "InMac: [%02x:%02x:%02x:%02x:%02x:%02x]", pInInfo_1->peer_addr[0], pInInfo_1->peer_addr[1],
-                             pInInfo_1->peer_addr[2], pInInfo_1->peer_addr[3], pInInfo_1->peer_addr[4], pInInfo_1->peer_addr[5]);
-                ChipLogError(WiFiPAF, "nodeId: [%lu, %lu]", pElmInfo->nodeId, pInInfo_1->nodeId);
-                ChipLogError(WiFiPAF, "discriminator: [%d, %d]", pElmInfo->discriminator, pInInfo_1->discriminator);
+                ChipLogError(WiFiPAF, "InMac: [%02x:%02x:%02x:%02x:%02x:%02x]", pInInfo->peer_addr[0], pInInfo->peer_addr[1],
+                             pInInfo->peer_addr[2], pInInfo->peer_addr[3], pInInfo->peer_addr[4], pInInfo->peer_addr[5]);
+                ChipLogError(WiFiPAF, "nodeId: [%lu, %lu]", pElmInfo->nodeId, pInInfo->nodeId);
+                ChipLogError(WiFiPAF, "discriminator: [%d, %d]", pElmInfo->discriminator, pInInfo->discriminator);
             }
         }
 
@@ -347,7 +345,6 @@ void WiFiPAFLayer::OnEndPointConnectComplete(WiFiPAFEndPoint * endPoint, CHIP_ER
         endPoint->mOnPafSubscribeComplete(endPoint->mAppState);
         endPoint->mOnPafSubscribeComplete = nullptr;
     }
-    return;
 }
 
 WiFiPAFTransportProtocolVersion
