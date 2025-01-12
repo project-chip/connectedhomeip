@@ -187,7 +187,7 @@ public:
     // and release from the pool.
     void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = false) override;
 
-    bool IsServerListenEnabled() override;
+    bool IsServerListenEnabled();
 
     bool CanSendToPeer(const PeerAddress & address) override
     {

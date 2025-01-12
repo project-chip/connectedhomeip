@@ -167,15 +167,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
                                                             .SetListenPort(params.listenPort)
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-                                                            ,
-                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
-                                                            .SetAddressType(IPAddressType::kIPv6)
-                                                            .SetListenPort(params.listenPort)
-                                                            .SetServerListenEnabled(false) // Initialize as a TCP Client
-#endif
 #if INET_CONFIG_ENABLE_IPV4
-                                                        ,
+                                                            ,
                                                         Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
                                                             .SetListenPort(params.listenPort)
@@ -184,8 +177,15 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                             ,
                                                         Transport::BleListenParameters(stateParams.bleLayer)
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
+                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                                                            .SetAddressType(IPAddressType::kIPv6)
+                                                            .SetListenPort(params.listenPort)
+                                                            .SetServerListenEnabled(false) // Initialize as a TCP Client
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                                                        ,
                                                         Transport::WiFiPAFListenParameters()
 #endif
                                                             ));
@@ -285,6 +285,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // Consequently, reach in set the fabric table pointer to point to the right version.
         //
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
+
+        // Disable the TCP Server based on the TCPListenParameters setting in TransportMgr Init.
+        app::DnssdServer::Instance().SetTCPServerEnabled(false);
     }
 
     stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();

@@ -107,7 +107,6 @@ public:
         return TCPDisconnectImpl<0>(conn, shouldAbort);
     }
 
-    bool IsServerListenEnabled() override { return IsServerListenEnabledImpl<0>(); }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     void Close() override { return CloseImpl<0>(); }
@@ -224,18 +223,6 @@ private:
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
     void TCPDisconnectImpl(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0)
     {}
-
-    template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    bool IsServerListenEnabledImpl()
-    {
-        return std::get<N>(mTransports).IsServerListenEnabled() || IsServerListenEnabledImpl<N + 1>();
-    }
-
-    template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    bool IsServerListenEnabledImpl()
-    {
-        return false;
-    }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /**
