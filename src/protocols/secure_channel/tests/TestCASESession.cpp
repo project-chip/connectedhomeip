@@ -1039,16 +1039,14 @@ struct Sigma2Params
     static constexpr uint16_t kResponderSessionId  = 0;
     static constexpr size_t kResponderEphPubKeyLen = 65;
     static constexpr size_t kEncrypted2Len =
-        CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + 1;              // Needs to be bigger than CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES
-    static constexpr size_t kResponderSessionParamsLen = 0; // Nonzero means include it.
-    static constexpr uint16_t kFutureProofTlvElement   = 77;
+        CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + 1; // Needs to be bigger than CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES
+    static constexpr uint16_t kFutureProofTlvElement = 77;
 
-    static constexpr uint8_t kResponderRandomTag        = 1;
-    static constexpr uint8_t kResponderSessionIdTag     = 2;
-    static constexpr uint8_t kResponderEphPubKeyTag     = 3;
-    static constexpr uint8_t kEncrypted2Tag             = 4;
-    static constexpr uint8_t kResponderSessionParamsTag = 5; // TODO SessionParams are not tested in non of ParseSigmaTests
-    static constexpr uint8_t kFutureProofTlvElementTag  = 11;
+    static constexpr uint8_t kResponderRandomTag       = 1;
+    static constexpr uint8_t kResponderSessionIdTag    = 2;
+    static constexpr uint8_t kResponderEphPubKeyTag    = 3;
+    static constexpr uint8_t kEncrypted2Tag            = 4;
+    static constexpr uint8_t kFutureProofTlvElementTag = 11;
 
     static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
 
@@ -1318,17 +1316,15 @@ struct Sigma2ResumeParams
 {
     // Purposefully not using constants like kSigmaParamRandomNumberSize that
     // the code uses, so we have a cross-check.
-    static constexpr size_t kResumptionIdLen           = 16;
-    static constexpr size_t kSigma2ResumeMICLen        = 16;
-    static constexpr uint16_t kResponderSessionId      = 0;
-    static constexpr size_t kResponderSessionParamsLen = 0; // Nonzero means include it. TODO should I remove this
-    static constexpr uint16_t kFutureProofTlvElement   = 77;
+    static constexpr size_t kResumptionIdLen         = 16;
+    static constexpr size_t kSigma2ResumeMICLen      = 16;
+    static constexpr uint16_t kResponderSessionId    = 0;
+    static constexpr uint16_t kFutureProofTlvElement = 77;
 
-    static constexpr uint8_t kResumptionIdTag           = 1;
-    static constexpr uint8_t kSigma2ResumeMICTag        = 2;
-    static constexpr uint8_t kResponderSessionIdTag     = 3;
-    static constexpr uint8_t kResponderSessionParamsTag = 4; // TODO SessionParams are not tested in non of ParseSigmaTests
-    static constexpr uint8_t kFutureProofTlvElementTag  = 11;
+    static constexpr uint8_t kResumptionIdTag          = 1;
+    static constexpr uint8_t kSigma2ResumeMICTag       = 2;
+    static constexpr uint8_t kResponderSessionIdTag    = 3;
+    static constexpr uint8_t kFutureProofTlvElementTag = 11;
 
     static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
 
@@ -1532,8 +1528,8 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
 {
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode, ScopedNodeId peerNodeId, ResumptionIdStorage * resumptionId,
                                  Crypto::P256ECDHDerivedSecret * sharedSecret) :
-        mFindMethodReturnCode(findMethodReturnCode), mPeerNodeId(peerNodeId), mResumptionId(resumptionId),
-        mSharedSecret(sharedSecret)
+        mFindMethodReturnCode(findMethodReturnCode),
+        mPeerNodeId(peerNodeId), mResumptionId(resumptionId), mSharedSecret(sharedSecret)
     {}
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode) : mFindMethodReturnCode(findMethodReturnCode) {}
     CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,

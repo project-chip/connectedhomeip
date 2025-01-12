@@ -237,26 +237,12 @@ protected:
         size_t encrypted2Length = 0;
         const ReliableMessageProtocolConfig * responderMrpConfig;
     };
-
-    struct EncodeSigma2ResumeInputs
-    {
-        ByteSpan resumptionId;
-        uint8_t sigma2ResumeMICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
-        MutableByteSpan sigma2ResumeMIC{ sigma2ResumeMICBuffer };
-        uint16_t responderSessionId;
-        const ReliableMessageProtocolConfig * responderMrpConfig;
-    };
-
     struct ParsedSigma2
     {
-        // TODO responderRandom is ByteSpan in ParsedSigma2 but is an array in EncodeSigma2Inputs
         ByteSpan responderRandom;
         uint16_t responderSessionId;
-        // TODO, If I will inherit, remember that this different from EncodeSigma2Inputs
         ByteSpan responderEphPubKey;
-
         Platform::ScopedMemoryBufferWithSize<uint8_t> msgR2Encrypted;
-        size_t encrypted2Length                 = 0;
         bool responderSessionParamStructPresent = false;
         SessionParameters responderSessionParams;
     };
@@ -269,20 +255,51 @@ protected:
         ByteSpan resumptionId;
     };
 
+    struct EncodeSigma2ResumeInputs
+    {
+        ByteSpan resumptionId;
+        uint8_t sigma2ResumeMICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
+        MutableByteSpan sigma2ResumeMIC{ sigma2ResumeMICBuffer };
+        uint16_t responderSessionId;
+        const ReliableMessageProtocolConfig * responderMrpConfig;
+    };
+
     struct ParsedSigma2Resume
     {
         ByteSpan resumptionId;
         ByteSpan sigma2ResumeMIC;
         uint16_t responderSessionId;
         SessionParameters responderSessionParams;
-        // TODO consider removing this?
         bool responderSessionParamStructPresent = false;
+    };
+
+    struct SendSigma3Data
+    {
+        FabricIndex fabricIndex;
+
+        // Use one or the other
+        const FabricTable * fabricTable;
+        const Crypto::OperationalKeystore * keystore;
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
+        size_t msg_r3_signed_len;
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Encrypted;
+        size_t msg_r3_encrypted_len;
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> icacBuf;
+        MutableByteSpan icaCert;
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
+        MutableByteSpan nocCert;
+
+        Crypto::P256ECDSASignature tbsData3Signature;
     };
 
     struct HandleSigma3Data
     {
-        chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
-        size_t msg_r3_signed_len;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> msgR3Signed;
+        size_t msgR3SignedLen;
 
         ByteSpan initiatorNOC;
         ByteSpan initiatorICAC;
@@ -366,7 +383,7 @@ protected:
     static CHIP_ERROR ParseSigma3(TLV::ContiguousBufferTLVReader & tlvReader,
                                   Platform::ScopedMemoryBufferWithSize<uint8_t> & msgR3Encrypted);
 
-    CHIP_ERROR ParseSigma3TBEData(TLV::ContiguousBufferTLVReader & tlvReader, HandleSigma3Data & data);
+    static CHIP_ERROR ParseSigma3TBEData(TLV::ContiguousBufferTLVReader & tlvReader, HandleSigma3Data & data);
 
 private:
     friend class TestCASESession;
@@ -406,12 +423,10 @@ private:
     CHIP_ERROR HandleSigma2(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma2Resume(System::PacketBufferHandle && msg);
 
-    struct SendSigma3Data;
     CHIP_ERROR SendSigma3a();
     static CHIP_ERROR SendSigma3b(SendSigma3Data & data, bool & cancel);
     CHIP_ERROR SendSigma3c(SendSigma3Data & data, CHIP_ERROR status);
 
-    // struct HandleSigma3Data;
     CHIP_ERROR HandleSigma3a(System::PacketBufferHandle && msg);
     static CHIP_ERROR HandleSigma3b(HandleSigma3Data & data, bool & cancel);
     CHIP_ERROR HandleSigma3c(HandleSigma3Data & data, CHIP_ERROR status);
