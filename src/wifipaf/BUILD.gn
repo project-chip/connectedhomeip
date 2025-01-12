@@ -21,11 +21,16 @@ if (chip_device_config_enable_wifipaf) {
     output_name = "libWiFiPAFLayer"
 
     sources = [
+      "WiFiPAFConfig.h",
       "WiFiPAFEndPoint.cpp",
+      "WiFiPAFEndPoint.h",
+      "WiFiPAFError.h",
       "WiFiPAFLayer.cpp",
       "WiFiPAFLayer.h",
       "WiFiPAFLayerDelegate.h",
+      "WiFiPAFRole.h",
       "WiFiPAFTP.cpp",
+      "WiFiPAFTP.h",
     ]
 
     cflags = [ "-Wconversion" ]
