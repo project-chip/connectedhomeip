@@ -845,7 +845,6 @@ CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
 {
     ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "+++++++++++++++++++++ entered receive");
     ChipLogDebugBufferWiFiPAFEndPoint(WiFiPAF, data);
-    DebugPktAckSn(PktDirect_t::kRx, std::move(data));
 
     CHIP_ERROR err               = CHIP_NO_ERROR;
     SequenceNumber_t receivedAck = 0;
@@ -853,6 +852,7 @@ CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
     bool didReceiveAck           = false;
     BitFlags<WiFiPAFTP::HeaderFlags> rx_flags;
     Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
+    DebugPktAckSn(PktDirect_t::kRx, std::move(data));
 
     { // This is a special handling on the first CHIPoPAF data packet, the CapabilitiesRequest.
         // If we're receiving the first inbound packet of a PAF transport connection handshake...
