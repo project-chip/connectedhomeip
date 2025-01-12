@@ -787,14 +787,12 @@ SequenceNumber_t WiFiPAFEndPoint::AdjustRemoteReceiveWindow(SequenceNumber_t las
     return static_cast<uint8_t>(newRemoteWindowBoundary - newestUnackedSentSeqNum);
 }
 
-CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t PktDirect, PacketBufferHandle && buf)
+CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t PktDirect, Encoding::LittleEndian::Reader & reader, uint8_t * pHead)
 {
 #ifdef CHIP_WIFIPAF_END_POINT_DEBUG_LOGGING_ENABLED
     BitFlags<WiFiPAFTP::HeaderFlags> rx_flags;
-    Encoding::LittleEndian::Reader reader(buf->Start(), buf->DataLength());
     CHIP_ERROR err;
-    uint8_t * pHead = buf->Start();
-    uint8_t * pAct  = nullptr;
+    uint8_t * pAct = nullptr;
     char AckBuff[4];
     uint8_t * pSn;
     uint8_t SnOffset = 0;
@@ -852,7 +850,7 @@ CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
     bool didReceiveAck           = false;
     BitFlags<WiFiPAFTP::HeaderFlags> rx_flags;
     Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
-    DebugPktAckSn(PktDirect_t::kRx, std::move(data));
+    DebugPktAckSn(PktDirect_t::kRx, reader, data->Start());
 
     { // This is a special handling on the first CHIPoPAF data packet, the CapabilitiesRequest.
         // If we're receiving the first inbound packet of a PAF transport connection handshake...
@@ -1013,7 +1011,8 @@ CHIP_ERROR WiFiPAFEndPoint::SendWrite(PacketBufferHandle && buf)
 
     ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "==> %s():", __FUNCTION__);
     ChipLogDebugBufferWiFiPAFEndPoint(WiFiPAF, buf);
-    DebugPktAckSn(PktDirect_t::kTx, std::move(buf));
+    Encoding::LittleEndian::Reader reader(buf->Start(), buf->DataLength());
+    DebugPktAckSn(PktDirect_t::kTx, reader, buf->Start());
     mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFMessageSend(mSessionInfo, std::move(buf));
 
     return CHIP_NO_ERROR;
