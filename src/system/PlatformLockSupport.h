@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <system/SystemEvent.h>
 #include <system/SystemLayer.h>
 
 namespace chip {
@@ -26,11 +25,11 @@ namespace System {
 class Layer;
 class Object;
 
-class PlatformEventing
+class PlatformLocking
 {
 public:
-    static CHIP_ERROR ScheduleLambdaBridge(System::Layer & aLayer, LambdaBridge && bridge);
-    static CHIP_ERROR StartTimer(System::Layer & aLayer, System::Clock::Timeout aTimeout);
+    static void LockMatterStack();
+    static void UnlockMatterStack();
 };
 
 } // namespace System

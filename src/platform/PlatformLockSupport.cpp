@@ -24,7 +24,7 @@
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
+#include <system/PlatformLockSupport.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
@@ -32,17 +32,17 @@ namespace System {
 
 using namespace ::chip::DeviceLayer;
 
-CHIP_ERROR PlatformEventing::ScheduleLambdaBridge(System::Layer & aLayer, LambdaBridge && bridge)
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+void PlatformLocking::LockMatterStack()
 {
-    ChipDeviceEvent event{ .Type = DeviceEventType::kChipLambdaEvent, .LambdaEvent = std::move(bridge) };
-
-    return PlatformMgr().PostEvent(&event);
+    PlatformMgr().LockChipStack();
 }
 
-CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, System::Clock::Timeout delay)
+void PlatformLocking::UnlockMatterStack()
 {
-    return PlatformMgr().StartChipTimer(delay);
+    PlatformMgr().UnlockChipStack();
 }
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 } // namespace System
 } // namespace chip
