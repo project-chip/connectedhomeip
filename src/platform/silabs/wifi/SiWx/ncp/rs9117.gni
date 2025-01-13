@@ -17,11 +17,11 @@ import("//build_overrides/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
 rs911x_src_plat = [
-  "${chip_root}/src/platform/silabs/wifi/SiWx/WifiInterface.cpp",
+  "${chip_root}/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp",
   "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/sl_si91x_ncp_utility.c",
   "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/sl_board_configuration.h",
-  "${chip_root}/src/platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.cpp",
-  "${chip_root}/src/platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h",
+  "${chip_root}/src/platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.cpp",
+  "${chip_root}/src/platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h",
   "${chip_root}/src/platform/silabs/wifi/ncp/spi_multiplex.h",
 
   # TODO : We should be using the file from the Wiseconnect SDK and not our copy of it.
