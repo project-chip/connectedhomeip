@@ -42,23 +42,10 @@
 #
 
 import asyncio
-from enum import IntEnum
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
-
-class AssociationFailureCauseEnum(IntEnum):
-    kUnknown = 0x00
-    kAssociationFailed = 0x01
-    kAuthenticationFailed = 0x02
-    kSsidNotFound = 0x03
-
-
-class ConnectionStatusEnum(IntEnum):
-    kConnected = 0x00
-    kNotConnected = 0x01
 
 
 class TC_DGWIFI_2_2(MatterBaseTest):
@@ -76,7 +63,7 @@ class TC_DGWIFI_2_2(MatterBaseTest):
         # is within the range of the defined enum (0..3).
         cause_valid = (
             hasattr(event_data, "associationFailureCause")
-            and event_data.associationFailureCause in AssociationFailureCauseEnum._value2member_map_
+            and event_data.associationFailureCause in Clusters.Objects.WiFiNetworkDiagnostics.Enums.AssociationFailureCauseEnum._value2member_map_
         )
 
         # Check for the `status` attribute and validate it's within the typical 802.11 range (0..65535).
@@ -94,7 +81,7 @@ class TC_DGWIFI_2_2(MatterBaseTest):
         # and if it's within the range of the defined enum.
         return (
             hasattr(event_data, "connectionStatus")
-            and event_data.connectionStatus in ConnectionStatusEnum._value2member_map_
+            and event_data.connectionStatus in Clusters.Objects.WiFiNetworkDiagnostics.Enums.ConnectionStatusEnum._value2member_map_
         )
 
     #
