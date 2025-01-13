@@ -94,7 +94,7 @@ class TC_DGWIFI_2_1(MatterBaseTest):
 
         if value is not None:
             asserts.assert_true(self.is_valid_bssid(value),
-                                f"{field_name} should be a valid BSSID string (e.g., '00:11:22:33:44:55') or None/NullValue.")        
+                                f"{field_name} should be a valid BSSID string (e.g., '00:11:22:33:44:55') or None/NullValue.")
 
     def assert_valid_uint64(self, value, field_name):
         """Asserts that the value is a valid uint64 or None (if attribute can return NULL)."""
