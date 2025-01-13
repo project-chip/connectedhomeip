@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@
 #include <transport/raw/WiFiPAF.h>
 
 using namespace chip::System;
+using namespace chip::WiFiPAF;
 
 namespace chip {
 namespace Transport {
@@ -38,7 +39,7 @@ CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
     ChipLogDetail(Inet, "WiFiPAFBase::Init - setting/overriding transport");
     mWiFiPAFLayer = DeviceLayer::ConnectivityMgr().GetWiFiPAF();
     SetWiFiPAFLayerTransportToSelf();
-    mWiFiPAFLayer->SetWiFiPAFState(chip::WiFiPAF::State::kInitialized);
+    mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
 
     if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
     {
@@ -65,12 +66,12 @@ CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, PacketBufferHandle && msgBuf)
 {
     VerifyOrReturnError(address.GetTransportType() == Type::kWiFiPAF, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != chip::WiFiPAF::State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
 
-    chip::WiFiPAF::WiFiPAFSession * pTxInfo = mWiFiPAFLayer->GetPAFInfo(address.GetRemoteId());
+    WiFiPAFSession * pTxInfo = mWiFiPAFLayer->GetPAFInfo(address.GetRemoteId());
     if (pTxInfo == nullptr)
     {
         /*
@@ -88,13 +89,12 @@ bool WiFiPAFBase::CanSendToPeer(const Transport::PeerAddress & address)
 {
     if (mWiFiPAFLayer != nullptr)
     {
-        return (mWiFiPAFLayer->GetWiFiPAFState() != chip::WiFiPAF::State::kNotReady) &&
-            (address.GetTransportType() == Type::kWiFiPAF);
+        return (mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady) && (address.GetTransportType() == Type::kWiFiPAF);
     }
     return false;
 }
 
-void WiFiPAFBase::OnWiFiPAFMessageReceived(chip::WiFiPAF::WiFiPAFSession & RxInfo, System::PacketBufferHandle && buffer)
+void WiFiPAFBase::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBufferHandle && buffer)
 {
     auto pPafInfo = mWiFiPAFLayer->GetPAFInfo(RxInfo.id);
     if (pPafInfo == nullptr)
@@ -124,15 +124,23 @@ void WiFiPAFBase::OnWiFiPAFMessageReceived(chip::WiFiPAF::WiFiPAFSession & RxInf
     HandleMessageReceived(Transport::PeerAddress(Transport::Type::kWiFiPAF, pPafInfo->nodeId), std::move(buffer));
 }
 
-CHIP_ERROR WiFiPAFBase::WiFiPAFMessageSend(chip::WiFiPAF::WiFiPAFSession & TxInfo, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR WiFiPAFBase::WiFiPAFMessageSend(WiFiPAFSession & TxInfo, PacketBufferHandle && msgBuf)
 {
-    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != chip::WiFiPAF::State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     DeviceLayer::ConnectivityMgr().WiFiPAFSend(TxInfo, std::move(msgBuf));
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiPAFBase::SendAfterConnect(System::PacketBufferHandle && msg)
+CHIP_ERROR WiFiPAFBase::WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)
+{
+    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(SessionInfo.id, SessionInfo.role);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WiFiPAFBase::SendAfterConnect(PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
